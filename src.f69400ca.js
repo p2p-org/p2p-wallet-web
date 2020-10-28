@@ -32265,7 +32265,7 @@ function createMemoryHistory(a) {
 }
 
 ;
-},{"@babel/runtime/helpers/esm/extends":"../node_modules/@babel/runtime/helpers/esm/extends.js"}],"../node_modules/react-router-dom/node_modules/react-router/index.js":[function(require,module,exports) {
+},{"@babel/runtime/helpers/esm/extends":"../node_modules/@babel/runtime/helpers/esm/extends.js"}],"../node_modules/react-router/index.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -33249,7 +33249,7 @@ function useSearchParams(a) {
 }
 
 ;
-},{"react-router":"../node_modules/react-router-dom/node_modules/react-router/index.js","history":"../node_modules/history/index.js","prop-types":"../node_modules/prop-types/index.js","react":"../node_modules/react/index.js"}],"../node_modules/linaria/node_modules/core-js/internals/global.js":[function(require,module,exports) {
+},{"react-router":"../node_modules/react-router/index.js","history":"../node_modules/history/index.js","prop-types":"../node_modules/prop-types/index.js","react":"../node_modules/react/index.js"}],"../node_modules/linaria/node_modules/core-js/internals/global.js":[function(require,module,exports) {
 var global = arguments[3];
 var check = function (it) {
   return it && it.Math == Math && it;
@@ -88400,7 +88400,7 @@ var Access = function Access() {
     type: "submit",
     disabled: error
   }, "Submit"), /*#__PURE__*/_react.default.createElement(LinkStyled, {
-    to: "".concat(undefined, "/create")
+    to: "/create"
   }, "Create Wallet")));
 };
 
@@ -88487,7 +88487,7 @@ var Create = function Create() {
   }), /*#__PURE__*/_react.default.createElement("button", {
     type: "submit"
   }, "Submit"), /*#__PURE__*/_react.default.createElement(LinkStyled, {
-    to: "".concat(undefined, "/access")
+    to: "/access"
   }, "Access Wallet")));
 };
 
@@ -88602,11 +88602,11 @@ var NetworkSelect = function NetworkSelect() {
   return /*#__PURE__*/_react.default.createElement("select", {
     value: entrypoint,
     onChange: handleChange
-  }, _constants.NETWORKS.map(function (url) {
+  }, _constants.NETWORKS.map(function (network) {
     return /*#__PURE__*/_react.default.createElement("option", {
-      key: url,
-      value: url
-    }, url);
+      key: network.name,
+      value: network.url
+    }, network.name);
   }));
 };
 
@@ -91791,9 +91791,9 @@ var Box = /*#__PURE__*/(0, _react2.styled)("div")({
 
 var Home = function Home() {
   return /*#__PURE__*/_react.default.createElement(Wrapper, null, /*#__PURE__*/_react.default.createElement(Box, null, /*#__PURE__*/_react.default.createElement(_reactRouterDom.Link, {
-    to: "".concat(undefined, "/create")
-  }, "Create Wallet"), ' ', /*#__PURE__*/_react.default.createElement(_reactRouterDom.Link, {
-    to: "".concat(undefined, "/access")
+    to: "/create"
+  }, "Create Wallet"), " ", /*#__PURE__*/_react.default.createElement(_reactRouterDom.Link, {
+    to: "/access"
   }, "Access Wallet")));
 };
 
@@ -91941,7 +91941,7 @@ var Container = /*#__PURE__*/(0, _react2.styled)("div")({
 
 var App = function App() {
   return /*#__PURE__*/_react.default.createElement(Wrapper, null, /*#__PURE__*/_react.default.createElement(Container, null, /*#__PURE__*/_react.default.createElement(_reactRouterDom.BrowserRouter, null, /*#__PURE__*/_react.default.createElement(_reactRouterDom.Routes, {
-    basename: undefined
+    basename: undefined || ''
   }, /*#__PURE__*/_react.default.createElement(_reactRouterDom.Route, {
     path: "/",
     element: /*#__PURE__*/_react.default.createElement(_pages.Home, null)
@@ -92251,7 +92251,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "61757" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "61935" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
