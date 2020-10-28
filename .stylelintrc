@@ -1,0 +1,24 @@
+{
+  "plugins": [
+    "stylelint-prettier"
+  ],
+  "extends": [
+    "stylelint-config-standard",
+    "stylelint-config-rational-order",
+    "stylelint-prettier/recommended",
+    "linaria/stylelint-config"
+  ],
+  "rules": {
+    "prettier/prettier": true,
+    "block-no-empty": null,
+    "declaration-empty-line-before": null,
+    "indentation": null,
+    "max-empty-lines": null,
+    "selector-pseudo-class-no-unknown": [true, {
+      "ignorePseudoClasses": ["global"]
+    }],
+    "plugin/rational-order": [true, {
+      "empty-line-between-groups": true
+    }]
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "presets": [
+    "@babel/preset-env",
+    "@babel/preset-typescript",
+    "@babel/preset-react",
+    "linaria/babel"
+  ],
+  "plugins": [
+    [
+      "module-resolver",
+      {
+        "root": ["./src"],
+        "alias": {
+          "config": "./src/config",
+          "utils": "./src/utils",
+          "store": "./src/store",
+          "pages": "./src/pages",
+          "components": "./src/components"
+        }
+      }
+    ],
+    "@babel/transform-runtime",
+    "@reatom/babel-plugin"
+  ]
+}

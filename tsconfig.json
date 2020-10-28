@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "allowJs": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "isolatedModules": true,
+    "resolveJsonModule": true,
+    "jsx": "react",
+    "lib": ["es6","dom"],
+    "moduleResolution": "node",
+    "noEmit": true,
+    "strict": true,
+    "module": "esnext",
+    "target": "esnext",
+    "baseUrl": ".",
+    "paths": {
+      "*": ["src/*"]
+    }
+  },
+  "include": ["src/**/*.ts", "src/**/*.tsx", ".eslintrc.js","commitlint.config.js", "linaria.config.js"],
+  "exclude": ["node_modules"]
+}
