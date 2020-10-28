@@ -88400,7 +88400,7 @@ var Access = function Access() {
     type: "submit",
     disabled: error
   }, "Submit"), /*#__PURE__*/_react.default.createElement(LinkStyled, {
-    to: "/create"
+    to: "".concat(undefined, "/create")
   }, "Create Wallet")));
 };
 
@@ -88487,7 +88487,7 @@ var Create = function Create() {
   }), /*#__PURE__*/_react.default.createElement("button", {
     type: "submit"
   }, "Submit"), /*#__PURE__*/_react.default.createElement(LinkStyled, {
-    to: "/access"
+    to: "".concat(undefined, "/access")
   }, "Access Wallet")));
 };
 
@@ -91791,9 +91791,9 @@ var Box = /*#__PURE__*/(0, _react2.styled)("div")({
 
 var Home = function Home() {
   return /*#__PURE__*/_react.default.createElement(Wrapper, null, /*#__PURE__*/_react.default.createElement(Box, null, /*#__PURE__*/_react.default.createElement(_reactRouterDom.Link, {
-    to: "/create"
-  }, "Create Wallet"), " ", /*#__PURE__*/_react.default.createElement(_reactRouterDom.Link, {
-    to: "/access"
+    to: "".concat(undefined, "/create")
+  }, "Create Wallet"), ' ', /*#__PURE__*/_react.default.createElement(_reactRouterDom.Link, {
+    to: "".concat(undefined, "/access")
   }, "Access Wallet")));
 };
 
