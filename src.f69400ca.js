@@ -88559,16 +88559,16 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 
 var NETWORKS = [{
   name: 'mainnet-beta',
-  url: web3.clusterApiUrl('mainnet-beta')
+  endpoint: web3.clusterApiUrl('mainnet-beta')
 }, {
   name: 'testnet',
-  url: web3.clusterApiUrl('testnet')
+  endpoint: web3.clusterApiUrl('testnet')
 }, {
   name: 'devnet',
-  url: web3.clusterApiUrl('devnet')
+  endpoint: web3.clusterApiUrl('devnet')
 }, {
-  name: 'local',
-  url: 'http://localhost:8899'
+  name: 'localnet',
+  endpoint: 'http://localhost:8899'
 }];
 exports.NETWORKS = NETWORKS;
 },{"@solana/web3.js":"../node_modules/@solana/web3.js/lib/index.esm.js"}],"components/common/NetworkSelect/NetworkSelect.tsx":[function(require,module,exports) {
@@ -88605,7 +88605,7 @@ var NetworkSelect = function NetworkSelect() {
   }, _constants.NETWORKS.map(function (network) {
     return /*#__PURE__*/_react.default.createElement("option", {
       key: network.name,
-      value: network.url
+      value: network.endpoint
     }, network.name);
   }));
 };
@@ -92045,7 +92045,7 @@ function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (O
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { (0, _defineProperty2.default)(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
 
 var initialState = {
-  entrypoint: localStorage.getItem('entrypoint') || _constants.NETWORKS[0].url,
+  entrypoint: localStorage.getItem('entrypoint') || _constants.NETWORKS[0].endpoint,
   feeCalculator: undefined,
   minBalanceForRentException: undefined,
   secretKey: undefined,
@@ -92251,7 +92251,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "61935" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "51980" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
