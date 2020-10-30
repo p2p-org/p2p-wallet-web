@@ -1,6 +1,6 @@
 import React, { FunctionComponent, useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 
 import * as bip39 from 'bip39';
 import { styled } from 'linaria/react';
@@ -26,7 +26,7 @@ const LinkStyled = styled(Link)`
 `;
 
 export const Create: FunctionComponent = () => {
-  const navigate = useNavigate();
+  const history = useHistory();
   const dispatch = useDispatch();
   const [password, setPassword] = useState(bip39.generateMnemonic());
 
@@ -39,7 +39,7 @@ export const Create: FunctionComponent = () => {
     dispatch(createAccount(password));
 
     setTimeout(() => {
-      navigate('/dashboard');
+      history.push('/dashboard');
     }, 0);
   };
 

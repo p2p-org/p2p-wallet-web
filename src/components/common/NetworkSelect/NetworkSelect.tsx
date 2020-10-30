@@ -14,9 +14,9 @@ export const NetworkSelect: FunctionComponent = () => {
 
   return (
     <select value={entrypoint} onChange={handleChange}>
-      {NETWORKS.map((url) => (
-        <option key={url} value={url}>
-          {url}
+      {NETWORKS.map((network) => (
+        <option key={network.name} value={network.endpoint}>
+          {network.name}
         </option>
       ))}
     </select>

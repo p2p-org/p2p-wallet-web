@@ -29,7 +29,7 @@ type State = {
 };
 
 const initialState: State = {
-  entrypoint: localStorage.getItem('entrypoint') || NETWORKS[0].url,
+  entrypoint: localStorage.getItem('entrypoint') || NETWORKS[0].endpoint,
   feeCalculator: undefined,
   minBalanceForRentException: undefined,
   secretKey: undefined,

@@ -1,7 +1,7 @@
 import React, { FunctionComponent } from 'react';
 import { useSelector } from 'react-redux';
 import { RouteProps } from 'react-router';
-import { Navigate, useLocation } from 'react-router-dom';
+import { Redirect, useLocation } from 'react-router-dom';
 
 import { RootState } from 'store/types';
 
@@ -12,11 +12,7 @@ export const ProtectedRoute: FunctionComponent<{
   redirect: string;
 }> = ({ element, children, allow, redirect }) => {
   const location = useLocation();
-  return allow ? (
-    element || children
-  ) : (
-    <Navigate to={redirect} replace state={{ from: location.pathname }} />
-  );
+  return allow ? element || children : <Redirect to={redirect} from={location.pathname} />;
 };
 
 // ProtectedRoute is used to create specific types of protected routes like this...

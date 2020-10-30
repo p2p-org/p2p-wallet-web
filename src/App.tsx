@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 
 import { styled } from 'linaria/react';
 
@@ -21,13 +21,13 @@ export const App: React.FC = () => {
   return (
     <Wrapper>
       <Container>
-        <Router>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/create" element={<Create />} />
-            <Route path="/access" element={<Access />} />
+        <Router basename={process.env.BASENAME || ''}>
+          <Switch>
+            <Route path="/" component={Home} exact />
+            <Route path="/create" component={Create} />
+            <Route path="/access" component={Access} />
             <AuthRequiredRoute path="/dashboard" element={<Dashboard />} />
-          </Routes>
+          </Switch>
         </Router>
       </Container>
     </Wrapper>

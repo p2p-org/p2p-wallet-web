@@ -5,8 +5,8 @@
   "license": "MIT",
   "scripts": {
     "start": "parcel -p 3000 src/index.html --out-dir dist",
-    "build": "parcel build src/index.html --out-dir dist",
-    "deploy": "npm run build && gh-pages -d dist",
+    "build": "parcel build src/index.html --out-dir dist --public-url /p2p-wallet-web",
+    "deploy": "BASENAME=/p2p-wallet-web npm run build && gh-pages -d dist",
     "lint:fix": "eslint src/ --ext js,.jsx,.ts,.tsx --fix"
   },
   "dependencies": {
@@ -25,7 +25,7 @@
     "react-loading-skeleton": "^2.1.1",
     "react-redux": "^7.2.1",
     "react-router": "^5.2.0",
-    "react-router-dom": "^6.0.0-beta.0",
+    "react-router-dom": "^5.2.0",
     "redux": "^3.1.0 || ^4.0.0",
     "redux-devtools-extension": "^2.13.8",
     "redux-thunk": "^2.3.0",
@@ -46,11 +46,13 @@
     "@commitlint/config-conventional": "^8.3.4",
     "@reatom/babel-plugin": "^1.0.0",
     "@types/classnames": "^2.2.10",
+    "@types/history": "^4.7.8",
     "@types/lodash.throttle": "^4.1.6",
     "@types/react": "^16.9.53",
     "@types/react-dom": "^16.9.8",
     "@types/react-redux": "^7.1.9",
     "@types/react-router": "^5.1.8",
+    "@types/react-router-dom": "^5.1.6",
     "@typescript-eslint/eslint-plugin": "^4.5.0",
     "@typescript-eslint/parser": "^4.5.0",
     "babel-plugin-module-resolver": "^4.0.0",
