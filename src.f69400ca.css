@@ -605,9 +605,9 @@ textarea,
 .LogoLink_l1ekikc4{color:#000;font-weight:bold;font-size:22px;line-height:120%;-webkit-text-decoration:none;text-decoration:none;}
 .Nav_n17m3d8c{display:grid;grid-auto-flow:column;grid-gap:40px;padding:0 16px;}
 .NavLink_n1gyjr0u{color:rgba(0,0,0,0.5);font-size:14px;line-height:140%;-webkit-text-decoration:none;text-decoration:none;}.NavLink_n1gyjr0u:hover{color:#000;}
-.HeaderAuth_h1r08nhz{display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;-webkit-align-items:center;-webkit-box-align:center;-ms-flex-align:center;align-items:center;}
-.Avatar_a1pmujzi{width:36px;height:36px;background:#c4c4c4;border-radius:50%;cursor:pointer;}
-.Username_u1hsvjbd{margin-left:16px;font-weight:500;font-size:14px;line-height:120%;cursor:pointer;}
+.HeaderAuth_h1r08nhz{display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;-webkit-align-items:center;-webkit-box-align:center;-ms-flex-align:center;align-items:center;cursor:pointer;}
+.Avatar_a1pmujzi{width:36px;height:36px;background:#c4c4c4;border-radius:50%;}
+.Username_u1hsvjbd{margin-left:16px;font-weight:500;font-size:14px;line-height:120%;}
 
 .Wrapper_w1eg9fgu{display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;-webkit-box-pack:justify;-webkit-justify-content:space-between;-ms-flex-pack:justify;justify-content:space-between;}
 .Actions_a1ua3cff{display:grid;grid-auto-flow:column;grid-gap:10px;}
@@ -646,7 +646,7 @@ textarea,
 
 .Wrapper_w10mvusw{display:grid;grid-gap:10px;}
 
-.WrapperCard_w1yxw71e{display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;}
+.WrapperCard_w1yxw71e{display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;cursor:pointer;}
 .Avatar_a1fck7wo{width:56px;height:56px;background:#c4c4c4;border-radius:50%;}
 .Content_c1ugvx7z{-webkit-flex:1;-ms-flex:1;flex:1;margin-left:20px;}
 .Top_t16pq9gi{display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;-webkit-box-pack:justify;-webkit-justify-content:space-between;-ms-flex-pack:justify;justify-content:space-between;font-weight:500;font-size:18px;line-height:140%;}
