@@ -1,19 +1,24 @@
 import React, { FunctionComponent } from 'react';
 
+import classNames from 'classnames';
 import { styled } from 'linaria/react';
 
 const Wrapper = styled.div`
-  padding: 24px 48px;
+  padding: 20px;
 
-  background-color: #fff;
-  border-radius: 1.25rem;
-  box-shadow: 0 0 25px rgba(104, 103, 140, 0.15);
+  background: #fff;
+  border-radius: 10px;
+
+  &.withShadow {
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.05);
+  }
 `;
 
 type Props = {
-  children: React.ReactNode;
+  withShadow?: boolean;
+  className?: string;
 };
 
-export const Card: FunctionComponent<Props> = ({ children }) => {
-  return <Wrapper>{children}</Wrapper>;
+export const Card: FunctionComponent<Props> = ({ withShadow = false, children, className }) => {
+  return <Wrapper className={classNames(className, { withShadow })}>{children}</Wrapper>;
 };

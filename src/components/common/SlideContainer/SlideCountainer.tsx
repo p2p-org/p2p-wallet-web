@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react';
 
-import classnames from 'classnames';
+import classNames from 'classnames';
 import { styled } from 'linaria/react';
 import throttle from 'lodash.throttle';
 
@@ -191,7 +191,7 @@ export class SlideContainer extends PureComponent<React.HTMLAttributes<HTMLDivEl
 
     return (
       <Root
-        className={classnames(className, { leftshade: Boolean(left), rightshade: Boolean(right) })}>
+        className={classNames(className, { leftshade: Boolean(left), rightshade: Boolean(right) })}>
         {left ? <LeftArrowContainer onClick={this.onLeftClick} /> : undefined}
         <Wrapper ref={this.wrapperRef} onScroll={this.renderLazy}>
           <Content ref={this.contentRef}>{children}</Content>

@@ -12,6 +12,7 @@ import {
   getConfirmedTransactionAsyncAction,
   requestAirdropAsyncAction,
 } from 'store/actions';
+import { str2ab } from 'utils/buffers';
 
 type State = {
   readonly entrypoint: string;
@@ -32,8 +33,12 @@ const initialState: State = {
   entrypoint: localStorage.getItem('entrypoint') || NETWORKS[0].endpoint,
   feeCalculator: undefined,
   minBalanceForRentException: undefined,
-  secretKey: undefined,
-  account: undefined,
+  secretKey: localStorage.getItem('secretKey') || undefined,
+  account: localStorage.getItem('secretKey')
+    ? new web3.Account(
+        new TextDecoder('utf-8').decode(new ArrayBuffer(localStorage.getItem('secretKey'))),
+      )
+    : undefined,
   balanceStatus: 'idle',
   balance: 0,
   airdropStatus: 'idle',

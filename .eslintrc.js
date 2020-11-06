@@ -18,6 +18,8 @@ module.exports = {
   rules: {
     'consistent-return': 'off',
     'no-void': 'off',
+    'no-plusplus': 'off',
+    'react/jsx-props-no-spreading': 'off',
     'react/state-in-constructor': 'off',
     '@typescript-eslint/explicit-module-boundary-types': 'off',
 

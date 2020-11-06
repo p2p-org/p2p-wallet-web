@@ -1,3 +1,4 @@
+import * as web3 from '@solana/web3.js';
 import * as bip39 from 'bip39';
 import nacl from 'tweetnacl';
 
@@ -57,5 +58,6 @@ export const createAccount = (mnemonic: string): AppThunk => async (dispatch) =>
   const seed = await bip39.mnemonicToSeed(mnemonic);
   const keyPair = nacl.sign.keyPair.fromSeed(seed.slice(0, 32));
 
+  localStorage.setItem('secretKey', new TextEncoder('utf-8').encode(keyPair.secretKey.toString()));
   dispatch(createAccountAction(keyPair.secretKey));
 };
