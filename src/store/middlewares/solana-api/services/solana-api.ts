@@ -1,5 +1,7 @@
 import * as web3 from '@solana/web3.js';
 
+const DEFAULT_COMMITMENT: web3.Commitment = 'recent';
+
 class ApiSolanaServiceSingletone {
   connection: web3.Connection | undefined;
 
@@ -8,7 +10,7 @@ class ApiSolanaServiceSingletone {
   }
 
   changeEntrypoint(entrypoint: string) {
-    this.connection = new web3.Connection(entrypoint);
+    this.connection = new web3.Connection(entrypoint, DEFAULT_COMMITMENT);
 
     return this;
   }

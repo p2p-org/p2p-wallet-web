@@ -1,6 +1,6 @@
 import { createReducer } from 'typesafe-actions';
 
-import { changeEntrypointAction } from 'store/actions';
+import { changeEntrypointAction } from 'store/commands';
 
 type State = {
   readonly entrypoint: string;

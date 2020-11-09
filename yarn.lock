@@ -1342,6 +1342,11 @@
     "@parcel/utils" "^1.11.0"
     physical-cpu-count "^2.0.0"
 
+"@reatom/babel-plugin@^1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@reatom/babel-plugin/-/babel-plugin-1.0.0.tgz#d3657e937071dbfd10f53c6a048dadbd08917976"
+  integrity sha512-rd8JMy27tMtz3/BVt+XN0mIF3RLD4WtjWggSPgAphNu6vpT7pVA6hAHLvPl1W+c+eVx1rpAegReZm0MZjZSRNw==
+
 "@solana/web3.js@^0.81.0":
   version "0.81.0"
   resolved "https://registry.yarnpkg.com/@solana/web3.js/-/web3.js-0.81.0.tgz#40d5dbe6c481eac8505668c5b20c44fe89e676e6"

@@ -1,11 +1,6 @@
 import * as web3 from '@solana/web3.js';
 import * as BufferLayout from 'buffer-layout';
 
-import { SOLANA_API } from 'store/middlewares';
-import { ApiSolanaService } from 'store/middlewares/solana-api/services';
-import { AppThunk } from 'store/types';
-import { asyncTimeout } from 'utils/common';
-
 import {
   getBalanceAsyncAction,
   getConfirmedSignaturesForAddressAsyncAction,
@@ -13,7 +8,11 @@ import {
   getProgramAccountsAsyncAction,
   requestAirdropAsyncAction,
   transferAsyncAction,
-} from '..';
+} from 'store/commands';
+import { SOLANA_API } from 'store/middlewares';
+import { ApiSolanaService } from 'store/middlewares/solana-api/services';
+import { AppThunk } from 'store/types';
+import { asyncTimeout } from 'utils/common';
 
 export const transfer = (toPublicKey: string, lamports: number): AppThunk => (
   dispatch,
@@ -168,11 +167,9 @@ const ACCOUNT_LAYOUT = BufferLayout.struct([
   BufferLayout.blob(93),
 ]);
 
-export const getOwnedTokenAccounts = (commitment?: web3.Commitment): AppThunk => (
-  dispatch,
-  getState,
-) => {
+export const getOwnedTokenAccounts = (): AppThunk => (dispatch, getState) => {
   const publicKey = getState().data.blockchain.account?.publicKey;
+  const commitment = ApiSolanaService.getConnection()?.commitment;
 
   if (!publicKey) {
     // TODO: check auth

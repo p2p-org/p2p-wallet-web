@@ -3,7 +3,7 @@ import { ActionType, StateType } from 'typesafe-actions';
 
 import { rootReducer } from 'store/reducers';
 
-export type RootAction = ActionType<typeof import('./actions')>;
+export type RootAction = ActionType<typeof import('./commands')>;
 export type RootState = StateType<typeof rootReducer>;
 
 export type AppThunk<ReturnType = void> = ThunkAction<ReturnType, RootState, unknown, RootAction>;

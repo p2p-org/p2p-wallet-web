@@ -3,14 +3,14 @@ import * as bip39 from 'bip39';
 import nacl from 'tweetnacl';
 
 import { getBalance } from 'store/actions/solana';
-import { AppAsyncThunk, AppThunk } from 'store/types';
-
 import {
   changeEntrypointAction,
   changeFeeCalculatorAction,
   changeMinBalanceForRentExceptionAction,
   createAccountAction,
-} from '..';
+} from 'store/commands';
+import { AppAsyncThunk, AppThunk } from 'store/types';
+
 import { ApiSolanaService } from '../../middlewares/solana-api/services';
 
 export const establishConnection = (entrypoint?: string): AppAsyncThunk<void> => async (

@@ -11,8 +11,7 @@ import {
   getConfirmedSignaturesForAddressAsyncAction,
   getConfirmedTransactionAsyncAction,
   requestAirdropAsyncAction,
-} from 'store/actions';
-import { str2ab } from 'utils/buffers';
+} from 'store/commands';
 
 type State = {
   readonly entrypoint: string;
