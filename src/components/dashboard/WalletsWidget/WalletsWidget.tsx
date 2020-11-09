@@ -1,10 +1,13 @@
 import React, { FunctionComponent } from 'react';
-import { Link } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
 
 import { styled } from 'linaria/react';
 
 import { WalletList } from 'components/common/WalletList';
 import { Widget } from 'components/common/Widget';
+import { Button } from 'components/ui';
+import { openModal } from 'store/actions/modals';
+import { SHOW_MODAL_ADD_COIN } from 'store/constants/modalTypes';
 
 const Wrapper = styled.div``;
 
@@ -28,8 +31,20 @@ const ITEMS = [
 type Props = {};
 
 export const WalletsWidget: FunctionComponent<Props> = (props) => {
+  const dispatch = useDispatch();
+
+  const handleAddCoinClick = () => {
+    dispatch(openModal(SHOW_MODAL_ADD_COIN));
+  };
+
   return (
-    <Widget title="Wallets" action={<Link to="/">+ Add coin</Link>}>
+    <Widget
+      title="Wallets"
+      action={
+        <Button link onClick={handleAddCoinClick}>
+          + Add coin
+        </Button>
+      }>
       <WalletList items={ITEMS} />
     </Widget>
   );

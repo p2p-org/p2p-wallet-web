@@ -49,6 +49,7 @@ const Top = styled.div`
 const Bottom = styled.div`
   display: flex;
   justify-content: space-between;
+  margin-top: 6px;
 
   color: ${rgba('#000', 0.3)};
 `;

@@ -1,0 +1,1 @@
+export const SHOW_MODAL_ADD_COIN = 'SHOW_MODAL_ADD_COIN';

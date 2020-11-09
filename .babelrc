@@ -19,7 +19,6 @@
         }
       }
     ],
-    "@babel/transform-runtime",
-    "@reatom/babel-plugin"
+    "@babel/transform-runtime"
   ]
 }

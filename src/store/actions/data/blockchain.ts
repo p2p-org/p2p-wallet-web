@@ -34,6 +34,13 @@ export const getConfirmedTransactionAsyncAction = createAsyncAction(
   'SOLANA_GET_CONFIRMED_TRANSACTION_ACTION_CANCEL',
 )<unknown, [web3.ConfirmedTransaction, { signature: string }], Error>();
 
+export const getProgramAccountsAsyncAction = createAsyncAction(
+  'SOLANA_GET_PROGRAM_ACCOUNTS_REQUEST',
+  'SOLANA_GET_PROGRAM_ACCOUNTS_SUCCESS',
+  'SOLANA_GET_PROGRAM_ACCOUNTS_FAILURE',
+  'SOLANA_GET_PROGRAM_ACCOUNTS_CANCEL',
+)<unknown, [web3.ConfirmedTransaction, { signature: string }], Error>();
+
 export const requestAirdropAsyncAction = createAsyncAction(
   'SOLANA_REQUEST_AIRDROP_REQUEST',
   'SOLANA_REQUEST_AIRDROP_SUCCESS',

@@ -5,13 +5,13 @@
     "esModuleInterop": true,
     "isolatedModules": true,
     "resolveJsonModule": true,
-    "jsx": "react",
-    "lib": ["es6","dom"],
     "moduleResolution": "node",
     "noEmit": true,
     "strict": true,
-    "module": "esnext",
     "target": "esnext",
+    "module": "esnext",
+    "lib": ["es6","dom"],
+    "jsx": "react",
     "baseUrl": ".",
     "paths": {
       "*": ["src/*"]

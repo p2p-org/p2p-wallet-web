@@ -2,7 +2,7 @@ import React, { FunctionComponent } from 'react';
 
 import { styled } from 'linaria/react';
 
-import { Button } from 'components/common/Button';
+import { Button } from 'components/ui';
 
 const Wrapper = styled.div`
   display: flex;

@@ -13,7 +13,7 @@ import {
 } from '..';
 import { ApiSolanaService } from '../../middlewares/solana-api/services';
 
-export const establishConnection = (entrypoint?: string): AppAsyncThunk => async (
+export const establishConnection = (entrypoint?: string): AppAsyncThunk<void> => async (
   dispatch,
   getState,
 ) => {

@@ -1,4 +1,5 @@
 import * as web3 from '@solana/web3.js';
+import * as BufferLayout from 'buffer-layout';
 
 import { SOLANA_API } from 'store/middlewares';
 import { ApiSolanaService } from 'store/middlewares/solana-api/services';
@@ -9,6 +10,7 @@ import {
   getBalanceAsyncAction,
   getConfirmedSignaturesForAddressAsyncAction,
   getConfirmedTransactionAsyncAction,
+  getProgramAccountsAsyncAction,
   requestAirdropAsyncAction,
   transferAsyncAction,
 } from '..';
@@ -130,4 +132,64 @@ export const getConfirmedTransaction = (signature: web3.TransactionSignature): A
   } catch (error) {
     dispatch(getConfirmedTransactionAsyncAction.failure(error));
   }
+};
+
+export const getProgramAccounts = (
+  programId: web3.PublicKey,
+  commitment?: web3.Commitment,
+  filters?: any,
+): AppThunk => async (dispatch) => {
+  try {
+    // const result = await ApiSolanaService.getConnection().getProgramAccounts(programId, commitment);
+    const result = await ApiSolanaService.getConnection()._rpcRequest('getProgramAccounts', [
+      programId.toBase58(),
+      {
+        commitment,
+        filters,
+      },
+    ]);
+
+    if (result.error) {
+      throw new Error(result.error);
+    }
+
+    dispatch(getProgramAccountsAsyncAction.success(result.result));
+  } catch (error) {
+    dispatch(getProgramAccountsAsyncAction.failure(error.toString()));
+  }
+};
+
+const TOKEN_PROGRAM_ID = new web3.PublicKey('TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA');
+
+const ACCOUNT_LAYOUT = BufferLayout.struct([
+  BufferLayout.blob(32, 'mint'),
+  BufferLayout.blob(32, 'owner'),
+  BufferLayout.nu64('amount'),
+  BufferLayout.blob(93),
+]);
+
+export const getOwnedTokenAccounts = (commitment?: web3.Commitment): AppThunk => (
+  dispatch,
+  getState,
+) => {
+  const publicKey = getState().data.blockchain.account?.publicKey;
+
+  if (!publicKey) {
+    // TODO: check auth
+    console.info('TODO: check auth');
+  }
+
+  return dispatch(
+    getProgramAccounts(TOKEN_PROGRAM_ID, commitment, [
+      {
+        memcmp: {
+          offset: ACCOUNT_LAYOUT.offsetOf('owner'),
+          bytes: publicKey.toBase58(),
+        },
+      },
+      {
+        dataSize: ACCOUNT_LAYOUT.span,
+      },
+    ]),
+  );
 };
