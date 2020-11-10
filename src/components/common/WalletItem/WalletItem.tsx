@@ -9,7 +9,7 @@ import { rgba } from 'polished';
 
 import { TOKEN_PROGRAM_ID } from 'constants/solana/bufferLayouts';
 import { TOKENS_BY_ENTRYPOINT } from 'constants/tokens';
-import { RootState } from 'store/types';
+import { RootState, TokenAccount } from 'store/types';
 // import { calculateInterval, calculateStart } from 'utils/charts';
 import { parseTokenAccountData } from 'utils/solana/parseData';
 
@@ -101,21 +101,11 @@ function getTokenInfo({
 
 export const WalletItem: FunctionComponent<Props> = ({ publicKey }) => {
   const entrypoint = useSelector((state: RootState) => state.data.blockchain.entrypoint);
-  const tokenAccount: web3.AccountInfo<string> = useSelector(
+  const tokenAccount: TokenAccount = useSelector(
     (state: RootState) => state.entities.tokens.items[publicKey],
   );
 
-  const {
-    mint,
-    owner,
-    amount,
-  }: {
-    mint?: web3.PublicKey;
-    owner?: web3.PublicKey;
-    amount?: number;
-  } = new web3.PublicKey(String(tokenAccount?.owner)).equals(TOKEN_PROGRAM_ID)
-    ? parseTokenAccountData(bs58.decode(tokenAccount.data))
-    : {};
+  const { mint, owner, amount } = tokenAccount.parsed;
 
   const { name, symbol } = getTokenInfo({ mint, entrypoint });
 

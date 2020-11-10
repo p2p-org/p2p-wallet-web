@@ -1,11 +1,14 @@
-import React, { FunctionComponent, MutableRefObject, Ref, useRef, useState } from 'react';
+import React, { FunctionComponent, useRef, useState } from 'react';
+import { useDispatch } from 'react-redux';
 
+import * as web3 from '@solana/web3.js';
 import classNames from 'classnames';
 import { styled } from 'linaria/react';
 import { rgba } from 'polished';
 
 import { Button, Icon, Input } from 'components/ui';
 import { TokenType } from 'constants/tokens';
+import { createTokenAccount } from 'store/actions/complex/tokens';
 
 const Wrapper = styled.div`
   display: flex;
@@ -111,12 +114,18 @@ export const TokenItem: FunctionComponent<TokenType> = ({
   tokenSymbol,
   icon,
 }) => {
+  const dispatch = useDispatch();
   // eslint-disable-next-line unicorn/no-null
   const inputRef = useRef<HTMLInputElement>(null);
   const [isOpen, setIsOpen] = useState(false);
 
   const handleChevronClick = () => {
     setIsOpen(!isOpen);
+  };
+
+  const handleAddClick = () => {
+    const mint = new web3.PublicKey(mintAddress);
+    dispatch(createTokenAccount(mint));
   };
 
   const handleCopyClick = () => {
@@ -147,7 +156,7 @@ export const TokenItem: FunctionComponent<TokenType> = ({
               </Bottom>
             </Info>
           </InfoWrapper>
-          <Button secondary small>
+          <Button secondary small onClick={handleAddClick}>
             Add
           </Button>
         </Content>

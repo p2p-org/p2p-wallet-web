@@ -4,6 +4,8 @@ import { Link } from 'react-router-dom';
 import { styled } from 'linaria/react';
 import { rgba } from 'polished';
 
+import { NetworkSelect } from 'components/common/NetworkSelect';
+
 const Wrapper = styled.header`
   position: relative;
 
@@ -61,6 +63,11 @@ const HeaderAuth = styled.div`
   cursor: pointer;
 `;
 
+// temp, will be in profile settings
+const NetworkWrapper = styled.div`
+  margin-right: 15px;
+`;
+
 const Avatar = styled.div`
   width: 36px;
   height: 36px;
@@ -91,6 +98,9 @@ export const Header: FunctionComponent<Props> = (props) => {
           <NavLink to="/dashboard_old">Contacts</NavLink>
         </Nav>
         <HeaderAuth>
+          <NetworkWrapper>
+            <NetworkSelect />
+          </NetworkWrapper>
           <Avatar />
           <Username>Konstantin</Username>
         </HeaderAuth>

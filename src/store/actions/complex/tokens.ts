@@ -23,7 +23,7 @@ export const createAndInitializeMint = ({
   amount: number;
   decimals: number;
   initialAccount: web3.Account;
-}): AppThunk => async (dispatch, getState) => {
+}): AppThunk => async (dispatch) => {
   const connection = ApiSolanaService.getConnection();
 
   const transaction = new web3.Transaction();
@@ -85,10 +85,6 @@ export const createAndInitializeMint = ({
     );
   }
 
-  // const result = connection.sendTransaction(transaction, signers, {
-  //   preflightCommitment: 'single',
-  // });
-
   return dispatch({
     [SOLANA_API]: {
       action: mintTestTokenAsyncAction,
@@ -99,4 +95,71 @@ export const createAndInitializeMint = ({
       },
     },
   });
+};
+
+const createAndInitializeTokenAccount = ({
+  payer,
+  mintPublicKey,
+  newAccount,
+}: {
+  payer: web3.Account;
+  mintPublicKey: web3.PublicKey;
+  newAccount: web3.Account;
+}): AppThunk => async (dispatch) => {
+  const connection = ApiSolanaService.getConnection();
+
+  const transaction = new web3.Transaction();
+
+  const lamportsForAccount = await connection.getMinimumBalanceForRentExemption(
+    ACCOUNT_LAYOUT.span,
+  );
+
+  transaction.add(
+    web3.SystemProgram.createAccount({
+      fromPubkey: payer.publicKey,
+      newAccountPubkey: newAccount.publicKey,
+      lamports: lamportsForAccount,
+      space: ACCOUNT_LAYOUT.span,
+      programId: TOKEN_PROGRAM_ID,
+    }),
+  );
+
+  transaction.add(
+    initializeAccountInstruction({
+      account: newAccount.publicKey,
+      mint: mintPublicKey,
+      owner: payer.publicKey,
+    }),
+  );
+
+  return dispatch({
+    [SOLANA_API]: {
+      action: mintTestTokenAsyncAction,
+      transaction,
+      signers: [payer, newAccount],
+      options: {
+        preflightCommitment: 'single',
+      },
+    },
+  });
+};
+
+export const createTokenAccount = (tokenAddress: web3.PublicKey): AppThunk => (
+  dispatch,
+  getState,
+) => {
+  const ownerAccount = getState().data.blockchain.account;
+
+  if (!ownerAccount) {
+    // TODO: check auth
+    console.info('TODO: check auth');
+  }
+
+  return dispatch(
+    createAndInitializeTokenAccount({
+      payer: ownerAccount,
+      mintPublicKey: tokenAddress,
+      newAccount: new web3.Account(),
+    }),
+  );
 };

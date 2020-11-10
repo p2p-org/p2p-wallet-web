@@ -1,11 +1,15 @@
 import * as web3 from '@solana/web3.js';
+import bs58 from 'bs58';
 import { mergeRight, uniq } from 'ramda';
 import { createReducer } from 'typesafe-actions';
 
+import { TOKEN_PROGRAM_ID } from 'constants/solana/bufferLayouts';
 import { getProgramAccountsAsyncAction } from 'store/commands';
+import { TokenAccount } from 'store/types';
+import { parseTokenAccountData } from 'utils/solana/parseData';
 
 type ItemsType = {
-  [pubkey: string]: web3.AccountInfo<string>;
+  [pubkey: string]: TokenAccount;
 };
 
 type State = {
@@ -25,7 +29,18 @@ export const tokensReducer = createReducer(initialState).handleAction(
     const newItems: ItemsType = {};
     const newPubkeys: string[] = [];
     for (const { pubkey, account } of action.payload) {
-      newItems[pubkey.toString()] = account;
+      const parsed: {
+        mint?: web3.PublicKey;
+        owner?: web3.PublicKey;
+        amount?: number;
+      } = new web3.PublicKey(String(account?.owner)).equals(TOKEN_PROGRAM_ID)
+        ? parseTokenAccountData(bs58.decode(account.data))
+        : {};
+
+      newItems[pubkey.toString()] = {
+        ...account,
+        parsed,
+      };
       newPubkeys.push(pubkey.toString());
     }
 

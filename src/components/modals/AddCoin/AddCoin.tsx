@@ -79,8 +79,9 @@ export const AddCoin: FunctionComponent<Props> = ({ close }) => {
   const dispatch = useDispatch();
   const ownerAccount = useSelector((state: RootState) => state.data.blockchain.account);
   const entrypoint = useSelector((state: RootState) => state.data.blockchain.entrypoint);
-  const isMainnetEntrypoint = entrypoint === web3.clusterApiUrl('mainnet-beta');
+  const tokenAccounts = useSelector((state: RootState) => state.entities.tokens.items);
   const tokens = TOKENS_BY_ENTRYPOINT[entrypoint];
+  const isMainnetEntrypoint = entrypoint === web3.clusterApiUrl('mainnet-beta');
 
   const handleMintTestTokenClick = () => {
     if (!ownerAccount) {
@@ -98,7 +99,17 @@ export const AddCoin: FunctionComponent<Props> = ({ close }) => {
     );
   };
 
-  const filteredTokens = useMemo(() => tokens, [tokens]);
+  const filteredTokens = useMemo(() => {
+    if (!tokens) {
+      return;
+    }
+
+    const existsMintAccounts = new Set(
+      Object.values(tokenAccounts).map((token) => token.parsed.mint?.toBase58()),
+    );
+
+    return tokens.filter((token) => !existsMintAccounts.has(token.mintAddress));
+  }, [tokenAccounts, tokens]);
 
   return (
     <WrapperModal
@@ -118,7 +129,7 @@ export const AddCoin: FunctionComponent<Props> = ({ close }) => {
       }
       close={close}>
       <ScrollableContainer>
-        <TokenList items={tokens} />
+        <TokenList items={filteredTokens} />
       </ScrollableContainer>
     </WrapperModal>
   );
