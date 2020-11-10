@@ -5,6 +5,7 @@ import { styled } from 'linaria/react';
 import { rgba } from 'polished';
 
 import { Button, Icon, Input } from 'components/ui';
+import { TokenType } from 'constants/tokens';
 
 const Wrapper = styled.div`
   display: flex;
@@ -52,7 +53,7 @@ const InfoWrapper = styled.div`
   cursor: pointer;
 `;
 
-const Avatar = styled.div`
+const Avatar = styled.img`
   width: 44px;
   height: 44px;
   margin-right: 20px;
@@ -104,9 +105,12 @@ const CopyIcon = styled(Icon)`
   height: 24px;
 `;
 
-type Props = {};
-
-export const TokenItem: FunctionComponent<Props> = ({ symbol, name, price, delta }) => {
+export const TokenItem: FunctionComponent<TokenType> = ({
+  mintAddress,
+  tokenName,
+  tokenSymbol,
+  icon,
+}) => {
   // eslint-disable-next-line unicorn/no-null
   const inputRef = useRef<HTMLInputElement>(null);
   const [isOpen, setIsOpen] = useState(false);
@@ -118,9 +122,11 @@ export const TokenItem: FunctionComponent<Props> = ({ symbol, name, price, delta
   const handleCopyClick = () => {
     const input = inputRef.current;
 
-    input.focus();
-    input.setSelectionRange(0, input.value.length);
-    document.execCommand('copy');
+    if (input) {
+      input.focus();
+      input.setSelectionRange(0, input.value.length);
+      document.execCommand('copy');
+    }
   };
 
   return (
@@ -131,13 +137,13 @@ export const TokenItem: FunctionComponent<Props> = ({ symbol, name, price, delta
       <Main>
         <Content>
           <InfoWrapper onClick={handleChevronClick}>
-            <Avatar />
+            <Avatar src={icon} />
             <Info>
               <Top>
-                <div>{symbol}</div> <div>{price}</div>
+                <div>{tokenSymbol}</div> <div />
               </Top>
               <Bottom>
-                <div>{name}</div> <div>{delta}</div>
+                <div>{tokenName}</div> <div />
               </Bottom>
             </Info>
           </InfoWrapper>
@@ -148,7 +154,9 @@ export const TokenItem: FunctionComponent<Props> = ({ symbol, name, price, delta
         <Additional className={classNames({ opened: isOpen })}>
           <Input
             ref={inputRef}
-            title="SRM Mint Address"
+            title={`${tokenSymbol} Mint Address`}
+            value={mintAddress}
+            readOnly
             postfix={
               <CopyWrapper onClick={handleCopyClick}>
                 <CopyIcon name="copy" />

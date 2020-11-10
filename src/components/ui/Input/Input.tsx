@@ -43,19 +43,27 @@ const PotfixWrapper = styled.div`
   margin-left: 16px;
 `;
 
-type Props = {
+type CustomProps = {
   forwardedRef?: React.Ref<HTMLInputElement>;
   title?: string;
   value?: string;
   postfix?: React.ReactNode;
 };
 
-const InputOriginal: FunctionComponent<Props> = ({ forwardedRef, title, value, postfix }) => {
+type Props = CustomProps & React.InputHTMLAttributes<HTMLInputElement>;
+
+const InputOriginal: FunctionComponent<Props> = ({
+  forwardedRef,
+  title,
+  value,
+  postfix,
+  ...props
+}) => {
   return (
     <Wrapper>
       <Content>
         {title ? <Title>{title}</Title> : undefined}
-        <InputElement ref={forwardedRef} value={value} />
+        <InputElement ref={forwardedRef} value={value} {...props} />
       </Content>
       {postfix ? <PotfixWrapper>{postfix}</PotfixWrapper> : undefined}
     </Wrapper>

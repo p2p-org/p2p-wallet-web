@@ -7,6 +7,7 @@ import {
   changeEntrypointAction,
   changeFeeCalculatorAction,
   changeMinBalanceForRentExceptionAction,
+  connectionReadyAction,
   createAccountAction,
 } from 'store/commands';
 import { AppAsyncThunk, AppThunk } from 'store/types';
@@ -39,6 +40,8 @@ export const establishConnection = (entrypoint?: string): AppAsyncThunk<void> =>
       dispatch(getBalance(account.publicKey));
     }
 
+    dispatch(connectionReadyAction());
+
     localStorage.setItem('entrypoint', entrypointUrl);
 
     return Promise.resolve();
@@ -58,6 +61,6 @@ export const createAccount = (mnemonic: string): AppThunk => async (dispatch) =>
   const seed = await bip39.mnemonicToSeed(mnemonic);
   const keyPair = nacl.sign.keyPair.fromSeed(seed.slice(0, 32));
 
-  localStorage.setItem('secretKey', new TextEncoder('utf-8').encode(keyPair.secretKey.toString()));
+  localStorage.setItem('secretKey', JSON.stringify([...keyPair.secretKey]));
   dispatch(createAccountAction(keyPair.secretKey));
 };

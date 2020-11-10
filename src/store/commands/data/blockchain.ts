@@ -9,6 +9,8 @@ export const changeMinBalanceForRentExceptionAction = createAction(
   'changeMinBalanceForRentException',
 )<number>();
 
+export const connectionReadyAction = createAction('connectionReady')();
+
 export const changeEntrypointAction = createAction('changeEntrypoint')<string>();
 
 export const createAccountAction = createAction('createAccount')<Uint8Array>();
@@ -39,7 +41,7 @@ export const getProgramAccountsAsyncAction = createAsyncAction(
   'SOLANA_GET_PROGRAM_ACCOUNTS_SUCCESS',
   'SOLANA_GET_PROGRAM_ACCOUNTS_FAILURE',
   'SOLANA_GET_PROGRAM_ACCOUNTS_CANCEL',
-)<unknown, [web3.ConfirmedTransaction, { signature: string }], Error>();
+)<unknown, [Array<web3.PublicKeyAndAccount<string>>, { signature: string }], Error>();
 
 export const requestAirdropAsyncAction = createAsyncAction(
   'SOLANA_REQUEST_AIRDROP_REQUEST',
@@ -53,4 +55,11 @@ export const transferAsyncAction = createAsyncAction(
   'SOLANA_TRANSFER_SUCCESS',
   'SOLANA_TRANSFER_FAILURE',
   'SOLANA_TRANSFER_CANCEL',
+)<undefined, string, Error>();
+
+export const mintTestTokenAsyncAction = createAsyncAction(
+  'SOLANA_MINT_TEST_TOKEN_REQUEST',
+  'SOLANA_MINT_TEST_TOKEN_SUCCESS',
+  'SOLANA_MINT_TEST_TOKEN_FAILURE',
+  'SOLANA_MINT_TEST_TOKEN_CANCEL',
 )<undefined, string, Error>();

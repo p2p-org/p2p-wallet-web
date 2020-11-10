@@ -1,14 +1,21 @@
 import React, { FunctionComponent } from 'react';
-import ReactHighcharts from 'react-highcharts';
+// import ReactHighcharts from 'react-highcharts';
+import { useSelector } from 'react-redux';
 
+import * as web3 from '@solana/web3.js';
+import bs58 from 'bs58';
 import { styled } from 'linaria/react';
 import { rgba } from 'polished';
 
-import { calculateInterval, calculateStart } from 'utils/charts';
+import { TOKEN_PROGRAM_ID } from 'constants/solana/bufferLayouts';
+import { TOKENS_BY_ENTRYPOINT } from 'constants/tokens';
+import { RootState } from 'store/types';
+// import { calculateInterval, calculateStart } from 'utils/charts';
+import { parseTokenAccountData } from 'utils/solana/parseData';
 
 import { Card } from '../Card';
-import { serials } from './data';
-import { getConfig } from './utils';
+// import { serials } from './data';
+// import { getConfig } from './utils';
 
 const WrapperCard = styled(Card)`
   display: flex;
@@ -39,9 +46,9 @@ const Top = styled.div`
   line-height: 140%;
 `;
 
-const ChartWrapper = styled.div`
-  width: 108px;
-`;
+// const ChartWrapper = styled.div`
+//   width: 108px;
+// `;
 
 const Middle = styled.div`
   display: flex;
@@ -63,24 +70,64 @@ const Bottom = styled.div`
   line-height: 140%;
 `;
 
-type Props = {};
+type Props = {
+  publicKey: string;
+};
 
-export const WalletItem: FunctionComponent<Props> = ({
-  name,
-  balance1,
-  balance2,
-  value,
-  delta,
-}) => {
-  const coin = 'BTC';
-  const currency = 'BTC';
-  const time = 'day';
+function getTokenInfo({
+  mint,
+  entrypoint,
+}: {
+  mint?: web3.PublicKey;
+  entrypoint: string;
+}): {
+  name?: string;
+  symbol?: string;
+} {
+  if (!mint) {
+    return { name: undefined, symbol: undefined };
+  }
 
-  const data = serials.map((d) => [d.timestamp * 1000, d.price]);
-  const decimals = 2;
-  const start = calculateStart(coin, time);
-  const interval = calculateInterval(time);
-  const config = getConfig(coin, currency, data, decimals, interval, start);
+  const match = TOKENS_BY_ENTRYPOINT[entrypoint]?.find(
+    (token) => token.mintAddress === mint.toBase58(),
+  );
+
+  if (match) {
+    return { name: match.tokenName, symbol: match.tokenSymbol };
+  }
+
+  return { name: undefined, symbol: undefined };
+}
+
+export const WalletItem: FunctionComponent<Props> = ({ publicKey }) => {
+  const entrypoint = useSelector((state: RootState) => state.data.blockchain.entrypoint);
+  const tokenAccount: web3.AccountInfo<string> = useSelector(
+    (state: RootState) => state.entities.tokens.items[publicKey],
+  );
+
+  const {
+    mint,
+    owner,
+    amount,
+  }: {
+    mint?: web3.PublicKey;
+    owner?: web3.PublicKey;
+    amount?: number;
+  } = new web3.PublicKey(String(tokenAccount?.owner)).equals(TOKEN_PROGRAM_ID)
+    ? parseTokenAccountData(bs58.decode(tokenAccount.data))
+    : {};
+
+  const { name, symbol } = getTokenInfo({ mint, entrypoint });
+
+  // const coin = 'BTC';
+  // const currency = 'BTC';
+  // const time = 'day';
+  //
+  // const data = serials.map((d) => [d.timestamp * 1000, d.price]);
+  // const decimals = 2;
+  // const start = calculateStart(coin, time);
+  // const interval = calculateInterval(time);
+  // const config = getConfig(coin, currency, data, decimals, interval, start);
 
   return (
     <WrapperCard>
@@ -88,15 +135,16 @@ export const WalletItem: FunctionComponent<Props> = ({
       <Content>
         <Top>
           <div>{name}</div>
-          <ChartWrapper>
-            <ReactHighcharts config={config} isPureConfig />
-          </ChartWrapper>
+          {/* <ChartWrapper> */}
+          {/*  <ReactHighcharts config={config} isPureConfig /> */}
+          {/* </ChartWrapper> */}
         </Top>
+        {/* <Middle><div>{balance1}</div> <div>{balance2}</div></Middle> */}
         <Middle>
-          <div>{balance1}</div> <div>{balance2}</div>
+          <div>{mint?.toBase58()}</div> {/* <div>{balance2}</div> */}
         </Middle>
         <Bottom>
-          <div>{value}</div> <div>{delta}</div>
+          <div>{amount}</div> {/* <div>{delta}</div> */}
         </Bottom>
       </Content>
     </WrapperCard>

@@ -33,6 +33,7 @@ type Props = {
   title: string;
   hasBigTitle?: boolean;
   action?: React.ReactNode;
+  className?: string;
 };
 
 export const Widget: FunctionComponent<Props> = ({
@@ -40,9 +41,10 @@ export const Widget: FunctionComponent<Props> = ({
   hasBigTitle = false,
   action,
   children,
+  className,
 }) => {
   return (
-    <Wrapper>
+    <Wrapper className={className}>
       <Header>
         <Title className={classNames({ hasBigTitle })}>{title}</Title>
         {action ? <Action>{action}</Action> : undefined}

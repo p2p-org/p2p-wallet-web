@@ -19,8 +19,7 @@ module.exports = {
     'consistent-return': 'off',
     'no-void': 'off',
     'no-plusplus': 'off',
-    'react/jsx-props-no-spreading': 'off',
-    'react/state-in-constructor': 'off',
+    'unicorn/no-null': 'off',
     '@typescript-eslint/explicit-module-boundary-types': 'off',
 
     // Too restrictive, writing ugly code to defend against a very unlikely scenario: https://eslint.org/docs/rules/no-prototype-builtins
@@ -29,9 +28,6 @@ module.exports = {
     // https://basarat.gitbooks.io/typescript/docs/tips/defaultIsBad.html
     'import/prefer-default-export': 'off',
     'import/no-default-export': 'error',
-
-    // No jsx extension: https://github.com/facebook/create-react-app/issues/87#issuecomment-234627904
-    'react/jsx-filename-extension': 'off',
 
     // Not a standard in React world
     'unicorn/filename-case': 'off',
@@ -49,7 +45,7 @@ module.exports = {
           ['^\\u0000'], // bare imports
           ['^react'], // react
           ['^[^\\.]'], // non-local imports
-          ['^config|^utils|^store|^pages|^components|'], // internal
+          ['^constants|^config|^utils|^store|^pages|^components|'], // internal
           ['^\\.'], // local imports
         ],
       },
@@ -60,6 +56,11 @@ module.exports = {
       files: ['**/*.tsx'],
       rules: {
         'react/prop-types': 'off',
+        'react/jsx-props-no-spreading': 'off',
+        'react/state-in-constructor': 'off',
+
+        // No jsx extension: https://github.com/facebook/create-react-app/issues/87#issuecomment-234627904
+        'react/jsx-filename-extension': 'off',
       },
     },
   ],

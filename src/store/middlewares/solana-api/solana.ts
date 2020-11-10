@@ -9,11 +9,9 @@ export const SOLANA_API = 'SOLANA_API';
 export type SolanaApiAction = {
   action: RootAction;
   transaction: web3.Transaction;
+  signers?: web3.Account[];
+  options?: web3.ConfirmOptions;
 };
-
-// export type SolanaAction = {
-//   [SOLANA_API]: SolanaApiAction;
-// };
 
 export const solanaApiMiddleware = (): Middleware<unknown, RootState> => {
   return ({ getState }) => (next) => {
@@ -30,22 +28,32 @@ export const solanaApiMiddleware = (): Middleware<unknown, RootState> => {
         return;
       }
 
-      // const actionWithoutCall = { ...action };
-      // delete actionWithoutCall[SOLANA_API];
-
       const callApi = action[SOLANA_API] as SolanaApiAction;
-      const { action: actionSolana, transaction } = callApi;
-
-      // if (!account) {
-      //   throw new Error('Unauthorized');
-      // }
+      const { action: actionSolana, transaction, signers, options } = callApi;
 
       next(actionSolana.request());
 
       try {
-        const { account } = getState().data.blockchain;
+        const finalSigners = [];
 
-        const result = await web3.sendAndConfirmTransaction(solanaConn, transaction, [account]);
+        if (signers) {
+          finalSigners.push(...signers);
+        } else {
+          const { account } = getState().data.blockchain;
+
+          if (!account) {
+            throw new Error('Unauthorized');
+          }
+
+          finalSigners.push(account);
+        }
+
+        const result = await web3.sendAndConfirmTransaction(
+          solanaConn,
+          transaction,
+          finalSigners,
+          options,
+        );
 
         next(actionSolana.success(result));
 

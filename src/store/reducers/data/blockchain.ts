@@ -6,6 +6,7 @@ import {
   changeEntrypointAction,
   changeFeeCalculatorAction,
   changeMinBalanceForRentExceptionAction,
+  connectionReadyAction,
   createAccountAction,
   getBalanceAsyncAction,
   getConfirmedSignaturesForAddressAsyncAction,
@@ -14,6 +15,7 @@ import {
 } from 'store/commands';
 
 type State = {
+  readonly connectionReady: boolean;
   readonly entrypoint: string;
   readonly feeCalculator: { lamportsPerSignature: number } | undefined;
   readonly minBalanceForRentException: number | undefined;
@@ -29,14 +31,13 @@ type State = {
 };
 
 const initialState: State = {
+  connectionReady: false,
   entrypoint: localStorage.getItem('entrypoint') || NETWORKS[0].endpoint,
   feeCalculator: undefined,
   minBalanceForRentException: undefined,
   secretKey: localStorage.getItem('secretKey') || undefined,
   account: localStorage.getItem('secretKey')
-    ? new web3.Account(
-        new TextDecoder('utf-8').decode(new ArrayBuffer(localStorage.getItem('secretKey'))),
-      )
+    ? new web3.Account(new Uint8Array(JSON.parse(localStorage.getItem('secretKey'))))
     : undefined,
   balanceStatus: 'idle',
   balance: 0,
@@ -46,8 +47,13 @@ const initialState: State = {
 };
 
 export const blockchainReducer = createReducer(initialState)
+  .handleAction(connectionReadyAction, (state, action) => ({
+    ...state,
+    connectionReady: true,
+  }))
   .handleAction(changeEntrypointAction, (state, action) => ({
     ...initialState,
+    connectionReady: true,
     secretKey: state.secretKey,
     account: state.account,
     entrypoint: action.payload,

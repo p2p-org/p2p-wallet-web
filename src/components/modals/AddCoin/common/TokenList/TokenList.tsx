@@ -2,6 +2,8 @@ import React, { FunctionComponent } from 'react';
 
 import { styled } from 'linaria/react';
 
+import { TokenType } from 'constants/tokens';
+
 import { TokenItem } from '../TokenItem';
 
 const Wrapper = styled.div`
@@ -10,14 +12,18 @@ const Wrapper = styled.div`
 `;
 
 type Props = {
-  items: any; // TODO: not any
+  items?: TokenType[]; // TODO: not any
 };
 
 export const TokenList: FunctionComponent<Props> = ({ items }) => {
+  if (!items) {
+    return null;
+  }
+
   return (
     <Wrapper>
-      {items.map((item, index) => (
-        <TokenItem key={index} {...item} />
+      {items.map((item) => (
+        <TokenItem key={item.mintAddress} {...item} />
       ))}
     </Wrapper>
   );

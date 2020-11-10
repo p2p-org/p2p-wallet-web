@@ -1,6 +1,7 @@
 import * as web3 from '@solana/web3.js';
 import * as BufferLayout from 'buffer-layout';
 
+import { ACCOUNT_LAYOUT, TOKEN_PROGRAM_ID } from 'constants/solana/bufferLayouts';
 import {
   getBalanceAsyncAction,
   getConfirmedSignaturesForAddressAsyncAction,
@@ -157,15 +158,6 @@ export const getProgramAccounts = (
     dispatch(getProgramAccountsAsyncAction.failure(error.toString()));
   }
 };
-
-const TOKEN_PROGRAM_ID = new web3.PublicKey('TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA');
-
-const ACCOUNT_LAYOUT = BufferLayout.struct([
-  BufferLayout.blob(32, 'mint'),
-  BufferLayout.blob(32, 'owner'),
-  BufferLayout.nu64('amount'),
-  BufferLayout.blob(93),
-]);
 
 export const getOwnedTokenAccounts = (): AppThunk => (dispatch, getState) => {
   const publicKey = getState().data.blockchain.account?.publicKey;

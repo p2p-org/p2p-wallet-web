@@ -14,9 +14,12 @@
     "@emotion/is-prop-valid": "^0.8.8",
     "@loadable/component": "^5.14.1",
     "@solana/web3.js": "^0.81.0",
+    "@types/bs58": "^4.0.1",
     "bip39": "^3.0.2",
+    "bs58": "^4.0.1",
     "buffer-layout": "^1.2.0",
     "classnames": "^2.2.6",
+    "constants": "^0.0.2",
     "dayjs": "^1.9.5",
     "highcharts": "^8.2.2",
     "history": "^5.0.0",
@@ -38,7 +41,8 @@
     "reselect": "^4.0.0",
     "sanitize.css": "^12.0.1",
     "tweetnacl": "^1.0.3",
-    "typesafe-actions": "^5.1.0"
+    "typesafe-actions": "^5.1.0",
+    "updeep": "^1.2.0"
   },
   "devDependencies": {
     "@babel/core": "^7.12.3",

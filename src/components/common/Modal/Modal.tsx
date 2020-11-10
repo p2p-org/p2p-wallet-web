@@ -51,9 +51,9 @@ const CloseIcon = styled(Icon)`
 const Content = styled.div``;
 
 type Props = {
-  title?: string;
-  description?: string;
-  close?: () => {};
+  title?: React.ReactNode;
+  description?: React.ReactNode;
+  close?: () => void;
   className?: string;
 };
 

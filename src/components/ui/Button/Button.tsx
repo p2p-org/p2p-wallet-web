@@ -37,10 +37,9 @@ const Wrapper = styled.button`
 
   &.link {
     height: auto;
+    padding: 0;
 
     color: ${rgba('#000', 0.5)};
-    font-size: 14px;
-    line-height: 140%;
     text-decoration: underline;
 
     background: transparent;

@@ -10,14 +10,14 @@ const Wrapper = styled.div`
 `;
 
 type Props = {
-  items: any; // TODO: not any
+  order: string[];
 };
 
-export const WalletList: FunctionComponent<Props> = ({ items }) => {
+export const WalletList: FunctionComponent<Props> = ({ order }) => {
   return (
     <Wrapper>
-      {items.map((item, index) => (
-        <WalletItem key={index} {...item} />
+      {order.map((publicKey, index) => (
+        <WalletItem key={publicKey} publicKey={publicKey} />
       ))}
     </Wrapper>
   );
