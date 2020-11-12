@@ -63,7 +63,7 @@ const Bottom = styled.div`
 
 type Props = {
   publicKey: string;
-  onItemClick: () => void;
+  onItemClick: (publicKey: string) => void;
 };
 
 export const TokenRow: FunctionComponent<Props> = ({ publicKey, onItemClick }) => {

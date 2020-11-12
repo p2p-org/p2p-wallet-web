@@ -1,7 +1,5 @@
 import { useSelector } from 'react-redux';
 
-import * as web3 from '@solana/web3.js';
-
 import { TOKENS_BY_ENTRYPOINT } from 'constants/tokens';
 import { RootState } from 'store/types';
 
@@ -49,6 +47,14 @@ export function usePopulateTokenInfo({
     }
 
     return { name: undefined, mint, symbol, icon: undefined };
+  }
+
+  if (!mint && !symbol) {
+    return {
+      name: 'SOL',
+      mint: undefined,
+      symbol: 'SOL',
+    };
   }
 
   return { name: undefined, mint: undefined, symbol: undefined, icon: undefined };

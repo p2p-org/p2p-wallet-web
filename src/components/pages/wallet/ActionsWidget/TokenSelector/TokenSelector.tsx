@@ -100,9 +100,9 @@ export const TokenSelector: FunctionComponent<Props> = ({ value, onChange }) => 
     setIsOpen(!isOpen);
   };
 
-  const handleItemClick = (token) => {
+  const handleItemClick = (publicKey) => {
     setIsOpen(false);
-    onChange(token);
+    onChange(publicKey);
   };
 
   return (

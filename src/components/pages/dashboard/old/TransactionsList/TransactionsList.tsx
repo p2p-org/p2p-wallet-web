@@ -2,6 +2,7 @@ import React, { FunctionComponent, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { styled } from 'linaria/react';
+import { path } from 'ramda';
 
 import { getMyConfirmedSignaturesForAddress } from 'store/actions/solana';
 import { ApiSolanaService } from 'store/middlewares/solana-api/services';
@@ -32,8 +33,10 @@ const Column = styled.div`
 
 export const TransactionsList: FunctionComponent = () => {
   const dispatch = useDispatch();
-  // const entrypoint = useSelector((state: RootState) => state.data.blockchain.entrypoint);
-  const transactions = useSelector((state: RootState) => state.data.blockchain.transactions);
+  const publicKey = useSelector((state: RootState) => state.data.blockchain.account?.publicKey);
+  const order = useSelector((state: RootState) =>
+    path<string[]>(['order'], state.entities.transactions[publicKey.toBase58()]),
+  );
 
   useEffect(() => {
     dispatch(getMyConfirmedSignaturesForAddress());
@@ -48,9 +51,7 @@ export const TransactionsList: FunctionComponent = () => {
         <Column>To</Column>
         <Column>Value</Column>
       </Head>
-      {transactions.map((transaction) => (
-        <TransactionRow key={transaction.signature} signature={transaction.signature} />
-      ))}
+      {order && order.map((signature) => <TransactionRow key={signature} signature={signature} />)}
     </Wrapper>
   );
 };

@@ -20,6 +20,7 @@ module.exports = {
     'no-void': 'off',
     'no-plusplus': 'off',
     'unicorn/no-null': 'off',
+    'unicorn/prefer-ternary': 'off',
     '@typescript-eslint/explicit-module-boundary-types': 'off',
 
     // Too restrictive, writing ugly code to defend against a very unlikely scenario: https://eslint.org/docs/rules/no-prototype-builtins

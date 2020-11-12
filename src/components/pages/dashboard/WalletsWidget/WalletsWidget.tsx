@@ -1,6 +1,7 @@
-import React, { FunctionComponent, useEffect } from 'react';
+import React, { FunctionComponent, useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
+import * as web3 from '@solana/web3.js';
 import { styled } from 'linaria/react';
 
 import { Widget } from 'components/common/Widget';
@@ -36,7 +37,15 @@ type Props = {};
 export const WalletsWidget: FunctionComponent<Props> = (props) => {
   const dispatch = useDispatch();
   const entrypoint = useSelector((state: RootState) => state.data.blockchain.entrypoint);
+  const publicKey = useSelector((state: RootState) =>
+    state.data.blockchain.account?.publicKey.toBase58(),
+  );
   const order = useSelector((state: RootState) => state.entities.tokens.order);
+
+  const preparedOrder = useMemo(() => (publicKey ? [publicKey, ...order] : order), [
+    publicKey,
+    order,
+  ]);
 
   useEffect(() => {
     dispatch(getOwnedTokenAccounts());
@@ -54,7 +63,7 @@ export const WalletsWidget: FunctionComponent<Props> = (props) => {
           + Add coin
         </Button>
       }>
-      <TokenList order={order} />
+      <TokenList order={preparedOrder} />
     </WrapperWidget>
   );
 };

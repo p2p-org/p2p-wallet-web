@@ -5,13 +5,13 @@ import { Link } from 'react-router-dom';
 
 import { styled } from 'linaria/react';
 import { rgba } from 'polished';
-
-import { Avatar } from 'components/ui';
-import { RootState, TokenAccount } from 'store/types';
-import { usePopulateTokenInfo } from 'utils/hooks/usePopulateTokenInfo';
+import { add } from 'ramda';
 
 // import { calculateInterval, calculateStart } from 'utils/charts';
-import { Card } from '../../../../common/Card';
+import { Card } from 'components/common/Card';
+import { TokenAvatar } from 'components/common/TokenAvatar';
+import { RootState, TokenAccount } from 'store/types';
+import { usePopulateTokenInfo } from 'utils/hooks/usePopulateTokenInfo';
 // import { serials } from './data';
 // import { getConfig } from './utils';
 
@@ -27,12 +27,12 @@ const WrapperLink = styled(Link)`
   cursor: pointer;
 `;
 
-const AvatarStyled = styled(Avatar)`
-  width: 56px;
-  height: 56px;
-
-  background: #c4c4c4;
-`;
+// const TokenAvatarStyled = styled(TokenAvatar)`
+//   width: 56px;
+//   height: 56px;
+//
+//   background: #c4c4c4;
+// `;
 
 const Content = styled.div`
   display: flex;
@@ -91,9 +91,20 @@ export const TokenRow: FunctionComponent<Props> = ({ publicKey }) => {
   const tokenAccount: TokenAccount = useSelector(
     (state: RootState) => state.entities.tokens.items[publicKey],
   );
+  const balance = useSelector((state: RootState) => state.data.blockchain.balance);
 
-  const { mint, owner, amount } = tokenAccount.parsed;
-  const { name, symbol, icon } = usePopulateTokenInfo({ mint: mint?.toBase58() });
+  // eslint-disable-next-line prefer-const
+  let { mint, amount } = tokenAccount?.parsed || {};
+  const { name, symbol } = usePopulateTokenInfo({ mint: mint?.toBase58() });
+
+  let address;
+
+  if (!mint) {
+    address = publicKey;
+    amount = balance;
+  } else {
+    address = mint.toBase58();
+  }
 
   // const coin = 'BTC';
   // const currency = 'BTC';
@@ -107,8 +118,9 @@ export const TokenRow: FunctionComponent<Props> = ({ publicKey }) => {
 
   return (
     <WrapperCard>
-      <WrapperLink to={`/wallet/${symbol || mint?.toBase58()}`}>
-        <AvatarStyled src={icon} />
+      <WrapperLink to={`/wallet/${mint ? symbol || address : address}`}>
+        {/* TODO: move to rollup because of parcel error if wrap TokenAvatar */}
+        <TokenAvatar mint={mint?.toBase58()} size={56} />
         <Content>
           <Top>
             <TokenName title={name || mint?.toBase58()}>{name || mint?.toBase58()}</TokenName>

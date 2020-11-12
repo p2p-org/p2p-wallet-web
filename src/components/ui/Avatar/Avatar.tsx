@@ -2,7 +2,10 @@ import React, { FunctionComponent } from 'react';
 
 import { styled } from 'linaria/react';
 
-const Wrapper = styled.img`
+const Wrapper = styled.img<{ size: string | number | undefined }>`
+  width: ${({ size }) => (size ? `${size}px` : 'auto')};
+  height: ${({ size }) => (size ? `${size}px` : 'auto')};
+
   border-radius: 50%;
 
   /* transparent pixel for not showing border if no src */
@@ -11,8 +14,11 @@ const Wrapper = styled.img`
   }
 `;
 
-type Props = {};
+type Props = {
+  src?: string;
+  size?: string | number;
+};
 
-export const Avatar: FunctionComponent<Props> = (props) => {
-  return <Wrapper {...props} />;
+export const Avatar: FunctionComponent<Props> = ({ src, size, ...props }) => {
+  return <Wrapper src={src} size={size} {...props} />;
 };
