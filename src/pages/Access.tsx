@@ -58,7 +58,7 @@ export const Access: FunctionComponent = () => {
     dispatch(createAccount(password));
 
     setTimeout(() => {
-      history.push('/dashboard');
+      history.push('/wallets');
     }, 10);
   };
 

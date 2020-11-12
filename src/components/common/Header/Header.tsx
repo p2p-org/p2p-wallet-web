@@ -90,12 +90,12 @@ export const Header: FunctionComponent<Props> = (props) => {
   return (
     <Wrapper>
       <Container>
-        <LogoLink to="/dashboard">wowlet</LogoLink>
+        <LogoLink to="/wallets">wowlet</LogoLink>
         <Nav>
-          <NavLink to="/dashboard">Wallets</NavLink>
-          <NavLink to="/">Investments</NavLink>
-          <NavLink to="/">Explore</NavLink>
-          <NavLink to="/dashboard_old">Contacts</NavLink>
+          <NavLink to="/wallets">Wallets</NavLink>
+          {/* <NavLink to="/">Investments</NavLink> */}
+          {/* <NavLink to="/">Explore</NavLink> */}
+          {/* <NavLink to="/dashboard_old">Contacts</NavLink> */}
         </Nav>
         <HeaderAuth>
           <NetworkWrapper>

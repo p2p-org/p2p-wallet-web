@@ -12,7 +12,7 @@ type Props = {};
 
 export const Wallet: FunctionComponent<Props> = (props) => {
   const { symbol: aliasSymbol } = useParams<{ symbol: string }>();
-  const breadcrumbs = [{ name: 'Wallets', to: '/dashboard' }, { name: aliasSymbol }];
+  const breadcrumbs = [{ name: 'Wallets', to: '/wallets' }, { name: aliasSymbol }];
 
   const { mint } = usePopulateTokenInfo({
     mint: aliasSymbol,
