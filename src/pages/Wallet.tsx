@@ -5,6 +5,7 @@ import * as web3 from '@solana/web3.js';
 
 import { Layout } from 'components/common/Layout';
 import { ActionsWidget, ActivityWidget } from 'components/pages/wallet';
+import { QRAddressWidget } from 'components/pages/wallet/QRAddressWidget';
 import { usePopulateTokenInfo } from 'utils/hooks/usePopulateTokenInfo';
 
 type Props = {};
@@ -33,7 +34,11 @@ export const Wallet: FunctionComponent<Props> = (props) => {
           <ActivityWidget address={accountAddress} />
         </>
       }
-      rightColumn={<div />}
+      rightColumn={
+        <>
+          <QRAddressWidget />
+        </>
+      }
     />
   );
 };

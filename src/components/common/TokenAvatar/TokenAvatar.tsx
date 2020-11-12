@@ -8,9 +8,7 @@ import { TOKENS_BY_ENTRYPOINT } from 'constants/tokens';
 import { RootState } from 'store/types';
 
 const AvatarStyled = styled(Avatar)`
-  &:not[src] {
-    background: #c4c4c4;
-  }
+  background: ${({ src }) => (src ? 'none' : '#c4c4c4')};
 `;
 
 type Props = {
