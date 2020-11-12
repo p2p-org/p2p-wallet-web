@@ -57,10 +57,10 @@ export const WalletsWidget: FunctionComponent<Props> = (props) => {
 
   return (
     <WrapperWidget
-      title="Wallets"
+      title="Currencies"
       action={
         <Button link onClick={handleAddCoinClick}>
-          + Add coin
+          + Add Token
         </Button>
       }>
       <TokenList order={preparedOrder} />
