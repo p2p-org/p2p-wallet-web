@@ -6,7 +6,7 @@ import * as bip39 from 'bip39';
 import { styled } from 'linaria/react';
 import throttle from 'lodash.throttle';
 
-import { createAccount } from 'store/actions/complex/blockchain';
+import { createAccount, accessAccount } from 'store/actions/complex/blockchain';
 
 const Wrapper = styled.div`
   display: flex;
@@ -55,7 +55,7 @@ export const Access: FunctionComponent = () => {
       return;
     }
 
-    dispatch(createAccount(password));
+    dispatch(accessAccount(password));
 
     setTimeout(() => {
       history.push('/dashboard');
