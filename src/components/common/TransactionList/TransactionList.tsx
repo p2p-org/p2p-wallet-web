@@ -2,22 +2,30 @@ import React, { FunctionComponent } from 'react';
 
 import { styled } from 'linaria/react';
 
-import { TransactionItem } from 'components/common/TransactionItem';
+import { TransactionRow } from '../TransactionRow';
 
 const Wrapper = styled.div`
   display: grid;
   grid-gap: 2px;
+
+  > :not(:first-child):not(:last-child) {
+    border-radius: 0;
+  }
 `;
 
 type Props = {
-  items: any; // TODO: not any
+  order?: string[];
 };
 
-export const TransactionList: FunctionComponent<Props> = ({ items }) => {
+export const TransactionList: FunctionComponent<Props> = ({ order }) => {
+  if (!order) {
+    return null;
+  }
+
   return (
     <Wrapper>
-      {items.map((item, index) => (
-        <TransactionItem key={index} {...item} />
+      {order.map((signature) => (
+        <TransactionRow key={signature} signature={signature} />
       ))}
     </Wrapper>
   );

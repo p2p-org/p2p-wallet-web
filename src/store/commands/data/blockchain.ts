@@ -27,21 +27,21 @@ export const getConfirmedSignaturesForAddressAsyncAction = createAsyncAction(
   'SOLANA_GET_CONFIRMED_SIGNATURES_FOR_ADDRESS_SUCCESS',
   'SOLANA_GET_CONFIRMED_SIGNATURES_FOR_ADDRESS_FAILURE',
   'SOLANA_GET_CONFIRMED_SIGNATURES_FOR_ADDRESS_CANCEL',
-)<unknown, web3.ConfirmedSignatureInfo[], Error>();
+)<unknown, [web3.ConfirmedSignatureInfo[], { publicKey: web3.PublicKey }], [Error]>();
 
 export const getConfirmedTransactionAsyncAction = createAsyncAction(
   'SOLANA_GET_CONFIRMED_TRANSACTION_ACTION_REQUEST',
   'SOLANA_GET_CONFIRMED_TRANSACTION_ACTION_SUCCESS',
   'SOLANA_GET_CONFIRMED_TRANSACTION_ACTION_FAILURE',
   'SOLANA_GET_CONFIRMED_TRANSACTION_ACTION_CANCEL',
-)<unknown, [web3.ConfirmedTransaction, { signature: string }], Error>();
+)<unknown, [web3.ConfirmedTransaction, { signature: web3.TransactionSignature }], Error>();
 
 export const getProgramAccountsAsyncAction = createAsyncAction(
   'SOLANA_GET_PROGRAM_ACCOUNTS_REQUEST',
   'SOLANA_GET_PROGRAM_ACCOUNTS_SUCCESS',
   'SOLANA_GET_PROGRAM_ACCOUNTS_FAILURE',
   'SOLANA_GET_PROGRAM_ACCOUNTS_CANCEL',
-)<unknown, [Array<web3.PublicKeyAndAccount<string>>, { signature: string }], Error>();
+)<unknown, Array<web3.PublicKeyAndAccount<string>>, Error>();
 
 export const requestAirdropAsyncAction = createAsyncAction(
   'SOLANA_REQUEST_AIRDROP_REQUEST',

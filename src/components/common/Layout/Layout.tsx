@@ -3,10 +3,11 @@ import React, { FunctionComponent } from 'react';
 import { styled } from 'linaria/react';
 
 import { Header } from '../Header';
+import { Breadcrumbs, BreadcrumbType } from './Breadcrumbs';
 
 const Wrapper = styled.div``;
 
-const Content = styled.div`
+const Main = styled.div`
   padding: 0 20px;
 `;
 
@@ -14,17 +15,69 @@ const Container = styled.div`
   width: 100%;
   max-width: 1004px;
   margin: 0 auto;
+  padding-top: 20px;
 `;
 
-type Props = {};
+const Content = styled.div``;
 
-export const Layout: FunctionComponent<Props> = ({ children }) => {
+const ColumnsWrapper = styled.div`
+  display: grid;
+  grid-auto-flow: column;
+  grid-gap: 84px;
+
+  margin-top: 32px;
+`;
+
+const ColumnLeft = styled.div`
+  display: grid;
+  grid-gap: 32px;
+  grid-template-rows: min-content;
+
+  width: 100%;
+  max-width: 556px;
+  height: fit-content;
+`;
+
+const ColumnRight = styled.div`
+  display: grid;
+  grid-gap: 40px;
+  grid-template-rows: min-content;
+
+  width: 100%;
+  max-width: 364px;
+  height: fit-content;
+`;
+
+type Props = {
+  breadcrumbs?: BreadcrumbType[];
+  leftColumn?: React.ReactNode;
+  rightColumn?: React.ReactNode;
+};
+
+export const Layout: FunctionComponent<Props> = ({
+  breadcrumbs,
+  leftColumn,
+  rightColumn,
+  children,
+}) => {
   return (
     <Wrapper>
       <Header />
-      <Content>
-        <Container>{children}</Container>
-      </Content>
+      <Main>
+        <Container>
+          {breadcrumbs ? <Breadcrumbs breadcrumbs={breadcrumbs} /> : undefined}
+          <Content>
+            {leftColumn && rightColumn ? (
+              <ColumnsWrapper>
+                <ColumnLeft>{leftColumn}</ColumnLeft>
+                <ColumnRight>{rightColumn}</ColumnRight>
+              </ColumnsWrapper>
+            ) : (
+              children
+            )}
+          </Content>
+        </Container>
+      </Main>
     </Wrapper>
   );
 };

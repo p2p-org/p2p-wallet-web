@@ -28,6 +28,7 @@ export const tokensReducer = createReducer(initialState).handleAction(
     // TODO: normalizr if it will fit many cases
     const newItems: ItemsType = {};
     const newPubkeys: string[] = [];
+
     for (const { pubkey, account } of action.payload) {
       const parsed: {
         mint?: web3.PublicKey;

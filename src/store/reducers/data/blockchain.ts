@@ -9,7 +9,6 @@ import {
   connectionReadyAction,
   createAccountAction,
   getBalanceAsyncAction,
-  getConfirmedSignaturesForAddressAsyncAction,
   getConfirmedTransactionAsyncAction,
   requestAirdropAsyncAction,
 } from 'store/commands';
@@ -24,10 +23,6 @@ type State = {
   readonly balanceStatus: 'idle' | 'pending' | 'success' | 'failure';
   readonly balance: number;
   readonly airdropStatus: 'idle' | 'pending' | 'success' | 'failure';
-  readonly transactions: web3.ConfirmedSignatureInfo[];
-  readonly transactionsNormalized: {
-    [signature: string]: web3.ConfirmedTransaction;
-  };
 };
 
 const initialState: State = {
@@ -42,8 +37,6 @@ const initialState: State = {
   balanceStatus: 'idle',
   balance: 0,
   airdropStatus: 'idle',
-  transactions: [],
-  transactionsNormalized: {},
 };
 
 export const blockchainReducer = createReducer(initialState)
@@ -98,18 +91,4 @@ export const blockchainReducer = createReducer(initialState)
   .handleAction(requestAirdropAsyncAction.failure, (state) => ({
     ...state,
     airdropStatus: 'failure',
-  }))
-  // getConfirmedSignaturesForAddressAction
-  .handleAction(getConfirmedSignaturesForAddressAsyncAction.success, (state, action) => ({
-    ...state,
-    transactions: [...state.transactions, ...action.payload],
-  }))
-  .handleAction(getConfirmedTransactionAsyncAction.success, (state, action) => ({
-    ...state,
-    transactionsNormalized: {
-      ...state.transactionsNormalized,
-      [action.meta.signature]: {
-        ...action.payload,
-      },
-    },
   }));

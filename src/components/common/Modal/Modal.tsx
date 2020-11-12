@@ -17,6 +17,7 @@ const Wrapper = styled.div`
 
 const Header = styled.div`
   position: relative;
+
   padding: 20px 30px;
 
   border-bottom: 1px solid ${rgba('#000', 0.05)};

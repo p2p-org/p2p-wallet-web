@@ -90,9 +90,9 @@ export const Header: FunctionComponent<Props> = (props) => {
   return (
     <Wrapper>
       <Container>
-        <LogoLink to="/">wowlet</LogoLink>
+        <LogoLink to="/dashboard">wowlet</LogoLink>
         <Nav>
-          <NavLink to="/">Wallets</NavLink>
+          <NavLink to="/dashboard">Wallets</NavLink>
           <NavLink to="/">Investments</NavLink>
           <NavLink to="/">Explore</NavLink>
           <NavLink to="/dashboard_old">Contacts</NavLink>

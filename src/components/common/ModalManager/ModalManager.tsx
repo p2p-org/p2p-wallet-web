@@ -6,7 +6,7 @@ import { styled } from 'linaria/react';
 import { last } from 'ramda';
 import { closeModal } from 'redux-modals-manager';
 
-import { SHOW_MODAL_ADD_COIN } from 'store/constants/modalTypes';
+import { SHOW_MODAL_ADD_COIN, SHOW_MODAL_TRANSACTION_DETAILS } from 'store/constants/modalTypes';
 import { RootState } from 'store/types';
 
 const Wrapper = styled.div`
@@ -57,7 +57,11 @@ const ModalBackground = styled.div`
 `;
 
 const modalsMap = new Map([
-  [SHOW_MODAL_ADD_COIN, loadable(() => import('components/modals/AddCoin'))],
+  [SHOW_MODAL_ADD_COIN, loadable(() => import('components/modals/AddCoinModal'))],
+  [
+    SHOW_MODAL_TRANSACTION_DETAILS,
+    loadable(() => import('components/modals/TransactionDetailsModal')),
+  ],
 ]);
 
 type Props = {};

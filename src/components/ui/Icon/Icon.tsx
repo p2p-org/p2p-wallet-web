@@ -2,13 +2,15 @@ import React, { FunctionComponent } from 'react';
 
 import isPropValid from '@emotion/is-prop-valid';
 
+import arrowAngle from './assets/arrow-angle.svg';
 import chevron from './assets/chevron-icon.svg';
 import close from './assets/close-icon.svg';
 import copy from './assets/copy-icon.svg';
 
 const iconsMap = new Map<string, string>([
-  ['close', close],
+  ['arrow-angle', arrowAngle],
   ['chevron', chevron],
+  ['close', close],
   ['copy', copy],
 ]);
 

@@ -104,7 +104,7 @@ export const getConfirmedSignaturesForAddress = (
       options,
     );
 
-    dispatch(getConfirmedSignaturesForAddressAsyncAction.success(result));
+    dispatch(getConfirmedSignaturesForAddressAsyncAction.success(result, { publicKey }));
   } catch (error) {
     dispatch(getConfirmedSignaturesForAddressAsyncAction.failure(error));
   }
