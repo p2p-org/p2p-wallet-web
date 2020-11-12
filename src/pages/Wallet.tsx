@@ -19,8 +19,10 @@ export const Wallet: FunctionComponent<Props> = (props) => {
   });
 
   if (!mint) {
-    return <div />;
+    return <div>No found token</div>;
   }
+
+  console.log(mint);
 
   const accountAddress = new web3.PublicKey(mint);
 

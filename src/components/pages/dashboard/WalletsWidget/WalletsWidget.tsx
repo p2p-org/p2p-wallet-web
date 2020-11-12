@@ -35,11 +35,12 @@ type Props = {};
 
 export const WalletsWidget: FunctionComponent<Props> = (props) => {
   const dispatch = useDispatch();
+  const entrypoint = useSelector((state: RootState) => state.data.blockchain.entrypoint);
   const order = useSelector((state: RootState) => state.entities.tokens.order);
 
   useEffect(() => {
     dispatch(getOwnedTokenAccounts());
-  }, []);
+  }, [entrypoint]);
 
   const handleAddCoinClick = () => {
     dispatch(openModal(SHOW_MODAL_ADD_COIN));

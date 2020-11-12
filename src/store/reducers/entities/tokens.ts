@@ -4,7 +4,7 @@ import { mergeRight, uniq } from 'ramda';
 import { createReducer } from 'typesafe-actions';
 
 import { TOKEN_PROGRAM_ID } from 'constants/solana/bufferLayouts';
-import { getProgramAccountsAsyncAction } from 'store/commands';
+import { changeEntrypointAction, getProgramAccountsAsyncAction } from 'store/commands';
 import { TokenAccount } from 'store/types';
 import { parseTokenAccountData } from 'utils/solana/parseData';
 
@@ -22,9 +22,8 @@ const initialState: State = {
   order: [],
 };
 
-export const tokensReducer = createReducer(initialState).handleAction(
-  getProgramAccountsAsyncAction.success,
-  (state, action) => {
+export const tokensReducer = createReducer(initialState)
+  .handleAction(getProgramAccountsAsyncAction.success, (state, action) => {
     // TODO: normalizr if it will fit many cases
     const newItems: ItemsType = {};
     const newPubkeys: string[] = [];
@@ -49,5 +48,7 @@ export const tokensReducer = createReducer(initialState).handleAction(
       items: mergeRight(state.items, newItems),
       order: uniq(state.order.concat(newPubkeys)),
     };
-  },
-);
+  })
+  .handleAction(changeEntrypointAction, () => ({
+    ...initialState,
+  }));

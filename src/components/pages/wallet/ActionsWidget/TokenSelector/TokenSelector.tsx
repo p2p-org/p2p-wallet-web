@@ -72,6 +72,8 @@ export const TokenSelector: FunctionComponent<Props> = ({ value, onChange }) => 
 
   const { name, mint } = usePopulateTokenInfo({ mint: value });
 
+  console.log(value, name, mint);
+
   useEffect(() => {
     dispatch(getOwnedTokenAccounts());
   }, []);

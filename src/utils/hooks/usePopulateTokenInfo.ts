@@ -19,7 +19,7 @@ export function usePopulateTokenInfo({
 } {
   const entrypoint = useSelector((state: RootState) => state.data.blockchain.entrypoint);
 
-  if (mint) {
+  if (mint && mint.length === 44) {
     const match = TOKENS_BY_ENTRYPOINT[entrypoint]?.find((token) => token.mintAddress === mint);
 
     if (match) {
@@ -30,9 +30,11 @@ export function usePopulateTokenInfo({
         icon: match.icon,
       };
     }
+
+    return { name: undefined, mint, symbol: undefined, icon: undefined };
   }
 
-  if (symbol) {
+  if (symbol && symbol.length !== 44) {
     const match = TOKENS_BY_ENTRYPOINT[entrypoint]?.find(
       (token) => token.tokenSymbol.toUpperCase() === symbol.toUpperCase(),
     );
@@ -45,7 +47,9 @@ export function usePopulateTokenInfo({
         icon: match.icon,
       };
     }
+
+    return { name: undefined, mint, symbol, icon: undefined };
   }
 
-  return { name: undefined, mint, symbol, icon: undefined };
+  return { name: undefined, mint: undefined, symbol: undefined, icon: undefined };
 }

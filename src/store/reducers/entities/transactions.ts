@@ -3,7 +3,10 @@ import { mergeRight, pathOr, uniq } from 'ramda';
 import { createReducer } from 'typesafe-actions';
 import u from 'updeep';
 
-import { getConfirmedSignaturesForAddressAsyncAction } from 'store/commands';
+import {
+  changeEntrypointAction,
+  getConfirmedSignaturesForAddressAsyncAction,
+} from 'store/commands';
 
 type ItemsType = {
   [pubkey: string]: web3.ConfirmedSignatureInfo;
@@ -18,9 +21,8 @@ type State = {
 
 const initialState: State = {};
 
-export const transactionsReducer = createReducer(initialState).handleAction(
-  getConfirmedSignaturesForAddressAsyncAction.success,
-  (state, { payload, meta }) => {
+export const transactionsReducer = createReducer(initialState)
+  .handleAction(getConfirmedSignaturesForAddressAsyncAction.success, (state, { payload, meta }) => {
     // // TODO: normalizr if it will fit many cases
     const newItems: ItemsType = {};
     const newPubkeys: string[] = [];
@@ -43,5 +45,7 @@ export const transactionsReducer = createReducer(initialState).handleAction(
       },
       state,
     ) as State;
-  },
-);
+  })
+  .handleAction(changeEntrypointAction, () => ({
+    ...initialState,
+  }));

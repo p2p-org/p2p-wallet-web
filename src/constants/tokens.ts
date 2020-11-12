@@ -181,8 +181,8 @@ export const TOKENS_BY_ENTRYPOINT: TokensByEntrypointType = {
   ],
   [web3.clusterApiUrl('devnet')]: [
     {
-      mintAddress: '96oUA9Zu6hdpp9rv41b8Z6DqRyVQm1VMqVU4cBxQupNJ',
       tokenName: 'Example Token',
+      mintAddress: '96oUA9Zu6hdpp9rv41b8Z6DqRyVQm1VMqVU4cBxQupNJ',
       tokenSymbol: 'EXMPL',
       icon:
         'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x476c5E26a75bd202a9683ffD34359C0CC15be0fF/logo.png',
