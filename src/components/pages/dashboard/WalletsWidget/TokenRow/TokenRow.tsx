@@ -8,7 +8,7 @@ import { rgba } from 'polished';
 
 import { Avatar } from 'components/ui';
 import { RootState, TokenAccount } from 'store/types';
-import { populateTokenInfo } from 'utils/tokens';
+import { usePopulateTokenInfo } from 'utils/hooks/usePopulateTokenInfo';
 
 // import { calculateInterval, calculateStart } from 'utils/charts';
 import { Card } from '../../../../common/Card';
@@ -88,13 +88,12 @@ type Props = {
 };
 
 export const TokenRow: FunctionComponent<Props> = ({ publicKey }) => {
-  const entrypoint = useSelector((state: RootState) => state.data.blockchain.entrypoint);
   const tokenAccount: TokenAccount = useSelector(
     (state: RootState) => state.entities.tokens.items[publicKey],
   );
 
   const { mint, owner, amount } = tokenAccount.parsed;
-  const { name, symbol, icon } = populateTokenInfo({ mint, entrypoint });
+  const { name, symbol, icon } = usePopulateTokenInfo({ mint: mint?.toBase58() });
 
   // const coin = 'BTC';
   // const currency = 'BTC';

@@ -6,7 +6,7 @@ import { rgba } from 'polished';
 
 import { Avatar } from 'components/ui';
 import { RootState, TokenAccount } from 'store/types';
-import { populateTokenInfo } from 'utils/tokens';
+import { usePopulateTokenInfo } from 'utils/hooks/usePopulateTokenInfo';
 
 const Wrapper = styled.div`
   padding: 15px 12px;
@@ -67,7 +67,6 @@ type Props = {
 };
 
 export const TokenRow: FunctionComponent<Props> = ({ publicKey, onItemClick }) => {
-  const entrypoint = useSelector((state: RootState) => state.data.blockchain.entrypoint);
   const tokenAccount: TokenAccount = useSelector(
     (state: RootState) => state.entities.tokens.items[publicKey],
   );
@@ -77,7 +76,7 @@ export const TokenRow: FunctionComponent<Props> = ({ publicKey, onItemClick }) =
   };
 
   const { mint, owner, amount } = tokenAccount.parsed;
-  const { name, symbol, icon } = populateTokenInfo({ mint, entrypoint });
+  const { name, symbol, icon } = usePopulateTokenInfo({ mint: mint?.toBase58() });
 
   return (
     <Wrapper onClick={handleClick}>

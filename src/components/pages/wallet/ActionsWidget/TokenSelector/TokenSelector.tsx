@@ -7,6 +7,7 @@ import { rgba } from 'polished';
 import { Icon } from 'components/ui';
 import { getOwnedTokenAccounts } from 'store/actions/solana';
 import { RootState } from 'store/types';
+import { usePopulateTokenInfo } from 'utils/hooks/usePopulateTokenInfo';
 
 import { TokenRow } from './TokenRow';
 
@@ -33,7 +34,7 @@ const Value = styled.div`
 `;
 
 const ChevronWrapper = styled.div`
-  margin-right: 12px;
+  margin-left: 12px;
 `;
 
 const ChevronIcon = styled(Icon)`
@@ -69,6 +70,8 @@ export const TokenSelector: FunctionComponent<Props> = ({ value, onChange }) => 
   const [isOpen, setIsOpen] = useState(false);
   const order = useSelector((state: RootState) => state.entities.tokens.order);
 
+  const { name, mint } = usePopulateTokenInfo({ mint: value });
+
   useEffect(() => {
     dispatch(getOwnedTokenAccounts());
   }, []);
@@ -103,7 +106,7 @@ export const TokenSelector: FunctionComponent<Props> = ({ value, onChange }) => 
   return (
     <Wrapper ref={selectorRef}>
       <Selector onClick={handleSelectorClick}>
-        <Value title={value}>{value}</Value>
+        <Value title={name || mint}>{name || mint}</Value>
         {order ? (
           <ChevronWrapper>
             <ChevronIcon name="chevron" />

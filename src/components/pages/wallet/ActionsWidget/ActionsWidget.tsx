@@ -1,6 +1,7 @@
 import React, { FunctionComponent } from 'react';
 import { useHistory } from 'react-router';
 
+import web3 from '@solana/web3.js';
 import { styled } from 'linaria/react';
 
 import { Button, ButtonsGroup } from 'components/ui';
@@ -14,10 +15,10 @@ const Wrapper = styled.div`
 `;
 
 type Props = {
-  symbol: string;
+  address: web3.PublicKey;
 };
 
-export const ActionsWidget: FunctionComponent<Props> = ({ symbol }) => {
+export const ActionsWidget: FunctionComponent<Props> = ({ address }) => {
   const history = useHistory();
 
   const handleTokenChange = (token: string) => {
@@ -26,7 +27,7 @@ export const ActionsWidget: FunctionComponent<Props> = ({ symbol }) => {
 
   return (
     <Wrapper>
-      <TokenSelector value={symbol} onChange={handleTokenChange} />
+      <TokenSelector value={address.toBase58()} onChange={handleTokenChange} />
 
       <ButtonsGroup>
         <Button primary small>
