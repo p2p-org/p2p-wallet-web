@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom';
 import { styled } from 'linaria/react';
 import { rgba } from 'polished';
 
+import { Avatar } from 'components/ui';
 import { RootState, TokenAccount } from 'store/types';
 import { populateTokenInfo } from 'utils/tokens';
 
@@ -26,16 +27,17 @@ const WrapperLink = styled(Link)`
   cursor: pointer;
 `;
 
-const Avatar = styled.div`
+const AvatarStyled = styled(Avatar)`
   width: 56px;
   height: 56px;
 
   background: #c4c4c4;
-
-  border-radius: 50%;
 `;
 
 const Content = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
   flex: 1;
   margin-left: 20px;
 `;
@@ -49,20 +51,28 @@ const Top = styled.div`
   line-height: 140%;
 `;
 
+const TokenName = styled.div`
+  max-width: 300px;
+  overflow: hidden;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+`;
+
 // const ChartWrapper = styled.div`
 //   width: 108px;
 // `;
 
-const Middle = styled.div`
-  display: flex;
-  justify-content: space-between;
-  margin: 12px 0 4px;
-
-  color: #000;
-  font-weight: 500;
-  font-size: 14px;
-  line-height: 140%;
-`;
+// const Middle = styled.div`
+//   display: flex;
+//   justify-content: space-between;
+//   margin: 12px 0 4px;
+//
+//   color: #000;
+//   font-weight: 500;
+//   font-size: 14px;
+//   line-height: 140%;
+// `;
 
 const Bottom = styled.div`
   display: flex;
@@ -84,7 +94,7 @@ export const TokenRow: FunctionComponent<Props> = ({ publicKey }) => {
   );
 
   const { mint, owner, amount } = tokenAccount.parsed;
-  const { name, symbol } = populateTokenInfo({ mint, entrypoint });
+  const { name, symbol, icon } = populateTokenInfo({ mint, entrypoint });
 
   // const coin = 'BTC';
   // const currency = 'BTC';
@@ -99,18 +109,18 @@ export const TokenRow: FunctionComponent<Props> = ({ publicKey }) => {
   return (
     <WrapperCard>
       <WrapperLink to={`/wallet/${symbol || mint?.toBase58()}`}>
-        <Avatar />
+        <AvatarStyled src={icon} />
         <Content>
           <Top>
-            <div>{name}</div>
+            <TokenName title={name || mint?.toBase58()}>{name || mint?.toBase58()}</TokenName>
             {/* <ChartWrapper> */}
             {/*  <ReactHighcharts config={config} isPureConfig /> */}
             {/* </ChartWrapper> */}
           </Top>
           {/* <Middle><div>{balance1}</div> <div>{balance2}</div></Middle> */}
-          <Middle>
-            <div>{mint?.toBase58()}</div> {/* <div>{balance2}</div> */}
-          </Middle>
+          {/* <Middle> */}
+          {/*  <div>{balanceUsd}</div> /!* <div>{balance2}</div> *!/ */}
+          {/* </Middle> */}
           <Bottom>
             <div>{amount}</div> {/* <div>{delta}</div> */}
           </Bottom>

@@ -4,6 +4,7 @@ import { useSelector } from 'react-redux';
 import { styled } from 'linaria/react';
 import { rgba } from 'polished';
 
+import { Avatar } from 'components/ui';
 import { RootState, TokenAccount } from 'store/types';
 import { populateTokenInfo } from 'utils/tokens';
 
@@ -19,18 +20,12 @@ const ItemWrapper = styled.div`
   height: 35px;
 `;
 
-const Avatar = styled.img`
+const AvatarStyled = styled(Avatar)`
   width: 32px;
   height: 32px;
   margin-right: 12px;
 
   background: #888;
-  border-radius: 50%;
-
-  /* transparent pixel for not showing border if no src */
-  &:not([src]) {
-    content: url('data:image/gif;base64,R0lGODlhAQABAPAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==');
-  }
 `;
 
 const Info = styled.div`
@@ -87,7 +82,7 @@ export const TokenRow: FunctionComponent<Props> = ({ publicKey, onItemClick }) =
   return (
     <Wrapper onClick={handleClick}>
       <ItemWrapper>
-        <Avatar src={icon} alt="" />
+        <AvatarStyled src={icon} />
         <Info>
           <Top>
             <TokenName>{name || mint?.toBase58()}</TokenName> <div />

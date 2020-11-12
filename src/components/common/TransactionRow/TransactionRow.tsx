@@ -5,6 +5,7 @@ import * as web3 from '@solana/web3.js';
 import { styled } from 'linaria/react';
 import { rgba } from 'polished';
 
+import { Avatar } from 'components/ui';
 import { openModal } from 'store/actions/modals';
 import { getConfirmedTransaction } from 'store/actions/solana';
 import { SHOW_MODAL_TRANSACTION_DETAILS } from 'store/constants/modalTypes';
@@ -23,13 +24,12 @@ const Wrapper = styled.div`
   cursor: pointer;
 `;
 
-const Avatar = styled.div`
+const AvatarStyled = styled(Avatar)`
   width: 32px;
   height: 32px;
   margin-right: 15px;
 
   background: #c4c4c4;
-  border-radius: 50%;
 `;
 
 const Content = styled.div`
@@ -79,7 +79,7 @@ export const TransactionRow: FunctionComponent<Props> = ({ signature }) => {
 
   return (
     <Wrapper onClick={handleClick}>
-      <Avatar />
+      <AvatarStyled />
       <Content>
         <Top>
           <div>{type}</div>

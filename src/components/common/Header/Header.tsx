@@ -5,6 +5,7 @@ import { styled } from 'linaria/react';
 import { rgba } from 'polished';
 
 import { NetworkSelect } from 'components/common/NetworkSelect';
+import { Avatar } from 'components/ui';
 
 const Wrapper = styled.header`
   position: relative;
@@ -68,12 +69,11 @@ const NetworkWrapper = styled.div`
   margin-right: 15px;
 `;
 
-const Avatar = styled.div`
+const AvatarStyled = styled(Avatar)`
   width: 36px;
   height: 36px;
 
   background: #c4c4c4;
-  border-radius: 50%;
 `;
 
 const Username = styled.div`
@@ -101,7 +101,7 @@ export const Header: FunctionComponent<Props> = (props) => {
           <NetworkWrapper>
             <NetworkSelect />
           </NetworkWrapper>
-          <Avatar />
+          <AvatarStyled />
           <Username>Konstantin</Username>
         </HeaderAuth>
       </Container>

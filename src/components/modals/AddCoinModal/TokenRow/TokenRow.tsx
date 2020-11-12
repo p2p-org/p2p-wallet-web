@@ -6,7 +6,7 @@ import classNames from 'classnames';
 import { styled } from 'linaria/react';
 import { rgba } from 'polished';
 
-import { Button, Icon, Input } from 'components/ui';
+import { Avatar, Button, Icon, Input } from 'components/ui';
 import { TokenType } from 'constants/tokens';
 import { createTokenAccount } from 'store/actions/complex/tokens';
 
@@ -56,13 +56,12 @@ const InfoWrapper = styled.div`
   cursor: pointer;
 `;
 
-const Avatar = styled.img`
+const AvatarStyled = styled(Avatar)`
   width: 44px;
   height: 44px;
   margin-right: 20px;
 
   background: #dadada;
-  border-radius: 50%;
 `;
 
 const Info = styled.div`
@@ -146,7 +145,7 @@ export const TokenRow: FunctionComponent<TokenType> = ({
       <Main>
         <Content>
           <InfoWrapper onClick={handleChevronClick}>
-            <Avatar src={icon} />
+            <AvatarStyled src={icon} />
             <Info>
               <Top>
                 <div>{tokenSymbol}</div> <div />

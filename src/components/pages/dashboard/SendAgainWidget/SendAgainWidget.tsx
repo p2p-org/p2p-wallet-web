@@ -4,6 +4,7 @@ import { styled } from 'linaria/react';
 import { rgba } from 'polished';
 
 import { Widget } from 'components/common/Widget';
+import { Avatar } from 'components/ui';
 
 const Wrapper = styled.div`
   display: grid;
@@ -20,12 +21,11 @@ const UserWrapper = styled.div`
   cursor: pointer;
 `;
 
-const Avatar = styled.div`
+const AvatarStyled = styled(Avatar)`
   width: 56px;
   height: 56px;
 
   background: ${rgba('#c4c4c4', 0.5)};
-  border-radius: 50%;
 `;
 
 const Username = styled.div`
@@ -44,7 +44,7 @@ export const SendAgainWidget: FunctionComponent<Props> = (props) => {
       <Wrapper>
         {['Konstantin', 'Martin', 'John', 'Olouwebeke'].map((name) => (
           <UserWrapper key={name}>
-            <Avatar />
+            <AvatarStyled />
             <Username>{name}</Username>
           </UserWrapper>
         ))}
