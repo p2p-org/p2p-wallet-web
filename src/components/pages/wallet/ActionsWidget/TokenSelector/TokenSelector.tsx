@@ -54,7 +54,7 @@ const DropDownList = styled.div`
   border-radius: 10px;
 
   > :not(:last-child) {
-    border: 1px solid ${rgba('#000', 0.05)};
+    border-bottom: 1px solid ${rgba('#000', 0.05)};
   }
 `;
 
@@ -85,7 +85,7 @@ export const TokenSelector: FunctionComponent<Props> = ({ value, onChange }) => 
     return () => {
       window.removeEventListener('click', handleAwayClick);
     };
-  });
+  }, []);
 
   const handleSelectorClick = () => {
     if (!order) {
@@ -93,6 +93,11 @@ export const TokenSelector: FunctionComponent<Props> = ({ value, onChange }) => 
     }
 
     setIsOpen(!isOpen);
+  };
+
+  const handleItemClick = (token) => {
+    setIsOpen(false);
+    onChange(token);
   };
 
   return (
@@ -108,7 +113,7 @@ export const TokenSelector: FunctionComponent<Props> = ({ value, onChange }) => 
       {isOpen ? (
         <DropDownList>
           {order.map((publicKey) => (
-            <TokenRow key={publicKey} publicKey={publicKey} />
+            <TokenRow key={publicKey} publicKey={publicKey} onItemClick={handleItemClick} />
           ))}
         </DropDownList>
       ) : undefined}

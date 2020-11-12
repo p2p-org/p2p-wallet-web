@@ -48,7 +48,7 @@ export const ActivityWidget: FunctionComponent<Props> = ({ address }) => {
 
   useEffect(() => {
     dispatch(getConfirmedSignaturesForAddress(address));
-  }, [ApiSolanaService.getConnection()]);
+  }, [ApiSolanaService.getConnection(), address]);
 
   return (
     <WrapperWidget title="Activity">

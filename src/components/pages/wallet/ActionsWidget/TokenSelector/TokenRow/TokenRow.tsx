@@ -68,19 +68,24 @@ const Bottom = styled.div`
 
 type Props = {
   publicKey: string;
+  onItemClick: () => void;
 };
 
-export const TokenRow: FunctionComponent<Props> = ({ publicKey }) => {
+export const TokenRow: FunctionComponent<Props> = ({ publicKey, onItemClick }) => {
   const entrypoint = useSelector((state: RootState) => state.data.blockchain.entrypoint);
   const tokenAccount: TokenAccount = useSelector(
     (state: RootState) => state.entities.tokens.items[publicKey],
   );
 
+  const handleClick = () => {
+    onItemClick(publicKey);
+  };
+
   const { mint, owner, amount } = tokenAccount.parsed;
   const { name, symbol, icon } = populateTokenInfo({ mint, entrypoint });
 
   return (
-    <Wrapper>
+    <Wrapper onClick={handleClick}>
       <ItemWrapper>
         <Avatar src={icon} alt="" />
         <Info>
