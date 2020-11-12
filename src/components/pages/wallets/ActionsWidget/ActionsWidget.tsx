@@ -1,4 +1,5 @@
 import React, { FunctionComponent } from 'react';
+import { Link } from 'react-router-dom';
 
 import { styled } from 'linaria/react';
 
@@ -21,7 +22,9 @@ export const ActionsWidget: FunctionComponent<Props> = (props) => {
   return (
     <Wrapper>
       <Actions>
-        <Button primary>Send</Button>
+        <Link to="/send/SOL">
+          <Button primary>Send</Button>
+        </Link>
         <Button primary>Receive</Button>
         <Button primary>Swap</Button>
       </Actions>

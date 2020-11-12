@@ -39,7 +39,7 @@ export const Create: FunctionComponent = () => {
     dispatch(createAccount(password));
 
     setTimeout(() => {
-      history.push('/dashboard');
+      history.push('/wallets');
     }, 0);
   };
 

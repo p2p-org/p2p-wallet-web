@@ -21,7 +21,7 @@ const Selector = styled.div`
 `;
 
 const Value = styled.div`
-  max-width: 300px;
+  max-width: 230px;
   overflow: hidden;
 
   color: #000;

@@ -58,7 +58,7 @@ export const Access: FunctionComponent = () => {
     dispatch(accessAccount(password));
 
     setTimeout(() => {
-      history.push('/dashboard');
+      history.push('/wallets');
     }, 10);
   };
 

@@ -8,7 +8,7 @@ import { Breadcrumbs, BreadcrumbType } from './Breadcrumbs';
 const Wrapper = styled.div``;
 
 const Main = styled.div`
-  padding: 0 20px;
+  padding: 0 20px 170px;
 `;
 
 const Container = styled.div`
@@ -48,16 +48,24 @@ const ColumnRight = styled.div`
   height: fit-content;
 `;
 
+const CenteredWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+`;
+
 type Props = {
   breadcrumbs?: BreadcrumbType[];
   leftColumn?: React.ReactNode;
   rightColumn?: React.ReactNode;
+  centered?: React.ReactNode;
 };
 
 export const Layout: FunctionComponent<Props> = ({
   breadcrumbs,
   leftColumn,
   rightColumn,
+  centered,
   children,
 }) => {
   return (
@@ -72,6 +80,8 @@ export const Layout: FunctionComponent<Props> = ({
                 <ColumnLeft>{leftColumn}</ColumnLeft>
                 <ColumnRight>{rightColumn}</ColumnRight>
               </ColumnsWrapper>
+            ) : centered ? (
+              <CenteredWrapper>{centered}</CenteredWrapper>
             ) : (
               children
             )}
