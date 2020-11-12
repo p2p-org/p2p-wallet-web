@@ -573,9 +573,9 @@ var InfoWrapper = /*#__PURE__*/(0, _react2.styled)("div")({
   name: "InfoWrapper",
   class: "InfoWrapper_ifuaxgh"
 });
-var Avatar = /*#__PURE__*/(0, _react2.styled)("img")({
-  name: "Avatar",
-  class: "Avatar_asx2g64"
+var AvatarStyled = /*#__PURE__*/(0, _react2.styled)(_ui.Avatar)({
+  name: "AvatarStyled",
+  class: "AvatarStyled_asx2g64"
 });
 var Info = /*#__PURE__*/(0, _react2.styled)("div")({
   name: "Info",
@@ -644,7 +644,7 @@ var TokenRow = function TokenRow(_ref) {
     name: "chevron"
   })), /*#__PURE__*/_react.default.createElement(Main, null, /*#__PURE__*/_react.default.createElement(Content, null, /*#__PURE__*/_react.default.createElement(InfoWrapper, {
     onClick: handleChevronClick
-  }, /*#__PURE__*/_react.default.createElement(Avatar, {
+  }, /*#__PURE__*/_react.default.createElement(AvatarStyled, {
     src: icon
   }), /*#__PURE__*/_react.default.createElement(Info, null, /*#__PURE__*/_react.default.createElement(Top, null, /*#__PURE__*/_react.default.createElement("div", null, tokenSymbol), " ", /*#__PURE__*/_react.default.createElement("div", null)), /*#__PURE__*/_react.default.createElement(Bottom, null, /*#__PURE__*/_react.default.createElement("div", null, tokenName), " ", /*#__PURE__*/_react.default.createElement("div", null)))), /*#__PURE__*/_react.default.createElement(_ui.Button, {
     secondary: true,
@@ -932,7 +932,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "50971" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "64903" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
