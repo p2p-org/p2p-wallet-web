@@ -5,3 +5,4 @@ export * from './Dashboard.old';
 export * from './Home';
 export * from './Wallet';
 export * from './Send';
+export * from './Swap';

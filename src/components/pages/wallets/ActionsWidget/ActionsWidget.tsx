@@ -40,9 +40,11 @@ export const ActionsWidget: FunctionComponent<Props> = ({ publicKey }) => {
         <Button primary onClick={handleReceiveClick}>
           Receive
         </Button>
-        <Button primary>Swap</Button>
+        <Link to="/swap/SOL">
+          <Button primary>Swap</Button>
+        </Link>
       </Actions>
-      <Button>Top-up with a card</Button>
+      {/* <Button>Top-up with a card</Button> */}
     </Wrapper>
   );
 };
