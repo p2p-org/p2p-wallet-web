@@ -90,7 +90,7 @@ export const Header: FunctionComponent<Props> = (props) => {
   return (
     <Wrapper>
       <Container>
-        <LogoLink to="/wallets">wowlet</LogoLink>
+        <LogoLink to="/wallets">P2P Wallet</LogoLink>
         {/* <Nav> */}
         {/*  /!*<NavLink to="/wallets">Wallets</NavLink>*!/ */}
         {/*  /!* <NavLink to="/">Investments</NavLink> *!/ */}
@@ -101,8 +101,8 @@ export const Header: FunctionComponent<Props> = (props) => {
           <NetworkWrapper>
             <NetworkSelect />
           </NetworkWrapper>
-          <AvatarStyled />
-          <Username>Konstantin</Username>
+          {/* <AvatarStyled /> */}
+          {/* <Username>Konstantin</Username> */}
         </HeaderAuth>
       </Container>
     </Wrapper>

@@ -69,12 +69,11 @@ export const createAccount = (mnemonic: string): AppThunk => async (dispatch) =>
 export const accessAccount = (mnemonic : string): AppThunk => async (dispatch) => {
 
   const seed = await bip39.mnemonicToSeed(mnemonic);
-
   const derivedSeed = bip32
     .fromSeed(seed)
     .derivePath(`m/501'/0'/0/0`).privateKey;
-
   const keyPair = nacl.sign.keyPair.fromSeed(derivedSeed);
+
   localStorage.setItem('secretKey', JSON.stringify([...keyPair.secretKey]));
   dispatch(createAccountAction(keyPair.secretKey));
 };
