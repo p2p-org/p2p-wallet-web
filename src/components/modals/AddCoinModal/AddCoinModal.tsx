@@ -14,10 +14,10 @@ import { TokenList } from './TokenList';
 
 const WrapperModal = styled(Modal)`
   flex-basis: 588px;
-  padding-bottom: 20px;
 `;
 
 const ScrollableContainer = styled.div`
+  padding-bottom: 20px;
   max-height: 668px;
   overflow-y: auto;
 
@@ -111,6 +111,8 @@ export const AddCoinModal: FunctionComponent<Props> = ({ close }) => {
     return tokens.filter((token) => !existsMintAccounts.has(token.mintAddress));
   }, [tokenAccounts, tokens]);
 
+  console.log(filteredTokens);
+
   return (
     <WrapperModal
       title="Add coins"
@@ -128,9 +130,11 @@ export const AddCoinModal: FunctionComponent<Props> = ({ close }) => {
         </>
       }
       close={close}>
-      <ScrollableContainer>
-        <TokenList items={filteredTokens} />
-      </ScrollableContainer>
+      {filteredTokens?.length ? (
+        <ScrollableContainer>
+          <TokenList items={filteredTokens} />
+        </ScrollableContainer>
+      ) : undefined}
     </WrapperModal>
   );
 };

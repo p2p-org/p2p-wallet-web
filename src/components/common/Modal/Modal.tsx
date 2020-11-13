@@ -76,7 +76,7 @@ export const Modal: FunctionComponent<Props> = ({
           </CloseWrapper>
         ) : undefined}
       </Header>
-      <Content>{children}</Content>
+      {children ? <Content>{children}</Content> : undefined}
     </Wrapper>
   );
 };
