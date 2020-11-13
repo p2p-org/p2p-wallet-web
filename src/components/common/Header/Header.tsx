@@ -5,7 +5,6 @@ import { styled } from 'linaria/react';
 import { rgba } from 'polished';
 
 import { NetworkSelect } from 'components/common/NetworkSelect';
-import { ScrollFix } from 'components/common/ScollFix';
 // import { Avatar } from 'components/ui';
 
 const Wrapper = styled.header`
@@ -23,7 +22,7 @@ const Wrapper = styled.header`
   border-bottom: 1px solid ${rgba('#000', 0.1)};
 `;
 
-const ContainerScrollFix = styled(ScrollFix)`
+const ContainerScrollFix = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
