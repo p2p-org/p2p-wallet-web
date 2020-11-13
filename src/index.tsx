@@ -16,8 +16,8 @@ export const global = css`
       font-family: 'Rubik', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
         'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
 
-      background: #f8f8f8;
-      -webkit-font-smoothing: antialiased;
+        background: #fff;
+        -webkit-font-smoothing: antialiased;
     }
 
     a {
