@@ -632,8 +632,6 @@ textarea,
 .LogoLink_l1ekikc4{color:#000;font-weight:bold;font-size:22px;line-height:120%;-webkit-text-decoration:none;text-decoration:none;}
 .HeaderAuth_h1r08nhz{display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;-webkit-align-items:center;-webkit-box-align:center;-ms-flex-align:center;align-items:center;cursor:pointer;}
 .NetworkWrapper_n1pmujzi{margin-right:15px;}
-.AvatarStyled_a1hsvjbd{width:36px;height:36px;background:#c4c4c4;}
-.Username_u1u14hfi{margin-left:16px;font-weight:500;font-size:14px;line-height:120%;}
 
 .Wrapper_w14yf8tm{display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;-webkit-align-items:center;-webkit-box-align:center;-ms-flex-align:center;align-items:center;-webkit-text-decoration:none;text-decoration:none;}
 .PartWrapper_p1uu769x{display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;-webkit-align-items:center;-webkit-box-align:center;-ms-flex-align:center;align-items:center;color:#000;}
@@ -703,8 +701,14 @@ textarea,
 .Wrapper_w1wrx8d5{display:table-row;}
 .Column_c120xwza{display:table-cell;}.Column_c120xwza:not(:last-child){padding-right:24px;}
 
-.Wrapper_w1iifxii{display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;-webkit-align-items:center;-webkit-box-align:center;-ms-flex-align:center;align-items:center;-webkit-box-pack:center;-webkit-justify-content:center;-ms-flex-pack:center;justify-content:center;height:100vh;}
-.Box_b1ttxzay{display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;-webkit-flex:1;-ms-flex:1;flex:1;-webkit-box-pack:justify;-webkit-justify-content:space-between;-ms-flex-pack:justify;justify-content:space-between;max-width:300px;}
+
+.Box_b1ttxzay{margin:auto;max-width:364px;}
+.Actions_atzm2dl{display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;-webkit-flex-flow:column wrap;-ms-flex-flow:column wrap;flex-flow:column wrap;}
+.CreateButton_cjwf4o{width:100%;height:56px;font-weight:500;color:#fff;background:#000;line-height:17px;margin-bottom:20px;size:14px;font-style:normal;}
+.AccessButton_a1dxl215{width:100%;height:56px;color:#000;font-weight:500;background:#F3F3F3;line-height:17px;font-style:normal;}
+.Title_td7pl6h{color:#000;font-weight:500;font-size:27px;line-height:120%;text-align:center;}
+.SubTitle_skbkwfh{color:#000;font-weight:500;font-size:27px;line-height:120%;text-align:center;margin-bottom:28px;}
+.HeaderImage_h874ulq{background-image:url('/images/sun.png');height:209px;width:219px;margin:auto;margin-top:91px;margin-bottom:48px;}
 
 .WrapperCard_w1n1sk0j{-webkit-flex:1;-ms-flex:1;flex:1;padding:0;}
 .HeaderWrapper_hudhabv{display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;padding:20px;border-bottom:1px solid rgba(0,0,0,0.05);}
