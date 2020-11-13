@@ -9,6 +9,7 @@ import { Icon } from 'components/ui';
 import { getOwnedTokenAccounts } from 'store/actions/solana';
 import { RootState, TokenAccount } from 'store/types';
 import { usePopulateTokenInfo } from 'utils/hooks/usePopulateTokenInfo';
+import { shortAddress } from 'utils/tokens';
 
 import { TokenRow } from './TokenRow';
 
@@ -41,6 +42,8 @@ const MainWrapper = styled.div`
   margin-top: 20px;
 `;
 
+const TokenAvatarWrapper = styled.div``;
+
 const InfoWrapper = styled.div`
   display: flex;
   flex-direction: column;
@@ -63,10 +66,16 @@ const TokenWrapper = styled.div`
 `;
 
 const TokenName = styled.div`
+  max-width: 200px;
+
   color: #000;
   font-weight: 500;
   font-size: 22px;
   line-height: 26px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+
+  overflow: hidden;
 `;
 
 const ChevronWrapper = styled.div``;
@@ -141,24 +150,34 @@ const DropDownList = styled.div`
   }
 `;
 
-type Props = {};
+type Props = {
+  tokenPublicKey: string;
+  tokenAmount: string;
+  onTokenChange: (tokenPublicKey: string) => void;
+  onAmountChange: (tokenAmount: string) => void;
+};
 
-export const FromSelectInput: FunctionComponent<Props> = (props) => {
+export const FromSelectInput: FunctionComponent<Props> = ({
+  tokenPublicKey,
+  tokenAmount,
+  onTokenChange,
+  onAmountChange,
+}) => {
   const dispatch = useDispatch();
   const selectorRef = useRef<HTMLDivElement>(null);
-  const [tokenPublicKey, setTokenPublicKey] = useState('');
   const [isOpen, setIsOpen] = useState(false);
   const order = useSelector((state: RootState) => state.entities.tokens.order);
+  const entrypoint = useSelector((state: RootState) => state.data.blockchain.entrypoint);
 
   const tokenAccount: TokenAccount = useSelector(
     (state: RootState) => state.entities.tokens.items[tokenPublicKey],
   );
-  const { mint } = tokenAccount?.parsed || {};
+  const { mint, amount } = tokenAccount?.parsed || { amount: 0 };
   const { name, symbol } = usePopulateTokenInfo({ mint: mint?.toBase58() });
 
   useEffect(() => {
     dispatch(getOwnedTokenAccounts());
-  }, []);
+  }, [entrypoint]);
 
   const handleAwayClick = (e: MouseEvent) => {
     if (!selectorRef.current?.contains(e.target as HTMLDivElement)) {
@@ -184,36 +203,52 @@ export const FromSelectInput: FunctionComponent<Props> = (props) => {
 
   const handleItemClick = (publicKey: string) => {
     setIsOpen(false);
-    setTokenPublicKey(publicKey);
+    onTokenChange(publicKey);
+  };
+
+  const handleAllBalanceClick = () => {
+    onAmountChange(String(amount));
+  };
+
+  const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value.trim();
+
+    onAmountChange(value);
   };
 
   return (
     <Wrapper>
       <TopWrapper>
         <FromTitle>From</FromTitle>
-        <AllBalance>Use all balance</AllBalance>
+        <AllBalance onClick={handleAllBalanceClick}>Use all balance</AllBalance>
       </TopWrapper>
       <MainWrapper>
-        <TokenAvatar mint={mint?.toBase58()} size={44} />
+        <TokenAvatarWrapper>
+          <TokenAvatar mint={mint?.toBase58()} size={44} />
+        </TokenAvatarWrapper>
         <InfoWrapper>
           <SpecifyTokenWrapper>
             <TokenWrapper ref={selectorRef} onClick={handleSelectorClick}>
-              <TokenName>{name || symbol || tokenPublicKey}</TokenName>
+              <TokenName title={tokenPublicKey}>
+                {name || symbol || shortAddress(tokenPublicKey)}
+              </TokenName>
               <ChevronWrapper>
                 <ChevronIcon name="arrow-triangle" />
               </ChevronWrapper>
             </TokenWrapper>
-            <AmountInput placeholder="0" />
+            <AmountInput placeholder="0" value={tokenAmount} onChange={handleAmountChange} />
           </SpecifyTokenWrapper>
           <BalanceWrapper>
-            <BalanceText>Balance = 1.24 BTC</BalanceText>
+            <BalanceText>
+              Balance = {amount} {symbol}
+            </BalanceText>
             <BalanceText> = $0.30</BalanceText>
           </BalanceWrapper>
         </InfoWrapper>
       </MainWrapper>
       {isOpen ? (
         <DropDownListContainer>
-          <DropDownHeader>You wallets</DropDownHeader>
+          <DropDownHeader>Your wallets</DropDownHeader>
           <DropDownList>
             {order.map((publicKey) => (
               <TokenRow key={publicKey} publicKey={publicKey} onClick={handleItemClick} />

@@ -117,7 +117,7 @@ export const TokenRow: FunctionComponent<Props> = ({ publicKey }) => {
         <TokenAvatar mint={mint?.toBase58()} size={56} includeSol />
         <Content>
           <Top>
-            <TokenName title={name || mint?.toBase58()}>{name || mint?.toBase58()}</TokenName>
+            <TokenName title={publicKey}>{name || publicKey}</TokenName>
             {/* <ChartWrapper> */}
             {/*  <ReactHighcharts config={config} isPureConfig /> */}
             {/* </ChartWrapper> */}

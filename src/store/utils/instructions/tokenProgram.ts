@@ -103,9 +103,33 @@ export function mintToInstruction({
   return new web3.TransactionInstruction({
     keys,
     data: encodeTokenInstructionData({
-      mintTo: {
-        amount,
-      },
+      mintTo: { amount },
+    }),
+    programId: TOKEN_PROGRAM_ID,
+  });
+}
+
+export function transfer({
+  source,
+  destination,
+  owner,
+  amount,
+}: {
+  source: web3.PublicKey;
+  destination: web3.PublicKey;
+  owner: web3.PublicKey;
+  amount: number;
+}) {
+  const keys = [
+    { pubkey: source, isSigner: false, isWritable: true },
+    { pubkey: destination, isSigner: false, isWritable: true },
+    { pubkey: owner, isSigner: true, isWritable: false },
+  ];
+
+  return new web3.TransactionInstruction({
+    keys,
+    data: encodeTokenInstructionData({
+      transfer: { amount },
     }),
     programId: TOKEN_PROGRAM_ID,
   });

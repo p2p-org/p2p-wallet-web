@@ -1,6 +1,9 @@
 import React, { FunctionComponent } from 'react';
+import { useSelector } from 'react-redux';
 
 import { styled } from 'linaria/react';
+
+import { RootState } from 'store/types';
 
 import { Header } from '../Header';
 import { ScrollFix } from '../ScollFix';
@@ -69,6 +72,8 @@ export const Layout: FunctionComponent<Props> = ({
   centered,
   children,
 }) => {
+  const connectionReady = useSelector((state: RootState) => state.data.blockchain.connectionReady);
+
   return (
     <Wrapper>
       <Header />
@@ -76,18 +81,20 @@ export const Layout: FunctionComponent<Props> = ({
         <Main>
           <Container>
             {breadcrumbs ? <Breadcrumbs breadcrumbs={breadcrumbs} /> : undefined}
-            <Content>
-              {leftColumn && rightColumn ? (
-                <ColumnsWrapper>
-                  <ColumnLeft>{leftColumn}</ColumnLeft>
-                  <ColumnRight>{rightColumn}</ColumnRight>
-                </ColumnsWrapper>
-              ) : centered ? (
-                <CenteredWrapper>{centered}</CenteredWrapper>
-              ) : (
-                children
-              )}
-            </Content>
+            {connectionReady ? (
+              <Content>
+                {leftColumn && rightColumn ? (
+                  <ColumnsWrapper>
+                    <ColumnLeft>{leftColumn}</ColumnLeft>
+                    <ColumnRight>{rightColumn}</ColumnRight>
+                  </ColumnsWrapper>
+                ) : centered ? (
+                  <CenteredWrapper>{centered}</CenteredWrapper>
+                ) : (
+                  children
+                )}
+              </Content>
+            ) : undefined}
           </Container>
         </Main>
       </ScrollFix>

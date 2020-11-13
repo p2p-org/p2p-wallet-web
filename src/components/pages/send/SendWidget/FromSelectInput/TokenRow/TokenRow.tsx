@@ -7,6 +7,7 @@ import { rgba } from 'polished';
 import { TokenAvatar } from 'components/common/TokenAvatar';
 import { RootState, TokenAccount } from 'store/types';
 import { usePopulateTokenInfo } from 'utils/hooks/usePopulateTokenInfo';
+import { shortAddress } from 'utils/tokens';
 
 const Wrapper = styled.div`
   padding: 15px 32px;
@@ -69,13 +70,8 @@ export const TokenRow: FunctionComponent<Props> = ({ publicKey, onClick }) => {
   let { mint, amount } = tokenAccount?.parsed || {};
   const { name, symbol } = usePopulateTokenInfo({ mint: mint?.toBase58() });
 
-  let address;
-
   if (!mint) {
-    address = publicKey;
     amount = balance;
-  } else {
-    address = mint.toBase58();
   }
 
   const handleClick = () => {
@@ -88,7 +84,7 @@ export const TokenRow: FunctionComponent<Props> = ({ publicKey, onClick }) => {
         <TokenAvatar mint={mint?.toBase58()} size={44} />
         <Info>
           <Top>
-            <TokenName>{name || mint?.toBase58()}</TokenName> <div />
+            <TokenName title={publicKey}>{name || publicKey}</TokenName> <div />
           </Top>
           <Bottom>
             <div>{symbol}</div> <div>{amount}</div>

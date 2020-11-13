@@ -111,8 +111,6 @@ export const AddCoinModal: FunctionComponent<Props> = ({ close }) => {
     return tokens.filter((token) => !existsMintAccounts.has(token.mintAddress));
   }, [tokenAccounts, tokens]);
 
-  console.log(filteredTokens);
-
   return (
     <WrapperModal
       title="Add coins"

@@ -1,11 +1,15 @@
 import React, { FunctionComponent, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router';
 
+import * as web3 from '@solana/web3.js';
 import { styled } from 'linaria/react';
 import { rgba } from 'polished';
 
 import { Card } from 'components/common/Card';
 import { Button, Icon } from 'components/ui';
+import { transferTokens } from 'store/actions/complex';
+import { RootState } from 'store/types';
 
 import { FromSelectInput } from './FromSelectInput';
 import { ToAddressInput } from './ToAddressInput';
@@ -107,7 +111,10 @@ const Hint = styled.div`
 type Props = {};
 
 export const SendWidget: FunctionComponent<Props> = (props) => {
+  const dispatch = useDispatch();
   const history = useHistory();
+  const [fromTokenPublicKey, setFromTokenPublicKey] = useState('');
+  const [fromTokenAmount, setFromTokenAmount] = useState('');
   const [toAddress, setToAddress] = useState('');
 
   const handleBackClick = () => {
@@ -116,6 +123,30 @@ export const SendWidget: FunctionComponent<Props> = (props) => {
 
   const handleToAddressChange = (publicKey) => {
     setToAddress(publicKey);
+  };
+
+  const handleSubmit = () => {
+    const amount = Math.round(Number.parseFloat(fromTokenAmount) * 10 ** 9);
+
+    if (!amount || amount <= 0) {
+      throw new Error('Invalid amount');
+    }
+
+    dispatch(
+      transferTokens({
+        sourcePublicKey: new web3.PublicKey(fromTokenPublicKey),
+        destPublicKey: new web3.PublicKey(fromTokenPublicKey),
+        amount,
+      }),
+    );
+  };
+
+  const handleTokenChange = (nextTokenPublicKey: string) => {
+    setFromTokenPublicKey(nextTokenPublicKey);
+  };
+
+  const handleAmountChange = (nextTokenAmount: string) => {
+    setFromTokenAmount(nextTokenAmount);
   };
 
   return (
@@ -128,7 +159,12 @@ export const SendWidget: FunctionComponent<Props> = (props) => {
       </TitleWrapper>
       <WrapperCard>
         <FromWrapper>
-          <FromSelectInput />
+          <FromSelectInput
+            tokenPublicKey={fromTokenPublicKey}
+            tokenAmount={fromTokenAmount}
+            onTokenChange={handleTokenChange}
+            onAmountChange={handleAmountChange}
+          />
         </FromWrapper>
         <ToWrapper>
           <ToSelect>
@@ -138,7 +174,7 @@ export const SendWidget: FunctionComponent<Props> = (props) => {
           <ToAddressInput value={toAddress} onChange={handleToAddressChange} />
         </ToWrapper>
         <ActionWrapper>
-          <Button primary big full>
+          <Button primary big full onClick={handleSubmit}>
             Send
           </Button>
           <Hint>

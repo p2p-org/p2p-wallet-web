@@ -6,8 +6,9 @@ import { rgba } from 'polished';
 
 import { Icon } from 'components/ui';
 import { getOwnedTokenAccounts } from 'store/actions/solana';
-import { RootState } from 'store/types';
+import { RootState, TokenAccount } from 'store/types';
 import { usePopulateTokenInfo } from 'utils/hooks/usePopulateTokenInfo';
+import { shortAddress } from 'utils/tokens';
 
 import { TokenRow } from './TokenRow';
 
@@ -72,7 +73,11 @@ export const TokenSelector: FunctionComponent<Props> = ({ value, onChange }) => 
   const [isOpen, setIsOpen] = useState(false);
   const order = useSelector((state: RootState) => state.entities.tokens.order);
 
-  const { name, mint } = usePopulateTokenInfo({ mint: value });
+  const tokenAccount: TokenAccount = useSelector(
+    (state: RootState) => state.entities.tokens.items[value],
+  );
+  const { mint } = tokenAccount?.parsed || {};
+  const { name } = usePopulateTokenInfo({ mint: mint?.toBase58() });
 
   useEffect(() => {
     dispatch(getOwnedTokenAccounts());
@@ -100,15 +105,15 @@ export const TokenSelector: FunctionComponent<Props> = ({ value, onChange }) => 
     setIsOpen(!isOpen);
   };
 
-  const handleItemClick = (publicKey) => {
+  const handleItemClick = (newPublicKey: string) => {
     setIsOpen(false);
-    onChange(publicKey);
+    onChange(newPublicKey);
   };
 
   return (
     <Wrapper ref={selectorRef}>
       <Selector onClick={handleSelectorClick}>
-        <Value title={name || mint}>{name || mint}</Value>
+        <Value title={value}>{name || shortAddress(value)}</Value>
         {order ? (
           <ChevronWrapper>
             <ChevronIcon name="chevron" />

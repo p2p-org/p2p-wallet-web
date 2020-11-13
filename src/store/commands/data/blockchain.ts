@@ -63,3 +63,10 @@ export const mintTestTokenAsyncAction = createAsyncAction(
   'SOLANA_MINT_TEST_TOKEN_FAILURE',
   'SOLANA_MINT_TEST_TOKEN_CANCEL',
 )<undefined, string, Error>();
+
+export const transferTokenAsyncAction = createAsyncAction(
+  'SOLANA_TRANSFER_TOKEN_REQUEST',
+  'SOLANA_TRANSFER_TOKEN_SUCCESS',
+  'SOLANA_TRANSFER_TOKEN_FAILURE',
+  'SOLANA_TRANSFER_TOKEN_CANCEL',
+)<undefined, string, Error>();

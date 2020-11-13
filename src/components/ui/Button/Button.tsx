@@ -1,10 +1,13 @@
-import React, { FunctionComponent, MouseEventHandler } from 'react';
+import React, { FunctionComponent } from 'react';
 
 import classNames from 'classnames';
 import { styled } from 'linaria/react';
 import { rgba } from 'polished';
 
 const Wrapper = styled.button`
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   height: 48px;
   padding: 0 20px;
 
@@ -12,7 +15,7 @@ const Wrapper = styled.button`
   font-size: 14px;
   line-height: 140%;
   white-space: nowrap;
-  text-align: center;
+  text-decoration: none;
 
   background: #fff;
   border: 0;
