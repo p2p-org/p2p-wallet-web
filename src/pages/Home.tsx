@@ -56,8 +56,10 @@ const SubTitle = styled.div`
   margin-bottom: 28px;
   `;
 
+const img = (process.env.BASENAME) ? process.env.BASENAME  + 'images/sun.png' : 'images/sun.png';
+
 const HeaderImage = styled.div`
-  background-image: url(${(process.env.BASENAME || '') + '/images/sun.png'});  
+  background-image: url('${img}'); 
   height: 209px;
   width: 219px;
   margin: auto;
