@@ -9,13 +9,7 @@ import { Header } from '../Header';
 import { ScrollFix } from '../ScollFix';
 import { Breadcrumbs, BreadcrumbType } from './Breadcrumbs';
 
-const Wrapper = styled(ScrollFix)`
-  :global(*) {
-    body {
-      background: #f8f8f8;
-    }
-  }
-`;
+const Wrapper = styled(ScrollFix)``;
 
 const MainScrollFix = styled.div`
   padding: 0 20px 170px;

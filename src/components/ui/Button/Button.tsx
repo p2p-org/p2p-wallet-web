@@ -38,6 +38,12 @@ const Wrapper = styled.button`
     background: #cecece;
   }
 
+  &.gray {
+    color: #000;
+
+    background: #f3f3f3;
+  }
+
   &.link {
     height: auto;
     padding: 0;
@@ -54,6 +60,8 @@ const Wrapper = styled.button`
 
   &.big {
     height: 58px;
+
+    font-weight: 500;
   }
 
   &.full {
@@ -64,6 +72,7 @@ const Wrapper = styled.button`
 type Props = {
   primary?: boolean;
   secondary?: boolean;
+  gray?: boolean;
   link?: boolean;
   small?: boolean;
   big?: boolean;
@@ -74,18 +83,20 @@ export const Button: FunctionComponent<Props & React.ButtonHTMLAttributes<HTMLBu
   type = 'button',
   primary,
   secondary,
+  gray,
   link,
   small,
   big,
   full,
   children,
+  className,
   ...props
 }) => {
   return (
     <Wrapper
       type={type}
-      className={classNames({ primary, secondary, link, small, full, big })}
-      {...props}>
+      {...props}
+      className={classNames(className, { primary, secondary, gray, link, small, full, big })}>
       {children}
     </Wrapper>
   );

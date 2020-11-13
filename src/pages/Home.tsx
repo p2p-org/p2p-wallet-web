@@ -2,8 +2,10 @@ import React, { FunctionComponent } from 'react';
 import { Link } from 'react-router-dom';
 
 import { styled } from 'linaria/react';
-import { Header } from '../components/common/Header';
+
 import { Button } from 'components/ui';
+
+import { Header } from '../components/common/Header';
 
 const Wrapper = styled.div``;
 
@@ -15,28 +17,10 @@ const Box = styled.div`
 const Actions = styled.div`
   display: flex;
   flex-flow: column wrap;
-`;
 
-const CreateButton = styled(Button)`
-  width: 100%;
-  height: 56px;
-  font-weight: 500;
-  color: #fff;
-  background: #000; 
-  line-height: 17px;
-  margin-bottom: 20px;
-  size: 14px;
-  font-style: normal;
-`;
-
-const AccessButton = styled(Button)`
-  width: 100%;
-  height: 56px;
-  color: #000;
-  font-weight: 500;
-  background: #F3F3F3; 
-  line-height: 17px;
-  font-style: normal;
+  > :not(:last-child) {
+    margin-bottom: 20px;
+  }
 `;
 
 const Title = styled.div`
@@ -45,7 +29,7 @@ const Title = styled.div`
   font-size: 27px;
   line-height: 120%;
   text-align: center;
-  `;
+`;
 
 const SubTitle = styled.div`
   color: #000;
@@ -54,7 +38,7 @@ const SubTitle = styled.div`
   line-height: 120%;
   text-align: center;
   margin-bottom: 28px;
-  `;
+`;
 
 const HeaderImage = styled.div`
   background-image: url('images/sun.png');
@@ -74,12 +58,12 @@ export const Home: FunctionComponent = () => {
         <Title>P2P Wallet </Title>
         <SubTitle> Own Your Money </SubTitle>
         <Actions>
-          <Link to="/create">
-            <CreateButton primary>Create Wallet</CreateButton>
-          </Link>
-          <Link to="/access">
-            <AccessButton primary>Access Wallet</AccessButton>
-          </Link>
+          <Button primary big full as={Link} to="/create">
+            Create new wallet
+          </Button>
+          <Button gray big full as={Link} to="/access">
+            I already have a wallet
+          </Button>
         </Actions>
       </Box>
     </Wrapper>

@@ -16,15 +16,15 @@ export const global = css`
       font-family: 'Rubik', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
         'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
 
-        background: #fff;
-        -webkit-font-smoothing: antialiased;
+      background: #f8f8f7;
+      -webkit-font-smoothing: antialiased;
     }
 
     a {
       color: ${rgba('#000', 0.5)};
       font-size: 14px;
       line-height: 140%;
-      text-decoration-line: underline;
+      text-decoration: underline;
     }
 
     & ::-webkit-scrollbar {
