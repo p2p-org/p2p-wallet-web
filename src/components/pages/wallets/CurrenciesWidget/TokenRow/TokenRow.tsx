@@ -112,7 +112,7 @@ export const TokenRow: FunctionComponent<Props> = ({ publicKey }) => {
 
   return (
     <WrapperCard>
-      <WrapperLink to={`/wallet/${mint ? symbol || publicKey : publicKey}`}>
+      <WrapperLink to={`/wallet/${/* mint ? symbol || publicKey : */ publicKey}`}>
         {/* TODO: move to rollup because of parcel error if wrap TokenAvatar */}
         <TokenAvatar mint={mint?.toBase58()} size={56} includeSol />
         <Content>

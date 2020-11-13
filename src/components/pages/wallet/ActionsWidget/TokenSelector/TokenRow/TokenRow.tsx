@@ -79,12 +79,12 @@ export const TokenRow: FunctionComponent<Props> = ({ publicKey, onItemClick }) =
   };
 
   return (
-    <Wrapper onClick={handleClick}>
+    <Wrapper title={publicKey} onClick={handleClick}>
       <ItemWrapper>
         <AvatarStyled src={icon} />
         <Info>
           <Top>
-            <TokenName>{name || mint?.toBase58()}</TokenName> <div />
+            <TokenName>{name || publicKey}</TokenName> <div />
           </Top>
           <Bottom>
             <div>{symbol}</div> <div>{amount}</div>

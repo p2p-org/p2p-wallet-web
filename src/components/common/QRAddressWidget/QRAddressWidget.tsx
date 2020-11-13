@@ -67,33 +67,34 @@ const Content = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 20px;
+  //padding: 20px;
+  padding: 20px 20px 40px;
 `;
 
-const ActionsWrapper = styled.div`
-  display: flex;
-  margin-top: 23px;
-
-  > :not(:last-child) {
-    margin-right: 10px;
-  }
-`;
-
-const Action = styled.div`
-  display: flex;
-  align-items: center;
-  height: 40px;
-  padding: 0 22px;
-
-  color: #000000;
-  font-size: 14px;
-  line-height: 17px;
-
-  background: ${rgba('#E8E8E8', 0.5)};
-  border-radius: 10px;
-
-  cursor: pointer;
-`;
+// const ActionsWrapper = styled.div`
+//   display: flex;
+//   margin-top: 23px;
+//
+//   > :not(:last-child) {
+//     margin-right: 10px;
+//   }
+// `;
+//
+// const Action = styled.div`
+//   display: flex;
+//   align-items: center;
+//   height: 40px;
+//   padding: 0 22px;
+//
+//   color: #000000;
+//   font-size: 14px;
+//   line-height: 17px;
+//
+//   background: ${rgba('#E8E8E8', 0.5)};
+//   border-radius: 10px;
+//
+//   cursor: pointer;
+// `;
 
 type Props = {
   publicKey: web3.PublicKey;
@@ -135,10 +136,10 @@ export const QRAddressWidget: FunctionComponent<Props> = ({ publicKey, isSol, cl
       </HeaderWrapper>
       <Content>
         <QRcode value={publicKeyBase58} size={148} />
-        <ActionsWrapper>
-          <Action>Copy image</Action>
-          <Action>Share</Action>
-        </ActionsWrapper>
+        {/* <ActionsWrapper> */}
+        {/*  <Action>Copy image</Action> */}
+        {/*  <Action>Share</Action> */}
+        {/* </ActionsWrapper> */}
       </Content>
     </WrapperCard>
   );
