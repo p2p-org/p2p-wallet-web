@@ -1,5 +1,6 @@
 import * as web3 from '@solana/web3.js';
 import * as bip39 from 'bip39';
+import * as bip32 from 'bip32';
 import nacl from 'tweetnacl';
 
 import { getBalance } from 'store/actions/solana';
@@ -61,6 +62,19 @@ export const createAccount = (mnemonic: string): AppThunk => async (dispatch) =>
   const seed = await bip39.mnemonicToSeed(mnemonic);
   const keyPair = nacl.sign.keyPair.fromSeed(seed.slice(0, 32));
 
+  localStorage.setItem('secretKey', JSON.stringify([...keyPair.secretKey]));
+  dispatch(createAccountAction(keyPair.secretKey));
+};
+
+export const accessAccount = (mnemonic : string): AppThunk => async (dispatch) => {
+
+  const seed = await bip39.mnemonicToSeed(mnemonic);
+
+  const derivedSeed = bip32
+    .fromSeed(seed)
+    .derivePath(`m/501'/0'/0/0`).privateKey;
+
+  const keyPair = nacl.sign.keyPair.fromSeed(derivedSeed);
   localStorage.setItem('secretKey', JSON.stringify([...keyPair.secretKey]));
   dispatch(createAccountAction(keyPair.secretKey));
 };
