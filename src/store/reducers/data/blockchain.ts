@@ -9,7 +9,6 @@ import {
   connectionReadyAction,
   createAccountAction,
   getBalanceAsyncAction,
-  getConfirmedTransactionAsyncAction,
   requestAirdropAsyncAction,
 } from 'store/commands';
 

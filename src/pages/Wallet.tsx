@@ -4,8 +4,8 @@ import { useParams } from 'react-router-dom';
 import * as web3 from '@solana/web3.js';
 
 import { Layout } from 'components/common/Layout';
+import { QRAddressWidget } from 'components/common/QRAddressWidget';
 import { ActionsWidget, ActivityWidget } from 'components/pages/wallet';
-import { QRAddressWidget } from 'components/pages/wallet/QRAddressWidget';
 import { usePopulateTokenInfo } from 'utils/hooks/usePopulateTokenInfo';
 
 type Props = {};
@@ -30,13 +30,13 @@ export const Wallet: FunctionComponent<Props> = (props) => {
       breadcrumbs={breadcrumbs}
       leftColumn={
         <>
-          <ActionsWidget address={accountAddress} />
-          <ActivityWidget address={accountAddress} />
+          <ActionsWidget publicKey={accountAddress} />
+          <ActivityWidget publicKey={accountAddress} />
         </>
       }
       rightColumn={
         <>
-          <QRAddressWidget />
+          <QRAddressWidget publicKey={accountAddress} />
         </>
       }
     />

@@ -34,7 +34,7 @@ const WrapperWidget = styled(Widget)``;
 
 type Props = {};
 
-export const WalletsWidget: FunctionComponent<Props> = (props) => {
+export const CurrenciesWidget: FunctionComponent<Props> = (props) => {
   const dispatch = useDispatch();
   const entrypoint = useSelector((state: RootState) => state.data.blockchain.entrypoint);
   const publicKey = useSelector((state: RootState) =>

@@ -1,14 +1,14 @@
 import React, { FunctionComponent } from 'react';
-import ReactHighcharts from 'react-highcharts';
 
+// import ReactHighcharts from 'react-highcharts';
 import { styled } from 'linaria/react';
 import { rgba } from 'polished';
 
 import { Card } from 'components/common/Card';
-import { calculateInterval, calculateStart } from 'utils/charts';
-
-import { serials } from './data';
-import { getConfig } from './utils';
+// import { calculateInterval, calculateStart } from 'utils/charts';
+//
+// import { serials } from './data';
+// import { getConfig } from './utils';
 
 const WrapperCard = styled(Card)``;
 
@@ -47,24 +47,24 @@ const Delta = styled.div`
 type Props = {};
 
 export const TotalBalanceWidget: FunctionComponent<Props> = (props) => {
-  const coin = 'BTC';
-  const currency = 'BTC';
-  const time = 'day';
-
-  const data = serials.map((d) => [d.timestamp * 1000, d.price]);
-  const decimals = 2;
-  const start = calculateStart(coin, time);
-  const interval = calculateInterval(time);
-  const config = getConfig(coin, currency, data, decimals, interval, start);
+  // const coin = 'BTC';
+  // const currency = 'BTC';
+  // const time = 'day';
+  //
+  // const data = serials.map((d) => [d.timestamp * 1000, d.price]);
+  // const decimals = 2;
+  // const start = calculateStart(coin, time);
+  // const interval = calculateInterval(time);
+  // const config = getConfig(coin, currency, data, decimals, interval, start);
 
   return (
     <WrapperCard withShadow>
       <Title>Total balance</Title>
       <PriceWrapper>
         <Price>$ 12 300,00</Price>
-        <ChartWrapper>
-          <ReactHighcharts config={config} isPureConfig />
-        </ChartWrapper>
+        {/* <ChartWrapper> */}
+        {/*  <ReactHighcharts config={config} isPureConfig /> */}
+        {/* </ChartWrapper> */}
       </PriceWrapper>
       <Delta>+ 0,16 US$ (0,01%) 24 hrs</Delta>
     </WrapperCard>

@@ -6,9 +6,11 @@ import { RootState } from 'store/types';
 export function usePopulateTokenInfo({
   mint,
   symbol,
+  includeSol,
 }: {
   mint?: string;
   symbol?: string;
+  includeSol?: boolean;
 }): {
   name?: string;
   mint?: string;
@@ -49,7 +51,7 @@ export function usePopulateTokenInfo({
     return { name: undefined, mint, symbol, icon: undefined };
   }
 
-  if (!mint && !symbol) {
+  if (includeSol && !mint && !symbol) {
     return {
       name: 'SOL',
       mint: undefined,

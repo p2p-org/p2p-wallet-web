@@ -5,7 +5,6 @@ import { Link } from 'react-router-dom';
 
 import { styled } from 'linaria/react';
 import { rgba } from 'polished';
-import { add } from 'ramda';
 
 // import { calculateInterval, calculateStart } from 'utils/charts';
 import { Card } from 'components/common/Card';
@@ -16,7 +15,7 @@ import { usePopulateTokenInfo } from 'utils/hooks/usePopulateTokenInfo';
 // import { getConfig } from './utils';
 
 const WrapperCard = styled(Card)`
-  padding: 0;
+  padding: 0 !important;
 `;
 
 const WrapperLink = styled(Link)`
@@ -95,7 +94,7 @@ export const TokenRow: FunctionComponent<Props> = ({ publicKey }) => {
 
   // eslint-disable-next-line prefer-const
   let { mint, amount } = tokenAccount?.parsed || {};
-  const { name, symbol } = usePopulateTokenInfo({ mint: mint?.toBase58() });
+  const { name, symbol } = usePopulateTokenInfo({ mint: mint?.toBase58(), includeSol: true });
 
   if (!mint) {
     amount = balance;
@@ -115,7 +114,7 @@ export const TokenRow: FunctionComponent<Props> = ({ publicKey }) => {
     <WrapperCard>
       <WrapperLink to={`/wallet/${mint ? symbol || publicKey : publicKey}`}>
         {/* TODO: move to rollup because of parcel error if wrap TokenAvatar */}
-        <TokenAvatar mint={mint?.toBase58()} size={56} isSolanaEmpty />
+        <TokenAvatar mint={mint?.toBase58()} size={56} includeSol />
         <Content>
           <Top>
             <TokenName title={name || mint?.toBase58()}>{name || mint?.toBase58()}</TokenName>

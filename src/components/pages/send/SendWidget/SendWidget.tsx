@@ -58,7 +58,6 @@ const FromWrapper = styled.div`
 `;
 
 const ToWrapper = styled.div`
-  height: 156px;
   padding: 16px 32px 32px;
 
   border-bottom: 1px solid ${rgba('#000', 0.1)};
@@ -74,8 +73,10 @@ const ToSelect = styled.div`
 `;
 
 const ToOption = styled.div`
+  display: flex;
+  align-items: center;
   height: 32px;
-  padding: 8px 20px;
+  padding: 0 20px;
 
   color: ${rgba('#000', 0.5)};
   font-size: 14px;
@@ -92,7 +93,7 @@ const ToOption = styled.div`
 `;
 
 const ActionWrapper = styled.div`
-  padding: 32px 32px 12px;
+  padding: 32px;
 `;
 
 const Hint = styled.div`

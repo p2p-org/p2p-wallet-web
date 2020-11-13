@@ -19,12 +19,7 @@ type Props = {
   className?: string;
 };
 
-export const Card: FunctionComponent<Props> = ({
-  withShadow = false,
-  children,
-  className,
-  ...props
-}) => {
+export const Card: FunctionComponent<Props> = ({ withShadow, children, className, ...props }) => {
   return (
     <Wrapper {...props} className={classNames(className, { withShadow })}>
       {children}

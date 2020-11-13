@@ -38,7 +38,7 @@ type Props = {
 
 export const Widget: FunctionComponent<Props> = ({
   title,
-  hasBigTitle = false,
+  hasBigTitle,
   action,
   children,
   className,

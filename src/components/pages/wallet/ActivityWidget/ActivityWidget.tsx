@@ -37,18 +37,18 @@ const WrapperWidget = styled(Widget)``;
 // ];
 
 type Props = {
-  address: web3.PublicKey;
+  publicKey: web3.PublicKey;
 };
 
-export const ActivityWidget: FunctionComponent<Props> = ({ address }) => {
+export const ActivityWidget: FunctionComponent<Props> = ({ publicKey }) => {
   const dispatch = useDispatch();
   const order = useSelector((state: RootState) =>
-    path<string[]>(['order'], state.entities.transactions[address.toBase58()]),
+    path<string[]>(['order'], state.entities.transactions[publicKey.toBase58()]),
   );
 
   useEffect(() => {
-    dispatch(getConfirmedSignaturesForAddress(address));
-  }, [ApiSolanaService.getConnection(), address]);
+    dispatch(getConfirmedSignaturesForAddress(publicKey));
+  }, [ApiSolanaService.getConnection(), publicKey]);
 
   return (
     <WrapperWidget title="Activity">

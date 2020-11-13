@@ -1,5 +1,5 @@
 export * from './ActionsWidget';
-export * from './WalletsWidget';
+export * from './CurrenciesWidget';
 export * from './SendAgainWidget';
 export * from './TotalBalanceWidget';
-export * from './WalletsWidget';
+export * from './CurrenciesWidget';

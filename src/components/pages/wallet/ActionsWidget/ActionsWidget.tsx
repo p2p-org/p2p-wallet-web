@@ -1,5 +1,6 @@
 import React, { FunctionComponent } from 'react';
 import { useHistory } from 'react-router';
+import { Link } from 'react-router-dom';
 
 import web3 from '@solana/web3.js';
 import { styled } from 'linaria/react';
@@ -15,10 +16,10 @@ const Wrapper = styled.div`
 `;
 
 type Props = {
-  address: web3.PublicKey;
+  publicKey: web3.PublicKey;
 };
 
-export const ActionsWidget: FunctionComponent<Props> = ({ address }) => {
+export const ActionsWidget: FunctionComponent<Props> = ({ publicKey }) => {
   const history = useHistory();
 
   const handleTokenChange = (token: string) => {
@@ -27,15 +28,17 @@ export const ActionsWidget: FunctionComponent<Props> = ({ address }) => {
 
   return (
     <Wrapper>
-      <TokenSelector value={address.toBase58()} onChange={handleTokenChange} />
+      <TokenSelector value={publicKey.toBase58()} onChange={handleTokenChange} />
 
       <ButtonsGroup>
+        {/* <Link to={`/send/${}`}> */}
         <Button primary small>
           Send
         </Button>
-        <Button primary small>
-          Buy
-        </Button>
+        {/* </Link> */}
+        {/* <Button primary small> */}
+        {/*  Buy */}
+        {/* </Button> */}
         <Button primary small>
           Swap
         </Button>

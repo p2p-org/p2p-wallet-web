@@ -1,0 +1,1 @@
+export { CurrenciesWidget } from './CurrenciesWidget';

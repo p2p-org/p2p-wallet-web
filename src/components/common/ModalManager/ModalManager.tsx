@@ -1,12 +1,16 @@
 import React, { createRef, FunctionComponent, Suspense, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
-import loadable from '@loadable/component';
+import loadable, { LoadableComponent } from '@loadable/component';
 import { styled } from 'linaria/react';
 import { last } from 'ramda';
 import { closeModal } from 'redux-modals-manager';
 
-import { SHOW_MODAL_ADD_COIN, SHOW_MODAL_TRANSACTION_DETAILS } from 'store/constants/modalTypes';
+import {
+  SHOW_MODAL_ADD_COIN,
+  SHOW_MODAL_RECIEVE_TOKENS,
+  SHOW_MODAL_TRANSACTION_DETAILS,
+} from 'store/constants/modalTypes';
 import { RootState } from 'store/types';
 
 const Wrapper = styled.div`
@@ -56,12 +60,14 @@ const ModalBackground = styled.div`
   user-select: none;
 `;
 
-const modalsMap = new Map([
+// TODO: types
+const modalsMap = new Map<string, LoadableComponent<any>>([
   [SHOW_MODAL_ADD_COIN, loadable(() => import('components/modals/AddCoinModal'))],
   [
     SHOW_MODAL_TRANSACTION_DETAILS,
     loadable(() => import('components/modals/TransactionDetailsModal')),
   ],
+  [SHOW_MODAL_RECIEVE_TOKENS, loadable(() => import('components/modals/RecieveTokensModal'))],
 ]);
 
 type Props = {};
