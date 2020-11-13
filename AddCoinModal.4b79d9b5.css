@@ -1,13 +1,5 @@
-.WrapperModal_wiqml5{-webkit-flex-basis:588px;-ms-flex-preferred-size:588px;flex-basis:588px;padding-bottom:20px;}
-.ScrollableContainer_s17ynaak{max-height:668px;overflow-y:auto;}.ScrollableContainer_s17ynaak::-webkit-scrollbar-track{margin-bottom:16px;}
-
-.Wrapper_wrdya2m{position:relative;display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;-webkit-flex-direction:column;-ms-flex-direction:column;flex-direction:column;background-color:#fff;border-radius:15px;}
-.Header_h1vh307k{position:relative;padding:20px 30px;border-bottom:1px solid rgba(0,0,0,0.05);}
-.Title_t1qfjroh{color:#000;font-weight:600;font-size:18px;line-height:100%;}
-.Description_d8b2mdb{margin-top:10px;color:rgba(0,0,0,0.5);font-size:14px;line-height:17px;}
-
-.CloseIcon_c1whuod3{position:absolute;top:15px;right:15px;width:32px;height:32px;cursor:pointer;}
-
+.WrapperModal_wiqml5{-webkit-flex-basis:588px;-ms-flex-preferred-size:588px;flex-basis:588px;}
+.ScrollableContainer_s17ynaak{padding-bottom:20px;max-height:668px;overflow-y:auto;}.ScrollableContainer_s17ynaak::-webkit-scrollbar-track{margin-bottom:16px;}
 
 .Wrapper_w1wf7dhi{display:grid;grid-gap:2px;}
 

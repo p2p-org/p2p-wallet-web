@@ -117,88 +117,7 @@ parcelRequire = (function (modules, cache, entry, globalName) {
   }
 
   return newRequire;
-})({"components/common/Modal/Modal.tsx":[function(require,module,exports) {
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.Modal = void 0;
-
-var _react = _interopRequireDefault(require("react"));
-
-var _react2 = require("linaria/react");
-
-var _ui = require("../../ui");
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var Wrapper = /*#__PURE__*/(0, _react2.styled)("div")({
-  name: "Wrapper",
-  class: "Wrapper_wrdya2m"
-});
-var Header = /*#__PURE__*/(0, _react2.styled)("div")({
-  name: "Header",
-  class: "Header_h1vh307k"
-});
-var Title = /*#__PURE__*/(0, _react2.styled)("div")({
-  name: "Title",
-  class: "Title_t1qfjroh"
-});
-var Description = /*#__PURE__*/(0, _react2.styled)("div")({
-  name: "Description",
-  class: "Description_d8b2mdb"
-});
-var CloseWrapper = /*#__PURE__*/(0, _react2.styled)("div")({
-  name: "CloseWrapper",
-  class: "CloseWrapper_c135gzia"
-});
-var CloseIcon = /*#__PURE__*/(0, _react2.styled)(_ui.Icon)({
-  name: "CloseIcon",
-  class: "CloseIcon_c1whuod3"
-});
-var Content = /*#__PURE__*/(0, _react2.styled)("div")({
-  name: "Content",
-  class: "Content_c12kmdhp"
-});
-
-var Modal = function Modal(_ref) {
-  var title = _ref.title,
-      description = _ref.description,
-      close = _ref.close,
-      children = _ref.children,
-      className = _ref.className;
-  return /*#__PURE__*/_react.default.createElement(Wrapper, {
-    className: className
-  }, /*#__PURE__*/_react.default.createElement(Header, null, title ? /*#__PURE__*/_react.default.createElement(Title, null, title) : undefined, description ? /*#__PURE__*/_react.default.createElement(Description, null, description) : undefined, close ? /*#__PURE__*/_react.default.createElement(CloseWrapper, {
-    onClick: close
-  }, /*#__PURE__*/_react.default.createElement(CloseIcon, {
-    name: "close"
-  })) : undefined), /*#__PURE__*/_react.default.createElement(Content, null, children));
-};
-
-exports.Modal = Modal;
-            ;(function() {
-              var reloadCSS = require('_css_loader');
-              module.hot.dispose(reloadCSS);
-              module.hot.accept(reloadCSS);
-            })();
-          
-},{"react":"../node_modules/react/index.js","linaria/react":"../node_modules/linaria/react.js","../../ui":"components/ui/index.ts","_css_loader":"../node_modules/parcel-bundler/src/builtins/css-loader.js"}],"components/common/Modal/index.ts":[function(require,module,exports) {
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-Object.defineProperty(exports, "Modal", {
-  enumerable: true,
-  get: function () {
-    return _Modal.Modal;
-  }
-});
-
-var _Modal = require("./Modal");
-},{"./Modal":"components/common/Modal/Modal.tsx"}],"store/utils/instructions/tokenProgram.ts":[function(require,module,exports) {
+})({"store/utils/instructions/tokenProgram.ts":[function(require,module,exports) {
 var Buffer = require("buffer").Buffer;
 "use strict";
 
@@ -871,6 +790,7 @@ var AddCoinModal = function AddCoinModal(_ref) {
       return !existsMintAccounts.has(token.mintAddress);
     });
   }, [tokenAccounts, tokens]);
+  console.log(filteredTokens);
   return /*#__PURE__*/_react.default.createElement(WrapperModal, {
     title: "Add coins",
     description: /*#__PURE__*/_react.default.createElement(_react.default.Fragment, null, "Add a token to your wallet. This will cost 0.002039 SOL.", !isMainnetEntrypoint ? /*#__PURE__*/_react.default.createElement(_react.default.Fragment, null, ' ', /*#__PURE__*/_react.default.createElement(_ui.Button, {
@@ -878,9 +798,9 @@ var AddCoinModal = function AddCoinModal(_ref) {
       onClick: handleMintTestTokenClick
     }, "Mint test token")) : null),
     close: close
-  }, /*#__PURE__*/_react.default.createElement(ScrollableContainer, null, /*#__PURE__*/_react.default.createElement(_TokenList.TokenList, {
+  }, (filteredTokens === null || filteredTokens === void 0 ? void 0 : filteredTokens.length) ? /*#__PURE__*/_react.default.createElement(ScrollableContainer, null, /*#__PURE__*/_react.default.createElement(_TokenList.TokenList, {
     items: filteredTokens
-  })));
+  })) : undefined);
 };
 
 exports.AddCoinModal = AddCoinModal;
@@ -932,7 +852,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "60390" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "63823" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
