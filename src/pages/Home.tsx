@@ -57,7 +57,7 @@ const SubTitle = styled.div`
   `;
 
 const HeaderImage = styled.div`
-  background-image: url('p2p-wallet-web/images/sun.png');
+  background-image: url('images/sun.png');
   height: 209px;
   width: 219px;
   margin: auto;
