@@ -11,7 +11,7 @@ import { Breadcrumbs, BreadcrumbType } from './Breadcrumbs';
 
 const Wrapper = styled.div``;
 
-const Main = styled.div`
+const MainScrollFix = styled(ScrollFix)`
   padding: 0 20px 170px;
 `;
 
@@ -77,27 +77,25 @@ export const Layout: FunctionComponent<Props> = ({
   return (
     <Wrapper>
       <Header />
-      <ScrollFix>
-        <Main>
-          <Container>
-            {breadcrumbs ? <Breadcrumbs breadcrumbs={breadcrumbs} /> : undefined}
-            {connectionReady ? (
-              <Content>
-                {leftColumn && rightColumn ? (
-                  <ColumnsWrapper>
-                    <ColumnLeft>{leftColumn}</ColumnLeft>
-                    <ColumnRight>{rightColumn}</ColumnRight>
-                  </ColumnsWrapper>
-                ) : centered ? (
-                  <CenteredWrapper>{centered}</CenteredWrapper>
-                ) : (
-                  children
-                )}
-              </Content>
-            ) : undefined}
-          </Container>
-        </Main>
-      </ScrollFix>
+      <MainScrollFix>
+        <Container>
+          {breadcrumbs ? <Breadcrumbs breadcrumbs={breadcrumbs} /> : undefined}
+          {connectionReady ? (
+            <Content>
+              {leftColumn && rightColumn ? (
+                <ColumnsWrapper>
+                  <ColumnLeft>{leftColumn}</ColumnLeft>
+                  <ColumnRight>{rightColumn}</ColumnRight>
+                </ColumnsWrapper>
+              ) : centered ? (
+                <CenteredWrapper>{centered}</CenteredWrapper>
+              ) : (
+                children
+              )}
+            </Content>
+          ) : undefined}
+        </Container>
+      </MainScrollFix>
     </Wrapper>
   );
 };

@@ -5,7 +5,8 @@ import { styled } from 'linaria/react';
 import { rgba } from 'polished';
 
 import { NetworkSelect } from 'components/common/NetworkSelect';
-import { Avatar } from 'components/ui';
+import { ScrollFix } from 'components/common/ScollFix';
+// import { Avatar } from 'components/ui';
 
 const Wrapper = styled.header`
   position: relative;
@@ -22,7 +23,7 @@ const Wrapper = styled.header`
   border-bottom: 1px solid ${rgba('#000', 0.1)};
 `;
 
-const Container = styled.div`
+const ContainerScrollFix = styled(ScrollFix)`
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -38,24 +39,24 @@ const LogoLink = styled(Link)`
   text-decoration: none;
 `;
 
-const Nav = styled.div`
-  display: grid;
-  grid-auto-flow: column;
-  grid-gap: 40px;
+// const Nav = styled.div`
+//   display: grid;
+//   grid-auto-flow: column;
+//   grid-gap: 40px;
+//
+//   padding: 0 16px;
+// `;
 
-  padding: 0 16px;
-`;
-
-const NavLink = styled(Link)`
-  color: ${rgba('#000', 0.5)};
-  font-size: 14px;
-  line-height: 140%;
-  text-decoration: none;
-
-  &:hover {
-    color: #000;
-  }
-`;
+// const NavLink = styled(Link)`
+//   color: ${rgba('#000', 0.5)};
+//   font-size: 14px;
+//   line-height: 140%;
+//   text-decoration: none;
+//
+//   &:hover {
+//     color: #000;
+//   }
+// `;
 
 const HeaderAuth = styled.div`
   display: flex;
@@ -69,27 +70,27 @@ const NetworkWrapper = styled.div`
   margin-right: 15px;
 `;
 
-const AvatarStyled = styled(Avatar)`
-  width: 36px;
-  height: 36px;
+// const AvatarStyled = styled(Avatar)`
+//   width: 36px;
+//   height: 36px;
+//
+//   background: #c4c4c4;
+// `;
 
-  background: #c4c4c4;
-`;
-
-const Username = styled.div`
-  margin-left: 16px;
-
-  font-weight: 500;
-  font-size: 14px;
-  line-height: 120%;
-`;
+// const Username = styled.div`
+//   margin-left: 16px;
+//
+//   font-weight: 500;
+//   font-size: 14px;
+//   line-height: 120%;
+// `;
 
 type Props = {};
 
 export const Header: FunctionComponent<Props> = (props) => {
   return (
     <Wrapper>
-      <Container>
+      <ContainerScrollFix>
         <LogoLink to="/wallets">P2P Wallet</LogoLink>
         {/* <Nav> */}
         {/*  /!*<NavLink to="/wallets">Wallets</NavLink>*!/ */}
@@ -104,7 +105,7 @@ export const Header: FunctionComponent<Props> = (props) => {
           {/* <AvatarStyled /> */}
           {/* <Username>Konstantin</Username> */}
         </HeaderAuth>
-      </Container>
+      </ContainerScrollFix>
     </Wrapper>
   );
 };
