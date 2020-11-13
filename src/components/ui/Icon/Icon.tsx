@@ -8,6 +8,7 @@ import chevron1 from './assets/chevron-1-icon.svg';
 import chevron from './assets/chevron-icon.svg';
 import close from './assets/close-icon.svg';
 import copy from './assets/copy-icon.svg';
+import eye from './assets/eye-icon.svg';
 
 const iconsMap = new Map<string, string>([
   ['arrow-angle', arrowAngle],
@@ -16,6 +17,7 @@ const iconsMap = new Map<string, string>([
   ['chevron', chevron],
   ['close', close],
   ['copy', copy],
+  ['eye', eye]
 ]);
 
 type Props = {
