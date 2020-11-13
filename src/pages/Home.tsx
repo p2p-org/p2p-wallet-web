@@ -56,10 +56,10 @@ const SubTitle = styled.div`
   margin-bottom: 28px;
   `;
 
-const img = (process.env.BASENAME) ? process.env.BASENAME  + 'images/sun.png' : 'images/sun.png';
+// const img = (process.env.BASENAME) ? process.env.BASENAME  + 'images/sun.png' : 'images/sun.png';
 
 const HeaderImage = styled.div`
-  background-image: url('${img}'); 
+  background-image: url('p2p-wallet-web/images/sun.png'); 
   height: 209px;
   width: 219px;
   margin: auto;
