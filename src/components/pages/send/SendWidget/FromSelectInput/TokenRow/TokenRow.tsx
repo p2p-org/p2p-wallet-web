@@ -4,12 +4,12 @@ import { useSelector } from 'react-redux';
 import { styled } from 'linaria/react';
 import { rgba } from 'polished';
 
-import { Avatar } from 'components/ui';
+import { TokenAvatar } from 'components/common/TokenAvatar';
 import { RootState, TokenAccount } from 'store/types';
 import { usePopulateTokenInfo } from 'utils/hooks/usePopulateTokenInfo';
 
 const Wrapper = styled.div`
-  padding: 15px 12px;
+  padding: 15px 32px;
 
   cursor: pointer;
 `;
@@ -17,29 +17,22 @@ const Wrapper = styled.div`
 const ItemWrapper = styled.div`
   display: flex;
   align-items: center;
-  height: 35px;
-`;
-
-const AvatarStyled = styled(Avatar)`
-  width: 32px;
-  height: 32px;
-  margin-right: 12px;
-
-  background: #888;
+  height: 44px;
 `;
 
 const Info = styled.div`
   flex: 1;
+  margin-left: 20px;
 `;
 
 const Top = styled.div`
   display: flex;
   justify-content: space-between;
 
-  color: #fff;
+  color: #000;
   font-weight: 500;
-  font-size: 14px;
-  line-height: 17px;
+  font-size: 18px;
+  line-height: 21px;
 `;
 
 const TokenName = styled.div`
@@ -56,32 +49,43 @@ const Bottom = styled.div`
   justify-content: space-between;
   margin-top: 4px;
 
-  color: ${rgba('#ffff', 0.5)};
-  font-size: 12px;
-  line-height: 14px;
+  color: ${rgba('#000', 0.5)};
+  font-size: 14px;
+  line-height: 17px;
 `;
 
 type Props = {
   publicKey: string;
-  onItemClick: (publicKey: string) => void;
+  onClick: (publicKey: string) => void;
 };
 
-export const TokenRow: FunctionComponent<Props> = ({ publicKey, onItemClick }) => {
+export const TokenRow: FunctionComponent<Props> = ({ publicKey, onClick }) => {
   const tokenAccount: TokenAccount = useSelector(
     (state: RootState) => state.entities.tokens.items[publicKey],
   );
+  const balance = useSelector((state: RootState) => state.data.blockchain.balance);
 
-  const { mint, amount } = tokenAccount.parsed;
-  const { name, symbol, icon } = usePopulateTokenInfo({ mint: mint?.toBase58() });
+  // eslint-disable-next-line prefer-const
+  let { mint, amount } = tokenAccount?.parsed || {};
+  const { name, symbol } = usePopulateTokenInfo({ mint: mint?.toBase58() });
+
+  let address;
+
+  if (!mint) {
+    address = publicKey;
+    amount = balance;
+  } else {
+    address = mint.toBase58();
+  }
 
   const handleClick = () => {
-    onItemClick(publicKey);
+    onClick(publicKey);
   };
 
   return (
     <Wrapper onClick={handleClick}>
       <ItemWrapper>
-        <AvatarStyled src={icon} />
+        <TokenAvatar mint={mint?.toBase58()} size={44} />
         <Info>
           <Top>
             <TokenName>{name || mint?.toBase58()}</TokenName> <div />

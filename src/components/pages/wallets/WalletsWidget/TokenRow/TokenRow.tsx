@@ -97,13 +97,8 @@ export const TokenRow: FunctionComponent<Props> = ({ publicKey }) => {
   let { mint, amount } = tokenAccount?.parsed || {};
   const { name, symbol } = usePopulateTokenInfo({ mint: mint?.toBase58() });
 
-  let address;
-
   if (!mint) {
-    address = publicKey;
     amount = balance;
-  } else {
-    address = mint.toBase58();
   }
 
   // const coin = 'BTC';
@@ -118,9 +113,9 @@ export const TokenRow: FunctionComponent<Props> = ({ publicKey }) => {
 
   return (
     <WrapperCard>
-      <WrapperLink to={`/wallet/${mint ? symbol || address : address}`}>
+      <WrapperLink to={`/wallet/${mint ? symbol || publicKey : publicKey}`}>
         {/* TODO: move to rollup because of parcel error if wrap TokenAvatar */}
-        <TokenAvatar mint={mint?.toBase58()} size={56} />
+        <TokenAvatar mint={mint?.toBase58()} size={56} isSolanaEmpty />
         <Content>
           <Top>
             <TokenName title={name || mint?.toBase58()}>{name || mint?.toBase58()}</TokenName>

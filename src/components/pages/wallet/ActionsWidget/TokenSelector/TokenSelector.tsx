@@ -46,9 +46,11 @@ const ChevronIcon = styled(Icon)`
 
 const DropDownList = styled.div`
   position: absolute;
+
   min-width: 302px;
   margin-top: 17px;
   padding: 5px 0;
+  z-index: 1;
 
   background: #464646;
   box-shadow: 0 12px 16px rgba(0, 0, 0, 0.15);
@@ -71,8 +73,6 @@ export const TokenSelector: FunctionComponent<Props> = ({ value, onChange }) => 
   const order = useSelector((state: RootState) => state.entities.tokens.order);
 
   const { name, mint } = usePopulateTokenInfo({ mint: value });
-
-  console.log(value, name, mint);
 
   useEffect(() => {
     dispatch(getOwnedTokenAccounts());

@@ -48,6 +48,14 @@ const Wrapper = styled.button`
   &.small {
     height: 40px;
   }
+
+  &.big {
+    height: 58px;
+  }
+
+  &.full {
+    width: 100%;
+  }
 `;
 
 type Props = {
@@ -55,6 +63,8 @@ type Props = {
   secondary?: boolean;
   link?: boolean;
   small?: boolean;
+  big?: boolean;
+  full?: boolean;
 };
 
 export const Button: FunctionComponent<Props & React.ButtonHTMLAttributes<HTMLButtonElement>> = ({
@@ -63,11 +73,16 @@ export const Button: FunctionComponent<Props & React.ButtonHTMLAttributes<HTMLBu
   secondary,
   link,
   small,
+  big,
+  full,
   children,
   ...props
 }) => {
   return (
-    <Wrapper type={type} className={classNames({ primary, secondary, link, small })} {...props}>
+    <Wrapper
+      type={type}
+      className={classNames({ primary, secondary, link, small, full, big })}
+      {...props}>
       {children}
     </Wrapper>
   );
