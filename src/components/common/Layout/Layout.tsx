@@ -3,6 +3,7 @@ import React, { FunctionComponent } from 'react';
 import { styled } from 'linaria/react';
 
 import { Header } from '../Header';
+import { ScrollFix } from '../ScollFix';
 import { Breadcrumbs, BreadcrumbType } from './Breadcrumbs';
 
 const Wrapper = styled.div``;
@@ -71,23 +72,25 @@ export const Layout: FunctionComponent<Props> = ({
   return (
     <Wrapper>
       <Header />
-      <Main>
-        <Container>
-          {breadcrumbs ? <Breadcrumbs breadcrumbs={breadcrumbs} /> : undefined}
-          <Content>
-            {leftColumn && rightColumn ? (
-              <ColumnsWrapper>
-                <ColumnLeft>{leftColumn}</ColumnLeft>
-                <ColumnRight>{rightColumn}</ColumnRight>
-              </ColumnsWrapper>
-            ) : centered ? (
-              <CenteredWrapper>{centered}</CenteredWrapper>
-            ) : (
-              children
-            )}
-          </Content>
-        </Container>
-      </Main>
+      <ScrollFix>
+        <Main>
+          <Container>
+            {breadcrumbs ? <Breadcrumbs breadcrumbs={breadcrumbs} /> : undefined}
+            <Content>
+              {leftColumn && rightColumn ? (
+                <ColumnsWrapper>
+                  <ColumnLeft>{leftColumn}</ColumnLeft>
+                  <ColumnRight>{rightColumn}</ColumnRight>
+                </ColumnsWrapper>
+              ) : centered ? (
+                <CenteredWrapper>{centered}</CenteredWrapper>
+              ) : (
+                children
+              )}
+            </Content>
+          </Container>
+        </Main>
+      </ScrollFix>
     </Wrapper>
   );
 };
