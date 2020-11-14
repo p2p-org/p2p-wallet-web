@@ -16,5 +16,7 @@ type Props = {};
 export const Swap: FunctionComponent<Props> = (props) => {
   const breadcrumbs = [{ name: 'Wallets', to: '/wallets' }, { name: 'Swap ' }];
 
-  return <Layout breadcrumbs={breadcrumbs} centered={<WrapperCard>In progress</WrapperCard>} />;
+  return (
+    <Layout breadcrumbs={breadcrumbs} centered={<WrapperCard>Work in progress</WrapperCard>} />
+  );
 };
