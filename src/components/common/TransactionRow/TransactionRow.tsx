@@ -5,13 +5,15 @@ import * as web3 from '@solana/web3.js';
 import { styled } from 'linaria/react';
 import { rgba } from 'polished';
 
+import { AmountUSDT } from 'components/common/AmountUSDT';
 import { Avatar } from 'components/ui';
 import { openModal } from 'store/actions/modals';
 import { getConfirmedTransaction } from 'store/actions/solana';
 import { SHOW_MODAL_TRANSACTION_DETAILS } from 'store/constants/modalTypes';
-import { RootState } from 'store/types';
+import { RootState, TokenAccount } from 'store/types';
 import { useDecodeSystemProgramInstructions } from 'utils/hooks/instructions/useDecodeSystemProgramInstructions';
 import { useDecodeTokenRegInstructions } from 'utils/hooks/instructions/useDecodeTokenRegInstractions';
+import { usePopulateTokenInfo } from 'utils/hooks/usePopulateTokenInfo';
 
 const Wrapper = styled.div`
   display: flex;
@@ -58,13 +60,26 @@ const Bottom = styled.div`
 
 type Props = {
   signature: string;
+  publicKey: web3.PublicKey;
 };
 
-export const TransactionRow: FunctionComponent<Props> = ({ signature }) => {
+export const TransactionRow: FunctionComponent<Props> = ({ signature, publicKey }) => {
   const dispatch = useDispatch();
   const transaction = useSelector(
     (state: RootState) => state.entities.transactionsNormalized[signature],
   );
+  const tokenAccount: TokenAccount = useSelector(
+    (state: RootState) => state.entities.tokens.items[publicKey.toBase58()],
+  );
+
+  const { mint } = tokenAccount?.parsed || { amount: 0 };
+  let { symbol } = usePopulateTokenInfo({ mint: mint?.toBase58(), includeSol: true });
+
+  const { type, lamports } = useDecodeSystemProgramInstructions(
+    transaction?.transaction.instructions,
+  );
+
+  const { transfer } = useDecodeTokenRegInstructions(transaction?.transaction.instructions);
 
   useEffect(() => {
     dispatch(getConfirmedTransaction(signature));
@@ -74,15 +89,10 @@ export const TransactionRow: FunctionComponent<Props> = ({ signature }) => {
     dispatch(openModal(SHOW_MODAL_TRANSACTION_DETAILS, { signature }));
   };
 
-  const { type, lamports } = useDecodeSystemProgramInstructions(
-    transaction?.transaction.instructions,
-  );
-
-  const { transfer } = useDecodeTokenRegInstructions(transaction?.transaction.instructions);
-
   // TODO: dirty
   let amount = 0;
   if (type) {
+    symbol = 'SOL';
     amount = (lamports || 0) / web3.LAMPORTS_PER_SOL;
   } else if (transfer) {
     amount = (transfer.amount || 0) / web3.LAMPORTS_PER_SOL;
@@ -96,11 +106,14 @@ export const TransactionRow: FunctionComponent<Props> = ({ signature }) => {
       <AvatarStyled />
       <Content>
         <Top>
-          <div>{type || (transfer && 'Transfer')}</div>
-          {/* <div>{type}</div> <div>{usd}</div> */}
+          <div>{type || (transfer && 'Transfer')}</div>{' '}
+          <AmountUSDT value={amount} symbol={symbol} />
         </Top>
         <Bottom>
-          <div>{transaction?.slot} SLOT</div> <div>{amount}</div>
+          <div>{transaction?.slot} SLOT</div>
+          <div>
+            {amount} {symbol}
+          </div>
         </Bottom>
       </Content>
     </Wrapper>

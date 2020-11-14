@@ -29,7 +29,7 @@ export const ActivityWidget: FunctionComponent<Props> = ({ publicKey }) => {
 
   return (
     <WrapperWidget title="Activity">
-      <TransactionList order={order} />
+      <TransactionList order={order} publicKey={publicKey} />
     </WrapperWidget>
   );
 };
