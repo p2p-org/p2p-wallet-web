@@ -16,7 +16,7 @@ export const AmountUSDT: FunctionComponent<Props> = ({ value = 0, symbol = '', .
   const rate = useSelector((state: RootState) => state.entities.rates[`${symbol}/USDT`]);
   const numberValue = Number.parseFloat(value as string) || 0;
 
-  let sum = numberValue;
+  let sum = String(numberValue);
 
   if (rate) {
     sum = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(

@@ -10,8 +10,8 @@ import { Header } from '../components/common/Header';
 const Wrapper = styled.div``;
 
 const Box = styled.div`
-  margin: auto;
   max-width: 364px;
+  margin: auto;
 `;
 
 const Actions = styled.div`

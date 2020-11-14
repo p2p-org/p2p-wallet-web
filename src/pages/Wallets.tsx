@@ -7,9 +7,19 @@ import { Layout } from 'components/common/Layout';
 import { ActionsWidget } from 'components/pages/wallets/ActionsWidget';
 import { CurrenciesWidget } from 'components/pages/wallets/CurrenciesWidget';
 // import { LatestTransactionsWidget } from 'components/pages/wallets/LatestTransactionsWidget';
-import { SendAgainWidget } from 'components/pages/wallets/SendAgainWidget';
+// import { SendAgainWidget } from 'components/pages/wallets/SendAgainWidget';
 import { TotalBalanceWidget } from 'components/pages/wallets/TotalBalanceWidget';
 import { RootState } from 'store/types';
+
+const WrapperTemp = styled.div`
+  display: grid;
+  grid-gap: 32px;
+  grid-template-rows: min-content;
+
+  width: 100%;
+  max-width: 556px;
+  height: fit-content;
+`;
 
 const HelloText = styled.div`
   color: #000;
@@ -49,8 +59,9 @@ export const Wallets: FunctionComponent = () => {
 
   return (
     <Layout
-      leftColumn={
-        <>
+      // leftColumn={
+      centered={
+        <WrapperTemp>
           {/* <HelloText>{greeting}, Konstantin!</HelloText> */}
           <HelloText>{greeting}!</HelloText>
           <BalanceGroup>
@@ -58,14 +69,14 @@ export const Wallets: FunctionComponent = () => {
             <ActionsWidget publicKey={publicKey} />
           </BalanceGroup>
           <CurrenciesWidget />
-        </>
+        </WrapperTemp>
       }
-      rightColumn={
-        <>
-          <SendAgainWidget />
-          {/* <LatestTransactionsWidget /> */}
-        </>
-      }
+      // rightColumn={
+      //   <>
+      //     <SendAgainWidget />
+      //     {/* <LatestTransactionsWidget /> */}
+      //   </>
+      // }
     />
   );
 };
