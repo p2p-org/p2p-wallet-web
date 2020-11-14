@@ -129,11 +129,17 @@ var _react = _interopRequireDefault(require("react"));
 
 var _reactRedux = require("react-redux");
 
+var web3 = _interopRequireWildcard(require("@solana/web3.js"));
+
 var _react2 = require("linaria/react");
 
 var _ui = require("../../ui");
 
-var _useDecodeInstrcutions = require("../../../utils/hooks/useDecodeInstrcutions");
+var _useDecodeSystemProgramInstructions = require("../../../utils/hooks/instructions/useDecodeSystemProgramInstructions");
+
+function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return null; var cache = new WeakMap(); _getRequireWildcardCache = function () { return cache; }; return cache; }
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -205,23 +211,23 @@ var TransactionDetailsModal = function TransactionDetailsModal(_ref) {
     return state.entities.transactionsNormalized[signature];
   });
 
-  var _useDecodeInstrcution = (0, _useDecodeInstrcutions.useDecodeInstrcutions)(transaction === null || transaction === void 0 ? void 0 : transaction.transaction.instructions),
-      type = _useDecodeInstrcution.type,
-      fromPubkey = _useDecodeInstrcution.fromPubkey,
-      lamports = _useDecodeInstrcution.lamports,
-      toPubkey = _useDecodeInstrcution.toPubkey;
+  var _useDecodeSystemProgr = (0, _useDecodeSystemProgramInstructions.useDecodeSystemProgramInstructions)(transaction === null || transaction === void 0 ? void 0 : transaction.transaction.instructions),
+      type = _useDecodeSystemProgr.type,
+      fromPubkey = _useDecodeSystemProgr.fromPubkey,
+      lamports = _useDecodeSystemProgr.lamports,
+      toPubkey = _useDecodeSystemProgr.toPubkey;
 
   if (!transaction) {
     return null;
   }
 
-  return /*#__PURE__*/_react.default.createElement(Wrapper, null, /*#__PURE__*/_react.default.createElement(Header, null, /*#__PURE__*/_react.default.createElement(Title, null, transaction.slot), /*#__PURE__*/_react.default.createElement(CloseWrapper, {
+  return /*#__PURE__*/_react.default.createElement(Wrapper, null, /*#__PURE__*/_react.default.createElement(Header, null, /*#__PURE__*/_react.default.createElement(Title, null, transaction.slot, " SLOT"), /*#__PURE__*/_react.default.createElement(CloseWrapper, {
     onClick: close
   }, /*#__PURE__*/_react.default.createElement(CloseIcon, {
     name: "close"
   })), /*#__PURE__*/_react.default.createElement(CircleWrapper, null, /*#__PURE__*/_react.default.createElement(ArrowAngleIcon, {
     name: "arrow-angle"
-  }))), /*#__PURE__*/_react.default.createElement(Content, null, /*#__PURE__*/_react.default.createElement(StatusWrapper, null, /*#__PURE__*/_react.default.createElement(Value, null, lamports), /*#__PURE__*/_react.default.createElement(Status, null, "Completed")), /*#__PURE__*/_react.default.createElement(FieldsWrapper, null, /*#__PURE__*/_react.default.createElement(FieldWrapper, null, /*#__PURE__*/_react.default.createElement(FieldTitle, null, "Transaction ID"), /*#__PURE__*/_react.default.createElement(FieldValue, null, signature)), /*#__PURE__*/_react.default.createElement(FieldWrapper, null, /*#__PURE__*/_react.default.createElement(FieldTitle, null, "Amount"), /*#__PURE__*/_react.default.createElement(FieldValue, null, lamports)), /*#__PURE__*/_react.default.createElement(FieldWrapper, null, /*#__PURE__*/_react.default.createElement(FieldTitle, null, "Value"), /*#__PURE__*/_react.default.createElement(FieldValue, null, lamports)), transaction.meta ? /*#__PURE__*/_react.default.createElement(FieldWrapper, null, /*#__PURE__*/_react.default.createElement(FieldTitle, null, "Fee"), /*#__PURE__*/_react.default.createElement(FieldValue, null, transaction.meta.fee)) : null)));
+  }))), /*#__PURE__*/_react.default.createElement(Content, null, /*#__PURE__*/_react.default.createElement(StatusWrapper, null, /*#__PURE__*/_react.default.createElement(Value, null, (lamports || 0) / web3.LAMPORTS_PER_SOL), /*#__PURE__*/_react.default.createElement(Status, null, "Completed")), /*#__PURE__*/_react.default.createElement(FieldsWrapper, null, /*#__PURE__*/_react.default.createElement(FieldWrapper, null, /*#__PURE__*/_react.default.createElement(FieldTitle, null, "Transaction ID"), /*#__PURE__*/_react.default.createElement(FieldValue, null, signature)), /*#__PURE__*/_react.default.createElement(FieldWrapper, null, /*#__PURE__*/_react.default.createElement(FieldTitle, null, "Amount"), /*#__PURE__*/_react.default.createElement(FieldValue, null, (lamports || 0) / web3.LAMPORTS_PER_SOL)), /*#__PURE__*/_react.default.createElement(FieldWrapper, null, /*#__PURE__*/_react.default.createElement(FieldTitle, null, "Value"), /*#__PURE__*/_react.default.createElement(FieldValue, null, (lamports || 0) / web3.LAMPORTS_PER_SOL)), transaction.meta ? /*#__PURE__*/_react.default.createElement(FieldWrapper, null, /*#__PURE__*/_react.default.createElement(FieldTitle, null, "Fee"), /*#__PURE__*/_react.default.createElement(FieldValue, null, transaction.meta.fee)) : null)));
 };
 
 exports.TransactionDetailsModal = TransactionDetailsModal;
@@ -231,7 +237,7 @@ exports.TransactionDetailsModal = TransactionDetailsModal;
               module.hot.accept(reloadCSS);
             })();
           
-},{"react":"../node_modules/react/index.js","react-redux":"../node_modules/react-redux/es/index.js","linaria/react":"../node_modules/linaria/react.js","../../ui":"components/ui/index.ts","../../../utils/hooks/useDecodeInstrcutions":"utils/hooks/useDecodeInstrcutions.ts","_css_loader":"../node_modules/parcel-bundler/src/builtins/css-loader.js"}],"components/modals/TransactionDetailsModal/index.ts":[function(require,module,exports) {
+},{"react":"../node_modules/react/index.js","react-redux":"../node_modules/react-redux/es/index.js","@solana/web3.js":"../node_modules/@solana/web3.js/lib/index.esm.js","linaria/react":"../node_modules/linaria/react.js","../../ui":"components/ui/index.ts","../../../utils/hooks/instructions/useDecodeSystemProgramInstructions":"utils/hooks/instructions/useDecodeSystemProgramInstructions.ts","_css_loader":"../node_modules/parcel-bundler/src/builtins/css-loader.js"}],"components/modals/TransactionDetailsModal/index.ts":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -273,7 +279,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "49667" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "61218" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

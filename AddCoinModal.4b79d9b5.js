@@ -137,6 +137,8 @@ var _classnames = _interopRequireDefault(require("classnames"));
 
 var _react2 = require("linaria/react");
 
+var _TokenAvatar = require("../../../common/TokenAvatar");
+
 var _ui = require("../../../ui");
 
 var _tokens = require("../../../../store/actions/complex/tokens");
@@ -171,33 +173,29 @@ var InfoWrapper = /*#__PURE__*/(0, _react2.styled)("div")({
   name: "InfoWrapper",
   class: "InfoWrapper_ifuaxgh"
 });
-var AvatarStyled = /*#__PURE__*/(0, _react2.styled)(_ui.Avatar)({
-  name: "AvatarStyled",
-  class: "AvatarStyled_asx2g64"
-});
 var Info = /*#__PURE__*/(0, _react2.styled)("div")({
   name: "Info",
-  class: "Info_i10180ct"
+  class: "Info_isx2g64"
 });
 var Top = /*#__PURE__*/(0, _react2.styled)("div")({
   name: "Top",
-  class: "Top_t1idmxl7"
+  class: "Top_t10180ct"
 });
 var Bottom = /*#__PURE__*/(0, _react2.styled)("div")({
   name: "Bottom",
-  class: "Bottom_b5vkidx"
+  class: "Bottom_b1idmxl7"
 });
 var Additional = /*#__PURE__*/(0, _react2.styled)("div")({
   name: "Additional",
-  class: "Additional_ajtzobz"
+  class: "Additional_a5vkidx"
 });
 var CopyWrapper = /*#__PURE__*/(0, _react2.styled)("div")({
   name: "CopyWrapper",
-  class: "CopyWrapper_cr7kpio"
+  class: "CopyWrapper_cjtzobz"
 });
 var CopyIcon = /*#__PURE__*/(0, _react2.styled)(_ui.Icon)({
   name: "CopyIcon",
-  class: "CopyIcon_c1n4pegg"
+  class: "CopyIcon_cr7kpio"
 });
 
 var TokenRow = function TokenRow(_ref) {
@@ -242,10 +240,11 @@ var TokenRow = function TokenRow(_ref) {
     name: "chevron"
   })), /*#__PURE__*/_react.default.createElement(Main, null, /*#__PURE__*/_react.default.createElement(Content, null, /*#__PURE__*/_react.default.createElement(InfoWrapper, {
     onClick: handleChevronClick
-  }, /*#__PURE__*/_react.default.createElement(AvatarStyled, {
-    src: icon
+  }, /*#__PURE__*/_react.default.createElement(_TokenAvatar.TokenAvatar, {
+    src: icon,
+    size: 44
   }), /*#__PURE__*/_react.default.createElement(Info, null, /*#__PURE__*/_react.default.createElement(Top, null, /*#__PURE__*/_react.default.createElement("div", null, tokenSymbol), " ", /*#__PURE__*/_react.default.createElement("div", null)), /*#__PURE__*/_react.default.createElement(Bottom, null, /*#__PURE__*/_react.default.createElement("div", null, tokenName), " ", /*#__PURE__*/_react.default.createElement("div", null)))), /*#__PURE__*/_react.default.createElement(_ui.Button, {
-    secondary: true,
+    primary: true,
     small: true,
     onClick: handleAddClick
   }, "Add")), /*#__PURE__*/_react.default.createElement(Additional, {
@@ -272,7 +271,7 @@ exports.TokenRow = TokenRow;
               module.hot.accept(reloadCSS);
             })();
           
-},{"@babel/runtime/helpers/slicedToArray":"../node_modules/@babel/runtime/helpers/slicedToArray.js","react":"../node_modules/react/index.js","react-redux":"../node_modules/react-redux/es/index.js","@solana/web3.js":"../node_modules/@solana/web3.js/lib/index.esm.js","classnames":"../node_modules/classnames/index.js","linaria/react":"../node_modules/linaria/react.js","../../../ui":"components/ui/index.ts","../../../../store/actions/complex/tokens":"store/actions/complex/tokens.ts","_css_loader":"../node_modules/parcel-bundler/src/builtins/css-loader.js"}],"components/modals/AddCoinModal/TokenRow/index.ts":[function(require,module,exports) {
+},{"@babel/runtime/helpers/slicedToArray":"../node_modules/@babel/runtime/helpers/slicedToArray.js","react":"../node_modules/react/index.js","react-redux":"../node_modules/react-redux/es/index.js","@solana/web3.js":"../node_modules/@solana/web3.js/lib/index.esm.js","classnames":"../node_modules/classnames/index.js","linaria/react":"../node_modules/linaria/react.js","../../../common/TokenAvatar":"components/common/TokenAvatar/index.ts","../../../ui":"components/ui/index.ts","../../../../store/actions/complex/tokens":"store/actions/complex/tokens.ts","_css_loader":"../node_modules/parcel-bundler/src/builtins/css-loader.js"}],"components/modals/AddCoinModal/TokenRow/index.ts":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -381,50 +380,7 @@ var WrapperModal = /*#__PURE__*/(0, _react2.styled)(_Modal.Modal)({
 var ScrollableContainer = /*#__PURE__*/(0, _react2.styled)("div")({
   name: "ScrollableContainer",
   class: "ScrollableContainer_s17ynaak"
-}); // const ITEMS = [
-//   {
-//     symbol: 'SRM',
-//     name: 'Serum',
-//     price: '$0.887832',
-//     delta: '+16.9% for 24hrs',
-//   },
-//   {
-//     symbol: 'MSRM',
-//     name: 'MegaSerum',
-//     price: '$0.887832',
-//     delta: '+16.9% for 24hrs',
-//   },
-//   {
-//     symbol: 'BTC',
-//     name: 'Wrapped Bitcoin',
-//     price: '$0.887832',
-//     delta: '+16.9% for 24hrs',
-//   },
-//   {
-//     symbol: 'ETH',
-//     name: 'Wrapped Ethereum',
-//     price: '$0.887832',
-//     delta: '+16.9% for 24hrs',
-//   },
-//   {
-//     symbol: 'FTT',
-//     name: 'Wrapped FTT',
-//     price: '$0.887832',
-//     delta: '+16.9% for 24hrs',
-//   },
-//   {
-//     symbol: 'YFI',
-//     name: 'Wrapped YFI',
-//     price: '$0.887832',
-//     delta: '+16.9% for 24hrs',
-//   },
-//   {
-//     symbol: 'YFI',
-//     name: 'Wrapped YFI',
-//     price: '$0.887832',
-//     delta: '+16.9% for 24hrs',
-//   },
-// ];
+});
 
 var AddCoinModal = function AddCoinModal(_ref) {
   var close = _ref.close;
@@ -471,7 +427,7 @@ var AddCoinModal = function AddCoinModal(_ref) {
   }, [tokenAccounts, tokens]);
   return /*#__PURE__*/_react.default.createElement(WrapperModal, {
     title: "Add coins",
-    description: /*#__PURE__*/_react.default.createElement(_react.default.Fragment, null, "Add a token to your wallet. This will cost 0.002039 SOL.", !isMainnetEntrypoint ? /*#__PURE__*/_react.default.createElement(_react.default.Fragment, null, ' ', /*#__PURE__*/_react.default.createElement(_ui.Button, {
+    description: /*#__PURE__*/_react.default.createElement(_react.default.Fragment, null, "Add a token to your wallet. This will some SOL", !isMainnetEntrypoint ? /*#__PURE__*/_react.default.createElement(_react.default.Fragment, null, ' ', /*#__PURE__*/_react.default.createElement(_ui.Button, {
       link: true,
       onClick: handleMintTestTokenClick
     }, "Mint test token")) : null),
@@ -530,7 +486,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "49667" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "61218" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

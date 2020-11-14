@@ -9,11 +9,10 @@
 .Main_m1x0i73s{-webkit-flex:1;-ms-flex:1;flex:1;}
 .Content_c1lrr91s{display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;-webkit-align-items:center;-webkit-box-align:center;-ms-flex-align:center;align-items:center;}
 .InfoWrapper_ifuaxgh{display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;-webkit-flex:1;-ms-flex:1;flex:1;margin-right:48px;cursor:pointer;}
-.AvatarStyled_asx2g64{width:44px;height:44px;margin-right:20px;background:#dadada;}
-.Info_i10180ct{-webkit-flex:1;-ms-flex:1;flex:1;font-size:14px;line-height:17px;}
-.Top_t1idmxl7{display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;-webkit-box-pack:justify;-webkit-justify-content:space-between;-ms-flex-pack:justify;justify-content:space-between;color:#000;font-weight:500;}
-.Bottom_b5vkidx{display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;-webkit-box-pack:justify;-webkit-justify-content:space-between;-ms-flex-pack:justify;justify-content:space-between;margin-top:4px;color:rgba(0,0,0,0.5);font-size:14px;line-height:17px;}
-.Additional_ajtzobz{display:none;margin-top:20px;}.Additional_ajtzobz.opened{display:block;}
-.CopyWrapper_cr7kpio{cursor:pointer;}
-.CopyIcon_c1n4pegg{width:24px;height:24px;}
+.Info_isx2g64{-webkit-flex:1;-ms-flex:1;flex:1;margin-left:20px;font-size:14px;line-height:17px;}
+.Top_t10180ct{display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;-webkit-box-pack:justify;-webkit-justify-content:space-between;-ms-flex-pack:justify;justify-content:space-between;color:#000;font-weight:500;}
+.Bottom_b1idmxl7{display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;-webkit-box-pack:justify;-webkit-justify-content:space-between;-ms-flex-pack:justify;justify-content:space-between;margin-top:4px;color:rgba(0,0,0,0.5);font-size:14px;line-height:17px;}
+.Additional_a5vkidx{display:none;margin-top:20px;}.Additional_a5vkidx.opened{display:block;}
+.CopyWrapper_cjtzobz{cursor:pointer;}
+.CopyIcon_cr7kpio{width:24px;height:24px;}
 
