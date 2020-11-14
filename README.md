@@ -1,7 +1,7 @@
 # P2P Wallet prototype
 
 A Open Source Browser Based Solana Wallet. Version "0.1a Wormhole Hackathon"
-Built on top of [Solana](https://github.com/solana-labs), [ProjectSerum](https://github.com/project-serum) [Bonfida](https://docs.bonfida.com/#project-serum)
+Built on top of [Solana](https://github.com/solana-labs), [ProjectSerum](https://github.com/project-serum), [Bonfida API](https://docs.bonfida.com/#project-serum)
 
 Live demo available at [github-pages](https://p2p-org.github.io/p2p-wallet-web/)
 
