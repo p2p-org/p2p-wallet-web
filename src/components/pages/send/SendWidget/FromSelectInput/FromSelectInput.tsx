@@ -50,6 +50,7 @@ const InfoWrapper = styled.div`
   display: flex;
   flex-direction: column;
   flex: 1;
+  min-width: 0;
 
   margin-left: 20px;
 `;
@@ -63,6 +64,7 @@ const SpecifyTokenWrapper = styled.div`
 
 const TokenWrapper = styled.div`
   display: flex;
+  min-width: 0;
 
   cursor: pointer;
 `;
