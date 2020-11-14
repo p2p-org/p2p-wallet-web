@@ -2,6 +2,7 @@ import React, { FunctionComponent, useEffect } from 'react';
 import Skeleton from 'react-loading-skeleton';
 import { useDispatch, useSelector } from 'react-redux';
 
+import * as web3 from '@solana/web3.js';
 import { styled } from 'linaria/react';
 
 import { getConfirmedTransaction } from 'store/actions/solana';
@@ -52,7 +53,7 @@ export const TransactionRow: FunctionComponent<Props> = ({ signature }) => {
       <Column>{transaction?.slot || <Skeleton height={24} width="100%" />}</Column>
       <Column>{fromPubkey?.toString() || <Skeleton height={24} width="100%" />}</Column>
       <Column>{toPubkey?.toString() || <Skeleton height={24} width="100%" />}</Column>
-      <Column>{lamports || <Skeleton height={24} width="100%" />}</Column>
+      <Column>{lamports / web3.LAMPORTS_PER_SOL || <Skeleton height={24} width="100%" />}</Column>
     </Wrapper>
   );
 };

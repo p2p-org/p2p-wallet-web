@@ -1,6 +1,7 @@
 import React, { FunctionComponent, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
+import * as web3 from '@solana/web3.js';
 import { styled } from 'linaria/react';
 import { rgba } from 'polished';
 
@@ -85,7 +86,7 @@ export const TransactionRow: FunctionComponent<Props> = ({ signature }) => {
           {/* <div>{type}</div> <div>{usd}</div> */}
         </Top>
         <Bottom>
-          <div /> <div>{lamports}</div>
+          <div /> <div>{(lamports || 0) / web3.LAMPORTS_PER_SOL}</div>
           {/* <div>{date}</div> <div>{value}</div> */}
         </Bottom>
       </Content>

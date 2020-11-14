@@ -158,7 +158,7 @@ export const TransactionDetailsModal: FunctionComponent<Props> = ({ signature, c
       <Content>
         <StatusWrapper>
           {/* <Value>+ 0,00344 BTC</Value> */}
-          <Value>{lamports}</Value>
+          <Value>{(lamports || 0) / web3.LAMPORTS_PER_SOL}</Value>
           <Status>Completed</Status>
         </StatusWrapper>
         <FieldsWrapper>
@@ -168,12 +168,12 @@ export const TransactionDetailsModal: FunctionComponent<Props> = ({ signature, c
           </FieldWrapper>
           <FieldWrapper>
             <FieldTitle>Amount</FieldTitle>
-            <FieldValue>{lamports}</FieldValue>
+            <FieldValue>{(lamports || 0) / web3.LAMPORTS_PER_SOL}</FieldValue>
             {/* <FieldValue>0,00344 BTC at 12 902, 07 US$</FieldValue> */}
           </FieldWrapper>
           <FieldWrapper>
             <FieldTitle>Value</FieldTitle>
-            <FieldValue>{lamports}</FieldValue>
+            <FieldValue>{(lamports || 0) / web3.LAMPORTS_PER_SOL}</FieldValue>
             {/* <FieldValue>0,00344 BTC at 12 902, 07 US$</FieldValue> */}
           </FieldWrapper>
           {transaction.meta ? (

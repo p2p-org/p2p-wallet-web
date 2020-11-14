@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useLocation } from 'react-router';
 import { Link } from 'react-router-dom';
 
+import * as web3 from '@solana/web3.js';
 import { styled } from 'linaria/react';
 import { rgba } from 'polished';
 
@@ -111,7 +112,7 @@ export const ResultWidget: FunctionComponent<Props> = (props) => {
       <CircleWrapper>
         <ArrowIcon name="arrow-angle" />
       </CircleWrapper>
-      <Value>{lamports}</Value>
+      <Value>{lamports / web3.LAMPORTS_PER_SOL}</Value>
       <Status>Processed</Status>
       <Details onClick={handleDetailsClick}>Transaction details</Details>
       <Button primary big full as={Link} to={`/wallet/${fromPubkey}`}>

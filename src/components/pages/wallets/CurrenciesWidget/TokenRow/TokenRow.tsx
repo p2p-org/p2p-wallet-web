@@ -7,8 +7,10 @@ import * as web3 from '@solana/web3.js';
 import { styled } from 'linaria/react';
 import { rgba } from 'polished';
 
+import { AmountUSDT } from 'components/common/AmountUSDT';
 // import { calculateInterval, calculateStart } from 'utils/charts';
 import { Card } from 'components/common/Card';
+import { RateUSDT } from 'components/common/RateUSDT';
 import { TokenAvatar } from 'components/common/TokenAvatar';
 import { RootState, TokenAccount } from 'store/types';
 import { usePopulateTokenInfo } from 'utils/hooks/usePopulateTokenInfo';
@@ -63,16 +65,16 @@ const TokenName = styled.div`
 //   width: 108px;
 // `;
 
-// const Middle = styled.div`
-//   display: flex;
-//   justify-content: space-between;
-//   margin: 12px 0 4px;
-//
-//   color: #000;
-//   font-weight: 500;
-//   font-size: 14px;
-//   line-height: 140%;
-// `;
+const Middle = styled.div`
+  display: flex;
+  justify-content: space-between;
+  margin: 12px 0 4px;
+
+  color: #000;
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 140%;
+`;
 
 const Bottom = styled.div`
   display: flex;
@@ -95,7 +97,7 @@ export const TokenRow: FunctionComponent<Props> = ({ publicKey }) => {
 
   // eslint-disable-next-line prefer-const
   let { mint, amount } = tokenAccount?.parsed || { amount: 0 };
-  const { name } = usePopulateTokenInfo({ mint: mint?.toBase58(), includeSol: true });
+  const { name, symbol } = usePopulateTokenInfo({ mint: mint?.toBase58(), includeSol: true });
 
   if (!mint) {
     amount = balanceLamports / web3.LAMPORTS_PER_SOL;
@@ -123,7 +125,9 @@ export const TokenRow: FunctionComponent<Props> = ({ publicKey }) => {
             {/*  <ReactHighcharts config={config} isPureConfig /> */}
             {/* </ChartWrapper> */}
           </Top>
-          {/* <Middle><div>{balance1}</div> <div>{balance2}</div></Middle> */}
+          <Middle>
+            <AmountUSDT value={amount} symbol={symbol} /> <RateUSDT symbol={symbol} />
+          </Middle>
           {/* <Middle> */}
           {/*  <div>{balanceUsd}</div> /!* <div>{balance2}</div> *!/ */}
           {/* </Middle> */}

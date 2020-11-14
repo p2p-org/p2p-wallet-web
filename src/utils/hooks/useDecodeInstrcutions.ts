@@ -2,6 +2,8 @@ import { useMemo } from 'react';
 
 import * as web3 from '@solana/web3.js';
 
+import { TOKEN_PROGRAM_ID } from 'constants/solana/bufferLayouts';
+
 export const useDecodeInstrcutions = (instructions) => {
   const { type, fromPubkey, lamports, toPubkey } = useMemo(() => {
     // eslint-disable-next-line no-shadow
@@ -15,7 +17,7 @@ export const useDecodeInstrcutions = (instructions) => {
 
     if (instructions) {
       const [instruction] = instructions;
-      if (instruction.programId.toString() === web3.SystemProgram.programId.toString()) {
+      if (instruction.programId.toBase58() === web3.SystemProgram.programId.toBase58()) {
         type = web3.SystemInstruction.decodeInstructionType(instruction);
 
         switch (type) {
@@ -30,6 +32,19 @@ export const useDecodeInstrcutions = (instructions) => {
           default:
             break;
         }
+      } else if (instruction.programId.toBase58() === TOKEN_PROGRAM_ID.toBase58()) {
+        // switch (type) {
+        //   case 'Create':
+        //     ({ fromPubkey, lamports } = web3.SystemInstruction.decodeCreateAccount(instruction));
+        //     break;
+        //   case 'Transfer':
+        //     ({ fromPubkey, lamports, toPubkey } = web3.SystemInstruction.decodeTransfer(
+        //       instruction,
+        //     ));
+        //     break;
+        //   default:
+        //     break;
+        // }
       }
     }
 
