@@ -127,7 +127,7 @@ export const QRAddressWidget: FunctionComponent<Props> = ({ publicKey, isSol, cl
     <WrapperCard className={className}>
       <HeaderWrapper>
         <TokenWrapper>
-          <TokenName>{name} Wowlet Address</TokenName>
+          <TokenName>{name} Address</TokenName>
           <TokenAddress>{publicKeyBase58}</TokenAddress>
         </TokenWrapper>
         <ShareWrapper onClick={handleCopyClick}>
