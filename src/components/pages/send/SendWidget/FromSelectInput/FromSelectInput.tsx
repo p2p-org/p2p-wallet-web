@@ -166,14 +166,20 @@ export const FromSelectInput: FunctionComponent<Props> = ({
   const dispatch = useDispatch();
   const selectorRef = useRef<HTMLDivElement>(null);
   const [isOpen, setIsOpen] = useState(false);
+  const balance = useSelector((state: RootState) => state.data.blockchain.balance);
   const order = useSelector((state: RootState) => state.entities.tokens.order);
   const entrypoint = useSelector((state: RootState) => state.data.blockchain.entrypoint);
 
   const tokenAccount: TokenAccount = useSelector(
     (state: RootState) => state.entities.tokens.items[tokenPublicKey],
   );
-  const { mint, amount } = tokenAccount?.parsed || { amount: 0 };
-  const { name, symbol } = usePopulateTokenInfo({ mint: mint?.toBase58() });
+  // eslint-disable-next-line prefer-const
+  let { mint, amount } = tokenAccount?.parsed || { amount: 0 };
+  const { name, symbol } = usePopulateTokenInfo({ mint: mint?.toBase58(), includeSol: true });
+
+  if (!mint) {
+    amount = balance * 0.000000001; // SOL;
+  }
 
   useEffect(() => {
     dispatch(getOwnedTokenAccounts());

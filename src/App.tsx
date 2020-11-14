@@ -22,9 +22,10 @@ export const App: React.FC = () => {
           <Route path="/create" component={Create} />
           <Route path="/access" component={Access} />
           <AuthRequiredRoute path="/wallets" component={Wallets} />
-          <AuthRequiredRoute path="/wallet/:symbol" component={Wallet} />
-          <AuthRequiredRoute path="/send/:symbol" component={Send} />
-          <AuthRequiredRoute path="/swap/:swap" component={Swap} />
+          <AuthRequiredRoute path="/wallet/:publicKey" component={Wallet} />
+          <AuthRequiredRoute path="/send/:publicKey/:status(result)" component={Send} />
+          <AuthRequiredRoute path="/send/:publicKey" component={Send} />
+          <AuthRequiredRoute path="/swap/:publicKey" component={Swap} />
           <AuthRequiredRoute path="/dashboard_old" component={DashboardOld} />
         </Switch>
       </Router>

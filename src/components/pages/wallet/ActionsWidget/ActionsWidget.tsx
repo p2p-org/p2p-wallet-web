@@ -1,12 +1,13 @@
 import React, { FunctionComponent } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router';
 import { Link } from 'react-router-dom';
 
-import web3 from '@solana/web3.js';
+import * as web3 from '@solana/web3.js';
 import { styled } from 'linaria/react';
 
 import { Button, ButtonsGroup } from 'components/ui';
+import { requestAirdrop } from 'store/actions/solana';
 import { RootState, TokenAccount } from 'store/types';
 import { usePopulateTokenInfo } from 'utils/hooks/usePopulateTokenInfo';
 
@@ -23,7 +24,10 @@ type Props = {
 };
 
 export const ActionsWidget: FunctionComponent<Props> = ({ publicKey }) => {
+  const dispatch = useDispatch();
   const history = useHistory();
+  const entrypoint = useSelector((state: RootState) => state.data.blockchain.entrypoint);
+  const isMainnetEntrypoint = entrypoint === web3.clusterApiUrl('mainnet-beta');
 
   const tokenAccount: TokenAccount = useSelector(
     (state: RootState) => state.entities.tokens.items[publicKey.toBase58()],
@@ -33,6 +37,10 @@ export const ActionsWidget: FunctionComponent<Props> = ({ publicKey }) => {
 
   const handleTokenChange = (token: string) => {
     history.push(`/wallet/${token}`);
+  };
+
+  const handleAirdropClick = () => {
+    dispatch(requestAirdrop());
   };
 
   return (
@@ -49,6 +57,11 @@ export const ActionsWidget: FunctionComponent<Props> = ({ publicKey }) => {
         <Button primary small as={Link} to={`/swap/${symbol || publicKey.toBase58()}`}>
           Swap
         </Button>
+        {!isMainnetEntrypoint ? (
+          <Button primary small onClick={handleAirdropClick}>
+            Airdrop
+          </Button>
+        ) : undefined}
       </ButtonsGroup>
     </Wrapper>
   );

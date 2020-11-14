@@ -4,8 +4,8 @@ import { useParams } from 'react-router-dom';
 import { styled } from 'linaria/react';
 
 import { Layout } from 'components/common/Layout';
+import { ResultWidget } from 'components/pages/send/ResultWidget';
 import { SendWidget } from 'components/pages/send/SendWidget';
-import { usePopulateTokenInfo } from 'utils/hooks/usePopulateTokenInfo';
 
 const Wrapper = styled.div`
   width: 100%;
@@ -16,20 +16,22 @@ const Wrapper = styled.div`
 type Props = {};
 
 export const Send: FunctionComponent<Props> = (props) => {
-  const { symbol: aliasSymbol } = useParams<{ symbol: string }>();
-  const { mint } = usePopulateTokenInfo({
-    mint: aliasSymbol,
-    symbol: aliasSymbol,
-  });
+  const { publicKey, status } = useParams<{ publicKey: string; status: string }>();
 
-  const breadcrumbs = [{ name: 'Wallets', to: '/wallets' }, { name: 'Send ' }];
+  const breadcrumbs: { name: string; to?: string }[] = [{ name: 'Wallets', to: '/wallets' }];
+
+  if (status === 'result') {
+    breadcrumbs.push({ name: 'Send', to: `/send/${publicKey}` }, { name: 'Result' });
+  } else {
+    breadcrumbs.push({ name: 'Send' });
+  }
 
   return (
     <Layout
       breadcrumbs={breadcrumbs}
       centered={
         <Wrapper>
-          <SendWidget />
+          {status !== 'result' ? <SendWidget publicKey={publicKey} /> : <ResultWidget />}
         </Wrapper>
       }
     />

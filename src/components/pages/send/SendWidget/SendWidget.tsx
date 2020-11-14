@@ -1,5 +1,5 @@
 import React, { FunctionComponent, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { useHistory } from 'react-router';
 
 import * as web3 from '@solana/web3.js';
@@ -9,7 +9,6 @@ import { rgba } from 'polished';
 import { Card } from 'components/common/Card';
 import { Button, Icon } from 'components/ui';
 import { transferTokens } from 'store/actions/complex';
-import { RootState } from 'store/types';
 
 import { FromSelectInput } from './FromSelectInput';
 import { ToAddressInput } from './ToAddressInput';
@@ -108,12 +107,14 @@ const Hint = styled.div`
   line-height: 17px;
 `;
 
-type Props = {};
+type Props = {
+  publicKey: string;
+};
 
-export const SendWidget: FunctionComponent<Props> = (props) => {
+export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
   const dispatch = useDispatch();
   const history = useHistory();
-  const [fromTokenPublicKey, setFromTokenPublicKey] = useState('');
+  const [fromTokenPublicKey, setFromTokenPublicKey] = useState(publicKey);
   const [fromTokenAmount, setFromTokenAmount] = useState('');
   const [toAddress, setToAddress] = useState('');
 
@@ -125,20 +126,26 @@ export const SendWidget: FunctionComponent<Props> = (props) => {
     setToAddress(publicKey);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const amount = Math.round(Number.parseFloat(fromTokenAmount) * 10 ** 9);
 
     if (!amount || amount <= 0) {
       throw new Error('Invalid amount');
     }
 
-    dispatch(
-      transferTokens({
-        sourcePublicKey: new web3.PublicKey(fromTokenPublicKey),
-        destPublicKey: new web3.PublicKey(fromTokenPublicKey),
-        amount,
-      }),
-    );
+    try {
+      const signature = await dispatch(
+        transferTokens({
+          sourcePublicKey: new web3.PublicKey(fromTokenPublicKey),
+          destPublicKey: new web3.PublicKey(fromTokenPublicKey),
+          amount,
+        }),
+      );
+
+      history.push(`/send/${publicKey}/result`, { signature });
+    } catch (error) {
+      alert(error);
+    }
   };
 
   const handleTokenChange = (nextTokenPublicKey: string) => {

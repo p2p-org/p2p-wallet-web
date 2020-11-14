@@ -34,15 +34,19 @@ export const ActionsWidget: FunctionComponent<Props> = ({ publicKey }) => {
   return (
     <Wrapper>
       <Actions>
-        <Link to="/send/SOL">
-          <Button primary>Send</Button>
-        </Link>
+        {publicKey ? (
+          <Link to={`/send/${publicKey?.toBase58()}`}>
+            <Button primary>Send</Button>
+          </Link>
+        ) : undefined}
         <Button primary onClick={handleReceiveClick}>
           Receive
         </Button>
-        <Link to="/swap/SOL">
-          <Button primary>Swap</Button>
-        </Link>
+        {publicKey ? (
+          <Link to={`/swap/${publicKey?.toBase58()}`}>
+            <Button primary>Swap</Button>
+          </Link>
+        ) : undefined}
       </Actions>
       {/* <Button>Top-up with a card</Button> */}
     </Wrapper>

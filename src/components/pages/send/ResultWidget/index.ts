@@ -1,0 +1,1 @@
+export { ResultWidget } from './ResultWidget';

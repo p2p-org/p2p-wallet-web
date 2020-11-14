@@ -11,31 +11,26 @@ import { usePopulateTokenInfo } from 'utils/hooks/usePopulateTokenInfo';
 type Props = {};
 
 export const Wallet: FunctionComponent<Props> = (props) => {
-  const { symbol: aliasSymbol } = useParams<{ symbol: string }>();
+  const { publicKey } = useParams<{ publicKey: string }>();
   const { mint } = usePopulateTokenInfo({
-    mint: aliasSymbol,
-    symbol: aliasSymbol,
+    mint: publicKey,
   });
 
-  if (!mint) {
-    return <div>No found token</div>;
-  }
-
-  const breadcrumbs = [{ name: 'Wallets', to: '/wallets' }, { name: aliasSymbol }];
-  const accountAddress = new web3.PublicKey(mint);
+  const breadcrumbs = [{ name: 'Wallets', to: '/wallets' }, { name: publicKey }];
+  const tokenPublicKey = new web3.PublicKey(publicKey);
 
   return (
     <Layout
       breadcrumbs={breadcrumbs}
       leftColumn={
         <>
-          <ActionsWidget publicKey={accountAddress} />
-          <ActivityWidget publicKey={accountAddress} />
+          <ActionsWidget publicKey={tokenPublicKey} />
+          <ActivityWidget publicKey={tokenPublicKey} />
         </>
       }
       rightColumn={
         <>
-          <QRAddressWidget publicKey={accountAddress} />
+          <QRAddressWidget publicKey={tokenPublicKey} />
         </>
       }
     />

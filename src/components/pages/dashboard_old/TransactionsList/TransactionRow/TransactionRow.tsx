@@ -2,7 +2,6 @@ import React, { FunctionComponent, useEffect } from 'react';
 import Skeleton from 'react-loading-skeleton';
 import { useDispatch, useSelector } from 'react-redux';
 
-import * as web3 from '@solana/web3.js';
 import { styled } from 'linaria/react';
 
 import { getConfirmedTransaction } from 'store/actions/solana';

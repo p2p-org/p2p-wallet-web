@@ -165,6 +165,42 @@ export const createTokenAccount = (tokenAddress: web3.PublicKey): AppThunk => (
   );
 };
 
+const transferSol = ({
+  destPublicKey,
+  amount,
+}: {
+  destPublicKey: web3.PublicKey;
+  amount: number;
+}): AppThunk => async (dispatch, getState) => {
+  const ownerAccount = getState().data.blockchain.account;
+
+  if (!ownerAccount) {
+    // TODO: check auth
+    console.info('TODO: check auth');
+  }
+
+  const transaction = new web3.Transaction().add(
+    web3.SystemProgram.transfer({
+      fromPubkey: ownerAccount.publicKey,
+      toPubkey: destPublicKey,
+      lamports: amount,
+    }),
+  );
+
+  const signers = [ownerAccount];
+
+  return dispatch({
+    [SOLANA_API]: {
+      action: transferTokenAsyncAction,
+      transaction,
+      signers,
+      options: {
+        preflightCommitment: 'single',
+      },
+    },
+  });
+};
+
 export const transferTokens = ({
   sourcePublicKey,
   destPublicKey,
@@ -176,17 +212,26 @@ export const transferTokens = ({
   amount: number;
   memo?: string;
 }): AppThunk => async (dispatch, getState) => {
-  const destAccountInfo = await ApiSolanaService.getConnection().getAccountInfo(destPublicKey);
-
-  if (!destAccountInfo?.owner.equals(TOKEN_PROGRAM_ID)) {
-    throw new Error('Not a token account');
-  }
-
   const ownerAccount = getState().data.blockchain.account;
 
   if (!ownerAccount) {
     // TODO: check auth
     console.info('TODO: check auth');
+  }
+
+  // if sol
+  if (sourcePublicKey.equals(ownerAccount.publicKey)) {
+    if (memo) {
+      throw new Error('Memo not implemented');
+    }
+
+    return dispatch(transferSol({ destPublicKey, amount }));
+  }
+
+  const destAccountInfo = await ApiSolanaService.getConnection().getAccountInfo(destPublicKey);
+
+  if (!destAccountInfo?.owner.equals(TOKEN_PROGRAM_ID)) {
+    throw new Error('Not a token account');
   }
 
   const transaction = new web3.Transaction().add(
