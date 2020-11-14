@@ -10,10 +10,10 @@ import { createAccount } from 'store/actions/complex/blockchain';
 import { Button, Input, Icon } from 'components/ui';
 import { Header } from '../components/common/Header';
 
-
-
-
-const Wrapper = styled.div``;
+const Wrapper = styled.div`
+  background: #fff; 
+  height: 100%;
+`;
 
 const Box = styled.div`
   margin: auto;
@@ -33,18 +33,33 @@ const Title = styled.div`
   text-align: center;
   margin-top: 100px;
   margin-bottom: 16px;
-  `;
+`;
 
 const Text = styled.div`
-color: #000;
-font-style: normal;
-font-weight: 400;
-font-size: 14px;
-line-height: 20px;
-text-align: center;
-margin-bottom: 8px;
+    color: #000;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 20px;
+    text-align: center;
+    margin-bottom: 8px;
+`;
 
-  `;
+const TextWithCover = styled.div`
+    color: #000;
+    background: #F5F5F5; 
+    font-style: normal;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 20px;
+    text-align: left;
+    margin-bottom: 20px;
+    margin-top: 16px;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 15px;
+    padding: 20px;
+`;
 
 const LinkStyled = styled(Link)`
   display: flex;
@@ -60,7 +75,7 @@ const EyeIcon = styled(Icon)`
   opacity: 0.5;
 `;
 
-const CreateButton = styled(Button)`
+const ContinueButton = styled(Button)`
   width: 100%;
   height: 56px;
   font-weight: 500;
@@ -84,6 +99,27 @@ const SubTitle = styled.div`
   opacity: 0.5;
   `;
 
+  const InputSeed = styled.textarea`
+  height: 72px;
+  margin-bottom: 24px;
+  outline: none !important;
+  border:1px solid #D2D2D2;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  border-radius: 15px;
+  padding: 16px;
+  `;
+
+  const Label = styled.label`
+font-weight: 400;
+size: 14px;
+line-height: 20px;
+  `;
+
+  const BoldText = styled.p`
+  font-weight: 500;
+  `;
+
 export const Create: FunctionComponent = () => {
   const history = useHistory();
   const dispatch = useDispatch();
@@ -92,14 +128,25 @@ export const Create: FunctionComponent = () => {
   const [password, setPassword] = useState(
     '',
   );
+  const [done, toggleForm] = useState(
+    true
+  )
+
+  const [mnemonic, setMnemonic] = useState(bip39.generateMnemonic());
+
+  const handlePasswordInput = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    toggleForm(false)
+};
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    console.log("handleSubmit")
     e.preventDefault();
-    if (password.length === 0) {
+    if (mnemonic.length === 0) {
       return;
     }
 
-    dispatch(createAccount(password));
+    dispatch(createAccount(mnemonic));
 
     setTimeout(() => {
       history.push('/wallets');
@@ -118,34 +165,64 @@ export const Create: FunctionComponent = () => {
     <Wrapper>
     <Header />
     <Box>
-
+    {done ? (
       <Form onSubmit={handleSubmit}>
-        <Title>Create Password</Title>
-        <Text>Create password to protect your wallet. It’s will be used for security actions confirmation and for editing your profile info.</Text>
-        <SubTitle>Create password</SubTitle>
-        <Input name="password" 
-                  type="password" 
-                  value={password} 
-                  onChange={handleChange}
-                  postfix={
-                    <EyeIcon name="eye" onclick={handleVisibility} />
-                  }
-          />
-          <SubTitle>Confirm password</SubTitle>
-          <Input name="password" 
-                  type="password" 
-                  value={password} 
-                  onChange={handleChange}
-                  postfix={
-                    <EyeIcon name="eye" onclick={handleVisibility} />
-                  }
-          />
-          <CreateButton type="submit" disabled={error}>
-             Continue
-           </CreateButton>
 
-        <LinkStyled to="/access">Already have wallet? Access it</LinkStyled>
-      </Form>
+      <Title>Create Password</Title>
+      <Text>Create password to protect your wallet. It’s will be used for security actions confirmation and for editing your profile info.</Text>
+
+      <SubTitle>Create password</SubTitle>
+      <Input name="password" 
+                type="password" 
+                value={password} 
+                onChange={handleChange}
+                postfix={
+                  <EyeIcon name="eye" onclick={handleVisibility} />
+                }
+        />
+
+        <SubTitle>Confirm password</SubTitle>
+        <Input name="password" 
+                type="password" 
+                value={password} 
+                onChange={handleChange}
+                postfix={
+                  <EyeIcon name="eye" onclick={handleVisibility} />
+                }
+        />
+
+        <ContinueButton onClick={handlePasswordInput} disabled={error}>
+           Continue
+         </ContinueButton>
+
+      <LinkStyled to="/access">Already have wallet? Access it</LinkStyled>
+    </Form>
+
+    ) : (
+    
+    <Form onSubmit={handleSubmit}>
+
+      <Title>Create New Wallet</Title>
+      
+      <TextWithCover>
+        <BoldText>Please write down the following twelve words and keep them in a safe place.</BoldText>
+        Your private keys are only stored on your current computer or device. You will need these words to restore your wallet if your browser's storage is cleared or your device is damaged or lost.
+      </TextWithCover>
+     
+      <InputSeed name="mnemonic" value={mnemonic} onChange={handleChange} />
+
+      <div>
+         <input type="checkbox" id="scales" name="scales" />
+         <Label htmlFor="scales"> I have saved these words in a safe place.</Label>
+      </div>
+
+      <ContinueButton type="submit" disabled={error}>
+           Continue
+      </ContinueButton>
+
+      <LinkStyled to="/access">Already have wallet? Access it</LinkStyled>
+    </Form>) }  
+      
       </Box>
     </Wrapper>
   );

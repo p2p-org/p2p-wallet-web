@@ -17,7 +17,10 @@ import { Button, Input, Icon } from 'components/ui';
 //   height: 100vh;
 // `;
 
-const Wrapper = styled.div``;
+const Wrapper = styled.div`
+  background: #fff; 
+  height: 100%;
+`;
 
 const Form = styled.form`
   display: flex;
@@ -84,6 +87,7 @@ const EyeIcon = styled(Icon)`
   height: 24px;
   opacity: 0.5;
 `;
+
 
 export const Access: FunctionComponent = () => {
   const history = useHistory();
