@@ -1,6 +1,7 @@
-import React, { FunctionComponent, useState } from 'react';
+import React, { FunctionComponent, useState, useCallback } from 'react';
 import { useDispatch } from 'react-redux';
 import { Link, useHistory } from 'react-router-dom';
+import throttle from 'lodash.throttle';
 
 import * as bip39 from 'bip39';
 import { styled } from 'linaria/react';
@@ -125,7 +126,9 @@ export const Create: FunctionComponent = () => {
   const dispatch = useDispatch();
   //const [password, setPassword] = useState(bip39.generateMnemonic());
   const [error, setError] = useState(false);
-  const [password, setPassword] = useState('',);
+  const [password, setPassword] = useState('');
+  const [password1, setPassword1] = useState('');
+  const [password2, setPassword2] = useState('');
   const [done, toggleForm] = useState(true);
   const [checkbox, toggleCheckbox] = useState(false);
 
@@ -133,10 +136,35 @@ export const Create: FunctionComponent = () => {
 
   const handlePasswordInput = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    toggleForm(false)
+    if (password1 === password2){
+      setPassword(password1)
+      toggleForm(false)
+    } else 
+        return;
+
+    
 };
 
+
+const validateMnemonic = useCallback(
+  throttle(
+    (mnemonic: string) => {
+      if (bip39.validateMnemonic(mnemonic)) {
+        setError(false);
+      } else if (!error) {
+        setError(true);
+      }
+    },
+    100,
+    { leading: false },
+  ),
+  [],
+);
+
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    const nextMnemonic: string = e.target.value;
+    validateMnemonic(nextMnemonic);
+
     e.preventDefault();
     if (mnemonic.length === 0) {
       return;
@@ -149,8 +177,11 @@ export const Create: FunctionComponent = () => {
     }, 0);
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setPassword(e.target.value);
+  const handleChangePassord = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setPassword1(e.target.value);
+  };
+  const handleChangePassordConfirmation = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setPassword2(e.target.value);
   };
 
   return (
@@ -160,24 +191,24 @@ export const Create: FunctionComponent = () => {
     {done ? (
       <Form onSubmit={handleSubmit}>
 
-      <Title>Create Password</Title>
+      <Title>Create Password (Optional)</Title>
       <Text>Create password to protect your wallet. It’s will be used for security actions confirmation and for editing your profile info.</Text>
 
       <SubTitle>Create password</SubTitle>
-      <Input name="password" 
+      <Input name="password1" 
                 type="password" 
-                value={password} 
-                onChange={handleChange}
+                value={password1} 
+                onChange={handleChangePassord}
                 // postfix={
                 //   <EyeIcon name="eye" onclick={handleVisibility} />
                 // }
         />
 
-        <SubTitle>Confirm password</SubTitle>
-        <Input name="password" 
+        <SubTitle>Confirm password </SubTitle>
+        <Input name="password2" 
                 type="password" 
-                value={password} 
-                onChange={handleChange}
+                value={password2} 
+                onChange={handleChangePassordConfirmation}
                 // postfix={
                 //   <EyeIcon name="eye" onclick={handleVisibility} />
                 // }
@@ -201,7 +232,7 @@ export const Create: FunctionComponent = () => {
         Your private keys are only stored on your current computer or device. You will need these words to restore your wallet if your browser's storage is cleared or your device is damaged or lost.
       </TextWithCover>
      
-      <InputSeed name="mnemonic" value={mnemonic} onChange={handleChange} />
+      <InputSeed name="mnemonic" value={mnemonic} readOnly={!!mnemonic}/>
 
       <div>
          <input type="checkbox" id="scales" name="scales" checked={checkbox} onChange={() => toggleCheckbox(!checkbox)} />
