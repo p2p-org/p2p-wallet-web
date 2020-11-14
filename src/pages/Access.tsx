@@ -94,7 +94,7 @@ export const Access: FunctionComponent = () => {
   const dispatch = useDispatch();
   const [error, setError] = useState(false);
   const [mnemonic, setMnemonic] = useState(
-    'galaxy lend nose glow equip student way hockey step dismiss expect silent',
+    '',
   );
   const [password, setPassword] = useState(
     '',
