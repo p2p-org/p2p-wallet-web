@@ -49,8 +49,10 @@ const Bottom = styled.div`
 export const DashboardOld: FunctionComponent = () => {
   const dispatch = useDispatch();
   const publicKey = useSelector((state: RootState) => state.data.blockchain.account?.publicKey);
-  const balance = useSelector((state: RootState) => state.data.blockchain.balance);
-  const balanceStatus = useSelector((state: RootState) => state.data.blockchain.balanceStatus);
+  const balanceLamports = useSelector((state: RootState) => state.data.blockchain.balanceLamports);
+  const balanceLamportsStatus = useSelector(
+    (state: RootState) => state.data.blockchain.balanceLamportsStatus,
+  );
   const airdropStatus = useSelector((state: RootState) => state.data.blockchain.airdropStatus);
 
   useEffect(() => {
@@ -83,12 +85,14 @@ export const DashboardOld: FunctionComponent = () => {
           </Card>
           <Card>
             <Title>Your Balance</Title>
-            <div>{balanceStatus === 'pending' ? 'updating...' : Number(balance)}</div>
+            <div>
+              {balanceLamportsStatus === 'pending' ? 'updating...' : Number(balanceLamports)}
+            </div>
           </Card>
           <Card>
             <button
               type="button"
-              disabled={balanceStatus === 'pending'}
+              disabled={balanceLamportsStatus === 'pending'}
               onClick={handleBalanceClick}>
               Update balance
             </button>

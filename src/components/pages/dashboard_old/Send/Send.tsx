@@ -59,12 +59,12 @@ export const Send: FunctionComponent = () => {
   const [amount, setAmount] = useState('');
   const [errorAmount, setAmountError] = useState('');
   const [errorRecipient, setRecipientError] = useState('');
-  const balance = useSelector((state: RootState) => state.data.blockchain.balance);
+  const balanceLamports = useSelector((state: RootState) => state.data.blockchain.balanceLamports);
 
   const handleChangeAmount = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value.trim();
 
-    const [, message] = validateAmount(value, balance);
+    const [, message] = validateAmount(value, balanceLamports);
 
     setAmount(value);
     setAmountError(message);

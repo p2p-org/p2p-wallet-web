@@ -1,6 +1,7 @@
-import React, { FunctionComponent, useEffect, useRef, useState } from 'react';
+import React, { FunctionComponent, useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
+import * as web3 from '@solana/web3.js';
 import { styled } from 'linaria/react';
 import { rgba } from 'polished';
 
@@ -166,9 +167,17 @@ export const FromSelectInput: FunctionComponent<Props> = ({
   const dispatch = useDispatch();
   const selectorRef = useRef<HTMLDivElement>(null);
   const [isOpen, setIsOpen] = useState(false);
-  const balance = useSelector((state: RootState) => state.data.blockchain.balance);
+  const balanceLamports = useSelector((state: RootState) => state.data.blockchain.balanceLamports);
   const order = useSelector((state: RootState) => state.entities.tokens.order);
   const entrypoint = useSelector((state: RootState) => state.data.blockchain.entrypoint);
+  const publicKey = useSelector((state: RootState) =>
+    state.data.blockchain.account?.publicKey.toBase58(),
+  );
+
+  const preparedOrder = useMemo(() => (publicKey ? [publicKey, ...order] : order), [
+    publicKey,
+    order,
+  ]);
 
   const tokenAccount: TokenAccount = useSelector(
     (state: RootState) => state.entities.tokens.items[tokenPublicKey],
@@ -178,7 +187,7 @@ export const FromSelectInput: FunctionComponent<Props> = ({
   const { name, symbol } = usePopulateTokenInfo({ mint: mint?.toBase58(), includeSol: true });
 
   if (!mint) {
-    amount = balance * 0.000000001; // SOL;
+    amount = balanceLamports / web3.LAMPORTS_PER_SOL;
   }
 
   useEffect(() => {
@@ -200,7 +209,7 @@ export const FromSelectInput: FunctionComponent<Props> = ({
   }, []);
 
   const handleSelectorClick = () => {
-    if (!order) {
+    if (!preparedOrder) {
       return;
     }
 
@@ -230,7 +239,7 @@ export const FromSelectInput: FunctionComponent<Props> = ({
       </TopWrapper>
       <MainWrapper>
         <TokenAvatarWrapper>
-          <TokenAvatar mint={mint?.toBase58()} size={44} />
+          <TokenAvatar mint={mint?.toBase58()} size={44} includeSol />
         </TokenAvatarWrapper>
         <InfoWrapper>
           <SpecifyTokenWrapper>
@@ -256,7 +265,7 @@ export const FromSelectInput: FunctionComponent<Props> = ({
         <DropDownListContainer>
           <DropDownHeader>Your wallets</DropDownHeader>
           <DropDownList>
-            {order.map((publicKey) => (
+            {preparedOrder.map((publicKey) => (
               <TokenRow key={publicKey} publicKey={publicKey} onClick={handleItemClick} />
             ))}
           </DropDownList>

@@ -15,23 +15,6 @@ import { TokenList } from './TokenList';
 
 const WrapperWidget = styled(Widget)``;
 
-// const ITEMS = [
-//   {
-//     name: 'Ethereum',
-//     balance1: '44,33 USD',
-//     balance2: '12 800,99 US$',
-//     value: '0,0034 Tkns',
-//     delta: '+0.35% 24 hrs',
-//   },
-//   {
-//     name: 'Coin name here',
-//     balance1: '44,33 USD',
-//     balance2: '12 800,99 US$',
-//     value: '0,0034 Tkns',
-//     delta: '+0.35% 24 hrs',
-//   },
-// ];
-
 type Props = {};
 
 export const CurrenciesWidget: FunctionComponent<Props> = (props) => {

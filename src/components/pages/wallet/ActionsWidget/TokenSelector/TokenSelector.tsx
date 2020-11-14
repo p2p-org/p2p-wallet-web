@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useEffect, useRef, useState } from 'react';
+import React, { FunctionComponent, useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { styled } from 'linaria/react';
@@ -72,11 +72,19 @@ export const TokenSelector: FunctionComponent<Props> = ({ value, onChange }) => 
   const selectorRef = useRef<HTMLDivElement>(null);
   const [isOpen, setIsOpen] = useState(false);
   const order = useSelector((state: RootState) => state.entities.tokens.order);
+  const publicKey = useSelector((state: RootState) =>
+    state.data.blockchain.account?.publicKey.toBase58(),
+  );
+
+  const preparedOrder = useMemo(() => (publicKey ? [publicKey, ...order] : order), [
+    publicKey,
+    order,
+  ]);
 
   const tokenAccount: TokenAccount = useSelector(
     (state: RootState) => state.entities.tokens.items[value],
   );
-  const { mint } = tokenAccount?.parsed || {};
+  const { mint } = tokenAccount?.parsed || { amount: 0 };
   const { name } = usePopulateTokenInfo({ mint: mint?.toBase58() });
 
   useEffect(() => {
@@ -98,7 +106,7 @@ export const TokenSelector: FunctionComponent<Props> = ({ value, onChange }) => 
   }, []);
 
   const handleSelectorClick = () => {
-    if (!order) {
+    if (!preparedOrder) {
       return;
     }
 
@@ -122,7 +130,7 @@ export const TokenSelector: FunctionComponent<Props> = ({ value, onChange }) => 
       </Selector>
       {isOpen ? (
         <DropDownList>
-          {order.map((publicKey) => (
+          {preparedOrder.map((publicKey) => (
             <TokenRow key={publicKey} publicKey={publicKey} onItemClick={handleItemClick} />
           ))}
         </DropDownList>

@@ -1,7 +1,5 @@
 import React, { FunctionComponent } from 'react';
 
-import { styled } from 'linaria/react';
-
 import { TransactionList } from 'components/common/TransactionList';
 import { Widget } from 'components/common/Widget';
 

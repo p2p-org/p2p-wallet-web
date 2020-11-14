@@ -4,14 +4,19 @@ import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 
 import { ModalManager } from 'components/common/ModalManager';
 import { Access, Create, DashboardOld, Home, Send, Swap, Wallet, Wallets } from 'pages';
-import { establishConnection } from 'store/actions/complex';
+import { establishConnection, getRates } from 'store/actions/complex';
 import { AuthRequiredRoute } from 'utils/routes/UserRequiredRoute';
 
 export const App: React.FC = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(establishConnection());
+    const mount = async () => {
+      await dispatch(establishConnection());
+      await dispatch(getRates());
+    };
+
+    void mount();
   }, []);
 
   return (

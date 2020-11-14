@@ -3,6 +3,7 @@ import React, { FunctionComponent } from 'react';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 
+import * as web3 from '@solana/web3.js';
 import { styled } from 'linaria/react';
 import { rgba } from 'polished';
 
@@ -90,14 +91,14 @@ export const TokenRow: FunctionComponent<Props> = ({ publicKey }) => {
   const tokenAccount: TokenAccount = useSelector(
     (state: RootState) => state.entities.tokens.items[publicKey],
   );
-  const balance = useSelector((state: RootState) => state.data.blockchain.balance);
+  const balanceLamports = useSelector((state: RootState) => state.data.blockchain.balanceLamports);
 
   // eslint-disable-next-line prefer-const
-  let { mint, amount } = tokenAccount?.parsed || {};
-  const { name, symbol } = usePopulateTokenInfo({ mint: mint?.toBase58(), includeSol: true });
+  let { mint, amount } = tokenAccount?.parsed || { amount: 0 };
+  const { name } = usePopulateTokenInfo({ mint: mint?.toBase58(), includeSol: true });
 
   if (!mint) {
-    amount = balance;
+    amount = balanceLamports / web3.LAMPORTS_PER_SOL;
   }
 
   // const coin = 'BTC';

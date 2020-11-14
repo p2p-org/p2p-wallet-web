@@ -32,7 +32,7 @@ export const ActionsWidget: FunctionComponent<Props> = ({ publicKey }) => {
   const tokenAccount: TokenAccount = useSelector(
     (state: RootState) => state.entities.tokens.items[publicKey.toBase58()],
   );
-  const { mint } = tokenAccount?.parsed || {};
+  const { mint } = tokenAccount?.parsed || { amount: 0 };
   const { symbol } = usePopulateTokenInfo({ mint: mint?.toBase58() });
 
   const handleTokenChange = (token: string) => {

@@ -19,8 +19,8 @@ type State = {
   readonly minBalanceForRentException: number | undefined;
   readonly secretKey: Uint8Array | undefined;
   readonly account: web3.Account | undefined;
-  readonly balanceStatus: 'idle' | 'pending' | 'success' | 'failure';
-  readonly balance: number;
+  readonly balanceLamportsStatus: 'idle' | 'pending' | 'success' | 'failure';
+  readonly balanceLamports: number;
   readonly airdropStatus: 'idle' | 'pending' | 'success' | 'failure';
 };
 
@@ -33,8 +33,8 @@ const initialState: State = {
   account: localStorage.getItem('secretKey')
     ? new web3.Account(new Uint8Array(JSON.parse(localStorage.getItem('secretKey'))))
     : undefined,
-  balanceStatus: 'idle',
-  balance: 0,
+  balanceLamportsStatus: 'idle',
+  balanceLamports: 0,
   airdropStatus: 'idle',
 };
 
@@ -66,22 +66,22 @@ export const blockchainReducer = createReducer(initialState)
   // getBalanceAction
   .handleAction(getBalanceAsyncAction.request, (state) => ({
     ...state,
-    balanceStatus: 'pending',
+    balanceLamportsStatus: 'pending',
   }))
   .handleAction(getBalanceAsyncAction.success, (state, action) => ({
     ...state,
-    balanceStatus: 'success',
-    balance: action.payload,
+    balanceLamportsStatus: 'success',
+    balanceLamports: action.payload,
   }))
   .handleAction(getBalanceAsyncAction.failure, (state) => ({
     ...state,
-    balanceStatus: 'failure',
+    balanceLamportsStatus: 'failure',
   }))
   // requestAirdropAction
   .handleAction(requestAirdropAsyncAction.request, (state) => ({
     ...state,
     airdropStatus: 'pending',
-    balanceStatus: 'pending',
+    balanceLamportsStatus: 'pending',
   }))
   .handleAction(requestAirdropAsyncAction.success, (state) => ({
     ...state,

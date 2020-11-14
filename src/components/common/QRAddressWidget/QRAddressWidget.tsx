@@ -108,7 +108,7 @@ export const QRAddressWidget: FunctionComponent<Props> = ({ publicKey, isSol, cl
   const tokenAccount: TokenAccount = useSelector(
     (state: RootState) => state.entities.tokens.items[publicKeyBase58],
   );
-  const { mint } = tokenAccount?.parsed || {};
+  const { mint } = tokenAccount?.parsed || { amount: 0 };
   const { name } = usePopulateTokenInfo({ mint: mint?.toBase58(), includeSol: isSol });
 
   const handleCopyClick = () => {

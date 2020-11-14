@@ -70,3 +70,5 @@ export const transferTokenAsyncAction = createAsyncAction(
   'SOLANA_TRANSFER_TOKEN_FAILURE',
   'SOLANA_TRANSFER_TOKEN_CANCEL',
 )<undefined, string, Error>();
+
+export const getRatesAction = createAction('getRatesAction')<[]>();
