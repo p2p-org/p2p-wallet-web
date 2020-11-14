@@ -137,6 +137,10 @@ var _ui = require("../../ui");
 
 var _useDecodeSystemProgramInstructions = require("../../../utils/hooks/instructions/useDecodeSystemProgramInstructions");
 
+var _useDecodeTokenRegInstractions = require("../../../utils/hooks/instructions/useDecodeTokenRegInstractions");
+
+var _usePopulateTokenInfo2 = require("../../../utils/hooks/usePopulateTokenInfo");
+
 function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return null; var cache = new WeakMap(); _getRequireWildcardCache = function () { return cache; }; return cache; }
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
@@ -210,6 +214,20 @@ var TransactionDetailsModal = function TransactionDetailsModal(_ref) {
   var transaction = (0, _reactRedux.useSelector)(function (state) {
     return state.entities.transactionsNormalized[signature];
   });
+  var transactionAuthor = transaction === null || transaction === void 0 ? void 0 : transaction.transaction.signatures[0].publicKey.toBase58();
+  var tokenAccount = (0, _reactRedux.useSelector)(function (state) {
+    return state.entities.tokens.items[transactionAuthor];
+  });
+
+  var _ref2 = (tokenAccount === null || tokenAccount === void 0 ? void 0 : tokenAccount.parsed) || {
+    amount: 0
+  },
+      mint = _ref2.mint;
+
+  var _usePopulateTokenInfo = (0, _usePopulateTokenInfo2.usePopulateTokenInfo)({
+    mint: mint === null || mint === void 0 ? void 0 : mint.toBase58()
+  }),
+      symbol = _usePopulateTokenInfo.symbol;
 
   var _useDecodeSystemProgr = (0, _useDecodeSystemProgramInstructions.useDecodeSystemProgramInstructions)(transaction === null || transaction === void 0 ? void 0 : transaction.transaction.instructions),
       type = _useDecodeSystemProgr.type,
@@ -217,8 +235,21 @@ var TransactionDetailsModal = function TransactionDetailsModal(_ref) {
       lamports = _useDecodeSystemProgr.lamports,
       toPubkey = _useDecodeSystemProgr.toPubkey;
 
+  var _useDecodeTokenRegIns = (0, _useDecodeTokenRegInstractions.useDecodeTokenRegInstructions)(transaction === null || transaction === void 0 ? void 0 : transaction.transaction.instructions),
+      transfer = _useDecodeTokenRegIns.transfer;
+
   if (!transaction) {
     return null;
+  } // TODO: dirty
+
+
+  var amount = 0;
+
+  if (type) {
+    symbol = 'SOL';
+    amount = (lamports || 0) / web3.LAMPORTS_PER_SOL;
+  } else if (transfer) {
+    amount = (transfer.amount || 0) / web3.LAMPORTS_PER_SOL;
   }
 
   return /*#__PURE__*/_react.default.createElement(Wrapper, null, /*#__PURE__*/_react.default.createElement(Header, null, /*#__PURE__*/_react.default.createElement(Title, null, transaction.slot, " SLOT"), /*#__PURE__*/_react.default.createElement(CloseWrapper, {
@@ -227,7 +258,7 @@ var TransactionDetailsModal = function TransactionDetailsModal(_ref) {
     name: "close"
   })), /*#__PURE__*/_react.default.createElement(CircleWrapper, null, /*#__PURE__*/_react.default.createElement(ArrowAngleIcon, {
     name: "arrow-angle"
-  }))), /*#__PURE__*/_react.default.createElement(Content, null, /*#__PURE__*/_react.default.createElement(StatusWrapper, null, /*#__PURE__*/_react.default.createElement(Value, null, (lamports || 0) / web3.LAMPORTS_PER_SOL), /*#__PURE__*/_react.default.createElement(Status, null, "Completed")), /*#__PURE__*/_react.default.createElement(FieldsWrapper, null, /*#__PURE__*/_react.default.createElement(FieldWrapper, null, /*#__PURE__*/_react.default.createElement(FieldTitle, null, "Transaction ID"), /*#__PURE__*/_react.default.createElement(FieldValue, null, signature)), /*#__PURE__*/_react.default.createElement(FieldWrapper, null, /*#__PURE__*/_react.default.createElement(FieldTitle, null, "Amount"), /*#__PURE__*/_react.default.createElement(FieldValue, null, (lamports || 0) / web3.LAMPORTS_PER_SOL)), /*#__PURE__*/_react.default.createElement(FieldWrapper, null, /*#__PURE__*/_react.default.createElement(FieldTitle, null, "Value"), /*#__PURE__*/_react.default.createElement(FieldValue, null, (lamports || 0) / web3.LAMPORTS_PER_SOL)), transaction.meta ? /*#__PURE__*/_react.default.createElement(FieldWrapper, null, /*#__PURE__*/_react.default.createElement(FieldTitle, null, "Fee"), /*#__PURE__*/_react.default.createElement(FieldValue, null, transaction.meta.fee)) : null)));
+  }))), /*#__PURE__*/_react.default.createElement(Content, null, /*#__PURE__*/_react.default.createElement(StatusWrapper, null, /*#__PURE__*/_react.default.createElement(Value, null, amount, " ", symbol), /*#__PURE__*/_react.default.createElement(Status, null, "Completed")), /*#__PURE__*/_react.default.createElement(FieldsWrapper, null, /*#__PURE__*/_react.default.createElement(FieldWrapper, null, /*#__PURE__*/_react.default.createElement(FieldTitle, null, "Transaction ID"), /*#__PURE__*/_react.default.createElement(FieldValue, null, signature)), /*#__PURE__*/_react.default.createElement(FieldWrapper, null, /*#__PURE__*/_react.default.createElement(FieldTitle, null, "Amount"), /*#__PURE__*/_react.default.createElement(FieldValue, null, amount)), /*#__PURE__*/_react.default.createElement(FieldWrapper, null, /*#__PURE__*/_react.default.createElement(FieldTitle, null, "Value"), /*#__PURE__*/_react.default.createElement(FieldValue, null, amount)), transaction.meta ? /*#__PURE__*/_react.default.createElement(FieldWrapper, null, /*#__PURE__*/_react.default.createElement(FieldTitle, null, "Fee"), /*#__PURE__*/_react.default.createElement(FieldValue, null, transaction.meta.fee, " SOL")) : null)));
 };
 
 exports.TransactionDetailsModal = TransactionDetailsModal;
@@ -237,7 +268,7 @@ exports.TransactionDetailsModal = TransactionDetailsModal;
               module.hot.accept(reloadCSS);
             })();
           
-},{"react":"../node_modules/react/index.js","react-redux":"../node_modules/react-redux/es/index.js","@solana/web3.js":"../node_modules/@solana/web3.js/lib/index.esm.js","linaria/react":"../node_modules/linaria/react.js","../../ui":"components/ui/index.ts","../../../utils/hooks/instructions/useDecodeSystemProgramInstructions":"utils/hooks/instructions/useDecodeSystemProgramInstructions.ts","_css_loader":"../node_modules/parcel-bundler/src/builtins/css-loader.js"}],"components/modals/TransactionDetailsModal/index.ts":[function(require,module,exports) {
+},{"react":"../node_modules/react/index.js","react-redux":"../node_modules/react-redux/es/index.js","@solana/web3.js":"../node_modules/@solana/web3.js/lib/index.esm.js","linaria/react":"../node_modules/linaria/react.js","../../ui":"components/ui/index.ts","../../../utils/hooks/instructions/useDecodeSystemProgramInstructions":"utils/hooks/instructions/useDecodeSystemProgramInstructions.ts","../../../utils/hooks/instructions/useDecodeTokenRegInstractions":"utils/hooks/instructions/useDecodeTokenRegInstractions.ts","../../../utils/hooks/usePopulateTokenInfo":"utils/hooks/usePopulateTokenInfo.ts","_css_loader":"../node_modules/parcel-bundler/src/builtins/css-loader.js"}],"components/modals/TransactionDetailsModal/index.ts":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -279,7 +310,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "50068" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "61080" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
