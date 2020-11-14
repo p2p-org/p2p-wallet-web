@@ -143,6 +143,8 @@ var _ui = require("../../../ui");
 
 var _tokens = require("../../../../store/actions/complex/tokens");
 
+var _solana = require("../../../../store/actions/solana");
+
 function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return null; var cache = new WeakMap(); _getRequireWildcardCache = function () { return cache; }; return cache; }
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
@@ -202,7 +204,8 @@ var TokenRow = function TokenRow(_ref) {
   var mintAddress = _ref.mintAddress,
       tokenName = _ref.tokenName,
       tokenSymbol = _ref.tokenSymbol,
-      icon = _ref.icon;
+      icon = _ref.icon,
+      closeModal = _ref.closeModal;
   var dispatch = (0, _reactRedux.useDispatch)(); // eslint-disable-next-line unicorn/no-null
 
   var inputRef = (0, _react.useRef)(null);
@@ -219,6 +222,8 @@ var TokenRow = function TokenRow(_ref) {
   var handleAddClick = function handleAddClick() {
     var mint = new web3.PublicKey(mintAddress);
     dispatch((0, _tokens.createTokenAccount)(mint));
+    dispatch((0, _solana.getOwnedTokenAccounts)());
+    closeModal();
   };
 
   var handleCopyClick = function handleCopyClick() {
@@ -271,7 +276,7 @@ exports.TokenRow = TokenRow;
               module.hot.accept(reloadCSS);
             })();
           
-},{"@babel/runtime/helpers/slicedToArray":"../node_modules/@babel/runtime/helpers/slicedToArray.js","react":"../node_modules/react/index.js","react-redux":"../node_modules/react-redux/es/index.js","@solana/web3.js":"../node_modules/@solana/web3.js/lib/index.esm.js","classnames":"../node_modules/classnames/index.js","linaria/react":"../node_modules/linaria/react.js","../../../common/TokenAvatar":"components/common/TokenAvatar/index.ts","../../../ui":"components/ui/index.ts","../../../../store/actions/complex/tokens":"store/actions/complex/tokens.ts","_css_loader":"../node_modules/parcel-bundler/src/builtins/css-loader.js"}],"components/modals/AddCoinModal/TokenRow/index.ts":[function(require,module,exports) {
+},{"@babel/runtime/helpers/slicedToArray":"../node_modules/@babel/runtime/helpers/slicedToArray.js","react":"../node_modules/react/index.js","react-redux":"../node_modules/react-redux/es/index.js","@solana/web3.js":"../node_modules/@solana/web3.js/lib/index.esm.js","classnames":"../node_modules/classnames/index.js","linaria/react":"../node_modules/linaria/react.js","../../../common/TokenAvatar":"components/common/TokenAvatar/index.ts","../../../ui":"components/ui/index.ts","../../../../store/actions/complex/tokens":"store/actions/complex/tokens.ts","../../../../store/actions/solana":"store/actions/solana/index.ts","_css_loader":"../node_modules/parcel-bundler/src/builtins/css-loader.js"}],"components/modals/AddCoinModal/TokenRow/index.ts":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -309,7 +314,8 @@ var Wrapper = /*#__PURE__*/(0, _react2.styled)("div")({
 });
 
 var TokenList = function TokenList(_ref) {
-  var items = _ref.items;
+  var items = _ref.items,
+      closeModal = _ref.closeModal;
 
   if (!items) {
     return null;
@@ -317,8 +323,10 @@ var TokenList = function TokenList(_ref) {
 
   return /*#__PURE__*/_react.default.createElement(Wrapper, null, items.map(function (item) {
     return /*#__PURE__*/_react.default.createElement(_TokenRow.TokenRow, (0, _extends2.default)({
-      key: item.mintAddress
-    }, item));
+      key: item.mintAddress || item.publicKey
+    }, item, {
+      closeModal: closeModal
+    }));
   }));
 };
 
@@ -411,6 +419,10 @@ var AddCoinModal = function AddCoinModal(_ref) {
     }));
   };
 
+  var closeModal = function closeModal() {
+    close();
+  };
+
   var filteredTokens = (0, _react.useMemo)(function () {
     if (!tokens) {
       return;
@@ -433,7 +445,8 @@ var AddCoinModal = function AddCoinModal(_ref) {
     }, "Mint test token")) : null),
     close: close
   }, (filteredTokens === null || filteredTokens === void 0 ? void 0 : filteredTokens.length) ? /*#__PURE__*/_react.default.createElement(ScrollableContainer, null, /*#__PURE__*/_react.default.createElement(_TokenList.TokenList, {
-    items: filteredTokens
+    items: filteredTokens,
+    closeModal: closeModal
   })) : undefined);
 };
 
@@ -486,7 +499,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "49235" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "50068" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
