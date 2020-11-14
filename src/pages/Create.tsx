@@ -125,12 +125,9 @@ export const Create: FunctionComponent = () => {
   const dispatch = useDispatch();
   //const [password, setPassword] = useState(bip39.generateMnemonic());
   const [error, setError] = useState(false);
-  const [password, setPassword] = useState(
-    '',
-  );
-  const [done, toggleForm] = useState(
-    true
-  )
+  const [password, setPassword] = useState('',);
+  const [done, toggleForm] = useState(true);
+  const [checkbox, toggleCheckbox] = useState(false);
 
   const [mnemonic, setMnemonic] = useState(bip39.generateMnemonic());
 
@@ -140,7 +137,6 @@ export const Create: FunctionComponent = () => {
 };
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    console.log("handleSubmit")
     e.preventDefault();
     if (mnemonic.length === 0) {
       return;
@@ -157,10 +153,6 @@ export const Create: FunctionComponent = () => {
     setPassword(e.target.value);
   };
 
-  const handleVisibility = () => {
-    console.log("Changing Visibility");
-  }
-
   return (
     <Wrapper>
     <Header />
@@ -176,9 +168,9 @@ export const Create: FunctionComponent = () => {
                 type="password" 
                 value={password} 
                 onChange={handleChange}
-                postfix={
-                  <EyeIcon name="eye" onclick={handleVisibility} />
-                }
+                // postfix={
+                //   <EyeIcon name="eye" onclick={handleVisibility} />
+                // }
         />
 
         <SubTitle>Confirm password</SubTitle>
@@ -186,9 +178,9 @@ export const Create: FunctionComponent = () => {
                 type="password" 
                 value={password} 
                 onChange={handleChange}
-                postfix={
-                  <EyeIcon name="eye" onclick={handleVisibility} />
-                }
+                // postfix={
+                //   <EyeIcon name="eye" onclick={handleVisibility} />
+                // }
         />
 
         <ContinueButton onClick={handlePasswordInput} disabled={error}>
@@ -212,13 +204,14 @@ export const Create: FunctionComponent = () => {
       <InputSeed name="mnemonic" value={mnemonic} onChange={handleChange} />
 
       <div>
-         <input type="checkbox" id="scales" name="scales" />
+         <input type="checkbox" id="scales" name="scales" checked={checkbox} onChange={() => toggleCheckbox(!checkbox)} />
          <Label htmlFor="scales"> I have saved these words in a safe place.</Label>
       </div>
-
-      <ContinueButton type="submit" disabled={error}>
+     
+      <ContinueButton type="submit" disabled={!checkbox}>
            Continue
       </ContinueButton>
+      
 
       <LinkStyled to="/access">Already have wallet? Access it</LinkStyled>
     </Form>) }  

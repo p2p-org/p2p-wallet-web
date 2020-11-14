@@ -160,9 +160,9 @@ export const Access: FunctionComponent = () => {
                   type="password" 
                   value={password} 
                   onChange={handlePasswordChange}
-                  postfix={
-                    <EyeIcon name="eye" onclick={handleVisibility} />
-                  }
+                  // postfix={
+                  //   <EyeIcon name="eye" onclick={handleVisibility} />
+                  // }
           />
           
            <CreateButton type="submit" disabled={error}>
