@@ -19,9 +19,10 @@ P2P Wallet Prototype supports a number features such as:
 * QR code generation
 * Nice UI
 
-### Direction of further development:
+### Further development:
 
 - One-tap access to swap assets 
+- Improving security
 - Wallet Connect integration
 - Send/Receive Wrapped tokens to/from Ethereum Blockchain
 - DeFi support
