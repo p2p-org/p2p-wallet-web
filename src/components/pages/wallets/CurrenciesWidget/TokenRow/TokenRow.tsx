@@ -103,6 +103,8 @@ export const TokenRow: FunctionComponent<Props> = ({ publicKey }) => {
     amount = balanceLamports / web3.LAMPORTS_PER_SOL;
   }
 
+  amount = symbol === 'SOL' ? amount : amount > 0 ? amount / 1000000 : amount;
+
   // const coin = 'BTC';
   // const currency = 'BTC';
   // const time = 'day';
