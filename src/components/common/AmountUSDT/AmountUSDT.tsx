@@ -14,15 +14,14 @@ type Props = {
 
 export const AmountUSDT: FunctionComponent<Props> = ({ value = 0, symbol = '', ...props }) => {
   const rate = useSelector((state: RootState) => state.entities.rates[`${symbol}/USDT`]);
+  const numberValue = Number.parseFloat(value as string) || 0;
 
-  let sum;
+  let sum = numberValue;
 
   if (rate) {
     sum = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(
-      Number.parseFloat(value as string) * rate,
+      (Number.parseFloat(value as string) || 0) * rate,
     );
-  } else {
-    sum = value;
   }
 
   return <Wrapper {...props}>{sum}</Wrapper>;

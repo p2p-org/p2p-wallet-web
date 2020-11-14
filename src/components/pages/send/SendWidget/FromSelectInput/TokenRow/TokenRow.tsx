@@ -85,14 +85,10 @@ export const TokenRow: FunctionComponent<Props> = ({ publicKey, onClick }) => {
         <TokenAvatar mint={mint?.toBase58()} size={44} includeSol />
         <Info>
           <Top>
-            <TokenName title={publicKey}>{name || publicKey}</TokenName>{' '}
-            <RateUSDT symbol={symbol} />
+            <TokenName title={publicKey}>{name || publicKey}</TokenName> <div>{amount}</div>
           </Top>
           <Bottom>
-            <div>{symbol}</div>{' '}
-            <div>
-              {amount} {symbol}
-            </div>
+            <div>{symbol}</div> <div>Current balance</div>
           </Bottom>
         </Info>
       </ItemWrapper>

@@ -5,6 +5,7 @@ import * as web3 from '@solana/web3.js';
 import { styled } from 'linaria/react';
 import { rgba } from 'polished';
 
+import { AmountUSDT } from 'components/common/AmountUSDT';
 import { TokenAvatar } from 'components/common/TokenAvatar';
 import { Icon } from 'components/ui';
 import { getOwnedTokenAccounts } from 'store/actions/solana';
@@ -119,7 +120,13 @@ const BalanceWrapper = styled.div`
   letter-spacing: -0.3px;
 `;
 
-const BalanceText = styled.div``;
+const BalanceText = styled.div`
+  display: flex;
+`;
+
+const AmountUSDTStyled = styled(AmountUSDT)`
+  margin-left: 3px;
+`;
 
 const DropDownListContainer = styled.div`
   position: absolute;
@@ -257,7 +264,9 @@ export const FromSelectInput: FunctionComponent<Props> = ({
             <BalanceText>
               Balance = {amount} {symbol}
             </BalanceText>
-            <BalanceText> = $0.30</BalanceText>
+            <BalanceText>
+              = <AmountUSDTStyled value={tokenAmount} symbol={symbol} />
+            </BalanceText>
           </BalanceWrapper>
         </InfoWrapper>
       </MainWrapper>
