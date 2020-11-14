@@ -10,6 +10,7 @@ import { TokenAvatar } from 'components/common/TokenAvatar';
 import { Avatar, Button, Icon, Input } from 'components/ui';
 import { TokenType } from 'constants/tokens';
 import { createTokenAccount } from 'store/actions/complex/tokens';
+import { getOwnedTokenAccounts } from 'store/actions/solana';
 
 const Wrapper = styled.div`
   display: flex;
@@ -101,11 +102,14 @@ const CopyIcon = styled(Icon)`
   height: 24px;
 `;
 
-export const TokenRow: FunctionComponent<TokenType> = ({
+type Props =  TokenType & { closeModal: () => void; };
+
+export const TokenRow: FunctionComponent<Props> = ({
   mintAddress,
   tokenName,
   tokenSymbol,
   icon,
+  closeModal,
 }) => {
   const dispatch = useDispatch();
   // eslint-disable-next-line unicorn/no-null
@@ -119,6 +123,8 @@ export const TokenRow: FunctionComponent<TokenType> = ({
   const handleAddClick = () => {
     const mint = new web3.PublicKey(mintAddress);
     dispatch(createTokenAccount(mint));
+    dispatch(getOwnedTokenAccounts())
+    closeModal();
   };
 
   const handleCopyClick = () => {

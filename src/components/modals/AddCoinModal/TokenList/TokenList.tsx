@@ -13,9 +13,10 @@ const Wrapper = styled.div`
 
 type Props = {
   items?: TokenType[]; // TODO: not any
+  closeModal: () => void;
 };
 
-export const TokenList: FunctionComponent<Props> = ({ items }) => {
+export const TokenList: FunctionComponent<Props> = ({ items, closeModal }) => {
   if (!items) {
     return null;
   }
@@ -23,7 +24,7 @@ export const TokenList: FunctionComponent<Props> = ({ items }) => {
   return (
     <Wrapper>
       {items.map((item) => (
-        <TokenRow key={item.mintAddress} {...item} />
+        <TokenRow key={item.mintAddress || item.publicKey} {...item} closeModal={closeModal}/>
       ))}
     </Wrapper>
   );

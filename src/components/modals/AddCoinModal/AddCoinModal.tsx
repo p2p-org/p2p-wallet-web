@@ -54,6 +54,10 @@ export const AddCoinModal: FunctionComponent<Props> = ({ close }) => {
     );
   };
 
+  const closeModal = () => {
+    close();
+  }
+
   const filteredTokens = useMemo(() => {
     if (!tokens) {
       return;
@@ -85,7 +89,7 @@ export const AddCoinModal: FunctionComponent<Props> = ({ close }) => {
       close={close}>
       {filteredTokens?.length ? (
         <ScrollableContainer>
-          <TokenList items={filteredTokens} />
+          <TokenList items={filteredTokens} closeModal={closeModal} />
         </ScrollableContainer>
       ) : undefined}
     </WrapperModal>
