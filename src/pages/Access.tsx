@@ -127,8 +127,7 @@ export const Access: FunctionComponent = () => {
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const nextMnemonic: string = e.target.value.trim();
-
+    const nextMnemonic: string = e.target.value;
     validateMnemonic(nextMnemonic);
     setMnemonic(nextMnemonic);
   };
@@ -140,8 +139,6 @@ export const Access: FunctionComponent = () => {
   };
 
   const handleVisibility = () => {
-    console.log("Changing Visibility");
-
   }
 
   return (
@@ -160,9 +157,9 @@ export const Access: FunctionComponent = () => {
                   type="password" 
                   value={password} 
                   onChange={handlePasswordChange}
-                  postfix={
-                    <EyeIcon name="eye" onclick={handleVisibility} />
-                  }
+                  // postfix={
+                  //   <EyeIcon name="eye" onclick={handleVisibility} />
+                  // }
           />
           
            <CreateButton type="submit" disabled={error}>
