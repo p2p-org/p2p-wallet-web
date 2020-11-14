@@ -1,5 +1,4 @@
 import * as web3 from '@solana/web3.js';
-import * as BufferLayout from 'buffer-layout';
 
 import { ACCOUNT_LAYOUT, TOKEN_PROGRAM_ID } from 'constants/solana/bufferLayouts';
 import {

@@ -5,6 +5,7 @@ import * as web3 from '@solana/web3.js';
 import { styled } from 'linaria/react';
 import { rgba } from 'polished';
 
+import { RateUSDT } from 'components/common/RateUSDT';
 import { TokenAvatar } from 'components/common/TokenAvatar';
 import { RootState, TokenAccount } from 'store/types';
 import { usePopulateTokenInfo } from 'utils/hooks/usePopulateTokenInfo';
@@ -84,10 +85,13 @@ export const TokenRow: FunctionComponent<Props> = ({ publicKey, onItemClick }) =
         <TokenAvatar mint={mint?.toBase58()} size={32} includeSol />
         <Info>
           <Top>
-            <TokenName>{name || publicKey}</TokenName> <div />
+            <TokenName>{name || publicKey}</TokenName> <RateUSDT symbol={symbol} />
           </Top>
           <Bottom>
-            <div>{symbol}</div> <div>{amount}</div>
+            <div>{symbol}</div>{' '}
+            <div>
+              {amount} {symbol}
+            </div>
           </Bottom>
         </Info>
       </ItemWrapper>

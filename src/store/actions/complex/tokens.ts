@@ -12,7 +12,6 @@ import {
   mintToInstruction,
   transfer,
 } from 'store/utils/instructions/tokenProgram';
-import { parseTokenAccountData } from 'utils/solana/parseData';
 
 export const createAndInitializeMint = ({
   owner, // Account for paying fees and allowed to mint new tokens

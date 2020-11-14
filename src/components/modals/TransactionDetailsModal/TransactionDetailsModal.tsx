@@ -7,7 +7,7 @@ import { rgba } from 'polished';
 
 import { Icon } from 'components/ui';
 import { RootState } from 'store/types';
-import { useDecodeInstrcutions } from 'utils/hooks/useDecodeInstrcutions';
+import { useDecodeSystemProgramInstructions } from 'utils/hooks/instructions/useDecodeSystemProgramInstructions';
 
 const Wrapper = styled.div`
   position: relative;
@@ -135,7 +135,7 @@ export const TransactionDetailsModal: FunctionComponent<Props> = ({ signature, c
     (state: RootState) => state.entities.transactionsNormalized[signature],
   );
 
-  const { type, fromPubkey, lamports, toPubkey } = useDecodeInstrcutions(
+  const { type, fromPubkey, lamports, toPubkey } = useDecodeSystemProgramInstructions(
     transaction?.transaction.instructions,
   );
 
@@ -147,7 +147,7 @@ export const TransactionDetailsModal: FunctionComponent<Props> = ({ signature, c
     <Wrapper>
       <Header>
         {/* <Title>24 Oct 2020 @ 12:51 PM</Title> */}
-        <Title>{transaction.slot}</Title>
+        <Title>{transaction.slot} SLOT</Title>
         <CloseWrapper onClick={close}>
           <CloseIcon name="close" />
         </CloseWrapper>

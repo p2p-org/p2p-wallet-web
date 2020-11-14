@@ -7,7 +7,7 @@ import { styled } from 'linaria/react';
 
 import { getConfirmedTransaction } from 'store/actions/solana';
 import { RootState } from 'store/types';
-import { useDecodeInstrcutions } from 'utils/hooks/useDecodeInstrcutions';
+import { useDecodeSystemProgramInstructions } from 'utils/hooks/instructions/useDecodeSystemProgramInstructions';
 
 const Wrapper = styled.div`
   display: table-row;
@@ -35,7 +35,7 @@ export const TransactionRow: FunctionComponent<Props> = ({ signature }) => {
     dispatch(getConfirmedTransaction(signature));
   }, []);
 
-  const { type, fromPubkey, lamports, toPubkey } = useDecodeInstrcutions(
+  const { type, fromPubkey, lamports, toPubkey } = useDecodeSystemProgramInstructions(
     transaction?.transaction.instructions,
   );
 
@@ -50,7 +50,7 @@ export const TransactionRow: FunctionComponent<Props> = ({ signature }) => {
           {signature.slice(0, 25)}...
         </a>
       </Column>
-      <Column>{transaction?.slot || <Skeleton height={24} width="100%" />}</Column>
+      <Column>{transaction?.slot || <Skeleton height={24} width="100%" />} SLOT</Column>
       <Column>{fromPubkey?.toString() || <Skeleton height={24} width="100%" />}</Column>
       <Column>{toPubkey?.toString() || <Skeleton height={24} width="100%" />}</Column>
       <Column>{lamports / web3.LAMPORTS_PER_SOL || <Skeleton height={24} width="100%" />}</Column>

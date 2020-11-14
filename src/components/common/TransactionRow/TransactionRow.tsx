@@ -10,7 +10,8 @@ import { openModal } from 'store/actions/modals';
 import { getConfirmedTransaction } from 'store/actions/solana';
 import { SHOW_MODAL_TRANSACTION_DETAILS } from 'store/constants/modalTypes';
 import { RootState } from 'store/types';
-import { useDecodeInstrcutions } from 'utils/hooks/useDecodeInstrcutions';
+import { useDecodeSystemProgramInstructions } from 'utils/hooks/instructions/useDecodeSystemProgramInstructions';
+import { useDecodeTokenRegInstructions } from 'utils/hooks/instructions/useDecodeTokenRegInstractions';
 
 const Wrapper = styled.div`
   display: flex;
@@ -69,25 +70,37 @@ export const TransactionRow: FunctionComponent<Props> = ({ signature }) => {
     dispatch(getConfirmedTransaction(signature));
   }, []);
 
-  const { type, fromPubkey, lamports, toPubkey } = useDecodeInstrcutions(
-    transaction?.transaction.instructions,
-  );
-
   const handleClick = () => {
     dispatch(openModal(SHOW_MODAL_TRANSACTION_DETAILS, { signature }));
   };
+
+  const { type, lamports } = useDecodeSystemProgramInstructions(
+    transaction?.transaction.instructions,
+  );
+
+  const { transfer } = useDecodeTokenRegInstructions(transaction?.transaction.instructions);
+
+  // TODO: dirty
+  let amount = 0;
+  if (type) {
+    amount = (lamports || 0) / web3.LAMPORTS_PER_SOL;
+  } else if (transfer) {
+    amount = (transfer.amount || 0) / web3.LAMPORTS_PER_SOL;
+  } else {
+    // TODO: other types
+    return null;
+  }
 
   return (
     <Wrapper onClick={handleClick}>
       <AvatarStyled />
       <Content>
         <Top>
-          <div>{type}</div>
+          <div>{type || (transfer && 'Transfer')}</div>
           {/* <div>{type}</div> <div>{usd}</div> */}
         </Top>
         <Bottom>
-          <div /> <div>{(lamports || 0) / web3.LAMPORTS_PER_SOL}</div>
-          {/* <div>{date}</div> <div>{value}</div> */}
+          <div>{transaction?.slot} SLOT</div> <div>{amount}</div>
         </Bottom>
       </Content>
     </Wrapper>

@@ -8,12 +8,12 @@ const Wrapper = styled.div`
   display: grid;
   grid-gap: 2px;
 
-  > :first-child {
+  > :first-child:not(:last-child) {
     border-bottom-right-radius: 0;
     border-bottom-left-radius: 0;
   }
 
-  > :last-child {
+  > :last-child:not(:first-child) {
     border-top-left-radius: 0;
     border-top-right-radius: 0;
   }

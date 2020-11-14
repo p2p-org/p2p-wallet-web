@@ -13,7 +13,7 @@ import { openModal } from 'store/actions/modals';
 import { getConfirmedTransaction } from 'store/actions/solana';
 import { SHOW_MODAL_TRANSACTION_DETAILS } from 'store/constants/modalTypes';
 import { RootState } from 'store/types';
-import { useDecodeInstrcutions } from 'utils/hooks/useDecodeInstrcutions';
+import { useDecodeSystemProgramInstructions } from 'utils/hooks/instructions/useDecodeSystemProgramInstructions';
 
 const WrapperCard = styled(Card)`
   display: flex;
@@ -94,7 +94,7 @@ export const ResultWidget: FunctionComponent<Props> = (props) => {
     (state: RootState) => state.entities.transactionsNormalized[signature],
   );
 
-  const { type, fromPubkey, lamports, toPubkey } = useDecodeInstrcutions(
+  const { type, fromPubkey, lamports, toPubkey } = useDecodeSystemProgramInstructions(
     transaction?.transaction.instructions,
   );
 

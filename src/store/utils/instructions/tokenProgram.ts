@@ -28,6 +28,10 @@ function encodeTokenInstructionData(instruction) {
   return b.slice(0, span);
 }
 
+export function decodeTokenInstructionData(buffer) {
+  return LAYOUT.decode(buffer);
+}
+
 export function initializeMintInstruction({
   mint,
   decimals,

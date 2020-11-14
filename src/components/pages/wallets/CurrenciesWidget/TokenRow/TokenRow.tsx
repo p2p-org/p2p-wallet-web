@@ -132,7 +132,10 @@ export const TokenRow: FunctionComponent<Props> = ({ publicKey }) => {
           {/*  <div>{balanceUsd}</div> /!* <div>{balance2}</div> *!/ */}
           {/* </Middle> */}
           <Bottom>
-            <div>{amount}</div> {/* <div>{delta}</div> */}
+            <div>
+              {amount} {symbol}
+            </div>
+            {/* <div>{delta}</div> */}
           </Bottom>
         </Content>
       </WrapperLink>
