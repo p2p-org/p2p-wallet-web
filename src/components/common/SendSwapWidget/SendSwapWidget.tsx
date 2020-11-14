@@ -115,7 +115,7 @@ type Props = {
   onToPublicKeyChange: (pubkey: string) => void;
   onBackClick: () => void;
   onSubmit: () => void;
-  disabled: boolean;
+  disabled?: boolean;
 };
 
 export const SendSwapWidget: FunctionComponent<Props> = ({
@@ -147,7 +147,7 @@ export const SendSwapWidget: FunctionComponent<Props> = ({
             tokenAmount={fromTokenAmount}
             onTokenChange={onTokenChange}
             onAmountChange={onAmountChange}
-            disabled
+            disabled={disabled}
           />
         </FromWrapper>
         {type === 'send' ? (
@@ -165,7 +165,7 @@ export const SendSwapWidget: FunctionComponent<Props> = ({
               tokenAmount={fromTokenAmount}
               onTokenChange={onTokenChange}
               onAmountChange={onAmountChange}
-              disabled
+              disabled={disabled}
             />
           </FromWrapper>
         )}
