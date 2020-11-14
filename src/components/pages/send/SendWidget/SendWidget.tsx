@@ -137,7 +137,7 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
       const signature = await dispatch(
         transferTokens({
           sourcePublicKey: new web3.PublicKey(fromTokenPublicKey),
-          destPublicKey: new web3.PublicKey(fromTokenPublicKey),
+          destPublicKey: new web3.PublicKey(toAddress),
           amount,
         }),
       );
