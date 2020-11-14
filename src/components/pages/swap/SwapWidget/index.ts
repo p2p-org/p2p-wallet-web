@@ -1,1 +1,1 @@
-export { SendWidget } from './SendWidget';
+export { SwapWidget } from './SwapWidget';

@@ -11,7 +11,7 @@ type Props = {
   publicKey: string;
 };
 
-export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
+export const SwapWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
   const dispatch = useDispatch();
   const history = useHistory();
   const [fromTokenPublicKey, setFromTokenPublicKey] = useState(publicKey);
@@ -58,8 +58,9 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
 
   return (
     <SendSwapWidget
-      title="Send tokens"
-      actionText="Send"
+      type="swap"
+      title="Swap"
+      actionText="Comming soon"
       fromTokenPublicKey={fromTokenPublicKey}
       fromTokenAmount={fromTokenAmount}
       toTokenPublicKey={toTokenPublicKey}
@@ -68,6 +69,7 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
       onToPublicKeyChange={handleToPublicKeyChange}
       onBackClick={handleBackClick}
       onSubmit={handleSubmit}
+      disabled
     />
   );
 };

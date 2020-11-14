@@ -93,12 +93,10 @@ const Details = styled.div`
 type Props = {};
 
 export const ResultWidget: FunctionComponent<Props> = (props) => {
-  const {
-    state: { signature },
-  } = useLocation();
+  const { state: locationState } = useLocation();
   const dispatch = useDispatch();
   const transaction = useSelector(
-    (state: RootState) => state.entities.transactionsNormalized[signature],
+    (state: RootState) => state.entities.transactionsNormalized[locationState?.signature],
   );
 
   const transactionAuthor = transaction?.transaction.signatures[0].publicKey.toBase58();
@@ -115,11 +113,19 @@ export const ResultWidget: FunctionComponent<Props> = (props) => {
   const { transfer } = useDecodeTokenRegInstructions(transaction?.transaction.instructions);
 
   useEffect(() => {
-    dispatch(getConfirmedTransaction(signature));
+    const mount = async () => {
+      const trx = await dispatch(getConfirmedTransaction(locationState?.signature));
+
+      if (!trx) {
+        setTimeout(mount, 3000);
+      }
+    };
+
+    void mount();
   }, []);
 
   const handleDetailsClick = () => {
-    dispatch(openModal(SHOW_MODAL_TRANSACTION_DETAILS, { signature }));
+    dispatch(openModal(SHOW_MODAL_TRANSACTION_DETAILS, { signature: locationState?.signature }));
   };
 
   // TODO: dirty

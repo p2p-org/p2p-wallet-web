@@ -2,6 +2,7 @@ import React, { FunctionComponent, useEffect, useMemo, useRef, useState } from '
 import { useDispatch, useSelector } from 'react-redux';
 
 import * as web3 from '@solana/web3.js';
+import classNames from 'classnames';
 import { styled } from 'linaria/react';
 import { rgba } from 'polished';
 
@@ -36,6 +37,11 @@ const AllBalance = styled.div`
   text-decoration: underline;
 
   cursor: pointer;
+
+  &.disabled {
+    cursor: auto;
+    pointer-events: none;
+  }
 `;
 
 const MainWrapper = styled.div`
@@ -67,6 +73,11 @@ const TokenWrapper = styled.div`
   min-width: 0;
 
   cursor: pointer;
+
+  &.disabled {
+    cursor: auto;
+    pointer-events: none;
+  }
 `;
 
 const TokenName = styled.div`
@@ -165,6 +176,7 @@ type Props = {
   tokenAmount: string;
   onTokenChange: (tokenPublicKey: string) => void;
   onAmountChange: (tokenAmount: string) => void;
+  disabled?: boolean;
 };
 
 export const FromSelectInput: FunctionComponent<Props> = ({
@@ -172,6 +184,7 @@ export const FromSelectInput: FunctionComponent<Props> = ({
   tokenAmount,
   onTokenChange,
   onAmountChange,
+  disabled,
 }) => {
   const dispatch = useDispatch();
   const selectorRef = useRef<HTMLDivElement>(null);
@@ -225,9 +238,9 @@ export const FromSelectInput: FunctionComponent<Props> = ({
     setIsOpen(!isOpen);
   };
 
-  const handleItemClick = (publicKey: string) => {
+  const handleItemClick = (newPublicKey: string) => {
     setIsOpen(false);
-    onTokenChange(publicKey);
+    onTokenChange(nextPublicKey);
   };
 
   const handleAllBalanceClick = () => {
@@ -244,7 +257,9 @@ export const FromSelectInput: FunctionComponent<Props> = ({
     <Wrapper>
       <TopWrapper>
         <FromTitle>From</FromTitle>
-        <AllBalance onClick={handleAllBalanceClick}>Use all balance</AllBalance>
+        <AllBalance onClick={handleAllBalanceClick} className={classNames({ disabled })}>
+          Use all balance
+        </AllBalance>
       </TopWrapper>
       <MainWrapper>
         <TokenAvatarWrapper>
@@ -252,7 +267,10 @@ export const FromSelectInput: FunctionComponent<Props> = ({
         </TokenAvatarWrapper>
         <InfoWrapper>
           <SpecifyTokenWrapper>
-            <TokenWrapper ref={selectorRef} onClick={handleSelectorClick}>
+            <TokenWrapper
+              ref={selectorRef}
+              onClick={handleSelectorClick}
+              className={classNames({ disabled })}>
               <TokenName title={tokenPublicKey}>
                 {name || symbol || shortAddress(tokenPublicKey)}
               </TokenName>
@@ -260,7 +278,12 @@ export const FromSelectInput: FunctionComponent<Props> = ({
                 <ChevronIcon name="arrow-triangle" />
               </ChevronWrapper>
             </TokenWrapper>
-            <AmountInput placeholder="0" value={tokenAmount} onChange={handleAmountChange} />
+            <AmountInput
+              placeholder="0"
+              value={tokenAmount}
+              onChange={handleAmountChange}
+              disabled={disabled}
+            />
           </SpecifyTokenWrapper>
           <BalanceWrapper>
             <BalanceText>

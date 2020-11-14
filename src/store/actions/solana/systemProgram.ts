@@ -128,6 +128,8 @@ export const getConfirmedTransaction = (signature: web3.TransactionSignature): A
   try {
     const result = await ApiSolanaService.getConnection().getConfirmedTransaction(signature);
     dispatch(getConfirmedTransactionAsyncAction.success(result, { signature }));
+
+    return result;
   } catch (error) {
     dispatch(getConfirmedTransactionAsyncAction.failure(error));
   }
