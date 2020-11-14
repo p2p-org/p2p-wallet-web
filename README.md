@@ -1,6 +1,7 @@
 # P2P Wallet prototype
 
 A Open Source Browser Based Solana Wallet. Version "0.1a Wormhole Hackathon"
+Built on top of [Solana](https://github.com/solana-labs), [ProjectSerum](https://github.com/project-serum) [Bonfida](https://docs.bonfida.com/#project-serum)
 
 Live demo available at [github-pages](https://p2p-org.github.io/p2p-wallet-web/)
 
@@ -10,7 +11,7 @@ P2P Wallet Prototype supports a number features such as:
 * Create/Access Wallet with seed. Your private keys are only stored on your current computer or device. 
 * Create Wrapped tokens addresses
 * Displaying balances of SOL token and Wrapped tokens
-* Displaying the value of assets in dollars. Thanks to [bonfida](https://docs.bonfida.com/#project-serum)
+* Displaying the value of assets in dollars. 
 * Send and receive SOL token and Wrapped tokens
 * Transaction history
 * Transaction details
@@ -23,6 +24,7 @@ P2P Wallet Prototype supports a number features such as:
 - One-tap access to swap assets 
 - Wallet Connect integration
 - Send/Receive Wrapped tokens to/from Ethereum Blockchain
+- DeFi support
 
 ## Build it yourself
 
