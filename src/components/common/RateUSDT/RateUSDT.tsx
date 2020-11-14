@@ -15,7 +15,7 @@ export const RateUSDT: FunctionComponent<Props> = ({ symbol = '', ...props }) =>
   const rate = useSelector((state: RootState) => state.entities.rates[`${symbol}/USDT`]);
 
   return (
-    <Wrapper {...props}>
+    <Wrapper title="Rate in USDT" {...props}>
       {rate
         ? new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(rate)
         : undefined}

@@ -24,5 +24,9 @@ export const AmountUSDT: FunctionComponent<Props> = ({ value = 0, symbol = '', .
     );
   }
 
-  return <Wrapper {...props}>{sum}</Wrapper>;
+  return (
+    <Wrapper title="Amount in USDT" {...props}>
+      {sum}
+    </Wrapper>
+  );
 };
