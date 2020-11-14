@@ -73,7 +73,7 @@ export const TransactionRow: FunctionComponent<Props> = ({ signature, publicKey 
   );
 
   const { mint } = tokenAccount?.parsed || { amount: 0 };
-  let { symbol } = usePopulateTokenInfo({ mint: mint?.toBase58(), includeSol: true });
+  let { symbol } = usePopulateTokenInfo({ mint: mint?.toBase58() });
 
   const { type, lamports } = useDecodeSystemProgramInstructions(
     transaction?.transaction.instructions,

@@ -12,8 +12,10 @@ import { Button, Icon } from 'components/ui';
 import { openModal } from 'store/actions/modals';
 import { getConfirmedTransaction } from 'store/actions/solana';
 import { SHOW_MODAL_TRANSACTION_DETAILS } from 'store/constants/modalTypes';
-import { RootState } from 'store/types';
+import { RootState, TokenAccount } from 'store/types';
 import { useDecodeSystemProgramInstructions } from 'utils/hooks/instructions/useDecodeSystemProgramInstructions';
+import { useDecodeTokenRegInstructions } from 'utils/hooks/instructions/useDecodeTokenRegInstractions';
+import { usePopulateTokenInfo } from 'utils/hooks/usePopulateTokenInfo';
 
 const WrapperCard = styled(Card)`
   display: flex;
@@ -50,6 +52,13 @@ const ArrowIcon = styled(Icon)`
   transform: rotate(180deg);
 `;
 
+const InfoWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 32px;
+`;
+
 const Value = styled.div`
   color: #000000;
   font-weight: 500;
@@ -74,8 +83,6 @@ const Status = styled.div`
 `;
 
 const Details = styled.div`
-  margin-bottom: 32px;
-
   color: ${rgba('#000', 0.5)};
   font-size: 14px;
   line-height: 140%;
@@ -94,9 +101,18 @@ export const ResultWidget: FunctionComponent<Props> = (props) => {
     (state: RootState) => state.entities.transactionsNormalized[signature],
   );
 
+  const transactionAuthor = transaction?.transaction.signatures[0].publicKey.toBase58();
+  const tokenAccount: TokenAccount = useSelector(
+    (state: RootState) => state.entities.tokens.items[transactionAuthor],
+  );
+  const { mint } = tokenAccount?.parsed || { amount: 0 };
+  let { symbol } = usePopulateTokenInfo({ mint: mint?.toBase58() });
+
   const { type, fromPubkey, lamports, toPubkey } = useDecodeSystemProgramInstructions(
     transaction?.transaction.instructions,
   );
+
+  const { transfer } = useDecodeTokenRegInstructions(transaction?.transaction.instructions);
 
   useEffect(() => {
     dispatch(getConfirmedTransaction(signature));
@@ -106,15 +122,32 @@ export const ResultWidget: FunctionComponent<Props> = (props) => {
     dispatch(openModal(SHOW_MODAL_TRANSACTION_DETAILS, { signature }));
   };
 
+  // TODO: dirty
+  let amount = 0;
+  if (type) {
+    symbol = 'SOL';
+    amount = (lamports || 0) / web3.LAMPORTS_PER_SOL;
+  } else if (transfer) {
+    amount = (transfer.amount || 0) / web3.LAMPORTS_PER_SOL;
+  }
+
   return (
     <WrapperCard>
       <HeaderImage />
       <CircleWrapper>
         <ArrowIcon name="arrow-angle" />
       </CircleWrapper>
-      <Value>{lamports / web3.LAMPORTS_PER_SOL}</Value>
-      <Status>Processed</Status>
-      <Details onClick={handleDetailsClick}>Transaction details</Details>
+      <InfoWrapper>
+        {transaction ? (
+          <Value>
+            {amount} {symbol}
+          </Value>
+        ) : undefined}
+        <Status>{transaction ? 'Processed' : 'Processing'}</Status>
+        {transaction ? (
+          <Details onClick={handleDetailsClick}>Transaction details</Details>
+        ) : undefined}
+      </InfoWrapper>
       <Button primary big full as={Link} to={`/wallet/${fromPubkey}`}>
         Go back to wallet
       </Button>

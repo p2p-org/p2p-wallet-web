@@ -6,8 +6,10 @@ import { styled } from 'linaria/react';
 import { rgba } from 'polished';
 
 import { Icon } from 'components/ui';
-import { RootState } from 'store/types';
+import { RootState, TokenAccount } from 'store/types';
 import { useDecodeSystemProgramInstructions } from 'utils/hooks/instructions/useDecodeSystemProgramInstructions';
+import { useDecodeTokenRegInstructions } from 'utils/hooks/instructions/useDecodeTokenRegInstractions';
+import { usePopulateTokenInfo } from 'utils/hooks/usePopulateTokenInfo';
 
 const Wrapper = styled.div`
   position: relative;
@@ -134,13 +136,30 @@ export const TransactionDetailsModal: FunctionComponent<Props> = ({ signature, c
   const transaction = useSelector(
     (state: RootState) => state.entities.transactionsNormalized[signature],
   );
+  const transactionAuthor = transaction?.transaction.signatures[0].publicKey.toBase58();
+  const tokenAccount: TokenAccount = useSelector(
+    (state: RootState) => state.entities.tokens.items[transactionAuthor],
+  );
+  const { mint } = tokenAccount?.parsed || { amount: 0 };
+  let { symbol } = usePopulateTokenInfo({ mint: mint?.toBase58() });
 
   const { type, fromPubkey, lamports, toPubkey } = useDecodeSystemProgramInstructions(
     transaction?.transaction.instructions,
   );
 
+  const { transfer } = useDecodeTokenRegInstructions(transaction?.transaction.instructions);
+
   if (!transaction) {
     return null;
+  }
+
+  // TODO: dirty
+  let amount = 0;
+  if (type) {
+    symbol = 'SOL';
+    amount = (lamports || 0) / web3.LAMPORTS_PER_SOL;
+  } else if (transfer) {
+    amount = (transfer.amount || 0) / web3.LAMPORTS_PER_SOL;
   }
 
   return (
@@ -157,8 +176,9 @@ export const TransactionDetailsModal: FunctionComponent<Props> = ({ signature, c
       </Header>
       <Content>
         <StatusWrapper>
-          {/* <Value>+ 0,00344 BTC</Value> */}
-          <Value>{(lamports || 0) / web3.LAMPORTS_PER_SOL}</Value>
+          <Value>
+            {amount} {symbol}
+          </Value>
           <Status>Completed</Status>
         </StatusWrapper>
         <FieldsWrapper>
@@ -168,18 +188,18 @@ export const TransactionDetailsModal: FunctionComponent<Props> = ({ signature, c
           </FieldWrapper>
           <FieldWrapper>
             <FieldTitle>Amount</FieldTitle>
-            <FieldValue>{(lamports || 0) / web3.LAMPORTS_PER_SOL}</FieldValue>
+            <FieldValue>{amount}</FieldValue>
             {/* <FieldValue>0,00344 BTC at 12 902, 07 US$</FieldValue> */}
           </FieldWrapper>
           <FieldWrapper>
             <FieldTitle>Value</FieldTitle>
-            <FieldValue>{(lamports || 0) / web3.LAMPORTS_PER_SOL}</FieldValue>
+            <FieldValue>{amount}</FieldValue>
             {/* <FieldValue>0,00344 BTC at 12 902, 07 US$</FieldValue> */}
           </FieldWrapper>
           {transaction.meta ? (
             <FieldWrapper>
               <FieldTitle>Fee</FieldTitle>
-              <FieldValue>{transaction.meta.fee}</FieldValue>
+              <FieldValue>{transaction.meta.fee} SOL</FieldValue>
               {/* <FieldValue>0,00009492 BTC</FieldValue> */}
             </FieldWrapper>
           ) : null}
