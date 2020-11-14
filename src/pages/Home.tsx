@@ -7,7 +7,12 @@ import { Button } from 'components/ui';
 
 import { Header } from '../components/common/Header';
 
-const Wrapper = styled.div``;
+const Wrapper = styled.div`
+  height: auto !important;
+  min-height: 100%;
+
+  background: #fff;
+`;
 
 const Box = styled.div`
   max-width: 364px;

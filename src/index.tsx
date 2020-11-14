@@ -11,7 +11,13 @@ import { App } from './App';
 import { store } from './store';
 
 export const global = css`
-  :global(*) {
+  :global() {
+    html,
+    body,
+    #root {
+      height: 100%;
+    }
+
     body {
       font-family: 'Rubik', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
         'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
