@@ -258,7 +258,7 @@ var TransactionDetailsModal = function TransactionDetailsModal(_ref) {
     name: "close"
   })), /*#__PURE__*/_react.default.createElement(CircleWrapper, null, /*#__PURE__*/_react.default.createElement(ArrowAngleIcon, {
     name: "arrow-angle"
-  }))), /*#__PURE__*/_react.default.createElement(Content, null, /*#__PURE__*/_react.default.createElement(StatusWrapper, null, /*#__PURE__*/_react.default.createElement(Value, null, amount, " ", symbol), /*#__PURE__*/_react.default.createElement(Status, null, "Completed")), /*#__PURE__*/_react.default.createElement(FieldsWrapper, null, /*#__PURE__*/_react.default.createElement(FieldWrapper, null, /*#__PURE__*/_react.default.createElement(FieldTitle, null, "Transaction ID"), /*#__PURE__*/_react.default.createElement(FieldValue, null, signature)), /*#__PURE__*/_react.default.createElement(FieldWrapper, null, /*#__PURE__*/_react.default.createElement(FieldTitle, null, "Amount"), /*#__PURE__*/_react.default.createElement(FieldValue, null, amount)), /*#__PURE__*/_react.default.createElement(FieldWrapper, null, /*#__PURE__*/_react.default.createElement(FieldTitle, null, "Value"), /*#__PURE__*/_react.default.createElement(FieldValue, null, amount)), transaction.meta ? /*#__PURE__*/_react.default.createElement(FieldWrapper, null, /*#__PURE__*/_react.default.createElement(FieldTitle, null, "Fee"), /*#__PURE__*/_react.default.createElement(FieldValue, null, transaction.meta.fee, " SOL")) : null)));
+  }))), /*#__PURE__*/_react.default.createElement(Content, null, /*#__PURE__*/_react.default.createElement(StatusWrapper, null, /*#__PURE__*/_react.default.createElement(Value, null, amount, " ", symbol), /*#__PURE__*/_react.default.createElement(Status, null, "Completed")), /*#__PURE__*/_react.default.createElement(FieldsWrapper, null, /*#__PURE__*/_react.default.createElement(FieldWrapper, null, /*#__PURE__*/_react.default.createElement(FieldTitle, null, "Transaction ID"), /*#__PURE__*/_react.default.createElement(FieldValue, null, signature)), /*#__PURE__*/_react.default.createElement(FieldWrapper, null, /*#__PURE__*/_react.default.createElement(FieldTitle, null, "Amount"), /*#__PURE__*/_react.default.createElement(FieldValue, null, amount)), /*#__PURE__*/_react.default.createElement(FieldWrapper, null, /*#__PURE__*/_react.default.createElement(FieldTitle, null, "Value"), /*#__PURE__*/_react.default.createElement(FieldValue, null, amount)), transaction.meta ? /*#__PURE__*/_react.default.createElement(FieldWrapper, null, /*#__PURE__*/_react.default.createElement(FieldTitle, null, "Fee"), /*#__PURE__*/_react.default.createElement(FieldValue, null, transaction.meta.fee, " lamports")) : null)));
 };
 
 exports.TransactionDetailsModal = TransactionDetailsModal;
@@ -310,7 +310,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "55236" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "65347" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
