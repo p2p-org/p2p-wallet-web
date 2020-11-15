@@ -238,7 +238,7 @@ export const FromSelectInput: FunctionComponent<Props> = ({
     setIsOpen(!isOpen);
   };
 
-  const handleItemClick = (newPublicKey: string) => {
+  const handleItemClick = (nextPublicKey: string) => {
     setIsOpen(false);
     onTokenChange(nextPublicKey);
   };
