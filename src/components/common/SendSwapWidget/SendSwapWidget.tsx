@@ -174,8 +174,7 @@ export const SendSwapWidget: FunctionComponent<Props> = ({
             {actionText}
           </Button>
           <Hint>
-            Physical space is often conceived in three linear dimensions, although modern physicists
-            usually consider it, with time
+            fee calculator comming soon
           </Hint>
         </ActionWrapper>
       </WrapperCard>
