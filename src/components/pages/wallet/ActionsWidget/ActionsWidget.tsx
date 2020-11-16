@@ -29,12 +29,6 @@ export const ActionsWidget: FunctionComponent<Props> = ({ publicKey }) => {
   const entrypoint = useSelector((state: RootState) => state.data.blockchain.entrypoint);
   const isMainnetEntrypoint = entrypoint === web3.clusterApiUrl('mainnet-beta');
 
-  const tokenAccount: TokenAccount = useSelector(
-    (state: RootState) => state.entities.tokens.items[publicKey.toBase58()],
-  );
-  const { mint } = tokenAccount?.parsed || { amount: 0 };
-  const { symbol } = usePopulateTokenInfo({ mint: mint?.toBase58() });
-
   const handleTokenChange = (token: string) => {
     history.push(`/wallet/${token}`);
   };
@@ -48,13 +42,13 @@ export const ActionsWidget: FunctionComponent<Props> = ({ publicKey }) => {
       <TokenSelector value={publicKey.toBase58()} onChange={handleTokenChange} />
 
       <ButtonsGroup>
-        <Button primary small as={Link} to={`/send/${symbol || publicKey.toBase58()}`}>
+        <Button primary small as={Link} to={`/send/${publicKey.toBase58()}`}>
           Send
         </Button>
         {/* <Button primary small> */}
         {/*  Buy */}
         {/* </Button> */}
-        <Button primary small as={Link} to={`/swap/${symbol || publicKey.toBase58()}`}>
+        <Button primary small as={Link} to={`/swap/${publicKey.toBase58()}`}>
           Swap
         </Button>
         {!isMainnetEntrypoint ? (
