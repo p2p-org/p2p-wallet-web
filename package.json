@@ -6,7 +6,7 @@
   "scripts": {
     "start": "parcel -p 3000 src/index.html --out-dir dist",
     "build": "parcel build src/index.html --out-dir dist --public-url /p2p-wallet-web",
-    "deploy": "BASENAME=/p2p-wallet-web npm run build && gh-pages -d dist",
+    "deploy": "npm run build && gh-pages -d dist",
     "lint:fix": "eslint src/ --ext js,.jsx,.ts,.tsx --fix"
   },
   "dependencies": {
