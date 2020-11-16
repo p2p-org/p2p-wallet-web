@@ -199,7 +199,7 @@ export const TransactionDetailsModal: FunctionComponent<Props> = ({ signature, c
           {transaction.meta ? (
             <FieldWrapper>
               <FieldTitle>Fee</FieldTitle>
-              <FieldValue>{transaction.meta.fee} SOL</FieldValue>
+              <FieldValue>{transaction.meta.fee} lamports</FieldValue>
               {/* <FieldValue>0,00009492 BTC</FieldValue> */}
             </FieldWrapper>
           ) : null}
