@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
-import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+import { HashRouter as Router, Route, Switch } from 'react-router-dom';
 
 import { ModalManager } from 'components/common/ModalManager';
 import { Access, Create, DashboardOld, Home, Send, Swap, Wallet, Wallets } from 'pages';
