@@ -8,12 +8,8 @@ import { rgba } from 'polished';
 import { AmountUSDT } from 'components/common/AmountUSDT';
 import { Avatar } from 'components/ui';
 import { openModal } from 'store/actions/modals';
-import { getConfirmedTransaction } from 'store/actions/solana';
 import { SHOW_MODAL_TRANSACTION_DETAILS } from 'store/constants/modalTypes';
-import { RootState, TokenAccount } from 'store/types';
-import { useDecodeSystemProgramInstructions } from 'utils/hooks/instructions/useDecodeSystemProgramInstructions';
-import { useDecodeTokenRegInstructions } from 'utils/hooks/instructions/useDecodeTokenRegInstractions';
-import { usePopulateTokenInfo } from 'utils/hooks/usePopulateTokenInfo';
+import { useTransactionInfo } from 'utils/hooks/useTransactionInfo';
 
 const Wrapper = styled.div`
   display: flex;
@@ -60,57 +56,26 @@ const Bottom = styled.div`
 
 type Props = {
   signature: string;
-  publicKey: web3.PublicKey;
 };
 
-export const TransactionRow: FunctionComponent<Props> = ({ signature, publicKey }) => {
+export const TransactionRow: FunctionComponent<Props> = ({ signature }) => {
   const dispatch = useDispatch();
-  const transaction = useSelector(
-    (state: RootState) => state.entities.transactionsNormalized[signature],
-  );
-  const tokenAccount: TokenAccount = useSelector(
-    (state: RootState) => state.entities.tokens.items[publicKey.toBase58()],
-  );
 
-  const { mint } = tokenAccount?.parsed || { amount: 0 };
-  let { symbol } = usePopulateTokenInfo({ mint: mint?.toBase58() });
-
-  const { type, lamports } = useDecodeSystemProgramInstructions(
-    transaction?.transaction.instructions,
-  );
-
-  const { transfer } = useDecodeTokenRegInstructions(transaction?.transaction.instructions);
-
-  useEffect(() => {
-    dispatch(getConfirmedTransaction(signature));
-  }, []);
+  const { slot, type, symbol, amount } = useTransactionInfo(signature);
 
   const handleClick = () => {
     dispatch(openModal(SHOW_MODAL_TRANSACTION_DETAILS, { signature }));
   };
-
-  // TODO: dirty
-  let amount = 0;
-  if (type) {
-    symbol = 'SOL';
-    amount = (lamports || 0) / web3.LAMPORTS_PER_SOL;
-  } else if (transfer) {
-    amount = (transfer.amount || 0) / web3.LAMPORTS_PER_SOL;
-  } else {
-    // TODO: other types
-    return null;
-  }
 
   return (
     <Wrapper onClick={handleClick}>
       <AvatarStyled />
       <Content>
         <Top>
-          <div>{type || (transfer && 'Transfer')}</div>{' '}
-          <AmountUSDT value={amount} symbol={symbol} />
+          <div>{type}</div> <AmountUSDT value={amount} symbol={symbol} />
         </Top>
         <Bottom>
-          <div>{transaction?.slot} SLOT</div>
+          <div>{slot} SLOT</div>
           <div>
             {amount} {symbol}
           </div>

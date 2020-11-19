@@ -15,20 +15,17 @@ type Props = {
   src?: string;
   size?: string | number;
   mint?: string;
-  includeSol?: boolean;
 };
 
-export const TokenAvatar: FunctionComponent<Props> = ({ mint, src, includeSol, ...props }) => {
+export const TokenAvatar: FunctionComponent<Props> = ({ mint, src, ...props }) => {
   const entrypoint = useSelector((state: RootState) => state.data.blockchain.entrypoint);
 
   let newSrc: string | undefined = src;
 
   if (!src) {
     if (!mint) {
-      if (includeSol) {
-        newSrc =
-          'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/solana/info/logo.png';
-      }
+      newSrc =
+        'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/solana/info/logo.png';
     } else {
       newSrc = TOKENS_BY_ENTRYPOINT[entrypoint]?.find((token) => token.mintAddress === mint)?.icon;
     }

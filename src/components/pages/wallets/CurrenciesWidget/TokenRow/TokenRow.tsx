@@ -1,9 +1,7 @@
 import React, { FunctionComponent } from 'react';
 // import ReactHighcharts from 'react-highcharts';
-import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 
-import * as web3 from '@solana/web3.js';
 import { styled } from 'linaria/react';
 import { rgba } from 'polished';
 
@@ -12,8 +10,7 @@ import { AmountUSDT } from 'components/common/AmountUSDT';
 import { Card } from 'components/common/Card';
 import { RateUSDT } from 'components/common/RateUSDT';
 import { TokenAvatar } from 'components/common/TokenAvatar';
-import { RootState, TokenAccount } from 'store/types';
-import { usePopulateTokenInfo } from 'utils/hooks/usePopulateTokenInfo';
+import { useTokenInfo } from 'utils/hooks/useTokenInfo';
 // import { serials } from './data';
 // import { getConfig } from './utils';
 
@@ -90,20 +87,7 @@ type Props = {
 };
 
 export const TokenRow: FunctionComponent<Props> = ({ publicKey }) => {
-  const tokenAccount: TokenAccount = useSelector(
-    (state: RootState) => state.entities.tokens.items[publicKey],
-  );
-  const balanceLamports = useSelector((state: RootState) => state.data.blockchain.balanceLamports);
-
-  // eslint-disable-next-line prefer-const
-  let { mint, amount } = tokenAccount?.parsed || { amount: 0 };
-  const { name, symbol } = usePopulateTokenInfo({ mint: mint?.toBase58(), includeSol: true });
-
-  if (!mint) {
-    amount = balanceLamports / web3.LAMPORTS_PER_SOL;
-  }
-
-  amount = symbol === 'SOL' ? amount : amount > 0 ? amount / 1000000 : amount;
+  const { name, mint, symbol, amount } = useTokenInfo(publicKey);
 
   // const coin = 'BTC';
   // const currency = 'BTC';
@@ -119,7 +103,7 @@ export const TokenRow: FunctionComponent<Props> = ({ publicKey }) => {
     <WrapperCard>
       <WrapperLink to={`/wallet/${/* mint ? symbol || publicKey : */ publicKey}`}>
         {/* TODO: move to rollup because of parcel error if wrap TokenAvatar */}
-        <TokenAvatar mint={mint?.toBase58()} size={56} includeSol />
+        <TokenAvatar mint={mint} size={56} />
         <Content>
           <Top>
             <TokenName title={publicKey}>{name || publicKey}</TokenName>

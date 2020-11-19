@@ -6,6 +6,7 @@ import {
   getConfirmedSignaturesForAddressAsyncAction,
   getConfirmedTransactionAsyncAction,
   getProgramAccountsAsyncAction,
+  getTokenAccountInfoAsyncAction,
   requestAirdropAsyncAction,
   transferAsyncAction,
 } from 'store/commands';
@@ -126,7 +127,7 @@ export const getConfirmedTransaction = (signature: web3.TransactionSignature): A
   dispatch,
 ) => {
   try {
-    const result = await ApiSolanaService.getConnection().getConfirmedTransaction(signature);
+    const result = await ApiSolanaService.getConnection().getParsedConfirmedTransaction(signature);
     dispatch(getConfirmedTransactionAsyncAction.success(result, { signature }));
 
     return result;
@@ -135,11 +136,33 @@ export const getConfirmedTransaction = (signature: web3.TransactionSignature): A
   }
 };
 
+export const getTokenAccountInfo = (
+  publicKey: web3.PublicKey,
+  commitment?: web3.Commitment,
+): AppThunk => async (dispatch) => {
+  dispatch(getTokenAccountInfoAsyncAction.request());
+  try {
+    const result = await ApiSolanaService.getConnection()?.getParsedAccountInfo(
+      publicKey,
+      commitment,
+    );
+
+    if (!result.value) {
+      throw new Error('Token not found');
+    }
+
+    dispatch(getTokenAccountInfoAsyncAction.success(result.value, { publicKey }));
+  } catch {
+    dispatch(getTokenAccountInfoAsyncAction.failure(error.toString()));
+  }
+};
+
 export const getProgramAccounts = (
   programId: web3.PublicKey,
   commitment?: web3.Commitment,
   filters?: any,
 ): AppThunk => async (dispatch) => {
+  dispatch(getProgramAccountsAsyncAction.request());
   try {
     // const result = await ApiSolanaService.getConnection().getProgramAccounts(programId, commitment);
     const result = await ApiSolanaService.getConnection()._rpcRequest('getProgramAccounts', [
@@ -147,6 +170,7 @@ export const getProgramAccounts = (
       {
         commitment,
         filters,
+        encoding: 'jsonParsed',
       },
     ]);
 

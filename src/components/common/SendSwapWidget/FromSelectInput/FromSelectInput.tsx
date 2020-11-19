@@ -10,8 +10,8 @@ import { AmountUSDT } from 'components/common/AmountUSDT';
 import { TokenAvatar } from 'components/common/TokenAvatar';
 import { Icon } from 'components/ui';
 import { getOwnedTokenAccounts } from 'store/actions/solana';
-import { RootState, TokenAccount } from 'store/types';
-import { usePopulateTokenInfo } from 'utils/hooks/usePopulateTokenInfo';
+import { RootState } from 'store/types';
+import { useTokenInfo } from 'utils/hooks/useTokenInfo';
 import { shortAddress } from 'utils/tokens';
 
 import { TokenRow } from './TokenRow';
@@ -189,28 +189,10 @@ export const FromSelectInput: FunctionComponent<Props> = ({
   const dispatch = useDispatch();
   const selectorRef = useRef<HTMLDivElement>(null);
   const [isOpen, setIsOpen] = useState(false);
-  const balanceLamports = useSelector((state: RootState) => state.data.blockchain.balanceLamports);
   const order = useSelector((state: RootState) => state.entities.tokens.order);
   const entrypoint = useSelector((state: RootState) => state.data.blockchain.entrypoint);
-  const publicKey = useSelector((state: RootState) =>
-    state.data.blockchain.account?.publicKey.toBase58(),
-  );
 
-  const preparedOrder = useMemo(() => (publicKey ? [publicKey, ...order] : order), [
-    publicKey,
-    order,
-  ]);
-
-  const tokenAccount: TokenAccount = useSelector(
-    (state: RootState) => state.entities.tokens.items[tokenPublicKey],
-  );
-  // eslint-disable-next-line prefer-const
-  let { mint, amount } = tokenAccount?.parsed || { amount: 0 };
-  const { name, symbol } = usePopulateTokenInfo({ mint: mint?.toBase58(), includeSol: true });
-
-  if (!mint) {
-    amount = balanceLamports / web3.LAMPORTS_PER_SOL;
-  }
+  const { name, mint, symbol, amount } = useTokenInfo(tokenPublicKey);
 
   useEffect(() => {
     dispatch(getOwnedTokenAccounts());
@@ -231,7 +213,7 @@ export const FromSelectInput: FunctionComponent<Props> = ({
   }, []);
 
   const handleSelectorClick = () => {
-    if (!preparedOrder) {
+    if (!order) {
       return;
     }
 
@@ -263,7 +245,7 @@ export const FromSelectInput: FunctionComponent<Props> = ({
       </TopWrapper>
       <MainWrapper>
         <TokenAvatarWrapper>
-          <TokenAvatar mint={mint?.toBase58()} size={44} includeSol />
+          <TokenAvatar mint={mint} size={44} />
         </TokenAvatarWrapper>
         <InfoWrapper>
           <SpecifyTokenWrapper>
@@ -299,7 +281,7 @@ export const FromSelectInput: FunctionComponent<Props> = ({
         <DropDownListContainer>
           <DropDownHeader>Your wallets</DropDownHeader>
           <DropDownList>
-            {preparedOrder.map((publicKey) => (
+            {order.map((publicKey) => (
               <TokenRow key={publicKey} publicKey={publicKey} onClick={handleItemClick} />
             ))}
           </DropDownList>

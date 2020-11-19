@@ -1,14 +1,11 @@
 import React, { FunctionComponent } from 'react';
-import { useSelector } from 'react-redux';
 
-import * as web3 from '@solana/web3.js';
 import { styled } from 'linaria/react';
 import { rgba } from 'polished';
 
 import { RateUSDT } from 'components/common/RateUSDT';
 import { TokenAvatar } from 'components/common/TokenAvatar';
-import { RootState, TokenAccount } from 'store/types';
-import { usePopulateTokenInfo } from 'utils/hooks/usePopulateTokenInfo';
+import { useTokenInfo } from 'utils/hooks/useTokenInfo';
 
 const Wrapper = styled.div`
   padding: 15px 12px;
@@ -62,18 +59,7 @@ type Props = {
 };
 
 export const TokenRow: FunctionComponent<Props> = ({ publicKey, onItemClick }) => {
-  const tokenAccount: TokenAccount = useSelector(
-    (state: RootState) => state.entities.tokens.items[publicKey],
-  );
-  const balanceLamports = useSelector((state: RootState) => state.data.blockchain.balanceLamports);
-
-  // eslint-disable-next-line prefer-const
-  let { mint, amount } = tokenAccount?.parsed || { amount: 0 };
-  const { name, symbol } = usePopulateTokenInfo({ mint: mint?.toBase58(), includeSol: true });
-
-  if (!mint) {
-    amount = balanceLamports / web3.LAMPORTS_PER_SOL;
-  }
+  const { name, mint, symbol, amount } = useTokenInfo(publicKey);
 
   const handleClick = () => {
     onItemClick(publicKey);
@@ -82,7 +68,7 @@ export const TokenRow: FunctionComponent<Props> = ({ publicKey, onItemClick }) =
   return (
     <Wrapper title={publicKey} onClick={handleClick}>
       <ItemWrapper>
-        <TokenAvatar mint={mint?.toBase58()} size={32} includeSol />
+        <TokenAvatar mint={mint} size={32} includeSol />
         <Info>
           <Top>
             <TokenName>{name || publicKey}</TokenName> <RateUSDT symbol={symbol} />

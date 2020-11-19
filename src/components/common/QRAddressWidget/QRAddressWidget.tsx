@@ -8,8 +8,7 @@ import QRcode from 'qrcode.react';
 
 import { Card } from 'components/common/Card';
 import { Icon } from 'components/ui';
-import { RootState, TokenAccount } from 'store/types';
-import { usePopulateTokenInfo } from 'utils/hooks/usePopulateTokenInfo';
+import { useTokenInfo } from 'utils/hooks/useTokenInfo';
 
 const WrapperCard = styled(Card)`
   flex: 1;
@@ -104,12 +103,7 @@ type Props = {
 
 export const QRAddressWidget: FunctionComponent<Props> = ({ publicKey, isSol, className }) => {
   const publicKeyBase58 = publicKey.toBase58();
-
-  const tokenAccount: TokenAccount = useSelector(
-    (state: RootState) => state.entities.tokens.items[publicKeyBase58],
-  );
-  const { mint } = tokenAccount?.parsed || { amount: 0 };
-  const { name } = usePopulateTokenInfo({ mint: mint?.toBase58(), includeSol: isSol });
+  const { name } = useTokenInfo(publicKeyBase58);
 
   const handleCopyClick = () => {
     try {

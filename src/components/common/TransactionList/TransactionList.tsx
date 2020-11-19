@@ -26,10 +26,9 @@ const Wrapper = styled.div`
 
 type Props = {
   order?: string[];
-  publicKey: web3.PublicKey;
 };
 
-export const TransactionList: FunctionComponent<Props> = ({ order, publicKey }) => {
+export const TransactionList: FunctionComponent<Props> = ({ order }) => {
   if (!order) {
     return null;
   }
@@ -37,7 +36,7 @@ export const TransactionList: FunctionComponent<Props> = ({ order, publicKey }) 
   return (
     <Wrapper>
       {order.map((signature) => (
-        <TransactionRow key={signature} signature={signature} publicKey={publicKey} />
+        <TransactionRow key={signature} signature={signature} />
       ))}
     </Wrapper>
   );

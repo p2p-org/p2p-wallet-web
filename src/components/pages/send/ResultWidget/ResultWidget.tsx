@@ -1,9 +1,8 @@
 import React, { FunctionComponent, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { useLocation } from 'react-router';
 import { Link } from 'react-router-dom';
 
-import * as web3 from '@solana/web3.js';
 import { styled } from 'linaria/react';
 import { rgba } from 'polished';
 
@@ -12,10 +11,7 @@ import { Button, Icon } from 'components/ui';
 import { openModal } from 'store/actions/modals';
 import { getConfirmedTransaction } from 'store/actions/solana';
 import { SHOW_MODAL_TRANSACTION_DETAILS } from 'store/constants/modalTypes';
-import { RootState, TokenAccount } from 'store/types';
-import { useDecodeSystemProgramInstructions } from 'utils/hooks/instructions/useDecodeSystemProgramInstructions';
-import { useDecodeTokenRegInstructions } from 'utils/hooks/instructions/useDecodeTokenRegInstractions';
-import { usePopulateTokenInfo } from 'utils/hooks/usePopulateTokenInfo';
+import { useTransactionInfo } from 'utils/hooks/useTransactionInfo';
 
 const WrapperCard = styled(Card)`
   display: flex;
@@ -90,27 +86,11 @@ const Details = styled.div`
   cursor: pointer;
 `;
 
-type Props = {};
-
-export const ResultWidget: FunctionComponent<Props> = (props) => {
+export const ResultWidget: FunctionComponent = () => {
   const { state: locationState } = useLocation();
   const dispatch = useDispatch();
-  const transaction = useSelector(
-    (state: RootState) => state.entities.transactionsNormalized[locationState?.signature],
-  );
 
-  const transactionAuthor = transaction?.transaction.signatures[0].publicKey.toBase58();
-  const tokenAccount: TokenAccount = useSelector(
-    (state: RootState) => state.entities.tokens.items[transactionAuthor],
-  );
-  const { mint } = tokenAccount?.parsed || { amount: 0 };
-  let { symbol } = usePopulateTokenInfo({ mint: mint?.toBase58() });
-
-  const { type, fromPubkey, lamports, toPubkey } = useDecodeSystemProgramInstructions(
-    transaction?.transaction.instructions,
-  );
-
-  const { transfer } = useDecodeTokenRegInstructions(transaction?.transaction.instructions);
+  const { slot, source, symbol, amount } = useTransactionInfo(locationState?.signature);
 
   useEffect(() => {
     const mount = async () => {
@@ -128,15 +108,6 @@ export const ResultWidget: FunctionComponent<Props> = (props) => {
     dispatch(openModal(SHOW_MODAL_TRANSACTION_DETAILS, { signature: locationState?.signature }));
   };
 
-  // TODO: dirty
-  let amount = 0;
-  if (type) {
-    symbol = 'SOL';
-    amount = (lamports || 0) / web3.LAMPORTS_PER_SOL;
-  } else if (transfer) {
-    amount = (transfer.amount || 0) / web3.LAMPORTS_PER_SOL;
-  }
-
   return (
     <WrapperCard>
       <HeaderImage />
@@ -144,19 +115,19 @@ export const ResultWidget: FunctionComponent<Props> = (props) => {
         <ArrowIcon name="arrow-angle" />
       </CircleWrapper>
       <InfoWrapper>
-        {transaction ? (
+        {slot ? (
           <Value>
             {amount} {symbol}
           </Value>
         ) : undefined}
-        <Status>{transaction ? 'Processed' : 'Processing'}</Status>
-        {transaction ? (
-          <Details onClick={handleDetailsClick}>Transaction details</Details>
-        ) : undefined}
+        <Status>{slot ? 'Processed' : 'Processing'}</Status>
+        {slot ? <Details onClick={handleDetailsClick}>Transaction details</Details> : undefined}
       </InfoWrapper>
-      <Button primary big full as={Link} to={`/wallet/${fromPubkey}`}>
-        Go back to wallet
-      </Button>
+      {source ? (
+        <Button primary big full as={Link} to={`/wallet/${source}`}>
+          Go back to wallet
+        </Button>
+      ) : undefined}
     </WrapperCard>
   );
 };

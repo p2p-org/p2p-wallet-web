@@ -1,9 +1,9 @@
 import * as web3 from '@solana/web3.js';
-import * as bip39 from 'bip39';
 import * as bip32 from 'bip32';
+import * as bip39 from 'bip39';
 import nacl from 'tweetnacl';
 
-import { getBalance } from 'store/actions/solana';
+import { getBalance, getTokenAccountInfo } from 'store/actions/solana';
 import {
   changeEntrypointAction,
   changeFeeCalculatorAction,
@@ -38,7 +38,7 @@ export const establishConnection = (entrypoint?: string): AppAsyncThunk<void> =>
     const { account } = getState().data.blockchain;
 
     if (account) {
-      dispatch(getBalance(account.publicKey));
+      dispatch(getTokenAccountInfo(account.publicKey));
     }
 
     dispatch(connectionReadyAction());
@@ -66,12 +66,9 @@ export const createAccount = (mnemonic: string): AppThunk => async (dispatch) =>
   dispatch(createAccountAction(keyPair.secretKey));
 };
 
-export const accessAccount = (mnemonic : string): AppThunk => async (dispatch) => {
-
+export const accessAccount = (mnemonic: string): AppThunk => async (dispatch) => {
   const seed = await bip39.mnemonicToSeed(mnemonic);
-  const derivedSeed = bip32
-    .fromSeed(seed)
-    .derivePath(`m/501'/0'/0/0`).privateKey;
+  const derivedSeed = bip32.fromSeed(seed).derivePath(`m/501'/0'/0/0`).privateKey;
   const keyPair = nacl.sign.keyPair.fromSeed(derivedSeed);
 
   localStorage.setItem('secretKey', JSON.stringify([...keyPair.secretKey]));

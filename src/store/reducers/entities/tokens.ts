@@ -1,15 +1,16 @@
 import * as web3 from '@solana/web3.js';
-import bs58 from 'bs58';
 import { mergeRight, uniq } from 'ramda';
 import { createReducer } from 'typesafe-actions';
 
-import { TOKEN_PROGRAM_ID } from 'constants/solana/bufferLayouts';
-import { changeEntrypointAction, getProgramAccountsAsyncAction } from 'store/commands';
-import { TokenAccount } from 'store/types';
-import { parseTokenAccountData } from 'utils/solana/parseData';
+import { SYSTEM_PROGRAM_ID, TOKEN_PROGRAM_ID } from 'constants/solana/bufferLayouts';
+import {
+  changeEntrypointAction,
+  getProgramAccountsAsyncAction,
+  getTokenAccountInfoAsyncAction,
+} from 'store/commands';
 
 type ItemsType = {
-  [pubkey: string]: TokenAccount;
+  [pubkey: string]: web3.AccountInfo<web3.ParsedAccountData>;
 };
 
 type State = {
@@ -29,19 +30,26 @@ export const tokensReducer = createReducer(initialState)
     const newPubkeys: string[] = [];
 
     for (const { pubkey, account } of action.payload) {
-      const parsed: {
-        mint?: web3.PublicKey;
-        owner?: web3.PublicKey;
-        amount?: number;
-      } = new web3.PublicKey(String(account?.owner)).equals(TOKEN_PROGRAM_ID)
-        ? parseTokenAccountData(bs58.decode(account.data))
-        : {};
+      if (new web3.PublicKey(String(account?.owner)).equals(TOKEN_PROGRAM_ID)) {
+        newItems[pubkey.toString()] = account;
+        newPubkeys.push(pubkey.toString());
+      }
+    }
 
-      newItems[pubkey.toString()] = {
-        ...account,
-        parsed,
-      };
-      newPubkeys.push(pubkey.toString());
+    return {
+      items: mergeRight(state.items, newItems),
+      order: uniq(state.order.concat(newPubkeys)),
+    };
+  })
+  .handleAction(getTokenAccountInfoAsyncAction.success, (state, { payload, meta }) => {
+    // TODO: normalizr if it will fit many cases
+    const newItems: ItemsType = {};
+    const newPubkeys: string[] = [];
+    const tokenPublicKey = new web3.PublicKey(String(payload?.owner.toBase58()));
+
+    if (tokenPublicKey.equals(TOKEN_PROGRAM_ID) || tokenPublicKey.equals(SYSTEM_PROGRAM_ID)) {
+      newItems[meta.publicKey.toBase58()] = payload;
+      newPubkeys.push(meta.publicKey.toBase58());
     }
 
     return {

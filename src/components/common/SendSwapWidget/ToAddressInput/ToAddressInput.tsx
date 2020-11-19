@@ -8,6 +8,14 @@ const Wrapper = styled.div`
   display: flex;
 `;
 
+const Circle = styled.div`
+  width: 44px;
+  height: 44px;
+
+  background: #c4c4c4;
+  border-radius: 50%;
+`;
+
 const ToInput = styled.input`
   flex: 1;
   margin-left: 20px;
@@ -43,7 +51,7 @@ export const ToAddressInput: FunctionComponent<Props> = ({ value, onChange }) =>
 
   return (
     <Wrapper>
-      <TokenAvatar mint={value} size={44} />
+      <Circle />
       <ToInput placeholder="Public key" value={value} onChange={handleChange} />
     </Wrapper>
   );

@@ -56,7 +56,7 @@ export const AddCoinModal: FunctionComponent<Props> = ({ close }) => {
 
   const closeModal = () => {
     close();
-  }
+  };
 
   const filteredTokens = useMemo(() => {
     if (!tokens) {
@@ -64,7 +64,7 @@ export const AddCoinModal: FunctionComponent<Props> = ({ close }) => {
     }
 
     const existsMintAccounts = new Set(
-      Object.values(tokenAccounts).map((token) => token.parsed.mint?.toBase58()),
+      Object.values(tokenAccounts).map((token) => token.data.parsed.info.mint?.toBase58()),
     );
 
     return tokens.filter((token) => !existsMintAccounts.has(token.mintAddress));

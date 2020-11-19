@@ -6,6 +6,7 @@ import * as web3 from '@solana/web3.js';
 
 import { SendSwapWidget } from 'components/common/SendSwapWidget';
 import { transferTokens } from 'store/actions/complex';
+import { useTokenInfo } from 'utils/hooks/useTokenInfo';
 
 type Props = {
   publicKey: string;
@@ -17,6 +18,7 @@ export const SwapWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
   const [fromTokenPublicKey, setFromTokenPublicKey] = useState(publicKey);
   const [fromTokenAmount, setFromTokenAmount] = useState('');
   const [toTokenPublicKey, setToTokenPublicKey] = useState('');
+  const { decimals } = useTokenInfo(fromTokenPublicKey);
 
   const handleBackClick = () => {
     history.replace('/wallets');
@@ -27,7 +29,7 @@ export const SwapWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
   };
 
   const handleSubmit = async () => {
-    const amount = Math.round(Number.parseFloat(fromTokenAmount) * 10 ** 9);
+    const amount = Math.round(Number.parseFloat(fromTokenAmount) * 10 ** decimals);
 
     if (!amount || amount <= 0) {
       throw new Error('Invalid amount');

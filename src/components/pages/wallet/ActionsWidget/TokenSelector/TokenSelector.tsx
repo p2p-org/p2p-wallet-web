@@ -6,8 +6,8 @@ import { rgba } from 'polished';
 
 import { Icon } from 'components/ui';
 import { getOwnedTokenAccounts } from 'store/actions/solana';
-import { RootState, TokenAccount } from 'store/types';
-import { usePopulateTokenInfo } from 'utils/hooks/usePopulateTokenInfo';
+import { RootState } from 'store/types';
+import { useTokenInfo } from 'utils/hooks/useTokenInfo';
 import { shortAddress } from 'utils/tokens';
 
 import { TokenRow } from './TokenRow';
@@ -72,20 +72,7 @@ export const TokenSelector: FunctionComponent<Props> = ({ value, onChange }) => 
   const selectorRef = useRef<HTMLDivElement>(null);
   const [isOpen, setIsOpen] = useState(false);
   const order = useSelector((state: RootState) => state.entities.tokens.order);
-  const publicKey = useSelector((state: RootState) =>
-    state.data.blockchain.account?.publicKey.toBase58(),
-  );
-
-  const preparedOrder = useMemo(() => (publicKey ? [publicKey, ...order] : order), [
-    publicKey,
-    order,
-  ]);
-
-  const tokenAccount: TokenAccount = useSelector(
-    (state: RootState) => state.entities.tokens.items[value],
-  );
-  const { mint } = tokenAccount?.parsed || { amount: 0 };
-  const { name } = usePopulateTokenInfo({ mint: mint?.toBase58() });
+  const { name } = useTokenInfo(value);
 
   useEffect(() => {
     dispatch(getOwnedTokenAccounts());
@@ -106,7 +93,7 @@ export const TokenSelector: FunctionComponent<Props> = ({ value, onChange }) => 
   }, []);
 
   const handleSelectorClick = () => {
-    if (!preparedOrder) {
+    if (!order) {
       return;
     }
 
@@ -130,7 +117,7 @@ export const TokenSelector: FunctionComponent<Props> = ({ value, onChange }) => 
       </Selector>
       {isOpen ? (
         <DropDownList>
-          {preparedOrder.map((publicKey) => (
+          {order.map((publicKey) => (
             <TokenRow key={publicKey} publicKey={publicKey} onItemClick={handleItemClick} />
           ))}
         </DropDownList>

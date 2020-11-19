@@ -5,7 +5,7 @@ import { createReducer } from 'typesafe-actions';
 import { changeEntrypointAction, getConfirmedTransactionAsyncAction } from 'store/commands';
 
 type State = {
-  [pubkey: string]: web3.ConfirmedTransaction;
+  [pubkey: string]: web3.ParsedConfirmedTransaction;
 };
 
 const initialState: State = {};

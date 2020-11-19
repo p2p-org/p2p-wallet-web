@@ -1,6 +1,8 @@
 import * as web3 from '@solana/web3.js';
 import * as BufferLayout from 'buffer-layout';
 
+export const SYSTEM_PROGRAM_ID = new web3.PublicKey('11111111111111111111111111111111');
+
 export const TOKEN_PROGRAM_ID = new web3.PublicKey('TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA');
 
 export const MEMO_PROGRAM_ID = new web3.PublicKey('Memo1UhkJRfHyvLMcVucJwxXeuD728EqVDDwQDxFMNo');

@@ -1,15 +1,14 @@
-import React, { FunctionComponent } from 'react';
-import { useSelector } from 'react-redux';
+import React, { FunctionComponent, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 
 import * as web3 from '@solana/web3.js';
 import { styled } from 'linaria/react';
 import { rgba } from 'polished';
 
 import { Icon } from 'components/ui';
-import { RootState, TokenAccount } from 'store/types';
-import { useDecodeSystemProgramInstructions } from 'utils/hooks/instructions/useDecodeSystemProgramInstructions';
-import { useDecodeTokenRegInstructions } from 'utils/hooks/instructions/useDecodeTokenRegInstractions';
-import { usePopulateTokenInfo } from 'utils/hooks/usePopulateTokenInfo';
+import { getConfirmedTransaction } from 'store/actions/solana';
+import { RootState } from 'store/types';
+import { useTransactionInfo } from 'utils/hooks/useTransactionInfo';
 
 const Wrapper = styled.div`
   position: relative;
@@ -133,40 +132,33 @@ type Props = {
 };
 
 export const TransactionDetailsModal: FunctionComponent<Props> = ({ signature, close }) => {
-  const transaction = useSelector(
-    (state: RootState) => state.entities.transactionsNormalized[signature],
-  );
-  const transactionAuthor = transaction?.transaction.signatures[0].publicKey.toBase58();
-  const tokenAccount: TokenAccount = useSelector(
-    (state: RootState) => state.entities.tokens.items[transactionAuthor],
-  );
-  const { mint } = tokenAccount?.parsed || { amount: 0 };
-  let { symbol } = usePopulateTokenInfo({ mint: mint?.toBase58() });
+  const dispatch = useDispatch();
 
-  const { type, fromPubkey, lamports, toPubkey } = useDecodeSystemProgramInstructions(
-    transaction?.transaction.instructions,
-  );
+  const { slot, symbol, amount, meta } = useTransactionInfo(signature);
 
-  const { transfer } = useDecodeTokenRegInstructions(transaction?.transaction.instructions);
+  useEffect(() => {
+    const mount = async () => {
+      const trx = await dispatch(getConfirmedTransaction(signature));
 
-  if (!transaction) {
+      if (!trx) {
+        setTimeout(mount, 3000);
+      }
+    };
+
+    if (!signature) {
+      void mount();
+    }
+  }, [signature]);
+
+  if (!slot) {
     return null;
-  }
-
-  // TODO: dirty
-  let amount = 0;
-  if (type) {
-    symbol = 'SOL';
-    amount = (lamports || 0) / web3.LAMPORTS_PER_SOL;
-  } else if (transfer) {
-    amount = (transfer.amount || 0) / web3.LAMPORTS_PER_SOL;
   }
 
   return (
     <Wrapper>
       <Header>
         {/* <Title>24 Oct 2020 @ 12:51 PM</Title> */}
-        <Title>{transaction.slot} SLOT</Title>
+        <Title>{slot} SLOT</Title>
         <CloseWrapper onClick={close}>
           <CloseIcon name="close" />
         </CloseWrapper>
@@ -196,10 +188,10 @@ export const TransactionDetailsModal: FunctionComponent<Props> = ({ signature, c
             <FieldValue>{amount}</FieldValue>
             {/* <FieldValue>0,00344 BTC at 12 902, 07 US$</FieldValue> */}
           </FieldWrapper>
-          {transaction.meta ? (
+          {meta ? (
             <FieldWrapper>
               <FieldTitle>Fee</FieldTitle>
-              <FieldValue>{transaction.meta.fee} lamports</FieldValue>
+              <FieldValue>{meta.fee} lamports</FieldValue>
               {/* <FieldValue>0,00009492 BTC</FieldValue> */}
             </FieldWrapper>
           ) : null}

@@ -8,8 +8,7 @@ import { styled } from 'linaria/react';
 
 import { Button, ButtonsGroup } from 'components/ui';
 import { requestAirdrop } from 'store/actions/solana';
-import { RootState, TokenAccount } from 'store/types';
-import { usePopulateTokenInfo } from 'utils/hooks/usePopulateTokenInfo';
+import { RootState } from 'store/types';
 
 import { TokenSelector } from './TokenSelector';
 

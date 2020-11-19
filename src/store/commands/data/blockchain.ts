@@ -34,14 +34,35 @@ export const getConfirmedTransactionAsyncAction = createAsyncAction(
   'SOLANA_GET_CONFIRMED_TRANSACTION_ACTION_SUCCESS',
   'SOLANA_GET_CONFIRMED_TRANSACTION_ACTION_FAILURE',
   'SOLANA_GET_CONFIRMED_TRANSACTION_ACTION_CANCEL',
-)<unknown, [web3.ConfirmedTransaction, { signature: web3.TransactionSignature }], Error>();
+)<unknown, [web3.ParsedConfirmedTransaction, { signature: web3.TransactionSignature }], Error>();
 
 export const getProgramAccountsAsyncAction = createAsyncAction(
   'SOLANA_GET_PROGRAM_ACCOUNTS_REQUEST',
   'SOLANA_GET_PROGRAM_ACCOUNTS_SUCCESS',
   'SOLANA_GET_PROGRAM_ACCOUNTS_FAILURE',
   'SOLANA_GET_PROGRAM_ACCOUNTS_CANCEL',
-)<unknown, Array<web3.PublicKeyAndAccount<string>>, Error>();
+)<
+  undefined,
+  Array<{
+    pubkey: web3.PublicKey;
+    account: web3.AccountInfo<web3.ParsedAccountData>;
+  }>,
+  Error
+>();
+
+export const getTokenAccountInfoAsyncAction = createAsyncAction(
+  'SOLANA_TOKEN_ACCOUNT_INFO_REQUEST',
+  'SOLANA_TOKEN_ACCOUNT_INFO_SUCCESS',
+  'SOLANA_TOKEN_ACCOUNT_INFO_FAILURE',
+  'SOLANA_TOKEN_ACCOUNT_INFO_CANCEL',
+)<
+  undefined,
+  [
+    web3.RpcResponseAndContext<web3.AccountInfo<Buffer | web3.ParsedAccountData> | null>,
+    { publicKey: web3.PublicKey },
+  ],
+  Error
+>();
 
 export const requestAirdropAsyncAction = createAsyncAction(
   'SOLANA_REQUEST_AIRDROP_REQUEST',

@@ -6,8 +6,7 @@ import { styled } from 'linaria/react';
 import { rgba } from 'polished';
 
 import { TokenAvatar } from 'components/common/TokenAvatar';
-import { RootState, TokenAccount } from 'store/types';
-import { usePopulateTokenInfo } from 'utils/hooks/usePopulateTokenInfo';
+import { useTokenInfo } from 'utils/hooks/useTokenInfo';
 
 const Wrapper = styled.div`
   padding: 15px 32px;
@@ -61,18 +60,7 @@ type Props = {
 };
 
 export const TokenRow: FunctionComponent<Props> = ({ publicKey, onClick }) => {
-  const tokenAccount: TokenAccount = useSelector(
-    (state: RootState) => state.entities.tokens.items[publicKey],
-  );
-  const balanceLamports = useSelector((state: RootState) => state.data.blockchain.balanceLamports);
-
-  // eslint-disable-next-line prefer-const
-  let { mint, amount } = tokenAccount?.parsed || { amount: 0 };
-  const { name, symbol } = usePopulateTokenInfo({ mint: mint?.toBase58(), includeSol: true });
-
-  if (!mint) {
-    amount = balanceLamports / web3.LAMPORTS_PER_SOL;
-  }
+  const { name, mint, symbol, amount } = useTokenInfo(publicKey);
 
   const handleClick = () => {
     onClick(publicKey);
@@ -81,7 +69,7 @@ export const TokenRow: FunctionComponent<Props> = ({ publicKey, onClick }) => {
   return (
     <Wrapper onClick={handleClick}>
       <ItemWrapper>
-        <TokenAvatar mint={mint?.toBase58()} size={44} includeSol />
+        <TokenAvatar mint={mint} size={44} includeSol />
         <Info>
           <Top>
             <TokenName title={publicKey}>{name || publicKey}</TokenName> <div>{amount}</div>

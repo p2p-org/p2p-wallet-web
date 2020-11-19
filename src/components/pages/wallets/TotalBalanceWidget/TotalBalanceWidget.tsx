@@ -7,6 +7,7 @@ import { styled } from 'linaria/react';
 import { rgba } from 'polished';
 
 import { Card } from 'components/common/Card';
+import { SYSTEM_PROGRAM_ID, TOKEN_PROGRAM_ID } from 'constants/solana/bufferLayouts';
 import { TOKENS_BY_ENTRYPOINT } from 'constants/tokens';
 import { RootState } from 'store/types';
 // import { calculateInterval, calculateStart } from 'utils/charts';
@@ -48,33 +49,35 @@ const Price = styled.div`
 //   line-height: 140%;
 // `;
 
-type Props = {};
-
-export const TotalBalanceWidget: FunctionComponent<Props> = (props) => {
+export const TotalBalanceWidget: FunctionComponent = () => {
   const tokens = useSelector((state: RootState) => state.entities.tokens.items);
   const balanceLamports = useSelector((state: RootState) => state.data.blockchain.balanceLamports);
   const rates = useSelector((state: RootState) => state.entities.rates);
   const entrypoint = useSelector((state: RootState) => state.data.blockchain.entrypoint);
 
-  const balanceLamportsUsdt = (balanceLamports / web3.LAMPORTS_PER_SOL) * (rates['SOL/USDT'] || 0);
-
   // Oh my gosh
   const totalBalance = useMemo(
     () =>
       Object.values(tokens).reduce((prev, cur) => {
-        const match = TOKENS_BY_ENTRYPOINT[entrypoint]?.find(
-          (token) => token.mintAddress === cur.parsed.mint,
-        );
+        const tokenPublicKey = new web3.PublicKey(String(cur.owner));
 
-        if (match) {
-          const rate = rates[`${match.tokenSymbol}/USDT`];
-          if (rate) {
-            return prev + cur.parsed.amount * rate;
+        if (tokenPublicKey.equals(TOKEN_PROGRAM_ID)) {
+          const match = TOKENS_BY_ENTRYPOINT[entrypoint]?.find(
+            (token) => token.mintAddress === cur.data.parsed.info.mint,
+          );
+
+          if (match) {
+            const rate = rates[`${match.tokenSymbol}/USDT`];
+            if (rate) {
+              return prev + cur.data.parsed.info.tokenAmount.uiAmount * rate;
+            }
           }
+        } else if (tokenPublicKey.equals(SYSTEM_PROGRAM_ID)) {
+          return prev + (cur.lamports / web3.LAMPORTS_PER_SOL) * (rates['SOL/USDT'] || 0);
         }
 
         return prev;
-      }, balanceLamportsUsdt),
+      }, 0),
     [tokens, balanceLamports, rates, entrypoint],
   );
 
