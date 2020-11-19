@@ -204,7 +204,6 @@ var TokenRow = function TokenRow(_ref) {
   var mintAddress = _ref.mintAddress,
       tokenName = _ref.tokenName,
       tokenSymbol = _ref.tokenSymbol,
-      icon = _ref.icon,
       closeModal = _ref.closeModal;
   var dispatch = (0, _reactRedux.useDispatch)(); // eslint-disable-next-line unicorn/no-null
 
@@ -246,7 +245,7 @@ var TokenRow = function TokenRow(_ref) {
   })), /*#__PURE__*/_react.default.createElement(Main, null, /*#__PURE__*/_react.default.createElement(Content, null, /*#__PURE__*/_react.default.createElement(InfoWrapper, {
     onClick: handleChevronClick
   }, /*#__PURE__*/_react.default.createElement(_TokenAvatar.TokenAvatar, {
-    src: icon,
+    mint: mintAddress,
     size: 44
   }), /*#__PURE__*/_react.default.createElement(Info, null, /*#__PURE__*/_react.default.createElement(Top, null, /*#__PURE__*/_react.default.createElement("div", null, tokenSymbol), " ", /*#__PURE__*/_react.default.createElement("div", null)), /*#__PURE__*/_react.default.createElement(Bottom, null, /*#__PURE__*/_react.default.createElement("div", null, tokenName), " ", /*#__PURE__*/_react.default.createElement("div", null)))), /*#__PURE__*/_react.default.createElement(_ui.Button, {
     primary: true,
@@ -503,7 +502,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "49654" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "53925" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
