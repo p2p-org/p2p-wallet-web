@@ -108,7 +108,6 @@ export const TokenRow: FunctionComponent<Props> = ({
   mintAddress,
   tokenName,
   tokenSymbol,
-  icon,
   closeModal,
 }) => {
   const dispatch = useDispatch();
@@ -145,7 +144,7 @@ export const TokenRow: FunctionComponent<Props> = ({
       <Main>
         <Content>
           <InfoWrapper onClick={handleChevronClick}>
-            <TokenAvatar src={icon} size={44} />
+            <TokenAvatar mint={mintAddress} size={44} />
             <Info>
               <Top>
                 <div>{tokenSymbol}</div> <div />
