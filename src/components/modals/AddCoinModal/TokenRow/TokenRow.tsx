@@ -102,7 +102,7 @@ const CopyIcon = styled(Icon)`
   height: 24px;
 `;
 
-type Props =  TokenType & { closeModal: () => void; };
+type Props = TokenType & { closeModal: () => void };
 
 export const TokenRow: FunctionComponent<Props> = ({
   mintAddress,
@@ -123,7 +123,7 @@ export const TokenRow: FunctionComponent<Props> = ({
   const handleAddClick = () => {
     const mint = new web3.PublicKey(mintAddress);
     dispatch(createTokenAccount(mint));
-    dispatch(getOwnedTokenAccounts())
+    dispatch(getOwnedTokenAccounts());
     closeModal();
   };
 

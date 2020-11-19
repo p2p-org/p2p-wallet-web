@@ -24,7 +24,7 @@ export const TokenList: FunctionComponent<Props> = ({ items, closeModal }) => {
   return (
     <Wrapper>
       {items.map((item) => (
-        <TokenRow key={item.mintAddress || item.publicKey} {...item} closeModal={closeModal}/>
+        <TokenRow key={item.mintAddress} {...item} closeModal={closeModal} />
       ))}
     </Wrapper>
   );

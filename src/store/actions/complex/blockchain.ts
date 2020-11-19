@@ -38,7 +38,7 @@ export const establishConnection = (entrypoint?: string): AppAsyncThunk<void> =>
     const { account } = getState().data.blockchain;
 
     if (account) {
-      dispatch(getTokenAccountInfo(account.publicKey));
+      await dispatch(getTokenAccountInfo(account.publicKey));
     }
 
     dispatch(connectionReadyAction());
@@ -64,6 +64,7 @@ export const createAccount = (mnemonic: string): AppThunk => async (dispatch) =>
 
   localStorage.setItem('secretKey', JSON.stringify([...keyPair.secretKey]));
   dispatch(createAccountAction(keyPair.secretKey));
+  dispatch(getTokenAccountInfo(new web3.PublicKey(keyPair.publicKey)));
 };
 
 export const accessAccount = (mnemonic: string): AppThunk => async (dispatch) => {
@@ -73,4 +74,5 @@ export const accessAccount = (mnemonic: string): AppThunk => async (dispatch) =>
 
   localStorage.setItem('secretKey', JSON.stringify([...keyPair.secretKey]));
   dispatch(createAccountAction(keyPair.secretKey));
+  dispatch(getTokenAccountInfo(new web3.PublicKey(keyPair.publicKey)));
 };

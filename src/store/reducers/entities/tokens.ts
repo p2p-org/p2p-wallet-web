@@ -45,6 +45,7 @@ export const tokensReducer = createReducer(initialState)
     // TODO: normalizr if it will fit many cases
     const newItems: ItemsType = {};
     const newPubkeys: string[] = [];
+
     const tokenPublicKey = new web3.PublicKey(String(payload?.owner.toBase58()));
 
     if (tokenPublicKey.equals(TOKEN_PROGRAM_ID) || tokenPublicKey.equals(SYSTEM_PROGRAM_ID)) {

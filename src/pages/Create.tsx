@@ -139,7 +139,7 @@ export const Create: FunctionComponent = () => {
     if (password1 === password2) {
       setPassword(password1);
       toggleForm(false);
-    } else return;
+    }
   };
 
   const validateMnemonic = useCallback(
@@ -170,7 +170,7 @@ export const Create: FunctionComponent = () => {
 
     setTimeout(() => {
       history.push('/wallets');
-    }, 0);
+    }, 100);
   };
 
   const handleChangePassord = (e: React.ChangeEvent<HTMLInputElement>) => {

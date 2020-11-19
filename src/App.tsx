@@ -1,16 +1,16 @@
 import React, { useEffect } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { BrowserRouter as Router, Route, Switch, useHistory } from 'react-router-dom';
 
 import { ModalManager } from 'components/common/ModalManager';
 import { Access, Create, Home, Send, Swap, Wallet, Wallets } from 'pages';
 import { establishConnection, getRates } from 'store/actions/complex';
+import { RootState } from 'store/types';
 import { AuthRequiredRoute } from 'utils/routes/UserRequiredRoute';
 
 /* Hack for states and hash routing until use own host */
 const FixRoute = () => {
   const history = useHistory();
-  console.log(location.hash.includes('#'));
 
   useEffect(() => {
     if (!location.hash.includes('#')) {

@@ -119,7 +119,7 @@ export const Access: FunctionComponent = () => {
     dispatch(accessAccount(mnemonic));
     setTimeout(() => {
       history.push('/wallets');
-    }, 10);
+    }, 100);
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {

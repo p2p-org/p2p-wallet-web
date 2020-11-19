@@ -6,6 +6,7 @@ import { styled } from 'linaria/react';
 
 import { Modal } from 'components/common/Modal';
 import { Button } from 'components/ui';
+import { TOKEN_PROGRAM_ID } from 'constants/solana/bufferLayouts';
 import { TOKENS_BY_ENTRYPOINT } from 'constants/tokens';
 import { createAndInitializeMint } from 'store/actions/complex/tokens';
 import { RootState } from 'store/types';
@@ -64,7 +65,9 @@ export const AddCoinModal: FunctionComponent<Props> = ({ close }) => {
     }
 
     const existsMintAccounts = new Set(
-      Object.values(tokenAccounts).map((token) => token.data.parsed.info.mint?.toBase58()),
+      Object.values(tokenAccounts)
+        .filter((token) => token.owner.equals(TOKEN_PROGRAM_ID))
+        .map((token) => token.data.parsed.info.mint?.toBase58()),
     );
 
     return tokens.filter((token) => !existsMintAccounts.has(token.mintAddress));

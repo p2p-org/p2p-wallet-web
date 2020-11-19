@@ -7,7 +7,7 @@ export const getRates = (): AppThunk => async (dispatch, getState) => {
 
   const rates = [];
 
-  const tokens = TOKENS_BY_ENTRYPOINT[entrypoint] || [];
+  const tokens = [...TOKENS_BY_ENTRYPOINT[entrypoint]] || [];
   tokens.push({ tokenSymbol: 'SOL' });
 
   await Promise.all(

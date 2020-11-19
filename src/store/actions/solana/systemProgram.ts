@@ -1,6 +1,10 @@
 import * as web3 from '@solana/web3.js';
 
-import { ACCOUNT_LAYOUT, TOKEN_PROGRAM_ID } from 'constants/solana/bufferLayouts';
+import {
+  ACCOUNT_LAYOUT,
+  SYSTEM_PROGRAM_ID,
+  TOKEN_PROGRAM_ID,
+} from 'constants/solana/bufferLayouts';
 import {
   getBalanceAsyncAction,
   getConfirmedSignaturesForAddressAsyncAction,
@@ -139,7 +143,7 @@ export const getConfirmedTransaction = (signature: web3.TransactionSignature): A
 export const getTokenAccountInfo = (
   publicKey: web3.PublicKey,
   commitment?: web3.Commitment,
-): AppThunk => async (dispatch) => {
+): AppThunk => async (dispatch, getState) => {
   dispatch(getTokenAccountInfoAsyncAction.request());
   try {
     const result = await ApiSolanaService.getConnection()?.getParsedAccountInfo(
@@ -148,12 +152,23 @@ export const getTokenAccountInfo = (
     );
 
     if (!result.value) {
-      throw new Error('Token not found');
+      const currentPublicKey = getState().data.blockchain.account?.publicKey;
+
+      if (publicKey.equals(currentPublicKey)) {
+        const fakeResult: web3.AccountInfo = {
+          owner: SYSTEM_PROGRAM_ID,
+          lamports: 0,
+        };
+
+        dispatch(getTokenAccountInfoAsyncAction.success(fakeResult, { publicKey }));
+        return;
+      }
     }
 
     dispatch(getTokenAccountInfoAsyncAction.success(result.value, { publicKey }));
-  } catch {
-    dispatch(getTokenAccountInfoAsyncAction.failure(error.toString()));
+  } catch (error) {
+    console.error('Failed to establish connection', error);
+    dispatch(getTokenAccountInfoAsyncAction.failure(error));
   }
 };
 
