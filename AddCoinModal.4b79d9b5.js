@@ -323,7 +323,7 @@ var TokenList = function TokenList(_ref) {
 
   return /*#__PURE__*/_react.default.createElement(Wrapper, null, items.map(function (item) {
     return /*#__PURE__*/_react.default.createElement(_TokenRow.TokenRow, (0, _extends2.default)({
-      key: item.mintAddress || item.publicKey
+      key: item.mintAddress
     }, item, {
       closeModal: closeModal
     }));
@@ -370,6 +370,8 @@ var _react2 = require("linaria/react");
 var _Modal = require("../../common/Modal");
 
 var _ui = require("../../ui");
+
+var _bufferLayouts = require("../../../constants/solana/bufferLayouts");
 
 var _tokens = require("../../../constants/tokens");
 
@@ -428,7 +430,9 @@ var AddCoinModal = function AddCoinModal(_ref) {
       return;
     }
 
-    var existsMintAccounts = new Set(Object.values(tokenAccounts).map(function (token) {
+    var existsMintAccounts = new Set(Object.values(tokenAccounts).filter(function (token) {
+      return token.owner.equals(_bufferLayouts.TOKEN_PROGRAM_ID);
+    }).map(function (token) {
       var _token$data$parsed$in;
 
       return (_token$data$parsed$in = token.data.parsed.info.mint) === null || _token$data$parsed$in === void 0 ? void 0 : _token$data$parsed$in.toBase58();
@@ -457,7 +461,7 @@ exports.AddCoinModal = AddCoinModal;
               module.hot.accept(reloadCSS);
             })();
           
-},{"react":"../node_modules/react/index.js","react-redux":"../node_modules/react-redux/es/index.js","@solana/web3.js":"../node_modules/@solana/web3.js/lib/index.esm.js","linaria/react":"../node_modules/linaria/react.js","../../common/Modal":"components/common/Modal/index.ts","../../ui":"components/ui/index.ts","../../../constants/tokens":"constants/tokens.ts","../../../store/actions/complex/tokens":"store/actions/complex/tokens.ts","./TokenList":"components/modals/AddCoinModal/TokenList/index.ts","_css_loader":"../node_modules/parcel-bundler/src/builtins/css-loader.js"}],"components/modals/AddCoinModal/index.ts":[function(require,module,exports) {
+},{"react":"../node_modules/react/index.js","react-redux":"../node_modules/react-redux/es/index.js","@solana/web3.js":"../node_modules/@solana/web3.js/lib/index.esm.js","linaria/react":"../node_modules/linaria/react.js","../../common/Modal":"components/common/Modal/index.ts","../../ui":"components/ui/index.ts","../../../constants/solana/bufferLayouts":"constants/solana/bufferLayouts.ts","../../../constants/tokens":"constants/tokens.ts","../../../store/actions/complex/tokens":"store/actions/complex/tokens.ts","./TokenList":"components/modals/AddCoinModal/TokenList/index.ts","_css_loader":"../node_modules/parcel-bundler/src/builtins/css-loader.js"}],"components/modals/AddCoinModal/index.ts":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -499,7 +503,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "53471" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "56817" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
