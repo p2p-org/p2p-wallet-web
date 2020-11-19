@@ -1,11 +1,25 @@
 import React, { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
-import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Switch, useHistory } from 'react-router-dom';
 
 import { ModalManager } from 'components/common/ModalManager';
 import { Access, Create, Home, Send, Swap, Wallet, Wallets } from 'pages';
 import { establishConnection, getRates } from 'store/actions/complex';
 import { AuthRequiredRoute } from 'utils/routes/UserRequiredRoute';
+
+/* Hack for states and hash routing until use own host */
+const FixRoute = () => {
+  const history = useHistory();
+  console.log(location.hash.includes('#'));
+
+  useEffect(() => {
+    if (!location.hash.includes('#')) {
+      history.replace('/');
+    }
+  }, []);
+
+  return null;
+};
 
 export const App: React.FC = () => {
   const dispatch = useDispatch();
@@ -21,7 +35,10 @@ export const App: React.FC = () => {
 
   return (
     <>
+      {/* Hack for states and hash routing until use own host */}
       <Router basename={process.env.BASENAME || `${location.pathname}#`}>
+        {/* Hack for states and hash routing until use own host */}
+        <FixRoute />
         <Switch>
           <Route path="/" component={Home} exact />
           <Route path="/create" component={Create} />
