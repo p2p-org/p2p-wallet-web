@@ -429,9 +429,9 @@ var AddCoinModal = function AddCoinModal(_ref) {
     }
 
     var existsMintAccounts = new Set(Object.values(tokenAccounts).map(function (token) {
-      var _token$parsed$mint;
+      var _token$data$parsed$in;
 
-      return (_token$parsed$mint = token.parsed.mint) === null || _token$parsed$mint === void 0 ? void 0 : _token$parsed$mint.toBase58();
+      return (_token$data$parsed$in = token.data.parsed.info.mint) === null || _token$data$parsed$in === void 0 ? void 0 : _token$data$parsed$in.toBase58();
     }));
     return tokens.filter(function (token) {
       return !existsMintAccounts.has(token.mintAddress);
@@ -499,7 +499,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "53146" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "61732" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
