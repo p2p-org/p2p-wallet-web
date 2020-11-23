@@ -69,6 +69,7 @@ export const TotalBalanceWidget: FunctionComponent = () => {
     () =>
       preparedOrder
         .map((publicKey) => tokens[publicKey])
+        .filter((token) => token)
         .reduce((prev, cur) => {
           const tokenPublicKey = new web3.PublicKey(String(cur.owner));
 
