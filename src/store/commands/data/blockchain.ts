@@ -55,14 +55,7 @@ export const getTokenAccountInfoAsyncAction = createAsyncAction(
   'SOLANA_TOKEN_ACCOUNT_INFO_SUCCESS',
   'SOLANA_TOKEN_ACCOUNT_INFO_FAILURE',
   'SOLANA_TOKEN_ACCOUNT_INFO_CANCEL',
-)<
-  undefined,
-  [
-    web3.RpcResponseAndContext<web3.AccountInfo<Buffer | web3.ParsedAccountData> | null>,
-    { publicKey: web3.PublicKey },
-  ],
-  Error
->();
+)<undefined, [web3.AccountInfo<web3.ParsedAccountData>, { publicKey: web3.PublicKey }], Error>();
 
 export const requestAirdropAsyncAction = createAsyncAction(
   'SOLANA_REQUEST_AIRDROP_REQUEST',

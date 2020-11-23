@@ -30,8 +30,12 @@ export const tokensReducer = createReducer(initialState)
     const newPubkeys: string[] = [];
 
     for (const { pubkey, account } of action.payload) {
-      if (new web3.PublicKey(String(account?.owner)).equals(TOKEN_PROGRAM_ID)) {
-        newItems[pubkey.toString()] = account;
+      const owner = new web3.PublicKey(String(account?.owner));
+      if (owner.equals(TOKEN_PROGRAM_ID)) {
+        newItems[pubkey.toString()] = {
+          ...account,
+          owner: new web3.PublicKey(owner),
+        };
         newPubkeys.push(pubkey.toString());
       }
     }
