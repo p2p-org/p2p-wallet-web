@@ -15,10 +15,9 @@ type Props = {
 export const SwapWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
   const dispatch = useDispatch();
   const history = useHistory();
-  const [fromTokenPublicKey, setFromTokenPublicKey] = useState(publicKey);
   const [fromTokenAmount, setFromTokenAmount] = useState('');
   const [toTokenPublicKey, setToTokenPublicKey] = useState('');
-  const { decimals } = useTokenInfo(fromTokenPublicKey);
+  const { decimals } = useTokenInfo(publicKey);
 
   const handleBackClick = () => {
     history.replace('/wallets');
@@ -38,7 +37,7 @@ export const SwapWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
     try {
       const signature = await dispatch(
         transferTokens({
-          sourcePublicKey: new web3.PublicKey(fromTokenPublicKey),
+          sourcePublicKey: new web3.PublicKey(publicKey),
           destPublicKey: new web3.PublicKey(toTokenPublicKey),
           amount,
         }),
@@ -51,7 +50,7 @@ export const SwapWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
   };
 
   const handleTokenChange = (nextTokenPublicKey: string) => {
-    setFromTokenPublicKey(nextTokenPublicKey);
+    history.replace(`/swap/${nextTokenPublicKey}`);
   };
 
   const handleAmountChange = (nextTokenAmount: string) => {
@@ -63,7 +62,7 @@ export const SwapWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
       type="swap"
       title="Swap"
       actionText="Comming soon"
-      fromTokenPublicKey={fromTokenPublicKey}
+      fromTokenPublicKey={publicKey}
       fromTokenAmount={fromTokenAmount}
       toTokenPublicKey={toTokenPublicKey}
       onTokenChange={handleTokenChange}
