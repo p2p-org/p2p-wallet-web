@@ -78,7 +78,7 @@ export const AddCoinModal: FunctionComponent<Props> = ({ close }) => {
       title="Add coins"
       description={
         <>
-          Add a token to your wallet. This will some SOL
+          Add a token to your wallet. This will const some SOL
           {!isMainnetEntrypoint ? (
             <>
               {' '}
