@@ -1,7 +1,9 @@
 import React, { FunctionComponent } from 'react';
+import { useSelector } from 'react-redux';
 // import ReactHighcharts from 'react-highcharts';
 import { Link } from 'react-router-dom';
 
+import * as web3 from '@solana/web3.js';
 import { styled } from 'linaria/react';
 import { rgba } from 'polished';
 
@@ -10,6 +12,7 @@ import { AmountUSDT } from 'components/common/AmountUSDT';
 import { Card } from 'components/common/Card';
 import { RateUSDT } from 'components/common/RateUSDT';
 import { TokenAvatar } from 'components/common/TokenAvatar';
+import { RootState } from 'store/types';
 import { useTokenInfo } from 'utils/hooks/useTokenInfo';
 // import { serials } from './data';
 // import { getConfig } from './utils';
@@ -87,7 +90,7 @@ type Props = {
 };
 
 export const TokenRow: FunctionComponent<Props> = ({ publicKey }) => {
-  const { name, mint, symbol, amount } = useTokenInfo(publicKey);
+  const { name, mint, owner, symbol, amount } = useTokenInfo(publicKey);
 
   // const coin = 'BTC';
   // const currency = 'BTC';

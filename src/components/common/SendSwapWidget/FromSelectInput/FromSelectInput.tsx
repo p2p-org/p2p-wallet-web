@@ -191,7 +191,14 @@ export const FromSelectInput: FunctionComponent<Props> = ({
   const [isOpen, setIsOpen] = useState(false);
   const order = useSelector((state: RootState) => state.entities.tokens.order);
   const entrypoint = useSelector((state: RootState) => state.data.blockchain.entrypoint);
+  const publicKey = useSelector((state: RootState) =>
+    state.data.blockchain.account?.publicKey.toBase58(),
+  );
 
+  const preparedOrder = useMemo(() => (publicKey ? [publicKey, ...order] : order), [
+    publicKey,
+    order,
+  ]);
   const { name, mint, symbol, amount } = useTokenInfo(tokenPublicKey);
 
   useEffect(() => {
@@ -213,7 +220,7 @@ export const FromSelectInput: FunctionComponent<Props> = ({
   }, []);
 
   const handleSelectorClick = () => {
-    if (!order) {
+    if (!preparedOrder) {
       return;
     }
 
@@ -281,7 +288,7 @@ export const FromSelectInput: FunctionComponent<Props> = ({
         <DropDownListContainer>
           <DropDownHeader>Your wallets</DropDownHeader>
           <DropDownList>
-            {order.map((publicKey) => (
+            {preparedOrder.map((publicKey) => (
               <TokenRow key={publicKey} publicKey={publicKey} onClick={handleItemClick} />
             ))}
           </DropDownList>

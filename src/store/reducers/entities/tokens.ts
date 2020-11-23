@@ -49,18 +49,16 @@ export const tokensReducer = createReducer(initialState)
   .handleAction(getTokenAccountInfoAsyncAction.success, (state, { payload, meta }) => {
     // TODO: normalizr if it will fit many cases
     const newItems: ItemsType = {};
-    const newPubkeys: string[] = [];
 
     const tokenPublicKey = new web3.PublicKey(String(payload?.owner.toBase58()));
 
     if (tokenPublicKey.equals(TOKEN_PROGRAM_ID) || tokenPublicKey.equals(SYSTEM_PROGRAM_ID)) {
       newItems[meta.publicKey.toBase58()] = payload;
-      newPubkeys.push(meta.publicKey.toBase58());
     }
 
     return {
+      ...state,
       items: mergeRight(state.items, newItems),
-      order: uniq(state.order.concat(newPubkeys)),
     };
   })
   .handleAction(changeEntrypointAction, () => ({

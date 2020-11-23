@@ -9,6 +9,7 @@ import { ParsedAccountData, RootState } from 'store/types';
 const defaults = {
   name: undefined,
   mint: undefined,
+  owner: undefined,
   symbol: undefined,
   amount: undefined,
   decimals: undefined,
@@ -19,11 +20,13 @@ export function usePopulateTokenInfo(
 ): {
   name?: string;
   mint?: string;
+  owner?: string;
   symbol?: string;
   amount?: number;
   decimals?: number;
 } {
   const entrypoint = useSelector((state: RootState) => state.data.blockchain.entrypoint);
+  const ownerAccount = useSelector((state: RootState) => state.data.blockchain.account);
 
   if (!tokenAccount) {
     return defaults;
@@ -32,7 +35,7 @@ export function usePopulateTokenInfo(
   const tokenPublicKey = new web3.PublicKey(String(tokenAccount?.owner));
 
   if (tokenPublicKey.equals(TOKEN_PROGRAM_ID)) {
-    const { mint, tokenAmount } = tokenAccount?.data.parsed.info || {};
+    const { mint, owner, tokenAmount } = tokenAccount?.data.parsed.info || {};
 
     if (mint) {
       const match = TOKENS_BY_ENTRYPOINT[entrypoint]?.find((token) => token.mintAddress === mint);
@@ -42,6 +45,7 @@ export function usePopulateTokenInfo(
           ...defaults,
           name: match.tokenName,
           mint: match.mintAddress,
+          owner,
           symbol: match.tokenSymbol,
           amount: tokenAmount.uiAmount,
           decimals: tokenAmount.decimals,
@@ -51,6 +55,7 @@ export function usePopulateTokenInfo(
       return {
         ...defaults,
         mint,
+        owner,
         amount: tokenAmount.uiAmount,
         decimals: tokenAmount.decimals,
       };
@@ -59,6 +64,7 @@ export function usePopulateTokenInfo(
     return {
       ...defaults,
       name: 'SOL',
+      owner: ownerAccount.publicKey.toBase58(),
       symbol: 'SOL',
       amount: tokenAccount.lamports / web3.LAMPORTS_PER_SOL,
       decimals: 9,

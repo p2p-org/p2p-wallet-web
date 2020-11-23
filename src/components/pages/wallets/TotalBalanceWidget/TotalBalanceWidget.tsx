@@ -51,34 +51,45 @@ const Price = styled.div`
 
 export const TotalBalanceWidget: FunctionComponent = () => {
   const tokens = useSelector((state: RootState) => state.entities.tokens.items);
+  const order = useSelector((state: RootState) => state.entities.tokens.order);
   const balanceLamports = useSelector((state: RootState) => state.data.blockchain.balanceLamports);
   const rates = useSelector((state: RootState) => state.entities.rates);
   const entrypoint = useSelector((state: RootState) => state.data.blockchain.entrypoint);
+  const publicKey = useSelector((state: RootState) =>
+    state.data.blockchain.account?.publicKey.toBase58(),
+  );
+
+  const preparedOrder = useMemo(() => (publicKey ? [publicKey, ...order] : order), [
+    publicKey,
+    order,
+  ]);
 
   // Oh my gosh
   const totalBalance = useMemo(
     () =>
-      Object.values(tokens).reduce((prev, cur) => {
-        const tokenPublicKey = new web3.PublicKey(String(cur.owner));
+      preparedOrder
+        .map((publicKey) => tokens[publicKey])
+        .reduce((prev, cur) => {
+          const tokenPublicKey = new web3.PublicKey(String(cur.owner));
 
-        if (tokenPublicKey.equals(TOKEN_PROGRAM_ID)) {
-          const match = TOKENS_BY_ENTRYPOINT[entrypoint]?.find(
-            (token) => token.mintAddress === cur.data.parsed.info.mint,
-          );
+          if (tokenPublicKey.equals(TOKEN_PROGRAM_ID)) {
+            const match = TOKENS_BY_ENTRYPOINT[entrypoint]?.find(
+              (token) => token.mintAddress === cur.data.parsed.info.mint,
+            );
 
-          if (match) {
-            const rate = rates[`${match.tokenSymbol}/USDT`];
-            if (rate) {
-              return prev + cur.data.parsed.info.tokenAmount.uiAmount * rate;
+            if (match) {
+              const rate = rates[`${match.tokenSymbol}/USDT`];
+              if (rate) {
+                return prev + cur.data.parsed.info.tokenAmount.uiAmount * rate;
+              }
             }
+          } else if (tokenPublicKey.equals(SYSTEM_PROGRAM_ID)) {
+            return prev + (cur.lamports / web3.LAMPORTS_PER_SOL) * (rates['SOL/USDT'] || 0);
           }
-        } else if (tokenPublicKey.equals(SYSTEM_PROGRAM_ID)) {
-          return prev + (cur.lamports / web3.LAMPORTS_PER_SOL) * (rates['SOL/USDT'] || 0);
-        }
 
-        return prev;
-      }, 0),
-    [tokens, balanceLamports, rates, entrypoint],
+          return prev;
+        }, 0),
+    [preparedOrder, tokens, balanceLamports, rates, entrypoint],
   );
 
   // const coin = 'BTC';

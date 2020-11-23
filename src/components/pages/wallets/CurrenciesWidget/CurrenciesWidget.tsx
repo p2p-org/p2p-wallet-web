@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useEffect } from 'react';
+import React, { FunctionComponent, useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { styled } from 'linaria/react';
@@ -20,6 +20,14 @@ export const CurrenciesWidget: FunctionComponent<Props> = (props) => {
   const dispatch = useDispatch();
   const entrypoint = useSelector((state: RootState) => state.data.blockchain.entrypoint);
   const order = useSelector((state: RootState) => state.entities.tokens.order);
+  const publicKey = useSelector((state: RootState) =>
+    state.data.blockchain.account?.publicKey.toBase58(),
+  );
+
+  const preparedOrder = useMemo(() => (publicKey ? [publicKey, ...order] : order), [
+    publicKey,
+    order,
+  ]);
 
   useEffect(() => {
     dispatch(getOwnedTokenAccounts());
@@ -37,7 +45,7 @@ export const CurrenciesWidget: FunctionComponent<Props> = (props) => {
           + Add Token
         </Button>
       }>
-      <TokenList order={order} />
+      <TokenList order={preparedOrder} />
     </WrapperWidget>
   );
 };

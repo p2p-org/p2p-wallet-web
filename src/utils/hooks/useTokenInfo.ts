@@ -10,7 +10,7 @@ import { usePopulateTokenInfo } from 'utils/hooks/usePopulateTokenInfo';
 export const useTokenInfo = (publicKey: string) => {
   const dispatch = useDispatch();
   const tokenAccount = useSelector((state: RootState) => state.entities.tokens.items[publicKey]);
-  const { name, mint, symbol, amount, decimals } = usePopulateTokenInfo(tokenAccount);
+  const { name, mint, owner, symbol, amount, decimals } = usePopulateTokenInfo(tokenAccount);
 
   useEffect(() => {
     const mount = async () => {
@@ -22,5 +22,5 @@ export const useTokenInfo = (publicKey: string) => {
     }
   }, [publicKey]);
 
-  return { mint, name, symbol, amount, decimals };
+  return { mint, owner, name, symbol, amount, decimals };
 };
