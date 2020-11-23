@@ -4,7 +4,7 @@ import * as web3 from '@solana/web3.js';
 
 import { SYSTEM_PROGRAM_ID, TOKEN_PROGRAM_ID } from 'constants/solana/bufferLayouts';
 import { TOKENS_BY_ENTRYPOINT } from 'constants/tokens';
-import { RootState } from 'store/types';
+import { ParsedAccountData, RootState } from 'store/types';
 
 const defaults = {
   name: undefined,
@@ -15,7 +15,7 @@ const defaults = {
 };
 
 export function usePopulateTokenInfo(
-  tokenAccount?: web3.AccountInfo<web3.ParsedAccountData>,
+  tokenAccount?: web3.AccountInfo<ParsedAccountData>,
 ): {
   name?: string;
   mint?: string;

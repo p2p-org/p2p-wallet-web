@@ -8,9 +8,10 @@ import {
   getProgramAccountsAsyncAction,
   getTokenAccountInfoAsyncAction,
 } from 'store/commands';
+import { ParsedAccountData } from 'store/types';
 
 type ItemsType = {
-  [pubkey: string]: web3.AccountInfo<web3.ParsedAccountData>;
+  [pubkey: string]: web3.AccountInfo<ParsedAccountData>;
 };
 
 type State = {
@@ -34,7 +35,7 @@ export const tokensReducer = createReducer(initialState)
       if (owner.equals(TOKEN_PROGRAM_ID)) {
         newItems[pubkey.toString()] = {
           ...account,
-          owner: new web3.PublicKey(owner),
+          owner,
         };
         newPubkeys.push(pubkey.toString());
       }

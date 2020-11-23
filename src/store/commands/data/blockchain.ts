@@ -1,6 +1,8 @@
 import * as web3 from '@solana/web3.js';
 import { createAction, createAsyncAction } from 'typesafe-actions';
 
+import { ParsedAccountData } from 'store/types';
+
 export const changeFeeCalculatorAction = createAction('changeFeeCalculator')<{
   lamportsPerSignature: number;
 }>();
@@ -45,7 +47,7 @@ export const getProgramAccountsAsyncAction = createAsyncAction(
   undefined,
   Array<{
     pubkey: web3.PublicKey;
-    account: web3.AccountInfo<web3.ParsedAccountData>;
+    account: web3.AccountInfo<ParsedAccountData>;
   }>,
   Error
 >();

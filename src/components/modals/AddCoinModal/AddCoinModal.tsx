@@ -67,7 +67,7 @@ export const AddCoinModal: FunctionComponent<Props> = ({ close }) => {
     const existsMintAccounts = new Set(
       Object.values(tokenAccounts)
         .filter((token) => token.owner.equals(TOKEN_PROGRAM_ID))
-        .map((token) => token.data.parsed.info.mint?.toBase58()),
+        .map((token) => token.data.parsed.info.mint),
     );
 
     return tokens.filter((token) => !existsMintAccounts.has(token.mintAddress));
