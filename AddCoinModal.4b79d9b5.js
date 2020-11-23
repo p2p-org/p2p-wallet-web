@@ -440,7 +440,7 @@ var AddCoinModal = function AddCoinModal(_ref) {
   }, [tokenAccounts, tokens]);
   return /*#__PURE__*/_react.default.createElement(WrapperModal, {
     title: "Add coins",
-    description: /*#__PURE__*/_react.default.createElement(_react.default.Fragment, null, "Add a token to your wallet. This will some SOL", !isMainnetEntrypoint ? /*#__PURE__*/_react.default.createElement(_react.default.Fragment, null, ' ', /*#__PURE__*/_react.default.createElement(_ui.Button, {
+    description: /*#__PURE__*/_react.default.createElement(_react.default.Fragment, null, "Add a token to your wallet. This will const some SOL", !isMainnetEntrypoint ? /*#__PURE__*/_react.default.createElement(_react.default.Fragment, null, ' ', /*#__PURE__*/_react.default.createElement(_ui.Button, {
       link: true,
       onClick: handleMintTestTokenClick
     }, "Mint test token")) : null),
