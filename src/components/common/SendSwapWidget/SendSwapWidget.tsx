@@ -6,7 +6,7 @@ import { rgba } from 'polished';
 import { Card } from 'components/common/Card';
 import { Button, Icon } from 'components/ui';
 
-import { FromSelectInput } from './FromSelectInput';
+import { FromToSelectInput } from './FromToSelectInput';
 import { ToAddressInput } from './ToAddressInput';
 
 const Wrapper = styled.div``;
@@ -109,10 +109,12 @@ type Props = {
   fromTokenPublicKey: string;
   fromTokenAmount: string;
   toTokenPublicKey: string;
+  toTokenAmount?: string;
   actionText: string;
-  onTokenChange: (pubkey: string) => void;
-  onAmountChange: (amount: string) => void;
-  onToPublicKeyChange: (pubkey: string) => void;
+  onFromTokenChange: (pubkey: string) => void;
+  onFromAmountChange: (amount: string) => void;
+  onToTokenChange: (pubkey: string) => void;
+  onToAmountChange?: (pubkey: string) => void;
   onBackClick: () => void;
   onSubmit: () => void;
   disabled?: boolean;
@@ -124,10 +126,12 @@ export const SendSwapWidget: FunctionComponent<Props> = ({
   fromTokenPublicKey,
   fromTokenAmount,
   toTokenPublicKey,
+  toTokenAmount = '',
   actionText,
-  onTokenChange,
-  onAmountChange,
-  onToPublicKeyChange,
+  onFromTokenChange,
+  onFromAmountChange,
+  onToTokenChange,
+  onToAmountChange = () => {},
   onBackClick,
   onSubmit,
   disabled,
@@ -142,11 +146,11 @@ export const SendSwapWidget: FunctionComponent<Props> = ({
       </TitleWrapper>
       <WrapperCard>
         <FromWrapper>
-          <FromSelectInput
+          <FromToSelectInput
             tokenPublicKey={fromTokenPublicKey}
             tokenAmount={fromTokenAmount}
-            onTokenChange={onTokenChange}
-            onAmountChange={onAmountChange}
+            onTokenChange={onFromTokenChange}
+            onAmountChange={onFromAmountChange}
             disabled={disabled}
           />
         </FromWrapper>
@@ -156,15 +160,16 @@ export const SendSwapWidget: FunctionComponent<Props> = ({
               {/* <ToOption>To user</ToOption> */}
               <ToOption className="active">To wallet</ToOption>
             </ToSelect>
-            <ToAddressInput value={toTokenPublicKey} onChange={onToPublicKeyChange} />
+            <ToAddressInput value={toTokenPublicKey} onChange={onToTokenChange} />
           </ToWrapper>
         ) : (
           <FromWrapper>
-            <FromSelectInput
-              tokenPublicKey={fromTokenPublicKey}
-              tokenAmount={fromTokenAmount}
-              onTokenChange={onTokenChange}
-              onAmountChange={onAmountChange}
+            <FromToSelectInput
+              type="to"
+              tokenPublicKey={toTokenPublicKey}
+              tokenAmount={toTokenAmount}
+              onTokenChange={onToTokenChange}
+              onAmountChange={onToAmountChange}
               disabled={disabled}
             />
           </FromWrapper>
@@ -173,9 +178,7 @@ export const SendSwapWidget: FunctionComponent<Props> = ({
           <Button primary={!disabled} secondary={disabled} big full onClick={onSubmit}>
             {actionText}
           </Button>
-          <Hint>
-            fee calculator comming soon
-          </Hint>
+          <Hint>fee calculator comming soon</Hint>
         </ActionWrapper>
       </WrapperCard>
     </Wrapper>

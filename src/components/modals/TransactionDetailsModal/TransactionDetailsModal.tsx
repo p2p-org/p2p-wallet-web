@@ -6,7 +6,7 @@ import { styled } from 'linaria/react';
 import { rgba } from 'polished';
 
 import { Icon } from 'components/ui';
-import { getConfirmedTransaction } from 'store/actions/solana';
+import { getConfirmedTransaction } from 'store/_actions/solana';
 import { RootState } from 'store/types';
 import { useTransactionInfo } from 'utils/hooks/useTransactionInfo';
 

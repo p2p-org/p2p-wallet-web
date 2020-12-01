@@ -5,7 +5,7 @@ import { useHistory } from 'react-router';
 import * as web3 from '@solana/web3.js';
 
 import { SendSwapWidget } from 'components/common/SendSwapWidget';
-import { transferTokens } from 'store/actions/complex';
+import { transferTokens } from 'store/_actions/complex';
 import { useTokenInfo } from 'utils/hooks/useTokenInfo';
 
 type Props = {
@@ -23,7 +23,7 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
     history.replace('/wallets');
   };
 
-  const handleToPublicKeyChange = (nextPublicKey: string) => {
+  const handleToTokenChange = (nextPublicKey: string) => {
     setToTokenPublicKey(nextPublicKey);
   };
 
@@ -65,9 +65,9 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
       fromTokenPublicKey={publicKey}
       fromTokenAmount={fromTokenAmount}
       toTokenPublicKey={toTokenPublicKey}
-      onTokenChange={handleTokenChange}
-      onAmountChange={handleAmountChange}
-      onToPublicKeyChange={handleToPublicKeyChange}
+      onFromTokenChange={handleTokenChange}
+      onFromAmountChange={handleAmountChange}
+      onToTokenChange={handleToTokenChange}
       onBackClick={handleBackClick}
       onSubmit={handleSubmit}
     />

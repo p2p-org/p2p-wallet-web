@@ -9,8 +9,8 @@ import { rgba } from 'polished';
 import { TokenAvatar } from 'components/common/TokenAvatar';
 import { Avatar, Button, Icon, Input } from 'components/ui';
 import { TokenType } from 'constants/tokens';
-import { createTokenAccount } from 'store/actions/complex/tokens';
-import { getOwnedTokenAccounts } from 'store/actions/solana';
+import { createTokenAccount } from 'store/_actions/complex/tokens';
+import { getOwnedTokenAccounts } from 'store/_actions/solana';
 
 const Wrapper = styled.div`
   display: flex;

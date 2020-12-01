@@ -1,11 +1,16 @@
 import React, { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { BrowserRouter as Router, Route, Switch, useHistory } from 'react-router-dom';
 
 import { ModalManager } from 'components/common/ModalManager';
-import { Access, Create, Home, Send, Swap, Wallet, Wallets } from 'pages';
-import { establishConnection, getRates } from 'store/actions/complex';
-import { RootState } from 'store/types';
+import { Access } from 'pages/Access';
+import { Create } from 'pages/Create';
+import { Home } from 'pages/Home';
+import { Send } from 'pages/Send';
+import { Swap } from 'pages/Swap';
+import { Wallet } from 'pages/Wallet';
+import { Wallets } from 'pages/Wallets';
+import { establishConnection, getRates } from 'store/_actions/complex';
 import { AuthRequiredRoute } from 'utils/routes/UserRequiredRoute';
 
 /* Hack for states and hash routing until use own host */
@@ -13,7 +18,7 @@ const FixRoute = () => {
   const history = useHistory();
 
   useEffect(() => {
-    if (!location.hash.includes('#')) {
+    if (!window.location.hash.includes('#')) {
       history.replace('/');
     }
   }, []);
@@ -21,22 +26,22 @@ const FixRoute = () => {
   return null;
 };
 
-export const App: React.FC = () => {
-  const dispatch = useDispatch();
+const App: React.FC = () => {
+  // const dispatch = useDispatch();
 
-  useEffect(() => {
-    const mount = async () => {
-      await dispatch(establishConnection());
-      await dispatch(getRates());
-    };
-
-    void mount();
-  }, []);
+  // useEffect(() => {
+  //   const mount = async () => {
+  //     await dispatch(establishConnection());
+  //     await dispatch(getRates());
+  //   };
+  //
+  //   void mount();
+  // }, []);
 
   return (
     <>
       {/* Hack for states and hash routing until use own host */}
-      <Router basename={process.env.BASENAME || `${location.pathname}#`}>
+      <Router basename={process.env.BASENAME || `${window.location.pathname}#`}>
         {/* Hack for states and hash routing until use own host */}
         <FixRoute />
         <Switch>
@@ -54,3 +59,6 @@ export const App: React.FC = () => {
     </>
   );
 };
+
+// eslint-disable-next-line import/no-default-export
+export default App;

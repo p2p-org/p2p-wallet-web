@@ -15,6 +15,8 @@
           "config": "./src/config",
           "utils": "./src/utils",
           "store": "./src/store",
+          "api": "./src/api",
+          "features": "./src/features",
           "pages": "./src/pages",
           "components": "./src/components"
         }

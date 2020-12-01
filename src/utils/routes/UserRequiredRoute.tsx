@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux';
 import { RouteProps } from 'react-router';
 import { Redirect, Route, useLocation } from 'react-router-dom';
 
-import { RootState } from 'store/types';
+import { RootState } from 'store/rootReducer';
 
 export const ProtectedRoute: FunctionComponent<
   {
@@ -22,6 +22,6 @@ export const ProtectedRoute: FunctionComponent<
 
 // ProtectedRoute is used to create specific types of protected routes like this...
 export const AuthRequiredRoute: FunctionComponent<RouteProps> = ({ children, ...props }) => {
-  const account = useSelector((state: RootState) => state.data.blockchain.account);
-  return <ProtectedRoute allow={!!account} redirect="/" {...props} />;
+  const connected = useSelector((state: RootState) => state.wallet.connected);
+  return <ProtectedRoute allow={!!connected} redirect="/" {...props} />;
 };

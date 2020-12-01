@@ -1,0 +1,23 @@
+{
+  "localnet": {
+    "swapProgramId": "",
+    "pools": []
+  },
+  "devnet": {
+    "swapProgramId": "E7G3NKPwVcuPXjqL11J2ZZWBVRsocb6Lu3nK5BrRwBNd",
+    "pools": [
+      "2s2mjJdAGM1qDygg65YCPrnQ9Dr4Xsd2dWS8QpVAuuyL"
+    ]
+  },
+  "testnet": {
+    "swapProgramId": "FmgrCQX1JJSAkJEk8fiL85Cgnh7g3DS1rmakEjP1eCyL",
+    "pools": [
+      "2eWaje2xd9VuBAEo82PMGxAxn2ZPhVEnzNo9dRYAiyey",
+      "2zKS9SSdfvLuzGKF5WX46tSesavDbs3eEXBGgZ3PyPjx"
+    ]
+  },
+  "mainnet-beta": {
+    "swapProgramId": "HYv7pNgHkkBGxfrnCre2pMgLpWm7LJPKxiyZVytN5HrM",
+    "pools": ["CyfMxsHgmjaBXgbV46e673MigKVUNzGf8Gj9CfwjvpMy"]
+  }
+}

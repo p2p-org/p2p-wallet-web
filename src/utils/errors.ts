@@ -1,5 +1,5 @@
 export class DuplicateModalError extends Error {
-  constructor(message) {
+  constructor(message: string) {
     super(message);
     this.name = 'DuplicateModalError';
   }

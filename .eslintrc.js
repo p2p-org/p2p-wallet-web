@@ -21,7 +21,14 @@ module.exports = {
     'no-plusplus': 'off',
     'unicorn/no-null': 'off',
     'unicorn/prefer-ternary': 'off',
+    '@typescript-eslint/restrict-template-expressions': 'off',
     '@typescript-eslint/explicit-module-boundary-types': 'off',
+    '@typescript-eslint/no-misused-promises': [
+      'off',
+      {
+        checks: ['void-return'],
+      },
+    ],
 
     // Too restrictive, writing ugly code to defend against a very unlikely scenario: https://eslint.org/docs/rules/no-prototype-builtins
     'no-prototype-builtins': 'off',
@@ -46,7 +53,7 @@ module.exports = {
           ['^\\u0000'], // bare imports
           ['^react'], // react
           ['^[^\\.]'], // non-local imports
-          ['^constants|^config|^utils|^store|^pages|^components|'], // internal
+          ['^constants|^config|^utils|^store|^api|^features|^pages|^components'], // internal
           ['^\\.'], // local imports
         ],
       },

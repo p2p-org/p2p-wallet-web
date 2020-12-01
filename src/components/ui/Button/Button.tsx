@@ -1,7 +1,7 @@
-import React, { FunctionComponent } from 'react';
+import React from 'react';
 
 import classNames from 'classnames';
-import { styled } from 'linaria/react';
+import { styled, StyledComponent } from 'linaria/react';
 import { rgba } from 'polished';
 
 const Wrapper = styled.button`
@@ -79,7 +79,7 @@ type Props = {
   full?: boolean;
 };
 
-export const Button: FunctionComponent<Props & React.ButtonHTMLAttributes<HTMLButtonElement>> = ({
+export const Button: StyledComponent<Props & React.ButtonHTMLAttributes<HTMLButtonElement>> = ({
   type = 'button',
   primary,
   secondary,

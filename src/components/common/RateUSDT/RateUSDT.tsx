@@ -3,8 +3,6 @@ import { useSelector } from 'react-redux';
 
 import { styled } from 'linaria/react';
 
-import { RootState } from 'store/types';
-
 const Wrapper = styled.div``;
 
 type Props = {
@@ -12,7 +10,7 @@ type Props = {
 };
 
 export const RateUSDT: FunctionComponent<Props> = ({ symbol = '', ...props }) => {
-  const rate = useSelector((state: RootState) => state.entities.rates[`${symbol}/USDT`]);
+  const rate = 1; // useSelector((state: RootState) => state.rates[`${symbol}/USDT`]);
 
   return (
     <Wrapper title="Rate in USDT" {...props}>

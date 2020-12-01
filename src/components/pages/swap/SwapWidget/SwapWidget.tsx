@@ -1,11 +1,12 @@
-import React, { FunctionComponent, useState } from 'react';
+import React, { FunctionComponent, useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useHistory } from 'react-router';
 
 import * as web3 from '@solana/web3.js';
 
 import { SendSwapWidget } from 'components/common/SendSwapWidget';
-import { transferTokens } from 'store/actions/complex';
+import { transferTokens } from 'store/_actions/complex';
+import { getPoolsAccounts } from 'store/_actions/complex/pools';
 import { useTokenInfo } from 'utils/hooks/useTokenInfo';
 
 type Props = {
@@ -16,14 +17,19 @@ export const SwapWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
   const dispatch = useDispatch();
   const history = useHistory();
   const [fromTokenAmount, setFromTokenAmount] = useState('');
+  const [toTokenAmount, setToTokenAmount] = useState('');
   const [toTokenPublicKey, setToTokenPublicKey] = useState('');
-  const { decimals } = useTokenInfo(publicKey);
+  const { mint, decimals } = useTokenInfo(publicKey);
+
+  useEffect(() => {
+    dispatch(getPoolsAccounts());
+  }, []);
 
   const handleBackClick = () => {
     history.replace('/wallets');
   };
 
-  const handleToPublicKeyChange = (nextPublicKey: string) => {
+  const handleToTokenChange = (nextPublicKey: string) => {
     setToTokenPublicKey(nextPublicKey);
   };
 
@@ -35,6 +41,18 @@ export const SwapWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
     }
 
     try {
+      const components = [
+        // {
+        //   account: publicKey,
+        //   mintAddress: mint,
+        //   amount,
+        // },
+        // {
+        //   mintAddress: B.mintAddress,
+        //   amount: B.convertAmount(),
+        // },
+      ];
+
       const signature = await dispatch(
         transferTokens({
           sourcePublicKey: new web3.PublicKey(publicKey),
@@ -43,18 +61,22 @@ export const SwapWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
         }),
       );
 
-      history.push(`/send/${publicKey}/result`, { signature });
+      console.log(signature);
     } catch (error) {
       alert(error);
     }
   };
 
-  const handleTokenChange = (nextTokenPublicKey: string) => {
+  const handleFromTokenChange = (nextTokenPublicKey: string) => {
     history.replace(`/swap/${nextTokenPublicKey}`);
   };
 
-  const handleAmountChange = (nextTokenAmount: string) => {
+  const handleFromAmountChange = (nextTokenAmount: string) => {
     setFromTokenAmount(nextTokenAmount);
+  };
+
+  const handleToAmountChange = (nextTokenAmount: string) => {
+    setToTokenAmount(nextTokenAmount);
   };
 
   return (
@@ -65,12 +87,13 @@ export const SwapWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
       fromTokenPublicKey={publicKey}
       fromTokenAmount={fromTokenAmount}
       toTokenPublicKey={toTokenPublicKey}
-      onTokenChange={handleTokenChange}
-      onAmountChange={handleAmountChange}
-      onToPublicKeyChange={handleToPublicKeyChange}
+      toTokenAmount={toTokenAmount}
+      onFromTokenChange={handleFromTokenChange}
+      onFromAmountChange={handleFromAmountChange}
+      onToTokenChange={handleToTokenChange}
+      onToAmountChange={handleToAmountChange}
       onBackClick={handleBackClick}
       onSubmit={handleSubmit}
-      disabled
     />
   );
 };

@@ -3,9 +3,9 @@ import { useSelector } from 'react-redux';
 
 import { styled } from 'linaria/react';
 
+import tokenConfig from 'api/token/token.config';
 import { Avatar } from 'components/ui';
-import { TOKENS_BY_ENTRYPOINT } from 'constants/tokens';
-import { RootState } from 'store/types';
+import { RootState } from 'store/rootReducer';
 
 const AvatarStyled = styled(Avatar)`
   background: ${({ src }) => (src ? 'none' : '#c4c4c4')};
@@ -18,7 +18,8 @@ type Props = {
 };
 
 export const TokenAvatar: FunctionComponent<Props> = ({ mint, src, ...props }) => {
-  const entrypoint = useSelector((state: RootState) => state.data.blockchain.entrypoint);
+  const cluster = useSelector((state: RootState) => state.wallet.cluster);
+  console.log(222, mint);
 
   let newSrc: string | undefined = src;
 
@@ -27,7 +28,7 @@ export const TokenAvatar: FunctionComponent<Props> = ({ mint, src, ...props }) =
       newSrc =
         'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/solana/info/logo.png';
     } else {
-      newSrc = TOKENS_BY_ENTRYPOINT[entrypoint]?.find((token) => token.mintAddress === mint)?.icon;
+      newSrc = tokenConfig[cluster]?.find((token) => token.mintAddress === mint)?.icon;
     }
   }
 

@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import * as web3 from '@solana/web3.js';
 
 import { SYSTEM_PROGRAM_ID, TOKEN_PROGRAM_ID } from 'constants/solana/bufferLayouts';
-import { getConfirmedTransaction } from 'store/actions/solana';
+import { getConfirmedTransaction } from 'store/_actions/solana';
 import { RootState } from 'store/types';
 import { useTokenInfo } from 'utils/hooks/useTokenInfo';
 

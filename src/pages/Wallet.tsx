@@ -7,9 +7,7 @@ import { Layout } from 'components/common/Layout';
 import { QRAddressWidget } from 'components/common/QRAddressWidget';
 import { ActionsWidget, ActivityWidget } from 'components/pages/wallet';
 
-type Props = {};
-
-export const Wallet: FunctionComponent<Props> = (props) => {
+export const Wallet: FunctionComponent = () => {
   const { publicKey } = useParams<{ publicKey: string }>();
 
   const breadcrumbs = [{ name: 'Wallets', to: '/wallets' }, { name: publicKey }];

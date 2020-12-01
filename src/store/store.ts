@@ -1,11 +1,21 @@
-import { applyMiddleware, createStore } from 'redux';
-import { composeWithDevTools } from 'redux-devtools-extension';
+import { configureStore } from '@reduxjs/toolkit';
+import logger from 'redux-logger';
 import { modalsMiddleware } from 'redux-modals-manager';
-import thunkMiddleware from 'redux-thunk';
 
-import { solanaApiMiddleware } from './middlewares';
-import { rootReducer } from './reducers';
+import { isDev } from 'config/constants';
 
-const middlewares = [thunkMiddleware, solanaApiMiddleware(), modalsMiddleware];
+import { rootReducer } from './rootReducer';
 
-export const store = createStore(rootReducer, composeWithDevTools(applyMiddleware(...middlewares)));
+export const store = configureStore({
+  reducer: rootReducer,
+  // add middlewares via a callback, as recommended
+  // here: https://redux-toolkit.js.org/api/configureStore#middleware
+  middleware: (getDefaultMiddleware) => [
+    ...getDefaultMiddleware(),
+    modalsMiddleware,
+    logger, // Note: logger must be the last middleware in chain, otherwise it will log thunk and promise, not actual actions
+  ],
+  devTools: isDev,
+});
+
+export type AppDispatch = typeof store.dispatch;

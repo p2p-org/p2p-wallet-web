@@ -7,7 +7,7 @@ import { rgba } from 'polished';
 
 import { AmountUSDT } from 'components/common/AmountUSDT';
 import { Avatar } from 'components/ui';
-import { openModal } from 'store/actions/modals';
+import { openModal } from 'store/_actions/modals';
 import { SHOW_MODAL_TRANSACTION_DETAILS } from 'store/constants/modalTypes';
 import { useTransactionInfo } from 'utils/hooks/useTransactionInfo';
 

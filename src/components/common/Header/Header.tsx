@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { styled } from 'linaria/react';
 import { rgba } from 'polished';
 
-import { NetworkSelect } from 'components/common/NetworkSelect';
+import { ClusterSelector } from 'components/common/ClusterSelector';
 // import { Avatar } from 'components/ui';
 
 const Wrapper = styled.header`
@@ -99,7 +99,7 @@ export const Header: FunctionComponent<Props> = (props) => {
         {/* </Nav> */}
         <HeaderAuth>
           <NetworkWrapper>
-            <NetworkSelect />
+            <ClusterSelector />
           </NetworkWrapper>
           {/* <AvatarStyled /> */}
           {/* <Username>Konstantin</Username> */}

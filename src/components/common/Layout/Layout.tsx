@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux';
 
 import { styled } from 'linaria/react';
 
-import { RootState } from 'store/types';
+import { RootState } from 'store/rootReducer';
 
 import { Header } from '../Header';
 import { ScrollFix } from '../ScollFix';
@@ -72,7 +72,7 @@ export const Layout: FunctionComponent<Props> = ({
   centered,
   children,
 }) => {
-  const connectionReady = useSelector((state: RootState) => state.data.blockchain.connectionReady);
+  const connected = useSelector((state: RootState) => state.wallet.connected);
 
   return (
     <Wrapper>
@@ -80,7 +80,7 @@ export const Layout: FunctionComponent<Props> = ({
       <MainScrollFix>
         <Container>
           {breadcrumbs ? <Breadcrumbs breadcrumbs={breadcrumbs} /> : undefined}
-          {connectionReady ? (
+          {connected ? (
             <Content>
               {leftColumn && rightColumn ? (
                 <ColumnsWrapper>

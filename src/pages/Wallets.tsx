@@ -4,12 +4,11 @@ import { useSelector } from 'react-redux';
 import { styled } from 'linaria/react';
 
 import { Layout } from 'components/common/Layout';
+import { TokensWidget } from 'components/pages/wallets';
 import { ActionsWidget } from 'components/pages/wallets/ActionsWidget';
-import { CurrenciesWidget } from 'components/pages/wallets/CurrenciesWidget';
 // import { LatestTransactionsWidget } from 'components/pages/wallets/LatestTransactionsWidget';
 // import { SendAgainWidget } from 'components/pages/wallets/SendAgainWidget';
 import { TotalBalanceWidget } from 'components/pages/wallets/TotalBalanceWidget';
-import { RootState } from 'store/types';
 
 const WrapperTemp = styled.div`
   display: grid;
@@ -34,7 +33,7 @@ const BalanceGroup = styled.div`
 `;
 
 export const Wallets: FunctionComponent = () => {
-  const publicKey = useSelector((state: RootState) => state.data.blockchain.account?.publicKey);
+  // const publicKey = useSelector((state: RootState) => state.data.blockchain.account?.publicKey);
 
   const greeting = useMemo(() => {
     let dayTime = '';
@@ -65,10 +64,10 @@ export const Wallets: FunctionComponent = () => {
           {/* <HelloText>{greeting}, Konstantin!</HelloText> */}
           <HelloText>{greeting}!</HelloText>
           <BalanceGroup>
-            <TotalBalanceWidget />
-            <ActionsWidget publicKey={publicKey} />
+            {/* <TotalBalanceWidget /> */}
+            {/* <ActionsWidget publicKey={publicKey} /> */}
           </BalanceGroup>
-          <CurrenciesWidget />
+          <TokensWidget />
         </WrapperTemp>
       }
       // rightColumn={

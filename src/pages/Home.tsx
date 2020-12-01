@@ -1,9 +1,11 @@
 import React, { FunctionComponent } from 'react';
-import { Link } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { Link, useHistory } from 'react-router-dom';
 
 import { styled } from 'linaria/react';
 
 import { Button } from 'components/ui';
+import { connect } from 'features/wallet/WalletSlice';
 
 import { Header } from '../components/common/Header';
 
@@ -37,24 +39,36 @@ const Title = styled.div`
 `;
 
 const SubTitle = styled.div`
+  margin-bottom: 28px;
+
   color: #000;
   font-weight: 500;
   font-size: 27px;
   line-height: 120%;
   text-align: center;
-  margin-bottom: 28px;
 `;
 
 const HeaderImage = styled.div`
-  background-image: url('images/sun.png');
-  height: 209px;
   width: 219px;
-  margin: auto;
-  margin-top: 91px;
-  margin-bottom: 48px;
+  height: 209px;
+  margin: 91px auto 48px;
+
+  background-image: url('images/sun.png');
 `;
 
 export const Home: FunctionComponent = () => {
+  const history = useHistory();
+  const dispatch = useDispatch();
+
+  const handleConnectBySolletClick = async () => {
+    // eslint-disable-next-line @typescript-eslint/await-thenable
+    await dispatch(connect());
+
+    setTimeout(() => {
+      history.push('/wallets');
+    }, 100);
+  };
+
   return (
     <Wrapper>
       <Header />
@@ -68,6 +82,9 @@ export const Home: FunctionComponent = () => {
           </Button>
           <Button gray big full as={Link} to="/access">
             I already have a wallet
+          </Button>
+          <Button gray big full onClick={handleConnectBySolletClick}>
+            Connect by Sollet
           </Button>
         </Actions>
       </Box>

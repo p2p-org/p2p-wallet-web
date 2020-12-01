@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import * as web3 from '@solana/web3.js';
 
-import { getTokenAccountInfo } from 'store/actions/solana';
+import { getTokenAccountInfo } from 'store/_actions/solana';
 import { RootState } from 'store/types';
 import { usePopulateTokenInfo } from 'utils/hooks/usePopulateTokenInfo';
 

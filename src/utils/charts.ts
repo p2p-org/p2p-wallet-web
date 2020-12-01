@@ -11,8 +11,8 @@ const start: { [key: string]: number } = {
   PAX: 0,
 };
 
-export const calculateStart = (coin, time: string): number => {
-  const coinStart = prop(coin, start);
+export const calculateStart = (symbol: string, time: string): number => {
+  const coinStart = prop(symbol, start);
   const dayStart = dayjs().subtract(1, 'day').format('X');
   const weekStart = dayjs().subtract(7, 'day').format('X');
   const monthStart = dayjs().subtract(1, 'month').format('X');

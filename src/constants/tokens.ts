@@ -15,6 +15,13 @@ export type TokensByEntrypointType = {
 export const TOKENS_BY_ENTRYPOINT: TokensByEntrypointType = {
   [web3.clusterApiUrl('mainnet-beta')]: [
     {
+      tokenSymbol: 'SOL',
+      mintAddress: 'So11111111111111111111111111111111111111112',
+      tokenName: 'Solana',
+      icon:
+        'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/solana/info/logo.png',
+    },
+    {
       mintAddress: 'SRMuApVNdxXokk5GT7XD5cUUgXMBCoAz2LHeuAoKWRt',
       tokenName: 'Serum',
       tokenSymbol: 'SRM',
@@ -181,11 +188,32 @@ export const TOKENS_BY_ENTRYPOINT: TokensByEntrypointType = {
   ],
   [web3.clusterApiUrl('devnet')]: [
     {
-      tokenName: 'Example Token',
-      mintAddress: '96oUA9Zu6hdpp9rv41b8Z6DqRyVQm1VMqVU4cBxQupNJ',
-      tokenSymbol: 'EXMPL',
+      tokenSymbol: 'SOL',
+      mintAddress: 'So11111111111111111111111111111111111111112',
+      tokenName: 'Solana',
       icon:
-        'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x476c5E26a75bd202a9683ffD34359C0CC15be0fF/logo.png',
+        'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/solana/info/logo.png',
+    },
+    {
+      tokenSymbol: 'XYZ',
+      mintAddress: 'DEhAasscXF4kEGxFgJ3bq4PpVGp5wyUxMRvn6TzGVHaw',
+      tokenName: 'XYZ Test',
+      icon:
+        'https://raw.githubusercontent.com/trustwallet/assets/08d734b5e6ec95227dc50efef3a9cdfea4c398a1/blockchains/ethereum/assets/0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984/logo.png',
+    },
+    {
+      tokenSymbol: 'ABC',
+      mintAddress: '6z83b76xbSm5UhdG33ePh7QCbLS8YaXCQ9up86tDTCUH',
+      tokenName: 'ABC Test',
+      icon:
+        'https://raw.githubusercontent.com/trustwallet/assets/08d734b5e6ec95227dc50efef3a9cdfea4c398a1/blockchains/ethereum/assets/0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984/logo.png',
+    },
+    {
+      tokenSymbol: 'DEF',
+      mintAddress: '3pyeDv6AV1RQuA6KzsqkZrpsNn4b3hooHrQhGs7K2TYa',
+      tokenName: 'DEF Test',
+      icon:
+        'https://raw.githubusercontent.com/trustwallet/assets/08d734b5e6ec95227dc50efef3a9cdfea4c398a1/blockchains/ethereum/assets/0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984/logo.png',
     },
   ],
 };

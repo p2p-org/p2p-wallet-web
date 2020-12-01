@@ -8,8 +8,8 @@ import { rgba } from 'polished';
 
 import { Card } from 'components/common/Card';
 import { Button, Icon } from 'components/ui';
-import { openModal } from 'store/actions/modals';
-import { getConfirmedTransaction } from 'store/actions/solana';
+import { openModal } from 'store/_actions/modals';
+import { getConfirmedTransaction } from 'store/_actions/solana';
 import { SHOW_MODAL_TRANSACTION_DETAILS } from 'store/constants/modalTypes';
 import { useTransactionInfo } from 'utils/hooks/useTransactionInfo';
 

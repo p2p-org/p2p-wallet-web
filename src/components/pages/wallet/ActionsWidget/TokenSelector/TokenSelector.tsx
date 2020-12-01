@@ -5,7 +5,7 @@ import { styled } from 'linaria/react';
 import { rgba } from 'polished';
 
 import { Icon } from 'components/ui';
-import { getOwnedTokenAccounts } from 'store/actions/solana';
+import { getOwnedTokenAccounts } from 'store/_actions/solana';
 import { RootState } from 'store/types';
 import { useTokenInfo } from 'utils/hooks/useTokenInfo';
 import { shortAddress } from 'utils/tokens';

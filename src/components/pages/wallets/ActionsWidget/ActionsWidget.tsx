@@ -6,7 +6,7 @@ import * as web3 from '@solana/web3.js';
 import { styled } from 'linaria/react';
 
 import { Button } from 'components/ui';
-import { openModal } from 'store/actions/modals';
+import { openModal } from 'store/_actions/modals';
 import { SHOW_MODAL_RECIEVE_TOKENS } from 'store/constants/modalTypes';
 
 const Wrapper = styled.div`

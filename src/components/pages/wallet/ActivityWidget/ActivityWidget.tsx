@@ -7,8 +7,8 @@ import { path } from 'ramda';
 
 import { TransactionList } from 'components/common/TransactionList';
 import { Widget } from 'components/common/Widget';
-import { getConfirmedSignaturesForAddress } from 'store/actions/solana';
-import { ApiSolanaService } from 'store/middlewares/solana-api/services';
+import { getConfirmedSignaturesForAddress } from 'store/_actions/solana';
+import { ApiSolanaService } from 'store/_middlewares/solana-api/services';
 import { RootState } from 'store/types';
 
 const WrapperWidget = styled(Widget)``;

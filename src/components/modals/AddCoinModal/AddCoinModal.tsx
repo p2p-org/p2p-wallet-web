@@ -8,7 +8,7 @@ import { Modal } from 'components/common/Modal';
 import { Button } from 'components/ui';
 import { TOKEN_PROGRAM_ID } from 'constants/solana/bufferLayouts';
 import { TOKENS_BY_ENTRYPOINT } from 'constants/tokens';
-import { createAndInitializeMint } from 'store/actions/complex/tokens';
+import { createAndInitializeMint } from 'store/_actions/complex/tokens';
 import { RootState } from 'store/types';
 
 import { TokenList } from './TokenList';

@@ -7,7 +7,7 @@ import * as web3 from '@solana/web3.js';
 import { styled } from 'linaria/react';
 
 import { Button, ButtonsGroup } from 'components/ui';
-import { requestAirdrop } from 'store/actions/solana';
+import { requestAirdrop } from 'store/_actions/solana';
 import { RootState } from 'store/types';
 
 import { TokenSelector } from './TokenSelector';
