@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react';
 
+import { styled } from '@linaria/react';
 import classNames from 'classnames';
-import { styled } from 'linaria/react';
 import throttle from 'lodash.throttle';
 
 const SHIFT_SPEED = 0.7;

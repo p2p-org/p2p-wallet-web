@@ -1,4 +1,6 @@
 .idea
+.linaria-cache
 .cache
 dist/
 node_modules
+*.log

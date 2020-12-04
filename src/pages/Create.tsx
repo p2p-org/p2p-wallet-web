@@ -2,8 +2,8 @@ import React, { FunctionComponent, useCallback, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { Link, useHistory } from 'react-router-dom';
 
+import { styled } from '@linaria/react';
 import * as bip39 from 'bip39';
-import { styled } from 'linaria/react';
 import throttle from 'lodash.throttle';
 
 import { Button, Icon, Input } from 'components/ui';

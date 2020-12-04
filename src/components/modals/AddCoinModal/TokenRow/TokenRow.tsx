@@ -1,9 +1,9 @@
 import React, { FunctionComponent, useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
 
+import { styled } from '@linaria/react';
 import * as web3 from '@solana/web3.js';
 import classNames from 'classnames';
-import { styled } from 'linaria/react';
 import { rgba } from 'polished';
 
 import { TokenAvatar } from 'components/common/TokenAvatar';

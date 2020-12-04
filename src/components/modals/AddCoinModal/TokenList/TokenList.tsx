@@ -1,6 +1,6 @@
 import React, { FunctionComponent } from 'react';
 
-import { styled } from 'linaria/react';
+import { styled } from '@linaria/react';
 
 import { TokenType } from 'constants/tokens';
 

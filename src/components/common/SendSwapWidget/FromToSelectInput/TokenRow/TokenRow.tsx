@@ -1,8 +1,8 @@
 import React, { FunctionComponent } from 'react';
 import { useSelector } from 'react-redux';
 
+import { styled } from '@linaria/react';
 import * as web3 from '@solana/web3.js';
-import { styled } from 'linaria/react';
 import { rgba } from 'polished';
 
 import { TokenAvatar } from 'components/common/TokenAvatar';

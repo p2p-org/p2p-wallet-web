@@ -1,12 +1,12 @@
 import React, { FunctionComponent, useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { styled } from 'linaria/react';
+import { styled } from '@linaria/react';
 import { rgba } from 'polished';
 
+import { TokenAccount } from 'api/token/TokenAccount';
 import { Icon } from 'components/ui';
-import { getOwnedTokenAccounts } from 'store/_actions/solana';
-import { RootState } from 'store/types';
+import { RootState } from 'store/rootReducer';
 import { useTokenInfo } from 'utils/hooks/useTokenInfo';
 import { shortAddress } from 'utils/tokens';
 
@@ -68,23 +68,20 @@ type Props = {
 };
 
 export const TokenSelector: FunctionComponent<Props> = ({ value, onChange }) => {
-  const dispatch = useDispatch();
   const selectorRef = useRef<HTMLDivElement>(null);
   const [isOpen, setIsOpen] = useState(false);
-  const order = useSelector((state: RootState) => state.entities.tokens.order);
-  const { name } = useTokenInfo(value);
-  const publicKey = useSelector((state: RootState) =>
-    state.data.blockchain.account?.publicKey.toBase58(),
+  const tokenAccounts = useSelector((state: RootState) =>
+    state.wallet.tokenAccounts.map((account) => TokenAccount.from(account)),
+  );
+  const tokenAccount = useMemo(
+    () => tokenAccounts.find((account) => account.address.toBase58() === value),
+    [tokenAccounts, value],
   );
 
-  const preparedOrder = useMemo(() => (publicKey ? [publicKey, ...order] : order), [
-    publicKey,
-    order,
-  ]);
-
-  useEffect(() => {
-    dispatch(getOwnedTokenAccounts());
-  }, []);
+  // const preparedOrder = useMemo(() => (publicKey ? [publicKey, ...order] : order), [
+  //   publicKey,
+  //   order,
+  // ]);
 
   const handleAwayClick = (e: MouseEvent) => {
     if (!selectorRef.current?.contains(e.target as HTMLDivElement)) {
@@ -101,7 +98,7 @@ export const TokenSelector: FunctionComponent<Props> = ({ value, onChange }) => 
   }, []);
 
   const handleSelectorClick = () => {
-    if (!preparedOrder) {
+    if (!tokenAccounts) {
       return;
     }
 
@@ -116,8 +113,8 @@ export const TokenSelector: FunctionComponent<Props> = ({ value, onChange }) => 
   return (
     <Wrapper ref={selectorRef}>
       <Selector onClick={handleSelectorClick}>
-        <Value title={value}>{name || shortAddress(value)}</Value>
-        {order ? (
+        <Value title={value}>{tokenAccount?.mint.name || shortAddress(value)}</Value>
+        {tokenAccounts ? (
           <ChevronWrapper>
             <ChevronIcon name="chevron" />
           </ChevronWrapper>
@@ -125,8 +122,8 @@ export const TokenSelector: FunctionComponent<Props> = ({ value, onChange }) => 
       </Selector>
       {isOpen ? (
         <DropDownList>
-          {preparedOrder.map((publicKey) => (
-            <TokenRow key={publicKey} publicKey={publicKey} onItemClick={handleItemClick} />
+          {tokenAccounts.map((item) => (
+            <TokenRow key={item} token={item} onItemClick={handleItemClick} />
           ))}
         </DropDownList>
       ) : undefined}

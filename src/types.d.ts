@@ -1,5 +1,3 @@
-declare module '*.png';
-
 export type ParsedAccountData = {
   program: string;
   parsed: {

@@ -1,7 +1,7 @@
 import React, { FunctionComponent, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 
-import { styled } from 'linaria/react';
+import { styled } from '@linaria/react';
 
 import { Layout } from 'components/common/Layout';
 import { TokensWidget } from 'components/pages/wallets';

@@ -1,6 +1,6 @@
 import React, { FunctionComponent } from 'react';
 
-import { styled } from 'linaria/react';
+import { styled } from '@linaria/react';
 import { rgba } from 'polished';
 
 import { Card } from 'components/common/Card';

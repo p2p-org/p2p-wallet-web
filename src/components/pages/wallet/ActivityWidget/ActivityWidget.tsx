@@ -1,15 +1,13 @@
 import React, { FunctionComponent, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
+import { styled } from '@linaria/react';
 import * as web3 from '@solana/web3.js';
-import { styled } from 'linaria/react';
 import { path } from 'ramda';
 
 import { TransactionList } from 'components/common/TransactionList';
 import { Widget } from 'components/common/Widget';
 import { getConfirmedSignaturesForAddress } from 'store/_actions/solana';
-import { ApiSolanaService } from 'store/_middlewares/solana-api/services';
-import { RootState } from 'store/types';
 
 const WrapperWidget = styled(Widget)``;
 
@@ -19,17 +17,13 @@ type Props = {
 
 export const ActivityWidget: FunctionComponent<Props> = ({ publicKey }) => {
   const dispatch = useDispatch();
-  const order = useSelector((state: RootState) =>
-    path<string[]>(['order'], state.entities.transactions[publicKey.toBase58()]),
-  );
+  // const order = useSelector((state: RootState) =>
+  //   path<string[]>(['order'], state.entities.transactions[publicKey.toBase58()]),
+  // );
 
   useEffect(() => {
     dispatch(getConfirmedSignaturesForAddress(publicKey));
-  }, [ApiSolanaService.getConnection(), publicKey]);
+  }, [publicKey]);
 
-  return (
-    <WrapperWidget title="Activity">
-      <TransactionList order={order} />
-    </WrapperWidget>
-  );
+  return <WrapperWidget title="Activity">{/* <TransactionList order={order} /> */}</WrapperWidget>;
 };

@@ -3,8 +3,8 @@ import { useSelector } from 'react-redux';
 // import ReactHighcharts from 'react-highcharts';
 import { Link } from 'react-router-dom';
 
+import { styled } from '@linaria/react';
 import * as web3 from '@solana/web3.js';
-import { styled } from 'linaria/react';
 import { rgba } from 'polished';
 
 import { TokenAccount } from 'api/token/TokenAccount';
@@ -92,8 +92,6 @@ type Props = {
 };
 
 export const TokenRow: FunctionComponent<Props> = ({ token }) => {
-  console.log(111, token);
-
   // const { name, mint, owner, symbol, amount } = useTokenInfo(publicKey);
 
   // const coin = 'BTC';

@@ -2,10 +2,9 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 
 import { APIFactory } from 'api/token';
 import { SerializableToken } from 'api/token/Token';
+import { ToastManager } from 'components/common/ToastManager';
 import { RootState } from 'store/rootReducer';
 import { isFulfilledAction, isPendingAction, isRejectedAction } from 'utils/redux';
-
-// import { notify } from '../components/notify';
 
 export interface GlobalState {
   loading: number;
@@ -51,7 +50,7 @@ const globalSlice = createSlice({
       loading: state.loading + 1,
     }));
     builder.addMatcher(isRejectedAction, (state, action) => {
-      // notify(action.error.message);
+      ToastManager.error(action.error.message);
       console.error(action.error);
       return {
         ...state,

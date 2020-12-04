@@ -5,7 +5,7 @@ import { ExtendedCluster } from 'utils/types';
 export const isDev = process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test';
 
 // Can be used in development mode only
-export const localPrivateKey = isDev && process.env.REACT_APP_LOCAL_WALLET_PRIVATE_KEY;
+export const localPrivateKey = isDev && process.env.APP_LOCAL_WALLET_PRIVATE_KEY;
 
 // Env vars that do not start with "REACT_APP_" are available in tests only
 export const localSwapProgramId = process.env.SWAP_PROGRAM_ID;
@@ -19,6 +19,6 @@ export const defaultCommitment: Commitment =
 export const postTransactionSleepMS = Number(process.env.POST_TRANSACTION_SLEEP_MS);
 
 export const airdropKey = (cluster: ExtendedCluster): string | undefined =>
-  process.env[`REACT_APP_${cluster.toUpperCase()}_AIRDROP_PRIVATE_KEY`];
+  process.env[`APP_${cluster.toUpperCase()}_AIRDROP_PRIVATE_KEY`];
 
 export const CLUSTERS = ['mainnet-beta', 'testnet', 'devnet', 'localnet'];

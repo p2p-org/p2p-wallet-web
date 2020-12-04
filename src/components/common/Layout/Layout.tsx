@@ -1,7 +1,7 @@
 import React, { FunctionComponent } from 'react';
 import { useSelector } from 'react-redux';
 
-import { styled } from 'linaria/react';
+import { styled } from '@linaria/react';
 
 import { RootState } from 'store/rootReducer';
 

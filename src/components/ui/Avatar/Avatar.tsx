@@ -1,6 +1,6 @@
 import React, { FunctionComponent } from 'react';
 
-import { styled } from 'linaria/react';
+import { styled } from '@linaria/react';
 
 const Wrapper = styled.img<{ size: string | number | undefined }>`
   width: ${({ size }) => (size ? `${size}px` : 'auto')};

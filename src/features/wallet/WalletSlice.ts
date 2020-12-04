@@ -6,7 +6,8 @@ import { SerializableTokenAccount, TokenAccount } from 'api/token/TokenAccount';
 import * as WalletAPI from 'api/wallet';
 import { WalletType } from 'api/wallet';
 import { WalletEvent } from 'api/wallet/Wallet';
-// import { notify, notifyTransaction } from '../../components/notify';
+import { ToastManager } from 'components/common/ToastManager';
+// import { notifyTransaction } from '../../components/notify';
 import { getAvailableTokens } from 'features/GlobalSlice';
 import { getPools } from 'features/pool/PoolSlice';
 import { updateEntityArray } from 'features/tokenPair/utils/tokenPair';
@@ -28,7 +29,7 @@ export interface WalletsState {
  */
 export const disconnect = createAsyncThunk(`${WALLET_SLICE_NAME}/disconnect`, () => {
   WalletAPI.disconnect();
-  // notify('notification.info.walletDisconnected', { type: 'info' });
+  ToastManager.info('notification.info.walletDisconnected');
 });
 
 export const getOwnedTokenAccounts = createAsyncThunk(
@@ -67,14 +68,14 @@ export const connect = createAsyncThunk(
 
     wallet.on(WalletEvent.DISCONNECT, () => {
       void thunkAPI.dispatch(disconnect());
-      // notify('notification.info.walletDisconnected', { type: 'info' });
+      ToastManager.info('notification.info.walletDisconnected');
     });
 
     // wallet.on(WalletEvent.CONFIRMED, ({ transactionSignature }) =>
     //   notifyTransaction(transactionSignature),
     // );
 
-    // notify('notification.info.walletConnected', { type: 'info' });
+    ToastManager.info('notification.info.walletConnected');
 
     // Get tokens first before getting accounts and pools,
     // to avail of the token caching feature
@@ -83,6 +84,14 @@ export const connect = createAsyncThunk(
     void thunkAPI.dispatch(getPools());
 
     return wallet.pubkey.toBase58();
+  },
+);
+
+export const airdrop = createAsyncThunk<void>(
+  `${WALLET_SLICE_NAME}/airdrop`,
+  async (): Promise<void> => {
+    await WalletAPI.airdrop();
+    // TODO: update balance
   },
 );
 

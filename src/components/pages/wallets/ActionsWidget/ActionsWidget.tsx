@@ -2,8 +2,8 @@ import React, { FunctionComponent } from 'react';
 import { useDispatch } from 'react-redux';
 import { Link } from 'react-router-dom';
 
+import { styled } from '@linaria/react';
 import * as web3 from '@solana/web3.js';
-import { styled } from 'linaria/react';
 
 import { Button } from 'components/ui';
 import { openModal } from 'store/_actions/modals';

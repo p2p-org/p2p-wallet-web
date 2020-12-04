@@ -3,7 +3,8 @@ import { useDispatch } from 'react-redux';
 import { useLocation } from 'react-router';
 import { Link } from 'react-router-dom';
 
-import { styled } from 'linaria/react';
+import { styled } from '@linaria/react';
+import bgImg from 'assets/images/sun.png';
 import { rgba } from 'polished';
 
 import { Card } from 'components/common/Card';
@@ -21,7 +22,7 @@ const WrapperCard = styled(Card)`
 `;
 
 const HeaderImage = styled.div`
-  background-image: url('images/sun.png');
+  background-image: url(${bgImg});
   background-size: 183px 175px;
   background-repeat: no-repeat;
   height: 183px;

@@ -1,7 +1,7 @@
 import React, { FunctionComponent } from 'react';
 
+import { styled } from '@linaria/react';
 import classNames from 'classnames';
-import { styled } from 'linaria/react';
 
 const Wrapper = styled.div`
   padding: 20px;

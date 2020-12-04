@@ -1,8 +1,8 @@
 import React, { FunctionComponent, useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
+import { styled } from '@linaria/react';
 import classNames from 'classnames';
-import { styled } from 'linaria/react';
 import { rgba } from 'polished';
 
 import { AmountUSDT } from 'components/common/AmountUSDT';

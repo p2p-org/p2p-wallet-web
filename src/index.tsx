@@ -1,55 +1,16 @@
-/// <reference types="webpack-env" />
 import 'sanitize.css';
+import 'styles/nprogress.css';
 
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
 
-import { css } from 'linaria';
-import { rgba } from 'polished';
-
 import { isDev } from 'config/constants';
+import globalCss from 'styles/global';
 
 import { store } from './store';
 
-export const global = css`
-  :global() {
-    html,
-    body,
-    #root {
-      height: 100%;
-    }
-
-    body {
-      font-family: 'Rubik', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-        'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
-
-      background: #f8f8f8;
-      -webkit-font-smoothing: antialiased;
-    }
-
-    a {
-      color: ${rgba('#000', 0.5)};
-      font-size: 14px;
-      line-height: 140%;
-      text-decoration: underline;
-    }
-
-    & ::-webkit-scrollbar {
-      width: 6px;
-      height: 6px;
-    }
-
-    & ::-webkit-scrollbar-track {
-      background: none;
-    }
-
-    & ::-webkit-scrollbar-thumb {
-      background: rgba(0, 0, 0, 0.2);
-      border-radius: 4px;
-    }
-  }
-`;
+export const global = globalCss;
 
 const render = () => {
   // Load the app dynamically, which allows for hot-reloading in development mode.

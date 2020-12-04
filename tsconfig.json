@@ -6,6 +6,8 @@
       "dom.iterable",
       "esnext"
     ],
+    "declaration": true,
+    "emitDeclarationOnly": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "allowJs": true,
@@ -25,6 +27,7 @@
       "*": ["src/*"]
     }
   },
+  "exclude": ["node_modules"],
   "include": [
     "src/**/*",
     "test/[^e2e]/*",

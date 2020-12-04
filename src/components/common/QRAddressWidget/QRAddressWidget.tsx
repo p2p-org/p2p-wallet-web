@@ -1,14 +1,15 @@
-import React, { FunctionComponent } from 'react';
+import React, { FunctionComponent, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 
+import { styled } from '@linaria/react';
 import * as web3 from '@solana/web3.js';
-import { styled } from 'linaria/react';
 import { rgba } from 'polished';
 import QRcode from 'qrcode.react';
 
+import { TokenAccount } from 'api/token/TokenAccount';
 import { Card } from 'components/common/Card';
 import { Icon } from 'components/ui';
-import { useTokenInfo } from 'utils/hooks/useTokenInfo';
+import { RootState } from 'store/rootReducer';
 
 const WrapperCard = styled(Card)`
   flex: 1;
@@ -97,17 +98,23 @@ const Content = styled.div`
 
 type Props = {
   publicKey: web3.PublicKey;
-  isSol?: boolean;
   className?: string;
 };
 
-export const QRAddressWidget: FunctionComponent<Props> = ({ publicKey, isSol, className }) => {
-  const publicKeyBase58 = publicKey.toBase58();
-  const { name } = useTokenInfo(publicKeyBase58);
+export const QRAddressWidget: FunctionComponent<Props> = ({ publicKey, className }) => {
+  const tokenAccounts = useSelector((state: RootState) => state.wallet.tokenAccounts);
+  const tokenAccount = useMemo(() => {
+    const foundToken = tokenAccounts.find((account) => account.address === publicKey.toBase58());
+    return foundToken && TokenAccount.from(foundToken);
+  }, [tokenAccounts, publicKey]);
+
+  if (!tokenAccount) {
+    return null;
+  }
 
   const handleCopyClick = () => {
     try {
-      void navigator.clipboard.writeText(publicKeyBase58);
+      void navigator.clipboard.writeText(tokenAccount.address.toBase58());
     } catch (error) {
       console.error(error);
     }
@@ -121,15 +128,15 @@ export const QRAddressWidget: FunctionComponent<Props> = ({ publicKey, isSol, cl
     <WrapperCard className={className}>
       <HeaderWrapper>
         <TokenWrapper>
-          <TokenName>{name} Address</TokenName>
-          <TokenAddress>{publicKeyBase58}</TokenAddress>
+          <TokenName>{tokenAccount.mint.name} Address</TokenName>
+          <TokenAddress>{tokenAccount.address.toBase58()}</TokenAddress>
         </TokenWrapper>
         <ShareWrapper onClick={handleCopyClick}>
           <ShareIcon name="copy" />
         </ShareWrapper>
       </HeaderWrapper>
       <Content>
-        <QRcode value={publicKeyBase58} size={148} />
+        <QRcode value={tokenAccount.address.toBase58()} size={148} />
         {/* <ActionsWrapper> */}
         {/*  <Action>Copy image</Action> */}
         {/*  <Action>Share</Action> */}

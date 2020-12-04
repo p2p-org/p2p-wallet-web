@@ -2,7 +2,8 @@ import React, { FunctionComponent } from 'react';
 import { useDispatch } from 'react-redux';
 import { Link, useHistory } from 'react-router-dom';
 
-import { styled } from 'linaria/react';
+import { styled } from '@linaria/react';
+import bgImg from 'assets/images/sun.png';
 
 import { Button } from 'components/ui';
 import { connect } from 'features/wallet/WalletSlice';
@@ -53,7 +54,7 @@ const HeaderImage = styled.div`
   height: 209px;
   margin: 91px auto 48px;
 
-  background-image: url('images/sun.png');
+  background-image: url(${bgImg});
 `;
 
 export const Home: FunctionComponent = () => {

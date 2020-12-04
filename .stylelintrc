@@ -6,11 +6,12 @@
     "stylelint-config-standard",
     "stylelint-config-rational-order",
     "stylelint-prettier/recommended",
-    "linaria/stylelint-config"
+    "@linaria/stylelint"
   ],
   "rules": {
     "prettier/prettier": true,
     "block-no-empty": null,
+    "no-empty-source": null,
     "declaration-empty-line-before": null,
     "indentation": null,
     "max-empty-lines": null,

@@ -1,7 +1,7 @@
 import React from 'react';
 
+import { styled, StyledComponent } from '@linaria/react';
 import classNames from 'classnames';
-import { styled, StyledComponent } from 'linaria/react';
 import { rgba } from 'polished';
 
 const Wrapper = styled.button`

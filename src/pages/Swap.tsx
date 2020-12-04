@@ -1,7 +1,7 @@
 import React, { FunctionComponent } from 'react';
 import { useParams } from 'react-router-dom';
 
-import { styled } from 'linaria/react';
+import { styled } from '@linaria/react';
 
 import { Layout } from 'components/common/Layout';
 import { SwapWidget } from 'components/pages/swap/SwapWidget';

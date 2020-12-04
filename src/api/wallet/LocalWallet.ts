@@ -16,6 +16,7 @@ export class LocalWallet extends Wallet {
     if (!isDev) {
       throw new Error('LocalWallet can not be used in production');
     }
+
     if (!localPrivateKey) {
       throw new Error('No local private key in the environment');
     }

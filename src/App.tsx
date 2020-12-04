@@ -1,8 +1,12 @@
 import React, { useEffect } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { BrowserRouter as Router, Route, Switch, useHistory } from 'react-router-dom';
 
+import NProgress from 'nprogress';
+
 import { ModalManager } from 'components/common/ModalManager';
+import { NotifyToast } from 'components/common/NotifyToast/NotifyToast';
+import { ToastManager } from 'components/common/ToastManager';
 import { Access } from 'pages/Access';
 import { Create } from 'pages/Create';
 import { Home } from 'pages/Home';
@@ -11,7 +15,10 @@ import { Swap } from 'pages/Swap';
 import { Wallet } from 'pages/Wallet';
 import { Wallets } from 'pages/Wallets';
 import { establishConnection, getRates } from 'store/_actions/complex';
+import { RootState } from 'store/rootReducer';
 import { AuthRequiredRoute } from 'utils/routes/UserRequiredRoute';
+
+NProgress.configure({ showSpinner: false });
 
 /* Hack for states and hash routing until use own host */
 const FixRoute = () => {
@@ -28,6 +35,7 @@ const FixRoute = () => {
 
 const App: React.FC = () => {
   // const dispatch = useDispatch();
+  const loading = useSelector((state: RootState) => state.global.loading);
 
   // useEffect(() => {
   //   const mount = async () => {
@@ -37,6 +45,14 @@ const App: React.FC = () => {
   //
   //   void mount();
   // }, []);
+
+  useEffect(() => {
+    if (loading) {
+      NProgress.start();
+    } else {
+      NProgress.done();
+    }
+  }, [Boolean(loading)]);
 
   return (
     <>
@@ -56,6 +72,7 @@ const App: React.FC = () => {
         </Switch>
       </Router>
       <ModalManager />
+      <ToastManager anchor="right" renderToast={(props) => <NotifyToast {...props} />} />
     </>
   );
 };

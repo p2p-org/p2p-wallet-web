@@ -29,6 +29,7 @@ module.exports = {
         checks: ['void-return'],
       },
     ],
+    'no-restricted-syntax': ['off', 'ForOfStatement'],
 
     // Too restrictive, writing ugly code to defend against a very unlikely scenario: https://eslint.org/docs/rules/no-prototype-builtins
     'no-prototype-builtins': 'off',
@@ -53,7 +54,7 @@ module.exports = {
           ['^\\u0000'], // bare imports
           ['^react'], // react
           ['^[^\\.]'], // non-local imports
-          ['^constants|^config|^utils|^store|^api|^features|^pages|^components'], // internal
+          ['^constants|^config|^utils|^store|^api|^features|^pages|^components|^styles'], // internal
           ['^\\.'], // local imports
         ],
       },
@@ -69,6 +70,14 @@ module.exports = {
 
         // No jsx extension: https://github.com/facebook/create-react-app/issues/87#issuecomment-234627904
         'react/jsx-filename-extension': 'off',
+
+        'react/static-property-placement': [
+          'warn',
+          'property assignment',
+          {
+            defaultProps: 'static public field',
+          },
+        ],
       },
     },
   ],

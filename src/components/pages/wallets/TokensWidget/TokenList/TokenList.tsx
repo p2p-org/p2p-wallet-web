@@ -1,6 +1,8 @@
 import React, { FunctionComponent } from 'react';
 
-import { styled } from 'linaria/react';
+import { styled } from '@linaria/react';
+
+import { TokenAccount } from 'api/token/TokenAccount';
 
 import { TokenRow } from '../TokenRow';
 
@@ -10,14 +12,10 @@ const Wrapper = styled.div`
 `;
 
 type Props = {
-  // order?: string[];
-  items: any;
+  items: TokenAccount[];
 };
 
-export const TokenList: FunctionComponent<Props> = ({
-  // order
-  items,
-}) => {
+export const TokenList: FunctionComponent<Props> = ({ items }) => {
   if (!items) {
     return null;
   }

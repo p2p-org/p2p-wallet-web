@@ -1,7 +1,7 @@
 import React, { FunctionComponent, useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { styled } from 'linaria/react';
+import { styled } from '@linaria/react';
 
 import { TokenAccount } from 'api/token/TokenAccount';
 import { Widget } from 'components/common/Widget';
@@ -19,7 +19,7 @@ export const TokensWidget: FunctionComponent = () => {
   const dispatch = useDispatch();
   // const order = useSelector((state: RootState) => state.entities.tokens.order);
   const tokenAccounts = useSelector((state: RootState) =>
-    state.tokenPair.tokenAccounts.map((account) => TokenAccount.from(account)),
+    state.wallet.tokenAccounts.map((account) => TokenAccount.from(account)),
   );
   // const publicKey = useSelector((state: RootState) =>
   //   state.data.blockchain.account?.publicKey.toBase58(),

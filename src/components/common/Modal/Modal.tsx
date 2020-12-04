@@ -1,6 +1,6 @@
 import React, { FunctionComponent } from 'react';
 
-import { styled } from 'linaria/react';
+import { styled } from '@linaria/react';
 import { rgba } from 'polished';
 
 import { Icon } from 'components/ui';
@@ -44,8 +44,10 @@ const CloseIcon = styled(Icon)`
   position: absolute;
   top: 15px;
   right: 15px;
+
   width: 32px;
   height: 32px;
+
   cursor: pointer;
 `;
 

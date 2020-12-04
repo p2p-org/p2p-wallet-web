@@ -1,6 +1,6 @@
 import React, { forwardRef, FunctionComponent } from 'react';
 
-import { styled } from 'linaria/react';
+import { styled } from '@linaria/react';
 import { rgba } from 'polished';
 
 const Wrapper = styled.label`

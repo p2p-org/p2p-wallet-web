@@ -1,7 +1,7 @@
 import React, { FunctionComponent } from 'react';
 import { useSelector } from 'react-redux';
 
-import { styled } from 'linaria/react';
+import { styled } from '@linaria/react';
 
 import tokenConfig from 'api/token/token.config';
 import { Avatar } from 'components/ui';
@@ -19,7 +19,6 @@ type Props = {
 
 export const TokenAvatar: FunctionComponent<Props> = ({ mint, src, ...props }) => {
   const cluster = useSelector((state: RootState) => state.wallet.cluster);
-  console.log(222, mint);
 
   let newSrc: string | undefined = src;
 

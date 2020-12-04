@@ -8,7 +8,6 @@ import { getPoolsProgramAccountsAsyncAction, mintTestTokenAsyncAction } from 'st
 import { SOLANA_API } from 'store/_middlewares';
 import { ApiSolanaService } from 'store/_middlewares/solana-api/services';
 import { PoolInfo } from 'store/_reducers/entities/pools';
-import { AppThunk } from 'store/types';
 
 export interface TokenAccount {
   pubkey: web3.PublicKey;

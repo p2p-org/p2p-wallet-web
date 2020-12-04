@@ -1,8 +1,8 @@
 import React, { createRef, FunctionComponent, Suspense, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
+import { styled } from '@linaria/react';
 import loadable, { LoadableComponent } from '@loadable/component';
-import { styled } from 'linaria/react';
 import { last } from 'ramda';
 import { closeModal } from 'redux-modals-manager';
 

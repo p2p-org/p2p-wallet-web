@@ -1,8 +1,9 @@
 import React, { FunctionComponent } from 'react';
 
-import { styled } from 'linaria/react';
+import { styled } from '@linaria/react';
 import { rgba } from 'polished';
 
+import { TokenAccount } from 'api/token/TokenAccount';
 import { RateUSDT } from 'components/common/RateUSDT';
 import { TokenAvatar } from 'components/common/TokenAvatar';
 import { useTokenInfo } from 'utils/hooks/useTokenInfo';
@@ -54,29 +55,28 @@ const Bottom = styled.div`
 `;
 
 type Props = {
-  publicKey: string;
+  token: TokenAccount;
   onItemClick: (publicKey: string) => void;
 };
 
-export const TokenRow: FunctionComponent<Props> = ({ publicKey, onItemClick }) => {
-  const { name, mint, symbol, amount } = useTokenInfo(publicKey);
-
+export const TokenRow: FunctionComponent<Props> = ({ token, onItemClick }) => {
   const handleClick = () => {
-    onItemClick(publicKey);
+    onItemClick(token.address.toBase58());
   };
 
   return (
-    <Wrapper title={publicKey} onClick={handleClick}>
+    <Wrapper title={token.address.toBase58()} onClick={handleClick}>
       <ItemWrapper>
-        <TokenAvatar mint={mint} size={32} includeSol />
+        <TokenAvatar mint={token.mint.address.toBase58()} size={32} includeSol />
         <Info>
           <Top>
-            <TokenName>{name || publicKey}</TokenName> <RateUSDT symbol={symbol} />
+            <TokenName>{token.mint.name || token.address.toBase58()}</TokenName>{' '}
+            <RateUSDT symbol={token.mint.symbol} />
           </Top>
           <Bottom>
-            <div>{symbol}</div>{' '}
+            <div>{token.mint.symbol}</div>{' '}
             <div>
-              {amount} {symbol}
+              {token.balance.toNumber()} {token.mint.symbol}
             </div>
           </Bottom>
         </Info>
