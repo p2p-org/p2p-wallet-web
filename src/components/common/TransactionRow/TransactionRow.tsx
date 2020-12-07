@@ -2,12 +2,14 @@ import React, { FunctionComponent, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { styled } from '@linaria/react';
+import { TransactionSignature } from '@solana/web3.js';
 import { rgba } from 'polished';
 
 import { Transaction } from 'api/transaction/Transaction';
 import { Avatar } from 'components/ui';
 import { openModal } from 'store/_actions/modals';
 import { SHOW_MODAL_TRANSACTION_DETAILS } from 'store/constants/modalTypes';
+import { RootState } from 'store/rootReducer';
 import { useTransactionInfo } from 'utils/hooks/useTransactionInfo';
 
 const Wrapper = styled.div`
@@ -54,12 +56,13 @@ const Bottom = styled.div`
 `;
 
 type Props = {
-  transaction: Transaction;
+  signature: TransactionSignature;
 };
 
-export const TransactionRow: FunctionComponent<Props> = ({ transaction }) => {
+export const TransactionRow: FunctionComponent<Props> = ({ signature }) => {
   const dispatch = useDispatch();
-  //
+  const transaction = useSelector((state: RootState) => state.transaction.items[signature]);
+
   // const { slot, type, symbol, amount } = useTransactionInfo(transaction);
 
   const handleClick = () => {

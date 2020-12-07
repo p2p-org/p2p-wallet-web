@@ -1,18 +1,14 @@
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
-import * as web3 from '@solana/web3.js';
-
 import { SYSTEM_PROGRAM_ID, TOKEN_PROGRAM_ID } from 'constants/solana/bufferLayouts';
-import { getConfirmedTransaction } from 'store/_actions/solana';
-import { RootState } from 'store/types';
+import { getTransaction } from 'features/transaction/TransactionSlice';
+import { RootState } from 'store/rootReducer';
 import { useTokenInfo } from 'utils/hooks/useTokenInfo';
 
 export const useTransactionInfo = (signature: string) => {
   const dispatch = useDispatch();
-  const transaction = useSelector(
-    (state: RootState) => state.entities.transactionsNormalized[signature],
-  );
+  const transaction = useSelector((state: RootState) => state.transaction.items[signature]);
 
   const instruction = transaction?.transaction.message.instructions[0];
 
@@ -20,7 +16,7 @@ export const useTransactionInfo = (signature: string) => {
   const { symbol, decimals } = useTokenInfo(source);
 
   useEffect(() => {
-    dispatch(getConfirmedTransaction(signature));
+    dispatch(getTransaction(signature));
   }, [signature]);
 
   let amount = 0;

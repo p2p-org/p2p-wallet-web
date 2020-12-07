@@ -8,6 +8,7 @@ import { ExtendedCluster } from 'utils/types';
 import { Transaction } from './Transaction';
 
 export interface API {
+  transactionInfo: (signature: TransactionSignature) => Promise<Transaction | null>;
   getTransactionsForAddress: (account: PublicKey) => Promise<Transaction[]>;
 }
 
@@ -78,6 +79,7 @@ export const APIFactory = memoizeWith(
     };
 
     return {
+      transactionInfo,
       getTransactionsForAddress,
     };
   },

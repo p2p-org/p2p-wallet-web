@@ -14,9 +14,9 @@ type TokensByEntrypointType = {
 export default {
   'mainnet-beta': [
     {
-      tokenSymbol: 'SOL',
+      tokenSymbol: 'WSOL',
       mintAddress: 'So11111111111111111111111111111111111111112',
-      tokenName: 'Solana',
+      tokenName: 'Wrapped Solana',
       icon:
         'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/solana/info/logo.png',
     },

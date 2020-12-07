@@ -7,6 +7,7 @@ import Decimal from 'decimal.js';
 
 import { TokenAccount } from 'api/token/TokenAccount';
 import { SendSwapWidget } from 'components/common/SendSwapWidget';
+import { transfer } from 'features/wallet/WalletSlice';
 import { transferTokens } from 'store/_actions/complex';
 import { RootState } from 'store/rootReducer';
 
@@ -17,7 +18,7 @@ type Props = {
 export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
   const dispatch = useDispatch();
   const history = useHistory();
-  const [fromTokenAmount, setFromTokenAmount] = useState<Decimal>(new Decimal(0));
+  const [fromTokenAmount, setFromTokenAmount] = useState('');
   const [toTokenPublicKey, setToTokenPublicKey] = useState('');
   const tokenAccounts = useSelector((state: RootState) =>
     state.wallet.tokenAccounts.map((account) => TokenAccount.from(account)),
@@ -36,9 +37,8 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
   };
 
   const handleSubmit = async () => {
-    const amount = fromTokenAmount
-      .div(10)
-      .pow(tokenAccount?.mint.decimals || 0)
+    const amount = new Decimal(fromTokenAmount)
+      .mul(10 ** (tokenAccount?.mint.decimals || 0))
       .toNumber();
 
     if (!amount || amount <= 0) {
@@ -47,9 +47,9 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
 
     try {
       const signature = await dispatch(
-        transferTokens({
-          sourcePublicKey: new web3.PublicKey(publicKey),
-          destPublicKey: new web3.PublicKey(toTokenPublicKey),
+        transfer({
+          source: new web3.PublicKey(publicKey),
+          destination: new web3.PublicKey(toTokenPublicKey),
           amount,
         }),
       );
@@ -64,7 +64,7 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
     history.replace(`/send/${nextTokenPublicKey}`);
   };
 
-  const handleAmountChange = (nextTokenAmount: Decimal) => {
+  const handleAmountChange = (nextTokenAmount: string) => {
     setFromTokenAmount(nextTokenAmount);
   };
 

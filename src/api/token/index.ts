@@ -34,9 +34,9 @@ export const TOKEN_PROGRAM_ID = new PublicKey('TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9
 
 type TokenAccountUpdateCallback = (tokenAccount: TokenAccount) => void;
 
-type TransferParameters = {
-  source: TokenAccount;
-  destination: TokenAccount;
+export type TransferParameters = {
+  source: PublicKey;
+  destination: PublicKey;
   amount: number | Decimal;
 };
 
@@ -457,8 +457,8 @@ export const APIFactory = memoizeWith(
 
       const transferInstruction = SPLToken.createTransferInstruction(
         TOKEN_PROGRAM_ID,
-        parameters.source.address,
-        parameters.destination.address,
+        parameters.source,
+        parameters.destination,
         getWallet().pubkey,
         [],
         amount,

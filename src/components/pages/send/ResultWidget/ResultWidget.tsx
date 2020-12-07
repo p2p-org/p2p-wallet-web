@@ -92,19 +92,19 @@ export const ResultWidget: FunctionComponent = () => {
   const { state: locationState } = useLocation<{ signature: string }>();
   const dispatch = useDispatch();
 
-  const { slot, source, symbol, amount } = useTransactionInfo(locationState?.signature);
+  // const { slot, source, symbol, amount } = useTransactionInfo(locationState?.signature);
 
-  useEffect(() => {
-    const mount = async () => {
-      const trx = await dispatch(getConfirmedTransaction(locationState?.signature));
-
-      if (!trx) {
-        setTimeout(mount, 3000);
-      }
-    };
-
-    void mount();
-  }, []);
+  // useEffect(() => {
+  //   const mount = async () => {
+  //     const trx = await dispatch(getConfirmedTransaction(locationState?.signature));
+  //
+  //     if (!trx) {
+  //       setTimeout(mount, 3000);
+  //     }
+  //   };
+  //
+  //   void mount();
+  // }, []);
 
   const handleDetailsClick = () => {
     dispatch(openModal(SHOW_MODAL_TRANSACTION_DETAILS, { signature: locationState?.signature }));
@@ -116,20 +116,20 @@ export const ResultWidget: FunctionComponent = () => {
       <CircleWrapper>
         <ArrowIcon name="arrow-angle" />
       </CircleWrapper>
-      <InfoWrapper>
-        {slot ? (
-          <Value>
-            {amount} {symbol}
-          </Value>
-        ) : undefined}
-        <Status>{slot ? 'Processed' : 'Processing'}</Status>
-        {slot ? <Details onClick={handleDetailsClick}>Transaction details</Details> : undefined}
-      </InfoWrapper>
-      {source ? (
-        <Button primary big full as={Link} to={`/wallet/${source}`}>
-          Go back to wallet
-        </Button>
-      ) : undefined}
+      {/* <InfoWrapper> */}
+      {/*  {slot ? ( */}
+      {/*    <Value> */}
+      {/*      {amount} {symbol} */}
+      {/*    </Value> */}
+      {/*  ) : undefined} */}
+      {/*  <Status>{slot ? 'Processed' : 'Processing'}</Status> */}
+      {/*  {slot ? <Details onClick={handleDetailsClick}>Transaction details</Details> : undefined} */}
+      {/* </InfoWrapper> */}
+      {/* {source ? ( */}
+      {/*  <Button primary big full as={Link} to={`/wallet/${source}`}> */}
+      {/*    Go back to wallet */}
+      {/*  </Button> */}
+      {/* ) : undefined} */}
     </WrapperCard>
   );
 };

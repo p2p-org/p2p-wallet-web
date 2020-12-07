@@ -2,6 +2,7 @@ import React, { FunctionComponent } from 'react';
 
 import { styled } from '@linaria/react';
 import * as web3 from '@solana/web3.js';
+import { TransactionSignature } from '@solana/web3.js';
 
 import { Transaction } from 'api/transaction/Transaction';
 
@@ -27,18 +28,18 @@ const Wrapper = styled.div`
 `;
 
 type Props = {
-  items?: Transaction[];
+  order?: TransactionSignature[];
 };
 
-export const TransactionList: FunctionComponent<Props> = ({ items }) => {
-  if (!items) {
+export const TransactionList: FunctionComponent<Props> = ({ order }) => {
+  if (!order) {
     return null;
   }
 
   return (
     <Wrapper>
-      {items.map((transaction) => (
-        <TransactionRow key={transaction.signature} transaction={transaction} />
+      {order.map((signature) => (
+        <TransactionRow key={signature} signature={signature} />
       ))}
     </Wrapper>
   );

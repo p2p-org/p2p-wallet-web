@@ -18,9 +18,7 @@ type Props = {
 
 export const ActivityWidget: FunctionComponent<Props> = ({ publicKey }) => {
   const dispatch = useDispatch();
-  const transactions = useSelector((state: RootState) =>
-    state.transaction[publicKey.toBase58()]?.map((transaction) => Transaction.from(transaction)),
-  );
+  const order = useSelector((state: RootState) => state.transaction.order[publicKey.toBase58()]);
 
   useEffect(() => {
     dispatch(getTransactions(publicKey));
@@ -28,7 +26,7 @@ export const ActivityWidget: FunctionComponent<Props> = ({ publicKey }) => {
 
   return (
     <WrapperWidget title="Activity">
-      <TransactionList items={transactions} />
+      <TransactionList order={order} />
     </WrapperWidget>
   );
 };

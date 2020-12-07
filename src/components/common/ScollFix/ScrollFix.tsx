@@ -1,6 +1,6 @@
 import React, { FunctionComponent } from 'react';
 
-import { useWidthWithoutScrollbar } from 'utils/hooks/useWitdthWithoutScrollbar';
+import { useWidthWithoutScrollbar } from 'utils/hooks/useWidthWithoutScrollbar';
 
 export const ScrollFix: FunctionComponent = (props) => {
   const width = useWidthWithoutScrollbar();

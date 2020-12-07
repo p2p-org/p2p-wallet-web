@@ -1,7 +1,6 @@
 import React, { FunctionComponent } from 'react';
 
 import { styled } from '@linaria/react';
-import { Decimal } from 'decimal.js';
 import { rgba } from 'polished';
 
 import { Card } from 'components/common/Card';
@@ -109,14 +108,14 @@ type Props = {
   type: 'send' | 'swap';
   title: string;
   fromTokenPublicKey: string;
-  fromTokenAmount: Decimal;
+  fromTokenAmount: string;
   toTokenPublicKey: string;
-  toTokenAmount?: Decimal;
+  toTokenAmount?: string;
   actionText: string;
   onFromTokenChange: (pubkey: string) => void;
-  onFromAmountChange: (amount: Decimal) => void;
+  onFromAmountChange: (amount: string) => void;
   onToTokenChange: (pubkey: string) => void;
-  onToAmountChange?: (amount: Decimal) => void;
+  onToAmountChange?: (amount: string) => void;
   onBackClick: () => void;
   onSubmit: () => void;
   disabled?: boolean;
@@ -128,7 +127,7 @@ export const SendSwapWidget: FunctionComponent<Props> = ({
   fromTokenPublicKey,
   fromTokenAmount,
   toTokenPublicKey,
-  toTokenAmount = new Decimal(0),
+  toTokenAmount = '',
   actionText,
   onFromTokenChange,
   onFromAmountChange,

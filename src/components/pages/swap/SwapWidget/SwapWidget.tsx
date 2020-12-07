@@ -18,8 +18,8 @@ type Props = {
 export const SwapWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
   const dispatch = useDispatch();
   const history = useHistory();
-  const [fromTokenAmount, setFromTokenAmount] = useState<Decimal>(new Decimal(0));
-  const [toTokenAmount, setToTokenAmount] = useState<Decimal>(new Decimal(0));
+  const [fromTokenAmount, setFromTokenAmount] = useState('');
+  const [toTokenAmount, setToTokenAmount] = useState('');
   const [toTokenPublicKey, setToTokenPublicKey] = useState('');
   const tokenAccounts = useSelector((state: RootState) =>
     state.wallet.tokenAccounts.map((account) => TokenAccount.from(account)),
@@ -42,7 +42,9 @@ export const SwapWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
   };
 
   const handleSubmit = async () => {
-    const amount = fromTokenAmount.div(10 ** (tokenAccount?.mint.decimals || 0)).toNumber();
+    const amount = new Decimal(fromTokenAmount)
+      .mul(10 ** (tokenAccount?.mint.decimals || 0))
+      .toNumber();
 
     if (!amount || amount <= 0) {
       throw new Error('Invalid amount');
@@ -79,11 +81,11 @@ export const SwapWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
     history.replace(`/swap/${nextTokenPublicKey}`);
   };
 
-  const handleFromAmountChange = (nextTokenAmount: Decimal) => {
+  const handleFromAmountChange = (nextTokenAmount: string) => {
     setFromTokenAmount(nextTokenAmount);
   };
 
-  const handleToAmountChange = (nextTokenAmount: Decimal) => {
+  const handleToAmountChange = (nextTokenAmount: string) => {
     setToTokenAmount(nextTokenAmount);
   };
 

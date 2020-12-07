@@ -175,9 +175,9 @@ const DropDownList = styled.div`
 type Props = {
   type?: 'from' | 'to';
   tokenPublicKey: string;
-  tokenAmount: Decimal;
+  tokenAmount: string;
   onTokenChange: (tokenPublicKey: string) => void;
-  onAmountChange: (tokenAmount: Decimal) => void;
+  onAmountChange: (tokenAmount: string) => void;
   disabled?: boolean;
 };
 
@@ -231,13 +231,20 @@ export const FromToSelectInput: FunctionComponent<Props> = ({
       return;
     }
 
-    onAmountChange(new Decimal(tokenAccount.mint.toMajorDenomination(tokenAccount.balance)));
+    onAmountChange(tokenAccount.mint.toMajorDenomination(tokenAccount.balance));
   };
 
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = new Decimal(e.target.value.trim());
+    let amount = e.target.value
+      .replace(/,/g, '.')
+      .replace(/\.+/g, '.')
+      .replace(/[^\d.]+/g, '');
 
-    onAmountChange(value);
+    if (amount === '.') {
+      amount = '0.';
+    }
+
+    onAmountChange(amount);
   };
 
   return (
@@ -271,7 +278,7 @@ export const FromToSelectInput: FunctionComponent<Props> = ({
             </TokenWrapper>
             <AmountInput
               placeholder="0"
-              value={tokenAmount.toString()}
+              value={tokenAmount}
               onChange={handleAmountChange}
               disabled={disabled}
             />
@@ -282,7 +289,11 @@ export const FromToSelectInput: FunctionComponent<Props> = ({
               {tokenAccount?.mint.symbol}
             </BalanceText>
             <BalanceText>
-              = <AmountUSDTStyled value={tokenAmount} symbol={tokenAccount?.mint.symbol} />
+              ={' '}
+              <AmountUSDTStyled
+                value={new Decimal(tokenAmount || 0)}
+                symbol={tokenAccount?.mint.symbol}
+              />
             </BalanceText>
           </BalanceWrapper>
         </InfoWrapper>

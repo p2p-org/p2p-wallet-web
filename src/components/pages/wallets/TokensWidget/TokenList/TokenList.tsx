@@ -18,9 +18,11 @@ type Props = {
 export const TokenList: FunctionComponent<Props> = ({ items = [] }) => {
   return (
     <Wrapper>
-      {items.map((item) => (
-        <TokenRow key={item.address.toBase58()} token={item} />
-      ))}
+      {items
+        .sort((a, b) => b.balance.minus(a.balance).toNumber())
+        .map((item) => (
+          <TokenRow key={item.address.toBase58()} token={item} />
+        ))}
     </Wrapper>
   );
 };

@@ -85,10 +85,18 @@ export class Transaction implements Serializable<SerializableTransaction> {
     }));
 
     const instructions: SerializedInstruction[] = this.message.instructions.map((instruction) => {
-      return <SerializedInstruction>{
+      const serializedInstruction = <SerializedInstruction>{
         ...instruction,
         programId: instruction.programId.toBase58(),
       };
+
+      if (instruction.accounts) {
+        serializedInstruction.accounts = serializedInstruction.accounts.map((account) =>
+          account.toBase58(),
+        );
+      }
+
+      return serializedInstruction;
     });
 
     return {
@@ -112,10 +120,16 @@ export class Transaction implements Serializable<SerializableTransaction> {
 
     const instructions: Instruction[] = serializableTransaction.message.instructions.map(
       (instruction) => {
-        return <Instruction>{
+        const originalInstruction = <Instruction>{
           ...instruction,
           programId: new PublicKey(instruction.programId),
         };
+
+        if (instruction.accounts) {
+          originalInstruction.accounts = originalInstruction.accounts.map(
+            (account) => new PublicKey(account),
+          );
+        }
       },
     );
 

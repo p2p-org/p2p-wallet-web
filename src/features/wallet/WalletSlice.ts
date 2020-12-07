@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice, Draft, PayloadAction } from '@reduxjs/toolkit';
 import { Cluster, PublicKey } from '@solana/web3.js';
 
-import { APIFactory as TokenAPIFactory } from 'api/token';
+import { APIFactory as TokenAPIFactory, TransferParameters } from 'api/token';
 import { Token } from 'api/token/Token';
 import { SerializableTokenAccount, TokenAccount } from 'api/token/TokenAccount';
 import * as WalletAPI from 'api/wallet';
@@ -33,7 +33,7 @@ export interface WalletsState {
  */
 export const disconnect = createAsyncThunk(`${WALLET_SLICE_NAME}/disconnect`, () => {
   WalletAPI.disconnect();
-  ToastManager.info('notification.info.walletDisconnected');
+  ToastManager.info('Wallet disconnected');
 });
 
 export const getSolBalance = createAsyncThunk<SerializableTokenAccount, PublicKey>(
@@ -94,14 +94,14 @@ export const connect = createAsyncThunk<string, WalletDataType | undefined>(
 
     wallet.on(WalletEvent.DISCONNECT, () => {
       void thunkAPI.dispatch(disconnect());
-      ToastManager.info('notification.info.walletDisconnected');
+      ToastManager.info('Wallet disconnected');
     });
 
     // wallet.on(WalletEvent.CONFIRMED, ({ transactionSignature }) =>
     //   notifyTransaction(transactionSignature),
     // );
 
-    ToastManager.info('notification.info.walletConnected');
+    ToastManager.info('Wallet connected');
 
     // Get tokens first before getting accounts and pools,
     // to avail of the token caching feature
@@ -112,6 +112,18 @@ export const connect = createAsyncThunk<string, WalletDataType | undefined>(
     void thunkAPI.dispatch(getRates());
 
     return wallet.pubkey.toBase58();
+  },
+);
+
+export const transfer = createAsyncThunk<string, TransferParameters>(
+  `${WALLET_SLICE_NAME}/transfer`,
+  async (parameters, thunkAPI): Promise<string> => {
+    const state: RootState = thunkAPI.getState() as RootState;
+    const walletState = state.wallet;
+    const TokenAPI = TokenAPIFactory(walletState.cluster);
+
+    return TokenAPI.transfer(parameters);
+    // TODO: update balances
   },
 );
 

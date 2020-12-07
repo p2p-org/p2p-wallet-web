@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { PublicKey } from '@solana/web3.js';
+import { PublicKey, TransactionSignature } from '@solana/web3.js';
+import { mergeRight, pathOr, uniq } from 'ramda';
 
 import { APIFactory } from 'api/transaction';
 import { SerializableTransaction } from 'api/transaction/Transaction';
@@ -24,11 +25,42 @@ export const getTransactions = createAsyncThunk<Array<SerializableTransaction>, 
   },
 );
 
+export const getTransaction = createAsyncThunk<
+  SerializableTransaction | null,
+  TransactionSignature
+>(`${TRANSACTION_SLICE_NAME}/getTransactions`, async (signature, thunkAPI) => {
+  const state: RootState = thunkAPI.getState() as RootState;
+
+  const TransactionAPI = APIFactory(state.wallet.cluster);
+  const transaction = await TransactionAPI.transactionInfo(signature);
+
+  if (!transaction) {
+    return null;
+  }
+
+  // PoolAPI.listenToPoolChanges(pools, (pool) => {
+  //   // eslint-disable-next-line @typescript-eslint/no-use-before-define
+  //   dispatch(transactionSlice.actions.updatePool(pool.serialize()));
+  // });
+
+  return transaction.serialize();
+});
+
+type ItemsType = {
+  [signature: string]: SerializableTransaction;
+};
+
 interface TransactionsState {
-  [signature: string]: Array<SerializableTransaction>;
+  items: ItemsType;
+  order: {
+    [account: string]: string[];
+  };
 }
 
-const initialState: TransactionsState = {};
+const initialState: TransactionsState = {
+  items: {},
+  order: {},
+};
 
 const transactionSlice = createSlice({
   name: TRANSACTION_SLICE_NAME,
@@ -37,10 +69,23 @@ const transactionSlice = createSlice({
     // updatePool: () => {},
   },
   extraReducers: (builder) => {
-    builder.addCase(getTransactions.fulfilled, (state, action) => ({
-      ...state,
-      [action.meta.arg.toBase58()]: action.payload,
-    }));
+    builder.addCase(getTransactions.fulfilled, (state, action) => {
+      const newItems: ItemsType = {};
+      const newPubkeys: string[] = [];
+
+      for (const transaction of action.payload) {
+        newItems[transaction.signature] = transaction;
+        newPubkeys.push(transaction.signature);
+      }
+
+      // eslint-disable-next-line no-param-reassign
+      state.items = mergeRight(state.items, newItems);
+
+      // eslint-disable-next-line no-param-reassign
+      state.order[action.meta.arg.toBase58()] = uniq(
+        pathOr<string[]>([], ['order', action.meta.arg.toBase58()], state).concat(newPubkeys),
+      );
+    });
   },
 });
 
