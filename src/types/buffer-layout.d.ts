@@ -2,6 +2,7 @@ declare module 'buffer-layout' {
   export type Layout = {
     encode(src: unknown, b: Buffer, number?: offset): number;
     decode(b: Buffer, number?: offset): number | array;
+    offsetOf(of: string): number;
     span: number;
   };
 

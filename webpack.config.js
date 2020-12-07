@@ -19,9 +19,10 @@ module.exports = {
       // Webpack 5 Change: Polyfill Node bindings.
       // See https://github.com/webpack/webpack/pull/8460
       // See https://github.com/webpack/node-libs-browser/blob/master/index.js
+      process: 'process/browser.js',
       assert: 'assert',
       util: 'util',
-      buffer: require.resolve('buffer/').Buffer,
+      buffer: 'buffer',
       stream: 'stream-browserify',
       'stream-http': 'stream-http',
       http: 'http-browserify',
@@ -35,9 +36,10 @@ module.exports = {
   },
   plugins: [
     new SvgStorePlugin(),
-    // new webpack.ProvidePlugin({
-    //   Buffer: ['buffer', 'Buffer'],
-    // }),
+    new webpack.ProvidePlugin({
+      process: 'process/browser.js',
+      Buffer: ['buffer', 'Buffer'],
+    }),
     new webpack.DefinePlugin({
       'process.env': { NODE_ENV: JSON.stringify(process.env.NODE_ENV) },
     }),

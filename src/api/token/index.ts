@@ -48,7 +48,7 @@ export interface API {
   updateTokenAccountInfo: (tokenAccount: TokenAccount) => Promise<TokenAccount | null>;
   getAccountsForToken: (token: Token) => Promise<TokenAccount[]>;
   getAccountsForWallet: () => Promise<TokenAccount[]>;
-  createToken: (decicmals?: number, mintAuthority?: PublicKey) => Promise<Token>;
+  createToken: (decimals?: number, mintAuthority?: PublicKey) => Promise<Token>;
   createAccountForToken: (token: Token, owner?: PublicKey) => Promise<TokenAccount>;
   mintTo: (recipient: TokenAccount, tokenAmount: number) => Promise<string>;
   airdropToWallet: (token: Token, tokenAmount: number) => Promise<string>;
@@ -144,7 +144,6 @@ export const APIFactory = memoizeWith(
         return [];
       }
 
-      // eslint-disable-next-line no-shadow
       const tokenPromises = clusterConfig.map((tokenConfig: TokenConfig) =>
         tokenInfo(new PublicKey(tokenConfig.mintAddress)),
       );

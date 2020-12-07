@@ -1,6 +1,7 @@
 import React, { FunctionComponent } from 'react';
 
 import { styled } from '@linaria/react';
+import { Decimal } from 'decimal.js';
 import { rgba } from 'polished';
 
 import { Card } from 'components/common/Card';
@@ -34,6 +35,7 @@ const BackIcon = styled(Icon)`
   height: 15px;
 
   color: #000;
+
   transform: rotate(90deg);
 `;
 
@@ -48,8 +50,8 @@ const Title = styled.div`
 `;
 
 const WrapperCard = styled(Card)`
-  padding: 0;
   margin-top: 20px;
+  padding: 0;
 `;
 
 const FromWrapper = styled.div`
@@ -107,14 +109,14 @@ type Props = {
   type: 'send' | 'swap';
   title: string;
   fromTokenPublicKey: string;
-  fromTokenAmount: string;
+  fromTokenAmount: Decimal;
   toTokenPublicKey: string;
-  toTokenAmount?: string;
+  toTokenAmount?: Decimal;
   actionText: string;
   onFromTokenChange: (pubkey: string) => void;
-  onFromAmountChange: (amount: string) => void;
+  onFromAmountChange: (amount: Decimal) => void;
   onToTokenChange: (pubkey: string) => void;
-  onToAmountChange?: (pubkey: string) => void;
+  onToAmountChange?: (amount: Decimal) => void;
   onBackClick: () => void;
   onSubmit: () => void;
   disabled?: boolean;
@@ -126,7 +128,7 @@ export const SendSwapWidget: FunctionComponent<Props> = ({
   fromTokenPublicKey,
   fromTokenAmount,
   toTokenPublicKey,
-  toTokenAmount = '',
+  toTokenAmount = new Decimal(0),
   actionText,
   onFromTokenChange,
   onFromAmountChange,

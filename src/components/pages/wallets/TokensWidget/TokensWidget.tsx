@@ -7,7 +7,6 @@ import { TokenAccount } from 'api/token/TokenAccount';
 import { Widget } from 'components/common/Widget';
 import { Button } from 'components/ui';
 import { openModal } from 'store/_actions/modals';
-import { getOwnedTokenAccounts } from 'store/_actions/solana';
 import { SHOW_MODAL_ADD_COIN } from 'store/constants/modalTypes';
 import { RootState } from 'store/rootReducer';
 

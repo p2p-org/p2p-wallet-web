@@ -1,24 +1,26 @@
 import React, { FunctionComponent, useCallback, useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { batch, useDispatch } from 'react-redux';
 import { Link, useHistory } from 'react-router-dom';
 
 import { styled } from '@linaria/react';
 import * as bip39 from 'bip39';
 import throttle from 'lodash.throttle';
 
+import { WalletType } from 'api/wallet';
 import { Button, Icon, Input } from 'components/ui';
+import { connect, selectType } from 'features/wallet/WalletSlice';
 
-// import { createAccount } from 'store/_actions/complex/blockchain';
 import { Header } from '../components/common/Header';
 
 const Wrapper = styled.div`
-  background: #fff;
   height: 100%;
+
+  background: #fff;
 `;
 
 const Box = styled.div`
-  margin: auto;
   max-width: 364px;
+  margin: auto;
 `;
 
 const Form = styled.form`
@@ -27,45 +29,46 @@ const Form = styled.form`
 `;
 
 const Title = styled.div`
+  margin: 100px 0 16px;
+
   color: #000;
   font-weight: 600;
   font-size: 28px;
   line-height: 34px;
   text-align: center;
-  margin-top: 100px;
-  margin-bottom: 16px;
 `;
 
 const Text = styled.div`
+  margin-bottom: 8px;
+
   color: #000;
-  font-style: normal;
   font-weight: 400;
   font-size: 14px;
   line-height: 20px;
   text-align: center;
-  margin-bottom: 8px;
 `;
 
 const TextWithCover = styled.div`
+  margin: 20px 0 16px;
+  padding: 20px;
+
   color: #000;
-  background: #f5f5f5;
-  font-style: normal;
   font-weight: 400;
   font-size: 14px;
   line-height: 20px;
   text-align: left;
-  margin-bottom: 20px;
-  margin-top: 16px;
+
+  background: #f5f5f5;
   -webkit-border-radius: 5px;
   -moz-border-radius: 5px;
   border-radius: 15px;
-  padding: 20px;
 `;
 
 const LinkStyled = styled(Link)`
   display: flex;
   justify-content: center;
   margin-top: 56px;
+
   color: #000;
   text-decoration: none;
 `;
@@ -73,47 +76,50 @@ const LinkStyled = styled(Link)`
 const EyeIcon = styled(Icon)`
   width: 24px;
   height: 24px;
+
   opacity: 0.5;
 `;
 
 const ContinueButton = styled(Button)`
   width: 100%;
   height: 56px;
-  font-weight: 500;
-  color: #fff;
-  background: #000;
-  line-height: 17px;
-  size: 14px;
-  font-style: normal;
   margin-top: 32px;
+
+  color: #fff;
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 17px;
+
+  background: #000;
 `;
 
 const SubTitle = styled.div`
+  margin: 24px 0 12px;
+
   color: #000;
-  font-style: normal;
   font-weight: 500;
   font-size: 14px;
   line-height: 17px;
   text-align: left;
-  margin-bottom: 12px;
-  margin-top: 24px;
+
   opacity: 0.5;
 `;
 
 const InputSeed = styled.textarea`
   height: 72px;
   margin-bottom: 24px;
-  outline: none !important;
+  padding: 16px;
+
   border: 1px solid #d2d2d2;
   -webkit-border-radius: 5px;
   -moz-border-radius: 5px;
   border-radius: 15px;
-  padding: 16px;
+  outline: none !important;
 `;
 
 const Label = styled.label`
   font-weight: 400;
-  size: 14px;
+  font-size: 14px;
   line-height: 20px;
 `;
 
@@ -124,67 +130,49 @@ const BoldText = styled.p`
 export const Create: FunctionComponent = () => {
   const history = useHistory();
   const dispatch = useDispatch();
-  // const [password, setPassword] = useState(bip39.generateMnemonic());
   const [error, setError] = useState(false);
   const [password, setPassword] = useState('');
-  const [password1, setPassword1] = useState('');
-  const [password2, setPassword2] = useState('');
-  const [done, toggleForm] = useState(true);
-  const [checkbox, toggleCheckbox] = useState(false);
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [isFirstStep, setIsFirstStep] = useState(true);
+  const [isAgreed, setIsAgreed] = useState(false);
 
-  const [mnemonic, setMnemonic] = useState(bip39.generateMnemonic());
+  const [mnemonic] = useState(bip39.generateMnemonic());
 
-  const handlePasswordInput = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleContinueClick = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (password1 === password2) {
-      setPassword(password1);
-      toggleForm(false);
+
+    if (newPassword === confirmPassword) {
+      setPassword(newPassword);
+      setIsFirstStep(false);
     }
   };
-
-  const validateMnemonic = useCallback(
-    throttle(
-      (mnemonic: string) => {
-        if (bip39.validateMnemonic(mnemonic)) {
-          setError(false);
-        } else if (!error) {
-          setError(true);
-        }
-      },
-      100,
-      { leading: false },
-    ),
-    [],
-  );
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    const nextMnemonic: string = e.target.value;
-    validateMnemonic(nextMnemonic);
-
     e.preventDefault();
-    if (mnemonic.length === 0) {
-      return;
-    }
 
-    dispatch(createAccount(mnemonic));
+    batch(async () => {
+      dispatch(selectType(WalletType.MANUAL));
+      await dispatch(connect({ mnemonic, password }));
 
-    setTimeout(() => {
-      history.push('/wallets');
-    }, 100);
+      setTimeout(() => {
+        history.push('/wallets');
+      }, 100);
+    });
   };
 
-  const handleChangePassord = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setPassword1(e.target.value);
+  const handleChangeNewPassword = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setNewPassword(e.target.value);
   };
-  const handleChangePassordConfirmation = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setPassword2(e.target.value);
+  const handleChangeConfirmPassword = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setConfirmPassword(e.target.value);
   };
 
   return (
     <Wrapper>
       <Header />
       <Box>
-        {done ? (
+        {isFirstStep ? (
           <Form onSubmit={handleSubmit}>
             <Title>Create Password (Optional)</Title>
             <Text>
@@ -194,10 +182,10 @@ export const Create: FunctionComponent = () => {
 
             <SubTitle>Create password</SubTitle>
             <Input
-              name="password1"
+              name="newPassword"
               type="password"
-              value={password1}
-              onChange={handleChangePassord}
+              value={newPassword}
+              onChange={handleChangeNewPassword}
               // postfix={
               //   <EyeIcon name="eye" onclick={handleVisibility} />
               // }
@@ -205,16 +193,16 @@ export const Create: FunctionComponent = () => {
 
             <SubTitle>Confirm password </SubTitle>
             <Input
-              name="password2"
+              name="confirmPassword"
               type="password"
-              value={password2}
-              onChange={handleChangePassordConfirmation}
+              value={confirmPassword}
+              onChange={handleChangeConfirmPassword}
               // postfix={
               //   <EyeIcon name="eye" onclick={handleVisibility} />
               // }
             />
 
-            <ContinueButton onClick={handlePasswordInput} disabled={error}>
+            <ContinueButton onClick={handleContinueClick} disabled={error}>
               Continue
             </ContinueButton>
 
@@ -229,24 +217,25 @@ export const Create: FunctionComponent = () => {
                 Please write down the following twelve words and keep them in a safe place.
               </BoldText>
               Your private keys are only stored on your current computer or device. You will need
-              these words to restore your wallet if your browser's storage is cleared or your device
+              these words to restore your wallet if your browser’s storage is cleared or your device
               is damaged or lost.
             </TextWithCover>
 
             <InputSeed name="mnemonic" value={mnemonic} readOnly={!!mnemonic} />
 
             <div>
-              <input
-                type="checkbox"
-                id="scales"
-                name="scales"
-                checked={checkbox}
-                onChange={() => toggleCheckbox(!checkbox)}
-              />
-              <Label htmlFor="scales"> I have saved these words in a safe place.</Label>
+              <Label>
+                <input
+                  type="checkbox"
+                  name="agree"
+                  checked={isAgreed}
+                  onChange={() => setIsAgreed(!isAgreed)}
+                />{' '}
+                I have saved these words in a safe place.
+              </Label>
             </div>
 
-            <ContinueButton type="submit" disabled={!checkbox}>
+            <ContinueButton type="submit" disabled={!isAgreed}>
               Continue
             </ContinueButton>
 

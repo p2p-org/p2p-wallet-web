@@ -1,6 +1,7 @@
+import { AccountLayout, MintLayout } from '@solana/spl-token';
 import * as web3 from '@solana/web3.js';
 
-import { ACCOUNT_LAYOUT, MINT_LAYOUT, TOKEN_PROGRAM_ID } from 'constants/solana/bufferLayouts';
+import { TOKEN_PROGRAM_ID } from 'constants/solana/bufferLayouts';
 import { mintTestTokenAsyncAction, transferTokenAsyncAction } from 'store/_commands';
 import { SOLANA_API } from 'store/_middlewares';
 import { ApiSolanaService } from 'store/_middlewares/solana-api/services';
@@ -20,8 +21,8 @@ export const createAndInitializeMint = ({
   decimals,
   initialAccount, // Account to hold newly issued tokens, if amount > 0
 }: {
-  owner: web3.Account;
-  mint: web3.Account;
+  owner: web3.PublicKey;
+  mint: web3.PublicKey;
   amount: number;
   decimals: number;
   initialAccount: web3.Account;
@@ -30,23 +31,23 @@ export const createAndInitializeMint = ({
 
   const transaction = new web3.Transaction();
 
-  const lamportsForMint = await connection.getMinimumBalanceForRentExemption(MINT_LAYOUT.span);
+  const lamportsForMint = await connection.getMinimumBalanceForRentExemption(MintLayout.span);
 
   transaction.add(
     web3.SystemProgram.createAccount({
-      fromPubkey: owner.publicKey,
-      newAccountPubkey: mint.publicKey,
+      fromPubkey: owner,
+      newAccountPubkey: mint,
       lamports: lamportsForMint,
-      space: MINT_LAYOUT.span,
+      space: MintLayout.span,
       programId: TOKEN_PROGRAM_ID,
     }),
   );
 
   transaction.add(
     initializeMintInstruction({
-      mint: mint.publicKey,
+      mint,
       decimals,
-      mintAuthority: owner.publicKey,
+      mintAuthority: owner,
     }),
   );
 
@@ -56,15 +57,15 @@ export const createAndInitializeMint = ({
     signers.push(initialAccount);
 
     const lamportsForAccount = await connection.getMinimumBalanceForRentExemption(
-      ACCOUNT_LAYOUT.span,
+      AccountLayout.span,
     );
 
     transaction.add(
       web3.SystemProgram.createAccount({
-        fromPubkey: owner.publicKey,
+        fromPubkey: owner,
         newAccountPubkey: initialAccount.publicKey,
         lamports: lamportsForAccount,
-        space: ACCOUNT_LAYOUT.span,
+        space: AccountLayout.span,
         programId: TOKEN_PROGRAM_ID,
       }),
     );
@@ -111,7 +112,7 @@ const createAndInitializeTokenAccount = ({
   const transaction = new web3.Transaction();
 
   const lamportsForAccount = await ApiSolanaService.getConnection().getMinimumBalanceForRentExemption(
-    ACCOUNT_LAYOUT.span,
+    AccountLayout.span,
   );
 
   transaction.add(
@@ -119,7 +120,7 @@ const createAndInitializeTokenAccount = ({
       fromPubkey: payer.publicKey,
       newAccountPubkey: newAccount.publicKey,
       lamports: lamportsForAccount,
-      space: ACCOUNT_LAYOUT.span,
+      space: AccountLayout.span,
       programId: TOKEN_PROGRAM_ID,
     }),
   );

@@ -1,12 +1,14 @@
-import React, { FunctionComponent, useState } from 'react';
-import { useDispatch } from 'react-redux';
+import React, { FunctionComponent, useMemo, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router';
 
 import * as web3 from '@solana/web3.js';
+import Decimal from 'decimal.js';
 
+import { TokenAccount } from 'api/token/TokenAccount';
 import { SendSwapWidget } from 'components/common/SendSwapWidget';
 import { transferTokens } from 'store/_actions/complex';
-import { useTokenInfo } from 'utils/hooks/useTokenInfo';
+import { RootState } from 'store/rootReducer';
 
 type Props = {
   publicKey: string;
@@ -15,9 +17,15 @@ type Props = {
 export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
   const dispatch = useDispatch();
   const history = useHistory();
-  const [fromTokenAmount, setFromTokenAmount] = useState('');
+  const [fromTokenAmount, setFromTokenAmount] = useState<Decimal>(new Decimal(0));
   const [toTokenPublicKey, setToTokenPublicKey] = useState('');
-  const { decimals } = useTokenInfo(publicKey);
+  const tokenAccounts = useSelector((state: RootState) =>
+    state.wallet.tokenAccounts.map((account) => TokenAccount.from(account)),
+  );
+  const tokenAccount = useMemo(
+    () => tokenAccounts.find((account) => account.address.toBase58() === publicKey),
+    [tokenAccounts, publicKey],
+  );
 
   const handleBackClick = () => {
     history.replace('/wallets');
@@ -28,7 +36,10 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
   };
 
   const handleSubmit = async () => {
-    const amount = Math.round(Number.parseFloat(fromTokenAmount) * 10 ** decimals);
+    const amount = fromTokenAmount
+      .div(10)
+      .pow(tokenAccount?.mint.decimals || 0)
+      .toNumber();
 
     if (!amount || amount <= 0) {
       throw new Error('Invalid amount');
@@ -53,7 +64,7 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
     history.replace(`/send/${nextTokenPublicKey}`);
   };
 
-  const handleAmountChange = (nextTokenAmount: string) => {
+  const handleAmountChange = (nextTokenAmount: Decimal) => {
     setFromTokenAmount(nextTokenAmount);
   };
 

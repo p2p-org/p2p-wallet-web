@@ -64,7 +64,7 @@ export const Wallets: FunctionComponent = () => {
           {/* <HelloText>{greeting}, Konstantin!</HelloText> */}
           <HelloText>{greeting}!</HelloText>
           <BalanceGroup>
-            {/* <TotalBalanceWidget /> */}
+            <TotalBalanceWidget />
             {/* <ActionsWidget publicKey={publicKey} /> */}
           </BalanceGroup>
           <TokensWidget />

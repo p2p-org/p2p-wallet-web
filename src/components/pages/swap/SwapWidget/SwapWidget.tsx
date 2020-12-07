@@ -1,13 +1,15 @@
-import React, { FunctionComponent, useEffect, useState } from 'react';
-import { useDispatch } from 'react-redux';
+import React, { FunctionComponent, useEffect, useMemo, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router';
 
 import * as web3 from '@solana/web3.js';
+import { Decimal } from 'decimal.js';
 
+import { TokenAccount } from 'api/token/TokenAccount';
 import { SendSwapWidget } from 'components/common/SendSwapWidget';
 import { transferTokens } from 'store/_actions/complex';
 import { getPoolsAccounts } from 'store/_actions/complex/pools';
-import { useTokenInfo } from 'utils/hooks/useTokenInfo';
+import { RootState } from 'store/rootReducer';
 
 type Props = {
   publicKey: string;
@@ -16,10 +18,16 @@ type Props = {
 export const SwapWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
   const dispatch = useDispatch();
   const history = useHistory();
-  const [fromTokenAmount, setFromTokenAmount] = useState('');
-  const [toTokenAmount, setToTokenAmount] = useState('');
+  const [fromTokenAmount, setFromTokenAmount] = useState<Decimal>(new Decimal(0));
+  const [toTokenAmount, setToTokenAmount] = useState<Decimal>(new Decimal(0));
   const [toTokenPublicKey, setToTokenPublicKey] = useState('');
-  const { mint, decimals } = useTokenInfo(publicKey);
+  const tokenAccounts = useSelector((state: RootState) =>
+    state.wallet.tokenAccounts.map((account) => TokenAccount.from(account)),
+  );
+  const tokenAccount = useMemo(
+    () => tokenAccounts.find((account) => account.address.toBase58() === publicKey),
+    [tokenAccounts, publicKey],
+  );
 
   useEffect(() => {
     dispatch(getPoolsAccounts());
@@ -34,7 +42,7 @@ export const SwapWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
   };
 
   const handleSubmit = async () => {
-    const amount = Math.round(Number.parseFloat(fromTokenAmount) * 10 ** decimals);
+    const amount = fromTokenAmount.div(10 ** (tokenAccount?.mint.decimals || 0)).toNumber();
 
     if (!amount || amount <= 0) {
       throw new Error('Invalid amount');
@@ -71,11 +79,11 @@ export const SwapWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
     history.replace(`/swap/${nextTokenPublicKey}`);
   };
 
-  const handleFromAmountChange = (nextTokenAmount: string) => {
+  const handleFromAmountChange = (nextTokenAmount: Decimal) => {
     setFromTokenAmount(nextTokenAmount);
   };
 
-  const handleToAmountChange = (nextTokenAmount: string) => {
+  const handleToAmountChange = (nextTokenAmount: Decimal) => {
     setToTokenAmount(nextTokenAmount);
   };
 

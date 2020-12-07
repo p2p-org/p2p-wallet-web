@@ -1,12 +1,13 @@
 import React, { FunctionComponent } from 'react';
-import { useDispatch } from 'react-redux';
+import { batch, useDispatch } from 'react-redux';
 import { Link, useHistory } from 'react-router-dom';
 
 import { styled } from '@linaria/react';
 import bgImg from 'assets/images/sun.png';
 
+import { WalletType } from 'api/wallet';
 import { Button } from 'components/ui';
-import { connect } from 'features/wallet/WalletSlice';
+import { connect, selectType } from 'features/wallet/WalletSlice';
 
 import { Header } from '../components/common/Header';
 
@@ -61,13 +62,17 @@ export const Home: FunctionComponent = () => {
   const history = useHistory();
   const dispatch = useDispatch();
 
-  const handleConnectBySolletClick = async () => {
+  const handleConnectBySolletClick = () => {
     // eslint-disable-next-line @typescript-eslint/await-thenable
-    await dispatch(connect());
 
-    setTimeout(() => {
-      history.push('/wallets');
-    }, 100);
+    batch(async () => {
+      dispatch(selectType(WalletType.SOLLET));
+      await dispatch(connect());
+
+      setTimeout(() => {
+        history.push('/wallets');
+      }, 100);
+    });
   };
 
   return (

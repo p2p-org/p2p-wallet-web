@@ -2,10 +2,9 @@ import React, { FunctionComponent, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { styled } from '@linaria/react';
-import * as web3 from '@solana/web3.js';
 import { rgba } from 'polished';
 
-import { AmountUSDT } from 'components/common/AmountUSDT';
+import { Transaction } from 'api/transaction/Transaction';
 import { Avatar } from 'components/ui';
 import { openModal } from 'store/_actions/modals';
 import { SHOW_MODAL_TRANSACTION_DETAILS } from 'store/constants/modalTypes';
@@ -55,31 +54,33 @@ const Bottom = styled.div`
 `;
 
 type Props = {
-  signature: string;
+  transaction: Transaction;
 };
 
-export const TransactionRow: FunctionComponent<Props> = ({ signature }) => {
+export const TransactionRow: FunctionComponent<Props> = ({ transaction }) => {
   const dispatch = useDispatch();
-
-  const { slot, type, symbol, amount } = useTransactionInfo(signature);
+  //
+  // const { slot, type, symbol, amount } = useTransactionInfo(transaction);
 
   const handleClick = () => {
-    dispatch(openModal(SHOW_MODAL_TRANSACTION_DETAILS, { signature }));
+    dispatch(openModal(SHOW_MODAL_TRANSACTION_DETAILS, { signature: transaction.signature }));
   };
+
+  console.log(transaction);
 
   return (
     <Wrapper onClick={handleClick}>
       <AvatarStyled />
       <Content>
-        <Top>
-          <div>{type}</div> <AmountUSDT value={amount} symbol={symbol} />
-        </Top>
-        <Bottom>
-          <div>{slot} SLOT</div>
-          <div>
-            {amount} {symbol}
-          </div>
-        </Bottom>
+        {/*  <Top> */}
+        {/*    <div>{type}</div> <AmountUSDT value={amount} symbol={symbol} /> */}
+        {/*  </Top> */}
+        {/*  <Bottom> */}
+        {/*    <div>{slot} SLOT</div> */}
+        {/*    <div> */}
+        {/*      {amount} {symbol} */}
+        {/*    </div> */}
+        {/*  </Bottom> */}
       </Content>
     </Wrapper>
   );

@@ -17,7 +17,7 @@ export const POOL_SLICE_NAME = 'pool';
 
 export const getPools = createAsyncThunk(
   `${POOL_SLICE_NAME}/getPools`,
-  async (arg, thunkAPI): Promise<Array<SerializablePool>> => {
+  async (_, thunkAPI): Promise<Array<SerializablePool>> => {
     const state: RootState = thunkAPI.getState() as RootState;
 
     const PoolAPI = APIFactory(state.wallet.cluster);

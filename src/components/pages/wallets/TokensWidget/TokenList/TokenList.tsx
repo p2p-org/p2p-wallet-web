@@ -15,15 +15,11 @@ type Props = {
   items: TokenAccount[];
 };
 
-export const TokenList: FunctionComponent<Props> = ({ items }) => {
-  if (!items) {
-    return null;
-  }
-
+export const TokenList: FunctionComponent<Props> = ({ items = [] }) => {
   return (
     <Wrapper>
       {items.map((item) => (
-        <TokenRow key={item} token={item} />
+        <TokenRow key={item.address.toBase58()} token={item} />
       ))}
     </Wrapper>
   );

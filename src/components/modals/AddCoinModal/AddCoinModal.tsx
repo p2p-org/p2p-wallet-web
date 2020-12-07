@@ -1,15 +1,12 @@
 import React, { FunctionComponent, useMemo } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 
 import { styled } from '@linaria/react';
-import * as web3 from '@solana/web3.js';
 
+import tokenConfig from 'api/token/token.config';
+import { TokenAccount } from 'api/token/TokenAccount';
 import { Modal } from 'components/common/Modal';
-import { Button } from 'components/ui';
-import { TOKEN_PROGRAM_ID } from 'constants/solana/bufferLayouts';
-import { TOKENS_BY_ENTRYPOINT } from 'constants/tokens';
-import { createAndInitializeMint } from 'store/_actions/complex/tokens';
-import { RootState } from 'store/types';
+import { RootState } from 'store/rootReducer';
 
 import { TokenList } from './TokenList';
 
@@ -18,8 +15,8 @@ const WrapperModal = styled(Modal)`
 `;
 
 const ScrollableContainer = styled.div`
-  padding-bottom: 20px;
   max-height: 668px;
+  padding-bottom: 20px;
   overflow-y: auto;
 
   &::-webkit-scrollbar-track {
@@ -32,28 +29,31 @@ type Props = {
 };
 
 export const AddCoinModal: FunctionComponent<Props> = ({ close }) => {
-  const dispatch = useDispatch();
-  const ownerAccount = useSelector((state: RootState) => state.data.blockchain.account);
-  const entrypoint = useSelector((state: RootState) => state.data.blockchain.entrypoint);
-  const tokenAccounts = useSelector((state: RootState) => state.entities.tokens.items);
-  const tokens = TOKENS_BY_ENTRYPOINT[entrypoint];
-  const isMainnetEntrypoint = entrypoint === web3.clusterApiUrl('mainnet-beta');
+  // const dispatch = useDispatch();
+  // const ownerAccount = useSelector((state: RootState) => state.wallet.publicKey);
+  const cluster = useSelector((state: RootState) => state.wallet.cluster);
+  const tokenAccounts = useSelector((state: RootState) =>
+    state.wallet.tokenAccounts.map((account) => TokenAccount.from(account)),
+  );
 
-  const handleMintTestTokenClick = () => {
-    if (!ownerAccount) {
-      return;
-    }
+  const tokens = tokenConfig[cluster];
+  // const isMainnetEntrypoint = cluster === web3.clusterApiUrl('mainnet-beta');
 
-    dispatch(
-      createAndInitializeMint({
-        owner: ownerAccount,
-        mint: new web3.Account(),
-        amount: 1000,
-        decimals: 2,
-        initialAccount: new web3.Account(),
-      }),
-    );
-  };
+  // const handleMintTestTokenClick = () => {
+  //   if (!ownerAccount) {
+  //     return;
+  //   }
+  //
+  //   dispatch(
+  //     createAndInitializeMint({
+  //       owner: ownerAccount,
+  //       mint: new web3.Account(),
+  //       amount: 1000,
+  //       decimals: 2,
+  //       initialAccount: new web3.Account(),
+  //     }),
+  //   );
+  // };
 
   const closeModal = () => {
     close();
@@ -64,29 +64,27 @@ export const AddCoinModal: FunctionComponent<Props> = ({ close }) => {
       return;
     }
 
-    const existsMintAccounts = new Set(
-      Object.values(tokenAccounts)
-        .filter((token) => token.owner.equals(TOKEN_PROGRAM_ID))
-        .map((token) => token.data.parsed.info.mint),
-    );
+    const existsMintAccounts = new Set(tokenAccounts.map((token) => token.mint.address.toBase58()));
 
     return tokens.filter((token) => !existsMintAccounts.has(token.mintAddress));
-  }, [tokenAccounts, tokens]);
+  }, [tokenAccounts]);
+
+  console.log(filteredTokens);
 
   return (
     <WrapperModal
       title="Add coins"
       description={
         <>
-          Add a token to your wallet. This will const some SOL
-          {!isMainnetEntrypoint ? (
-            <>
-              {' '}
-              <Button link onClick={handleMintTestTokenClick}>
-                Mint test token
-              </Button>
-            </>
-          ) : null}
+          Add a token to your wallet. This will cost some SOL
+          {/* {!isMainnetEntrypoint ? ( */}
+          {/*  <> */}
+          {/*    {' '} */}
+          {/*    <Button link onClick={handleMintTestTokenClick}> */}
+          {/*      Mint test token */}
+          {/*    </Button> */}
+          {/*  </> */}
+          {/* ) : null} */}
         </>
       }
       close={close}>

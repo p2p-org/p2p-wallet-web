@@ -5,6 +5,7 @@ import { styled } from '@linaria/react';
 import * as web3 from '@solana/web3.js';
 import { rgba } from 'polished';
 
+import { TokenAccount } from 'api/token/TokenAccount';
 import { TokenAvatar } from 'components/common/TokenAvatar';
 import { useTokenInfo } from 'utils/hooks/useTokenInfo';
 
@@ -55,27 +56,28 @@ const Bottom = styled.div`
 `;
 
 type Props = {
-  publicKey: string;
+  token: TokenAccount;
   onClick: (publicKey: string) => void;
 };
 
-export const TokenRow: FunctionComponent<Props> = ({ publicKey, onClick }) => {
-  const { name, mint, symbol, amount } = useTokenInfo(publicKey);
-
+export const TokenRow: FunctionComponent<Props> = ({ token, onClick }) => {
   const handleClick = () => {
-    onClick(publicKey);
+    onClick(token.address.toBase58());
   };
 
   return (
     <Wrapper onClick={handleClick}>
       <ItemWrapper>
-        <TokenAvatar mint={mint} size={44} includeSol />
+        <TokenAvatar symbol={token.mint.symbol} size={44} />
         <Info>
           <Top>
-            <TokenName title={publicKey}>{name || publicKey}</TokenName> <div>{amount}</div>
+            <TokenName title={token.address.toBase58()}>
+              {token.mint.name || token.address.toBase58()}
+            </TokenName>
+            <div>{token.mint.toMajorDenomination(token.balance)}</div>
           </Top>
           <Bottom>
-            <div>{symbol}</div> <div>Current balance</div>
+            <div>{token.mint.symbol}</div> <div>Current balance</div>
           </Bottom>
         </Info>
       </ItemWrapper>

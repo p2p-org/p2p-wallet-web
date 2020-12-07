@@ -4,12 +4,13 @@ import { useSelector } from 'react-redux';
 // import ReactHighcharts from 'react-highcharts';
 import { styled } from '@linaria/react';
 import * as web3 from '@solana/web3.js';
+import { Decimal } from 'decimal.js';
 import { rgba } from 'polished';
 
+import tokenConfig from 'api/token/token.config';
+import { TokenAccount } from 'api/token/TokenAccount';
 import { Card } from 'components/common/Card';
-import { SYSTEM_PROGRAM_ID, TOKEN_PROGRAM_ID } from 'constants/solana/bufferLayouts';
-import { TOKENS_BY_ENTRYPOINT } from 'constants/tokens';
-import { RootState } from 'store/types';
+import { RootState } from 'store/rootReducer';
 // import { calculateInterval, calculateStart } from 'utils/charts';
 //
 // import { serials } from './data';
@@ -50,47 +51,33 @@ const Price = styled.div`
 // `;
 
 export const TotalBalanceWidget: FunctionComponent = () => {
-  const tokens = useSelector((state: RootState) => state.entities.tokens.items);
-  const order = useSelector((state: RootState) => state.entities.tokens.order);
-  const balanceLamports = useSelector((state: RootState) => state.data.blockchain.balanceLamports);
-  const rates = useSelector((state: RootState) => state.entities.rates);
-  const entrypoint = useSelector((state: RootState) => state.data.blockchain.entrypoint);
-  const publicKey = useSelector((state: RootState) =>
-    state.data.blockchain.account?.publicKey.toBase58(),
+  const tokenAccounts = useSelector((state: RootState) =>
+    state.wallet.tokenAccounts.map((account) => TokenAccount.from(account)),
   );
+  const rates = useSelector((state: RootState) => state.rate);
 
-  const preparedOrder = useMemo(() => (publicKey ? [publicKey, ...order] : order), [
-    publicKey,
-    order,
-  ]);
-
-  // Oh my gosh
   const totalBalance = useMemo(
     () =>
-      preparedOrder
-        .map((publicKey) => tokens[publicKey])
-        .filter((token) => token)
-        .reduce((prev, cur) => {
-          const tokenPublicKey = new web3.PublicKey(String(cur.owner));
+      // eslint-disable-next-line unicorn/no-reduce
+      tokenAccounts.reduce((prev, tokenAccount) => {
+        const rate = rates[`${tokenAccount.mint.symbol}/USDT`];
+        if (rate) {
+          return new Decimal(tokenAccount.mint.toMajorDenomination(tokenAccount.balance))
+            .times(rate)
+            .plus(prev)
+            .toNumber();
+        }
 
-          if (tokenPublicKey.equals(TOKEN_PROGRAM_ID)) {
-            const match = TOKENS_BY_ENTRYPOINT[entrypoint]?.find(
-              (token) => token.mintAddress === cur.data.parsed.info.mint,
-            );
+        // Same as USD
+        if (tokenAccount.mint.symbol && ['USDT', 'USDC'].includes(tokenAccount.mint.symbol)) {
+          return new Decimal(tokenAccount.mint.toMajorDenomination(tokenAccount.balance))
+            .plus(prev)
+            .toNumber();
+        }
 
-            if (match) {
-              const rate = rates[`${match.tokenSymbol}/USDT`];
-              if (rate) {
-                return prev + cur.data.parsed.info.tokenAmount.uiAmount * rate;
-              }
-            }
-          } else if (tokenPublicKey.equals(SYSTEM_PROGRAM_ID)) {
-            return prev + (cur.lamports / web3.LAMPORTS_PER_SOL) * (rates['SOL/USDT'] || 0);
-          }
-
-          return prev;
-        }, 0),
-    [preparedOrder, tokens, balanceLamports, rates, entrypoint],
+        return prev;
+      }, 0),
+    [tokenAccounts, rates],
   );
 
   // const coin = 'BTC';

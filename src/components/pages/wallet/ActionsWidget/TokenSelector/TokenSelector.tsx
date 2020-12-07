@@ -47,15 +47,15 @@ const ChevronIcon = styled(Icon)`
 
 const DropDownList = styled.div`
   position: absolute;
+  z-index: 1;
 
   min-width: 302px;
   margin-top: 17px;
   padding: 5px 0;
-  z-index: 1;
 
   background: #464646;
-  box-shadow: 0 12px 16px rgba(0, 0, 0, 0.15);
   border-radius: 10px;
+  box-shadow: 0 12px 16px rgba(0, 0, 0, 0.15);
 
   > :not(:last-child) {
     border-bottom: 1px solid ${rgba('#000', 0.05)};

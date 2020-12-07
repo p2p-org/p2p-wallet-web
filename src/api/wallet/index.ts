@@ -8,6 +8,7 @@ import {
   TransactionInstructionCtorFields,
 } from '@solana/web3.js';
 
+import { ManualWallet, ManualWalletData } from 'api/wallet/ManualWallet';
 import { postTransactionSleepMS } from 'config/constants';
 import { sleep } from 'utils/common';
 import { ExtendedCluster } from 'utils/types';
@@ -29,23 +30,36 @@ let wallet: Wallet | null;
 let connection: Connection | null;
 
 export enum WalletType {
+  MANUAL,
   SOLLET,
   LOCAL,
 }
 
-const createWallet = (type: WalletType, cluster: ExtendedCluster): Wallet => {
+export type WalletDataType = ManualWalletData;
+
+const createWallet = (
+  type: WalletType,
+  cluster: ExtendedCluster,
+  data?: WalletDataType,
+): Wallet => {
   const network = getNetwork(cluster);
   switch (type) {
     case WalletType.LOCAL:
       return new LocalWallet(network);
     case WalletType.SOLLET:
-    default:
       return new SolletWallet(network);
+    case WalletType.MANUAL:
+    default:
+      return new ManualWallet(network, data);
   }
 };
 
-export const connect = async (cluster: ExtendedCluster, type: WalletType): Promise<Wallet> => {
-  const newWallet = createWallet(type, cluster);
+export const connect = async (
+  cluster: ExtendedCluster,
+  type: WalletType,
+  data?: WalletDataType,
+): Promise<Wallet> => {
+  const newWallet = createWallet(type, cluster, data);
 
   // assign the singleton wallet.
   // Using a separate variable to simplify the type definitions
@@ -168,6 +182,14 @@ export const airdropTo = (publicKey: PublicKey): Promise<string> => {
   }
 
   return connection.requestAirdrop(publicKey, 100000000);
+};
+
+export const getBalance = (publicKey: PublicKey): Promise<number> => {
+  if (!wallet || !connection) {
+    throw new Error('Connect first');
+  }
+
+  return connection.getBalance(publicKey);
 };
 
 export const airdrop = (): null | Promise<string> => wallet && airdropTo(wallet.pubkey);

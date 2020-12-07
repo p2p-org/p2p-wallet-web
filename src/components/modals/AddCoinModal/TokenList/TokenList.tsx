@@ -12,7 +12,7 @@ const Wrapper = styled.div`
 `;
 
 type Props = {
-  items?: TokenType[]; // TODO: not any
+  items?: TokenType[];
   closeModal: () => void;
 };
 

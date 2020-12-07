@@ -46,7 +46,7 @@ const normalize = (tokenPairState: TokenPairState): TokenPairState => {
   const poolTokenAccount = selectedPool
     ? selectTokenAccount(
         Token.from(selectedPool.poolToken),
-        tokenPairState.tokenAccounts.map(TokenAccount.from),
+        tokenPairState.tokenAccounts.map((account) => TokenAccount.from(account)),
         false,
       )
     : undefined;
@@ -74,7 +74,7 @@ const updateAccountReducer = (
   // find and replace the pool in the list with the pool in the action
   const updatedAccounts = updateEntityArray(
     TokenAccount.from(action.payload),
-    state.tokenAccounts.map(TokenAccount.from),
+    state.tokenAccounts.map((account) => TokenAccount.from(account)),
   );
 
   return normalize({
@@ -89,7 +89,7 @@ const updatePoolReducer = (
 ) => {
   const updatedPools = updateEntityArray(
     Pool.from(action.payload),
-    state.availablePools.map(Pool.from),
+    state.availablePools.map((pool) => Pool.from(pool)),
   );
   return normalize({
     ...state,

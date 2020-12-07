@@ -7,9 +7,10 @@ export type TokenConfig = {
 };
 
 type TokensByEntrypointType = {
-  [entrypoint: string]: TokenConfig[];
+  [cluster: string]: TokenConfig[];
 };
 
+// eslint-disable-next-line import/no-default-export
 export default {
   'mainnet-beta': [
     {

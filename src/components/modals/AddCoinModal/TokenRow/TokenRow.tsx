@@ -10,7 +10,6 @@ import { TokenAvatar } from 'components/common/TokenAvatar';
 import { Avatar, Button, Icon, Input } from 'components/ui';
 import { TokenType } from 'constants/tokens';
 import { createTokenAccount } from 'store/_actions/complex/tokens';
-import { getOwnedTokenAccounts } from 'store/_actions/solana';
 
 const Wrapper = styled.div`
   display: flex;
@@ -120,10 +119,10 @@ export const TokenRow: FunctionComponent<Props> = ({
   };
 
   const handleAddClick = () => {
-    const mint = new web3.PublicKey(mintAddress);
-    dispatch(createTokenAccount(mint));
-    dispatch(getOwnedTokenAccounts());
-    closeModal();
+    // const mint = new web3.PublicKey(mintAddress);
+    // dispatch(createTokenAccount(mint));
+    // dispatch(getOwnedTokenAccounts());
+    // closeModal();
   };
 
   const handleCopyClick = () => {
@@ -144,7 +143,7 @@ export const TokenRow: FunctionComponent<Props> = ({
       <Main>
         <Content>
           <InfoWrapper onClick={handleChevronClick}>
-            <TokenAvatar mint={mintAddress} size={44} />
+            <TokenAvatar symbol={tokenSymbol} size={44} />
             <Info>
               <Top>
                 <div>{tokenSymbol}</div> <div />

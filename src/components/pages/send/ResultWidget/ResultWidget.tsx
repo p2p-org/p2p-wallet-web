@@ -22,12 +22,13 @@ const WrapperCard = styled(Card)`
 `;
 
 const HeaderImage = styled.div`
-  background-image: url(${bgImg});
-  background-size: 183px 175px;
-  background-repeat: no-repeat;
-  height: 183px;
   width: 175px;
+  height: 183px;
   margin-bottom: 32px;
+
+  background-image: url(${bgImg});
+  background-repeat: no-repeat;
+  background-size: 183px 175px;
 `;
 
 const CircleWrapper = styled.div`
@@ -57,7 +58,7 @@ const InfoWrapper = styled.div`
 `;
 
 const Value = styled.div`
-  color: #000000;
+  color: #000;
   font-weight: 500;
   font-size: 28px;
   line-height: 33px;
@@ -67,8 +68,8 @@ const Status = styled.div`
   display: flex;
   align-items: center;
   height: 24px;
-  padding: 0 16px;
   margin: 12px 0;
+  padding: 0 16px;
 
   color: ${rgba('#000', 0.5)};
   font-weight: bold;
@@ -88,7 +89,7 @@ const Details = styled.div`
 `;
 
 export const ResultWidget: FunctionComponent = () => {
-  const { state: locationState } = useLocation();
+  const { state: locationState } = useLocation<{ signature: string }>();
   const dispatch = useDispatch();
 
   const { slot, source, symbol, amount } = useTransactionInfo(locationState?.signature);

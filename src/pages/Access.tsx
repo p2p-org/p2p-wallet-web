@@ -1,26 +1,21 @@
 import React, { FunctionComponent, useCallback, useState } from 'react';
-import { useDispatch } from 'react-redux';
-import { Link, useHistory } from 'react-router-dom';
+import { batch, useDispatch } from 'react-redux';
+import { useHistory } from 'react-router-dom';
 
 import { styled } from '@linaria/react';
 import * as bip39 from 'bip39';
 import throttle from 'lodash.throttle';
 
+import { WalletType } from 'api/wallet';
 import { Button, Icon, Input } from 'components/ui';
+import { connect, selectType } from 'features/wallet/WalletSlice';
 
-// import { accessAccount } from 'store/_actions/complex/blockchain';
 import { Header } from '../components/common/Header';
 
-// const Wrapper = styled.div`
-//   display: flex;
-//   align-items: center;
-//   justify-content: center;
-//   height: 100vh;
-// `;
-
 const Wrapper = styled.div`
-  background: #fff;
   height: 100%;
+
+  background: #fff;
 `;
 
 const Form = styled.form`
@@ -28,64 +23,62 @@ const Form = styled.form`
   flex-direction: column;
 `;
 
-const LinkStyled = styled(Link)`
-  display: flex;
-  justify-content: center;
-  margin-top: 20px;
-`;
-
 const Title = styled.div`
+  margin: 100px 0 32px;
+
   color: #000;
   font-weight: 500;
   font-size: 27px;
   line-height: 120%;
   text-align: center;
-  margin-top: 100px;
-  margin-bottom: 32px;
 `;
 
 const SubTitle = styled.div`
+  margin-bottom: 12px;
+
   color: #000;
-  font-style: normal;
   font-weight: 500;
   font-size: 14px;
   line-height: 17px;
   text-align: left;
-  margin-bottom: 12px;
+
   opacity: 0.5;
 `;
 
 const CreateButton = styled(Button)`
   width: 100%;
   height: 56px;
-  font-weight: 500;
-  color: #fff;
-  background: #000;
-  line-height: 17px;
-  size: 14px;
-  font-style: normal;
   margin-top: 32px;
+
+  color: #fff;
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 17px;
+
+  background: #000;
 `;
 
 const Box = styled.div`
-  margin: auto;
   max-width: 364px;
+  margin: auto;
 `;
 
-const InputSeed = styled.textarea`
+const TextareaSeed = styled.textarea`
   height: 72px;
   margin-bottom: 24px;
-  outline: none !important;
+  padding: 16px;
+
   border: 1px solid #d2d2d2;
   -webkit-border-radius: 5px;
   -moz-border-radius: 5px;
   border-radius: 15px;
-  padding: 16px;
+  outline: none !important;
 `;
 
 const EyeIcon = styled(Icon)`
   width: 24px;
   height: 24px;
+
   opacity: 0.5;
 `;
 
@@ -113,28 +106,35 @@ export const Access: FunctionComponent = () => {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
     if (mnemonic.length === 0) {
       return;
     }
-    dispatch(accessAccount(mnemonic));
-    setTimeout(() => {
-      history.push('/wallets');
-    }, 100);
+
+    batch(async () => {
+      dispatch(selectType(WalletType.MANUAL));
+      await dispatch(connect({ mnemonic, password }));
+
+      setTimeout(() => {
+        history.push('/wallets');
+      }, 100);
+    });
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const nextMnemonic: string = e.target.value;
+  const handleMnemonicChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const nextMnemonic = e.target.value;
     validateMnemonic(nextMnemonic);
     setMnemonic(nextMnemonic);
   };
 
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const nextPassword: string = e.target.value.trim();
-
+    const nextPassword = e.target.value.trim();
     setPassword(nextPassword);
   };
 
   const handleVisibility = () => {};
+
+  const isDisabled = error || !mnemonic;
 
   return (
     <Wrapper>
@@ -144,7 +144,7 @@ export const Access: FunctionComponent = () => {
           <Title>Access Wallet</Title>
 
           <SubTitle>Enter your Seed, to get access to wallet </SubTitle>
-          <InputSeed name="mnemonic" value={mnemonic} onChange={handleChange} />
+          <TextareaSeed name="mnemonic" value={mnemonic} onChange={handleMnemonicChange} />
 
           <SubTitle>Enter Password (optional) </SubTitle>
           <Input
@@ -152,12 +152,10 @@ export const Access: FunctionComponent = () => {
             type="password"
             value={password}
             onChange={handlePasswordChange}
-            // postfix={
-            //   <EyeIcon name="eye" onclick={handleVisibility} />
-            // }
+            // postfix={<EyeIcon name="eye" onClick={handleVisibility} />}
           />
 
-          <CreateButton type="submit" disabled={error}>
+          <CreateButton type="submit" disabled={isDisabled}>
             Continue
           </CreateButton>
         </Form>

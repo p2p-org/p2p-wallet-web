@@ -1,11 +1,12 @@
-import React, { FunctionComponent } from 'react';
+import React, { FunctionComponent, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router';
 import { Link } from 'react-router-dom';
 
 import { styled } from '@linaria/react';
-import * as web3 from '@solana/web3.js';
+import { clusterApiUrl, PublicKey } from '@solana/web3.js';
 
+import { TokenAccount } from 'api/token/TokenAccount';
 import { Button, ButtonsGroup } from 'components/ui';
 import { airdrop } from 'features/wallet/WalletSlice';
 import { RootState } from 'store/rootReducer';
@@ -19,14 +20,21 @@ const Wrapper = styled.div`
 `;
 
 type Props = {
-  publicKey: web3.PublicKey;
+  publicKey: PublicKey;
 };
 
 export const ActionsWidget: FunctionComponent<Props> = ({ publicKey }) => {
   const dispatch = useDispatch();
   const history = useHistory();
   const cluster = useSelector((state: RootState) => state.wallet.cluster);
-  const isMainnet = cluster === web3.clusterApiUrl('mainnet-beta');
+  const tokenAccounts = useSelector((state: RootState) =>
+    state.wallet.tokenAccounts.map((account) => TokenAccount.from(account)),
+  );
+  const tokenAccount = useMemo(
+    () => tokenAccounts.find((account) => account.address.equals(publicKey)),
+    [tokenAccounts, publicKey],
+  );
+  const isMainnet = cluster === clusterApiUrl('mainnet-beta');
 
   const handleTokenChange = (token: string) => {
     history.push(`/wallet/${token}`);
@@ -50,7 +58,7 @@ export const ActionsWidget: FunctionComponent<Props> = ({ publicKey }) => {
         <Button primary small as={Link} to={`/swap/${publicKey.toBase58()}`}>
           Swap
         </Button>
-        {!isMainnet ? (
+        {!isMainnet && tokenAccount?.mint.symbol === 'SOL' ? (
           <Button primary small onClick={handleAirdropClick}>
             Airdrop
           </Button>

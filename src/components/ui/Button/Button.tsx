@@ -67,6 +67,10 @@ const Wrapper = styled.button`
   &.full {
     width: 100%;
   }
+
+  &:disabled {
+    opacity: 0.5;
+  }
 `;
 
 type Props = {

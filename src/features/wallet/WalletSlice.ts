@@ -1,18 +1,22 @@
 import { createAsyncThunk, createSlice, Draft, PayloadAction } from '@reduxjs/toolkit';
-import { Cluster } from '@solana/web3.js';
+import { Cluster, PublicKey } from '@solana/web3.js';
 
 import { APIFactory as TokenAPIFactory } from 'api/token';
+import { Token } from 'api/token/Token';
 import { SerializableTokenAccount, TokenAccount } from 'api/token/TokenAccount';
 import * as WalletAPI from 'api/wallet';
-import { WalletType } from 'api/wallet';
+import { getBalance, WalletDataType, WalletType } from 'api/wallet';
 import { WalletEvent } from 'api/wallet/Wallet';
 import { ToastManager } from 'components/common/ToastManager';
+import { SYSTEM_PROGRAM_ID } from 'constants/solana/bufferLayouts';
 // import { notifyTransaction } from '../../components/notify';
 import { getAvailableTokens } from 'features/GlobalSlice';
 import { getPools } from 'features/pool/PoolSlice';
+import { getRates } from 'features/rate/RateSlice';
 import { updateEntityArray } from 'features/tokenPair/utils/tokenPair';
 import { RootState } from 'store/rootReducer';
 
+const CLUSTER_STORAGE_KEY = 'cluster';
 export const DEFAULT_CLUSTER: Cluster = 'devnet';
 export const WALLET_SLICE_NAME = 'wallet';
 
@@ -32,9 +36,31 @@ export const disconnect = createAsyncThunk(`${WALLET_SLICE_NAME}/disconnect`, ()
   ToastManager.info('notification.info.walletDisconnected');
 });
 
-export const getOwnedTokenAccounts = createAsyncThunk(
+export const getSolBalance = createAsyncThunk<SerializableTokenAccount, PublicKey>(
+  `${WALLET_SLICE_NAME}/getSolBalance`,
+  async (publicKey) => {
+    const balance = await getBalance(publicKey);
+
+    const mint = new Token(
+      SYSTEM_PROGRAM_ID, // Fake
+      9,
+      0, // Fake
+      undefined,
+      'Solana',
+      'SOL',
+    );
+
+    const tokenAccount = new TokenAccount(mint, publicKey, balance);
+
+    // TODO: listen to changes
+
+    return tokenAccount.serialize();
+  },
+);
+
+export const getOwnedTokenAccounts = createAsyncThunk<Array<SerializableTokenAccount>>(
   `${WALLET_SLICE_NAME}/getOwnedTokenAccounts`,
-  async (arg, thunkAPI): Promise<Array<SerializableTokenAccount>> => {
+  async (_, thunkAPI) => {
     const state: RootState = thunkAPI.getState() as RootState;
     const walletState = state.wallet;
     const TokenAPI = TokenAPIFactory(walletState.cluster);
@@ -58,13 +84,13 @@ export const getOwnedTokenAccounts = createAsyncThunk(
  * The output of the action is the user's public key in Base58 form,
  * so that the user can verify it.
  */
-export const connect = createAsyncThunk(
+export const connect = createAsyncThunk<string, WalletDataType | undefined>(
   `${WALLET_SLICE_NAME}/connect`,
-  async (arg, thunkAPI): Promise<string> => {
+  async (data, thunkAPI) => {
     const {
       wallet: { cluster, type },
     }: RootState = thunkAPI.getState() as RootState;
-    const wallet = await WalletAPI.connect(cluster, type);
+    const wallet = await WalletAPI.connect(cluster, type, data);
 
     wallet.on(WalletEvent.DISCONNECT, () => {
       void thunkAPI.dispatch(disconnect());
@@ -80,8 +106,10 @@ export const connect = createAsyncThunk(
     // Get tokens first before getting accounts and pools,
     // to avail of the token caching feature
     await thunkAPI.dispatch(getAvailableTokens());
+    void thunkAPI.dispatch(getSolBalance(wallet.pubkey));
     void thunkAPI.dispatch(getOwnedTokenAccounts());
     void thunkAPI.dispatch(getPools());
+    void thunkAPI.dispatch(getRates());
 
     return wallet.pubkey.toBase58();
   },
@@ -113,7 +141,7 @@ const updateAccountReducer = (
 
 // The initial wallet state. No wallet is connected yet.
 const initialState: WalletsState = {
-  cluster: DEFAULT_CLUSTER,
+  cluster: (localStorage.getItem(CLUSTER_STORAGE_KEY) as Cluster) || DEFAULT_CLUSTER,
   connected: false,
   publicKey: null,
   type: WalletType.SOLLET,
@@ -128,10 +156,14 @@ const walletSlice = createSlice({
   initialState,
   reducers: {
     updateAccount: updateAccountReducer,
-    selectCluster: (state, action: PayloadAction<Cluster>) => ({
-      ...state,
-      cluster: action.payload,
-    }),
+    selectCluster: (state, action: PayloadAction<Cluster>) => {
+      localStorage.setItem(CLUSTER_STORAGE_KEY, action.payload);
+
+      return {
+        ...state,
+        cluster: action.payload,
+      };
+    },
     selectType: (state, action: PayloadAction<WalletType>) => ({
       ...state,
       type: action.payload,
@@ -139,20 +171,24 @@ const walletSlice = createSlice({
   },
   extraReducers: (builder) => {
     // Triggered when the connect async action is completed
-    builder.addCase(connect.fulfilled, (state, action) => ({
-      ...state,
+    builder.addCase(connect.fulfilled, (_, action) => ({
+      ...initialState,
       publicKey: action.payload,
       connected: true,
     }));
     // Triggered when the disconnect async action is completed
-    builder.addCase(disconnect.fulfilled, (state) => ({
-      ...state,
+    builder.addCase(disconnect.fulfilled, () => ({
+      ...initialState,
       publicKey: null,
       connected: false,
     }));
     builder.addCase(getOwnedTokenAccounts.fulfilled, (state, action) => ({
       ...state,
-      tokenAccounts: action.payload,
+      tokenAccounts: state.tokenAccounts.concat(action.payload),
+    }));
+    builder.addCase(getSolBalance.fulfilled, (state, action) => ({
+      ...state,
+      tokenAccounts: state.tokenAccounts.concat(action.payload),
     }));
   },
 });

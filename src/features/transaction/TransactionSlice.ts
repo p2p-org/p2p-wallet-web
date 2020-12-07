@@ -1,46 +1,45 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { PublicKey } from '@solana/web3.js';
 
-import { APIFactory } from 'api/pool';
-import { SerializablePool } from 'api/pool/Pool';
+import { APIFactory } from 'api/transaction';
+import { SerializableTransaction } from 'api/transaction/Transaction';
 import { RootState } from 'store/rootReducer';
 
 const TRANSACTION_SLICE_NAME = 'transaction';
 
-export const getTransactions = createAsyncThunk(
+export const getTransactions = createAsyncThunk<Array<SerializableTransaction>, PublicKey>(
   `${TRANSACTION_SLICE_NAME}/getTransactions`,
-  async (arg, { dispatch, getState }): Promise<Array<SerializablePool>> => {
-    const state: RootState = getState() as RootState;
+  async (publicKey, thunkAPI) => {
+    const state: RootState = thunkAPI.getState() as RootState;
 
-    const PoolAPI = APIFactory(state.wallet.cluster);
-    const pools = await PoolAPI.getTransactions();
+    const TransactionAPI = APIFactory(state.wallet.cluster);
+    const transactions = await TransactionAPI.getTransactionsForAddress(publicKey);
 
-    PoolAPI.listenToPoolChanges(pools, (pool) => {
-      // eslint-disable-next-line @typescript-eslint/no-use-before-define
-      dispatch(transactionSlice.actions.updatePool(pool.serialize()));
-    });
+    // PoolAPI.listenToPoolChanges(pools, (pool) => {
+    //   // eslint-disable-next-line @typescript-eslint/no-use-before-define
+    //   dispatch(transactionSlice.actions.updatePool(pool.serialize()));
+    // });
 
-    return pools.map((pool) => pool.serialize());
+    return transactions.map((transaction) => transaction.serialize());
   },
 );
 
 interface TransactionsState {
-  availablePools: Array<SerializablePool>;
+  [signature: string]: Array<SerializableTransaction>;
 }
 
-const initialState: TransactionsState = {
-  availablePools: [],
-};
+const initialState: TransactionsState = {};
 
 const transactionSlice = createSlice({
   name: TRANSACTION_SLICE_NAME,
   initialState,
   reducers: {
-    updatePool: () => {},
+    // updatePool: () => {},
   },
   extraReducers: (builder) => {
     builder.addCase(getTransactions.fulfilled, (state, action) => ({
       ...state,
-      availablePools: action.payload,
+      [action.meta.arg.toBase58()]: action.payload,
     }));
   },
 });

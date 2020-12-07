@@ -11,10 +11,8 @@ import { localSwapProgramId } from 'config/constants';
 import { ExtendedCluster } from 'utils/types';
 
 import { adjustForSlippage, DEFAULT_SLIPPAGE, Pool } from './Pool';
+import poolConfig from './pool.config';
 import { POOL_UPDATED_EVENT, PoolListener, PoolUpdatedEvent } from './PoolListener';
-
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const poolConfig = require('./pool.config.json');
 
 type PoolUpdateCallback = (pool: Pool) => void;
 
@@ -112,7 +110,12 @@ export const APIFactory = (cluster: ExtendedCluster): API => {
 
     // load the pool
     console.log('swap Address', address);
-    const swapInfo = await TokenSwap.loadTokenSwap(connection, address, swapProgramId, payer);
+    const swapInfo: TokenSwap = await TokenSwap.loadTokenSwap(
+      connection,
+      address,
+      swapProgramId,
+      payer,
+    );
 
     // load the token account and mint info for tokens A and B
     const tokenAccountAInfo = await tokenAPI.tokenAccountInfo(swapInfo.tokenAccountA);

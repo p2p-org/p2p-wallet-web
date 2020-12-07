@@ -7,15 +7,14 @@ import { rgba } from 'polished';
 
 import { Icon } from 'components/ui';
 import { getConfirmedTransaction } from 'store/_actions/solana';
-import { RootState } from 'store/types';
 import { useTransactionInfo } from 'utils/hooks/useTransactionInfo';
 
 const Wrapper = styled.div`
   position: relative;
 
   display: flex;
-  flex-direction: column;
   flex-basis: 588px;
+  flex-direction: column;
 
   background-color: #fff;
   border-radius: 15px;
@@ -42,8 +41,10 @@ const CloseIcon = styled(Icon)`
   position: absolute;
   top: 15px;
   right: 15px;
+
   width: 32px;
   height: 32px;
+
   cursor: pointer;
 `;
 
@@ -134,7 +135,7 @@ type Props = {
 export const TransactionDetailsModal: FunctionComponent<Props> = ({ signature, close }) => {
   const dispatch = useDispatch();
 
-  const { slot, symbol, amount, meta } = useTransactionInfo(signature);
+  // const { slot, symbol, amount, meta } = useTransactionInfo(signature);
 
   useEffect(() => {
     const mount = async () => {
@@ -150,53 +151,53 @@ export const TransactionDetailsModal: FunctionComponent<Props> = ({ signature, c
     }
   }, [signature]);
 
-  if (!slot) {
-    return null;
-  }
+  // if (!slot) {
+  //   return null;
+  // }
 
   return (
     <Wrapper>
-      <Header>
-        {/* <Title>24 Oct 2020 @ 12:51 PM</Title> */}
-        <Title>{slot} SLOT</Title>
-        <CloseWrapper onClick={close}>
-          <CloseIcon name="close" />
-        </CloseWrapper>
-        <CircleWrapper>
-          <ArrowAngleIcon name="arrow-angle" />
-        </CircleWrapper>
-      </Header>
-      <Content>
-        <StatusWrapper>
-          <Value>
-            {amount} {symbol}
-          </Value>
-          <Status>Completed</Status>
-        </StatusWrapper>
-        <FieldsWrapper>
-          <FieldWrapper>
-            <FieldTitle>Transaction ID</FieldTitle>
-            <FieldValue>{signature}</FieldValue>
-          </FieldWrapper>
-          <FieldWrapper>
-            <FieldTitle>Amount</FieldTitle>
-            <FieldValue>{amount}</FieldValue>
-            {/* <FieldValue>0,00344 BTC at 12 902, 07 US$</FieldValue> */}
-          </FieldWrapper>
-          <FieldWrapper>
-            <FieldTitle>Value</FieldTitle>
-            <FieldValue>{amount}</FieldValue>
-            {/* <FieldValue>0,00344 BTC at 12 902, 07 US$</FieldValue> */}
-          </FieldWrapper>
-          {meta ? (
-            <FieldWrapper>
-              <FieldTitle>Fee</FieldTitle>
-              <FieldValue>{meta.fee} lamports</FieldValue>
-              {/* <FieldValue>0,00009492 BTC</FieldValue> */}
-            </FieldWrapper>
-          ) : null}
-        </FieldsWrapper>
-      </Content>
+      {/* <Header> */}
+      {/*  /!* <Title>24 Oct 2020 @ 12:51 PM</Title> *!/ */}
+      {/*  <Title>{slot} SLOT</Title> */}
+      {/*  <CloseWrapper onClick={close}> */}
+      {/*    <CloseIcon name="close" /> */}
+      {/*  </CloseWrapper> */}
+      {/*  <CircleWrapper> */}
+      {/*    <ArrowAngleIcon name="arrow-angle" /> */}
+      {/*  </CircleWrapper> */}
+      {/* </Header> */}
+      {/* <Content> */}
+      {/*  <StatusWrapper> */}
+      {/*    <Value> */}
+      {/*      {amount} {symbol} */}
+      {/*    </Value> */}
+      {/*    <Status>Completed</Status> */}
+      {/*  </StatusWrapper> */}
+      {/*  <FieldsWrapper> */}
+      {/*    <FieldWrapper> */}
+      {/*      <FieldTitle>Transaction ID</FieldTitle> */}
+      {/*      <FieldValue>{signature}</FieldValue> */}
+      {/*    </FieldWrapper> */}
+      {/*    <FieldWrapper> */}
+      {/*      <FieldTitle>Amount</FieldTitle> */}
+      {/*      <FieldValue>{amount}</FieldValue> */}
+      {/*      /!* <FieldValue>0,00344 BTC at 12 902, 07 US$</FieldValue> *!/ */}
+      {/*    </FieldWrapper> */}
+      {/*    <FieldWrapper> */}
+      {/*      <FieldTitle>Value</FieldTitle> */}
+      {/*      <FieldValue>{amount}</FieldValue> */}
+      {/*      /!* <FieldValue>0,00344 BTC at 12 902, 07 US$</FieldValue> *!/ */}
+      {/*    </FieldWrapper> */}
+      {/*    {meta ? ( */}
+      {/*      <FieldWrapper> */}
+      {/*        <FieldTitle>Fee</FieldTitle> */}
+      {/*        <FieldValue>{meta.fee} lamports</FieldValue> */}
+      {/*        /!* <FieldValue>0,00009492 BTC</FieldValue> *!/ */}
+      {/*      </FieldWrapper> */}
+      {/*    ) : null} */}
+      {/*  </FieldsWrapper> */}
+      {/* </Content> */}
     </Wrapper>
   );
 };

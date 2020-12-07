@@ -18,19 +18,17 @@ export const AmountUSDT: FunctionComponent<Props> = ({
   symbol = '',
   ...props
 }) => {
-  const rate = 1; // useSelector((state: RootState) => state.rates[`${symbol}/USDT`]);
+  const rate = useSelector((state: RootState) => state.rate[`${symbol}/USDT`]);
 
-  let sum = String(value);
-
-  if (rate) {
-    sum = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(
-      value.times(rate).toNumber(),
-    );
+  if (!rate) {
+    return null;
   }
 
   return (
     <Wrapper title="Amount in USDT" {...props}>
-      {sum}
+      {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(
+        value.times(rate).toNumber(),
+      )}
     </Wrapper>
   );
 };
