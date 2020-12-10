@@ -2,11 +2,14 @@ const webpack = require('webpack');
 const path = require('path');
 const HtmlWebPackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const SvgStorePlugin = require('external-svg-sprite-loader');
+// const SvgStorePlugin = require('external-svg-sprite-loader');
+const SpritePlugin = require('svg-sprite-loader/plugin');
 
 const isDev = process.env.NODE_ENV !== 'production';
 
 module.exports = {
+  target: 'web',
+  // target: ['web', 'es5'],
   mode: isDev ? 'development' : 'production',
   devtool: 'source-map',
   entry: {
@@ -15,19 +18,19 @@ module.exports = {
   resolve: {
     extensions: ['.tsx', '.ts', '.js'],
     modules: ['node_modules'],
-    alias: {
-      // Webpack 5 Change: Polyfill Node bindings.
-      // See https://github.com/webpack/webpack/pull/8460
-      // See https://github.com/webpack/node-libs-browser/blob/master/index.js
-      process: 'process/browser.js',
-      assert: 'assert',
-      util: 'util',
-      buffer: 'buffer',
-      stream: 'stream-browserify',
-      'stream-http': 'stream-http',
-      http: 'http-browserify',
-      https: 'https-browserify',
-    },
+    // alias: {
+    //   // Webpack 5 Change: Polyfill Node bindings.
+    //   // See https://github.com/webpack/webpack/pull/8460
+    //   // See https://github.com/webpack/node-libs-browser/blob/master/index.js
+    //   process: 'process/browser.js',
+    //   assert: 'assert',
+    //   util: 'util',
+    //   buffer: 'buffer',
+    //   stream: 'stream-browserify',
+    //   'stream-http': 'stream-http',
+    //   http: 'http-browserify',
+    //   https: 'https-browserify',
+    // },
   },
   output: {
     path: path.resolve(__dirname, 'dist'),
@@ -35,7 +38,8 @@ module.exports = {
     filename: '[name].bundle.js',
   },
   plugins: [
-    new SvgStorePlugin(),
+    // new SvgStorePlugin(),
+    new SpritePlugin(),
     new webpack.ProvidePlugin({
       process: 'process/browser.js',
       Buffer: ['buffer', 'Buffer'],
@@ -81,10 +85,23 @@ module.exports = {
         test: /\.(jpg|png|gif|woff|woff2|eot|ttf)$/,
         use: [{ loader: 'file-loader' }],
       },
+      // {
+      //   test: /\.svg$/,
+      //   exclude: /node_modules/,
+      //   loader: SvgStorePlugin.loader,
+      // },
       {
         test: /\.svg$/,
-        exclude: /node_modules/,
-        loader: SvgStorePlugin.loader,
+        use: [
+          {
+            loader: 'svg-sprite-loader',
+            // options: {
+            //   extract: true,
+            //   publicPath: '/static/',
+            // },
+          },
+          // 'svgo-loader'
+        ],
       },
     ],
   },

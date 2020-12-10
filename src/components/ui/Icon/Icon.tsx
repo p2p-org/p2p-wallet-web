@@ -14,7 +14,7 @@ import warning from './assets/warning-icon.svg';
 
 export type SvgIconType = {
   viewBox: string;
-  symbol: string;
+  id: string;
 };
 
 const iconsMap = new Map<string, SvgIconType>([
@@ -59,7 +59,7 @@ export const Icon: FunctionComponent<IconType> = ({ name, size, height, width, .
 
   return (
     <svg {...validProps} viewBox={icon.viewBox} height={size || height} width={size || width}>
-      <use xlinkHref={icon.symbol} />
+      <use xlinkHref={`#${icon.id}`} />
     </svg>
   );
 };
