@@ -29,8 +29,8 @@ export abstract class Wallet extends EventEmitter {
    * Sign the transaction, and emit a "signed" event
    * @param transaction
    */
-  sign(transaction: Transaction): Promise<Transaction> {
-    const signedTransaction = this.signTransaction(transaction);
+  async sign(transaction: Transaction): Promise<Transaction> {
+    const signedTransaction = await this.signTransaction(transaction);
     this.emit(WalletEvent.SIGNED, { transaction: signedTransaction });
 
     return signedTransaction;

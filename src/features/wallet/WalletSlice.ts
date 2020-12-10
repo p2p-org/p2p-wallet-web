@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice, Draft, PayloadAction } from '@reduxjs/toolkit';
-import { Cluster, PublicKey } from '@solana/web3.js';
+import { Account, Cluster, PublicKey } from '@solana/web3.js';
 
 import { APIFactory as TokenAPIFactory, TransferParameters } from 'api/token';
 import { Token } from 'api/token/Token';
@@ -33,7 +33,7 @@ export interface WalletsState {
  */
 export const disconnect = createAsyncThunk(`${WALLET_SLICE_NAME}/disconnect`, () => {
   WalletAPI.disconnect();
-  ToastManager.info('Wallet disconnected');
+  ToastManager.error('Wallet disconnected');
 });
 
 export const getSolBalance = createAsyncThunk<SerializableTokenAccount, PublicKey>(
@@ -94,12 +94,12 @@ export const connect = createAsyncThunk<string, WalletDataType | undefined>(
 
     wallet.on(WalletEvent.DISCONNECT, () => {
       void thunkAPI.dispatch(disconnect());
-      ToastManager.info('Wallet disconnected');
+      ToastManager.error('Wallet disconnected');
     });
 
-    // wallet.on(WalletEvent.CONFIRMED, ({ transactionSignature }) =>
-    //   notifyTransaction(transactionSignature),
-    // );
+    wallet.on(WalletEvent.CONFIRMED, ({ transactionSignature }) =>
+      ToastManager.info(`Confirmed: ${transactionSignature}`),
+    );
 
     ToastManager.info('Wallet connected');
 
@@ -117,13 +117,36 @@ export const connect = createAsyncThunk<string, WalletDataType | undefined>(
 
 export const transfer = createAsyncThunk<string, TransferParameters>(
   `${WALLET_SLICE_NAME}/transfer`,
-  async (parameters, thunkAPI): Promise<string> => {
+  async (parameters, thunkAPI) => {
     const state: RootState = thunkAPI.getState() as RootState;
     const walletState = state.wallet;
     const TokenAPI = TokenAPIFactory(walletState.cluster);
 
     return TokenAPI.transfer(parameters);
+
     // TODO: update balances
+  },
+);
+
+export const createMint = createAsyncThunk<
+  string,
+  { amount: number; decimals: number; initialAccount: Account }
+>(`${WALLET_SLICE_NAME}/createMint`, async (parameters, thunkAPI) => {
+  const state: RootState = thunkAPI.getState() as RootState;
+  const walletState = state.wallet;
+  const TokenAPI = TokenAPIFactory(walletState.cluster);
+
+  return TokenAPI.createMint(parameters.amount, parameters.decimals, parameters.initialAccount);
+});
+
+export const createAccountForToken = createAsyncThunk<TokenAccount, { token: Token }>(
+  `${WALLET_SLICE_NAME}/createMint`,
+  async (parameters, thunkAPI) => {
+    const state: RootState = thunkAPI.getState() as RootState;
+    const walletState = state.wallet;
+    const TokenAPI = TokenAPIFactory(walletState.cluster);
+
+    return TokenAPI.createAccountForToken(parameters.token);
   },
 );
 

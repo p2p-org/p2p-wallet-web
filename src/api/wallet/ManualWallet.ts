@@ -11,7 +11,7 @@ export type ManualWalletData = {
 };
 
 /**
- * Test wallet implementation that uses a private key
+ * Manual wallet implementation that uses a private key
  */
 export class ManualWallet extends Wallet {
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment

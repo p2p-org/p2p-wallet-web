@@ -6,10 +6,11 @@ import * as web3 from '@solana/web3.js';
 import classNames from 'classnames';
 import { rgba } from 'polished';
 
+import { Token } from 'api/token/Token';
 import { TokenAvatar } from 'components/common/TokenAvatar';
 import { Avatar, Button, Icon, Input } from 'components/ui';
 import { TokenType } from 'constants/tokens';
-import { createTokenAccount } from 'store/_actions/complex/tokens';
+import { createAccountForToken } from 'features/wallet/WalletSlice';
 
 const Wrapper = styled.div`
   display: flex;
@@ -101,14 +102,12 @@ const CopyIcon = styled(Icon)`
   height: 24px;
 `;
 
-type Props = TokenType & { closeModal: () => void };
+type Props = {
+  token: Token;
+  closeModal: () => void;
+};
 
-export const TokenRow: FunctionComponent<Props> = ({
-  mintAddress,
-  tokenName,
-  tokenSymbol,
-  closeModal,
-}) => {
+export const TokenRow: FunctionComponent<Props> = ({ token, closeModal }) => {
   const dispatch = useDispatch();
   // eslint-disable-next-line unicorn/no-null
   const inputRef = useRef<HTMLInputElement>(null);
@@ -118,11 +117,10 @@ export const TokenRow: FunctionComponent<Props> = ({
     setIsOpen(!isOpen);
   };
 
-  const handleAddClick = () => {
-    // const mint = new web3.PublicKey(mintAddress);
-    // dispatch(createTokenAccount(mint));
+  const handleAddClick = async () => {
+    await dispatch(createAccountForToken({ token }));
     // dispatch(getOwnedTokenAccounts());
-    // closeModal();
+    closeModal();
   };
 
   const handleCopyClick = () => {
@@ -143,13 +141,13 @@ export const TokenRow: FunctionComponent<Props> = ({
       <Main>
         <Content>
           <InfoWrapper onClick={handleChevronClick}>
-            <TokenAvatar symbol={tokenSymbol} size={44} />
+            <TokenAvatar symbol={token.symbol} size={44} />
             <Info>
               <Top>
-                <div>{tokenSymbol}</div> <div />
+                <div>{token.symbol}</div> <div />
               </Top>
               <Bottom>
-                <div>{tokenName}</div> <div />
+                <div>{token.name}</div> <div />
               </Bottom>
             </Info>
           </InfoWrapper>
@@ -160,8 +158,8 @@ export const TokenRow: FunctionComponent<Props> = ({
         <Additional className={classNames({ opened: isOpen })}>
           <Input
             ref={inputRef}
-            title={`${tokenSymbol} Mint Address`}
-            value={mintAddress}
+            title={`${token.symbol} Mint Address`}
+            value={token.address.toBase58()}
             readOnly
             postfix={
               <CopyWrapper onClick={handleCopyClick}>

@@ -6,9 +6,11 @@ import {
   ParsedAccountData,
   PublicKey,
   PublicKeyAndAccount,
+  SystemProgram,
   TransactionInstruction,
 } from '@solana/web3.js';
 import BN from 'bn.js';
+import BufferLayout, { blob, u8 } from 'buffer-layout';
 import { Decimal } from 'decimal.js';
 import { complement, find, identity, isNil, memoizeWith, path, propEq } from 'ramda';
 import assert from 'ts-invariant';
@@ -20,6 +22,7 @@ import {
   sendTransaction,
   sendTransactionFromAccount,
 } from 'api/wallet';
+import { ToastManager } from 'components/common/ToastManager';
 import { airdropKey } from 'config/constants';
 import { toDecimal } from 'utils/amount';
 import { makeNewAccountInstruction } from 'utils/transaction';
@@ -32,12 +35,17 @@ import { TokenAccount } from './TokenAccount';
 
 export const TOKEN_PROGRAM_ID = new PublicKey('TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA');
 
+// TODO: check
+export const OWNER_VALIDATION_PROGRAM_ID = new PublicKey(
+  '4MNPdKu9wFMvEeZBMt3Eipfs5ovVWTJb31pEXDJAAxX5',
+);
+
 type TokenAccountUpdateCallback = (tokenAccount: TokenAccount) => void;
 
 export type TransferParameters = {
   source: PublicKey;
   destination: PublicKey;
-  amount: number | Decimal;
+  amount: number;
 };
 
 export interface API {
@@ -51,6 +59,7 @@ export interface API {
   createToken: (decimals?: number, mintAuthority?: PublicKey) => Promise<Token>;
   createAccountForToken: (token: Token, owner?: PublicKey) => Promise<TokenAccount>;
   mintTo: (recipient: TokenAccount, tokenAmount: number) => Promise<string>;
+  createMint: (amount: number, decimals: number, initialAccount: Account) => Promise<string>;
   airdropToWallet: (token: Token, tokenAmount: number) => Promise<string>;
   transfer: (parameters: TransferParameters) => Promise<string>;
   approveInstruction: (
@@ -145,10 +154,15 @@ export const APIFactory = memoizeWith(
       }
 
       const tokenPromises = clusterConfig.map((tokenConfig: TokenConfig) =>
-        tokenInfo(new PublicKey(tokenConfig.mintAddress)),
+        tokenInfo(new PublicKey(tokenConfig.mintAddress)).catch((error) => {
+          ToastManager.error(error.toString());
+          return null;
+        }),
       );
 
-      return Promise.all(tokenPromises);
+      const tokens = await Promise.all(tokenPromises);
+
+      return tokens.filter(complement(isNil)) as Token[];
     };
 
     type GetAccountInfoResponse = AccountInfo<Buffer | ParsedAccountData> | null;
@@ -197,14 +211,16 @@ export const APIFactory = memoizeWith(
     /**
      * Get all token accounts for this wallet
      */
-    const getAccountsForWallet = async (): Promise<TokenAccount[]> => {
+    const getAccountsForWallet = async (owner?: PublicKey): Promise<TokenAccount[]> => {
+      const ownerKey = owner || getWallet().pubkey;
+
       console.log('Token program ID', TOKEN_PROGRAM_ID.toBase58());
       const allParsedAccountInfos = await connection
-        .getParsedTokenAccountsByOwner(getWallet().pubkey, {
+        .getParsedTokenAccountsByOwner(ownerKey, {
           programId: TOKEN_PROGRAM_ID,
         })
         .catch((error) => {
-          console.error(`Error getting accounts for ${getWallet().pubkey.toBase58()}`, error);
+          console.error(`Error getting accounts for ${ownerKey.toBase58()}`, error);
           throw error;
         });
 
@@ -237,8 +253,12 @@ export const APIFactory = memoizeWith(
     /**
      * Get the wallet's accounts for a token
      * @param token
+     * @param owner
      */
-    const getAccountsForToken = async (token: Token): Promise<TokenAccount[]> => {
+    const getAccountsForToken = async (
+      token: Token,
+      owner?: PublicKey,
+    ): Promise<TokenAccount[]> => {
       console.log("Finding the wallet's accounts for the token", {
         wallet: { address: getWallet().pubkey.toBase58() },
         token: {
@@ -246,7 +266,7 @@ export const APIFactory = memoizeWith(
         },
       });
 
-      const allAccounts = await getAccountsForWallet();
+      const allAccounts = await getAccountsForWallet(owner);
       return allAccounts.filter(propEq('mint', token));
     };
 
@@ -362,6 +382,89 @@ export const APIFactory = memoizeWith(
       return updatedInfo;
     };
 
+    const createMint = async (
+      amount: number,
+      decimals: number,
+      initialAccount: Account,
+    ): Promise<string> => {
+      const mintAccount = new Account();
+      // const token = new SPLToken(connection, mintAccount.publicKey, programId, payer);
+
+      // Allocate memory for the account
+      const balanceNeededMint: number = await SPLToken.getMinBalanceRentForExemptMint(connection);
+
+      const instructions = [];
+
+      // createMintAccountInstruction
+      instructions.push(
+        SystemProgram.createAccount({
+          fromPubkey: getWallet().pubkey,
+          newAccountPubkey: mintAccount.publicKey,
+          lamports: balanceNeededMint,
+          space: MintLayout.span,
+          programId: TOKEN_PROGRAM_ID,
+        }),
+      );
+
+      // createInitMintInstruction
+      instructions.push(
+        SPLToken.createInitMintInstruction(
+          TOKEN_PROGRAM_ID,
+          mintAccount.publicKey,
+          decimals,
+          getWallet().pubkey,
+          null,
+        ),
+      );
+
+      const signers = [mintAccount];
+
+      if (amount > 0) {
+        signers.push(initialAccount);
+
+        const balanceNeededAccount: number = await SPLToken.getMinBalanceRentForExemptAccount(
+          connection,
+        );
+
+        // createAccountInstruction
+        instructions.push(
+          SystemProgram.createAccount({
+            fromPubkey: getWallet().pubkey,
+            newAccountPubkey: initialAccount.publicKey,
+            lamports: balanceNeededAccount,
+            space: AccountLayout.span,
+            programId: TOKEN_PROGRAM_ID,
+          }),
+        );
+
+        // createInitAccountInstruction
+        instructions.push(
+          SPLToken.createInitAccountInstruction(
+            TOKEN_PROGRAM_ID,
+            mintAccount.publicKey,
+            initialAccount.publicKey,
+            getWallet().pubkey,
+          ),
+        );
+
+        // createMintToInstruction
+        instructions.push(
+          SPLToken.createMintToInstruction(
+            TOKEN_PROGRAM_ID,
+            mintAccount.publicKey,
+            initialAccount.publicKey,
+            getWallet().pubkey,
+            [],
+            amount,
+          ),
+        );
+      }
+
+      const transaction = await makeTransaction(instructions, signers);
+
+      return sendTransaction(transaction);
+    };
+
     const mintTo = async (recipient: TokenAccount, tokenAmount: number): Promise<string> => {
       const token = recipient.mint;
       assert(
@@ -451,14 +554,29 @@ export const APIFactory = memoizeWith(
       return sendTransaction(transaction);
     };
 
-    const transfer = async (parameters: TransferParameters): Promise<string> => {
-      const amount = toU64(parameters.amount);
-      console.log('Amount', amount.toString());
+    const transferSol = async (parameters: TransferParameters): Promise<string> => {
+      console.log('Transfer SOL amount', parameters.amount);
 
+      const transferInstruction = SystemProgram.transfer({
+        fromPubkey: parameters.source,
+        toPubkey: parameters.destination,
+        lamports: parameters.amount,
+      });
+
+      const transaction = await makeTransaction([transferInstruction]);
+
+      return sendTransaction(transaction);
+    };
+
+    const transferBetweenSplTokenAccounts = async (
+      source: PublicKey,
+      destination: PublicKey,
+      amount: number,
+    ): Promise<string> => {
       const transferInstruction = SPLToken.createTransferInstruction(
         TOKEN_PROGRAM_ID,
-        parameters.source,
-        parameters.destination,
+        source,
+        destination,
         getWallet().pubkey,
         [],
         amount,
@@ -467,6 +585,126 @@ export const APIFactory = memoizeWith(
       const transaction = await makeTransaction([transferInstruction]);
 
       return sendTransaction(transaction);
+    };
+
+    const createAndTransferToAccount = async (
+      source: PublicKey,
+      destination: PublicKey,
+      amount: number,
+      mint: PublicKey,
+    ): Promise<string> => {
+      const newAccount = new Account();
+
+      const instructions = [];
+
+      // AssertOwnerInstruction
+      const dataLayout = BufferLayout.struct([blob(32, 'account')]);
+      const data = Buffer.alloc(dataLayout.span);
+      dataLayout.encode(
+        {
+          account: SystemProgram.programId.toBuffer(),
+        },
+        data,
+      );
+      instructions.push({
+        keys: [{ pubkey: destination, isSigner: false, isWritable: false }],
+        programId: OWNER_VALIDATION_PROGRAM_ID,
+        data,
+      });
+
+      const balanceNeededAccount: number = await SPLToken.getMinBalanceRentForExemptAccount(
+        connection,
+      );
+
+      instructions.push(
+        SystemProgram.createAccount({
+          fromPubkey: getWallet().pubkey,
+          newAccountPubkey: newAccount.publicKey,
+          lamports: balanceNeededAccount,
+          space: AccountLayout.span,
+          programId: TOKEN_PROGRAM_ID,
+        }),
+      );
+
+      instructions.push(
+        SPLToken.createInitAccountInstruction(
+          TOKEN_PROGRAM_ID,
+          mint,
+          newAccount.publicKey,
+          destination,
+        ),
+      );
+
+      // transferBetweenAccountsTxn
+      instructions.push(
+        SPLToken.createTransferInstruction(
+          TOKEN_PROGRAM_ID,
+          source,
+          newAccount.publicKey,
+          getWallet().pubkey,
+          [],
+          amount,
+        ),
+      );
+
+      const transaction = await makeTransaction(instructions, [newAccount]);
+
+      return sendTransaction(transaction);
+    };
+
+    const transferTokens = async (parameters: TransferParameters): Promise<string> => {
+      // Get info about token with mint
+      const sourceTokenAccountInfo = await tokenAccountInfo(parameters.source);
+
+      // If this token doesn't exists
+      if (!sourceTokenAccountInfo) {
+        throw new Error(`Token doesn't exits`);
+      }
+
+      // Get info about destination address
+      const destinationAccountInfo = await connection.getAccountInfo(parameters.destination);
+
+      // If it's founded and spl token
+      if (destinationAccountInfo && destinationAccountInfo.owner.equals(TOKEN_PROGRAM_ID)) {
+        return transferBetweenSplTokenAccounts(
+          parameters.source,
+          parameters.destination,
+          parameters.amount,
+        );
+      }
+
+      // If account didn't found or lamports equal 0
+      if (!destinationAccountInfo || destinationAccountInfo.lamports === 0) {
+        throw new Error('Cannot send to address with zero SOL balances');
+      }
+
+      // Try to find Token account by SOL address with highest balance
+      const destinationSplTokenAccount = (
+        await getAccountsForToken(sourceTokenAccountInfo.mint, parameters.destination)
+      ).sort((a, b) => b.balance.minus(a.balance).toNumber())[0];
+
+      if (destinationSplTokenAccount) {
+        return transferBetweenSplTokenAccounts(
+          parameters.source,
+          destinationSplTokenAccount.address,
+          parameters.amount,
+        );
+      }
+
+      return createAndTransferToAccount(
+        parameters.source,
+        parameters.destination,
+        parameters.amount,
+        sourceTokenAccountInfo.mint.address,
+      );
+    };
+
+    const transfer = async (parameters: TransferParameters): Promise<string> => {
+      if (parameters.source.equals(getWallet().pubkey)) {
+        return transferSol(parameters);
+      }
+
+      return transferTokens(parameters);
     };
 
     return {
@@ -478,6 +716,7 @@ export const APIFactory = memoizeWith(
       createAccountForToken,
       createToken,
       mintTo,
+      createMint,
       airdropToWallet,
       transfer,
       approveInstruction,

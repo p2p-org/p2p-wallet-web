@@ -2,6 +2,7 @@ import React, { FunctionComponent } from 'react';
 
 import { styled } from '@linaria/react';
 
+import { Token } from 'api/token/Token';
 import { TokenType } from 'constants/tokens';
 
 import { TokenRow } from '../TokenRow';
@@ -12,7 +13,7 @@ const Wrapper = styled.div`
 `;
 
 type Props = {
-  items?: TokenType[];
+  items?: Token[];
   closeModal: () => void;
 };
 
@@ -23,8 +24,8 @@ export const TokenList: FunctionComponent<Props> = ({ items, closeModal }) => {
 
   return (
     <Wrapper>
-      {items.map((item) => (
-        <TokenRow key={item.mintAddress} {...item} closeModal={closeModal} />
+      {items.map((token) => (
+        <TokenRow key={token.address.toBase58()} token={token} closeModal={closeModal} />
       ))}
     </Wrapper>
   );

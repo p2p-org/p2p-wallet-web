@@ -2,6 +2,7 @@ import React, { FunctionComponent, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router';
 
+import { unwrapResult } from '@reduxjs/toolkit';
 import * as web3 from '@solana/web3.js';
 import Decimal from 'decimal.js';
 
@@ -37,26 +38,30 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
   };
 
   const handleSubmit = async () => {
-    const amount = new Decimal(fromTokenAmount)
-      .mul(10 ** (tokenAccount?.mint.decimals || 0))
-      .toNumber();
+    if (!tokenAccount) {
+      throw new Error(`Did't find token`);
+    }
+
+    const amount = new Decimal(fromTokenAmount).mul(10 ** tokenAccount?.mint.decimals).toNumber();
 
     if (!amount || amount <= 0) {
       throw new Error('Invalid amount');
     }
 
     try {
-      const signature = await dispatch(
-        transfer({
-          source: new web3.PublicKey(publicKey),
-          destination: new web3.PublicKey(toTokenPublicKey),
-          amount,
-        }),
+      const signature = unwrapResult(
+        await dispatch(
+          transfer({
+            source: new web3.PublicKey(publicKey),
+            destination: new web3.PublicKey(toTokenPublicKey),
+            amount,
+          }),
+        ),
       );
 
       history.push(`/send/${publicKey}/result`, { signature });
     } catch (error) {
-      alert(error);
+      console.error(error);
     }
   };
 
