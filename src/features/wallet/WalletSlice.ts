@@ -175,20 +175,20 @@ const updateAccountReducer = (
 };
 
 // The initial wallet state. No wallet is connected yet.
-const initialState: WalletsState = {
+const makeInitialState = (): WalletsState => ({
   cluster: (localStorage.getItem(CLUSTER_STORAGE_KEY) as Cluster) || DEFAULT_CLUSTER,
   connected: false,
   publicKey: null,
   type: WalletType.SOLLET,
   tokenAccounts: [],
-};
+});
 
 /**
  * Redux slice containing the reducers for the wallet
  */
 const walletSlice = createSlice({
   name: WALLET_SLICE_NAME,
-  initialState,
+  initialState: makeInitialState(),
   reducers: {
     updateAccount: updateAccountReducer,
     selectCluster: (state, action: PayloadAction<Cluster>) => {
@@ -206,14 +206,14 @@ const walletSlice = createSlice({
   },
   extraReducers: (builder) => {
     // Triggered when the connect async action is completed
-    builder.addCase(connect.fulfilled, (_, action) => ({
-      ...initialState,
+    builder.addCase(connect.fulfilled, (state, action) => ({
+      ...makeInitialState(),
       publicKey: action.payload,
       connected: true,
     }));
     // Triggered when the disconnect async action is completed
-    builder.addCase(disconnect.fulfilled, () => ({
-      ...initialState,
+    builder.addCase(disconnect.fulfilled, (state) => ({
+      ...makeInitialState(),
       publicKey: null,
       connected: false,
     }));

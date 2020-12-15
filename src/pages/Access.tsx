@@ -8,6 +8,7 @@ import throttle from 'lodash.throttle';
 
 import { WalletType } from 'api/wallet';
 import { Button, Icon, Input } from 'components/ui';
+import { localMnemonic } from 'config/constants';
 import { connect, selectType } from 'features/wallet/WalletSlice';
 
 import { Header } from '../components/common/Header';
@@ -86,7 +87,7 @@ export const Access: FunctionComponent = () => {
   const history = useHistory();
   const dispatch = useDispatch();
   const [error, setError] = useState(false);
-  const [mnemonic, setMnemonic] = useState('');
+  const [mnemonic, setMnemonic] = useState(localMnemonic || '');
   const [password, setPassword] = useState('');
 
   const validateMnemonic = useCallback(

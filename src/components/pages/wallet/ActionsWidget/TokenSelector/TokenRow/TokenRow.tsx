@@ -6,7 +6,6 @@ import { rgba } from 'polished';
 import { TokenAccount } from 'api/token/TokenAccount';
 import { RateUSDT } from 'components/common/RateUSDT';
 import { TokenAvatar } from 'components/common/TokenAvatar';
-import { useTokenInfo } from 'utils/hooks/useTokenInfo';
 
 const Wrapper = styled.div`
   padding: 15px 12px;

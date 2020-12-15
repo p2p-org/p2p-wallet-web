@@ -1,4 +1,4 @@
-import { Commitment } from '@solana/web3.js';
+import { Commitment, PublicKey } from '@solana/web3.js';
 
 import { ExtendedCluster } from 'utils/types';
 
@@ -7,8 +7,12 @@ export const isDev = process.env.NODE_ENV === 'development' || process.env.NODE_
 // Can be used in development mode only
 export const localPrivateKey = isDev && process.env.APP_LOCAL_WALLET_PRIVATE_KEY;
 
+export const localMnemonic = isDev && process.env.APP_LOCAL_WALLET_MNEMONIC;
+
 // Env vars that do not start with "REACT_APP_" are available in tests only
-export const localSwapProgramId = process.env.SWAP_PROGRAM_ID;
+export const localSwapProgramId = process.env.SWAP_PROGRAM_ID
+  ? new PublicKey(process.env.SWAP_PROGRAM_ID)
+  : null;
 
 // the default commitment uesd by the Solana web3 connection when checking the blockchain state
 export const defaultCommitment: Commitment =

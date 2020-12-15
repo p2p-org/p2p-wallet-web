@@ -2,12 +2,15 @@ import React, { FunctionComponent, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { styled } from '@linaria/react';
+import { unwrapResult } from '@reduxjs/toolkit';
 import * as web3 from '@solana/web3.js';
+import dayjs from 'dayjs';
 import { rgba } from 'polished';
 
+import { Transaction } from 'api/transaction/Transaction';
 import { Icon } from 'components/ui';
-import { getConfirmedTransaction } from 'store/_actions/solana';
-import { useTransactionInfo } from 'utils/hooks/useTransactionInfo';
+import { getTransaction } from 'features/transaction/TransactionSlice';
+import { RootState } from 'store/rootReducer';
 
 const Wrapper = styled.div`
   position: relative;
@@ -134,70 +137,76 @@ type Props = {
 
 export const TransactionDetailsModal: FunctionComponent<Props> = ({ signature, close }) => {
   const dispatch = useDispatch();
-
-  // const { slot, symbol, amount, meta } = useTransactionInfo(signature);
+  const transaction = useSelector(
+    (state: RootState) =>
+      state.transaction.items[signature] && Transaction.from(state.transaction.items[signature]),
+  );
 
   useEffect(() => {
     const mount = async () => {
-      const trx = await dispatch(getConfirmedTransaction(signature));
+      const trx = unwrapResult(await dispatch(getTransaction(signature)));
 
       if (!trx) {
         setTimeout(mount, 3000);
       }
     };
 
-    if (!signature) {
+    if (!transaction) {
       void mount();
     }
   }, [signature]);
 
-  // if (!slot) {
-  //   return null;
-  // }
+  if (!transaction) {
+    return null;
+  }
 
   return (
     <Wrapper>
-      {/* <Header> */}
-      {/*  /!* <Title>24 Oct 2020 @ 12:51 PM</Title> *!/ */}
-      {/*  <Title>{slot} SLOT</Title> */}
-      {/*  <CloseWrapper onClick={close}> */}
-      {/*    <CloseIcon name="close" /> */}
-      {/*  </CloseWrapper> */}
-      {/*  <CircleWrapper> */}
-      {/*    <ArrowAngleIcon name="arrow-angle" /> */}
-      {/*  </CircleWrapper> */}
-      {/* </Header> */}
-      {/* <Content> */}
-      {/*  <StatusWrapper> */}
-      {/*    <Value> */}
-      {/*      {amount} {symbol} */}
-      {/*    </Value> */}
-      {/*    <Status>Completed</Status> */}
-      {/*  </StatusWrapper> */}
-      {/*  <FieldsWrapper> */}
-      {/*    <FieldWrapper> */}
-      {/*      <FieldTitle>Transaction ID</FieldTitle> */}
-      {/*      <FieldValue>{signature}</FieldValue> */}
-      {/*    </FieldWrapper> */}
-      {/*    <FieldWrapper> */}
-      {/*      <FieldTitle>Amount</FieldTitle> */}
-      {/*      <FieldValue>{amount}</FieldValue> */}
-      {/*      /!* <FieldValue>0,00344 BTC at 12 902, 07 US$</FieldValue> *!/ */}
-      {/*    </FieldWrapper> */}
-      {/*    <FieldWrapper> */}
-      {/*      <FieldTitle>Value</FieldTitle> */}
-      {/*      <FieldValue>{amount}</FieldValue> */}
-      {/*      /!* <FieldValue>0,00344 BTC at 12 902, 07 US$</FieldValue> *!/ */}
-      {/*    </FieldWrapper> */}
-      {/*    {meta ? ( */}
-      {/*      <FieldWrapper> */}
-      {/*        <FieldTitle>Fee</FieldTitle> */}
-      {/*        <FieldValue>{meta.fee} lamports</FieldValue> */}
-      {/*        /!* <FieldValue>0,00009492 BTC</FieldValue> *!/ */}
-      {/*      </FieldWrapper> */}
-      {/*    ) : null} */}
-      {/*  </FieldsWrapper> */}
-      {/* </Content> */}
+      <Header>
+        <Title title={`${transaction.slot} SLOT`}>
+          {transaction.timestamp
+            ? dayjs.unix(transaction.timestamp).format('LLL')
+            : `${transaction.slot} SLOT`}
+        </Title>
+        <CloseWrapper onClick={close}>
+          <CloseIcon name="close" />
+        </CloseWrapper>
+        <CircleWrapper>
+          <ArrowAngleIcon name="arrow-angle" />
+        </CircleWrapper>
+      </Header>
+      <Content>
+        <StatusWrapper>
+          <Value>
+            {transaction.short.amount.toNumber()}{' '}
+            {transaction.short.sourceTokenAccount?.mint.symbol}
+          </Value>
+          <Status>Completed</Status>
+        </StatusWrapper>
+        <FieldsWrapper>
+          <FieldWrapper>
+            <FieldTitle>Transaction ID</FieldTitle>
+            <FieldValue>{signature}</FieldValue>
+          </FieldWrapper>
+          <FieldWrapper>
+            <FieldTitle>Amount</FieldTitle>
+            <FieldValue>{transaction.short.amount.toNumber()}</FieldValue>
+            {/* <FieldValue>0,00344 BTC at 12 902, 07 US$</FieldValue> */}
+          </FieldWrapper>
+          <FieldWrapper>
+            <FieldTitle>Value</FieldTitle>
+            <FieldValue>{transaction.short.amount.toNumber()}</FieldValue>
+            {/* <FieldValue>0,00344 BTC at 12 902, 07 US$</FieldValue> */}
+          </FieldWrapper>
+          {transaction.meta ? (
+            <FieldWrapper>
+              <FieldTitle>Fee</FieldTitle>
+              <FieldValue>{transaction.meta.fee} lamports</FieldValue>
+              {/* <FieldValue>0,00009492 BTC</FieldValue> */}
+            </FieldWrapper>
+          ) : null}
+        </FieldsWrapper>
+      </Content>
     </Wrapper>
   );
 };

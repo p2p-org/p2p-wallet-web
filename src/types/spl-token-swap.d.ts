@@ -6,6 +6,8 @@ declare module '@solana/spl-token-swap' {
 
     feeAccount: PublicKey;
 
+    authority: PublicKey;
+
     tokenAccountA: PublicKey;
 
     tokenAccountB: PublicKey;

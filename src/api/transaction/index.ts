@@ -1,8 +1,17 @@
 import cache from '@civic/simple-cache';
-import { PublicKey, TransactionSignature } from '@solana/web3.js';
+import {
+  LAMPORTS_PER_SOL,
+  ParsedAccountData,
+  ParsedInstruction,
+  PublicKey,
+  TransactionSignature,
+} from '@solana/web3.js';
+import { Decimal } from 'decimal.js';
 import { complement, identity, isNil, memoizeWith } from 'ramda';
 
 import { getConnection } from 'api/connection';
+import { APIFactory as TokenAPIFactory } from 'api/token';
+import { SYSTEM_PROGRAM_ID, TOKEN_PROGRAM_ID } from 'constants/solana/bufferLayouts';
 import { ExtendedCluster } from 'utils/types';
 
 import { Transaction } from './Transaction';
@@ -17,6 +26,7 @@ export const APIFactory = memoizeWith(
   identity,
   (cluster: ExtendedCluster): API => {
     const connection = getConnection(cluster);
+    const tokenAPI = TokenAPIFactory(cluster);
 
     const transactionInfoUncached = async (
       signature: TransactionSignature,
@@ -41,11 +51,33 @@ export const APIFactory = memoizeWith(
           }
         : null;
 
+      const instruction = transactionInfo?.transaction.message.instructions[0];
+      const source = instruction?.parsed?.info.source
+        ? new PublicKey(instruction?.parsed?.info.source)
+        : null;
+      const sourceTokenAccount = source ? await tokenAPI.tokenAccountInfo(source) : null;
+      const type = instruction?.parsed?.type;
+
+      let amount = new Decimal(0);
+      if (instruction?.programId.equals(TOKEN_PROGRAM_ID)) {
+        amount = new Decimal(instruction?.parsed?.info.amount || 0);
+
+        if (sourceTokenAccount?.mint.decimals) {
+          amount = new Decimal(amount).div(10 ** sourceTokenAccount?.mint.decimals);
+        }
+      } else if (instruction?.programId.equals(SYSTEM_PROGRAM_ID)) {
+        amount = new Decimal(instruction?.parsed?.info.lamports || 0).div(LAMPORTS_PER_SOL);
+      }
+
+      const timestamp = await connection.getBlockTime(transactionInfo.slot);
+
       return new Transaction(
         signature,
         transactionInfo.slot,
+        timestamp,
         meta,
         transactionInfo.transaction.message,
+        { type, source, sourceTokenAccount, amount },
       );
     };
 

@@ -1,5 +1,4 @@
-import { Decimal } from 'decimal.js';
-import { any, complement, curry, eqProps, find, head, indexOf, propEq, update } from 'ramda';
+import { any, complement, curry, eqProps, find, indexOf, propEq, update } from 'ramda';
 
 import { Pool, SerializablePool } from 'api/pool/Pool';
 import { SerializableToken, Token } from 'api/token/Token';
@@ -27,12 +26,12 @@ export const selectPoolForTokenPair = (
   return foundPool && foundPool.serialize();
 };
 
-// const isPoolToken = (pools: Array<Pool>) => (token: Token) =>
-//   any(propEq('poolToken', token), pools);
+const isPoolToken = (pools: Array<Pool>) => (token: Token) =>
+  any(propEq('poolToken', token), pools);
 
-// export const withoutPoolTokens = curry((pools: Array<Pool>, tokens: Array<Token>) =>
-//   tokens.filter(complement(isPoolToken(pools))),
-// );
+export const withoutPoolTokens = curry((pools: Array<Pool>, tokens: Array<Token>) =>
+  tokens.filter(complement(isPoolToken(pools))),
+);
 
 export const getToAmount = (
   firstAmount: number,

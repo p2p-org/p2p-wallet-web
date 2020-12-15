@@ -1,12 +1,14 @@
-import { Numberu64, TokenSwap } from '@solana/spl-token-swap';
+import { Numberu64, TokenSwap, TokenSwapLayout } from '@solana/spl-token-swap';
 import { Account, PublicKey, TransactionInstruction } from '@solana/web3.js';
 import { Decimal } from 'decimal.js';
+import { complement, isNil } from 'ramda';
 import assert from 'ts-invariant';
 
 import { getConnection } from 'api/connection';
 import { APIFactory as TokenAPIFactory, TOKEN_PROGRAM_ID } from 'api/token';
 import { TokenAccount } from 'api/token/TokenAccount';
 import { makeTransaction, sendTransaction } from 'api/wallet';
+import { ToastManager } from 'components/common/ToastManager';
 import { localSwapProgramId } from 'config/constants';
 import { ExtendedCluster } from 'utils/types';
 
@@ -91,13 +93,12 @@ export const APIFactory = (cluster: ExtendedCluster): API => {
   const connection = getConnection(cluster);
   const poolConfigForCluster = poolConfig[cluster];
 
-  const swapProgramIdString = poolConfigForCluster.swapProgramId || localSwapProgramId;
-  if (!swapProgramIdString) {
+  const swapProgramId = poolConfigForCluster.swapProgramId || localSwapProgramId;
+  if (!swapProgramId) {
     throw new Error('No TokenSwap program ID defined');
   }
 
-  console.log(`Swap Program ID ${swapProgramIdString}.`);
-  const swapProgramId = new PublicKey(swapProgramIdString);
+  console.log(`Swap Program ID ${swapProgramId.toBase58()}.`);
 
   const tokenAPI = TokenAPIFactory(cluster);
 
@@ -145,7 +146,6 @@ export const APIFactory = (cluster: ExtendedCluster): API => {
       poolTokenInfo,
       feeAccountInfo,
       swapProgramId,
-      swapInfo.nonce,
       feeRatio,
       tokenAccountAInfo.lastUpdatedSlot,
     );
@@ -176,12 +176,27 @@ export const APIFactory = (cluster: ExtendedCluster): API => {
   };
 
   const getPools = async (): Promise<Array<Pool>> => {
+    if (!poolConfigForCluster.swapProgramId) {
+      console.log(`Current network doesn't have swap program`, cluster);
+      return [];
+    }
+
     console.log('Loading pools for cluster', cluster);
-    const poolPromises = poolConfigForCluster.pools.map((address: string) =>
-      getPool(new PublicKey(address)),
+
+    const poolInfos = (
+      await connection.getProgramAccounts(poolConfigForCluster.swapProgramId)
+    ).filter((item) => item.account.data.length === TokenSwapLayout.span);
+
+    const poolPromises = poolInfos.map((poolInfo) =>
+      getPool(poolInfo.pubkey).catch((error: Error) => {
+        ToastManager.error(error.toString());
+        return null;
+      }),
     );
 
-    return Promise.all(poolPromises);
+    const pools = await Promise.all(poolPromises);
+
+    return pools.filter(complement(isNil)) as Pool[];
   };
 
   const listenToPoolChanges = (pools: Array<Pool>, callback: PoolUpdateCallback) => {
@@ -234,7 +249,7 @@ export const APIFactory = (cluster: ExtendedCluster): API => {
       swapProgramId,
       TOKEN_PROGRAM_ID,
       parameters.fromAmount,
-      toNumberU64(minimumToAmountWithSlippage),
+      minimumToAmountWithSlippage.toNumber(),
     );
   };
 
@@ -401,30 +416,36 @@ export const APIFactory = (cluster: ExtendedCluster): API => {
    * @param {SwapParameters} parameters
    */
   const swap = async (parameters: SwapParameters): Promise<string> => {
-    validateSwapParameters(parameters);
+    try {
+      validateSwapParameters(parameters);
 
-    // get the toAccount from the parameters, or create it if not present
-    const isReverse = parameters.fromAccount.sameToken(parameters.pool.tokenB);
-    const toToken = isReverse ? parameters.pool.tokenA.mint : parameters.pool.tokenB.mint;
-    const toAccount = parameters.toAccount || (await tokenAPI.createAccountForToken(toToken));
+      // get the toAccount from the parameters, or create it if not present
+      const isReverse = parameters.fromAccount.sameToken(parameters.pool.tokenB);
+      const toToken = isReverse ? parameters.pool.tokenA.mint : parameters.pool.tokenB.mint;
+      const toAccount = parameters.toAccount || (await tokenAPI.createAccountForToken(toToken));
 
-    console.log('Executing swap:', parameters);
+      console.log('Executing swap:', parameters);
 
-    const delegate = await parameters.pool.tokenSwapAuthority();
-    const approveInstruction = tokenAPI.approveInstruction(
-      parameters.fromAccount,
-      delegate,
-      parameters.fromAmount,
-    );
+      const delegate = await parameters.pool.tokenSwapAuthority();
 
-    const swapInstruction = await createSwapTransactionInstruction({
-      ...parameters,
-      slippage: DEFAULT_SLIPPAGE,
-      toAccount,
-    });
+      const approveInstruction = tokenAPI.approveInstruction(
+        parameters.fromAccount,
+        delegate,
+        parameters.fromAmount,
+      );
 
-    const transaction = await makeTransaction([approveInstruction, swapInstruction]);
-    return sendTransaction(transaction);
+      const swapInstruction = await createSwapTransactionInstruction({
+        ...parameters,
+        slippage: DEFAULT_SLIPPAGE,
+        toAccount,
+      });
+
+      const transaction = await makeTransaction([approveInstruction, swapInstruction]);
+      return sendTransaction(transaction);
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
   };
 
   /**

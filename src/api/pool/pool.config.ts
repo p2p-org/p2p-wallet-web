@@ -1,6 +1,7 @@
+import { PublicKey } from '@solana/web3.js';
+
 export type PoolConfig = {
-  swapProgramId: string;
-  pools: string[];
+  swapProgramId: PublicKey | null;
 };
 
 type PoolsByEntrypointType = {
@@ -10,22 +11,15 @@ type PoolsByEntrypointType = {
 // eslint-disable-next-line import/no-default-export
 export default {
   localnet: {
-    swapProgramId: '',
-    pools: [],
+    swapProgramId: null,
   },
   devnet: {
-    swapProgramId: 'E7G3NKPwVcuPXjqL11J2ZZWBVRsocb6Lu3nK5BrRwBNd',
-    pools: ['2s2mjJdAGM1qDygg65YCPrnQ9Dr4Xsd2dWS8QpVAuuyL'],
+    swapProgramId: new PublicKey('E7G3NKPwVcuPXjqL11J2ZZWBVRsocb6Lu3nK5BrRwBNd'),
   },
   testnet: {
-    swapProgramId: 'FmgrCQX1JJSAkJEk8fiL85Cgnh7g3DS1rmakEjP1eCyL',
-    pools: [
-      '2eWaje2xd9VuBAEo82PMGxAxn2ZPhVEnzNo9dRYAiyey',
-      '2zKS9SSdfvLuzGKF5WX46tSesavDbs3eEXBGgZ3PyPjx',
-    ],
+    swapProgramId: new PublicKey('FmgrCQX1JJSAkJEk8fiL85Cgnh7g3DS1rmakEjP1eCyL'),
   },
   'mainnet-beta': {
-    swapProgramId: 'HYv7pNgHkkBGxfrnCre2pMgLpWm7LJPKxiyZVytN5HrM',
-    pools: ['CyfMxsHgmjaBXgbV46e673MigKVUNzGf8Gj9CfwjvpMy'],
+    swapProgramId: new PublicKey('9qvG1zUp8xF1Bi4m6UdRNby1BAAuaDrUxSpv4CmRRMjL'),
   },
 } as PoolsByEntrypointType;

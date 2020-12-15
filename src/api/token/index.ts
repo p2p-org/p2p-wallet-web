@@ -1,5 +1,5 @@
 import cache from '@civic/simple-cache';
-import { AccountLayout, MintLayout, Token as SPLToken, u64 } from '@solana/spl-token';
+import { AccountLayout, MintLayout, Token as SPLToken } from '@solana/spl-token';
 import {
   Account,
   AccountInfo,
@@ -10,8 +10,7 @@ import {
   TransactionInstruction,
 } from '@solana/web3.js';
 import BN from 'bn.js';
-import BufferLayout, { blob, u8 } from 'buffer-layout';
-import { Decimal } from 'decimal.js';
+import BufferLayout, { blob } from 'buffer-layout';
 import { complement, find, identity, isNil, memoizeWith, path, propEq } from 'ramda';
 import assert from 'ts-invariant';
 
@@ -65,7 +64,7 @@ export interface API {
   approveInstruction: (
     sourceAccount: TokenAccount,
     delegate: PublicKey,
-    amount: number | Decimal,
+    amount: number,
   ) => TransactionInstruction;
   approve: (sourceAccount: TokenAccount, delegate: PublicKey, amount: number) => Promise<string>;
   listenToTokenAccountChanges: (
@@ -73,9 +72,6 @@ export interface API {
     callback: TokenAccountUpdateCallback,
   ) => void;
 }
-
-// eslint-disable-next-line new-cap
-const toU64 = (number: Decimal | number) => new u64(`${number}`);
 
 // The API is a singleton per cluster. This ensures requests can be cached
 export const APIFactory = memoizeWith(
@@ -486,18 +482,14 @@ export const APIFactory = memoizeWith(
       return sendTransaction(transaction);
     };
 
-    function approveInstruction(
-      sourceAccount: TokenAccount,
-      delegate: PublicKey,
-      amount: number | Decimal,
-    ) {
+    function approveInstruction(sourceAccount: TokenAccount, delegate: PublicKey, amount: number) {
       return SPLToken.createApproveInstruction(
         TOKEN_PROGRAM_ID,
         sourceAccount.address,
         delegate,
         getWallet().pubkey,
         [],
-        toU64(amount),
+        amount,
       );
     }
 
@@ -681,7 +673,7 @@ export const APIFactory = memoizeWith(
       // Try to find Token account by SOL address with highest balance
       const destinationSplTokenAccount = (
         await getAccountsForToken(sourceTokenAccountInfo.mint, parameters.destination)
-      ).sort((a, b) => b.balance.minus(a.balance).toNumber())[0];
+      ).sort((a, b) => b.balance.cmp(a.balance))[0];
 
       if (destinationSplTokenAccount) {
         return transferBetweenSplTokenAccounts(

@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import { styled } from '@linaria/react';
 import { TransactionSignature } from '@solana/web3.js';
+import dayjs from 'dayjs';
 import { rgba } from 'polished';
 
 import { Transaction } from 'api/transaction/Transaction';
@@ -10,7 +11,8 @@ import { Avatar } from 'components/ui';
 import { openModal } from 'store/_actions/modals';
 import { SHOW_MODAL_TRANSACTION_DETAILS } from 'store/constants/modalTypes';
 import { RootState } from 'store/rootReducer';
-import { useTransactionInfo } from 'utils/hooks/useTransactionInfo';
+
+import { AmountUSDT } from '../AmountUSDT';
 
 const Wrapper = styled.div`
   display: flex;
@@ -61,29 +63,37 @@ type Props = {
 
 export const TransactionRow: FunctionComponent<Props> = ({ signature }) => {
   const dispatch = useDispatch();
-  const transaction = useSelector((state: RootState) => state.transaction.items[signature]);
-
-  // const { slot, type, symbol, amount } = useTransactionInfo(transaction);
+  const transaction = useSelector(
+    (state: RootState) =>
+      state.transaction.items[signature] && Transaction.from(state.transaction.items[signature]),
+  );
 
   const handleClick = () => {
-    dispatch(openModal(SHOW_MODAL_TRANSACTION_DETAILS, { signature: transaction.signature }));
+    dispatch(openModal(SHOW_MODAL_TRANSACTION_DETAILS, { signature }));
   };
-
-  console.log(transaction);
 
   return (
     <Wrapper onClick={handleClick}>
       <AvatarStyled />
       <Content>
-        {/*  <Top> */}
-        {/*    <div>{type}</div> <AmountUSDT value={amount} symbol={symbol} /> */}
-        {/*  </Top> */}
-        {/*  <Bottom> */}
-        {/*    <div>{slot} SLOT</div> */}
-        {/*    <div> */}
-        {/*      {amount} {symbol} */}
-        {/*    </div> */}
-        {/*  </Bottom> */}
+        <Top>
+          <div>{transaction.short.type}</div>
+          <AmountUSDT
+            value={transaction.short.amount}
+            symbol={transaction.short.sourceTokenAccount?.mint.symbol}
+          />
+        </Top>
+        <Bottom>
+          <div title={`${transaction.slot} SLOT`}>
+            {transaction.timestamp
+              ? dayjs.unix(transaction.timestamp).format('LLL')
+              : `${transaction.slot} SLOT`}
+          </div>
+          <div>
+            {transaction.short.amount.toNumber()}{' '}
+            {transaction.short.sourceTokenAccount?.mint.symbol}
+          </div>
+        </Bottom>
       </Content>
     </Wrapper>
   );

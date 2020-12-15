@@ -1,18 +1,20 @@
 import React, { FunctionComponent, useEffect } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useLocation } from 'react-router';
 import { Link } from 'react-router-dom';
 
 import { styled } from '@linaria/react';
+import { unwrapResult } from '@reduxjs/toolkit';
 import bgImg from 'assets/images/sun.png';
 import { rgba } from 'polished';
 
+import { Transaction } from 'api/transaction/Transaction';
 import { Card } from 'components/common/Card';
 import { Button, Icon } from 'components/ui';
+import { getTransaction } from 'features/transaction/TransactionSlice';
 import { openModal } from 'store/_actions/modals';
-import { getConfirmedTransaction } from 'store/_actions/solana';
 import { SHOW_MODAL_TRANSACTION_DETAILS } from 'store/constants/modalTypes';
-import { useTransactionInfo } from 'utils/hooks/useTransactionInfo';
+import { RootState } from 'store/rootReducer';
 
 const WrapperCard = styled(Card)`
   display: flex;
@@ -91,20 +93,23 @@ const Details = styled.div`
 export const ResultWidget: FunctionComponent = () => {
   const { state: locationState } = useLocation<{ signature: string }>();
   const dispatch = useDispatch();
+  const transaction = useSelector(
+    (state: RootState) =>
+      state.transaction.items[locationState.signature] &&
+      Transaction.from(state.transaction.items[locationState.signature]),
+  );
 
-  // const { slot, source, symbol, amount } = useTransactionInfo(locationState?.signature);
+  useEffect(() => {
+    const mount = async () => {
+      const trx = unwrapResult(await dispatch(getTransaction(locationState?.signature)));
 
-  // useEffect(() => {
-  //   const mount = async () => {
-  //     const trx = await dispatch(getConfirmedTransaction(locationState?.signature));
-  //
-  //     if (!trx) {
-  //       setTimeout(mount, 3000);
-  //     }
-  //   };
-  //
-  //   void mount();
-  // }, []);
+      if (!trx) {
+        setTimeout(mount, 3000);
+      }
+    };
+
+    void mount();
+  }, []);
 
   const handleDetailsClick = () => {
     dispatch(openModal(SHOW_MODAL_TRANSACTION_DETAILS, { signature: locationState?.signature }));
@@ -116,20 +121,23 @@ export const ResultWidget: FunctionComponent = () => {
       <CircleWrapper>
         <ArrowIcon name="arrow-angle" />
       </CircleWrapper>
-      {/* <InfoWrapper> */}
-      {/*  {slot ? ( */}
-      {/*    <Value> */}
-      {/*      {amount} {symbol} */}
-      {/*    </Value> */}
-      {/*  ) : undefined} */}
-      {/*  <Status>{slot ? 'Processed' : 'Processing'}</Status> */}
-      {/*  {slot ? <Details onClick={handleDetailsClick}>Transaction details</Details> : undefined} */}
-      {/* </InfoWrapper> */}
-      {/* {source ? ( */}
-      {/*  <Button primary big full as={Link} to={`/wallet/${source}`}> */}
-      {/*    Go back to wallet */}
-      {/*  </Button> */}
-      {/* ) : undefined} */}
+      <InfoWrapper>
+        {transaction ? (
+          <Value>
+            {transaction.short.amount.toNumber()}{' '}
+            {transaction.short.sourceTokenAccount?.mint.symbol}
+          </Value>
+        ) : undefined}
+        <Status>{transaction ? 'Processed' : 'Processing'}</Status>
+        {transaction ? (
+          <Details onClick={handleDetailsClick}>Transaction details</Details>
+        ) : undefined}
+      </InfoWrapper>
+      {transaction?.short.source ? (
+        <Button primary big full as={Link} to={`/wallet/${transaction.short.source.toBase58()}`}>
+          Go back to wallet
+        </Button>
+      ) : undefined}
     </WrapperCard>
   );
 };

@@ -1,5 +1,5 @@
 import React, { FunctionComponent } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { batch, useDispatch, useSelector } from 'react-redux';
 
 import { Cluster } from '@solana/web3.js';
 
@@ -14,8 +14,10 @@ export const ClusterSelector: FunctionComponent = () => {
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const newCluster = e.target.value as Cluster;
 
-    dispatch(disconnect());
-    dispatch(selectCluster(newCluster));
+    batch(() => {
+      dispatch(selectCluster(newCluster));
+      dispatch(disconnect());
+    });
   };
 
   return (

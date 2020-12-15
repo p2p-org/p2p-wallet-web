@@ -45,7 +45,14 @@ module.exports = {
       Buffer: ['buffer', 'Buffer'],
     }),
     new webpack.DefinePlugin({
-      'process.env': { NODE_ENV: JSON.stringify(process.env.NODE_ENV) },
+      'process.env': {
+        NODE_ENV: JSON.stringify(process.env.NODE_ENV),
+        APP_LOCAL_WALLET_PRIVATE_KEY: JSON.stringify(process.env.APP_LOCAL_WALLET_PRIVATE_KEY),
+        APP_LOCAL_WALLET_MNEMONIC: JSON.stringify(process.env.APP_LOCAL_WALLET_MNEMONIC),
+        SWAP_PROGRAM_ID: JSON.stringify(process.env.SWAP_PROGRAM_ID),
+        DEFAULT_COMMITMENT: JSON.stringify(process.env.DEFAULT_COMMITMENT),
+        POST_TRANSACTION_SLEEP_MS: JSON.stringify(process.env.POST_TRANSACTION_SLEEP_MS),
+      },
     }),
     new HtmlWebPackPlugin({
       template: path.resolve(__dirname, 'public/index.html'),

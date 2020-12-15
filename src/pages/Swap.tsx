@@ -1,5 +1,4 @@
 import React, { FunctionComponent } from 'react';
-import { useParams } from 'react-router-dom';
 
 import { styled } from '@linaria/react';
 
@@ -15,8 +14,6 @@ const Wrapper = styled.div`
 type Props = {};
 
 export const Swap: FunctionComponent<Props> = (props) => {
-  const { publicKey } = useParams<{ publicKey: string; status: string }>();
-
   const breadcrumbs = [{ name: 'Wallets', to: '/wallets' }, { name: 'Swap ' }];
 
   return (
@@ -24,7 +21,7 @@ export const Swap: FunctionComponent<Props> = (props) => {
       breadcrumbs={breadcrumbs}
       centered={
         <Wrapper>
-          <SwapWidget publicKey={publicKey} />
+          <SwapWidget />
         </Wrapper>
       }
     />

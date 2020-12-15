@@ -3,6 +3,7 @@ import React, { FunctionComponent } from 'react';
 import { styled } from '@linaria/react';
 import { rgba } from 'polished';
 
+import { TokenAccount } from 'api/token/TokenAccount';
 import { Card } from 'components/common/Card';
 import { Button, Icon } from 'components/ui';
 
@@ -104,18 +105,20 @@ const Hint = styled.div`
   line-height: 17px;
 `;
 
+// TODO: make amounts with decimal type
 type Props = {
   type: 'send' | 'swap';
   title: string;
-  fromTokenPublicKey: string;
-  fromTokenAmount: string;
-  toTokenPublicKey: string;
-  toTokenAmount?: string;
+  fromTokenAccount?: TokenAccount;
+  fromAmount: string;
+  toTokenAccount?: TokenAccount | string;
+  toAmount?: string;
   actionText: string;
-  onFromTokenChange: (pubkey: string) => void;
-  onFromAmountChange: (amount: string) => void;
-  onToTokenChange: (pubkey: string) => void;
-  onToAmountChange?: (amount: string) => void;
+  fee?: number;
+  onFromTokenAccountChange: (tokenAccount: TokenAccount) => void;
+  onFromAmountChange: (minorAmount: string) => void;
+  onToTokenAccountChange: (tokenAccount: TokenAccount | string) => void;
+  onToAmountChange?: (minorAmount: string) => void;
   onBackClick: () => void;
   onSubmit: () => void;
   disabled?: boolean;
@@ -124,14 +127,15 @@ type Props = {
 export const SendSwapWidget: FunctionComponent<Props> = ({
   type,
   title,
-  fromTokenPublicKey,
-  fromTokenAmount,
-  toTokenPublicKey,
-  toTokenAmount = '',
+  fromTokenAccount,
+  fromAmount,
+  toTokenAccount,
+  toAmount,
   actionText,
-  onFromTokenChange,
+  fee,
+  onFromTokenAccountChange,
   onFromAmountChange,
-  onToTokenChange,
+  onToTokenAccountChange,
   onToAmountChange = () => {},
   onBackClick,
   onSubmit,
@@ -148,9 +152,10 @@ export const SendSwapWidget: FunctionComponent<Props> = ({
       <WrapperCard>
         <FromWrapper>
           <FromToSelectInput
-            tokenPublicKey={fromTokenPublicKey}
-            tokenAmount={fromTokenAmount}
-            onTokenChange={onFromTokenChange}
+            type={type}
+            tokenAccount={fromTokenAccount}
+            amount={fromAmount}
+            onTokenAccountChange={onFromTokenAccountChange}
             onAmountChange={onFromAmountChange}
             disabled={disabled}
           />
@@ -161,15 +166,19 @@ export const SendSwapWidget: FunctionComponent<Props> = ({
               {/* <ToOption>To user</ToOption> */}
               <ToOption className="active">To wallet</ToOption>
             </ToSelect>
-            <ToAddressInput value={toTokenPublicKey} onChange={onToTokenChange} />
+            <ToAddressInput
+              value={String(toTokenAccount) || ''}
+              onChange={onToTokenAccountChange}
+            />
           </ToWrapper>
         ) : (
           <FromWrapper>
             <FromToSelectInput
-              type="to"
-              tokenPublicKey={toTokenPublicKey}
-              tokenAmount={toTokenAmount}
-              onTokenChange={onToTokenChange}
+              type={type}
+              direction="to"
+              tokenAccount={toTokenAccount as TokenAccount}
+              amount={toAmount}
+              onTokenAccountChange={onToTokenAccountChange}
               onAmountChange={onToAmountChange}
               disabled={disabled}
             />
@@ -179,7 +188,7 @@ export const SendSwapWidget: FunctionComponent<Props> = ({
           <Button primary={!disabled} secondary={disabled} big full onClick={onSubmit}>
             {actionText}
           </Button>
-          <Hint>fee calculator comming soon</Hint>
+          {fee ? <Hint>{fee}</Hint> : undefined}
         </ActionWrapper>
       </WrapperCard>
     </Wrapper>

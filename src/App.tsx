@@ -1,7 +1,9 @@
 import React, { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { BrowserRouter as Router, Route, Switch, useHistory } from 'react-router-dom';
 
+import dayjs from 'dayjs';
+import localizedFormat from 'dayjs/plugin/localizedFormat';
 import NProgress from 'nprogress';
 
 import { ModalManager } from 'components/common/ModalManager';
@@ -14,9 +16,10 @@ import { Send } from 'pages/Send';
 import { Swap } from 'pages/Swap';
 import { Wallet } from 'pages/Wallet';
 import { Wallets } from 'pages/Wallets';
-import { establishConnection, getRates } from 'store/_actions/complex';
 import { RootState } from 'store/rootReducer';
 import { AuthRequiredRoute } from 'utils/routes/UserRequiredRoute';
+
+dayjs.extend(localizedFormat);
 
 NProgress.configure({ showSpinner: false });
 
@@ -34,17 +37,7 @@ const FixRoute = () => {
 };
 
 const App: React.FC = () => {
-  // const dispatch = useDispatch();
   const loading = useSelector((state: RootState) => state.global.loading);
-
-  // useEffect(() => {
-  //   const mount = async () => {
-  //     await dispatch(establishConnection());
-  //     await dispatch(getRates());
-  //   };
-  //
-  //   void mount();
-  // }, []);
 
   useEffect(() => {
     if (loading) {

@@ -1,107 +1,87 @@
-import React, { FunctionComponent, useEffect, useMemo, useState } from 'react';
+import React, { FunctionComponent } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router';
 
-import * as web3 from '@solana/web3.js';
-import { Decimal } from 'decimal.js';
-
+import { usePoolFromLocation } from 'api/pool/utils/state';
 import { TokenAccount } from 'api/token/TokenAccount';
 import { SendSwapWidget } from 'components/common/SendSwapWidget';
-import { transferTokens } from 'store/_actions/complex';
-import { getPoolsAccounts } from 'store/_actions/complex/pools';
-import { RootState } from 'store/rootReducer';
+import { executeSwap } from 'features/swap/SwapSlice';
+import { updateTokenPairState } from 'features/tokenPair/TokenPairSlice';
+import { tokenPairSelector } from 'features/tokenPair/utils/tokenPair';
 
 type Props = {
   publicKey: string;
 };
 
-export const SwapWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
+export const SwapWidget: FunctionComponent<Props> = () => {
   const dispatch = useDispatch();
   const history = useHistory();
-  const [fromTokenAmount, setFromTokenAmount] = useState('');
-  const [toTokenAmount, setToTokenAmount] = useState('');
-  const [toTokenPublicKey, setToTokenPublicKey] = useState('');
-  const tokenAccounts = useSelector((state: RootState) =>
-    state.wallet.tokenAccounts.map((account) => TokenAccount.from(account)),
-  );
-  const tokenAccount = useMemo(
-    () => tokenAccounts.find((account) => account.address.toBase58() === publicKey),
-    [tokenAccounts, publicKey],
-  );
 
-  useEffect(() => {
-    dispatch(getPoolsAccounts());
-  }, []);
+  const {
+    firstAmount,
+    secondAmount,
+    firstTokenAccount,
+    secondTokenAccount,
+    firstToken,
+    selectedPool,
+    tokenAccounts,
+  } = useSelector(tokenPairSelector);
+
+  usePoolFromLocation({
+    tokenAccounts,
+    updateAction: updateTokenPairState,
+  });
 
   const handleBackClick = () => {
     history.replace('/wallets');
   };
 
-  const handleToTokenChange = (nextPublicKey: string) => {
-    setToTokenPublicKey(nextPublicKey);
-  };
-
   const handleSubmit = async () => {
-    const amount = new Decimal(fromTokenAmount)
-      .mul(10 ** (tokenAccount?.mint.decimals || 0))
-      .toNumber();
-
-    if (!amount || amount <= 0) {
-      throw new Error('Invalid amount');
-    }
-
     try {
-      const components = [
-        // {
-        //   account: publicKey,
-        //   mintAddress: mint,
-        //   amount,
-        // },
-        // {
-        //   mintAddress: B.mintAddress,
-        //   amount: B.convertAmount(),
-        // },
-      ];
-
-      const signature = await dispatch(
-        transferTokens({
-          sourcePublicKey: new web3.PublicKey(publicKey),
-          destPublicKey: new web3.PublicKey(toTokenPublicKey),
-          amount,
-        }),
-      );
-
-      console.log(signature);
+      await dispatch(executeSwap());
     } catch (error) {
       alert(error);
     }
   };
 
-  const handleFromTokenChange = (nextTokenPublicKey: string) => {
-    history.replace(`/swap/${nextTokenPublicKey}`);
+  const handleTokenSelectionChange = (key: 'firstToken' | 'secondToken') => (
+    selectedAccountToken: TokenAccount | string,
+  ) => {
+    dispatch(
+      updateTokenPairState({
+        [key]: (selectedAccountToken as TokenAccount).mint.serialize(),
+        [`${key}Account`]: (selectedAccountToken as TokenAccount).serialize(),
+      }),
+    );
   };
 
-  const handleFromAmountChange = (nextTokenAmount: string) => {
-    setFromTokenAmount(nextTokenAmount);
+  const selectFirstTokenHandleChange = handleTokenSelectionChange('firstToken');
+  const selectSecondTokenHandleChange = handleTokenSelectionChange('secondToken');
+
+  const updateFirstAmount = (minorAmount: string) => {
+    dispatch(updateTokenPairState({ firstAmount: Number(minorAmount) }));
   };
 
-  const handleToAmountChange = (nextTokenAmount: string) => {
-    setToTokenAmount(nextTokenAmount);
-  };
+  const fee =
+    selectedPool && firstToken && firstAmount
+      ? selectedPool.impliedFee(firstToken, firstAmount)
+      : undefined;
 
   return (
     <SendSwapWidget
       type="swap"
       title="Swap"
-      actionText="Comming soon"
-      fromTokenPublicKey={publicKey}
-      fromTokenAmount={fromTokenAmount}
-      toTokenPublicKey={toTokenPublicKey}
-      toTokenAmount={toTokenAmount}
-      onFromTokenChange={handleFromTokenChange}
-      onFromAmountChange={handleFromAmountChange}
-      onToTokenChange={handleToTokenChange}
-      onToAmountChange={handleToAmountChange}
+      disabled={!selectedPool}
+      actionText={selectedPool ? 'Swap' : 'This pair is unavailable'}
+      fee={fee}
+      fromTokenAccount={firstTokenAccount}
+      fromAmount={firstAmount.toString()}
+      toTokenAccount={secondTokenAccount}
+      toAmount={secondAmount.toString()}
+      onFromTokenAccountChange={selectFirstTokenHandleChange}
+      onFromAmountChange={updateFirstAmount}
+      onToTokenAccountChange={selectSecondTokenHandleChange}
+      // onToAmountChange={handleToAmountChange}
       onBackClick={handleBackClick}
       onSubmit={handleSubmit}
     />

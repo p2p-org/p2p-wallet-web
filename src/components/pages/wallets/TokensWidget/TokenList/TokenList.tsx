@@ -19,7 +19,7 @@ export const TokenList: FunctionComponent<Props> = ({ items = [] }) => {
   return (
     <Wrapper>
       {items
-        .sort((a, b) => b.balance.minus(a.balance).toNumber())
+        .sort((a, b) => b.balance.cmp(a.balance))
         .map((item) => (
           <TokenRow key={item.address.toBase58()} token={item} />
         ))}

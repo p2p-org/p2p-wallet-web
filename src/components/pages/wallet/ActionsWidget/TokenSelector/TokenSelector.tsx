@@ -1,5 +1,5 @@
 import React, { FunctionComponent, useEffect, useMemo, useRef, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 
 import { styled } from '@linaria/react';
 import { rgba } from 'polished';
@@ -7,7 +7,6 @@ import { rgba } from 'polished';
 import { TokenAccount } from 'api/token/TokenAccount';
 import { Icon } from 'components/ui';
 import { RootState } from 'store/rootReducer';
-import { useTokenInfo } from 'utils/hooks/useTokenInfo';
 import { shortAddress } from 'utils/tokens';
 
 import { TokenRow } from './TokenRow';
@@ -122,9 +121,11 @@ export const TokenSelector: FunctionComponent<Props> = ({ value, onChange }) => 
       </Selector>
       {isOpen ? (
         <DropDownList>
-          {tokenAccounts.map((item) => (
-            <TokenRow key={item} token={item} onItemClick={handleItemClick} />
-          ))}
+          {tokenAccounts
+            .sort((a, b) => b.balance.cmp(a.balance))
+            .map((item) => (
+              <TokenRow key={item} token={item} onItemClick={handleItemClick} />
+            ))}
         </DropDownList>
       ) : undefined}
     </Wrapper>

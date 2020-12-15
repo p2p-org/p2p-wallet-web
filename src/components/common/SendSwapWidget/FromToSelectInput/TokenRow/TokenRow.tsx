@@ -1,13 +1,10 @@
 import React, { FunctionComponent } from 'react';
-import { useSelector } from 'react-redux';
 
 import { styled } from '@linaria/react';
-import * as web3 from '@solana/web3.js';
 import { rgba } from 'polished';
 
 import { TokenAccount } from 'api/token/TokenAccount';
 import { TokenAvatar } from 'components/common/TokenAvatar';
-import { useTokenInfo } from 'utils/hooks/useTokenInfo';
 
 const Wrapper = styled.div`
   padding: 15px 32px;
@@ -56,28 +53,28 @@ const Bottom = styled.div`
 `;
 
 type Props = {
-  token: TokenAccount;
-  onClick: (publicKey: string) => void;
+  tokenAccount: TokenAccount;
+  onClick: (tokenAccount: TokenAccount) => void;
 };
 
-export const TokenRow: FunctionComponent<Props> = ({ token, onClick }) => {
+export const TokenRow: FunctionComponent<Props> = ({ tokenAccount, onClick }) => {
   const handleClick = () => {
-    onClick(token.address.toBase58());
+    onClick(tokenAccount);
   };
 
   return (
     <Wrapper onClick={handleClick}>
       <ItemWrapper>
-        <TokenAvatar symbol={token.mint.symbol} size={44} />
+        <TokenAvatar symbol={tokenAccount.mint.symbol} size={44} />
         <Info>
           <Top>
-            <TokenName title={token.address.toBase58()}>
-              {token.mint.name || token.address.toBase58()}
+            <TokenName title={tokenAccount.address.toBase58()}>
+              {tokenAccount.mint.name || tokenAccount.address.toBase58()}
             </TokenName>
-            <div>{token.mint.toMajorDenomination(token.balance)}</div>
+            <div>{tokenAccount.mint.toMajorDenomination(tokenAccount.balance)}</div>
           </Top>
           <Bottom>
-            <div>{token.mint.symbol}</div> <div>Current balance</div>
+            <div>{tokenAccount.mint.symbol}</div> <div>Current balance</div>
           </Bottom>
         </Info>
       </ItemWrapper>

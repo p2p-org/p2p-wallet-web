@@ -20,7 +20,6 @@ export type SerializablePool = {
   previous?: SerializablePool;
 
   programId: string;
-  nonce: number;
   feeRatio: number;
 };
 
@@ -51,7 +50,7 @@ export const adjustForSlippage = (
 ): Decimal => {
   const slippageMultiplier = 1 + (direction === 'up' ? slippage : -slippage);
 
-  return toDecimal(amount).mul(slippageMultiplier).floor();
+  return toDecimal(amount).mul(slippageMultiplier);
 };
 
 export class Pool extends OnChainEntity<Pool> implements Serializable<SerializablePool> {
@@ -69,8 +68,6 @@ export class Pool extends OnChainEntity<Pool> implements Serializable<Serializab
 
   private programId: PublicKey;
 
-  private nonce: number;
-
   constructor(
     address: PublicKey,
     tokenA: TokenAccount,
@@ -78,7 +75,6 @@ export class Pool extends OnChainEntity<Pool> implements Serializable<Serializab
     poolToken: Token,
     feeAccount: TokenAccount,
     programId: PublicKey,
-    nonce: number,
     feeRatio: number,
     currentSlot?: number,
     previous?: Pool,
@@ -91,7 +87,6 @@ export class Pool extends OnChainEntity<Pool> implements Serializable<Serializab
     this.poolToken = poolToken;
     this.feeAccount = feeAccount;
     this.programId = programId;
-    this.nonce = nonce;
     this.feeRatio = feeRatio;
   }
 
@@ -182,11 +177,14 @@ export class Pool extends OnChainEntity<Pool> implements Serializable<Serializab
     const invariant = firstAmountInPool.mul(secondAmountInPool);
     const newFromAmountInPool = firstAmountInPool.add(toDecimal(inputAmount));
 
-    const newToAmountInPool = invariant.divToInt(newFromAmountInPool);
+    const newToAmountInPool = invariant.div(newFromAmountInPool);
     const grossToAmount = secondAmountInPool.sub(newToAmountInPool);
-    const fees = includeFees ? grossToAmount.mul(this.feeRatio).floor() : new Decimal(0);
+    const fees = includeFees ? grossToAmount.mul(this.feeRatio) : new Decimal(0);
 
-    return grossToAmount.sub(toDecimal(fees)).toNumber();
+    return grossToAmount
+      .sub(fees)
+      .toDecimalPlaces(isReverse ? this.tokenB.mint.decimals : this.tokenA.mint.decimals)
+      .toNumber();
   };
 
   calculateTokenAAmount = (tokenBAmount: number, includeFees: boolean): number =>
@@ -212,6 +210,7 @@ export class Pool extends OnChainEntity<Pool> implements Serializable<Serializab
       inputAmount,
       false,
     );
+
     return swappedAmountWithoutFee - swappedAmountWithFee;
   }
 
@@ -284,11 +283,17 @@ export class Pool extends OnChainEntity<Pool> implements Serializable<Serializab
     `;
   }
 
-  tokenSwapAuthority(): Promise<PublicKey> {
-    return PublicKey.createProgramAddress(
-      [this.address.toBuffer(), Buffer.from([this.nonce])],
-      this.programId,
-    );
+  tokenSwapAuthority(): PublicKey {
+    // return PublicKey.createProgramAddress(
+    //   [this.address.toBuffer(), Buffer.from([this.nonce])],
+    //   this.programId,
+    // );
+
+    if (!this.poolToken.mintAuthority || !this.feeAccount) {
+      throw new Error('Mint doesnt have authority');
+    }
+
+    return this.poolToken.mintAuthority;
   }
 
   matches(firstTokenAccount: TokenAccount, secondTokenAccount: TokenAccount): boolean {
@@ -317,7 +322,6 @@ export class Pool extends OnChainEntity<Pool> implements Serializable<Serializab
       poolToken: this.poolToken.serialize(),
       feeAccount: this.feeAccount.serialize(),
       programId: this.programId.toBase58(),
-      nonce: this.nonce,
       feeRatio: this.feeRatio,
       lastUpdatedSlot: this.lastUpdatedSlot,
       previous: this.previous?.serialize(),
@@ -332,7 +336,6 @@ export class Pool extends OnChainEntity<Pool> implements Serializable<Serializab
       Token.from(serializablePool.poolToken),
       TokenAccount.from(serializablePool.feeAccount),
       new PublicKey(serializablePool.programId),
-      serializablePool.nonce,
       serializablePool.feeRatio,
       serializablePool.lastUpdatedSlot,
       serializablePool.previous && Pool.from(serializablePool.previous),

@@ -6,7 +6,9 @@ import {
   TransactionError,
   TransactionSignature,
 } from '@solana/web3.js';
+import { Decimal } from 'decimal.js';
 
+import { SerializableTokenAccount, TokenAccount } from 'api/token/TokenAccount';
 import { Serializable } from 'utils/types';
 
 export type ParsedConfirmedTransactionMeta = {
@@ -19,6 +21,20 @@ type Instruction = ParsedInstruction | PartiallyDecodedInstruction;
 type TransactionMessage = {
   accountKeys: ParsedMessageAccount[];
   instructions: Instruction[];
+};
+
+type ParsedShort = {
+  type: string;
+  source: PublicKey | null;
+  sourceTokenAccount: TokenAccount | null;
+  amount: Decimal;
+};
+
+type SerializedShort = {
+  type: string;
+  source: string | null;
+  sourceTokenAccount: SerializableTokenAccount | null;
+  amount: number;
 };
 
 type SerializedParsedInstruction = {
@@ -49,8 +65,10 @@ type SerializedTransactionMessage = {
 export type SerializableTransaction = {
   signature: string;
   slot: number;
+  timestamp: number | null;
   meta: ParsedConfirmedTransactionMeta | null;
   message: SerializedTransactionMessage;
+  short: SerializedShort;
 };
 
 export class Transaction implements Serializable<SerializableTransaction> {
@@ -58,20 +76,28 @@ export class Transaction implements Serializable<SerializableTransaction> {
 
   readonly slot: number;
 
+  readonly timestamp: number | null;
+
   readonly meta: ParsedConfirmedTransactionMeta | null;
 
   readonly message: TransactionMessage;
 
+  readonly short: ParsedShort;
+
   constructor(
     signature: TransactionSignature,
     slot: number,
+    timestamp: number | null,
     meta: ParsedConfirmedTransactionMeta | null,
     message: TransactionMessage,
+    short: ParsedShort,
   ) {
     this.signature = signature;
     this.slot = slot;
+    this.timestamp = timestamp;
     this.meta = meta;
     this.message = message;
+    this.short = short;
   }
 
   toString(): string {
@@ -102,10 +128,17 @@ export class Transaction implements Serializable<SerializableTransaction> {
     return {
       signature: this.signature,
       slot: this.slot,
+      timestamp: this.timestamp,
       meta: this.meta,
       message: {
         accountKeys,
         instructions,
+      },
+      short: {
+        type: this.short.type,
+        source: this.short.source?.toBase58() || null,
+        sourceTokenAccount: this.short.sourceTokenAccount?.serialize() || null,
+        amount: this.short.amount.toNumber(),
       },
     };
   }
@@ -130,14 +163,27 @@ export class Transaction implements Serializable<SerializableTransaction> {
             (account) => new PublicKey(account),
           );
         }
+
+        return originalInstruction;
       },
     );
 
     return new Transaction(
       serializableTransaction.signature,
       serializableTransaction.slot,
+      serializableTransaction.timestamp,
       serializableTransaction.meta,
       { accountKeys, instructions },
+      {
+        type: serializableTransaction.short.type,
+        source: serializableTransaction.short.source
+          ? new PublicKey(serializableTransaction.short.source)
+          : null,
+        sourceTokenAccount: serializableTransaction.short.sourceTokenAccount
+          ? TokenAccount.from(serializableTransaction.short.sourceTokenAccount)
+          : null,
+        amount: new Decimal(serializableTransaction.short.amount),
+      },
     );
   }
 }

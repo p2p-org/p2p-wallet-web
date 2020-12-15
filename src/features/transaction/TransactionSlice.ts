@@ -16,11 +16,6 @@ export const getTransactions = createAsyncThunk<Array<SerializableTransaction>, 
     const TransactionAPI = APIFactory(state.wallet.cluster);
     const transactions = await TransactionAPI.getTransactionsForAddress(publicKey);
 
-    // PoolAPI.listenToPoolChanges(pools, (pool) => {
-    //   // eslint-disable-next-line @typescript-eslint/no-use-before-define
-    //   dispatch(transactionSlice.actions.updatePool(pool.serialize()));
-    // });
-
     return transactions.map((transaction) => transaction.serialize());
   },
 );
@@ -28,7 +23,7 @@ export const getTransactions = createAsyncThunk<Array<SerializableTransaction>, 
 export const getTransaction = createAsyncThunk<
   SerializableTransaction | null,
   TransactionSignature
->(`${TRANSACTION_SLICE_NAME}/getTransactions`, async (signature, thunkAPI) => {
+>(`${TRANSACTION_SLICE_NAME}/getTransaction`, async (signature, thunkAPI) => {
   const state: RootState = thunkAPI.getState() as RootState;
 
   const TransactionAPI = APIFactory(state.wallet.cluster);
@@ -37,11 +32,6 @@ export const getTransaction = createAsyncThunk<
   if (!transaction) {
     return null;
   }
-
-  // PoolAPI.listenToPoolChanges(pools, (pool) => {
-  //   // eslint-disable-next-line @typescript-eslint/no-use-before-define
-  //   dispatch(transactionSlice.actions.updatePool(pool.serialize()));
-  // });
 
   return transaction.serialize();
 });
@@ -84,6 +74,24 @@ const transactionSlice = createSlice({
       // eslint-disable-next-line no-param-reassign
       state.order[action.meta.arg.toBase58()] = uniq(
         pathOr<string[]>([], ['order', action.meta.arg.toBase58()], state).concat(newPubkeys),
+      );
+    });
+    builder.addCase(getTransaction.fulfilled, (state, action) => {
+      if (!action.payload) {
+        return state;
+      }
+
+      const newItems: ItemsType = {
+        [action.payload.signature]: action.payload,
+      };
+      const newPubkeys: string[] = [action.payload.signature];
+
+      // eslint-disable-next-line no-param-reassign
+      state.items = mergeRight(state.items, newItems);
+
+      // eslint-disable-next-line no-param-reassign
+      state.order[action.payload.signature] = uniq(
+        pathOr<string[]>([], ['order', action.payload.signature], state).concat(newPubkeys),
       );
     });
   },

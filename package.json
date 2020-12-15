@@ -4,7 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "start": "webpack-cli serve --progress",
+    "start": "dotenv -e .env.local webpack-cli serve --progress",
     "build": "webpack",
     "deploy": "yarn build && gh-pages -d dist",
     "lint": "eslint src/ --ext js,ts,tsx --cache src --fix",
