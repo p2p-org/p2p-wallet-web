@@ -156,7 +156,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _api_token_TokenAccount__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../../api/token/TokenAccount */ "./src/api/token/TokenAccount.ts");
 /* harmony import */ var _common_Modal__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../../common/Modal */ "./src/components/common/Modal/index.ts");
 /* harmony import */ var _ui__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../../ui */ "./src/components/ui/index.ts");
-/* harmony import */ var _features_wallet_WalletSlice__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../../../features/wallet/WalletSlice */ "./src/features/wallet/WalletSlice.ts");
+/* harmony import */ var _store_slices_wallet_WalletSlice__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../../../store/slices/wallet/WalletSlice */ "./src/store/slices/wallet/WalletSlice.ts");
 /* harmony import */ var _TokenList__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./TokenList */ "./src/components/modals/AddCoinModal/TokenList/index.ts");
 
 
@@ -186,7 +186,7 @@ const AddCoinModal = ({
   const isMainnetEntrypoint = cluster === Object(_solana_web3_js__WEBPACK_IMPORTED_MODULE_3__["clusterApiUrl"])('mainnet-beta');
 
   const handleMintTestTokenClick = () => {
-    dispatch(Object(_features_wallet_WalletSlice__WEBPACK_IMPORTED_MODULE_8__["createMint"])({
+    dispatch(Object(_store_slices_wallet_WalletSlice__WEBPACK_IMPORTED_MODULE_8__["createMint"])({
       amount: 1000,
       decimals: 2,
       initialAccount: new _solana_web3_js__WEBPACK_IMPORTED_MODULE_3__["Account"]()
@@ -296,7 +296,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var classnames__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(classnames__WEBPACK_IMPORTED_MODULE_3__);
 /* harmony import */ var _common_TokenAvatar__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../../common/TokenAvatar */ "./src/components/common/TokenAvatar/index.ts");
 /* harmony import */ var _ui__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../../ui */ "./src/components/ui/index.ts");
-/* harmony import */ var _features_wallet_WalletSlice__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../../../../features/wallet/WalletSlice */ "./src/features/wallet/WalletSlice.ts");
+/* harmony import */ var _store_slices_wallet_WalletSlice__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../../../../store/slices/wallet/WalletSlice */ "./src/store/slices/wallet/WalletSlice.ts");
 
 
 
@@ -366,7 +366,7 @@ const TokenRow = ({
   };
 
   const handleAddClick = async () => {
-    await dispatch(Object(_features_wallet_WalletSlice__WEBPACK_IMPORTED_MODULE_6__["createAccountForToken"])({
+    await dispatch(Object(_store_slices_wallet_WalletSlice__WEBPACK_IMPORTED_MODULE_6__["createAccountForToken"])({
       token
     })); // dispatch(getOwnedTokenAccounts());
 

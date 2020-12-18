@@ -33,7 +33,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var dayjs__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(dayjs__WEBPACK_IMPORTED_MODULE_4__);
 /* harmony import */ var _api_transaction_Transaction__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../../api/transaction/Transaction */ "./src/api/transaction/Transaction.ts");
 /* harmony import */ var _ui__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../../ui */ "./src/components/ui/index.ts");
-/* harmony import */ var _features_transaction_TransactionSlice__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../../../features/transaction/TransactionSlice */ "./src/features/transaction/TransactionSlice.ts");
+/* harmony import */ var _store_slices_transaction_TransactionSlice__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../../../store/slices/transaction/TransactionSlice */ "./src/store/slices/transaction/TransactionSlice.ts");
 
 
 
@@ -112,7 +112,7 @@ const TransactionDetailsModal = ({
   const transaction = Object(react_redux__WEBPACK_IMPORTED_MODULE_1__["useSelector"])(state => state.transaction.items[signature] && _api_transaction_Transaction__WEBPACK_IMPORTED_MODULE_5__["Transaction"].from(state.transaction.items[signature]));
   Object(react__WEBPACK_IMPORTED_MODULE_0__["useEffect"])(() => {
     const mount = async () => {
-      const trx = Object(_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_3__["unwrapResult"])(await dispatch(Object(_features_transaction_TransactionSlice__WEBPACK_IMPORTED_MODULE_7__["getTransaction"])(signature)));
+      const trx = Object(_reduxjs_toolkit__WEBPACK_IMPORTED_MODULE_3__["unwrapResult"])(await dispatch(Object(_store_slices_transaction_TransactionSlice__WEBPACK_IMPORTED_MODULE_7__["getTransaction"])(signature)));
 
       if (!trx) {
         setTimeout(mount, 3000);
