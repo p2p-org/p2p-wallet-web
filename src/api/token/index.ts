@@ -23,6 +23,7 @@ import {
 } from 'api/wallet';
 import { ToastManager } from 'components/common/ToastManager';
 import { airdropKey } from 'config/constants';
+import { SYSTEM_PROGRAM_ID } from 'constants/solana/bufferLayouts';
 import { toDecimal } from 'utils/amount';
 import { makeNewAccountInstruction } from 'utils/transaction';
 import { ExtendedCluster } from 'utils/types';
@@ -175,21 +176,34 @@ export const APIFactory = memoizeWith(
     const tokenAccountInfo = async (account: PublicKey): Promise<TokenAccount | null> => {
       const getParsedAccountInfoResult = await connection.getParsedAccountInfo(account);
 
-      const parsedInfo = extractParsedTokenAccountInfo(getParsedAccountInfoResult.value);
+      // For Tokens
+      if (getParsedAccountInfoResult.value?.owner.equals(TOKEN_PROGRAM_ID)) {
+        const parsedInfo = extractParsedTokenAccountInfo(getParsedAccountInfoResult.value);
 
-      // this account does not appear to be a token account
-      if (!parsedInfo) {
-        return null;
+        // this account does not appear to be a token account
+        if (!parsedInfo) {
+          return null;
+        }
+
+        const mintTokenInfo = await tokenInfo(new PublicKey(parsedInfo.mint));
+
+        return new TokenAccount(
+          mintTokenInfo,
+          account,
+          toDecimal(new BN(parsedInfo.tokenAmount.amount)),
+          getParsedAccountInfoResult.context.slot,
+        );
       }
 
-      const mintTokenInfo = await tokenInfo(new PublicKey(parsedInfo.mint));
+      // For SOL simulated token
+      if (account.equals(getWallet().pubkey)) {
+        const balance = await connection.getBalance(account);
+        const mint = new Token(SYSTEM_PROGRAM_ID, 9, 0, undefined, 'Solana', 'SOL');
 
-      return new TokenAccount(
-        mintTokenInfo,
-        account,
-        toDecimal(new BN(parsedInfo.tokenAmount.amount)),
-        getParsedAccountInfoResult.context.slot,
-      );
+        return new TokenAccount(mint, account, balance);
+      }
+
+      return null;
     };
 
     const updateTokenAccountInfo = async (tokenAccount: TokenAccount) => {

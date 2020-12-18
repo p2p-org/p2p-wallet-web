@@ -36,23 +36,24 @@ export const disconnect = createAsyncThunk(`${WALLET_SLICE_NAME}/disconnect`, ()
   ToastManager.error('Wallet disconnected');
 });
 
-export const getSolBalance = createAsyncThunk<SerializableTokenAccount, PublicKey>(
-  `${WALLET_SLICE_NAME}/getSolBalance`,
-  async (publicKey) => {
+export const createSolToken = createAsyncThunk<SerializableTokenAccount, PublicKey>(
+  `${WALLET_SLICE_NAME}/createSolToken`,
+  async (publicKey, thunkAPI) => {
+    const state: RootState = thunkAPI.getState() as RootState;
+    const walletState = state.wallet;
+    const TokenAPI = TokenAPIFactory(walletState.cluster);
+
     const balance = await getBalance(publicKey);
 
-    const mint = new Token(
-      SYSTEM_PROGRAM_ID, // Fake
-      9,
-      0, // Fake
-      undefined,
-      'Solana',
-      'SOL',
-    );
+    // Fake token to simulate SOL as Token
+    const mint = new Token(SYSTEM_PROGRAM_ID, 9, 0, undefined, 'Solana', 'SOL');
 
     const tokenAccount = new TokenAccount(mint, publicKey, balance);
 
-    // TODO: listen to changes
+    TokenAPI.listenToTokenAccountChanges([tokenAccount], (updatedTokenAccount) => {
+      // eslint-disable-next-line @typescript-eslint/no-use-before-define
+      thunkAPI.dispatch(updateAccount(updatedTokenAccount.serialize()));
+    });
 
     return tokenAccount.serialize();
   },
@@ -67,9 +68,9 @@ export const getOwnedTokenAccounts = createAsyncThunk<Array<SerializableTokenAcc
 
     const accountsForWallet = await TokenAPI.getAccountsForWallet();
 
-    TokenAPI.listenToTokenAccountChanges(accountsForWallet, (tokenAccount) => {
+    TokenAPI.listenToTokenAccountChanges(accountsForWallet, (updatedTokenAccount) => {
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
-      thunkAPI.dispatch(updateAccount(tokenAccount.serialize()));
+      thunkAPI.dispatch(updateAccount(updatedTokenAccount.serialize()));
     });
 
     return accountsForWallet.map((tokenAccount) => tokenAccount.serialize());
@@ -106,7 +107,7 @@ export const connect = createAsyncThunk<string, WalletDataType | undefined>(
     // Get tokens first before getting accounts and pools,
     // to avail of the token caching feature
     await thunkAPI.dispatch(getAvailableTokens());
-    void thunkAPI.dispatch(getSolBalance(wallet.pubkey));
+    void thunkAPI.dispatch(createSolToken(wallet.pubkey));
     void thunkAPI.dispatch(getOwnedTokenAccounts());
     void thunkAPI.dispatch(getPools());
     void thunkAPI.dispatch(getMarketsRates());
@@ -213,7 +214,7 @@ const walletSlice = createSlice({
       connected: true,
     }));
     // Triggered when the disconnect async action is completed
-    builder.addCase(disconnect.fulfilled, (state) => ({
+    builder.addCase(disconnect.fulfilled, () => ({
       ...makeInitialState(),
       publicKey: null,
       connected: false,
@@ -222,7 +223,7 @@ const walletSlice = createSlice({
       ...state,
       tokenAccounts: state.tokenAccounts.concat(action.payload),
     }));
-    builder.addCase(getSolBalance.fulfilled, (state, action) => ({
+    builder.addCase(createSolToken.fulfilled, (state, action) => ({
       ...state,
       tokenAccounts: state.tokenAccounts.concat(action.payload),
     }));
