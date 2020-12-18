@@ -88,7 +88,8 @@ export const PriceWidget: FunctionComponent<Props> = ({ publicKey }) => {
           {tokenAccount.mint.toMajorDenomination(tokenAccount.balance)} {tokenAccount.mint.symbol}
         </BalanceValue>
         <DeltaValue>
-          {diff.toFixed(2)} USD (${percentage.toFixed(2)}%) {dayjs(rates[0].startTime).format('LL')}
+          {diff.toFixed(2)} USD (${percentage.toFixed(2)}%){' '}
+          {dayjs(rates[rates.length - 1].startTime).format('LL')}
         </DeltaValue>
       </TopWrapper>
       <ReactHighcharts config={config} isPureConfig />
