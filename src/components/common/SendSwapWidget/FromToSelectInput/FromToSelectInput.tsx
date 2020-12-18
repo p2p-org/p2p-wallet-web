@@ -13,7 +13,7 @@ import { TokenAvatar } from 'components/common/TokenAvatar';
 import { Icon } from 'components/ui';
 import { SYSTEM_PROGRAM_ID } from 'constants/solana/bufferLayouts';
 import { RootState } from 'store/rootReducer';
-import { majorAmountToMinor } from 'utils/amount';
+import { majorAmountToMinor, minorAmountToMajor } from 'utils/amount';
 import { shortAddress } from 'utils/tokens';
 
 import { TokenRow } from './TokenRow';
@@ -245,7 +245,9 @@ export const FromToSelectInput: FunctionComponent<Props> = ({
       return;
     }
 
-    onAmountChange(majorAmountToMinor(tokenAccount.balance, tokenAccount.mint).toString());
+    console.log(111, minorAmountToMajor(tokenAccount.balance, tokenAccount.mint).toNumber());
+
+    onAmountChange(minorAmountToMajor(tokenAccount.balance, tokenAccount.mint).toString());
   };
 
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
