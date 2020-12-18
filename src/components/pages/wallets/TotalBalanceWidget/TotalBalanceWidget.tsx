@@ -60,7 +60,7 @@ export const TotalBalanceWidget: FunctionComponent = () => {
     () =>
       // eslint-disable-next-line unicorn/no-reduce
       tokenAccounts.reduce((prev, tokenAccount) => {
-        const rate = rates[`${tokenAccount.mint.symbol}/USDT`];
+        const rate = rates.markets[`${tokenAccount.mint.symbol}/USDT`];
         if (rate) {
           return new Decimal(tokenAccount.mint.toMajorDenomination(tokenAccount.balance))
             .times(rate)
