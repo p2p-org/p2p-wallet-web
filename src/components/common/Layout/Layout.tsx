@@ -37,8 +37,7 @@ const ColumnLeft = styled.div`
   grid-gap: 32px;
   grid-template-rows: min-content;
 
-  width: 100%;
-  max-width: 556px;
+  width: 556px;
   height: fit-content;
 `;
 
@@ -47,8 +46,7 @@ const ColumnRight = styled.div`
   grid-gap: 40px;
   grid-template-rows: min-content;
 
-  width: 100%;
-  max-width: 364px;
+  width: 364px;
   height: fit-content;
 `;
 

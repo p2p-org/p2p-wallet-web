@@ -9,7 +9,7 @@ import throttle from 'lodash.throttle';
 import { WalletType } from 'api/wallet';
 import { Button, Icon, Input } from 'components/ui';
 import { localMnemonic } from 'config/constants';
-import { connect, selectType } from 'features/wallet/WalletSlice';
+import { connect, selectType } from 'store/slices/wallet/WalletSlice';
 
 import { Header } from '../components/common/Header';
 

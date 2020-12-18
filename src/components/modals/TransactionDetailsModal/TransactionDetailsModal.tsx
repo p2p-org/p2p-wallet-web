@@ -9,8 +9,8 @@ import { rgba } from 'polished';
 
 import { Transaction } from 'api/transaction/Transaction';
 import { Icon } from 'components/ui';
-import { getTransaction } from 'features/transaction/TransactionSlice';
 import { RootState } from 'store/rootReducer';
+import { getTransaction } from 'store/slices/transaction/TransactionSlice';
 
 const Wrapper = styled.div`
   position: relative;

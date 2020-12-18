@@ -9,12 +9,12 @@ import { getBalance, WalletDataType, WalletType } from 'api/wallet';
 import { WalletEvent } from 'api/wallet/Wallet';
 import { ToastManager } from 'components/common/ToastManager';
 import { SYSTEM_PROGRAM_ID } from 'constants/solana/bufferLayouts';
-// import { notifyTransaction } from '../../components/notify';
-import { getAvailableTokens } from 'features/GlobalSlice';
-import { getPools } from 'features/pool/PoolSlice';
-import { getRates } from 'features/rate/RateSlice';
-import { updateEntityArray } from 'features/tokenPair/utils/tokenPair';
 import { RootState } from 'store/rootReducer';
+// import { notifyTransaction } from '../../components/notify';
+import { getAvailableTokens } from 'store/slices/GlobalSlice';
+import { getPools } from 'store/slices/pool/PoolSlice';
+import { getCandleRates, getMarketsRates } from 'store/slices/rate/RateSlice';
+import { updateEntityArray } from 'store/slices/tokenPair/utils/tokenPair';
 
 const CLUSTER_STORAGE_KEY = 'cluster';
 export const DEFAULT_CLUSTER: Cluster = 'devnet';
@@ -109,7 +109,8 @@ export const connect = createAsyncThunk<string, WalletDataType | undefined>(
     void thunkAPI.dispatch(getSolBalance(wallet.pubkey));
     void thunkAPI.dispatch(getOwnedTokenAccounts());
     void thunkAPI.dispatch(getPools());
-    void thunkAPI.dispatch(getRates());
+    void thunkAPI.dispatch(getMarketsRates());
+    void thunkAPI.dispatch(getCandleRates('SOL'));
 
     return wallet.pubkey.toBase58();
   },

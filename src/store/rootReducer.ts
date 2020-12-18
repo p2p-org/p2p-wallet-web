@@ -1,12 +1,12 @@
 import { combineReducers } from 'redux';
 import { modalsReducer as modals } from 'redux-modals-manager';
 
-import global from 'features/GlobalSlice';
-import pool from 'features/pool/PoolSlice';
-import rate from 'features/rate/RateSlice';
-import tokenPair from 'features/tokenPair/TokenPairSlice';
-import transaction from 'features/transaction/TransactionSlice';
-import wallet from 'features/wallet/WalletSlice';
+import global from 'store/slices/GlobalSlice';
+import pool from 'store/slices/pool/PoolSlice';
+import rate from 'store/slices/rate/RateSlice';
+import tokenPair from 'store/slices/tokenPair/TokenPairSlice';
+import transaction from 'store/slices/transaction/TransactionSlice';
+import wallet from 'store/slices/wallet/WalletSlice';
 
 export const rootReducer = combineReducers({
   global,

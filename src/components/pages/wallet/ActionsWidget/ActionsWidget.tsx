@@ -8,8 +8,8 @@ import { clusterApiUrl, PublicKey } from '@solana/web3.js';
 
 import { TokenAccount } from 'api/token/TokenAccount';
 import { Button, ButtonsGroup } from 'components/ui';
-import { airdrop } from 'features/wallet/WalletSlice';
 import { RootState } from 'store/rootReducer';
+import { airdrop } from 'store/slices/wallet/WalletSlice';
 
 import { TokenSelector } from './TokenSelector';
 

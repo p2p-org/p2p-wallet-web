@@ -7,7 +7,7 @@ import { PayloadAction } from '@reduxjs/toolkit';
 import { Pool, SerializablePool } from 'api/pool/Pool';
 import { SerializableToken } from 'api/token/Token';
 import { SerializableTokenAccount, TokenAccount } from 'api/token/TokenAccount';
-import { selectTokenAccount } from 'features/tokenPair/utils/tokenPair';
+import { selectTokenAccount } from 'store/slices/tokenPair/utils/tokenPair';
 
 type Params = {
   publicKey?: string;

@@ -7,8 +7,8 @@ import * as web3 from '@solana/web3.js';
 import { Transaction } from 'api/transaction/Transaction';
 import { TransactionList } from 'components/common/TransactionList';
 import { Widget } from 'components/common/Widget';
-import { getTransactions } from 'features/transaction/TransactionSlice';
 import { RootState } from 'store/rootReducer';
+import { getTransactions } from 'store/slices/transaction/TransactionSlice';
 
 const WrapperWidget = styled(Widget)``;
 

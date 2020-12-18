@@ -10,7 +10,7 @@ import { Token } from 'api/token/Token';
 import { TokenAvatar } from 'components/common/TokenAvatar';
 import { Avatar, Button, Icon, Input } from 'components/ui';
 import { TokenType } from 'constants/tokens';
-import { createAccountForToken } from 'features/wallet/WalletSlice';
+import { createAccountForToken } from 'store/slices/wallet/WalletSlice';
 
 const Wrapper = styled.div`
   display: flex;

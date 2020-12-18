@@ -5,9 +5,9 @@ import { useHistory } from 'react-router';
 import { usePoolFromLocation } from 'api/pool/utils/state';
 import { TokenAccount } from 'api/token/TokenAccount';
 import { SendSwapWidget } from 'components/common/SendSwapWidget';
-import { executeSwap } from 'features/swap/SwapSlice';
-import { updateTokenPairState } from 'features/tokenPair/TokenPairSlice';
-import { tokenPairSelector } from 'features/tokenPair/utils/tokenPair';
+import { executeSwap } from 'store/slices/swap/SwapSlice';
+import { updateTokenPairState } from 'store/slices/tokenPair/TokenPairSlice';
+import { tokenPairSelector } from 'store/slices/tokenPair/utils/tokenPair';
 
 type Props = {
   publicKey: string;

@@ -8,8 +8,8 @@ import Decimal from 'decimal.js';
 
 import { TokenAccount } from 'api/token/TokenAccount';
 import { SendSwapWidget } from 'components/common/SendSwapWidget';
-import { transfer } from 'features/wallet/WalletSlice';
 import { RootState } from 'store/rootReducer';
+import { transfer } from 'store/slices/wallet/WalletSlice';
 
 type Props = {
   publicKey: string;

@@ -3,11 +3,11 @@ import { createAsyncThunk, createSlice, Draft, PayloadAction } from '@reduxjs/to
 // import { APIFactory as IdentityAPIFactory } from 'api/identity';
 import { APIFactory } from 'api/pool';
 import { Pool, SerializablePool } from 'api/pool/Pool';
-import { updateEntityArray } from 'features/tokenPair/utils/tokenPair';
 // import { APIFactory as TokenAPIFactory } from 'api/token';
 // import * as WalletAPI from 'api/wallet';
 // import { getOwnedTokenAccounts } from 'features/wallet/WalletSlice';
 import { RootState } from 'store/rootReducer';
+import { updateEntityArray } from 'store/slices/tokenPair/utils/tokenPair';
 
 interface PoolsState {
   availablePools: Array<SerializablePool>;

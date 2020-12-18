@@ -4,8 +4,8 @@ import { batch, useDispatch, useSelector } from 'react-redux';
 import { Cluster } from '@solana/web3.js';
 
 import { CLUSTERS } from 'config/constants';
-import { disconnect, selectCluster } from 'features/wallet/WalletSlice';
 import { RootState } from 'store/rootReducer';
+import { disconnect, selectCluster } from 'store/slices/wallet/WalletSlice';
 
 export const ClusterSelector: FunctionComponent = () => {
   const dispatch = useDispatch();

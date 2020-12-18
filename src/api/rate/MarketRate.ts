@@ -1,11 +1,11 @@
 import { Serializable } from 'utils/types';
 
-export type SerializableRate = {
+export type SerializableMarketRate = {
   market: string;
   price: number;
 };
 
-export class Rate implements Serializable<SerializableRate> {
+export class MarketRate implements Serializable<SerializableMarketRate> {
   readonly market: string;
 
   readonly price: number;
@@ -19,14 +19,14 @@ export class Rate implements Serializable<SerializableRate> {
     return this.market;
   }
 
-  serialize(): SerializableRate {
+  serialize(): SerializableMarketRate {
     return {
       market: this.market,
       price: this.price,
     };
   }
 
-  static from(serializableRate: SerializableRate): Rate {
-    return new Rate(serializableRate.market, serializableRate.price);
+  static from(serializableRate: SerializableMarketRate): MarketRate {
+    return new MarketRate(serializableRate.market, serializableRate.price);
   }
 }

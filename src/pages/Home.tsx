@@ -7,7 +7,7 @@ import bgImg from 'assets/images/sun.png';
 
 import { WalletType } from 'api/wallet';
 import { Button } from 'components/ui';
-import { connect, selectType } from 'features/wallet/WalletSlice';
+import { connect, selectType } from 'store/slices/wallet/WalletSlice';
 
 import { Header } from '../components/common/Header';
 

@@ -11,10 +11,10 @@ import { rgba } from 'polished';
 import { Transaction } from 'api/transaction/Transaction';
 import { Card } from 'components/common/Card';
 import { Button, Icon } from 'components/ui';
-import { getTransaction } from 'features/transaction/TransactionSlice';
 import { openModal } from 'store/_actions/modals';
 import { SHOW_MODAL_TRANSACTION_DETAILS } from 'store/constants/modalTypes';
 import { RootState } from 'store/rootReducer';
+import { getTransaction } from 'store/slices/transaction/TransactionSlice';
 
 const WrapperCard = styled(Card)`
   display: flex;

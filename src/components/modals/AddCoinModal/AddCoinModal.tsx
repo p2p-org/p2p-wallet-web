@@ -9,8 +9,8 @@ import tokenConfig from 'api/token/token.config';
 import { TokenAccount } from 'api/token/TokenAccount';
 import { Modal } from 'components/common/Modal';
 import { Button } from 'components/ui';
-import { createMint } from 'features/wallet/WalletSlice';
 import { RootState } from 'store/rootReducer';
+import { createMint } from 'store/slices/wallet/WalletSlice';
 
 import { TokenList } from './TokenList';
 

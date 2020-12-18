@@ -18,7 +18,7 @@ export const AmountUSDT: FunctionComponent<Props> = ({
   symbol = '',
   ...props
 }) => {
-  const rate = useSelector((state: RootState) => state.rate[`${symbol}/USDT`]);
+  const rate = useSelector((state: RootState) => state.rate.markets[`${symbol}/USDT`]);
 
   if (!rate) {
     return null;
