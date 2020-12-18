@@ -3,6 +3,7 @@ import { any, complement, curry, eqProps, find, indexOf, propEq, update } from '
 import { Pool, SerializablePool } from 'api/pool/Pool';
 import { SerializableToken, Token } from 'api/token/Token';
 import { SerializableTokenAccount, TokenAccount } from 'api/token/TokenAccount';
+import { SYSTEM_PROGRAM_ID, WRAPPED_SOL_MINT } from 'constants/solana/bufferLayouts';
 import { RootState } from 'store/rootReducer';
 import { HasEqual, TokenPairState } from 'utils/types';
 
@@ -74,13 +75,31 @@ export const syncTokenAccount = (
 export const syncTokenAccounts = (
   tokenPairState: TokenPairState,
   tokenAccounts: Array<SerializableTokenAccount>,
-): TokenPairState => ({
-  ...tokenPairState,
-  tokenAccounts,
-  firstTokenAccount: syncTokenAccount(tokenAccounts, tokenPairState.firstTokenAccount),
-  secondTokenAccount: syncTokenAccount(tokenAccounts, tokenPairState.secondTokenAccount),
-  poolTokenAccount: syncTokenAccount(tokenAccounts, tokenPairState.poolTokenAccount),
-});
+): TokenPairState => {
+  const tokenAccountsWithWSOL = tokenAccounts.map((tokenAccount) => {
+    // Change SOL to WSOL in token pair
+    if (tokenAccount?.mint.address === SYSTEM_PROGRAM_ID.toBase58()) {
+      return {
+        ...tokenAccount,
+        mint: {
+          ...tokenAccount.mint,
+          symbol: 'WSOL',
+          address: WRAPPED_SOL_MINT.toBase58(),
+        },
+      };
+    }
+
+    return tokenAccount;
+  });
+
+  return {
+    ...tokenPairState,
+    tokenAccounts: tokenAccountsWithWSOL,
+    firstTokenAccount: syncTokenAccount(tokenAccountsWithWSOL, tokenPairState.firstTokenAccount),
+    secondTokenAccount: syncTokenAccount(tokenAccountsWithWSOL, tokenPairState.secondTokenAccount),
+    poolTokenAccount: syncTokenAccount(tokenAccountsWithWSOL, tokenPairState.poolTokenAccount),
+  };
+};
 
 export const syncPools = (
   tokenPairState: TokenPairState,

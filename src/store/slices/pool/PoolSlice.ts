@@ -5,7 +5,7 @@ import { APIFactory } from 'api/pool';
 import { Pool, SerializablePool } from 'api/pool/Pool';
 // import { APIFactory as TokenAPIFactory } from 'api/token';
 // import * as WalletAPI from 'api/wallet';
-// import { getOwnedTokenAccounts } from 'features/wallet/WalletSlice';
+// import { getTokenAccounts } from 'features/wallet/WalletSlice';
 import { RootState } from 'store/rootReducer';
 import { updateEntityArray } from 'store/slices/tokenPair/utils/tokenPair';
 
@@ -55,7 +55,7 @@ export const getPools = createAsyncThunk(
 //     const airdropBPromise = TokenAPI.airdropToWallet(pool.tokenB.mint, amountB);
 //
 //     await Promise.all([airdropSolIDVPromise, airdropAPromise, airdropBPromise]);
-//     void thunkAPI.dispatch(getOwnedTokenAccounts());
+//     void thunkAPI.dispatch(getTokenAccounts());
 //   },
 // );
 

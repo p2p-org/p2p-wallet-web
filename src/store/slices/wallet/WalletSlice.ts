@@ -5,7 +5,7 @@ import { APIFactory as TokenAPIFactory, TransferParameters } from 'api/token';
 import { Token } from 'api/token/Token';
 import { SerializableTokenAccount, TokenAccount } from 'api/token/TokenAccount';
 import * as WalletAPI from 'api/wallet';
-import { getBalance, WalletDataType, WalletType } from 'api/wallet';
+import { getBalance, getWallet, WalletDataType, WalletType } from 'api/wallet';
 import { WalletEvent } from 'api/wallet/Wallet';
 import { ToastManager } from 'components/common/ToastManager';
 import { SYSTEM_PROGRAM_ID } from 'constants/solana/bufferLayouts';
@@ -36,44 +36,37 @@ export const disconnect = createAsyncThunk(`${WALLET_SLICE_NAME}/disconnect`, ()
   ToastManager.error('Wallet disconnected');
 });
 
-export const createSolToken = createAsyncThunk<SerializableTokenAccount, PublicKey>(
-  `${WALLET_SLICE_NAME}/createSolToken`,
-  async (publicKey, thunkAPI) => {
-    const state: RootState = thunkAPI.getState() as RootState;
-    const walletState = state.wallet;
-    const TokenAPI = TokenAPIFactory(walletState.cluster);
+// Simulate SOL token account
+const getSolToken = async () => {
+  const publicKey = getWallet().pubkey;
+  const balance = await getBalance(publicKey);
 
-    const balance = await getBalance(publicKey);
+  // Fake token to simulate SOL as Token
+  const mint = new Token(SYSTEM_PROGRAM_ID, 9, 0, undefined, 'Solana', 'SOL');
+  return new TokenAccount(mint, publicKey, balance);
+};
 
-    // Fake token to simulate SOL as Token
-    const mint = new Token(SYSTEM_PROGRAM_ID, 9, 0, undefined, 'Solana', 'SOL');
-
-    const tokenAccount = new TokenAccount(mint, publicKey, balance);
-
-    TokenAPI.listenToTokenAccountChanges([tokenAccount], (updatedTokenAccount) => {
-      // eslint-disable-next-line @typescript-eslint/no-use-before-define
-      thunkAPI.dispatch(updateAccount(updatedTokenAccount.serialize()));
-    });
-
-    return tokenAccount.serialize();
-  },
-);
-
-export const getOwnedTokenAccounts = createAsyncThunk<Array<SerializableTokenAccount>>(
-  `${WALLET_SLICE_NAME}/getOwnedTokenAccounts`,
+export const getTokenAccounts = createAsyncThunk<Array<SerializableTokenAccount>>(
+  `${WALLET_SLICE_NAME}/getTokenAccounts`,
   async (_, thunkAPI) => {
     const state: RootState = thunkAPI.getState() as RootState;
     const walletState = state.wallet;
     const TokenAPI = TokenAPIFactory(walletState.cluster);
 
+    // Simulated SOL token
+    const solToken = await getSolToken();
+    // Get all Tokens
     const accountsForWallet = await TokenAPI.getAccountsForWallet();
 
-    TokenAPI.listenToTokenAccountChanges(accountsForWallet, (updatedTokenAccount) => {
+    // Merge SOL and Tokens as token accounts
+    const tokenAccounts = [solToken, ...accountsForWallet];
+
+    TokenAPI.listenToTokenAccountChanges(tokenAccounts, (updatedTokenAccount) => {
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
       thunkAPI.dispatch(updateAccount(updatedTokenAccount.serialize()));
     });
 
-    return accountsForWallet.map((tokenAccount) => tokenAccount.serialize());
+    return tokenAccounts.map((tokenAccount) => tokenAccount.serialize());
   },
 );
 
@@ -107,8 +100,7 @@ export const connect = createAsyncThunk<string, WalletDataType | undefined>(
     // Get tokens first before getting accounts and pools,
     // to avail of the token caching feature
     await thunkAPI.dispatch(getAvailableTokens());
-    void thunkAPI.dispatch(createSolToken(wallet.pubkey));
-    void thunkAPI.dispatch(getOwnedTokenAccounts());
+    void thunkAPI.dispatch(getTokenAccounts());
     void thunkAPI.dispatch(getPools());
     void thunkAPI.dispatch(getMarketsRates());
     void thunkAPI.dispatch(getCandleRates('SOL'));
@@ -125,8 +117,6 @@ export const transfer = createAsyncThunk<string, TransferParameters>(
     const TokenAPI = TokenAPIFactory(walletState.cluster);
 
     return TokenAPI.transfer(parameters);
-
-    // TODO: update balances
   },
 );
 
@@ -156,7 +146,6 @@ export const airdrop = createAsyncThunk<void>(
   `${WALLET_SLICE_NAME}/airdrop`,
   async (): Promise<void> => {
     await WalletAPI.airdrop();
-    // TODO: update balance
   },
 );
 
@@ -219,11 +208,7 @@ const walletSlice = createSlice({
       publicKey: null,
       connected: false,
     }));
-    builder.addCase(getOwnedTokenAccounts.fulfilled, (state, action) => ({
-      ...state,
-      tokenAccounts: state.tokenAccounts.concat(action.payload),
-    }));
-    builder.addCase(createSolToken.fulfilled, (state, action) => ({
+    builder.addCase(getTokenAccounts.fulfilled, (state, action) => ({
       ...state,
       tokenAccounts: state.tokenAccounts.concat(action.payload),
     }));

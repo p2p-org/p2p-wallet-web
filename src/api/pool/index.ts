@@ -1,15 +1,18 @@
+import { AccountLayout, Token as SPLToken } from '@solana/spl-token';
 import { Numberu64, TokenSwap, TokenSwapLayout } from '@solana/spl-token-swap';
-import { Account, PublicKey, TransactionInstruction } from '@solana/web3.js';
+import { Account, PublicKey, SystemProgram, TransactionInstruction } from '@solana/web3.js';
 import { Decimal } from 'decimal.js';
 import { complement, isNil } from 'ramda';
 import assert from 'ts-invariant';
 
 import { getConnection } from 'api/connection';
 import { APIFactory as TokenAPIFactory, TOKEN_PROGRAM_ID } from 'api/token';
+import { Token } from 'api/token/Token';
 import { TokenAccount } from 'api/token/TokenAccount';
-import { makeTransaction, sendTransaction } from 'api/wallet';
+import { getWallet, makeTransaction, sendTransaction } from 'api/wallet';
 import { ToastManager } from 'components/common/ToastManager';
 import { localSwapProgramId } from 'config/constants';
+import { WRAPPED_SOL_MINT } from 'constants/solana/bufferLayouts';
 import { ExtendedCluster } from 'utils/types';
 
 import { adjustForSlippage, DEFAULT_SLIPPAGE, Pool } from './Pool';
@@ -234,7 +237,7 @@ export const APIFactory = (cluster: ExtendedCluster): API => {
       parameters.slippage,
     );
 
-    const authority = await parameters.pool.tokenSwapAuthority();
+    const authority = parameters.pool.tokenSwapAuthority();
 
     return TokenSwap.swapInstruction(
       parameters.pool.address,
@@ -393,6 +396,73 @@ export const APIFactory = (cluster: ExtendedCluster): API => {
   //   return createdPool;
   // };
 
+  const createWrappedSolAccount = async (
+    fromAccount: TokenAccount,
+    amount: number,
+    instructions: TransactionInstruction[],
+    cleanupInstructions: TransactionInstruction[],
+    signers: Account[],
+  ): Promise<TokenAccount> => {
+    const accountRentExempt = await connection.getMinimumBalanceForRentExemption(
+      AccountLayout.span,
+    );
+
+    const newAccount = new Account();
+
+    instructions.push(
+      SystemProgram.createAccount({
+        fromPubkey: fromAccount.address,
+        newAccountPubkey: newAccount.publicKey,
+        lamports: amount + accountRentExempt,
+        space: AccountLayout.span,
+        programId: TOKEN_PROGRAM_ID,
+      }),
+    );
+
+    instructions.push(
+      SPLToken.createInitAccountInstruction(
+        TOKEN_PROGRAM_ID,
+        WRAPPED_SOL_MINT,
+        newAccount.publicKey,
+        getWallet().pubkey,
+      ),
+    );
+
+    cleanupInstructions.push(
+      SPLToken.createCloseAccountInstruction(
+        TOKEN_PROGRAM_ID,
+        newAccount.publicKey,
+        getWallet().pubkey,
+        getWallet().pubkey,
+        [],
+      ),
+    );
+
+    signers.push(newAccount);
+
+    return new TokenAccount(fromAccount.mint, newAccount.publicKey, amount);
+  };
+
+  const createAccountByMint = async (
+    mintToken: Token,
+    cleanupInstructions: TransactionInstruction[],
+  ): Promise<TokenAccount> => {
+    // creating depositor pool account
+    const newToAccount = await tokenAPI.createAccountForToken(mintToken);
+
+    cleanupInstructions.push(
+      SPLToken.createCloseAccountInstruction(
+        TOKEN_PROGRAM_ID,
+        newToAccount.address,
+        getWallet().pubkey,
+        getWallet().pubkey,
+        [],
+      ),
+    );
+
+    return newToAccount;
+  };
+
   const validateSwapParameters = (parameters: SwapParameters): void => {
     // the From amount must be either tokenA or tokenB
     // and, if present, the To amount must be the other one
@@ -419,28 +489,53 @@ export const APIFactory = (cluster: ExtendedCluster): API => {
     try {
       validateSwapParameters(parameters);
 
+      const instructions: TransactionInstruction[] = [];
+      const cleanupInstructions: TransactionInstruction[] = [];
+      const signers: Account[] = [];
+
+      // Create WSOL or Token account
+      const fromAccount = parameters.fromAccount.mint.address.equals(WRAPPED_SOL_MINT)
+        ? await createWrappedSolAccount(
+            parameters.fromAccount,
+            parameters.fromAmount,
+            instructions,
+            cleanupInstructions,
+            signers,
+          )
+        : parameters.fromAccount;
+
       // get the toAccount from the parameters, or create it if not present
-      const isReverse = parameters.fromAccount.sameToken(parameters.pool.tokenB);
+      const isReverse = isReverseSwap(parameters);
       const toToken = isReverse ? parameters.pool.tokenA.mint : parameters.pool.tokenB.mint;
-      const toAccount = parameters.toAccount || (await tokenAPI.createAccountForToken(toToken));
+
+      // Token account or Create Token account
+      const toAccount =
+        parameters.toAccount && !parameters.toAccount.mint.address.equals(WRAPPED_SOL_MINT)
+          ? parameters.toAccount
+          : await createAccountByMint(toToken, cleanupInstructions);
 
       console.log('Executing swap:', parameters);
 
-      const delegate = await parameters.pool.tokenSwapAuthority();
+      const delegate = parameters.pool.tokenSwapAuthority();
 
       const approveInstruction = tokenAPI.approveInstruction(
-        parameters.fromAccount,
+        fromAccount,
         delegate,
         parameters.fromAmount,
       );
 
       const swapInstruction = await createSwapTransactionInstruction({
-        ...parameters,
-        slippage: DEFAULT_SLIPPAGE,
+        fromAccount,
+        fromAmount: parameters.fromAmount,
         toAccount,
+        slippage: parameters.slippage || DEFAULT_SLIPPAGE,
+        pool: parameters.pool,
       });
 
-      const transaction = await makeTransaction([approveInstruction, swapInstruction]);
+      const transaction = await makeTransaction(
+        [...instructions, approveInstruction, swapInstruction, ...cleanupInstructions],
+        signers,
+      );
       return sendTransaction(transaction);
     } catch (error) {
       console.error(error);
@@ -467,7 +562,7 @@ export const APIFactory = (cluster: ExtendedCluster): API => {
       `Invalid pool token account - must be ${pool.poolToken}`,
     );
 
-    const authority = await pool.tokenSwapAuthority();
+    const authority = pool.tokenSwapAuthority();
 
     // Calculate the expected amounts for token A, B and pool token
     // TODO change the parameters to expect a pool token amount
@@ -553,7 +648,7 @@ export const APIFactory = (cluster: ExtendedCluster): API => {
       `Invalid pool token account - must be ${pool.poolToken}`,
     );
 
-    const authority = await pool.tokenSwapAuthority();
+    const authority = pool.tokenSwapAuthority();
 
     // Calculate the expected amounts for token A, B and pool token
     const minimumAmounts = pool.calculateAmountsWithSlippage(

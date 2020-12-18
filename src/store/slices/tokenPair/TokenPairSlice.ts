@@ -3,10 +3,11 @@ import { createSlice, Draft, PayloadAction } from '@reduxjs/toolkit';
 import { DEFAULT_SLIPPAGE, Pool, SerializablePool } from 'api/pool/Pool';
 import { Token } from 'api/token/Token';
 import { SerializableTokenAccount, TokenAccount } from 'api/token/TokenAccount';
+import { SYSTEM_PROGRAM_ID, WRAPPED_SOL_MINT } from 'constants/solana/bufferLayouts';
 import { TokenPairState } from 'utils/types';
 
 import { getPools, updatePool } from '../pool/PoolSlice';
-import { getOwnedTokenAccounts, updateAccount } from '../wallet/WalletSlice';
+import { getTokenAccounts, updateAccount } from '../wallet/WalletSlice';
 import {
   getToAmount,
   selectPoolForTokenPair,
@@ -71,9 +72,23 @@ const updateAccountReducer = (
   state: Draft<TokenPairState>,
   action: PayloadAction<SerializableTokenAccount>,
 ) => {
+  let serializedTokenAccount = action.payload;
+
+  // Change SOL to WSOL in token pair
+  if (serializedTokenAccount.mint.address === SYSTEM_PROGRAM_ID.toBase58()) {
+    serializedTokenAccount = {
+      ...serializedTokenAccount,
+      mint: {
+        ...serializedTokenAccount.mint,
+        symbol: 'WSOL',
+        address: WRAPPED_SOL_MINT.toBase58(),
+      },
+    };
+  }
+
   // find and replace the pool in the list with the pool in the action
   const updatedAccounts = updateEntityArray(
-    TokenAccount.from(action.payload),
+    TokenAccount.from(serializedTokenAccount),
     state.tokenAccounts.map((account) => TokenAccount.from(account)),
   );
 
@@ -108,10 +123,9 @@ const tokenPairSlice = createSlice({
       }),
   },
   extraReducers: (builder) => {
-    builder.addCase(getOwnedTokenAccounts.fulfilled, (state, action) =>
+    builder.addCase(getTokenAccounts.fulfilled, (state, action) =>
       syncTokenAccounts(state, action.payload),
     );
-
     builder.addCase(getPools.fulfilled, (state, action) => syncPools(state, action.payload));
 
     builder.addCase(updatePool, updatePoolReducer);

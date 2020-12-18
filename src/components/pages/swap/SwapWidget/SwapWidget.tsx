@@ -5,6 +5,7 @@ import { useHistory } from 'react-router';
 import { usePoolFromLocation } from 'api/pool/utils/state';
 import { TokenAccount } from 'api/token/TokenAccount';
 import { SendSwapWidget } from 'components/common/SendSwapWidget';
+import { SYSTEM_PROGRAM_ID, WRAPPED_SOL_MINT } from 'constants/solana/bufferLayouts';
 import { executeSwap } from 'store/slices/swap/SwapSlice';
 import { updateTokenPairState } from 'store/slices/tokenPair/TokenPairSlice';
 import { tokenPairSelector } from 'store/slices/tokenPair/utils/tokenPair';
@@ -47,10 +48,26 @@ export const SwapWidget: FunctionComponent<Props> = () => {
   const handleTokenSelectionChange = (key: 'firstToken' | 'secondToken') => (
     selectedAccountToken: TokenAccount | string,
   ) => {
+    let newSelectedAccountToken: TokenAccount = selectedAccountToken as TokenAccount;
+
+    // Change SOL to WSOL in token pair
+    if (newSelectedAccountToken?.mint.address.equals(SYSTEM_PROGRAM_ID)) {
+      const serialized = newSelectedAccountToken.serialize();
+
+      newSelectedAccountToken = TokenAccount.from({
+        ...serialized,
+        mint: {
+          ...serialized.mint,
+          symbol: 'WSOL',
+          address: WRAPPED_SOL_MINT.toBase58(),
+        },
+      });
+    }
+
     dispatch(
       updateTokenPairState({
-        [key]: (selectedAccountToken as TokenAccount).mint.serialize(),
-        [`${key}Account`]: (selectedAccountToken as TokenAccount).serialize(),
+        [key]: newSelectedAccountToken.mint.serialize(),
+        [`${key}Account`]: newSelectedAccountToken.serialize(),
       }),
     );
   };

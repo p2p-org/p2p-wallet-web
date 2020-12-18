@@ -7,6 +7,7 @@ import { Decimal } from 'decimal.js';
 import { rgba } from 'polished';
 
 import { TOKEN_PROGRAM_ID } from 'api/token';
+import { Token } from 'api/token/Token';
 import { TokenAccount } from 'api/token/TokenAccount';
 import { AmountUSDT } from 'components/common/AmountUSDT';
 import { TokenAvatar } from 'components/common/TokenAvatar';
@@ -180,7 +181,6 @@ type Props = {
 };
 
 export const FromToSelectInput: FunctionComponent<Props> = ({
-  type = 'send',
   direction = 'from',
   tokenAccount,
   amount,
@@ -193,18 +193,6 @@ export const FromToSelectInput: FunctionComponent<Props> = ({
   const [isOpen, setIsOpen] = useState(false);
   const tokenAccounts = useSelector((state: RootState) =>
     state.wallet.tokenAccounts.map((account) => TokenAccount.from(account)),
-  );
-
-  const filteredTokens = useMemo(
-    // TODO: maybe make owner
-    () => {
-      if (type === 'swap') {
-        return tokenAccounts.filter((token) => !token.mint.address.equals(SYSTEM_PROGRAM_ID));
-      }
-
-      return tokenAccounts;
-    },
-    [tokenAccounts],
   );
 
   useEffect(() => {
@@ -244,8 +232,6 @@ export const FromToSelectInput: FunctionComponent<Props> = ({
     if (!tokenAccount) {
       return;
     }
-
-    console.log(111, minorAmountToMajor(tokenAccount.balance, tokenAccount.mint).toNumber());
 
     onAmountChange(minorAmountToMajor(tokenAccount.balance, tokenAccount.mint).toString());
   };
@@ -316,7 +302,7 @@ export const FromToSelectInput: FunctionComponent<Props> = ({
         <DropDownListContainer>
           <DropDownHeader>Your wallets</DropDownHeader>
           <DropDownList>
-            {filteredTokens
+            {tokenAccounts
               .filter((account) => direction === 'to' || account.balance.toNumber() > 0)
               .map((account) => (
                 <TokenRow

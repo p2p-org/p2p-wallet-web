@@ -25,25 +25,20 @@ type PoolState = {
  * If the react-router location state contains a pool address, then load this pool
  * into the state.
  * This allows the creation of react-route links to specific pools.
- * TODO After HE-53, there will be one global pool state, at which time they can be
- * retrieved here using useSelector(), rather than having to be passed in.
- * (likewise with the updateAction property, we can simply dispatch the appropriate updateState action)
- * @param selectedPool
- * @param availablePools
  * @param updateAction
  * @param tokenAccounts
  */
 export const usePoolFromLocation = ({ updateAction, tokenAccounts }: PoolState): void => {
-  const params = useParams<Params>();
+  const { publicKey } = useParams<Params>();
   const dispatch = useDispatch();
 
   useEffect(() => {
-    if (params.publicKey) {
-      const tokenAccount = tokenAccounts.find(
-        (token) => token.address.toBase58() === params.publicKey,
-      );
+    if (publicKey) {
+      const locationTokenAccount = tokenAccounts.find((token) => {
+        return token.address.toBase58() === publicKey;
+      });
 
-      const firstToken = tokenAccount?.mint;
+      const firstToken = locationTokenAccount?.mint;
 
       const firstTokenAccount = selectTokenAccount(firstToken, tokenAccounts, false);
 
@@ -56,6 +51,5 @@ export const usePoolFromLocation = ({ updateAction, tokenAccounts }: PoolState):
         );
       }
     }
-    // empty deps is a workaround to ensure this only triggers once
-  }, [params]);
+  }, [publicKey]);
 };

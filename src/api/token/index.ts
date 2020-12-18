@@ -35,7 +35,8 @@ import { TokenAccount } from './TokenAccount';
 
 export const TOKEN_PROGRAM_ID = new PublicKey('TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA');
 
-// TODO: check
+// Check that was pass same owner
+// https://github.com/project-serum/serum-dex/tree/master/assert-owner
 export const OWNER_VALIDATION_PROGRAM_ID = new PublicKey(
   '4MNPdKu9wFMvEeZBMt3Eipfs5ovVWTJb31pEXDJAAxX5',
 );
@@ -150,8 +151,8 @@ export const APIFactory = memoizeWith(
         return [];
       }
 
-      const tokenPromises = clusterConfig.map((tokenConfig: TokenConfig) =>
-        tokenInfo(new PublicKey(tokenConfig.mintAddress)).catch((error) => {
+      const tokenPromises = clusterConfig.map((config: TokenConfig) =>
+        tokenInfo(new PublicKey(config.mintAddress)).catch((error: Error) => {
           ToastManager.error(error.toString());
           return null;
         }),

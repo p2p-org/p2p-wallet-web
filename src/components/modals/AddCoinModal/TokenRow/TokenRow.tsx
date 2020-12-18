@@ -119,7 +119,7 @@ export const TokenRow: FunctionComponent<Props> = ({ token, closeModal }) => {
 
   const handleAddClick = async () => {
     await dispatch(createAccountForToken({ token }));
-    // dispatch(getOwnedTokenAccounts());
+    // dispatch(getTokenAccounts());
     closeModal();
   };
 
