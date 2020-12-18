@@ -34,7 +34,7 @@ module.exports = {
   },
   output: {
     path: path.resolve(__dirname, 'dist'),
-    publicPath: '/',
+    publicPath: isDev ? '/' : '/p2p-wallet-web/',
     filename: '[name].bundle.js',
   },
   plugins: [
@@ -115,5 +115,6 @@ module.exports = {
   devServer: {
     contentBase: [path.join(__dirname, 'public')],
     historyApiFallback: true,
+    publicPath: '/',
   },
 };
