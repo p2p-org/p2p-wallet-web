@@ -126,11 +126,11 @@ export const QRAddressWidget: FunctionComponent<Props> = ({ publicKey, className
   //   navigator.share({ text, title, url });
   // }
 
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   const imageSettings: QRCode.ImageSettings = {
     height: 28,
     width: 28,
-    excavate: true,
   };
 
   if (tokenAccount.mint.symbol === 'SOL') {
