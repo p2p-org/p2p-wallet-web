@@ -5,7 +5,7 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 // const SvgStorePlugin = require('external-svg-sprite-loader');
 const SpritePlugin = require('svg-sprite-loader/plugin');
 
-const isDev = process.env.NODE_ENV !== 'production';
+const isDev = process.env.NODE_ENV === 'development';
 
 module.exports = {
   target: 'web',
