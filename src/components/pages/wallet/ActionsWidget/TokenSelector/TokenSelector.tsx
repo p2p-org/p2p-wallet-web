@@ -124,7 +124,7 @@ export const TokenSelector: FunctionComponent<Props> = ({ value, onChange }) => 
           {tokenAccounts
             .sort((a, b) => b.balance.cmp(a.balance))
             .map((item) => (
-              <TokenRow key={item} token={item} onItemClick={handleItemClick} />
+              <TokenRow key={item.address.toBase58()} token={item} onItemClick={handleItemClick} />
             ))}
         </DropDownList>
       ) : undefined}
