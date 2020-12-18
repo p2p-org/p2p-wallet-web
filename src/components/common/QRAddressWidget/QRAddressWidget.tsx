@@ -4,8 +4,9 @@ import { useSelector } from 'react-redux';
 import { styled } from '@linaria/react';
 import * as web3 from '@solana/web3.js';
 import { rgba } from 'polished';
-import QRcode from 'qrcode.react';
+import QRCode from 'qrcode.react';
 
+import tokenConfig from 'api/token/token.config';
 import { TokenAccount } from 'api/token/TokenAccount';
 import { Card } from 'components/common/Card';
 import { Icon } from 'components/ui';
@@ -29,7 +30,7 @@ const TokenWrapper = styled.div`
 `;
 
 const TokenName = styled.div`
-  color: #000000;
+  color: #000;
   font-weight: 500;
   font-size: 14px;
   line-height: 17px;
@@ -102,6 +103,7 @@ type Props = {
 };
 
 export const QRAddressWidget: FunctionComponent<Props> = ({ publicKey, className }) => {
+  const cluster = useSelector((state: RootState) => state.wallet.cluster);
   const tokenAccounts = useSelector((state: RootState) => state.wallet.tokenAccounts);
   const tokenAccount = useMemo(() => {
     const foundToken = tokenAccounts.find((account) => account.address === publicKey.toBase58());
@@ -124,6 +126,26 @@ export const QRAddressWidget: FunctionComponent<Props> = ({ publicKey, className
   //   navigator.share({ text, title, url });
   // }
 
+  // @ts-ignore
+  const imageSettings: QRCode.ImageSettings = {
+    height: 28,
+    width: 28,
+    excavate: true,
+  };
+
+  if (tokenAccount.mint.symbol === 'SOL') {
+    imageSettings.src =
+      'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/solana/info/logo.png';
+  } else {
+    const iconSrc = tokenConfig[cluster]?.find(
+      (token) => token.tokenSymbol === tokenAccount.mint.symbol,
+    )?.icon;
+
+    if (iconSrc) {
+      imageSettings.src = iconSrc;
+    }
+  }
+
   return (
     <WrapperCard className={className}>
       <HeaderWrapper>
@@ -136,7 +158,7 @@ export const QRAddressWidget: FunctionComponent<Props> = ({ publicKey, className
         </ShareWrapper>
       </HeaderWrapper>
       <Content>
-        <QRcode value={tokenAccount.address.toBase58()} size={148} />
+        <QRCode value={tokenAccount.address.toBase58()} imageSettings={imageSettings} size={148} />
         {/* <ActionsWrapper> */}
         {/*  <Action>Copy image</Action> */}
         {/*  <Action>Share</Action> */}
