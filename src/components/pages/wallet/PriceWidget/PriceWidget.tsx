@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useEffect, useMemo } from 'react';
+import React, { FunctionComponent, useEffect, useMemo, useState } from 'react';
 import ReactHighcharts from 'react-highcharts';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -48,6 +48,7 @@ type Props = {
 
 export const PriceWidget: FunctionComponent<Props> = ({ publicKey }) => {
   const dispatch = useDispatch();
+  const [isLoading, setIsLoading] = useState(false);
   const tokenAccounts = useSelector((state: RootState) => state.wallet.tokenAccounts);
   const tokenAccount = useMemo(() => {
     const foundToken = tokenAccounts.find((account) => account.address === publicKey.toBase58());
@@ -58,9 +59,17 @@ export const PriceWidget: FunctionComponent<Props> = ({ publicKey }) => {
   );
 
   useEffect(() => {
-    if (tokenAccount?.mint.symbol && !rates) {
-      dispatch(getCandleRates(tokenAccount.mint.symbol));
-    }
+    const loadCandles = async () => {
+      if (isLoading || !tokenAccount?.mint.symbol || rates) {
+        return;
+      }
+
+      setIsLoading(true);
+      await dispatch(getCandleRates(tokenAccount.mint.symbol));
+      setIsLoading(false);
+    };
+
+    void loadCandles();
   }, [tokenAccount?.mint.symbol]);
 
   if (!tokenAccount || !rates || rates.length === 0) {
