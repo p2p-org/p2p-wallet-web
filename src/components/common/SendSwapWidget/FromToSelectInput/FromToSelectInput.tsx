@@ -304,6 +304,7 @@ export const FromToSelectInput: FunctionComponent<Props> = ({
           <DropDownList>
             {tokenAccounts
               .filter((account) => direction === 'to' || account.balance.toNumber() > 0)
+              .sort((a, b) => b.balance.cmp(a.balance))
               .map((account) => (
                 <TokenRow
                   key={account.address.toBase58()}
