@@ -280,7 +280,7 @@ export const FromToSelectInput: FunctionComponent<Props> = ({
               placeholder="0"
               value={localAmount}
               onChange={handleAmountChange}
-              disabled={disabled}
+              disabled={disabled || direction === 'to'}
             />
           </SpecifyTokenWrapper>
           <BalanceWrapper>
