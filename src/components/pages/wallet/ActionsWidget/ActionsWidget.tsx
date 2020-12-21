@@ -4,7 +4,7 @@ import { useHistory } from 'react-router';
 import { Link } from 'react-router-dom';
 
 import { styled } from '@linaria/react';
-import { clusterApiUrl, PublicKey } from '@solana/web3.js';
+import { PublicKey } from '@solana/web3.js';
 
 import { TokenAccount } from 'api/token/TokenAccount';
 import { Button, ButtonsGroup } from 'components/ui';
@@ -34,7 +34,7 @@ export const ActionsWidget: FunctionComponent<Props> = ({ publicKey }) => {
     () => tokenAccounts.find((account) => account.address.equals(publicKey)),
     [tokenAccounts, publicKey],
   );
-  const isMainnet = cluster === clusterApiUrl('mainnet-beta');
+  const isMainnet = cluster === 'mainnet-beta';
 
   const handleTokenChange = (token: string) => {
     history.push(`/wallet/${token}`);
