@@ -9,6 +9,10 @@ export const localPrivateKey = isDev && process.env.APP_LOCAL_WALLET_PRIVATE_KEY
 
 export const localMnemonic = isDev && process.env.APP_LOCAL_WALLET_MNEMONIC;
 
+export const swapHostFeeAddress = process.env.SWAP_HOST_FEE_ADDRESS
+  ? new PublicKey(process.env.SWAP_HOST_FEE_ADDRESS)
+  : null;
+
 // Env vars that do not start with "REACT_APP_" are available in tests only
 export const localSwapProgramId = process.env.SWAP_PROGRAM_ID
   ? new PublicKey(process.env.SWAP_PROGRAM_ID)

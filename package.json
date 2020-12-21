@@ -6,7 +6,7 @@
   "scripts": {
     "start": "dotenv -e .env.local webpack-cli serve --progress",
     "build": "NODE_ENV=production webpack",
-    "deploy": "yarn build && gh-pages -d dist",
+    "deploy": "dotenv -e .env yarn build && gh-pages -d dist",
     "lint": "eslint src/ --ext js,ts,tsx --cache src --fix",
     "lint:fix": "yarn lint --fix",
     "test": "dotenv -e .env.test jest",

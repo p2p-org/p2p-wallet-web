@@ -11,7 +11,7 @@ import { Token } from 'api/token/Token';
 import { TokenAccount } from 'api/token/TokenAccount';
 import { getWallet, makeTransaction, sendTransaction } from 'api/wallet';
 import { ToastManager } from 'components/common/ToastManager';
-import { localSwapProgramId } from 'config/constants';
+import { localSwapProgramId, swapHostFeeAddress } from 'config/constants';
 import { WRAPPED_SOL_MINT } from 'constants/solana/bufferLayouts';
 import { ExtendedCluster } from 'utils/types';
 
@@ -45,6 +45,8 @@ export type SwapParameters = PoolOperationParameters & {
   // The account, owned by the wallet, that will contain the target tokens.
   // If missing, a new account will be created (incurring a fee)
   toAccount?: TokenAccount;
+
+  hostFeePublicKey: PublicKey | undefined;
 
   // The amount of source tokens to swap
   fromAmount: number;
@@ -248,7 +250,7 @@ export const APIFactory = (cluster: ExtendedCluster): API => {
       parameters.toAccount.address,
       parameters.pool.poolToken.address,
       parameters.pool.feeAccount.address,
-      null,
+      parameters.hostFeePublicKey || null,
       swapProgramId,
       TOKEN_PROGRAM_ID,
       parameters.fromAmount,
@@ -446,9 +448,10 @@ export const APIFactory = (cluster: ExtendedCluster): API => {
   const createAccountByMint = async (
     mintToken: Token,
     cleanupInstructions: TransactionInstruction[],
+    owner?: PublicKey,
   ): Promise<TokenAccount> => {
     // creating depositor pool account
-    const newToAccount = await tokenAPI.createAccountForToken(mintToken);
+    const newToAccount = await tokenAPI.createAccountForToken(mintToken, owner);
 
     cleanupInstructions.push(
       SPLToken.createCloseAccountInstruction(
@@ -524,10 +527,15 @@ export const APIFactory = (cluster: ExtendedCluster): API => {
         parameters.fromAmount,
       );
 
+      const feeAccount = swapHostFeeAddress
+        ? await createAccountByMint(toToken, cleanupInstructions, swapHostFeeAddress)
+        : null;
+
       const swapInstruction = await createSwapTransactionInstruction({
         fromAccount,
         fromAmount: parameters.fromAmount,
         toAccount,
+        hostFeePublicKey: feeAccount?.address,
         slippage: parameters.slippage || DEFAULT_SLIPPAGE,
         pool: parameters.pool,
       });

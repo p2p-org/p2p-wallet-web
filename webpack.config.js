@@ -50,6 +50,7 @@ module.exports = {
         APP_LOCAL_WALLET_PRIVATE_KEY: JSON.stringify(process.env.APP_LOCAL_WALLET_PRIVATE_KEY),
         APP_LOCAL_WALLET_MNEMONIC: JSON.stringify(process.env.APP_LOCAL_WALLET_MNEMONIC),
         SWAP_PROGRAM_ID: JSON.stringify(process.env.SWAP_PROGRAM_ID),
+        SWAP_HOST_FEE_ADDRESS: JSON.stringify(process.env.SWAP_HOST_FEE_ADDRESS),
         DEFAULT_COMMITMENT: JSON.stringify(process.env.DEFAULT_COMMITMENT),
         POST_TRANSACTION_SLEEP_MS: JSON.stringify(process.env.POST_TRANSACTION_SLEEP_MS),
       },
