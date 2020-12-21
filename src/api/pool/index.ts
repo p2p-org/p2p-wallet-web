@@ -447,23 +447,52 @@ export const APIFactory = (cluster: ExtendedCluster): API => {
 
   const createAccountByMint = async (
     mintToken: Token,
+    instructions: TransactionInstruction[],
     cleanupInstructions: TransactionInstruction[],
+    signers: Account[],
     owner?: PublicKey,
   ): Promise<TokenAccount> => {
-    // creating depositor pool account
-    const newToAccount = await tokenAPI.createAccountForToken(mintToken, owner);
+    const accountRentExempt = await connection.getMinimumBalanceForRentExemption(
+      AccountLayout.span,
+    );
 
-    cleanupInstructions.push(
-      SPLToken.createCloseAccountInstruction(
+    const newAccount = new Account();
+
+    // creating depositor pool account
+    instructions.push(
+      SystemProgram.createAccount({
+        fromPubkey: getWallet().pubkey,
+        newAccountPubkey: newAccount.publicKey,
+        lamports: accountRentExempt,
+        space: AccountLayout.span,
+        programId: TOKEN_PROGRAM_ID,
+      }),
+    );
+
+    instructions.push(
+      SPLToken.createInitAccountInstruction(
         TOKEN_PROGRAM_ID,
-        newToAccount.address,
-        getWallet().pubkey,
-        getWallet().pubkey,
-        [],
+        mintToken.address,
+        newAccount.publicKey,
+        owner || getWallet().pubkey,
       ),
     );
 
-    return newToAccount;
+    if (mintToken.address.equals(WRAPPED_SOL_MINT)) {
+      cleanupInstructions.push(
+        SPLToken.createCloseAccountInstruction(
+          TOKEN_PROGRAM_ID,
+          newAccount.publicKey,
+          getWallet().pubkey,
+          getWallet().pubkey,
+          [],
+        ),
+      );
+    }
+
+    signers.push(newAccount);
+
+    return new TokenAccount(mintToken, newAccount.publicKey, 0);
   };
 
   const validateSwapParameters = (parameters: SwapParameters): void => {
@@ -497,15 +526,17 @@ export const APIFactory = (cluster: ExtendedCluster): API => {
       const signers: Account[] = [];
 
       // Create WSOL or Token account
-      const fromAccount = parameters.fromAccount.mint.address.equals(WRAPPED_SOL_MINT)
-        ? await createWrappedSolAccount(
-            parameters.fromAccount,
-            parameters.fromAmount,
-            instructions,
-            cleanupInstructions,
-            signers,
-          )
-        : parameters.fromAccount;
+      const fromAccount =
+        parameters.fromAccount.mint.address.equals(WRAPPED_SOL_MINT) &&
+        parameters.fromAccount.mint.isSimulated
+          ? await createWrappedSolAccount(
+              parameters.fromAccount,
+              parameters.fromAmount,
+              instructions,
+              cleanupInstructions,
+              signers,
+            )
+          : parameters.fromAccount;
 
       // get the toAccount from the parameters, or create it if not present
       const isReverse = isReverseSwap(parameters);
@@ -515,35 +546,39 @@ export const APIFactory = (cluster: ExtendedCluster): API => {
       const toAccount =
         parameters.toAccount && !parameters.toAccount.mint.address.equals(WRAPPED_SOL_MINT)
           ? parameters.toAccount
-          : await createAccountByMint(toToken, cleanupInstructions);
+          : await createAccountByMint(toToken, instructions, cleanupInstructions, signers);
 
       console.log('Executing swap:', parameters);
 
       const delegate = parameters.pool.tokenSwapAuthority();
 
-      const approveInstruction = tokenAPI.approveInstruction(
-        fromAccount,
-        delegate,
-        parameters.fromAmount,
-      );
+      // approveInstruction
+      instructions.push(tokenAPI.approveInstruction(fromAccount, delegate, parameters.fromAmount));
 
+      // TODO: host fee
       const feeAccount = swapHostFeeAddress
-        ? await createAccountByMint(toToken, cleanupInstructions, swapHostFeeAddress)
+        ? await createAccountByMint(
+            parameters.pool.poolToken,
+            instructions,
+            cleanupInstructions,
+            signers,
+            swapHostFeeAddress,
+          )
         : null;
 
-      const swapInstruction = await createSwapTransactionInstruction({
-        fromAccount,
-        fromAmount: parameters.fromAmount,
-        toAccount,
-        hostFeePublicKey: feeAccount?.address,
-        slippage: parameters.slippage || DEFAULT_SLIPPAGE,
-        pool: parameters.pool,
-      });
-
-      const transaction = await makeTransaction(
-        [...instructions, approveInstruction, swapInstruction, ...cleanupInstructions],
-        signers,
+      // swapInstruction
+      instructions.push(
+        await createSwapTransactionInstruction({
+          fromAccount,
+          fromAmount: parameters.fromAmount,
+          toAccount,
+          hostFeePublicKey: feeAccount?.address,
+          slippage: parameters.slippage || DEFAULT_SLIPPAGE,
+          pool: parameters.pool,
+        }),
       );
+
+      const transaction = await makeTransaction([...instructions, ...cleanupInstructions], signers);
       return sendTransaction(transaction);
     } catch (error) {
       console.error(error);

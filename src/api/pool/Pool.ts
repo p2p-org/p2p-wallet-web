@@ -50,7 +50,7 @@ export const adjustForSlippage = (
 ): Decimal => {
   const slippageMultiplier = 1 + (direction === 'up' ? slippage : -slippage);
 
-  return toDecimal(amount).mul(slippageMultiplier);
+  return toDecimal(amount).mul(slippageMultiplier).floor();
 };
 
 export class Pool extends OnChainEntity<Pool> implements Serializable<SerializablePool> {
@@ -174,17 +174,17 @@ export class Pool extends OnChainEntity<Pool> implements Serializable<Serializab
     const [firstAmountInPool, secondAmountInPool] = isReverse
       ? [this.tokenB.balance, this.tokenA.balance]
       : [this.tokenA.balance, this.tokenB.balance];
+
+    const adjustedAmount = toDecimal(inputAmount);
+
     const invariant = firstAmountInPool.mul(secondAmountInPool);
-    const newFromAmountInPool = firstAmountInPool.add(toDecimal(inputAmount));
+    const newFromAmountInPool = firstAmountInPool.add(adjustedAmount);
 
-    const newToAmountInPool = invariant.div(newFromAmountInPool);
+    const newToAmountInPool = invariant.divToInt(newFromAmountInPool);
     const grossToAmount = secondAmountInPool.sub(newToAmountInPool);
-    const fees = includeFees ? grossToAmount.mul(this.feeRatio) : new Decimal(0);
+    const fees = includeFees ? grossToAmount.mul(this.feeRatio).floor() : new Decimal(0);
 
-    return grossToAmount
-      .sub(fees)
-      .toDecimalPlaces(isReverse ? this.tokenB.mint.decimals : this.tokenA.mint.decimals)
-      .toNumber();
+    return grossToAmount.sub(fees).toNumber();
   };
 
   calculateTokenAAmount = (tokenBAmount: number, includeFees: boolean): number =>

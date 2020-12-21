@@ -82,6 +82,7 @@ const updateAccountReducer = (
         ...serializedTokenAccount.mint,
         symbol: 'WSOL',
         address: WRAPPED_SOL_MINT.toBase58(),
+        isSimulated: true,
       },
     };
   }

@@ -12,6 +12,7 @@ export type SerializableToken = {
   mintAuthority?: string;
   name?: string;
   symbol?: string;
+  isSimulated?: boolean;
 };
 
 export class Token implements Serializable<SerializableToken> {
@@ -27,6 +28,9 @@ export class Token implements Serializable<SerializableToken> {
 
   readonly symbol?: string;
 
+  // it's simulated WSOL address
+  readonly isSimulated?: boolean;
+
   constructor(
     address: PublicKey,
     decimals: number,
@@ -34,6 +38,7 @@ export class Token implements Serializable<SerializableToken> {
     mintAuthority?: PublicKey,
     name?: string,
     symbol?: string,
+    isSimulated?: boolean,
   ) {
     this.address = address;
     this.decimals = decimals;
@@ -41,6 +46,7 @@ export class Token implements Serializable<SerializableToken> {
     this.mintAuthority = mintAuthority;
     this.name = name;
     this.symbol = symbol;
+    this.isSimulated = isSimulated;
   }
 
   toMajorDenomination(amountInMinorDenomination: number | Decimal): string {
@@ -63,6 +69,7 @@ export class Token implements Serializable<SerializableToken> {
       mintAuthority: this.mintAuthority?.toBase58(),
       name: this.name,
       symbol: this.symbol,
+      isSimulated: this.isSimulated,
     };
   }
 
@@ -77,6 +84,7 @@ export class Token implements Serializable<SerializableToken> {
       mintAuthority,
       serializableToken.name,
       serializableToken.symbol,
+      serializableToken.isSimulated,
     );
   }
 }

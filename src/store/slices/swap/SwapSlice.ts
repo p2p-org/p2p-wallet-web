@@ -3,6 +3,7 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import { APIFactory, SwapParameters } from 'api/pool';
 import { Pool } from 'api/pool/Pool';
 import { TokenAccount } from 'api/token/TokenAccount';
+import { swapHostFeeAddress } from 'config/constants';
 import { RootState } from 'store/rootReducer';
 
 export const SWAP_SLICE_NAME = 'swap';
@@ -28,8 +29,7 @@ export const executeSwap = createAsyncThunk(
       const swapParameters: SwapParameters = {
         fromAccount: TokenAccount.from(serializedFirstTokenAccount),
         toAccount: serializedSecondTokenAccount && TokenAccount.from(serializedSecondTokenAccount),
-        fromAmount:
-          firstAmount * 10 ** (TokenAccount.from(serializedFirstTokenAccount).mint.decimals || 0),
+        fromAmount: firstAmount,
         pool: Pool.from(selectedPool),
         slippage,
       };

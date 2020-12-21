@@ -1,4 +1,4 @@
-import React, { FunctionComponent } from 'react';
+import React, { FunctionComponent, useCallback, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router';
 
@@ -9,6 +9,7 @@ import { SYSTEM_PROGRAM_ID, WRAPPED_SOL_MINT } from 'constants/solana/bufferLayo
 import { executeSwap } from 'store/slices/swap/SwapSlice';
 import { updateTokenPairState } from 'store/slices/tokenPair/TokenPairSlice';
 import { tokenPairSelector } from 'store/slices/tokenPair/utils/tokenPair';
+import { majorAmountToMinor, minorAmountToMajor } from 'utils/amount';
 
 type Props = {
   publicKey: string;
@@ -24,9 +25,19 @@ export const SwapWidget: FunctionComponent<Props> = () => {
     firstTokenAccount,
     secondTokenAccount,
     firstToken,
+    secondToken,
     selectedPool,
     tokenAccounts,
   } = useSelector(tokenPairSelector);
+
+  const feeProperties = useMemo(() => {
+    if (selectedPool && firstToken && firstAmount) {
+      return {
+        amount: selectedPool.impliedFee(firstToken, firstAmount),
+        token: selectedPool.otherToken(firstToken),
+      };
+    }
+  }, [selectedPool, firstToken, firstAmount]);
 
   usePoolFromLocation({
     tokenAccounts,
@@ -60,6 +71,7 @@ export const SwapWidget: FunctionComponent<Props> = () => {
           ...serialized.mint,
           symbol: 'WSOL',
           address: WRAPPED_SOL_MINT.toBase58(),
+          isSimulated: true,
         },
       });
     }
@@ -76,13 +88,16 @@ export const SwapWidget: FunctionComponent<Props> = () => {
   const selectSecondTokenHandleChange = handleTokenSelectionChange('secondToken');
 
   const updateFirstAmount = (minorAmount: string) => {
-    dispatch(updateTokenPairState({ firstAmount: Number(minorAmount) }));
-  };
+    if (!firstToken) {
+      return;
+    }
 
-  const fee =
-    selectedPool && firstToken && firstAmount
-      ? selectedPool.impliedFee(firstToken, firstAmount)
-      : undefined;
+    dispatch(
+      updateTokenPairState({
+        firstAmount: majorAmountToMinor(Number(minorAmount), firstToken).toNumber(),
+      }),
+    );
+  };
 
   return (
     <SendSwapWidget
@@ -90,11 +105,15 @@ export const SwapWidget: FunctionComponent<Props> = () => {
       title="Swap"
       disabled={!selectedPool}
       actionText={selectedPool ? 'Swap' : 'This pair is unavailable'}
-      fee={fee}
+      fee={
+        feeProperties
+          ? minorAmountToMajor(feeProperties.amount, feeProperties.token).toNumber()
+          : undefined
+      }
       fromTokenAccount={firstTokenAccount}
-      fromAmount={firstAmount.toString()}
+      fromAmount={firstToken ? minorAmountToMajor(firstAmount, firstToken).toString() : ''}
       toTokenAccount={secondTokenAccount}
-      toAmount={secondAmount.toString()}
+      toAmount={secondToken ? minorAmountToMajor(secondAmount, secondToken).toString() : ''}
       onFromTokenAccountChange={selectFirstTokenHandleChange}
       onFromAmountChange={updateFirstAmount}
       onToTokenAccountChange={selectSecondTokenHandleChange}
