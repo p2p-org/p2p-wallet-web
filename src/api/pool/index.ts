@@ -115,7 +115,7 @@ export const APIFactory = (cluster: ExtendedCluster): API => {
     const payer = new Account();
 
     // load the pool
-    console.log('swap Address', address);
+    console.log('swap Address', address.toBase58());
     const swapInfo: TokenSwap = await TokenSwap.loadTokenSwap(
       connection,
       address,
