@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { FunctionComponent, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 
 import { styled } from '@linaria/react';
@@ -6,15 +6,12 @@ import classNames from 'classnames';
 import { Decimal } from 'decimal.js';
 import { rgba } from 'polished';
 
-import { TOKEN_PROGRAM_ID } from 'api/token';
-import { Token } from 'api/token/Token';
 import { TokenAccount } from 'api/token/TokenAccount';
 import { AmountUSDT } from 'components/common/AmountUSDT';
 import { TokenAvatar } from 'components/common/TokenAvatar';
 import { Icon } from 'components/ui';
-import { SYSTEM_PROGRAM_ID } from 'constants/solana/bufferLayouts';
 import { RootState } from 'store/rootReducer';
-import { majorAmountToMinor, minorAmountToMajor } from 'utils/amount';
+import { minorAmountToMajor } from 'utils/amount';
 import { shortAddress } from 'utils/tokens';
 
 import { TokenRow } from './TokenRow';
@@ -103,6 +100,8 @@ const ChevronIcon = styled(Icon)`
 `;
 
 const AmountInput = styled.input`
+  max-width: 100px;
+
   color: #000;
   font-weight: 500;
   font-size: 28px;

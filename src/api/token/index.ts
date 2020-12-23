@@ -402,7 +402,7 @@ export const APIFactory = memoizeWith(
       // const token = new SPLToken(connection, mintAccount.publicKey, programId, payer);
 
       // Allocate memory for the account
-      const balanceNeededMint: number = await SPLToken.getMinBalanceRentForExemptMint(connection);
+      const balanceNeededMint = await connection.getMinimumBalanceForRentExemption(MintLayout.span);
 
       const instructions = [];
 
@@ -433,8 +433,8 @@ export const APIFactory = memoizeWith(
       if (amount > 0) {
         signers.push(initialAccount);
 
-        const balanceNeededAccount: number = await SPLToken.getMinBalanceRentForExemptAccount(
-          connection,
+        const balanceNeededAccount = await connection.getMinimumBalanceForRentExemption(
+          AccountLayout.span,
         );
 
         // createAccountInstruction
@@ -619,8 +619,8 @@ export const APIFactory = memoizeWith(
         data,
       });
 
-      const balanceNeededAccount: number = await SPLToken.getMinBalanceRentForExemptAccount(
-        connection,
+      const balanceNeededAccount = await connection.getMinimumBalanceForRentExemption(
+        AccountLayout.span,
       );
 
       instructions.push(
