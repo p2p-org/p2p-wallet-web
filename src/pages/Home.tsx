@@ -62,11 +62,9 @@ export const Home: FunctionComponent = () => {
   const history = useHistory();
   const dispatch = useDispatch();
 
-  const handleConnectBySolletClick = () => {
-    // eslint-disable-next-line @typescript-eslint/await-thenable
-
+  const handleConnectByClick = (type: WalletType) => {
     batch(async () => {
-      dispatch(selectType(WalletType.SOLLET));
+      dispatch(selectType(type));
       await dispatch(connect());
 
       setTimeout(() => {
@@ -89,8 +87,11 @@ export const Home: FunctionComponent = () => {
           <Button gray big full as={Link} to="/access">
             I already have a wallet
           </Button>
-          <Button gray big full onClick={handleConnectBySolletClick}>
+          <Button gray big full onClick={() => handleConnectByClick(WalletType.SOLLET)}>
             Connect by Sollet
+          </Button>
+          <Button gray big full onClick={() => handleConnectByClick(WalletType.BONFIDA)}>
+            Connect by Bonfida
           </Button>
         </Actions>
       </Box>

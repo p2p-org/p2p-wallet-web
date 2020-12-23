@@ -13,9 +13,9 @@ const DEFAULT_PROVIDER = 'https://www.sollet.io';
 export class SolletWallet extends Wallet {
   private solletWallet: SolletWalletAdapter;
 
-  constructor(network: string) {
+  constructor(network: string, provider: string = DEFAULT_PROVIDER) {
     super(network);
-    this.solletWallet = new SolletWalletAdapter(DEFAULT_PROVIDER, network);
+    this.solletWallet = new SolletWalletAdapter(provider, network);
 
     // once the sollet wallet emits a connect or disconnect event, pass it on
     this.solletWallet.on(WalletEvent.CONNECT, () => this.emit(WalletEvent.CONNECT));
