@@ -2,14 +2,12 @@ import React, { FunctionComponent, useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
 
 import { styled } from '@linaria/react';
-import * as web3 from '@solana/web3.js';
 import classNames from 'classnames';
 import { rgba } from 'polished';
 
 import { Token } from 'api/token/Token';
 import { TokenAvatar } from 'components/common/TokenAvatar';
-import { Avatar, Button, Icon, Input } from 'components/ui';
-import { TokenType } from 'constants/tokens';
+import { Button, Icon, Input } from 'components/ui';
 import { createAccountForToken } from 'store/slices/wallet/WalletSlice';
 
 const Wrapper = styled.div`

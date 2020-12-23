@@ -268,8 +268,7 @@ export const FromToSelectInput: FunctionComponent<Props> = ({
           <SpecifyTokenWrapper>
             <TokenWrapper ref={selectorRef} onClick={handleSelectorClick}>
               <TokenName title={tokenAccount?.address.toBase58()}>
-                {tokenAccount?.mint.name ||
-                  tokenAccount?.mint.symbol ||
+                {tokenAccount?.mint.symbol ||
                   (tokenAccount && shortAddress(tokenAccount.address.toBase58()))}
               </TokenName>
               <ChevronWrapper>
