@@ -146,7 +146,6 @@ const DropDownListContainer = styled.div`
   z-index: 1;
 
   margin-top: 17px;
-  padding: 20px 0 17px;
 
   background: #fefefe;
   border: 1px solid #efefef;
@@ -155,15 +154,58 @@ const DropDownListContainer = styled.div`
 `;
 
 const DropDownHeader = styled.div`
-  padding: 0 32px;
+  display: flex;
+  padding: 15px 32px;
 
   color: #000;
   font-weight: 600;
   font-size: 14px;
   line-height: 17px;
+
+  border-bottom: 1px solid ${rgba('#000', 0.05)};
+`;
+
+const SearchCircle = styled.div`
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+
+  background: #f5f5f5;
+  border-radius: 50%;
+`;
+
+const SearchIcon = styled(Icon)`
+  width: 24px;
+  height: 24px;
+`;
+
+const SearchInput = styled.input`
+  width: 100%;
+  margin-left: 20px;
+
+  color: #000;
+  font-size: 14px;
+  line-height: 17px;
+
+  background: transparent;
+  border: 0;
+
+  outline: none;
+
+  appearance: none;
+
+  &::placeholder {
+    color: ${rgba('#000', 0.5)};
+  }
 `;
 
 const DropDownList = styled.div`
+  max-height: 400px;
+  overflow-y: auto;
+
   > :not(:last-child) {
     border-bottom: 1px solid ${rgba('#000', 0.05)};
   }
@@ -188,6 +230,8 @@ export const FromToSelectInput: FunctionComponent<Props> = ({
   disabled,
 }) => {
   const selectorRef = useRef<HTMLDivElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const [filter, setFilter] = useState('');
   const [localAmount, setLocalAmount] = useState(`${amount}`);
   const [isOpen, setIsOpen] = useState(false);
   const tokenAccounts = useSelector((state: RootState) =>
@@ -201,7 +245,10 @@ export const FromToSelectInput: FunctionComponent<Props> = ({
   }, [amount]);
 
   const handleAwayClick = (e: MouseEvent) => {
-    if (!selectorRef.current?.contains(e.target as HTMLDivElement)) {
+    if (
+      !selectorRef.current?.contains(e.target as HTMLDivElement) &&
+      !dropdownRef.current?.contains(e.target as HTMLDivElement)
+    ) {
       setIsOpen(false);
     }
   };
@@ -247,6 +294,12 @@ export const FromToSelectInput: FunctionComponent<Props> = ({
     if (Number(nextAmount)) {
       onAmountChange(nextAmount);
     }
+  };
+
+  const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const nextFilter = e.target.value.trim();
+
+    setFilter(nextFilter);
   };
 
   return (
@@ -297,11 +350,22 @@ export const FromToSelectInput: FunctionComponent<Props> = ({
         </InfoWrapper>
       </MainWrapper>
       {isOpen ? (
-        <DropDownListContainer>
-          <DropDownHeader>Your wallets</DropDownHeader>
+        <DropDownListContainer ref={dropdownRef}>
+          <DropDownHeader>
+            <SearchCircle>
+              <SearchIcon name="search" />
+            </SearchCircle>
+            <SearchInput placeholder="Search for currency to swap" onChange={handleFilterChange} />
+          </DropDownHeader>
           <DropDownList>
             {tokenAccounts
               .filter((account) => direction === 'to' || account.balance.toNumber() > 0)
+              .filter(
+                (account) =>
+                  !filter ||
+                  account.mint.symbol?.toLowerCase().includes(filter) ||
+                  account.mint.name?.toLowerCase().includes(filter),
+              )
               .sort((a, b) => b.balance.cmp(a.balance))
               .map((account) => (
                 <TokenRow

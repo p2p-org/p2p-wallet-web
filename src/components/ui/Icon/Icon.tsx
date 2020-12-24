@@ -9,6 +9,7 @@ import chevron from './assets/chevron-icon.svg';
 import close from './assets/close-icon.svg';
 import copy from './assets/copy-icon.svg';
 import eye from './assets/eye-icon.svg';
+import search from './assets/search-icon.svg';
 import success from './assets/success-icon.svg';
 import warning from './assets/warning-icon.svg';
 
@@ -25,6 +26,7 @@ const iconsMap = new Map<string, SvgIconType>([
   ['close', close],
   ['copy', copy],
   ['eye', eye],
+  ['search', search],
   ['success', success],
   ['warning', warning],
 ]);
