@@ -1,4 +1,4 @@
-import { clusterApiUrl, Commitment, Connection, EpochInfo, SignatureResult } from '@solana/web3.js';
+import { clusterApiUrl, Commitment, Connection, SignatureResult } from '@solana/web3.js';
 import { identity, memoizeWith } from 'ramda';
 
 import { defaultCommitment } from 'config/constants';
@@ -39,8 +39,17 @@ const createConnection = memoizeWith<(network: string) => Connection>(identity, 
   return connection;
 });
 
-export const getNetwork = (cluster: ExtendedCluster): string =>
-  cluster === 'localnet' ? LOCALNET_URL : clusterApiUrl(cluster);
+export const getNetwork = (cluster: ExtendedCluster): string => {
+  if (cluster === 'localnet') {
+    return LOCALNET_URL;
+  }
+
+  if (cluster === 'mainnet-beta') {
+    return 'https://solana-api.projectserum.com/';
+  }
+
+  return clusterApiUrl(cluster);
+};
 
 export const getConnection = (cluster?: ExtendedCluster): Connection => {
   if (cluster) {

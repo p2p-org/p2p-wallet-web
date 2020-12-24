@@ -5,7 +5,6 @@ import { styled } from '@linaria/react';
 import { Account, clusterApiUrl } from '@solana/web3.js';
 
 import { Token } from 'api/token/Token';
-import tokenConfig from 'api/token/token.config';
 import { TokenAccount } from 'api/token/TokenAccount';
 import { Modal } from 'components/common/Modal';
 import { Button } from 'components/ui';

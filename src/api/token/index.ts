@@ -21,7 +21,6 @@ import {
   sendTransaction,
   sendTransactionFromAccount,
 } from 'api/wallet';
-import { ToastManager } from 'components/common/ToastManager';
 import { airdropKey } from 'config/constants';
 import { SYSTEM_PROGRAM_ID } from 'constants/solana/bufferLayouts';
 import { CacheTTL } from 'lib/cachettl';
