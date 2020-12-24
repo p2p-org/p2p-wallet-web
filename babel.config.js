@@ -19,6 +19,7 @@ module.exports = {
           constants: './src/constants',
           config: './src/config',
           utils: './src/utils',
+          lib: './src/lib',
           store: './src/store',
           api: './src/api',
           features: './src/features',

@@ -1,5 +1,4 @@
-import cache from '@civic/simple-cache';
-import { AccountLayout, MintLayout, Token as SPLToken } from '@solana/spl-token';
+import { AccountLayout, MintInfo, MintLayout, Token as SPLToken } from '@solana/spl-token';
 import {
   Account,
   AccountInfo,
@@ -15,6 +14,7 @@ import { complement, find, identity, isNil, memoizeWith, path, propEq } from 'ra
 import assert from 'ts-invariant';
 
 import { getConnection } from 'api/connection';
+import { retryableProxy } from 'api/connection/utils/retryableProxy';
 import {
   getWallet,
   makeTransaction,
@@ -24,6 +24,7 @@ import {
 import { ToastManager } from 'components/common/ToastManager';
 import { airdropKey } from 'config/constants';
 import { SYSTEM_PROGRAM_ID } from 'constants/solana/bufferLayouts';
+import { CacheTTL } from 'lib/cachettl';
 import { toDecimal } from 'utils/amount';
 import { makeNewAccountInstruction } from 'utils/transaction';
 import { ExtendedCluster } from 'utils/types';
@@ -40,6 +41,8 @@ export const TOKEN_PROGRAM_ID = new PublicKey('TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9
 export const OWNER_VALIDATION_PROGRAM_ID = new PublicKey(
   '4MNPdKu9wFMvEeZBMt3Eipfs5ovVWTJb31pEXDJAAxX5',
 );
+
+const tokensCache = new CacheTTL<Token>({ ttl: 5000 });
 
 type TokenAccountUpdateCallback = (tokenAccount: TokenAccount) => void;
 
@@ -142,7 +145,62 @@ export const APIFactory = memoizeWith(
      * Given a mint address, return its token information
      * @param mint
      */
-    const tokenInfo = cache(tokenInfoUncached, { ttl: 5000 });
+    const tokenInfo = async (mint: PublicKey): Promise<Token> => {
+      // try to get cached version
+      const tokenCached = tokensCache.get(mint.toBase58());
+      if (tokenCached) {
+        return tokenCached;
+      }
+
+      const tokenUncached = await tokenInfoUncached(mint);
+
+      // set cache
+      tokensCache.set(mint.toBase58(), tokenUncached);
+
+      return tokenUncached;
+    };
+
+    const tokensInfo = retryableProxy(
+      async (mints: PublicKey[]): Promise<Token[]> => {
+        const publicKeys = mints.map((publicKey) => publicKey.toBase58());
+
+        const getMultipleAccountsResult = await connection._rpcRequest('getMultipleAccounts', [
+          publicKeys,
+          { commiment: connection.commitment, encoding: 'jsonParsed' },
+        ]);
+
+        const tokens: Token[] = [];
+
+        mints.forEach((mint, index) => {
+          const mintInfo = path<MintInfo>(
+            ['result', 'value', index, 'data', 'parsed', 'info'],
+            getMultipleAccountsResult,
+          );
+
+          if (!mintInfo) {
+            return;
+          }
+
+          const configForToken = getConfigForToken(mint);
+
+          const token = new Token(
+            mint,
+            mintInfo.decimals,
+            mintInfo.supply,
+            mintInfo.mintAuthority ? new PublicKey(mintInfo.mintAuthority) : undefined, // maps a null mintAuthority to undefined
+            configForToken?.tokenName,
+            configForToken?.tokenSymbol,
+          );
+
+          // set cache
+          tokensCache.set(mint.toBase58(), token);
+
+          tokens.push(token);
+        });
+
+        return tokens;
+      },
+    );
 
     const getTokens = async (): Promise<Token[]> => {
       const clusterConfig = tokenConfig[cluster];
@@ -151,16 +209,11 @@ export const APIFactory = memoizeWith(
         return [];
       }
 
-      const tokenPromises = clusterConfig.map((config: TokenConfig) =>
-        tokenInfo(new PublicKey(config.mintAddress)).catch((error: Error) => {
-          ToastManager.error(error.toString());
-          return null;
-        }),
+      const tokensAddresses = clusterConfig.map(
+        (config: TokenConfig) => new PublicKey(config.mintAddress),
       );
 
-      const tokens = await Promise.all(tokenPromises);
-
-      return tokens.filter(complement(isNil)) as Token[];
+      return tokensInfo(tokensAddresses);
     };
 
     type GetAccountInfoResponse = AccountInfo<Buffer | ParsedAccountData> | null;
@@ -235,6 +288,25 @@ export const APIFactory = memoizeWith(
           throw error;
         });
 
+      // const res = await connection._rpcRequest('getProgramAccounts', [
+      //   TOKEN_PROGRAM_ID.toBase58(),
+      //   {
+      //     commitment: connection.commitment,
+      //     filters: [
+      //       {
+      //         memcmp: {
+      //           offset: AccountLayout.offsetOf('owner'),
+      //           bytes: ownerKey.toBase58(),
+      //         },
+      //       },
+      //       {
+      //         dataSize: AccountLayout.span,
+      //       },
+      //     ],
+      //     // encoding: 'jsonParsed',
+      //   },
+      // ]);
+
       const secondTokenAccount = async (
         accountResult: PublicKeyAndAccount<Buffer | ParsedAccountData>,
       ): Promise<TokenAccount | null> => {
@@ -253,6 +325,20 @@ export const APIFactory = memoizeWith(
           toDecimal(new BN(parsedTokenAccountInfo.tokenAmount.amount)),
         );
       };
+
+      const mints: PublicKey[] = [];
+
+      allParsedAccountInfos.value.map((accountResult) => {
+        const parsedTokenAccountInfo = extractParsedTokenAccountInfo(accountResult.account);
+
+        if (!parsedTokenAccountInfo) {
+          return null;
+        }
+
+        mints.push(new PublicKey(parsedTokenAccountInfo.mint));
+      });
+
+      await tokensInfo(mints);
 
       const allTokenAccounts = await Promise.all(
         allParsedAccountInfos.value.map((account) => secondTokenAccount(account)),
