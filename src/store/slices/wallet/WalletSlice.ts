@@ -132,7 +132,7 @@ export const createMint = createAsyncThunk<
 });
 
 export const createAccountForToken = createAsyncThunk<TokenAccount, { token: Token }>(
-  `${WALLET_SLICE_NAME}/createMint`,
+  `${WALLET_SLICE_NAME}/createAccountForToken`,
   async (parameters, thunkAPI) => {
     const state: RootState = thunkAPI.getState() as RootState;
     const walletState = state.wallet;
@@ -211,6 +211,10 @@ const walletSlice = createSlice({
     builder.addCase(getTokenAccounts.fulfilled, (state, action) => ({
       ...state,
       tokenAccounts: state.tokenAccounts.concat(action.payload),
+    }));
+    builder.addCase(createAccountForToken.fulfilled, (state, action) => ({
+      ...state,
+      tokenAccounts: state.tokenAccounts.concat(action.payload.serialize()),
     }));
   },
 });
