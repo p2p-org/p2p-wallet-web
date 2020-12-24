@@ -772,9 +772,12 @@ html,body,#root{height:100%;}body{font-family:'Rubik',-apple-system,BlinkMacSyst
 .beq3zku{display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;-webkit-box-pack:justify;-webkit-justify-content:space-between;-ms-flex-pack:justify;justify-content:space-between;margin-top:5px;color:rgba(0,0,0,0.3);font-size:14px;line-height:17px;-webkit-letter-spacing:-0.3px;-moz-letter-spacing:-0.3px;-ms-letter-spacing:-0.3px;letter-spacing:-0.3px;}
 .bc9mt3j{display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;}
 .a1ark1hb{margin-left:3px;}
-.dnysyxe{position:absolute;right:0;left:0;z-index:1;margin-top:17px;padding:20px 0 17px;background:#fefefe;border:1px solid #efefef;border-radius:0 0 10px 10px;box-shadow:0 12px 20px rgba(0,0,0,0.15);}
-.ds42d8f{padding:0 32px;color:#000;font-weight:600;font-size:14px;line-height:17px;}
-.d14wtbdx > :not(:last-child){border-bottom:1px solid rgba(0,0,0,0.05);}
+.dnysyxe{position:absolute;right:0;left:0;z-index:1;margin-top:17px;background:#fefefe;border:1px solid #efefef;border-radius:0 0 10px 10px;box-shadow:0 12px 20px rgba(0,0,0,0.15);}
+.ds42d8f{display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;padding:15px 32px;color:#000;font-weight:600;font-size:14px;line-height:17px;border-bottom:1px solid rgba(0,0,0,0.05);}
+.s14wtbdx{display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;-webkit-align-items:center;-webkit-box-align:center;-ms-flex-align:center;align-items:center;-webkit-box-pack:center;-webkit-justify-content:center;-ms-flex-pack:center;justify-content:center;width:44px;height:44px;background:#f5f5f5;border-radius:50%;}
+.sh5zf5i{width:24px;height:24px;}
+.s1hxmn7n{width:100%;margin-left:20px;color:#000;font-size:14px;line-height:17px;background:transparent;border:0;outline:none;-webkit-appearance:none;-moz-appearance:none;appearance:none;}.s1hxmn7n::-webkit-input-placeholder{color:rgba(0,0,0,0.5);}.s1hxmn7n::-moz-placeholder{color:rgba(0,0,0,0.5);}.s1hxmn7n:-ms-input-placeholder{color:rgba(0,0,0,0.5);}.s1hxmn7n::placeholder{color:rgba(0,0,0,0.5);}
+.d1yxk729{max-height:400px;overflow-y:auto;}.d1yxk729 > :not(:last-child){border-bottom:1px solid rgba(0,0,0,0.05);}
 
 .w7sff4t{display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;}
 .c1m6pxlm{width:44px;height:44px;background:#c4c4c4;border-radius:50%;}
