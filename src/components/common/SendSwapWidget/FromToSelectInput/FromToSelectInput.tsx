@@ -100,7 +100,7 @@ const ChevronIcon = styled(Icon)`
 `;
 
 const AmountInput = styled.input`
-  max-width: 100px;
+  max-width: 200px;
 
   color: #000;
   font-weight: 500;
