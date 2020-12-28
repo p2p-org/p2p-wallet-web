@@ -19,7 +19,7 @@ import { TokenRow } from './TokenRow';
 const Wrapper = styled.div`
   position: relative;
 
-  padding: 20px 32px 38px;
+  padding: 0 0 20px;
 `;
 
 const TopWrapper = styled.div`
@@ -222,6 +222,7 @@ type Props = {
 };
 
 export const FromToSelectInput: FunctionComponent<Props> = ({
+  type = 'send',
   direction = 'from',
   tokenAccount,
   amount,
@@ -355,7 +356,10 @@ export const FromToSelectInput: FunctionComponent<Props> = ({
             <SearchCircle>
               <SearchIcon name="search" />
             </SearchCircle>
-            <SearchInput placeholder="Search for currency to swap" onChange={handleFilterChange} />
+            <SearchInput
+              placeholder={`Search for currency to ${type}`}
+              onChange={handleFilterChange}
+            />
           </DropDownHeader>
           <DropDownList>
             {tokenAccounts

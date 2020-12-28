@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useMemo, useState } from 'react';
+import React, { FunctionComponent, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router';
 
@@ -9,7 +9,8 @@ import Decimal from 'decimal.js';
 import { TokenAccount } from 'api/token/TokenAccount';
 import { SendSwapWidget } from 'components/common/SendSwapWidget';
 import { RootState } from 'store/rootReducer';
-import { transfer } from 'store/slices/wallet/WalletSlice';
+import { getMinimumBalanceForRentExemption, transfer } from 'store/slices/wallet/WalletSlice';
+import { formatValueWithDecimals, toDecimal } from 'utils/amount';
 
 type Props = {
   publicKey: string;
@@ -20,6 +21,7 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
   const history = useHistory();
   const [fromAmount, setFromAmount] = useState('');
   const [toTokenPublicKey, setToTokenPublicKey] = useState('');
+  const [fee, setFee] = useState('');
   const tokenAccounts = useSelector((state: RootState) =>
     state.wallet.tokenAccounts.map((account) => TokenAccount.from(account)),
   );
@@ -28,13 +30,24 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
     [tokenAccounts, publicKey],
   );
 
+  useEffect(() => {
+    dispatch(getMinimumBalanceForRentExemption(0)).then((action) => {
+      setFee(
+        new Decimal(action.payload)
+          .div(10 ** 9)
+          .toDecimalPlaces(9)
+          .toString(),
+      );
+    });
+  }, []);
+
   const handleBackClick = () => {
     history.replace('/wallets');
   };
 
   const handleSubmit = async () => {
     if (!fromTokenAccount) {
-      throw new Error(`Did't find token`);
+      throw new Error(`Didn't find token`);
     }
 
     const amount = new Decimal(fromAmount).mul(10 ** fromTokenAccount?.mint.decimals).toNumber();
@@ -77,6 +90,7 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
       type="send"
       title="Send tokens"
       actionText="Send"
+      fee={fee}
       fromTokenAccount={fromTokenAccount}
       onFromTokenAccountChange={handleFromTokenAccountChange}
       fromAmount={fromAmount}

@@ -11,6 +11,7 @@ import copy from './assets/copy-icon.svg';
 import eye from './assets/eye-icon.svg';
 import search from './assets/search-icon.svg';
 import success from './assets/success-icon.svg';
+import wallet from './assets/wallet-icon.svg';
 import warning from './assets/warning-icon.svg';
 
 export type SvgIconType = {
@@ -28,6 +29,7 @@ const iconsMap = new Map<string, SvgIconType>([
   ['eye', eye],
   ['search', search],
   ['success', success],
+  ['wallet', wallet],
   ['warning', warning],
 ]);
 

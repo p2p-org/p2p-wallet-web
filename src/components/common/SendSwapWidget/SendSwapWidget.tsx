@@ -1,10 +1,13 @@
 import React, { FunctionComponent } from 'react';
 
 import { styled } from '@linaria/react';
+import Decimal from 'decimal.js';
 import { rgba } from 'polished';
 
 import { TokenAccount } from 'api/token/TokenAccount';
+import { AmountUSDT } from 'components/common/AmountUSDT';
 import { Card } from 'components/common/Card';
+import { RateUSDT } from 'components/common/RateUSDT';
 import { Button, Icon } from 'components/ui';
 
 import { FromToSelectInput } from './FromToSelectInput';
@@ -55,6 +58,8 @@ const WrapperCard = styled(Card)`
 `;
 
 const FromWrapper = styled.div`
+  padding: 20px 32px;
+
   border-bottom: 1px solid ${rgba('#000', 0.1)};
 `;
 
@@ -66,7 +71,8 @@ const ToWrapper = styled.div`
 
 const ToSelect = styled.div`
   display: flex;
-  margin-bottom: 32px;
+  /*margin-bottom: 32px; */
+  margin-bottom: 20px;
 
   > :not(:last-child) {
     margin-right: 10px;
@@ -93,17 +99,70 @@ const ToOption = styled.div`
   }
 `;
 
-const ActionWrapper = styled.div`
-  padding: 32px;
+const SendTo = styled.div`
+  color: ${rgba('#000', 0.5)};
+  font-size: 14px;
+  line-height: 17px;
 `;
 
-const Hint = styled.div`
-  margin-top: 24px;
+const FeeLine = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 35px;
+  margin-top: 10px;
+  padding: 0 18px;
+
+  color: ${rgba('#000', 0.5)};
+  font-size: 14px;
+  line-height: 17px;
+
+  background: #f7f7f7;
+  border-radius: 8px;
+`;
+
+const FeeLeft = styled.div`
+  display: flex;
+`;
+
+const FeeRight = styled.div`
+  flex: 1;
+
+  text-align: right;
+`;
+
+const PropertiesWrapper = styled.div`
+  padding: 0 50px;
+
+  > :first-child {
+    margin-top: 20px;
+  }
+
+  > :not(:last-child) {
+    margin-bottom: 16px;
+  }
+`;
+
+const PropertyLine = styled.div`
+  display: flex;
+  justify-content: space-between;
 
   color: ${rgba('#000', 0.5)};
   font-size: 14px;
   line-height: 17px;
 `;
+
+const ActionWrapper = styled.div`
+  padding: 32px;
+`;
+
+// const Hint = styled.div`
+//   margin-top: 24px;
+//
+//   color: ${rgba('#000', 0.5)};
+//   font-size: 14px;
+//   line-height: 17px;
+// `;
 
 // TODO: make amounts with decimal type
 type Props = {
@@ -115,6 +174,7 @@ type Props = {
   toAmount?: string;
   actionText: string;
   fee?: number;
+  rate?: number;
   onFromTokenAccountChange: (tokenAccount: TokenAccount) => void;
   onFromAmountChange: (minorAmount: string) => void;
   onToTokenAccountChange: (tokenAccount: TokenAccount | string) => void;
@@ -133,6 +193,7 @@ export const SendSwapWidget: FunctionComponent<Props> = ({
   toAmount,
   actionText,
   fee,
+  rate,
   onFromTokenAccountChange,
   onFromAmountChange,
   onToTokenAccountChange,
@@ -159,12 +220,25 @@ export const SendSwapWidget: FunctionComponent<Props> = ({
             onAmountChange={onFromAmountChange}
             disabled={disabled}
           />
+          {type === 'send' ? (
+            <FeeLine>
+              {fromTokenAccount?.mint ? (
+                <FeeLeft>
+                  1 {fromTokenAccount?.mint.symbol} =&nbsp;
+                  <RateUSDT symbol={fromTokenAccount?.mint.symbol} />
+                </FeeLeft>
+              ) : undefined}
+
+              {fee ? <FeeRight>Fee: {fee} SOL</FeeRight> : undefined}
+            </FeeLine>
+          ) : undefined}
         </FromWrapper>
         {type === 'send' ? (
           <ToWrapper>
             <ToSelect>
               {/* <ToOption>To user</ToOption> */}
-              <ToOption className="active">To wallet</ToOption>
+              {/* <ToOption className="active">To wallet</ToOption> */}
+              <SendTo>Send to</SendTo>
             </ToSelect>
             <ToAddressInput
               value={String(toTokenAccount) || ''}
@@ -182,13 +256,30 @@ export const SendSwapWidget: FunctionComponent<Props> = ({
               onAmountChange={onToAmountChange}
               disabled={disabled}
             />
+            {rate ? (
+              <FeeLine>
+                <FeeLeft>Price:</FeeLeft>
+                <FeeRight>
+                  {rate} {fromTokenAccount?.mint.symbol} per{' '}
+                  {(toTokenAccount as TokenAccount)?.mint.symbol}
+                </FeeRight>
+              </FeeLine>
+            ) : undefined}
           </FromWrapper>
         )}
+        {type === 'swap' ? (
+          <PropertiesWrapper>
+            {fee ? <PropertyLine>Liquidity Provider Fee: {fee} SOL</PropertyLine> : undefined}
+          </PropertiesWrapper>
+        ) : undefined}
         <ActionWrapper>
           <Button primary={!disabled} secondary={disabled} big full onClick={onSubmit}>
             {actionText}
           </Button>
-          {fee ? <Hint>{fee}</Hint> : undefined}
+          {/* <Hint> */}
+          {/*  Physical space is often conceived in three linear dimensions, although modern physicists */}
+          {/*  usually consider it, with time */}
+          {/* </Hint> */}
         </ActionWrapper>
       </WrapperCard>
     </Wrapper>

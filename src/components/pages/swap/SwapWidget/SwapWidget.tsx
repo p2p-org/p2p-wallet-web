@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useCallback, useMemo } from 'react';
+import React, { FunctionComponent, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router';
 
@@ -11,11 +11,7 @@ import { updateTokenPairState } from 'store/slices/tokenPair/TokenPairSlice';
 import { tokenPairSelector } from 'store/slices/tokenPair/utils/tokenPair';
 import { majorAmountToMinor, minorAmountToMajor } from 'utils/amount';
 
-type Props = {
-  publicKey: string;
-};
-
-export const SwapWidget: FunctionComponent<Props> = () => {
+export const SwapWidget: FunctionComponent = () => {
   const dispatch = useDispatch();
   const history = useHistory();
 
@@ -108,6 +104,11 @@ export const SwapWidget: FunctionComponent<Props> = () => {
       fee={
         feeProperties
           ? minorAmountToMajor(feeProperties.amount, feeProperties.token).toNumber()
+          : undefined
+      }
+      rate={
+        selectedPool && secondToken
+          ? selectedPool.impliedRate(secondToken, firstAmount).toNumber()
           : undefined
       }
       fromTokenAccount={firstTokenAccount}

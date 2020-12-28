@@ -11,9 +11,7 @@ const Wrapper = styled.div`
   margin-top: 25px;
 `;
 
-type Props = {};
-
-export const Swap: FunctionComponent<Props> = (props) => {
+export const Swap: FunctionComponent = () => {
   const breadcrumbs = [{ name: 'Wallets', to: '/wallets' }, { name: 'Swap ' }];
 
   return (

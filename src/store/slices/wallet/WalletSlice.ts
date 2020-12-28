@@ -10,7 +10,6 @@ import { WalletEvent } from 'api/wallet/Wallet';
 import { ToastManager } from 'components/common/ToastManager';
 import { SYSTEM_PROGRAM_ID } from 'constants/solana/bufferLayouts';
 import { RootState } from 'store/rootReducer';
-// import { notifyTransaction } from '../../components/notify';
 import { getAvailableTokens } from 'store/slices/GlobalSlice';
 import { getPools } from 'store/slices/pool/PoolSlice';
 import { getCandleRates, getMarketsRates } from 'store/slices/rate/RateSlice';
@@ -149,7 +148,14 @@ export const airdrop = createAsyncThunk<void>(
   },
 );
 
-const updateAccountReducer = (
+export const getMinimumBalanceForRentExemption = createAsyncThunk<number, number>(
+  `${WALLET_SLICE_NAME}/getMinimumBalanceForRentExemption`,
+  async (length) => {
+    return WalletAPI.getMinimumBalanceForRentExemption(length);
+  },
+);
+
+export const updateAccountReducer = (
   state: Draft<WalletsState>,
   action: PayloadAction<SerializableTokenAccount>,
 ) => {

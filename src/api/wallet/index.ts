@@ -195,4 +195,12 @@ export const getBalance = (publicKey: PublicKey): Promise<number> => {
   return connection.getBalance(publicKey);
 };
 
+export const getMinimumBalanceForRentExemption = (length: number): Promise<number> => {
+  if (!wallet || !connection) {
+    throw new Error('Connect first');
+  }
+
+  return connection.getMinimumBalanceForRentExemption(length);
+};
+
 export const airdrop = (): null | Promise<string> => wallet && airdropTo(wallet.pubkey);

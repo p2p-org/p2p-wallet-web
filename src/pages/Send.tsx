@@ -13,9 +13,7 @@ const Wrapper = styled.div`
   margin-top: 25px;
 `;
 
-type Props = {};
-
-export const Send: FunctionComponent<Props> = (props) => {
+export const Send: FunctionComponent = () => {
   const { publicKey, status } = useParams<{ publicKey: string; status: string }>();
 
   const breadcrumbs: { name: string; to?: string }[] = [{ name: 'Wallets', to: '/wallets' }];

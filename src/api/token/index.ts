@@ -171,10 +171,11 @@ export const APIFactory = memoizeWith(
         const tokens: Token[] = [];
 
         mints.forEach((mint, index) => {
-          const mintInfo = path<MintInfo>(
-            ['result', 'value', index, 'data', 'parsed', 'info'],
-            getMultipleAccountsResult,
-          );
+          const mintInfo = path<{
+            decimals: number;
+            supply: number;
+            mintAuthority: string;
+          }>(['result', 'value', index, 'data', 'parsed', 'info'], getMultipleAccountsResult);
 
           if (!mintInfo) {
             return;
