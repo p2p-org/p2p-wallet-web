@@ -4,6 +4,7 @@ import isPropValid from '@emotion/is-prop-valid';
 
 import arrowAngle from './assets/arrow-angle-icon.svg';
 import arrowTriangle from './assets/arrow-triangle-icon.svg';
+import change from './assets/change-icon.svg';
 import chevron1 from './assets/chevron-1-icon.svg';
 import chevron from './assets/chevron-icon.svg';
 import close from './assets/close-icon.svg';
@@ -22,6 +23,7 @@ export type SvgIconType = {
 const iconsMap = new Map<string, SvgIconType>([
   ['arrow-angle', arrowAngle],
   ['arrow-triangle', arrowTriangle],
+  ['change', change],
   ['chevron-1', chevron1],
   ['chevron', chevron],
   ['close', close],

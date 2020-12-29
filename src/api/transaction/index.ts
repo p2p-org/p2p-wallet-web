@@ -2,8 +2,6 @@ import cache from '@civic/simple-cache';
 import {
   ConfirmedSignaturesForAddress2Options,
   LAMPORTS_PER_SOL,
-  ParsedAccountData,
-  ParsedInstruction,
   PublicKey,
   TransactionSignature,
 } from '@solana/web3.js';

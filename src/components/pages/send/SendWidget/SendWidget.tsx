@@ -10,7 +10,6 @@ import { TokenAccount } from 'api/token/TokenAccount';
 import { SendSwapWidget } from 'components/common/SendSwapWidget';
 import { RootState } from 'store/rootReducer';
 import { getMinimumBalanceForRentExemption, transfer } from 'store/slices/wallet/WalletSlice';
-import { formatValueWithDecimals, toDecimal } from 'utils/amount';
 
 type Props = {
   publicKey: string;
@@ -21,7 +20,7 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
   const history = useHistory();
   const [fromAmount, setFromAmount] = useState('');
   const [toTokenPublicKey, setToTokenPublicKey] = useState('');
-  const [fee, setFee] = useState('');
+  const [fee, setFee] = useState(0);
   const tokenAccounts = useSelector((state: RootState) =>
     state.wallet.tokenAccounts.map((account) => TokenAccount.from(account)),
   );
@@ -36,7 +35,7 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
         new Decimal(action.payload)
           .div(10 ** 9)
           .toDecimalPlaces(9)
-          .toString(),
+          .toNumber(),
       );
     });
   }, []);

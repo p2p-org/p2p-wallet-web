@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useMemo } from 'react';
+import React, { FunctionComponent, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router';
 
@@ -10,11 +10,33 @@ import { adjustForSlippage } from 'api/pool/Pool';
 import { usePoolFromLocation } from 'api/pool/utils/state';
 import { TokenAccount } from 'api/token/TokenAccount';
 import { SendSwapWidget } from 'components/common/SendSwapWidget';
+import { Icon } from 'components/ui';
 import { SYSTEM_PROGRAM_ID, WRAPPED_SOL_MINT } from 'constants/solana/bufferLayouts';
 import { executeSwap } from 'store/slices/swap/SwapSlice';
 import { updateTokenPairState } from 'store/slices/tokenPair/TokenPairSlice';
 import { tokenPairSelector } from 'store/slices/tokenPair/utils/tokenPair';
 import { majorAmountToMinor, minorAmountToMajor } from 'utils/amount';
+
+const Rate = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  margin-right: -8px;
+`;
+
+const ChangeRateWrapper = styled.div`
+  margin-left: 12px;
+
+  cursor: pointer;
+`;
+
+const ChangeRateIcon = styled(Icon)`
+  display: flex;
+  width: 15px;
+  height: 15px;
+
+  color: #a3a5ba;
+`;
 
 const PropertiesWrapper = styled.div`
   padding: 0 50px;
@@ -67,6 +89,7 @@ const SlippageOption = styled.button`
 export const SwapWidget: FunctionComponent = () => {
   const dispatch = useDispatch();
   const history = useHistory();
+  const [isReverseRate, setIsReverseRate] = useState(false);
 
   const {
     firstAmount,
@@ -163,9 +186,18 @@ export const SwapWidget: FunctionComponent = () => {
     );
   };
 
+  const handleChangeRateClick = () => {
+    setIsReverseRate((state) => !state);
+  };
+
   const fee = feeProperties
     ? minorAmountToMajor(feeProperties.amount, feeProperties.token).toNumber()
     : undefined;
+
+  const rate =
+    selectedPool && firstToken && secondToken
+      ? selectedPool.impliedRate(isReverseRate ? firstToken : secondToken, firstAmount).toNumber()
+      : undefined;
 
   return (
     <SendSwapWidget
@@ -174,9 +206,15 @@ export const SwapWidget: FunctionComponent = () => {
       disabled={!selectedPool}
       actionText={selectedPool ? 'Swap' : 'This pair is unavailable'}
       rate={
-        selectedPool && secondToken
-          ? selectedPool.impliedRate(secondToken, firstAmount).toNumber()
-          : undefined
+        rate ? (
+          <Rate>
+            {rate} {(isReverseRate ? secondToken : firstToken)?.symbol} per{' '}
+            {(isReverseRate ? firstToken : secondToken)?.symbol}
+            <ChangeRateWrapper onClick={handleChangeRateClick}>
+              <ChangeRateIcon name="change" />
+            </ChangeRateWrapper>
+          </Rate>
+        ) : undefined
       }
       properties={
         <PropertiesWrapper>

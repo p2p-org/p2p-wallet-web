@@ -153,7 +153,7 @@ type Props = {
   toAmount?: string;
   actionText: string;
   fee?: number;
-  rate?: number;
+  rate?: ReactNode;
   properties?: ReactNode;
   onFromTokenAccountChange: (tokenAccount: TokenAccount) => void;
   onFromAmountChange: (minorAmount: string) => void;
@@ -240,10 +240,7 @@ export const SendSwapWidget: FunctionComponent<Props> = ({
             {rate ? (
               <FeeLine>
                 <FeeLeft>Price:</FeeLeft>
-                <FeeRight>
-                  {rate} {fromTokenAccount?.mint.symbol} per{' '}
-                  {(toTokenAccount as TokenAccount)?.mint.symbol}
-                </FeeRight>
+                <FeeRight>{rate}</FeeRight>
               </FeeLine>
             ) : undefined}
           </FromWrapper>
