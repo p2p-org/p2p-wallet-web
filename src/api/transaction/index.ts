@@ -1,5 +1,6 @@
 import cache from '@civic/simple-cache';
 import {
+  ConfirmedSignaturesForAddress2Options,
   LAMPORTS_PER_SOL,
   ParsedAccountData,
   ParsedInstruction,
@@ -18,7 +19,10 @@ import { Transaction } from './Transaction';
 
 export interface API {
   transactionInfo: (signature: TransactionSignature) => Promise<Transaction | null>;
-  getTransactionsForAddress: (account: PublicKey) => Promise<Transaction[]>;
+  getTransactionsForAddress: (
+    account: PublicKey,
+    options: ConfirmedSignaturesForAddress2Options,
+  ) => Promise<Transaction[]>;
 }
 
 // The API is a singleton per cluster. This ensures requests can be cached
@@ -91,23 +95,26 @@ export const APIFactory = memoizeWith(
      * Get transactions for a address
      * @param publicKey
      */
-    const getTransactionsForAddress = async (account: PublicKey): Promise<Transaction[]> => {
+    const getTransactionsForAddress = async (
+      account: PublicKey,
+      options: ConfirmedSignaturesForAddress2Options,
+    ): Promise<Transaction[]> => {
       console.log('Get transactions for the address', {
         account: account.toBase58(),
       });
 
-      const allConfirmedSignatures = await connection
-        .getConfirmedSignaturesForAddress2(account)
+      const confirmedSignatures = await connection
+        .getConfirmedSignaturesForAddress2(account, options)
         .catch((error) => {
           console.error(`Error getting transaction signatures for ${account.toBase58()}`, error);
           throw error;
         });
 
-      const allTransactions = await Promise.all(
-        allConfirmedSignatures.map((signatureResult) => transactionInfo(signatureResult.signature)),
+      const transactions = await Promise.all(
+        confirmedSignatures.map((signatureResult) => transactionInfo(signatureResult.signature)),
       );
 
-      return allTransactions.filter(complement(isNil)) as Transaction[];
+      return transactions.filter(complement(isNil)) as Transaction[];
     };
 
     return {

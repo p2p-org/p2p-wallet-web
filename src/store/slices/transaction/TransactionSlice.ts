@@ -1,5 +1,9 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { PublicKey, TransactionSignature } from '@solana/web3.js';
+import {
+  ConfirmedSignaturesForAddress2Options,
+  PublicKey,
+  TransactionSignature,
+} from '@solana/web3.js';
 import { mergeRight, pathOr, uniq } from 'ramda';
 
 import { APIFactory } from 'api/transaction';
@@ -8,17 +12,17 @@ import { RootState } from 'store/rootReducer';
 
 const TRANSACTION_SLICE_NAME = 'transaction';
 
-export const getTransactions = createAsyncThunk<Array<SerializableTransaction>, PublicKey>(
-  `${TRANSACTION_SLICE_NAME}/getTransactions`,
-  async (publicKey, thunkAPI) => {
-    const state: RootState = thunkAPI.getState() as RootState;
+export const getTransactions = createAsyncThunk<
+  Array<SerializableTransaction>,
+  { publicKey: PublicKey; options: ConfirmedSignaturesForAddress2Options }
+>(`${TRANSACTION_SLICE_NAME}/getTransactions`, async ({ publicKey, options }, thunkAPI) => {
+  const state: RootState = thunkAPI.getState() as RootState;
 
-    const TransactionAPI = APIFactory(state.wallet.cluster);
-    const transactions = await TransactionAPI.getTransactionsForAddress(publicKey);
+  const TransactionAPI = APIFactory(state.wallet.cluster);
+  const transactions = await TransactionAPI.getTransactionsForAddress(publicKey, options);
 
-    return transactions.map((transaction) => transaction.serialize());
-  },
-);
+  return transactions.map((transaction) => transaction.serialize());
+});
 
 export const getTransaction = createAsyncThunk<
   SerializableTransaction | null,
@@ -72,8 +76,10 @@ const transactionSlice = createSlice({
       state.items = mergeRight(state.items, newItems);
 
       // eslint-disable-next-line no-param-reassign
-      state.order[action.meta.arg.toBase58()] = uniq(
-        pathOr<string[]>([], ['order', action.meta.arg.toBase58()], state).concat(newPubkeys),
+      state.order[action.meta.arg.publicKey.toBase58()] = uniq(
+        pathOr<string[]>([], ['order', action.meta.arg.publicKey.toBase58()], state).concat(
+          newPubkeys,
+        ),
       );
     });
     builder.addCase(getTransaction.fulfilled, (state, action) => {
