@@ -803,9 +803,12 @@ html,body,#root{height:100%;}body{font-family:'Rubik',-apple-system,BlinkMacSyst
 
 .w1n6rojg{width:100%;max-width:556px;margin-top:25px;}
 
-.p112fvh0{padding:0 50px;}.p112fvh0 > :first-child{margin-top:20px;}.p112fvh0 > :not(:last-child){margin-bottom:16px;}
-.p1xlurkn{display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;-webkit-align-items:center;-webkit-box-align:center;-ms-flex-align:center;align-items:center;-webkit-box-pack:justify;-webkit-justify-content:space-between;-ms-flex-pack:justify;justify-content:space-between;color:rgba(0,0,0,0.5);font-size:14px;line-height:17px;}
-.sishvkc{height:35px;padding:0 18px;color:rgba(0,0,0,0.5);background:#f7f7f7;border:1px solid transparent;border-radius:8px;outline:none;cursor:pointer;-webkit-appearance:none;-moz-appearance:none;appearance:none;}.sishvkc.active{color:#000;border-color:rgba(0,0,0,0.5);}.sishvkc:not(:last-child){margin-right:10px;}
+.r112fvh0{display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;-webkit-align-items:center;-webkit-box-align:center;-ms-flex-align:center;align-items:center;-webkit-box-pack:end;-webkit-justify-content:flex-end;-ms-flex-pack:end;justify-content:flex-end;margin-right:-8px;}
+.c1xlurkn{margin-left:12px;cursor:pointer;}
+.cishvkc{display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;width:15px;height:15px;color:#a3a5ba;}
+.ppcs0vx{padding:0 50px;}.ppcs0vx > :first-child{margin-top:20px;}.ppcs0vx > :not(:last-child){margin-bottom:16px;}
+.pkuwe37{display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;-webkit-align-items:center;-webkit-box-align:center;-ms-flex-align:center;align-items:center;-webkit-box-pack:justify;-webkit-justify-content:space-between;-ms-flex-pack:justify;justify-content:space-between;color:rgba(0,0,0,0.5);font-size:14px;line-height:17px;}
+.s1wwioqt{height:35px;padding:0 18px;color:rgba(0,0,0,0.5);background:#f7f7f7;border:1px solid transparent;border-radius:8px;outline:none;cursor:pointer;-webkit-appearance:none;-moz-appearance:none;appearance:none;}.s1wwioqt.active{color:#000;border-color:rgba(0,0,0,0.5);}.s1wwioqt:not(:last-child){margin-right:10px;}
 
 .wouisqs{width:100%;max-width:556px;margin-top:25px;}
 
