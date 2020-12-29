@@ -1,4 +1,4 @@
-import React, { FunctionComponent } from 'react';
+import React, { FunctionComponent, ReactNode } from 'react';
 
 import { styled } from '@linaria/react';
 import Decimal from 'decimal.js';
@@ -131,27 +131,6 @@ const FeeRight = styled.div`
   text-align: right;
 `;
 
-const PropertiesWrapper = styled.div`
-  padding: 0 50px;
-
-  > :first-child {
-    margin-top: 20px;
-  }
-
-  > :not(:last-child) {
-    margin-bottom: 16px;
-  }
-`;
-
-const PropertyLine = styled.div`
-  display: flex;
-  justify-content: space-between;
-
-  color: ${rgba('#000', 0.5)};
-  font-size: 14px;
-  line-height: 17px;
-`;
-
 const ActionWrapper = styled.div`
   padding: 32px;
 `;
@@ -175,6 +154,7 @@ type Props = {
   actionText: string;
   fee?: number;
   rate?: number;
+  properties?: ReactNode;
   onFromTokenAccountChange: (tokenAccount: TokenAccount) => void;
   onFromAmountChange: (minorAmount: string) => void;
   onToTokenAccountChange: (tokenAccount: TokenAccount | string) => void;
@@ -194,6 +174,7 @@ export const SendSwapWidget: FunctionComponent<Props> = ({
   actionText,
   fee,
   rate,
+  properties,
   onFromTokenAccountChange,
   onFromAmountChange,
   onToTokenAccountChange,
@@ -267,11 +248,7 @@ export const SendSwapWidget: FunctionComponent<Props> = ({
             ) : undefined}
           </FromWrapper>
         )}
-        {type === 'swap' ? (
-          <PropertiesWrapper>
-            {fee ? <PropertyLine>Liquidity Provider Fee: {fee} SOL</PropertyLine> : undefined}
-          </PropertiesWrapper>
-        ) : undefined}
+        {properties}
         <ActionWrapper>
           <Button primary={!disabled} secondary={disabled} big full onClick={onSubmit}>
             {actionText}

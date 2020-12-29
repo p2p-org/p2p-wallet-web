@@ -39,7 +39,7 @@ export const getToAmount = (
   fromSerializableToken?: SerializableToken,
   serializablePool?: SerializablePool,
 ): number => {
-  if (!serializablePool || !fromSerializableToken) {
+  if (!firstAmount || !serializablePool || !fromSerializableToken) {
     return 0;
   }
 

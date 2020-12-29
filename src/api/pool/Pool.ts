@@ -23,7 +23,7 @@ export type SerializablePool = {
   feeRatio: number;
 };
 
-export const DEFAULT_SLIPPAGE = 0.2;
+export const DEFAULT_SLIPPAGE = 0.01;
 type SlippageDirection = 'down' | 'up';
 
 export type TokenAmounts = {
@@ -50,7 +50,7 @@ export const adjustForSlippage = (
 ): Decimal => {
   const slippageMultiplier = 1 + (direction === 'up' ? slippage : -slippage);
 
-  return toDecimal(amount).mul(slippageMultiplier).floor();
+  return toDecimal(amount).mul(slippageMultiplier); // TODO: check its need or not ".floor()"
 };
 
 export class Pool extends OnChainEntity<Pool> implements Serializable<SerializablePool> {
