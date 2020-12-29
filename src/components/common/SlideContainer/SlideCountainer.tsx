@@ -1,4 +1,4 @@
-import React, { PureComponent } from 'react';
+import React, { createRef, PureComponent } from 'react';
 
 import { styled } from '@linaria/react';
 import classNames from 'classnames';
@@ -108,9 +108,9 @@ export class SlideContainer extends PureComponent<React.HTMLAttributes<HTMLDivEl
     contentWidth: 0,
   };
 
-  contentRef = React.createRef<HTMLDivElement>();
+  contentRef = createRef<HTMLDivElement>();
 
-  wrapperRef = React.createRef<HTMLDivElement>();
+  wrapperRef = createRef<HTMLDivElement>();
 
   stepTs = 0;
 
