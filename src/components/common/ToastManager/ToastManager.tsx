@@ -173,9 +173,9 @@ export class ToastManager extends PureComponent<Props, State> {
     [id: string]: RefObject<HTMLDivElement>;
   } = {};
 
-  hideTimeouts: NodeJS.Timeout[] = [];
+  hideTimeouts: number[] = [];
 
-  clearingTimeouts: NodeJS.Timeout[] = [];
+  clearingTimeouts: number[] = [];
 
   state: State = {
     currentToasts: [],
@@ -248,7 +248,7 @@ export class ToastManager extends PureComponent<Props, State> {
 
     const hideIds = new Set(currentToasts.map(({ id }) => id));
 
-    const timeoutId = setTimeout(() => {
+    const timeoutId = window.setTimeout(() => {
       this.startToastsHiding(hideIds);
     }, HIDE_LEAVE_TIMEOUT);
 
@@ -311,7 +311,7 @@ export class ToastManager extends PureComponent<Props, State> {
     );
 
     this.clearingTimeouts.push(
-      setTimeout(() => {
+      window.setTimeout(() => {
         this.removeToasts(ids as Set<number>);
       }, 400),
     );
@@ -424,7 +424,7 @@ export class ToastManager extends PureComponent<Props, State> {
   }
 
   startToastHideTimeout(id: number) {
-    const timeoutId = setTimeout(() => {
+    const timeoutId = window.setTimeout(() => {
       this.startToastsHiding(id);
     }, HIDE_TIMEOUT);
 
