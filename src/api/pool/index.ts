@@ -506,7 +506,12 @@ export const APIFactory = (cluster: ExtendedCluster): API => {
 
     signers.push(newAccount);
 
-    const newTokenAccount = new TokenAccount(mintToken, TOKEN_PROGRAM_ID, newAccount.publicKey, 0);
+    const newTokenAccount = new TokenAccount(
+      mintToken,
+      owner || TOKEN_PROGRAM_ID,
+      newAccount.publicKey,
+      0,
+    );
 
     tokenAccountsPrecache.set(newTokenAccount.address.toBase58(), newTokenAccount);
 
