@@ -69,7 +69,9 @@ const Wrapper = styled.button`
   }
 
   &:disabled {
-    opacity: 0.5;
+    color: #fff;
+
+    background: #7b7b7b;
   }
 `;
 

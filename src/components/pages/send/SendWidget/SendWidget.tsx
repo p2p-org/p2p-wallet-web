@@ -21,6 +21,7 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
   const [fromAmount, setFromAmount] = useState('');
   const [toTokenPublicKey, setToTokenPublicKey] = useState('');
   const [fee, setFee] = useState(0);
+  const [isExecuting, setIsExecuting] = useState(false);
   const tokenAccounts = useSelector((state: RootState) =>
     state.wallet.tokenAccounts.map((account) => TokenAccount.from(account)),
   );
@@ -56,6 +57,7 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
     }
 
     try {
+      setIsExecuting(true);
       const signature = unwrapResult(
         await dispatch(
           transfer({
@@ -69,6 +71,8 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
       history.push(`/send/${publicKey}/result`, { signature });
     } catch (error) {
       console.error(error);
+    } finally {
+      setIsExecuting(false);
     }
   };
 
@@ -88,7 +92,7 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
     <SendSwapWidget
       type="send"
       title="Send tokens"
-      actionText="Send"
+      actionText={isExecuting ? 'Processing...' : 'Send'}
       fee={fee}
       fromTokenAccount={fromTokenAccount}
       onFromTokenAccountChange={handleFromTokenAccountChange}
@@ -98,6 +102,7 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
       onToTokenAccountChange={handleToPublicKeyChange}
       onBackClick={handleBackClick}
       onSubmit={handleSubmit}
+      disabled={isExecuting}
     />
   );
 };

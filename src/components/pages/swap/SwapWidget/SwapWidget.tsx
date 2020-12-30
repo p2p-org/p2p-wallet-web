@@ -89,6 +89,7 @@ const SlippageOption = styled.button`
 export const SwapWidget: FunctionComponent = () => {
   const dispatch = useDispatch();
   const history = useHistory();
+  const [isExecuting, setIsExecuting] = useState(false);
   const [isReverseRate, setIsReverseRate] = useState(false);
 
   const {
@@ -129,9 +130,12 @@ export const SwapWidget: FunctionComponent = () => {
 
   const handleSubmit = async () => {
     try {
+      setIsExecuting(true);
       await dispatch(executeSwap());
     } catch (error) {
       alert(error);
+    } finally {
+      setIsExecuting(false);
     }
   };
 
@@ -216,8 +220,10 @@ export const SwapWidget: FunctionComponent = () => {
     <SendSwapWidget
       type="swap"
       title="Swap"
-      disabled={!selectedPool}
-      actionText={selectedPool ? 'Swap' : 'This pair is unavailable'}
+      disabled={isExecuting || !selectedPool}
+      actionText={
+        isExecuting ? 'Processing...' : selectedPool ? 'Swap' : 'This pair is unavailable'
+      }
       rate={
         rate ? (
           <Rate>

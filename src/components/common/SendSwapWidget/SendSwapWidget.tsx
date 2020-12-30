@@ -276,7 +276,7 @@ export const SendSwapWidget: FunctionComponent<Props> = ({
         )}
         {properties}
         <ActionWrapper>
-          <Button primary={!disabled} secondary={disabled} big full onClick={onSubmit}>
+          <Button primary={!disabled} disabled={disabled} big full onClick={onSubmit}>
             {actionText}
           </Button>
           {/* <Hint> */}
