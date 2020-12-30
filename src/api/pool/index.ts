@@ -6,7 +6,7 @@ import { complement, isNil } from 'ramda';
 import assert from 'ts-invariant';
 
 import { getConnection } from 'api/connection';
-import { APIFactory as TokenAPIFactory, TOKEN_PROGRAM_ID } from 'api/token';
+import { APIFactory as TokenAPIFactory, TOKEN_PROGRAM_ID, tokenAccountsPrecache } from 'api/token';
 import { Token } from 'api/token/Token';
 import { TokenAccount } from 'api/token/TokenAccount';
 import { getWallet, makeTransaction, sendTransaction } from 'api/wallet';
@@ -442,7 +442,7 @@ export const APIFactory = (cluster: ExtendedCluster): API => {
 
     signers.push(newAccount);
 
-    return new TokenAccount(fromAccount.mint, newAccount.publicKey, amount);
+    return new TokenAccount(fromAccount.mint, TOKEN_PROGRAM_ID, newAccount.publicKey, amount);
   };
 
   const createAccountByMint = async (
@@ -452,6 +452,19 @@ export const APIFactory = (cluster: ExtendedCluster): API => {
     signers: Account[],
     owner?: PublicKey,
   ): Promise<TokenAccount> => {
+    // if account for owner with same token already exists
+    if (owner) {
+      const account = tokenAccountsPrecache
+        .toArray()
+        .find(
+          (tokenAccount) => tokenAccount.matchToken(mintToken) && tokenAccount.matchOwner(owner),
+        );
+
+      if (account) {
+        return account;
+      }
+    }
+
     const accountRentExempt = await connection.getMinimumBalanceForRentExemption(
       AccountLayout.span,
     );
@@ -492,7 +505,7 @@ export const APIFactory = (cluster: ExtendedCluster): API => {
 
     signers.push(newAccount);
 
-    return new TokenAccount(mintToken, newAccount.publicKey, 0);
+    return new TokenAccount(mintToken, TOKEN_PROGRAM_ID, newAccount.publicKey, 0);
   };
 
   const validateSwapParameters = (parameters: SwapParameters): void => {

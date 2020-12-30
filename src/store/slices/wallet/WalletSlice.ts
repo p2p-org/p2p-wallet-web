@@ -8,6 +8,7 @@ import * as WalletAPI from 'api/wallet';
 import { getBalance, getWallet, WalletDataType, WalletType } from 'api/wallet';
 import { WalletEvent } from 'api/wallet/Wallet';
 import { ToastManager } from 'components/common/ToastManager';
+import { swapHostFeeAddress } from 'config/constants';
 import { SYSTEM_PROGRAM_ID } from 'constants/solana/bufferLayouts';
 import { RootState } from 'store/rootReducer';
 import { getAvailableTokens } from 'store/slices/GlobalSlice';
@@ -42,7 +43,7 @@ const getSolToken = async () => {
 
   // Fake token to simulate SOL as Token
   const mint = new Token(SYSTEM_PROGRAM_ID, 9, 0, undefined, 'Solana', 'SOL');
-  return new TokenAccount(mint, publicKey, balance);
+  return new TokenAccount(mint, SYSTEM_PROGRAM_ID, publicKey, balance);
 };
 
 export const getTokenAccounts = createAsyncThunk<Array<SerializableTokenAccount>>(
@@ -66,6 +67,17 @@ export const getTokenAccounts = createAsyncThunk<Array<SerializableTokenAccount>
     });
 
     return tokenAccounts.map((tokenAccount) => tokenAccount.serialize());
+  },
+);
+
+export const precacheTokenAccounts = createAsyncThunk<void, PublicKey>(
+  `${WALLET_SLICE_NAME}/precacheTokenAccounts`,
+  async (publicKey, thunkAPI) => {
+    const state: RootState = thunkAPI.getState() as RootState;
+    const walletState = state.wallet;
+    const TokenAPI = TokenAPIFactory(walletState.cluster);
+
+    await TokenAPI.precacheTokenAccounts(publicKey);
   },
 );
 
@@ -103,6 +115,10 @@ export const connect = createAsyncThunk<string, WalletDataType | undefined>(
     void thunkAPI.dispatch(getPools());
     void thunkAPI.dispatch(getMarketsRates());
     void thunkAPI.dispatch(getCandleRates('SOL'));
+
+    if (swapHostFeeAddress) {
+      void thunkAPI.dispatch(precacheTokenAccounts(swapHostFeeAddress));
+    }
 
     return wallet.pubkey.toBase58();
   },

@@ -11,6 +11,7 @@ import { SerializableToken, Token } from './Token';
 
 export type SerializableTokenAccount = {
   mint: SerializableToken;
+  owner: string;
   address: string;
   balance: string;
   lastUpdatedSlot?: number;
@@ -22,12 +23,15 @@ export class TokenAccount
   implements Serializable<SerializableTokenAccount> {
   readonly mint: Token;
 
+  readonly owner: PublicKey;
+
   readonly address: PublicKey;
 
   readonly balance: Decimal;
 
   constructor(
     mint: Token,
+    owner: PublicKey,
     address: PublicKey,
     balance: number | BN | Decimal,
     currentSlot?: number,
@@ -36,6 +40,7 @@ export class TokenAccount
     super(currentSlot, previous);
 
     this.mint = mint;
+    this.owner = owner;
     this.address = address;
     this.balance = toDecimal(balance);
   }
@@ -50,6 +55,10 @@ export class TokenAccount
 
   isAccountFor(tokens: Array<Token>): boolean {
     return includes(this.mint, tokens);
+  }
+
+  matchOwner(owner: PublicKey): boolean {
+    return this.owner.equals(owner);
   }
 
   /**
@@ -76,6 +85,7 @@ export class TokenAccount
   serialize(): SerializableTokenAccount {
     return {
       mint: this.mint.serialize(),
+      owner: this.owner.toBase58(),
       address: this.address.toBase58(),
       balance: this.balance.toString(),
       lastUpdatedSlot: this.lastUpdatedSlot,
@@ -90,6 +100,7 @@ export class TokenAccount
   static from(serializableTokenAccount: SerializableTokenAccount): TokenAccount {
     return new TokenAccount(
       Token.from(serializableTokenAccount.mint),
+      new PublicKey(serializableTokenAccount.owner),
       new PublicKey(serializableTokenAccount.address),
       new Decimal(serializableTokenAccount.balance),
       serializableTokenAccount.lastUpdatedSlot,

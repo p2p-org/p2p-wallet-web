@@ -8,14 +8,12 @@ type CacheItem<T> = {
 };
 
 export class CacheTTL<T> {
-  private readonly opts: CacheOpts;
+  private readonly opts?: CacheOpts;
 
   private readonly caches = new Map<string, CacheItem<T>>();
 
-  constructor({ ttl = 5000 }: CacheOpts) {
-    this.opts = {
-      ttl,
-    };
+  constructor(opts?: CacheOpts) {
+    this.opts = opts;
   }
 
   set(key: string, item: T) {
@@ -28,12 +26,17 @@ export class CacheTTL<T> {
 
     if (timestamp && cachedResult) {
       // cache hit
-      if (now - timestamp < this.opts.ttl) {
+      if (!this.opts?.ttl || now - timestamp < this.opts.ttl) {
         // not expired
         return cachedResult;
       }
     }
 
     return null;
+  }
+
+  toArray() {
+    // eslint-disable-next-line unicorn/prefer-spread
+    return Array.from(this.caches.values()).map((item) => item.cachedResult);
   }
 }

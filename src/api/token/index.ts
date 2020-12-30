@@ -43,6 +43,9 @@ export const OWNER_VALIDATION_PROGRAM_ID = new PublicKey(
 
 const tokensCache = new CacheTTL<Token>({ ttl: 5000 });
 
+// uses for precache SWAP_HOST_FEE_ADDRESS token accounts
+export const tokenAccountsPrecache = new CacheTTL<TokenAccount>();
+
 type TokenAccountUpdateCallback = (tokenAccount: TokenAccount) => void;
 
 export type TransferParameters = {
@@ -58,7 +61,8 @@ export interface API {
   tokenAccountInfo: (account: PublicKey) => Promise<TokenAccount | null>;
   updateTokenAccountInfo: (tokenAccount: TokenAccount) => Promise<TokenAccount | null>;
   getAccountsForToken: (token: Token) => Promise<TokenAccount[]>;
-  getAccountsForWallet: () => Promise<TokenAccount[]>;
+  getAccountsForWallet: (owner?: PublicKey) => Promise<TokenAccount[]>;
+  precacheTokenAccounts: (owner: PublicKey) => Promise<void>;
   createToken: (decimals?: number, mintAuthority?: PublicKey) => Promise<Token>;
   createAccountForToken: (token: Token, owner?: PublicKey) => Promise<TokenAccount>;
   mintTo: (recipient: TokenAccount, tokenAmount: number) => Promise<string>;
@@ -110,6 +114,7 @@ export const APIFactory = memoizeWith(
      */
     type ParsedTokenAccountInfo = {
       mint: string;
+      owner: string;
       tokenAmount: { amount: string; decimals: number; uiAmount: number };
     };
 
@@ -243,6 +248,7 @@ export const APIFactory = memoizeWith(
 
         return new TokenAccount(
           mintTokenInfo,
+          new PublicKey(parsedInfo.owner),
           account,
           toDecimal(new BN(parsedInfo.tokenAmount.amount)),
           getParsedAccountInfoResult.context.slot,
@@ -254,7 +260,7 @@ export const APIFactory = memoizeWith(
         const balance = await connection.getBalance(account);
         const mint = new Token(SYSTEM_PROGRAM_ID, 9, 0, undefined, 'Solana', 'SOL');
 
-        return new TokenAccount(mint, account, balance);
+        return new TokenAccount(mint, SYSTEM_PROGRAM_ID, account, balance);
       }
 
       return null;
@@ -321,6 +327,7 @@ export const APIFactory = memoizeWith(
 
         return new TokenAccount(
           token,
+          new PublicKey(parsedTokenAccountInfo.owner),
           accountResult.pubkey,
           toDecimal(new BN(parsedTokenAccountInfo.tokenAmount.amount)),
         );
@@ -345,6 +352,14 @@ export const APIFactory = memoizeWith(
       );
 
       return allTokenAccounts.filter(complement(isNil)) as TokenAccount[];
+    };
+
+    const precacheTokenAccounts = async (owner: PublicKey) => {
+      const tokenAccounts = await getAccountsForWallet(owner);
+
+      tokenAccounts.forEach((tokenAccount) => {
+        tokenAccountsPrecache.set(tokenAccount.address.toBase58(), tokenAccount);
+      });
     };
 
     /**
@@ -816,6 +831,7 @@ export const APIFactory = memoizeWith(
       approve,
       getAccountsForToken,
       getAccountsForWallet,
+      precacheTokenAccounts,
       listenToTokenAccountChanges,
     };
   },
