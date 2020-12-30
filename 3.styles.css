@@ -12,7 +12,12 @@
 
 .f1n4mogn{padding:20px 0;border-bottom:1px solid rgba(0,0,0,0.05);}.f1n4mogn:first-child{border-top:1px solid rgba(0,0,0,0.05);}
 .f9aqzce{color:rgba(0,0,0,0.5);font-weight:500;font-size:12px;line-height:14px;}
-.fuy8m85{margin-top:8px;color:#000;font-size:14px;line-height:17px;}
+.fuy8m85{display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;-webkit-align-items:center;-webkit-box-align:center;-ms-flex-align:center;align-items:center;margin-top:8px;color:#000;font-size:14px;line-height:17px;}
+.anug4ak{display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;-webkit-flex:1;-ms-flex:1;flex:1;-webkit-flex-direction:column;-ms-flex-direction:column;flex-direction:column;margin:0 9px 0 10px;}
+.az23y8{margin-bottom:6px;color:#000;font-weight:500;font-size:14px;line-height:100%;}
+.a1qhcojt{color:rgba(0,0,0,0.5);font-size:12px;line-height:120%;}
+.cehvxtz{cursor:pointer;}
+.c1ylh4b7{width:24px;height:24px;}
 
 
 /*# sourceMappingURL=3.styles.css.map*/
