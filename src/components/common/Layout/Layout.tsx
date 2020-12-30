@@ -1,7 +1,8 @@
-import React, { FunctionComponent } from 'react';
+import React, { FunctionComponent, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 
 import { styled } from '@linaria/react';
+import NProgress from 'nprogress';
 
 import { RootState } from 'store/rootReducer';
 
@@ -56,6 +57,8 @@ const CenteredWrapper = styled.div`
   align-items: center;
 `;
 
+NProgress.configure({ showSpinner: false, parent: '#container' });
+
 type Props = {
   breadcrumbs?: BreadcrumbType[];
   leftColumn?: React.ReactNode;
@@ -71,11 +74,20 @@ export const Layout: FunctionComponent<Props> = ({
   children,
 }) => {
   const connected = useSelector((state: RootState) => state.wallet.connected);
+  const loading = useSelector((state: RootState) => state.global.loading);
+
+  useEffect(() => {
+    if (loading) {
+      NProgress.start();
+    } else {
+      NProgress.done();
+    }
+  }, [Boolean(loading)]);
 
   return (
     <Wrapper>
       <Header />
-      <MainScrollFix>
+      <MainScrollFix id="container">
         <Container>
           {breadcrumbs ? <Breadcrumbs breadcrumbs={breadcrumbs} /> : undefined}
           {connected ? (

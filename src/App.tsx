@@ -4,7 +4,6 @@ import { BrowserRouter as Router, Route, Switch, useHistory } from 'react-router
 
 import dayjs from 'dayjs';
 import localizedFormat from 'dayjs/plugin/localizedFormat';
-import NProgress from 'nprogress';
 
 import { ModalManager } from 'components/common/ModalManager';
 import { NotifyToast } from 'components/common/NotifyToast/NotifyToast';
@@ -21,8 +20,6 @@ import { AuthRequiredRoute } from 'utils/routes/UserRequiredRoute';
 
 dayjs.extend(localizedFormat);
 
-NProgress.configure({ showSpinner: false });
-
 /* Hack for states and hash routing until use own host */
 const FixRoute = () => {
   const history = useHistory();
@@ -37,16 +34,6 @@ const FixRoute = () => {
 };
 
 const App: React.FC = () => {
-  const loading = useSelector((state: RootState) => state.global.loading);
-
-  useEffect(() => {
-    if (loading) {
-      NProgress.start();
-    } else {
-      NProgress.done();
-    }
-  }, [Boolean(loading)]);
-
   return (
     <>
       {/* Hack for states and hash routing until use own host */}
