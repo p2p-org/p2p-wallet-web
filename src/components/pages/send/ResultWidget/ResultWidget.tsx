@@ -101,14 +101,16 @@ export const ResultWidget: FunctionComponent = () => {
 
   useEffect(() => {
     const mount = async () => {
-      const trx = unwrapResult(await dispatch(getTransaction(locationState?.signature)));
+      const trx = unwrapResult(await dispatch(getTransaction(locationState.signature)));
 
       if (!trx) {
         setTimeout(mount, 3000);
       }
     };
 
-    void mount();
+    if (locationState.signature) {
+      void mount();
+    }
   }, []);
 
   const handleDetailsClick = () => {
