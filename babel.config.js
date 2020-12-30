@@ -8,7 +8,7 @@ module.exports = {
     ],
     '@babel/preset-react',
     '@babel/preset-typescript',
-    'module:@linaria/babel',
+    'module:@linaria/babel-preset',
   ],
   plugins: [
     [
