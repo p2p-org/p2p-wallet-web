@@ -13,6 +13,7 @@ import { getWallet, makeTransaction, sendTransaction } from 'api/wallet';
 import { ToastManager } from 'components/common/ToastManager';
 import { localSwapProgramId, swapHostFeeAddress } from 'config/constants';
 import { WRAPPED_SOL_MINT } from 'constants/solana/bufferLayouts';
+import { precacheTokenAccounts } from 'store/slices/wallet/WalletSlice';
 import { ExtendedCluster } from 'utils/types';
 
 import { adjustForSlippage, DEFAULT_SLIPPAGE, Pool } from './Pool';
@@ -505,7 +506,11 @@ export const APIFactory = (cluster: ExtendedCluster): API => {
 
     signers.push(newAccount);
 
-    return new TokenAccount(mintToken, TOKEN_PROGRAM_ID, newAccount.publicKey, 0);
+    const newTokenAccount = new TokenAccount(mintToken, TOKEN_PROGRAM_ID, newAccount.publicKey, 0);
+
+    tokenAccountsPrecache.set(newTokenAccount.address.toBase58(), newTokenAccount);
+
+    return newTokenAccount;
   };
 
   const validateSwapParameters = (parameters: SwapParameters): void => {
