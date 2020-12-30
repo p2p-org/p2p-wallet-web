@@ -27,6 +27,8 @@ type ParsedShort = {
   type: string;
   source: PublicKey | null;
   sourceTokenAccount: TokenAccount | null;
+  destination: PublicKey | null;
+  destinationTokenAccount: TokenAccount | null;
   amount: Decimal;
 };
 
@@ -34,6 +36,8 @@ type SerializedShort = {
   type: string;
   source: string | null;
   sourceTokenAccount: SerializableTokenAccount | null;
+  destination: string | null;
+  destinationTokenAccount: SerializableTokenAccount | null;
   amount: number;
 };
 
@@ -138,6 +142,8 @@ export class Transaction implements Serializable<SerializableTransaction> {
         type: this.short.type,
         source: this.short.source?.toBase58() || null,
         sourceTokenAccount: this.short.sourceTokenAccount?.serialize() || null,
+        destination: this.short.destination?.toBase58() || null,
+        destinationTokenAccount: this.short.destinationTokenAccount?.serialize() || null,
         amount: this.short.amount.toNumber(),
       },
     };
@@ -181,6 +187,12 @@ export class Transaction implements Serializable<SerializableTransaction> {
           : null,
         sourceTokenAccount: serializableTransaction.short.sourceTokenAccount
           ? TokenAccount.from(serializableTransaction.short.sourceTokenAccount)
+          : null,
+        destination: serializableTransaction.short.destination
+          ? new PublicKey(serializableTransaction.short.destination)
+          : null,
+        destinationTokenAccount: serializableTransaction.short.destinationTokenAccount
+          ? TokenAccount.from(serializableTransaction.short.destinationTokenAccount)
           : null,
         amount: new Decimal(serializableTransaction.short.amount),
       },

@@ -58,6 +58,12 @@ export const APIFactory = memoizeWith(
         ? new PublicKey(instruction?.parsed?.info.source)
         : null;
       const sourceTokenAccount = source ? await tokenAPI.tokenAccountInfo(source) : null;
+      const destination = instruction?.parsed?.info.destination
+        ? new PublicKey(instruction?.parsed?.info.destination)
+        : null;
+      const destinationTokenAccount = destination
+        ? await tokenAPI.tokenAccountInfo(destination)
+        : null;
       const type = instruction?.parsed?.type;
 
       let amount = new Decimal(0);
@@ -79,7 +85,7 @@ export const APIFactory = memoizeWith(
         timestamp,
         meta,
         transactionInfo.transaction.message,
-        { type, source, sourceTokenAccount, amount },
+        { type, source, sourceTokenAccount, destination, destinationTokenAccount, amount },
       );
     };
 
