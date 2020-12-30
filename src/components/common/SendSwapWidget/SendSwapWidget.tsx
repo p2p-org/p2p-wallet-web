@@ -58,9 +58,33 @@ const WrapperCard = styled(Card)`
 `;
 
 const FromWrapper = styled.div`
+  position: relative;
+
   padding: 20px 32px;
 
   border-bottom: 1px solid ${rgba('#000', 0.1)};
+`;
+
+const ReverseWrapper = styled.div`
+  position: absolute;
+  top: -24px;
+  right: 32px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+
+  background: #fff;
+  border: 1px solid #e7e7e7;
+  border-radius: 44px;
+  cursor: pointer;
+`;
+
+const ReverseIcon = styled(Icon)`
+  width: 24px;
+  height: 24px;
 `;
 
 const ToWrapper = styled.div`
@@ -161,6 +185,7 @@ type Props = {
   onToAmountChange?: (minorAmount: string) => void;
   onBackClick: () => void;
   onSubmit: () => void;
+  onReverseClick?: () => void;
   disabled?: boolean;
 };
 
@@ -181,6 +206,7 @@ export const SendSwapWidget: FunctionComponent<Props> = ({
   onToAmountChange = () => {},
   onBackClick,
   onSubmit,
+  onReverseClick,
   disabled,
 }) => {
   return (
@@ -228,6 +254,9 @@ export const SendSwapWidget: FunctionComponent<Props> = ({
           </ToWrapper>
         ) : (
           <FromWrapper>
+            <ReverseWrapper onClick={onReverseClick}>
+              <ReverseIcon name="change" />
+            </ReverseWrapper>
             <FromToSelectInput
               type={type}
               direction="to"

@@ -186,6 +186,19 @@ export const SwapWidget: FunctionComponent = () => {
     );
   };
 
+  const handleReverseClick = () => {
+    dispatch(
+      updateTokenPairState({
+        firstAmount: secondAmount,
+        firstToken: secondToken?.serialize(),
+        firstTokenAccount: secondTokenAccount?.serialize(),
+        secondAmount: firstAmount,
+        secondToken: firstToken?.serialize(),
+        secondTokenAccount: firstTokenAccount?.serialize(),
+      }),
+    );
+  };
+
   const handleChangeRateClick = () => {
     setIsReverseRate((state) => !state);
   };
@@ -256,6 +269,7 @@ export const SwapWidget: FunctionComponent = () => {
       // onToAmountChange={handleToAmountChange}
       onBackClick={handleBackClick}
       onSubmit={handleSubmit}
+      onReverseClick={handleReverseClick}
     />
   );
 };

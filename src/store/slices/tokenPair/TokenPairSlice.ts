@@ -21,6 +21,10 @@ import {
 const initialState: TokenPairState = {
   firstAmount: 0,
   secondAmount: 0,
+  firstToken: undefined,
+  secondToken: undefined,
+  firstTokenAccount: undefined,
+  secondTokenAccount: undefined,
   tokenAccounts: [],
   availablePools: [],
   slippage: DEFAULT_SLIPPAGE,
