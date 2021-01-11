@@ -263,6 +263,18 @@ export const APIFactory = memoizeWith(
         return new TokenAccount(mint, SYSTEM_PROGRAM_ID, account, balance);
       }
 
+      // For SOL tokens
+      if (getParsedAccountInfoResult.value?.owner.equals(SYSTEM_PROGRAM_ID)) {
+        const mint = new Token(SYSTEM_PROGRAM_ID, 9, 0, undefined, 'Solana', 'SOL');
+
+        return new TokenAccount(
+          mint,
+          SYSTEM_PROGRAM_ID,
+          account,
+          getParsedAccountInfoResult.value?.lamports,
+        );
+      }
+
       return null;
     };
 
