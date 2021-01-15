@@ -9,7 +9,7 @@ import { Pool, SerializablePool } from 'api/pool/Pool';
 import { RootState } from 'store/rootReducer';
 import { updateEntityArray } from 'store/slices/tokenPair/utils/tokenPair';
 
-interface PoolsState {
+export interface PoolsState {
   availablePools: Array<SerializablePool>;
 }
 

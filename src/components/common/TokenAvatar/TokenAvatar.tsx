@@ -7,7 +7,7 @@ import tokenConfig from 'api/token/token.config';
 import { Avatar } from 'components/ui';
 import { RootState } from 'store/rootReducer';
 
-const AvatarStyled = styled<{ src?: string }>(Avatar)`
+const AvatarStyled = styled(Avatar)`
   background: ${({ src }) => (src ? 'none' : '#c4c4c4')};
 `;
 

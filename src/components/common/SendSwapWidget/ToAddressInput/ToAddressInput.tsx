@@ -2,7 +2,6 @@ import React, { FunctionComponent } from 'react';
 
 import { styled } from '@linaria/react';
 
-import { TokenAvatar } from 'components/common/TokenAvatar';
 import { Icon } from 'components/ui';
 
 const Wrapper = styled.div`
@@ -53,9 +52,9 @@ type Props = {
 
 export const ToAddressInput: FunctionComponent<Props> = ({ value, onChange }) => {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value.trim();
+    const nextValue = e.target.value.trim();
 
-    onChange(value);
+    onChange(nextValue);
   };
 
   return (

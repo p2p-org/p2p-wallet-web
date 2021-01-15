@@ -29,6 +29,7 @@ const POST_TRANSACTION_SLEEP_MS = postTransactionSleepMS || 500;
 let wallet: Wallet | null;
 let connection: Connection | null;
 
+// eslint-disable-next-line no-shadow
 export enum WalletType {
   MANUAL,
   SOLLET,

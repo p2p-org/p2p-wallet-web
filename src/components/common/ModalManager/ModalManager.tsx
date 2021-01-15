@@ -1,17 +1,17 @@
-import React, { createRef, FunctionComponent, Suspense, useState } from 'react';
+import React, { createRef, FunctionComponent, RefObject, Suspense, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { styled } from '@linaria/react';
 import loadable, { LoadableComponent } from '@loadable/component';
 import { last } from 'ramda';
-import { closeModal } from 'redux-modals-manager';
+import { closeModal, ModalComponentType, ModalState } from 'redux-modals-manager';
 
 import {
   SHOW_MODAL_ADD_COIN,
   SHOW_MODAL_RECIEVE_TOKENS,
   SHOW_MODAL_TRANSACTION_DETAILS,
 } from 'store/constants/modalTypes';
-import { RootState } from 'store/types';
+import { RootState } from 'store/rootReducer';
 
 const Wrapper = styled.div`
   position: fixed;
@@ -70,15 +70,19 @@ const modalsMap = new Map<string, LoadableComponent<any>>([
   [SHOW_MODAL_RECIEVE_TOKENS, loadable(() => import('components/modals/RecieveTokensModal'))],
 ]);
 
-type Props = {};
-
-export const ModalManager: FunctionComponent<Props> = (props) => {
+export const ModalManager: FunctionComponent = () => {
   const dispatch = useDispatch();
-  const [modalsRefs, setModalsRefs] = useState({});
+  const [modalsRefs, setModalsRefs] = useState<{
+    [modalId: string]: RefObject<ModalComponentType>;
+  }>({});
   const modals = useSelector((state: RootState) => state.modals);
 
   const closeTopModal = async () => {
-    const { modalId } = last(modals);
+    const { modalId } = last(modals) || {};
+
+    if (!modalId) {
+      return;
+    }
 
     const modalRef = modalsRefs[modalId];
 
@@ -91,17 +95,19 @@ export const ModalManager: FunctionComponent<Props> = (props) => {
     dispatch(closeModal(modalId));
   };
 
-  const handleWrapperClick = (e) => {
+  const handleWrapperClick = (e: React.MouseEvent<HTMLDivElement>) => {
     // handle click only on element
     if (e.target !== e.currentTarget) {
       return;
     }
 
-    closeTopModal();
+    void closeTopModal();
   };
 
   const getReadyDialogs = () => {
-    const dialogs = [];
+    const dialogs: (ModalState & {
+      ModalComponent: LoadableComponent<any>;
+    })[] = [];
 
     for (const { type, modalId, props } of modals) {
       const ModalComponent = modalsMap.get(type);
@@ -109,6 +115,7 @@ export const ModalManager: FunctionComponent<Props> = (props) => {
         dialogs.push({
           type,
           modalId,
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
           props,
           ModalComponent,
         });
@@ -139,7 +146,7 @@ export const ModalManager: FunctionComponent<Props> = (props) => {
               {...props}
               modalId={modalId}
               modalRef={modalRef}
-              close={(result) => dispatch(closeModal(modalId, result))}
+              close={(result: any) => dispatch(closeModal(modalId, result))}
             />
           </ModalWrapper>
         </ModalContainer>
@@ -147,7 +154,7 @@ export const ModalManager: FunctionComponent<Props> = (props) => {
     );
   });
 
-  if (dialogs.length) {
+  if (dialogs.length > 0) {
     return (
       <Wrapper>
         <ModalBackground />

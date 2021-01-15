@@ -14,7 +14,7 @@ const TRANSACTION_SLICE_NAME = 'transaction';
 
 export const getTransactions = createAsyncThunk<
   Array<SerializableTransaction>,
-  { publicKey: PublicKey; options: ConfirmedSignaturesForAddress2Options }
+  { publicKey: PublicKey; options?: ConfirmedSignaturesForAddress2Options }
 >(`${TRANSACTION_SLICE_NAME}/getTransactions`, async ({ publicKey, options }, thunkAPI) => {
   const state: RootState = thunkAPI.getState() as RootState;
 
@@ -44,7 +44,7 @@ type ItemsType = {
   [signature: string]: SerializableTransaction;
 };
 
-interface TransactionsState {
+export interface TransactionsState {
   items: ItemsType;
   order: {
     [account: string]: string[];

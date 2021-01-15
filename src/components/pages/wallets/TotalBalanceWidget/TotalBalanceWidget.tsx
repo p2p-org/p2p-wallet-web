@@ -3,11 +3,9 @@ import { useSelector } from 'react-redux';
 
 // import ReactHighcharts from 'react-highcharts';
 import { styled } from '@linaria/react';
-import * as web3 from '@solana/web3.js';
 import { Decimal } from 'decimal.js';
 import { rgba } from 'polished';
 
-import tokenConfig from 'api/token/token.config';
 import { TokenAccount } from 'api/token/TokenAccount';
 import { Card } from 'components/common/Card';
 import { RootState } from 'store/rootReducer';

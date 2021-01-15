@@ -39,7 +39,12 @@ export const retryableProxy = <U>(
     target: GenericAsyncFunction<T>,
     thisArg: unknown,
     argArray: Array<never>,
-  ) => async (previousValue: Promise<T>, currentValue: Promise<T>, currentIndex: number) => {
+  ) => async (
+    previousValue: Promise<T>,
+    currentValue: Promise<T>,
+    currentIndex: number,
+  ): Promise<any> => {
+    // eslint-disable-next-line unicorn/consistent-function-scoping
     const call = async () => target.apply(thisArg, argArray);
 
     // if it hasn't been called yet, call the function
@@ -53,6 +58,7 @@ export const retryableProxy = <U>(
       console.error(error);
       console.log(`Retrying after ${sleepMs}ms. (Retried ${currentIndex} times)`);
 
+      // eslint-disable-next-line promise/no-nesting
       return sleep(sleepMs).then(call);
     });
   };
@@ -63,6 +69,7 @@ export const retryableProxy = <U>(
     apply: (target, thisArg, argArray) => {
       // reduce over the maximum number of retries.
       // if any of them pass, the code will short-circuit and skip the rest
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-return,@typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
       return [...new Array(options.count)]
         .reduce(retryReducer(target, thisArg, argArray))
         .catch((error: Error) => {

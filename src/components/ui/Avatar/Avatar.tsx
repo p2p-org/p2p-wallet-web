@@ -1,5 +1,6 @@
 import React, { FunctionComponent } from 'react';
 
+import { CSSProperties } from '@linaria/core';
 import { styled } from '@linaria/react';
 
 const Wrapper = styled.img<{ size: string | number | undefined }>`
@@ -17,6 +18,8 @@ const Wrapper = styled.img<{ size: string | number | undefined }>`
 type Props = {
   src?: string;
   size?: string | number;
+  style?: CSSProperties;
+  className?: string;
 };
 
 export const Avatar: FunctionComponent<Props> = ({ src, size, ...props }) => {

@@ -81,12 +81,16 @@ export const Home: FunctionComponent = () => {
         <Title>P2P Wallet </Title>
         <SubTitle> Own Your Money </SubTitle>
         <Actions>
-          <Button primary big full as={Link} to="/create">
-            Create new wallet
-          </Button>
-          <Button gray big full as={Link} to="/access">
-            I already have a wallet
-          </Button>
+          <Link to="/create" className="button">
+            <Button primary big full>
+              Create new wallet
+            </Button>
+          </Link>
+          <Link to="/access" className="button">
+            <Button gray big full>
+              I already have a wallet
+            </Button>
+          </Link>
           <Button gray big full onClick={() => handleConnectByClick(WalletType.SOLLET)}>
             Connect by Sollet
           </Button>

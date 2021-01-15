@@ -1,6 +1,7 @@
 import React, { FunctionComponent } from 'react';
 import { useSelector } from 'react-redux';
 
+import { CSSProperties } from '@linaria/core';
 import { styled } from '@linaria/react';
 import { Decimal } from 'decimal.js';
 
@@ -11,6 +12,8 @@ const Wrapper = styled.div``;
 type Props = {
   value?: Decimal;
   symbol?: string;
+  style?: CSSProperties;
+  className?: string;
 };
 
 export const AmountUSDT: FunctionComponent<Props> = ({

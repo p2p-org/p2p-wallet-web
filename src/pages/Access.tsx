@@ -7,7 +7,7 @@ import * as bip39 from 'bip39';
 import throttle from 'lodash.throttle';
 
 import { WalletType } from 'api/wallet';
-import { Button, Icon, Input } from 'components/ui';
+import { Button, Input } from 'components/ui';
 import { localMnemonic } from 'config/constants';
 import { connect, selectType } from 'store/slices/wallet/WalletSlice';
 
@@ -76,12 +76,12 @@ const TextareaSeed = styled.textarea`
   outline: none !important;
 `;
 
-const EyeIcon = styled(Icon)`
-  width: 24px;
-  height: 24px;
-
-  opacity: 0.5;
-`;
+// const EyeIcon = styled(Icon)`
+//   width: 24px;
+//   height: 24px;
+//
+//   opacity: 0.5;
+// `;
 
 export const Access: FunctionComponent = () => {
   const history = useHistory();
@@ -133,7 +133,7 @@ export const Access: FunctionComponent = () => {
     setPassword(nextPassword);
   };
 
-  const handleVisibility = () => {};
+  // const handleVisibility = () => {};
 
   const isDisabled = error || !mnemonic;
 

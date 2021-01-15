@@ -1,11 +1,10 @@
 import React, { FunctionComponent, useMemo } from 'react';
-import { useSelector } from 'react-redux';
 
 import { styled } from '@linaria/react';
 
 import { Layout } from 'components/common/Layout';
 import { TokensWidget } from 'components/pages/wallets';
-import { ActionsWidget } from 'components/pages/wallets/ActionsWidget';
+// import { ActionsWidget } from 'components/pages/wallets/ActionsWidget';
 // import { LatestTransactionsWidget } from 'components/pages/wallets/LatestTransactionsWidget';
 // import { SendAgainWidget } from 'components/pages/wallets/SendAgainWidget';
 import { TotalBalanceWidget } from 'components/pages/wallets/TotalBalanceWidget';
@@ -43,7 +42,7 @@ export const Wallets: FunctionComponent = () => {
       [12, 'afternoon'],
       [5, 'morning'],
       [0, 'night'],
-    ];
+    ] as [number, string][];
 
     const hours = new Date().getHours();
     for (const [hour, message] of data) {

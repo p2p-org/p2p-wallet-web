@@ -115,7 +115,7 @@ export class Transaction implements Serializable<SerializableTransaction> {
     }));
 
     const instructions: SerializedInstruction[] = this.message.instructions.map((instruction) => {
-      const serializedInstruction = <SerializedInstruction>{
+      const serializedInstruction: SerializedInstruction = <SerializedInstruction>{
         ...instruction,
         programId: instruction.programId.toBase58(),
       };

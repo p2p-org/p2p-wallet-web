@@ -6,7 +6,7 @@ import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
 
 import { isDev } from 'config/constants';
-import globalCss from 'styles/global';
+import { globalCss } from 'styles/global';
 
 import { store } from './store';
 

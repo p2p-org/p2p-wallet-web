@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 
 const getScrollbarWidth = (() => {
-  let scrollElement = null;
+  let scrollElement: HTMLElement | null = null;
 
   return () => {
     if (scrollElement === null) {
@@ -11,7 +11,7 @@ const getScrollbarWidth = (() => {
         <div style="position: absolute; top: -200px; width: 100px; height: 100px; overflow: scroll; visibility: hidden;"></div>
       `;
 
-      scrollElement = containerDiv.firstElementChild;
+      scrollElement = containerDiv.firstElementChild as HTMLElement;
       document.body.append(scrollElement);
     }
 
@@ -19,10 +19,10 @@ const getScrollbarWidth = (() => {
   };
 })();
 
-const listeners = [];
+const listeners: React.Dispatch<any>[] = [];
 
-let width;
-let prevWidth;
+let width: number | null;
+let prevWidth: number | null;
 
 function onResize() {
   const scrollbarWidth = getScrollbarWidth();
@@ -42,9 +42,9 @@ function onResize() {
   prevWidth = width;
 }
 
-export const useWidthWithoutScrollbar = () => {
-  const [value, setValue] = useState(width);
-  const currentRef = useRef(null);
+export const useWidthWithoutScrollbar = (): number | null => {
+  const [value, setValue] = useState<number | null>(width);
+  const currentRef = useRef<number | null>(null);
   currentRef.current = value;
 
   useEffect(() => {

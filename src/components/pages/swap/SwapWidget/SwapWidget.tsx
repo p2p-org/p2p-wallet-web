@@ -10,6 +10,7 @@ import { adjustForSlippage } from 'api/pool/Pool';
 import { usePoolFromLocation } from 'api/pool/utils/state';
 import { TokenAccount } from 'api/token/TokenAccount';
 import { SendSwapWidget } from 'components/common/SendSwapWidget';
+import { ToastManager } from 'components/common/ToastManager';
 import { Icon } from 'components/ui';
 import { SYSTEM_PROGRAM_ID, WRAPPED_SOL_MINT } from 'constants/solana/bufferLayouts';
 import { executeSwap } from 'store/slices/swap/SwapSlice';
@@ -133,7 +134,7 @@ export const SwapWidget: FunctionComponent = () => {
       setIsExecuting(true);
       await dispatch(executeSwap());
     } catch (error) {
-      alert(error);
+      ToastManager.error(error);
     } finally {
       setIsExecuting(false);
     }
@@ -222,6 +223,7 @@ export const SwapWidget: FunctionComponent = () => {
       title="Swap"
       disabled={isExecuting || !selectedPool}
       actionText={
+        // eslint-disable-next-line unicorn/no-nested-ternary
         isExecuting ? 'Processing...' : selectedPool ? 'Swap' : 'This pair is unavailable'
       }
       rate={

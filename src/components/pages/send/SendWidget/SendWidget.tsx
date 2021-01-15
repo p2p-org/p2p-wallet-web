@@ -8,6 +8,7 @@ import Decimal from 'decimal.js';
 
 import { TokenAccount } from 'api/token/TokenAccount';
 import { SendSwapWidget } from 'components/common/SendSwapWidget';
+import { ToastManager } from 'components/common/ToastManager';
 import { RootState } from 'store/rootReducer';
 import { getMinimumBalanceForRentExemption, transfer } from 'store/slices/wallet/WalletSlice';
 
@@ -31,14 +32,22 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
   );
 
   useEffect(() => {
-    dispatch(getMinimumBalanceForRentExemption(0)).then((action) => {
-      setFee(
-        new Decimal(action.payload)
-          .div(10 ** 9)
-          .toDecimalPlaces(9)
-          .toNumber(),
-      );
-    });
+    const mount = async () => {
+      try {
+        // TODO: not 0
+        const resultFee = unwrapResult(await dispatch(getMinimumBalanceForRentExemption(0)));
+        setFee(
+          new Decimal(resultFee)
+            .div(10 ** 9)
+            .toDecimalPlaces(9)
+            .toNumber(),
+        );
+      } catch (error) {
+        ToastManager.error(error);
+      }
+    };
+
+    void mount();
   }, []);
 
   const handleBackClick = () => {
@@ -70,7 +79,7 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
 
       history.push(`/send/${publicKey}/result`, { signature });
     } catch (error) {
-      console.error(error);
+      ToastManager.error(error);
     } finally {
       setIsExecuting(false);
     }

@@ -1,6 +1,7 @@
-import React, { FunctionComponent } from 'react';
+import React from 'react';
 
 import isPropValid from '@emotion/is-prop-valid';
+import { CSSProperties } from '@linaria/core';
 
 import arrowAngle from './assets/arrow-angle-icon.svg';
 import arrowTriangle from './assets/arrow-triangle-icon.svg';
@@ -40,10 +41,17 @@ export type IconType = {
   size?: string | number;
   height?: string | number;
   width?: string | number;
-  style?: CSSStyleDeclaration;
+  style?: CSSProperties;
+  className?: string;
 };
 
-export const Icon: FunctionComponent<IconType> = ({ name, size, height, width, ...props }) => {
+export const Icon: React.FunctionComponent<IconType> = ({
+  name,
+  size,
+  height,
+  width,
+  ...props
+}) => {
   const validProps: {
     [prop: string]: any;
   } = {};

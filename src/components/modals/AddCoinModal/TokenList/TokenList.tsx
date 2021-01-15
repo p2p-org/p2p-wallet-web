@@ -3,7 +3,6 @@ import React, { FunctionComponent } from 'react';
 import { styled } from '@linaria/react';
 
 import { Token } from 'api/token/Token';
-import { TokenType } from 'constants/tokens';
 
 import { TokenRow } from '../TokenRow';
 

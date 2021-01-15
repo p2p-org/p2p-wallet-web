@@ -2,7 +2,6 @@ import React, { FunctionComponent } from 'react';
 
 import { styled } from '@linaria/react';
 import classNames from 'classnames';
-import { rgba } from 'polished';
 
 const Wrapper = styled.div``;
 

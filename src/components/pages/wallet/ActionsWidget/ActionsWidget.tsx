@@ -41,7 +41,7 @@ export const ActionsWidget: FunctionComponent<Props> = ({ publicKey }) => {
   };
 
   const handleAirdropClick = () => {
-    dispatch(airdrop());
+    void dispatch(airdrop());
   };
 
   return (
@@ -49,15 +49,19 @@ export const ActionsWidget: FunctionComponent<Props> = ({ publicKey }) => {
       <TokenSelector value={publicKey.toBase58()} onChange={handleTokenChange} />
 
       <ButtonsGroup>
-        <Button primary small as={Link} to={`/send/${publicKey.toBase58()}`}>
-          Send
-        </Button>
+        <Link to={`/send/${publicKey.toBase58()}`} className="button">
+          <Button primary small>
+            Send
+          </Button>
+        </Link>
         {/* <Button primary small> */}
         {/*  Buy */}
         {/* </Button> */}
-        <Button primary small as={Link} to={`/swap/${publicKey.toBase58()}`}>
-          Swap
-        </Button>
+        <Link to={`/swap/${publicKey.toBase58()}`} className="button">
+          <Button primary small>
+            Swap
+          </Button>
+        </Link>
         {!isMainnet && tokenAccount?.mint.symbol === 'SOL' ? (
           <Button primary small onClick={handleAirdropClick}>
             Airdrop

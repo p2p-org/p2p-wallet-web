@@ -35,7 +35,7 @@ export const ActionsWidget: FunctionComponent<Props> = ({ publicKey }) => {
     <Wrapper>
       <Actions>
         {publicKey ? (
-          <Link to={`/send/${publicKey?.toBase58()}`}>
+          <Link to={`/send/${publicKey?.toBase58()}`} className="button">
             <Button primary>Send</Button>
           </Link>
         ) : undefined}
@@ -43,7 +43,7 @@ export const ActionsWidget: FunctionComponent<Props> = ({ publicKey }) => {
           Receive
         </Button>
         {publicKey ? (
-          <Link to={`/swap/${publicKey?.toBase58()}`}>
+          <Link to={`/swap/${publicKey?.toBase58()}`} className="button">
             <Button primary>Swap</Button>
           </Link>
         ) : undefined}

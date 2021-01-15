@@ -136,9 +136,11 @@ export const ResultWidget: FunctionComponent = () => {
         ) : undefined}
       </InfoWrapper>
       {transaction?.short.source ? (
-        <Button primary big full as={Link} to={`/wallet/${transaction.short.source.toBase58()}`}>
-          Go back to wallet
-        </Button>
+        <Link to={`/wallet/${transaction.short.source.toBase58()}`} className="button">
+          <Button primary big full>
+            Go back to wallet
+          </Button>
+        </Link>
       ) : undefined}
     </WrapperCard>
   );

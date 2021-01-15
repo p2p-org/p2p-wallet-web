@@ -36,9 +36,7 @@ const Username = styled.div`
   line-height: 140%;
 `;
 
-type Props = {};
-
-export const SendAgainWidget: FunctionComponent<Props> = (props) => {
+export const SendAgainWidget: FunctionComponent = () => {
   return (
     <Widget title="Send again">
       <Wrapper>

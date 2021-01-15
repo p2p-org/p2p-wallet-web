@@ -43,6 +43,25 @@ export interface API {
   getCandleRates: (symbol: string) => Promise<CandleRate[]>;
 }
 
+const getCandleRates = async (symbol: string): Promise<CandleRate[]> => {
+  try {
+    const res = await fetch(
+      `https://serum-api.bonfida.com/candles/${symbol}USDT?resolution=86400&limit=365`,
+    );
+
+    if (!res.ok) {
+      throw new Error('Something wrong');
+    }
+
+    const result = (await res.json()) as CandlesResponse;
+
+    return result.data.map((rate) => new CandleRate(rate.market, rate.close, rate.startTime));
+  } catch (error) {
+    console.error(`Can't get rates for ${symbol}:`, error);
+    throw new Error(`Can't get rates for ${symbol}`);
+  }
+};
+
 // The API is a singleton per cluster. This ensures requests can be cached
 export const APIFactory = memoizeWith(
   identity,
@@ -56,25 +75,6 @@ export const APIFactory = memoizeWith(
       );
 
       return rates.filter(complement(isNil)) as MarketRate[];
-    };
-
-    const getCandleRates = async (symbol: string): Promise<CandleRate[]> => {
-      try {
-        const res = await fetch(
-          `https://serum-api.bonfida.com/candles/${symbol}USDT?resolution=86400&limit=365`,
-        );
-
-        if (!res.ok) {
-          throw new Error('Something wrong');
-        }
-
-        const result = (await res.json()) as CandlesResponse;
-
-        return result.data.map((rate) => new CandleRate(rate.market, rate.close, rate.startTime));
-      } catch (error) {
-        console.error(`Can't get rates for ${symbol}:`, error);
-        throw new Error(`Can't get rates for ${symbol}`);
-      }
     };
 
     return {

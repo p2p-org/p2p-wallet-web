@@ -1,4 +1,4 @@
-import { AccountLayout, MintInfo, MintLayout, Token as SPLToken } from '@solana/spl-token';
+import { AccountLayout, MintLayout, Token as SPLToken } from '@solana/spl-token';
 import {
   Account,
   AccountInfo,

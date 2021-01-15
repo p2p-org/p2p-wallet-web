@@ -1,6 +1,5 @@
 import React, { FunctionComponent, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link } from 'react-router-dom';
 
 import { styled } from '@linaria/react';
 import { unwrapResult } from '@reduxjs/toolkit';
@@ -8,11 +7,10 @@ import * as web3 from '@solana/web3.js';
 import dayjs from 'dayjs';
 import { rgba } from 'polished';
 
-import { confirmTransaction } from 'api/connection';
 import { Transaction } from 'api/transaction/Transaction';
 import { ToastManager } from 'components/common/ToastManager';
 import { TokenAvatar } from 'components/common/TokenAvatar';
-import { Avatar, Button, Icon } from 'components/ui';
+import { Icon } from 'components/ui';
 import { RootState } from 'store/rootReducer';
 import { getTransaction } from 'store/slices/transaction/TransactionSlice';
 
@@ -176,9 +174,17 @@ type Props = {
   close: () => void;
 };
 
+const handleCopyClick = (publicKey: string) => () => {
+  try {
+    void navigator.clipboard.writeText(publicKey);
+    ToastManager.info('Copied to buffer!');
+  } catch (error) {
+    console.error(error);
+  }
+};
+
 export const TransactionDetailsModal: FunctionComponent<Props> = ({ signature, close }) => {
   const dispatch = useDispatch();
-  // const cluster = useSelector((state: RootState) => state.wallet.cluster);
   const transaction = useSelector(
     (state: RootState) =>
       state.transaction.items[signature] && Transaction.from(state.transaction.items[signature]),
@@ -201,15 +207,6 @@ export const TransactionDetailsModal: FunctionComponent<Props> = ({ signature, c
   if (!transaction) {
     return null;
   }
-
-  const handleCopyClick = (publicKey: string) => () => {
-    try {
-      void navigator.clipboard.writeText(publicKey);
-      ToastManager.info('Copied to buffer!');
-    } catch (error) {
-      console.error(error);
-    }
-  };
 
   return (
     <Wrapper>

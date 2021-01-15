@@ -223,7 +223,7 @@ export class Pool extends OnChainEntity<Pool> implements Serializable<Serializab
       return this.tokenA.mint;
     }
 
-    throw new Error('');
+    throw new Error('Other token');
   }
 
   /**

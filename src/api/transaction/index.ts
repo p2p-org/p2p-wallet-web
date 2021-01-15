@@ -19,7 +19,7 @@ export interface API {
   transactionInfo: (signature: TransactionSignature) => Promise<Transaction | null>;
   getTransactionsForAddress: (
     account: PublicKey,
-    options: ConfirmedSignaturesForAddress2Options,
+    options?: ConfirmedSignaturesForAddress2Options,
   ) => Promise<Transaction[]>;
 }
 
@@ -101,7 +101,7 @@ export const APIFactory = memoizeWith(
      */
     const getTransactionsForAddress = async (
       account: PublicKey,
-      options: ConfirmedSignaturesForAddress2Options,
+      options?: ConfirmedSignaturesForAddress2Options,
     ): Promise<Transaction[]> => {
       console.log('Get transactions for the address', {
         account: account.toBase58(),

@@ -95,6 +95,7 @@ export const Button: FunctionComponent<Props & React.ButtonHTMLAttributes<HTMLBu
   big,
   full,
   children,
+  style,
   className,
   ...props
 }) => {
@@ -102,6 +103,7 @@ export const Button: FunctionComponent<Props & React.ButtonHTMLAttributes<HTMLBu
     <Wrapper
       type={type}
       {...props}
+      style={style}
       className={classNames(className, { primary, secondary, gray, link, small, full, big })}>
       {children}
     </Wrapper>

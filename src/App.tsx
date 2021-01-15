@@ -1,12 +1,11 @@
 import React, { useEffect } from 'react';
-import { useSelector } from 'react-redux';
 import { BrowserRouter as Router, Route, Switch, useHistory } from 'react-router-dom';
 
 import dayjs from 'dayjs';
 import localizedFormat from 'dayjs/plugin/localizedFormat';
 
 import { ModalManager } from 'components/common/ModalManager';
-import { NotifyToast } from 'components/common/NotifyToast/NotifyToast';
+import { NotifyToast } from 'components/common/NotifyToast';
 import { ToastManager } from 'components/common/ToastManager';
 import { Access } from 'pages/Access';
 import { Create } from 'pages/Create';
@@ -15,7 +14,6 @@ import { Send } from 'pages/Send';
 import { Swap } from 'pages/Swap';
 import { Wallet } from 'pages/Wallet';
 import { Wallets } from 'pages/Wallets';
-import { RootState } from 'store/rootReducer';
 import { AuthRequiredRoute } from 'utils/routes/UserRequiredRoute';
 
 dayjs.extend(localizedFormat);

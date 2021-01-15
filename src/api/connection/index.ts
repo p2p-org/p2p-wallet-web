@@ -11,7 +11,8 @@ const LOCALNET_URL = 'http://localhost:8899';
 
 // The default time to wait when confirming a transaction.
 export const DEFAULT_COMMITMENT: Commitment = defaultCommitment;
-export let currentCluster: ExtendedCluster;
+
+let currentCluster: ExtendedCluster;
 
 // Since connection objects include state, we memoise them here per network
 const createConnection = memoizeWith<(network: string) => Connection>(identity, (network) => {

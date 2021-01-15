@@ -16,7 +16,7 @@ export const ClusterSelector: FunctionComponent = () => {
 
     batch(() => {
       dispatch(selectCluster(newCluster));
-      dispatch(disconnect());
+      void dispatch(disconnect());
     });
   };
 

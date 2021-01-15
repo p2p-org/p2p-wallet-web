@@ -44,7 +44,7 @@ export const AddCoinModal: FunctionComponent<Props> = ({ close }) => {
   const isMainnetEntrypoint = cluster === clusterApiUrl('mainnet-beta');
 
   const handleMintTestTokenClick = () => {
-    dispatch(createMint({ amount: 1000, decimals: 2, initialAccount: new Account() }));
+    void dispatch(createMint({ amount: 1000, decimals: 2, initialAccount: new Account() }));
   };
 
   const closeModal = () => {

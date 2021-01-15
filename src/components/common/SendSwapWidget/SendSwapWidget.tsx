@@ -1,11 +1,9 @@
 import React, { FunctionComponent, ReactNode } from 'react';
 
 import { styled } from '@linaria/react';
-import Decimal from 'decimal.js';
 import { rgba } from 'polished';
 
 import { TokenAccount } from 'api/token/TokenAccount';
-import { AmountUSDT } from 'components/common/AmountUSDT';
 import { Card } from 'components/common/Card';
 import { RateUSDT } from 'components/common/RateUSDT';
 import { Button, Icon } from 'components/ui';
@@ -95,7 +93,8 @@ const ToWrapper = styled.div`
 
 const ToSelect = styled.div`
   display: flex;
-  /*margin-bottom: 32px; */
+
+  /* margin-bottom: 32px; */
   margin-bottom: 20px;
 
   > :not(:last-child) {
@@ -103,25 +102,25 @@ const ToSelect = styled.div`
   }
 `;
 
-const ToOption = styled.div`
-  display: flex;
-  align-items: center;
-  height: 32px;
-  padding: 0 20px;
-
-  color: ${rgba('#000', 0.5)};
-  font-size: 14px;
-  line-height: 17px;
-
-  background: #fafafa;
-  border-radius: 10px;
-
-  &.active {
-    color: #000;
-
-    background: #e6e6e6;
-  }
-`;
+// const ToOption = styled.div`
+//   display: flex;
+//   align-items: center;
+//   height: 32px;
+//   padding: 0 20px;
+//
+//   color: ${rgba('#000', 0.5)};
+//   font-size: 14px;
+//   line-height: 17px;
+//
+//   background: #fafafa;
+//   border-radius: 10px;
+//
+//   &.active {
+//     color: #000;
+//
+//     background: #e6e6e6;
+//   }
+// `;
 
 const SendTo = styled.div`
   color: ${rgba('#000', 0.5)};

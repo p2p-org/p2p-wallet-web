@@ -97,7 +97,8 @@ export const Layout: FunctionComponent<Props> = ({
                   <ColumnLeft>{leftColumn}</ColumnLeft>
                   <ColumnRight>{rightColumn}</ColumnRight>
                 </ColumnsWrapper>
-              ) : centered ? (
+              ) : // eslint-disable-next-line unicorn/no-nested-ternary
+              centered ? (
                 <CenteredWrapper>{centered}</CenteredWrapper>
               ) : (
                 children

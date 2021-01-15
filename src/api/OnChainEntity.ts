@@ -13,6 +13,7 @@ export abstract class OnChainEntity<T extends OnChainEntity<T>> {
   }
 
   addToHistory(entity: T): void {
+    // eslint-disable-next-line no-param-reassign
     entity.previous = this.previous;
     this.previous = entity;
   }

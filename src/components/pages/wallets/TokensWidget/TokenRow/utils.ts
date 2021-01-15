@@ -1,17 +1,13 @@
 import { rgba } from 'polished';
 
-export const getConfig = (coin, currency, data, decimals, interval: number, start: number) => ({
+export const getConfig = (data: number[][]): Highcharts.Options => ({
   chart: {
     height: 25,
     type: 'line',
     spacing: [0, 0, 0, 0],
-    data: {
-      dateFormat: 'YYYY/mm/dd',
-    },
   },
   title: {
-    // eslint-disable-next-line unicorn/no-null
-    text: null,
+    text: undefined,
   },
   yAxis: {
     visible: false,
@@ -28,8 +24,8 @@ export const getConfig = (coin, currency, data, decimals, interval: number, star
   },
   plotOptions: {
     series: {
-      pointStart: start,
-      pointInterval: interval,
+      // pointStart: start,
+      // pointInterval: interval,
       animation: false,
     },
     line: {
@@ -46,6 +42,7 @@ export const getConfig = (coin, currency, data, decimals, interval: number, star
   },
   series: [
     {
+      type: 'area',
       name: 'Price',
       data,
     },

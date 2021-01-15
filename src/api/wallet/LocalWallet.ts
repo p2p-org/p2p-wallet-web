@@ -31,6 +31,7 @@ export class LocalWallet extends Wallet {
     return this.account.publicKey;
   }
 
+  // eslint-disable-next-line class-methods-use-this
   disconnect(): void {
     // Nothing to do here
   }

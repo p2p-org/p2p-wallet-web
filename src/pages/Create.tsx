@@ -1,13 +1,12 @@
-import React, { FunctionComponent, useCallback, useState } from 'react';
+import React, { FunctionComponent, useState } from 'react';
 import { batch, useDispatch } from 'react-redux';
 import { Link, useHistory } from 'react-router-dom';
 
 import { styled } from '@linaria/react';
 import * as bip39 from 'bip39';
-import throttle from 'lodash.throttle';
 
 import { WalletType } from 'api/wallet';
-import { Button, Icon, Input } from 'components/ui';
+import { Button, Input } from 'components/ui';
 import { connect, selectType } from 'store/slices/wallet/WalletSlice';
 
 import { Header } from '../components/common/Header';
@@ -73,12 +72,12 @@ const LinkStyled = styled(Link)`
   text-decoration: none;
 `;
 
-const EyeIcon = styled(Icon)`
-  width: 24px;
-  height: 24px;
-
-  opacity: 0.5;
-`;
+// const EyeIcon = styled(Icon)`
+//   width: 24px;
+//   height: 24px;
+//
+//   opacity: 0.5;
+// `;
 
 const ContinueButton = styled(Button)`
   width: 100%;
@@ -130,7 +129,6 @@ const BoldText = styled.p`
 export const Create: FunctionComponent = () => {
   const history = useHistory();
   const dispatch = useDispatch();
-  const [error, setError] = useState(false);
   const [password, setPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -139,7 +137,7 @@ export const Create: FunctionComponent = () => {
 
   const [mnemonic] = useState(bip39.generateMnemonic());
 
-  const handleContinueClick = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleContinueClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
 
     if (newPassword === confirmPassword) {
@@ -202,9 +200,7 @@ export const Create: FunctionComponent = () => {
               // }
             />
 
-            <ContinueButton onClick={handleContinueClick} disabled={error}>
-              Continue
-            </ContinueButton>
+            <ContinueButton onClick={handleContinueClick}>Continue</ContinueButton>
 
             <LinkStyled to="/access">Already have wallet? Access it</LinkStyled>
           </Form>

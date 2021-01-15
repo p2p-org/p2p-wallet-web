@@ -11,8 +11,8 @@ import { TokenAccount } from 'api/token/TokenAccount';
 import { Card } from 'components/common/Card';
 import { RootState } from 'store/rootReducer';
 import { getCandleRates } from 'store/slices/rate/RateSlice';
-import { calculateInterval, calculateStart } from 'utils/charts';
 
+// import { calculateInterval, calculateStart } from 'utils/charts';
 import { getConfig } from './utils';
 
 const Wrapper = styled(Card)`
@@ -76,15 +76,15 @@ export const PriceWidget: FunctionComponent<Props> = ({ publicKey }) => {
     return null;
   }
 
-  const coin = 'BTC';
-  const currency = 'BTC';
-  const time = 'day';
+  // const coin = 'BTC';
+  // const currency = 'BTC';
+  // const time = 'day';
 
   const data = rates.map((rate) => [rate.startTime, rate.price]);
-  const decimals = 2;
-  const start = calculateStart(coin, time);
-  const interval = calculateInterval(time);
-  const config = getConfig(coin, currency, data, decimals, interval, start);
+  // const decimals = 2;
+  // const start = calculateStart(coin, time);
+  // const interval = calculateInterval(time);
+  const config = getConfig(data);
 
   const diff = rates[rates.length - 1].price - rates[rates.length - 2].price;
   const sum = rates[rates.length - 1].price + rates[rates.length - 2].price;

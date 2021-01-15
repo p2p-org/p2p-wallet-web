@@ -17,6 +17,7 @@ module.exports = {
   plugins: ['simple-import-sort'],
   rules: {
     'consistent-return': 'off',
+    'no-console': 'off',
     'no-void': 'off',
     'no-plusplus': 'off',
     'unicorn/no-null': 'off',

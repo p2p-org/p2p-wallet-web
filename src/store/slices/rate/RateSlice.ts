@@ -1,3 +1,4 @@
+// eslint-disable-next-line eslint-comments/disable-enable-pair
 /* eslint-disable no-param-reassign */
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 
@@ -32,7 +33,7 @@ export const getCandleRates = createAsyncThunk<SerializableCandleRate[], string>
   },
 );
 
-interface RatesState {
+export interface RatesState {
   candles: {
     [pair: string]: {
       price: number;

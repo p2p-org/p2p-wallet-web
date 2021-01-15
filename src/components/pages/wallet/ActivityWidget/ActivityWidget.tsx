@@ -2,6 +2,7 @@ import React, { FunctionComponent, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { styled } from '@linaria/react';
+import { unwrapResult } from '@reduxjs/toolkit';
 import * as web3 from '@solana/web3.js';
 import { ConfirmedSignaturesForAddress2Options } from '@solana/web3.js';
 import { last } from 'ramda';
@@ -36,13 +37,13 @@ export const ActivityWidget: FunctionComponent<Props> = ({ publicKey }) => {
 
     setIsLoading(true);
     try {
-      const result = await dispatch(getTransactions({ publicKey, options }));
+      const result = unwrapResult(await dispatch(getTransactions({ publicKey, options })));
 
-      if (!result.payload.length) {
+      if (result.length === 0) {
         setIsEnd(true);
       }
     } catch (error) {
-      ToastManager.error(error.toString());
+      ToastManager.error(String(error));
     } finally {
       setIsLoading(false);
     }

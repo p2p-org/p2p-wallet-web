@@ -84,9 +84,7 @@ const NetworkWrapper = styled.div`
 //   line-height: 120%;
 // `;
 
-type Props = {};
-
-export const Header: FunctionComponent<Props> = (props) => {
+export const Header: FunctionComponent = () => {
   return (
     <Wrapper>
       <ContainerScrollFix>

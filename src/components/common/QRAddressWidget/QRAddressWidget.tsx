@@ -68,7 +68,8 @@ const Content = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  //padding: 20px;
+
+  /* padding: 20px; */
   padding: 20px 20px 40px;
 `;
 

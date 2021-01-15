@@ -9,6 +9,7 @@ import { Icon } from 'components/ui';
 const Wrapper = styled.div`
   display: flex;
   align-items: center;
+
   text-decoration: none;
 `;
 
@@ -35,6 +36,7 @@ const ChevronIcon = styled(Icon)`
   height: 12px;
 
   color: #000;
+
   transform: rotate(-90deg);
 `;
 

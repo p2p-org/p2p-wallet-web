@@ -1,7 +1,7 @@
 import { css } from '@linaria/core';
 import { rgba } from 'polished';
 
-export default css`
+export const globalCss = css`
   :global() {
     html,
     body,
@@ -22,6 +22,10 @@ export default css`
       font-size: 14px;
       line-height: 140%;
       text-decoration: underline;
+    }
+
+    a.button {
+      text-decoration: none;
     }
 
     & ::-webkit-scrollbar {

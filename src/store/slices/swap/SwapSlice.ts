@@ -3,7 +3,6 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import { APIFactory, SwapParameters } from 'api/pool';
 import { Pool } from 'api/pool/Pool';
 import { TokenAccount } from 'api/token/TokenAccount';
-import { swapHostFeeAddress } from 'config/constants';
 import { RootState } from 'store/rootReducer';
 
 export const SWAP_SLICE_NAME = 'swap';

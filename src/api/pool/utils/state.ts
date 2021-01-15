@@ -1,10 +1,10 @@
 import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
-import { useLocation, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 
 import { PayloadAction } from '@reduxjs/toolkit';
 
-import { Pool, SerializablePool } from 'api/pool/Pool';
+import { SerializablePool } from 'api/pool/Pool';
 import { SerializableToken } from 'api/token/Token';
 import { SerializableTokenAccount, TokenAccount } from 'api/token/TokenAccount';
 import { selectTokenAccount } from 'store/slices/tokenPair/utils/tokenPair';
