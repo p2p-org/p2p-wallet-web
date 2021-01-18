@@ -24,7 +24,7 @@ type TransactionMessage = {
 };
 
 type ParsedShort = {
-  type: string;
+  type: string | null;
   source: PublicKey | null;
   sourceTokenAccount: TokenAccount | null;
   destination: PublicKey | null;
@@ -33,7 +33,7 @@ type ParsedShort = {
 };
 
 type SerializedShort = {
-  type: string;
+  type: string | null;
   source: string | null;
   sourceTokenAccount: SerializableTokenAccount | null;
   destination: string | null;
@@ -115,14 +115,14 @@ export class Transaction implements Serializable<SerializableTransaction> {
     }));
 
     const instructions: SerializedInstruction[] = this.message.instructions.map((instruction) => {
-      const serializedInstruction: SerializedInstruction = <SerializedInstruction>{
+      const serializedInstruction = <SerializedInstruction>{
         ...instruction,
         programId: instruction.programId.toBase58(),
       };
 
-      if (instruction.accounts) {
-        serializedInstruction.accounts = serializedInstruction.accounts.map((account) =>
-          account.toBase58(),
+      if ((instruction as PartiallyDecodedInstruction).accounts) {
+        (serializedInstruction as SerializedPartiallyDecodedInstruction).accounts = (instruction as PartiallyDecodedInstruction).accounts.map(
+          (account) => account.toBase58(),
         );
       }
 
@@ -139,7 +139,7 @@ export class Transaction implements Serializable<SerializableTransaction> {
         instructions,
       },
       short: {
-        type: this.short.type,
+        type: this.short.type || null,
         source: this.short.source?.toBase58() || null,
         sourceTokenAccount: this.short.sourceTokenAccount?.serialize() || null,
         destination: this.short.destination?.toBase58() || null,
@@ -164,8 +164,8 @@ export class Transaction implements Serializable<SerializableTransaction> {
           programId: new PublicKey(instruction.programId),
         };
 
-        if (instruction.accounts) {
-          originalInstruction.accounts = originalInstruction.accounts.map(
+        if ((instruction as SerializedPartiallyDecodedInstruction).accounts) {
+          (originalInstruction as PartiallyDecodedInstruction).accounts = (instruction as SerializedPartiallyDecodedInstruction).accounts.map(
             (account) => new PublicKey(account),
           );
         }

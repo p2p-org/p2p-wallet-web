@@ -2,10 +2,13 @@ import cache from '@civic/simple-cache';
 import {
   ConfirmedSignaturesForAddress2Options,
   LAMPORTS_PER_SOL,
+  ParsedInstruction,
+  PartiallyDecodedInstruction,
   PublicKey,
   TransactionSignature,
 } from '@solana/web3.js';
 import { Decimal } from 'decimal.js';
+import { stringify } from 'querystring';
 import { complement, identity, isNil, memoizeWith } from 'ramda';
 
 import { getConnection } from 'api/connection';
@@ -53,7 +56,21 @@ export const APIFactory = memoizeWith(
           }
         : null;
 
-      const instruction = transactionInfo?.transaction.message.instructions[0];
+      type ConfirmedTransaction = {
+        programId: PublicKey;
+        parsed?: {
+          info: {
+            source: string;
+            destination: string;
+            amount: number;
+            lamports: number;
+          };
+          type: string;
+        };
+      };
+
+      const instruction = transactionInfo?.transaction.message
+        .instructions[0] as ConfirmedTransaction;
       const source = instruction?.parsed?.info.source
         ? new PublicKey(instruction?.parsed?.info.source)
         : null;
@@ -64,7 +81,7 @@ export const APIFactory = memoizeWith(
       const destinationTokenAccount = destination
         ? await tokenAPI.tokenAccountInfo(destination)
         : null;
-      const type = instruction?.parsed?.type;
+      const type = instruction?.parsed?.type || null;
 
       let amount = new Decimal(0);
       if (instruction?.programId.equals(TOKEN_PROGRAM_ID)) {

@@ -5,6 +5,7 @@ import {
   ParsedAccountData,
   PublicKey,
   PublicKeyAndAccount,
+  RpcResponseAndContext,
   SystemProgram,
   TransactionInstruction,
 } from '@solana/web3.js';
@@ -80,6 +81,41 @@ export interface API {
     callback: TokenAccountUpdateCallback,
   ) => void;
 }
+
+const mintTo = async (recipient: TokenAccount, tokenAmount: number): Promise<string> => {
+  const token = recipient.mint;
+  assert(
+    token.mintAuthority && getWallet().pubkey.equals(token.mintAuthority),
+    `The current wallet does not have the authority to mint tokens for mint ${token}`,
+  );
+
+  const mintToInstruction = SPLToken.createMintToInstruction(
+    TOKEN_PROGRAM_ID,
+    token.address,
+    recipient.address,
+    getWallet().pubkey,
+    [],
+    tokenAmount,
+  );
+
+  const transaction = await makeTransaction([mintToInstruction]);
+
+  return sendTransaction(transaction);
+};
+
+const transferSol = async (parameters: TransferParameters): Promise<string> => {
+  console.log('Transfer SOL amount', parameters.amount);
+
+  const transferInstruction = SystemProgram.transfer({
+    fromPubkey: parameters.source,
+    toPubkey: parameters.destination,
+    lamports: parameters.amount,
+  });
+
+  const transaction = await makeTransaction([transferInstruction]);
+
+  return sendTransaction(transaction);
+};
 
 // The API is a singleton per cluster. This ensures requests can be cached
 export const APIFactory = memoizeWith(
@@ -164,48 +200,45 @@ export const APIFactory = memoizeWith(
       return tokenUncached;
     };
 
-    const tokensInfo = retryableProxy(
-      async (mints: PublicKey[]): Promise<Token[]> => {
-        const publicKeys = mints.map((publicKey) => publicKey.toBase58());
+    const tokensInfo = retryableProxy<PublicKey[], Token[]>(async (mints: PublicKey[]) => {
+      const publicKeys = mints.map((publicKey) => publicKey.toBase58());
 
-        const getMultipleAccountsResult = await connection._rpcRequest('getMultipleAccounts', [
-          publicKeys,
-          { commiment: connection.commitment, encoding: 'jsonParsed' },
-        ]);
+      const getMultipleAccountsResult = <
+        RpcResponseAndContext<AccountInfo<Buffer | ParsedAccountData> | null> // eslint-disable-next-line @typescript-eslint/no-unsafe-call,no-underscore-dangle
+      >await connection._rpcRequest('getMultipleAccounts', [publicKeys, { commiment: connection.commitment, encoding: 'jsonParsed' }]);
 
-        const tokens: Token[] = [];
+      const tokens: Token[] = [];
 
-        mints.forEach((mint, index) => {
-          const mintInfo = path<{
-            decimals: number;
-            supply: number;
-            mintAuthority: string;
-          }>(['result', 'value', index, 'data', 'parsed', 'info'], getMultipleAccountsResult);
+      mints.forEach((mint, index) => {
+        const mintInfo = path<{
+          decimals: number;
+          supply: number;
+          mintAuthority: string;
+        }>(['result', 'value', index, 'data', 'parsed', 'info'], getMultipleAccountsResult);
 
-          if (!mintInfo) {
-            return;
-          }
+        if (!mintInfo) {
+          return;
+        }
 
-          const configForToken = getConfigForToken(mint);
+        const configForToken = getConfigForToken(mint);
 
-          const token = new Token(
-            mint,
-            mintInfo.decimals,
-            mintInfo.supply,
-            mintInfo.mintAuthority ? new PublicKey(mintInfo.mintAuthority) : undefined, // maps a null mintAuthority to undefined
-            configForToken?.tokenName,
-            configForToken?.tokenSymbol,
-          );
+        const token = new Token(
+          mint,
+          mintInfo.decimals,
+          mintInfo.supply,
+          mintInfo.mintAuthority ? new PublicKey(mintInfo.mintAuthority) : undefined, // maps a null mintAuthority to undefined
+          configForToken?.tokenName,
+          configForToken?.tokenSymbol,
+        );
 
-          // set cache
-          tokensCache.set(mint.toBase58(), token);
+        // set cache
+        tokensCache.set(mint.toBase58(), token);
 
-          tokens.push(token);
-        });
+        tokens.push(token);
+      });
 
-        return tokens;
-      },
-    );
+      return tokens;
+    });
 
     const getTokens = async (): Promise<Token[]> => {
       const clusterConfig = tokenConfig[cluster];
@@ -347,11 +380,11 @@ export const APIFactory = memoizeWith(
 
       const mints: PublicKey[] = [];
 
-      allParsedAccountInfos.value.map((accountResult) => {
+      allParsedAccountInfos.value.forEach((accountResult) => {
         const parsedTokenAccountInfo = extractParsedTokenAccountInfo(accountResult.account);
 
         if (!parsedTokenAccountInfo) {
-          return null;
+          return;
         }
 
         mints.push(new PublicKey(parsedTokenAccountInfo.mint));
@@ -589,27 +622,6 @@ export const APIFactory = memoizeWith(
       return sendTransaction(transaction);
     };
 
-    const mintTo = async (recipient: TokenAccount, tokenAmount: number): Promise<string> => {
-      const token = recipient.mint;
-      assert(
-        token.mintAuthority && getWallet().pubkey.equals(token.mintAuthority),
-        `The current wallet does not have the authority to mint tokens for mint ${token}`,
-      );
-
-      const mintToInstruction = SPLToken.createMintToInstruction(
-        TOKEN_PROGRAM_ID,
-        token.address,
-        recipient.address,
-        getWallet().pubkey,
-        [],
-        tokenAmount,
-      );
-
-      const transaction = await makeTransaction([mintToInstruction]);
-
-      return sendTransaction(transaction);
-    };
-
     function approveInstruction(sourceAccount: TokenAccount, delegate: PublicKey, amount: number) {
       return SPLToken.createApproveInstruction(
         TOKEN_PROGRAM_ID,
@@ -670,20 +682,6 @@ export const APIFactory = memoizeWith(
       const instruction = approveInstruction(sourceAccount, delegate, amount);
 
       const transaction = await makeTransaction([instruction]);
-
-      return sendTransaction(transaction);
-    };
-
-    const transferSol = async (parameters: TransferParameters): Promise<string> => {
-      console.log('Transfer SOL amount', parameters.amount);
-
-      const transferInstruction = SystemProgram.transfer({
-        fromPubkey: parameters.source,
-        toPubkey: parameters.destination,
-        lamports: parameters.amount,
-      });
-
-      const transaction = await makeTransaction([transferInstruction]);
 
       return sendTransaction(transaction);
     };

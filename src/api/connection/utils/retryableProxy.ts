@@ -16,8 +16,8 @@ const defaultRetryOptions: RetryOptions = {
   backoutMultiplier: 1.5,
 };
 
-interface GenericAsyncFunction<T> {
-  (...args: Array<never>): Promise<T>;
+interface GenericAsyncFunction<U, R> {
+  (...args: Array<U>): Promise<R>;
 }
 
 /**
@@ -28,22 +28,22 @@ interface GenericAsyncFunction<T> {
  * @param fn
  * @param retryOptions
  */
-export const retryableProxy = <U>(
-  fn: GenericAsyncFunction<U>,
+export const retryableProxy = <U, R>(
+  fn: GenericAsyncFunction<U, R>,
   retryOptions: Partial<RetryOptions> = defaultRetryOptions,
-): GenericAsyncFunction<U> => {
+): GenericAsyncFunction<U, R> => {
   // combine the passed in options with default options
   const options = mergeLeft(retryOptions, defaultRetryOptions);
 
   const retryReducer = <T>(
-    target: GenericAsyncFunction<T>,
+    target: GenericAsyncFunction<U, T>,
     thisArg: unknown,
-    argArray: Array<never>,
+    argArray: Array<U>,
   ) => async (
     previousValue: Promise<T>,
     currentValue: Promise<T>,
     currentIndex: number,
-  ): Promise<any> => {
+  ): Promise<T> => {
     // eslint-disable-next-line unicorn/consistent-function-scoping
     const call = async () => target.apply(thisArg, argArray);
 

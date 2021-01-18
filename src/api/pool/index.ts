@@ -1,5 +1,5 @@
 import { AccountLayout, Token as SPLToken } from '@solana/spl-token';
-import { TokenSwap, TokenSwapLayout } from '@solana/spl-token-swap';
+import { TokenSwap, TokenSwapInfo, TokenSwapLayout } from '@solana/spl-token-swap';
 import { Account, PublicKey, SystemProgram, TransactionInstruction } from '@solana/web3.js';
 import { Decimal } from 'decimal.js';
 import { complement, isNil } from 'ramda';
@@ -127,12 +127,12 @@ export const APIFactory = (cluster: ExtendedCluster): API => {
 
     // load the pool
     console.log('swap Address', address.toBase58());
-    const swapInfo: TokenSwap = await TokenSwap.loadTokenSwap(
+    const swapInfo = ((await TokenSwap.loadTokenSwap(
       connection,
       address,
       swapProgramId,
       payer,
-    );
+    )) as unknown) as TokenSwapInfo;
 
     // load the token account and mint info for tokens A and B
     const tokenAccountAInfo = await tokenAPI.tokenAccountInfo(swapInfo.tokenAccountA);
