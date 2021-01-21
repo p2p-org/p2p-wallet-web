@@ -44,6 +44,7 @@ const TokenName = styled.div`
 
 const WrapperLink = styled(Link)`
   display: flex;
+  align-items: center;
   margin: 10px;
   padding: 10px;
 
