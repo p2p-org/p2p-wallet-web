@@ -69,7 +69,7 @@ const CircleWrapper = styled.div`
   border-radius: 50%;
 `;
 
-const ArrowAngleIcon = styled(Icon)`
+const BottomIcon = styled(Icon)`
   width: 17px;
   height: 17px;
 `;
@@ -220,7 +220,7 @@ export const TransactionDetailsModal: FunctionComponent<Props> = ({ signature, c
           <CloseIcon name="close" />
         </CloseWrapper>
         <CircleWrapper>
-          <ArrowAngleIcon name="arrow-angle" />
+          <BottomIcon name="bottom" />
         </CircleWrapper>
       </Header>
       <Content>

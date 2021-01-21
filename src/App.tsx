@@ -45,8 +45,8 @@ const App: React.FC = () => {
           <AuthRequiredRoute path="/wallets" component={Wallets} />
           <AuthRequiredRoute path="/wallet/:publicKey" component={Wallet} />
           <AuthRequiredRoute path="/send/:publicKey/:status(result)" component={Send} />
-          <AuthRequiredRoute path="/send/:publicKey" component={Send} />
-          <AuthRequiredRoute path="/swap/:publicKey" component={Swap} />
+          <AuthRequiredRoute path="/send/:publicKey?" component={Send} />
+          <AuthRequiredRoute path="/swap/:publicKey?" component={Swap} />
         </Switch>
       </Router>
       <ModalManager />

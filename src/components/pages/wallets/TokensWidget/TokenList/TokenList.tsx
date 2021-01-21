@@ -6,10 +6,7 @@ import { TokenAccount } from 'api/token/TokenAccount';
 
 import { TokenRow } from '../TokenRow';
 
-const Wrapper = styled.div`
-  display: grid;
-  grid-gap: 10px;
-`;
+const Wrapper = styled.div``;
 
 type Props = {
   items: TokenAccount[];

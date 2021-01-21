@@ -92,8 +92,8 @@ const TokenName = styled.div`
 const ChevronWrapper = styled.div``;
 
 const ChevronIcon = styled(Icon)`
-  width: 11px;
-  height: 8px;
+  width: 16px;
+  height: 16px;
   margin-left: 16px;
 
   color: #000;

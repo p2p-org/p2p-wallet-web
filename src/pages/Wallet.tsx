@@ -11,22 +11,17 @@ import { PriceWidget } from 'components/pages/wallet/PriceWidget';
 export const Wallet: FunctionComponent = () => {
   const { publicKey } = useParams<{ publicKey: string }>();
 
-  const breadcrumbs = [{ name: 'Wallets', to: '/wallets' }, { name: publicKey }];
+  // const breadcrumbs = [{ name: 'Wallets', to: '/wallets' }, { name: publicKey }];
   const tokenPublicKey = new web3.PublicKey(publicKey);
 
   return (
     <Layout
-      breadcrumbs={breadcrumbs}
-      leftColumn={
+      rightColumn={
         <>
           <ActionsWidget publicKey={tokenPublicKey} />
           <PriceWidget publicKey={tokenPublicKey} />
-          <ActivityWidget publicKey={tokenPublicKey} />
-        </>
-      }
-      rightColumn={
-        <>
           <QRAddressWidget publicKey={tokenPublicKey} />
+          <ActivityWidget publicKey={tokenPublicKey} />
         </>
       }
     />

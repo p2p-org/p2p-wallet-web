@@ -47,16 +47,7 @@ const SubTitle = styled.div`
 `;
 
 const CreateButton = styled(Button)`
-  width: 100%;
-  height: 56px;
   margin-top: 32px;
-
-  color: #fff;
-  font-weight: 500;
-  font-size: 14px;
-  line-height: 17px;
-
-  background: #000;
 `;
 
 const Box = styled.div`
@@ -156,7 +147,7 @@ export const Access: FunctionComponent = () => {
             // postfix={<EyeIcon name="eye" onClick={handleVisibility} />}
           />
 
-          <CreateButton type="submit" disabled={isDisabled}>
+          <CreateButton type="submit" primary big disabled={isDisabled}>
             Continue
           </CreateButton>
         </Form>

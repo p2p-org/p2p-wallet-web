@@ -9,6 +9,8 @@ import { RootState } from 'store/rootReducer';
 import { Header } from '../Header';
 import { ScrollFix } from '../ScollFix';
 import { Breadcrumbs, BreadcrumbType } from './Breadcrumbs';
+import { LeftNavMenu } from './LeftNavMenu';
+import { ProfileWidget } from './ProfileWidget';
 
 const Wrapper = styled(ScrollFix)``;
 
@@ -18,9 +20,9 @@ const MainScrollFix = styled.div`
 
 const Container = styled.div`
   width: 100%;
-  max-width: 1004px;
+  max-width: 796px;
   margin: 0 auto;
-  padding-top: 20px;
+  padding-top: 16px;
 `;
 
 const Content = styled.div``;
@@ -28,9 +30,7 @@ const Content = styled.div``;
 const ColumnsWrapper = styled.div`
   display: grid;
   grid-auto-flow: column;
-  grid-gap: 84px;
-
-  margin-top: 32px;
+  grid-gap: 20px;
 `;
 
 const ColumnLeft = styled.div`
@@ -38,7 +38,7 @@ const ColumnLeft = styled.div`
   grid-gap: 32px;
   grid-template-rows: min-content;
 
-  width: 556px;
+  width: 252px;
   height: fit-content;
 `;
 
@@ -47,7 +47,7 @@ const ColumnRight = styled.div`
   grid-gap: 40px;
   grid-template-rows: min-content;
 
-  width: 364px;
+  width: 524px;
   height: fit-content;
 `;
 
@@ -92,9 +92,16 @@ export const Layout: FunctionComponent<Props> = ({
           {breadcrumbs ? <Breadcrumbs breadcrumbs={breadcrumbs} /> : undefined}
           {connected ? (
             <Content>
-              {leftColumn && rightColumn ? (
+              {rightColumn ? (
                 <ColumnsWrapper>
-                  <ColumnLeft>{leftColumn}</ColumnLeft>
+                  <ColumnLeft>
+                    {leftColumn || (
+                      <>
+                        <ProfileWidget />
+                        <LeftNavMenu />
+                      </>
+                    )}
+                  </ColumnLeft>
                   <ColumnRight>{rightColumn}</ColumnRight>
                 </ColumnsWrapper>
               ) : // eslint-disable-next-line unicorn/no-nested-ternary

@@ -1,4 +1,4 @@
-import { Commitment, PublicKey } from '@solana/web3.js';
+import { Cluster, Commitment, PublicKey } from '@solana/web3.js';
 
 import { ExtendedCluster } from 'utils/types';
 
@@ -29,4 +29,4 @@ export const postTransactionSleepMS = Number(process.env.POST_TRANSACTION_SLEEP_
 export const airdropKey = (cluster: ExtendedCluster): string | undefined =>
   process.env[`APP_${cluster.toUpperCase()}_AIRDROP_PRIVATE_KEY`];
 
-export const CLUSTERS = ['mainnet-beta', 'testnet', 'devnet', 'localnet'];
+export const CLUSTERS: Cluster[] = ['mainnet-beta', 'testnet', 'devnet'];

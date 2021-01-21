@@ -1,5 +1,5 @@
 import 'sanitize.css';
-import 'styles/nprogress.css';
+import 'styles/css/nprogress.css';
 
 import React from 'react';
 import ReactDOM from 'react-dom';

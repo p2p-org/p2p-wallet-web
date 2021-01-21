@@ -41,7 +41,7 @@ export const AddCoinModal: FunctionComponent<Props> = ({ close }) => {
     state.global.availableTokens.map((token) => Token.from(token)),
   );
 
-  const isMainnetEntrypoint = cluster === clusterApiUrl('mainnet-beta');
+  const isMainnetEntrypoint = cluster === 'mainnet-beta';
 
   const handleMintTestTokenClick = () => {
     void dispatch(createMint({ amount: 1000, decimals: 2, initialAccount: new Account() }));

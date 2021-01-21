@@ -1,27 +1,31 @@
 import React, { FunctionComponent } from 'react';
 
 import { styled } from '@linaria/react';
-import classNames from 'classnames';
+import { rgba } from 'polished';
 
-const Wrapper = styled.div``;
+import { Card } from '../Card';
+
+const Wrapper = styled(Card)`
+  padding: 0;
+
+  box-shadow: 0 4px 4px #f6f6f9;
+`;
 
 const Header = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
+  height: 70px;
+  padding: 0 20px;
 
-  margin-bottom: 16px;
+  border-bottom: 1px solid ${rgba(0, 0, 0, 0.05)};
 `;
 
 const Title = styled.div`
   color: #000;
-  font-weight: 500;
-  font-size: 18px;
-  line-height: 120%;
-
-  &.hasBigTitle {
-    font-size: 22px;
-  }
+  font-weight: 600;
+  font-size: 24px;
+  line-height: 140%;
 `;
 
 const Action = styled.div``;
@@ -29,25 +33,20 @@ const Action = styled.div``;
 const Content = styled.div``;
 
 type Props = {
-  title: string;
-  hasBigTitle?: boolean;
+  title?: string;
   action?: React.ReactNode;
   className?: string;
 };
 
-export const Widget: FunctionComponent<Props> = ({
-  title,
-  hasBigTitle,
-  action,
-  children,
-  className,
-}) => {
+export const Widget: FunctionComponent<Props> = ({ title, action, children, className }) => {
   return (
     <Wrapper className={className}>
-      <Header>
-        <Title className={classNames({ hasBigTitle })}>{title}</Title>
-        {action ? <Action>{action}</Action> : undefined}
-      </Header>
+      {title || action ? (
+        <Header>
+          {title ? <Title>{title}</Title> : undefined}
+          {action ? <Action>{action}</Action> : undefined}
+        </Header>
+      ) : undefined}
       <Content>{children}</Content>
     </Wrapper>
   );

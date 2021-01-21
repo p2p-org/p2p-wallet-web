@@ -2,10 +2,9 @@ import React, { FunctionComponent } from 'react';
 import { Link } from 'react-router-dom';
 
 import { styled } from '@linaria/react';
-import { rgba } from 'polished';
+import Logo from 'assets/images/logo.png';
 
 import { ClusterSelector } from 'components/common/ClusterSelector';
-// import { Avatar } from 'components/ui';
 
 const Wrapper = styled.header`
   position: relative;
@@ -19,7 +18,8 @@ const Wrapper = styled.header`
   white-space: nowrap;
 
   background: #fff;
-  border-bottom: 1px solid ${rgba('#000', 0.1)};
+  border-bottom: 1px solid #f6f6f8;
+  box-shadow: 0 1px 8px rgba(0, 0, 0, 0.05);
 `;
 
 const ContainerScrollFix = styled.div`
@@ -27,7 +27,7 @@ const ContainerScrollFix = styled.div`
   align-items: center;
   justify-content: space-between;
   width: 100%;
-  max-width: 1260px;
+  max-width: 796px;
 `;
 
 const LogoLink = styled(Link)`
@@ -36,6 +36,11 @@ const LogoLink = styled(Link)`
   font-size: 22px;
   line-height: 120%;
   text-decoration: none;
+`;
+
+const LogoImg = styled.img`
+  width: 108px;
+  height: 38px;
 `;
 
 // const Nav = styled.div`
@@ -57,51 +62,20 @@ const LogoLink = styled(Link)`
 //   }
 // `;
 
-const HeaderAuth = styled.div`
-  display: flex;
-  align-items: center;
-
-  cursor: pointer;
-`;
-
-// temp, will be in profile settings
-const NetworkWrapper = styled.div`
-  margin-right: 15px;
-`;
-
-// const AvatarStyled = styled(Avatar)`
-//   width: 36px;
-//   height: 36px;
-//
-//   background: #c4c4c4;
-// `;
-
-// const Username = styled.div`
-//   margin-left: 16px;
-//
-//   font-weight: 500;
-//   font-size: 14px;
-//   line-height: 120%;
-// `;
-
 export const Header: FunctionComponent = () => {
   return (
     <Wrapper>
       <ContainerScrollFix>
-        <LogoLink to="/wallets">P2P Wallet</LogoLink>
+        <LogoLink to="/wallets">
+          <LogoImg src={Logo as string} />
+        </LogoLink>
         {/* <Nav> */}
         {/*  /!*<NavLink to="/wallets">Wallets</NavLink>*!/ */}
         {/*  /!* <NavLink to="/">Investments</NavLink> *!/ */}
         {/*  /!* <NavLink to="/">Explore</NavLink> *!/ */}
         {/*  /!* <NavLink to="/dashboard_old">Contacts</NavLink> *!/ */}
         {/* </Nav> */}
-        <HeaderAuth>
-          <NetworkWrapper>
-            <ClusterSelector />
-          </NetworkWrapper>
-          {/* <AvatarStyled /> */}
-          {/* <Username>Konstantin</Username> */}
-        </HeaderAuth>
+        <ClusterSelector />
       </ContainerScrollFix>
     </Wrapper>
   );

@@ -9,17 +9,19 @@ const Wrapper = styled.button`
   align-items: center;
   justify-content: center;
   height: 48px;
-  padding: 0 20px;
+  padding: 0 15px;
 
   color: #000;
-  font-size: 14px;
+  font-weight: 600;
+  font-size: 16px;
+  font-family: unset;
   line-height: 140%;
   white-space: nowrap;
   text-decoration: none;
 
   background: #fff;
   border: 0;
-  border-radius: 10px;
+  border-radius: 12px;
 
   outline: none;
   cursor: pointer;
@@ -36,6 +38,12 @@ const Wrapper = styled.button`
     color: #fff;
 
     background: #cecece;
+  }
+
+  &.light {
+    color: #5887ff;
+
+    background: #eff3ff;
   }
 
   &.gray {
@@ -55,13 +63,11 @@ const Wrapper = styled.button`
   }
 
   &.small {
-    height: 40px;
+    height: 36px;
   }
 
   &.big {
     height: 58px;
-
-    font-weight: 500;
   }
 
   &.full {
@@ -78,6 +84,7 @@ const Wrapper = styled.button`
 type Props = {
   primary?: boolean;
   secondary?: boolean;
+  light?: boolean;
   gray?: boolean;
   link?: boolean;
   small?: boolean;
@@ -89,6 +96,7 @@ export const Button: FunctionComponent<Props & React.ButtonHTMLAttributes<HTMLBu
   type = 'button',
   primary,
   secondary,
+  light,
   gray,
   link,
   small,
@@ -104,7 +112,16 @@ export const Button: FunctionComponent<Props & React.ButtonHTMLAttributes<HTMLBu
       type={type}
       {...props}
       style={style}
-      className={classNames(className, { primary, secondary, gray, link, small, full, big })}>
+      className={classNames(className, {
+        primary,
+        secondary,
+        light,
+        gray,
+        link,
+        small,
+        full,
+        big,
+      })}>
       {children}
     </Wrapper>
   );

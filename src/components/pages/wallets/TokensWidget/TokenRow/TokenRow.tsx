@@ -1,5 +1,4 @@
 import React, { FunctionComponent } from 'react';
-// import ReactHighcharts from 'react-highcharts';
 import { Link } from 'react-router-dom';
 
 import { styled } from '@linaria/react';
@@ -8,32 +7,14 @@ import { rgba } from 'polished';
 
 import { TokenAccount } from 'api/token/TokenAccount';
 import { AmountUSDT } from 'components/common/AmountUSDT';
-// import { calculateInterval, calculateStart } from 'utils/charts';
-import { Card } from 'components/common/Card';
-import { RateUSDT } from 'components/common/RateUSDT';
 import { TokenAvatar } from 'components/common/TokenAvatar';
-// import { serials } from './data';
-// import { getConfig } from './utils';
+import { shortAddress } from 'utils/tokens';
 
-const WrapperCard = styled(Card)`
-  padding: 0 !important;
+const Wrapper = styled.div`
+  &:not(:last-child) {
+    border-bottom: 1px solid ${rgba(0, 0, 0, 0.05)};
+  }
 `;
-
-const WrapperLink = styled(Link)`
-  display: flex;
-  padding: 20px;
-
-  text-decoration: none;
-
-  cursor: pointer;
-`;
-
-// const TokenAvatarStyled = styled(TokenAvatar)`
-//   width: 56px;
-//   height: 56px;
-//
-//   background: #c4c4c4;
-// `;
 
 const Content = styled.div`
   display: flex;
@@ -47,9 +28,10 @@ const Top = styled.div`
   display: flex;
   justify-content: space-between;
 
-  font-weight: 500;
+  color: #000;
+  font-weight: 600;
   font-size: 18px;
-  line-height: 140%;
+  line-height: 27px;
 `;
 
 const TokenName = styled.div`
@@ -60,26 +42,32 @@ const TokenName = styled.div`
   text-overflow: ellipsis;
 `;
 
-// const ChartWrapper = styled.div`
-//   width: 108px;
-// `;
-
-const Middle = styled.div`
+const WrapperLink = styled(Link)`
   display: flex;
-  justify-content: space-between;
-  margin: 12px 0 4px;
+  margin: 10px;
+  padding: 10px;
 
-  color: #000;
-  font-weight: 500;
-  font-size: 14px;
-  line-height: 140%;
+  text-decoration: none;
+
+  cursor: pointer;
+
+  &:hover {
+    background: #f6f6f8;
+    border-radius: 12px;
+
+    ${TokenName} {
+      color: #5887ff;
+    }
+  }
 `;
 
 const Bottom = styled.div`
   display: flex;
   justify-content: space-between;
+  margin-top: 5px;
 
-  color: ${rgba('#000', 0.5)};
+  color: #a3a5ba;
+  font-weight: 600;
   font-size: 14px;
   line-height: 140%;
 `;
@@ -89,44 +77,28 @@ type Props = {
 };
 
 export const TokenRow: FunctionComponent<Props> = ({ token }) => {
-  // const coin = 'BTC';
-  // const currency = 'BTC';
-  // const time = 'day';
-  //
-  // const data = serials.map((d) => [d.timestamp * 1000, d.price]);
-  // const decimals = 2;
-  // const start = calculateStart(coin, time);
-  // const interval = calculateInterval(time);
-  // const config = getConfig(coin, currency, data, decimals, interval, start);
-
   return (
-    <WrapperCard>
+    <Wrapper>
       <WrapperLink to={`/wallet/${token.address.toBase58()}`}>
-        <TokenAvatar symbol={token.mint.symbol} size={56} />
+        <TokenAvatar symbol={token.mint.symbol} size={48} />
         <Content>
           <Top>
             <TokenName title={token.mint.address.toBase58()}>
               {token.mint.symbol || token.mint.address.toBase58()}
             </TokenName>
-            {/* <ChartWrapper> */}
-            {/*  <ReactHighcharts config={config} isPureConfig /> */}
-            {/* </ChartWrapper> */}
-          </Top>
-          <Middle>
             <AmountUSDT
               value={new Decimal(token.mint.toMajorDenomination(token.balance))}
               symbol={token.mint.symbol}
             />
-            <RateUSDT symbol={token.mint.symbol} />
-          </Middle>
+          </Top>
           <Bottom>
+            <div>{shortAddress(token.address.toBase58())}</div>
             <div>
               {token.mint.toMajorDenomination(token.balance)} {token.mint.symbol}
             </div>
-            {/* <div>{delta}</div> */}
           </Bottom>
         </Content>
       </WrapperLink>
-    </WrapperCard>
+    </Wrapper>
   );
 };

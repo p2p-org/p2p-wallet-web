@@ -15,6 +15,7 @@
     "declaration-empty-line-before": null,
     "indentation": null,
     "max-empty-lines": null,
+    "value-keyword-case": null,
     "selector-pseudo-class-no-unknown": [true, {
       "ignorePseudoClasses": ["global"]
     }],

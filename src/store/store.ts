@@ -19,7 +19,7 @@ export const store = configureStore({
 });
 
 if (isDev && module.hot) {
-  module.hot.accept('./reducers', () => store.replaceReducer(rootReducer));
+  module.hot.accept('./rootReducer', () => store.replaceReducer(rootReducer));
 }
 
 export type AppDispatch = typeof store.dispatch;

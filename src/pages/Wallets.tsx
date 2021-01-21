@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useMemo } from 'react';
+import React, { FunctionComponent } from 'react';
 
 import { styled } from '@linaria/react';
 
@@ -19,53 +19,15 @@ const WrapperTemp = styled.div`
   height: fit-content;
 `;
 
-const HelloText = styled.div`
-  color: #000;
-  font-weight: 500;
-  font-size: 27px;
-  line-height: 120%;
-`;
-
-const BalanceGroup = styled.div`
-  display: grid;
-  grid-gap: 20px;
-`;
-
 export const Wallets: FunctionComponent = () => {
   // const publicKey = useSelector((state: RootState) => state.data.blockchain.account?.publicKey);
 
-  const greeting = useMemo(() => {
-    let dayTime = '';
-    const data = [
-      [22, 'night'],
-      [18, 'evening'],
-      [12, 'afternoon'],
-      [5, 'morning'],
-      [0, 'night'],
-    ] as [number, string][];
-
-    const hours = new Date().getHours();
-    for (const [hour, message] of data) {
-      if (hours >= hour) {
-        dayTime = message;
-        break;
-      }
-    }
-
-    return `Good ${dayTime}`;
-  }, [new Date().getHours()]);
-
   return (
     <Layout
-      // leftColumn={
-      centered={
+      rightColumn={
         <WrapperTemp>
-          {/* <HelloText>{greeting}, Konstantin!</HelloText> */}
-          <HelloText>{greeting}!</HelloText>
-          <BalanceGroup>
-            <TotalBalanceWidget />
-            {/* <ActionsWidget publicKey={publicKey} /> */}
-          </BalanceGroup>
+          <TotalBalanceWidget />
+          {/* <ActionsWidget publicKey={publicKey} /> */}
           <TokensWidget />
         </WrapperTemp>
       }

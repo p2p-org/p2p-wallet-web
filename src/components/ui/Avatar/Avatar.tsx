@@ -7,7 +7,7 @@ const Wrapper = styled.img<{ size: string | number | undefined }>`
   width: ${({ size }) => (size ? `${size}px` : 'auto')};
   height: ${({ size }) => (size ? `${size}px` : 'auto')};
 
-  border-radius: 50%;
+  border-radius: 12px;
 
   /* transparent pixel for not showing border if no src */
   &:not([src]) {

@@ -4,48 +4,50 @@ import { useSelector } from 'react-redux';
 // import ReactHighcharts from 'react-highcharts';
 import { styled } from '@linaria/react';
 import { Decimal } from 'decimal.js';
-import { rgba } from 'polished';
 
 import { TokenAccount } from 'api/token/TokenAccount';
-import { Card } from 'components/common/Card';
+import { Widget } from 'components/common/Widget';
 import { RootState } from 'store/rootReducer';
 // import { calculateInterval, calculateStart } from 'utils/charts';
 //
 // import { serials } from './data';
 // import { getConfig } from './utils';
 
-const WrapperCard = styled(Card)``;
+const WrapperWidget = styled(Widget)``;
 
-const Title = styled.div`
-  color: ${rgba('#000', 0.5)};
-  font-size: 14px;
-  line-height: 140%;
+const TotalWrapper = styled.div`
+  display: flex;
+  justify-content: space-between;
+  margin: 20px 20px 30px;
 `;
 
 const PriceWrapper = styled.div`
-  display: flex;
-  justify-content: space-between;
+  font-weight: 600;
+`;
+
+const TotalText = styled.div`
+  color: #000;
+  font-size: 16px;
+  line-height: 24px;
 `;
 
 const Price = styled.div`
   align-self: flex-end;
+  margin: 24px 0 4px;
 
   color: #000;
-  font-weight: 500;
-  font-size: 34px;
+  font-size: 32px;
   line-height: 120%;
+`;
+
+const AllTokensText = styled.div`
+  color: #a3a5ba;
+  font-size: 14px;
+  line-height: 140%;
 `;
 
 // const ChartWrapper = styled.div`
 //   width: 254px;
-// `;
-//
-// const Delta = styled.div`
-//   margin-top: 9px;
-//
-//   color: ${rgba('#000', 0.5)};
-//   font-size: 14px;
-//   line-height: 140%;
 // `;
 
 export const TotalBalanceWidget: FunctionComponent = () => {
@@ -78,6 +80,27 @@ export const TotalBalanceWidget: FunctionComponent = () => {
     [tokenAccounts, rates],
   );
 
+  const greeting = useMemo(() => {
+    let dayTime = '';
+    const data = [
+      [22, 'night'],
+      [18, 'evening'],
+      [12, 'afternoon'],
+      [5, 'morning'],
+      [0, 'night'],
+    ] as [number, string][];
+
+    const hours = new Date().getHours();
+    for (const [hour, message] of data) {
+      if (hours >= hour) {
+        dayTime = message;
+        break;
+      }
+    }
+
+    return `Good ${dayTime}!`;
+  }, [new Date().getHours()]);
+
   // const coin = 'BTC';
   // const currency = 'BTC';
   // const time = 'day';
@@ -89,19 +112,21 @@ export const TotalBalanceWidget: FunctionComponent = () => {
   // const config = getConfig(coin, currency, data, decimals, interval, start);
 
   return (
-    <WrapperCard withShadow>
-      <Title>Total balance</Title>
-      <PriceWrapper>
-        <Price>
-          {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(
-            totalBalance,
-          )}
-        </Price>
+    <WrapperWidget title={`${greeting} 👋`}>
+      <TotalWrapper>
+        <PriceWrapper>
+          <TotalText>Total balance</TotalText>
+          <Price>
+            {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(
+              totalBalance,
+            )}
+          </Price>
+          <AllTokensText>All tokens</AllTokensText>
+        </PriceWrapper>
         {/* <ChartWrapper> */}
         {/*  <ReactHighcharts config={config} isPureConfig /> */}
         {/* </ChartWrapper> */}
-      </PriceWrapper>
-      {/* <Delta>+ 0,16 US$ (0,01%) 24 hrs</Delta> */}
-    </WrapperCard>
+      </TotalWrapper>
+    </WrapperWidget>
   );
 };

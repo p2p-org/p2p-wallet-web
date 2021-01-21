@@ -3,16 +3,22 @@ import React from 'react';
 import isPropValid from '@emotion/is-prop-valid';
 import { CSSProperties } from '@linaria/core';
 
-import arrowAngle from './assets/arrow-angle-icon.svg';
 import arrowTriangle from './assets/arrow-triangle-icon.svg';
+import bottom from './assets/bottom-icon.svg';
 import change from './assets/change-icon.svg';
+import checkmark from './assets/checkmark-icon.svg';
 import chevron1 from './assets/chevron-1-icon.svg';
 import chevron from './assets/chevron-icon.svg';
 import close from './assets/close-icon.svg';
 import copy from './assets/copy-icon.svg';
-import eye from './assets/eye-icon.svg';
+import gear from './assets/gear-icon.svg';
+import home from './assets/home-icon.svg';
+import plug from './assets/plug-icon.svg';
+import plus from './assets/plus-icon.svg';
 import search from './assets/search-icon.svg';
 import success from './assets/success-icon.svg';
+import swap from './assets/swap-icon.svg';
+import top from './assets/top-icon.svg';
 import wallet from './assets/wallet-icon.svg';
 import warning from './assets/warning-icon.svg';
 
@@ -22,16 +28,22 @@ export type SvgIconType = {
 };
 
 const iconsMap = new Map<string, SvgIconType>([
-  ['arrow-angle', arrowAngle],
   ['arrow-triangle', arrowTriangle],
+  ['bottom', bottom],
   ['change', change],
+  ['checkmark', checkmark],
   ['chevron-1', chevron1],
   ['chevron', chevron],
   ['close', close],
   ['copy', copy],
-  ['eye', eye],
+  ['gear', gear],
   ['search', search],
   ['success', success],
+  ['swap', swap],
+  ['home', home],
+  ['plug', plug],
+  ['plus', plus],
+  ['top', top],
   ['wallet', wallet],
   ['warning', warning],
 ]);

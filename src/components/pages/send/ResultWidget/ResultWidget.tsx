@@ -45,7 +45,7 @@ const CircleWrapper = styled.div`
   border-radius: 50%;
 `;
 
-const ArrowIcon = styled(Icon)`
+const BottomIcon = styled(Icon)`
   width: 17px;
   height: 17px;
 
@@ -121,7 +121,7 @@ export const ResultWidget: FunctionComponent = () => {
     <WrapperCard>
       <HeaderImage />
       <CircleWrapper>
-        <ArrowIcon name="arrow-angle" />
+        <BottomIcon name="bottom" />
       </CircleWrapper>
       <InfoWrapper>
         {transaction ? (
