@@ -35,7 +35,7 @@ const ColumnsWrapper = styled.div`
 
 const ColumnLeft = styled.div`
   display: grid;
-  grid-gap: 32px;
+  grid-gap: 16px;
   grid-template-rows: min-content;
 
   width: 252px;
@@ -44,7 +44,7 @@ const ColumnLeft = styled.div`
 
 const ColumnRight = styled.div`
   display: grid;
-  grid-gap: 40px;
+  grid-gap: 24px;
   grid-template-rows: min-content;
 
   width: 524px;
