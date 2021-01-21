@@ -5,7 +5,6 @@ import { Cluster } from '@solana/web3.js';
 import classNames from 'classnames';
 
 import { Icon } from 'components/ui';
-import { Theme, withTheme } from 'styles/theme';
 
 const CheckmarkIcon = styled(Icon)`
   width: 20px;
