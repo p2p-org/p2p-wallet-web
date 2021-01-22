@@ -72,7 +72,7 @@ export const TransactionList: FunctionComponent<Props> = ({ order }) => {
     let group: Transaction[] = [];
     let lastDate: string | null = null;
 
-    order.forEach((signature) => {
+    order.forEach((signature, index) => {
       const transaction = transactions[signature]
         ? Transaction.from(transactions[signature])
         : undefined;
@@ -91,6 +91,12 @@ export const TransactionList: FunctionComponent<Props> = ({ order }) => {
           items: group,
         });
         group = [];
+      } else if (order.length === index + 1) {
+        group.push(transaction);
+        txs.push({
+          date: currentDate,
+          items: group,
+        });
       } else {
         group.push(transaction);
       }
