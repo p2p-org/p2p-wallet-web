@@ -6,7 +6,9 @@ import { TokenAccount } from 'api/token/TokenAccount';
 
 import { TokenRow } from '../TokenRow';
 
-const Wrapper = styled.div``;
+const Wrapper = styled.div`
+  margin: 0 10px;
+`;
 
 type Props = {
   items: TokenAccount[];
