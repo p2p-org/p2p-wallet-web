@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { styled } from '@linaria/react';
 import web3 from '@solana/web3.js';
 import dayjs from 'dayjs';
-import rgba from 'polished/lib/color/rgba';
+import { rgba } from 'polished';
 
 import { TokenAccount } from 'api/token/TokenAccount';
 import { Card } from 'components/common/Card';

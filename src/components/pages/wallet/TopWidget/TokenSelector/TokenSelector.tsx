@@ -5,6 +5,7 @@ import { styled } from '@linaria/react';
 import { rgba } from 'polished';
 
 import { TokenAccount } from 'api/token/TokenAccount';
+import { TokenAvatar } from 'components/common/TokenAvatar';
 import { Icon } from 'components/ui';
 import { RootState } from 'store/rootReducer';
 import { shortAddress } from 'utils/tokens';
@@ -22,11 +23,12 @@ const Selector = styled.div`
 
 const Value = styled.div`
   max-width: 230px;
+  margin-left: 16px;
   overflow: hidden;
 
   color: #000;
-  font-weight: 500;
-  font-size: 22px;
+  font-weight: 600;
+  font-size: 20px;
   line-height: 120%;
   white-space: nowrap;
 
@@ -112,6 +114,7 @@ export const TokenSelector: FunctionComponent<Props> = ({ value, onChange }) => 
   return (
     <Wrapper ref={selectorRef}>
       <Selector onClick={handleSelectorClick}>
+        <TokenAvatar symbol={tokenAccount?.mint.symbol} size="36" />
         <Value title={value}>{tokenAccount?.mint.name || shortAddress(value)}</Value>
         {tokenAccounts ? (
           <ChevronWrapper>
