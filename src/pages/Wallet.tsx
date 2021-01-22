@@ -5,8 +5,7 @@ import * as web3 from '@solana/web3.js';
 
 import { Layout } from 'components/common/Layout';
 import { QRAddressWidget } from 'components/common/QRAddressWidget';
-import { ActionsWidget, ActivityWidget } from 'components/pages/wallet';
-import { PriceWidget } from 'components/pages/wallet/PriceWidget';
+import { ActivityWidget, TopWidget } from 'components/pages/wallet';
 
 export const Wallet: FunctionComponent = () => {
   const { publicKey } = useParams<{ publicKey: string }>();
@@ -18,8 +17,7 @@ export const Wallet: FunctionComponent = () => {
     <Layout
       rightColumn={
         <>
-          <ActionsWidget publicKey={tokenPublicKey} />
-          <PriceWidget publicKey={tokenPublicKey} />
+          <TopWidget publicKey={tokenPublicKey} />
           <QRAddressWidget publicKey={tokenPublicKey} />
           <ActivityWidget publicKey={tokenPublicKey} />
         </>

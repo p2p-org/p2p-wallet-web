@@ -7,10 +7,10 @@ const Wrapper = styled.div`
   padding: 20px;
 
   background: #fff;
-  border-radius: 10px;
+  border-radius: 12px;
 
   &.withShadow {
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 4px 4px #f6f6f9;
   }
 `;
 

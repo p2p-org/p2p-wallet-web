@@ -1,3 +1,2 @@
-export * from './ActionsWidget';
+export * from './TopWidget';
 export * from './ActivityWidget';
-export * from '../../common/QRAddressWidget';

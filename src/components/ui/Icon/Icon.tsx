@@ -15,6 +15,7 @@ import gear from './assets/gear-icon.svg';
 import home from './assets/home-icon.svg';
 import plug from './assets/plug-icon.svg';
 import plus from './assets/plus-icon.svg';
+import qr from './assets/qr-icon.svg';
 import search from './assets/search-icon.svg';
 import success from './assets/success-icon.svg';
 import swap from './assets/swap-icon.svg';
@@ -43,6 +44,7 @@ const iconsMap = new Map<string, SvgIconType>([
   ['home', home],
   ['plug', plug],
   ['plus', plus],
+  ['qr', qr],
   ['top', top],
   ['wallet', wallet],
   ['warning', warning],
