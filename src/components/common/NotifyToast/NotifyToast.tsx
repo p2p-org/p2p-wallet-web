@@ -49,8 +49,8 @@ const CloseButton = styled.button`
 `;
 
 const CloseIcon = styled(Icon)`
-  width: 28px;
-  height: 28px;
+  width: 20px;
+  height: 20px;
 `;
 
 export const NotifyToast: FunctionComponent<RendererParams> = ({ type, text, onClose }) => {
