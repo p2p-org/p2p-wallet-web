@@ -298,7 +298,7 @@ export const TransactionDetailsModal: FunctionComponent<Props> = ({ signature, c
             <FieldWrapper>
               <FieldTitle>To</FieldTitle>
               <FieldValue>
-                <TokenAvatar symbol={undefined} size={40} />
+                <TokenAvatar symbol={undefined} size={48} />
                 <AddressWrapper>
                   <AddressTitle>
                     {transaction.short.destinationTokenAccount.mint.symbol}
