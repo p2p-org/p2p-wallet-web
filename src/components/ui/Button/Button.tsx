@@ -37,7 +37,7 @@ const Wrapper = styled.button`
   &.secondary {
     color: #fff;
 
-    background: #cecece;
+    background: #a3a5ba;
   }
 
   &.light {

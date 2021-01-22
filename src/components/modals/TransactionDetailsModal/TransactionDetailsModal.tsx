@@ -1,5 +1,6 @@
 import React, { FunctionComponent, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { Link } from 'react-router-dom';
 
 import { styled } from '@linaria/react';
 import { unwrapResult } from '@reduxjs/toolkit';
@@ -10,8 +11,7 @@ import { rgba } from 'polished';
 import { Transaction } from 'api/transaction/Transaction';
 import { ToastManager } from 'components/common/ToastManager';
 import { TokenAvatar } from 'components/common/TokenAvatar';
-import { Icon } from 'components/ui';
-import { RootState } from 'store/rootReducer';
+import { Button, Icon } from 'components/ui';
 import { getTransaction } from 'store/slices/transaction/TransactionSlice';
 
 const Wrapper = styled.div`
@@ -22,7 +22,8 @@ const Wrapper = styled.div`
   flex-direction: column;
   overflow: hidden;
 
-  background: #fff;
+  background: #f6f6f8;
+
   border-radius: 15px;
 `;
 
@@ -31,7 +32,16 @@ const Header = styled.div`
 
   padding: 26px 20px 50px;
 
-  background: #f6f6f8;
+  text-align: center;
+`;
+
+const Title = styled.div`
+  margin-bottom: 10px;
+
+  color: #000;
+  font-weight: bold;
+  font-size: 20px;
+  line-height: 100%;
 `;
 
 const Date = styled.div`
@@ -39,7 +49,6 @@ const Date = styled.div`
   font-weight: 600;
   font-size: 16px;
   line-height: 100%;
-  text-align: center;
 `;
 
 const CloseWrapper = styled.div`
@@ -87,7 +96,10 @@ const BlockIcon = styled(Icon)`
   color: #fff;
 `;
 
-const Content = styled.div``;
+const Content = styled.div`
+  background: #fff;
+  border-radius: 0 0 15px 15px;
+`;
 
 const StatusWrapper = styled.div`
   display: flex;
@@ -124,10 +136,12 @@ const FieldsWrapper = styled.div``;
 const FieldWrapper = styled.div`
   padding: 16px 30px;
 
-  border-bottom: 1px solid ${rgba('#000', 0.05)};
-
   &:first-child {
     border-top: 1px solid ${rgba('#000', 0.05)};
+  }
+
+  &:not(:last-child) {
+    border-bottom: 1px solid ${rgba('#000', 0.05)};
   }
 `;
 
@@ -152,22 +166,23 @@ const AddressWrapper = styled.div`
   display: flex;
   flex: 1;
   flex-direction: column;
-  margin: 0 9px 0 10px;
+  margin: 0 9px 0 12px;
 `;
 
 const AddressTitle = styled.div`
-  margin-bottom: 6px;
-
   color: #000;
-  font-weight: 500;
-  font-size: 14px;
-  line-height: 100%;
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 24px;
 `;
 
 const AddressValue = styled.div`
-  color: ${rgba('#000', 0.5)};
-  font-size: 12px;
-  line-height: 120%;
+  margin-bottom: 5px;
+
+  color: #a3a5ba;
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 16px;
 `;
 
 const CopyWrapper = styled.div`
@@ -179,9 +194,20 @@ const CopyIcon = styled(Icon)`
   height: 24px;
 `;
 
-// const ButtonExplorer = styled(Button)`
-//   color: ${rgba('#000', 0.5)};
-// `;
+const Footer = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 85px;
+
+  background: #f6f6f8;
+`;
+
+const ButtonExplorer = styled(Button)`
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 150%;
+`;
 
 type Props = {
   signature: web3.TransactionSignature;
@@ -200,9 +226,10 @@ const handleCopyClick = (publicKey: string) => () => {
 export const TransactionDetailsModal: FunctionComponent<Props> = ({ signature, close }) => {
   const dispatch = useDispatch();
   const transaction = useSelector(
-    (state: RootState) =>
+    (state) =>
       state.transaction.items[signature] && Transaction.from(state.transaction.items[signature]),
   );
+  const cluster = useSelector((state) => state.wallet.cluster);
 
   useEffect(() => {
     const mount = async () => {
@@ -229,6 +256,7 @@ export const TransactionDetailsModal: FunctionComponent<Props> = ({ signature, c
   return (
     <Wrapper>
       <Header>
+        <Title>{transaction.short.type}</Title>
         <Date title={`${transaction.slot} SLOT`}>{date}</Date>
         <CloseWrapper onClick={close}>
           <CloseIcon name="close" />
@@ -250,7 +278,7 @@ export const TransactionDetailsModal: FunctionComponent<Props> = ({ signature, c
             <FieldWrapper>
               <FieldTitle>From</FieldTitle>
               <FieldValue>
-                <TokenAvatar symbol={undefined} size={40} />
+                <TokenAvatar symbol={undefined} size={48} />
                 <AddressWrapper>
                   <AddressTitle>{transaction.short.sourceTokenAccount.mint.symbol}</AddressTitle>
                   <AddressValue>
@@ -315,13 +343,16 @@ export const TransactionDetailsModal: FunctionComponent<Props> = ({ signature, c
             <FieldValue>{signature}</FieldValue>
           </FieldWrapper>
         </FieldsWrapper>
-        {/* <ButtonExplorer */}
-        {/*  gray */}
-        {/*  as="a" */}
-        {/*  href={`https://explorer.solana.com/tx/${signature}?cluster=${cluster}`}> */}
-        {/*  View in blockchain explorer */}
-        {/* </ButtonExplorer> */}
       </Content>
+      <Footer>
+        <a
+          href={`https://explorer.solana.com/tx/${signature}?cluster=${cluster}`}
+          target="_blank"
+          rel="noopener noreferrer noindex"
+          className="button">
+          <ButtonExplorer secondary>View in blockchain explorer</ButtonExplorer>
+        </a>
+      </Footer>
     </Wrapper>
   );
 };
