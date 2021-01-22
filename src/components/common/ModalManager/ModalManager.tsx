@@ -45,6 +45,7 @@ const ModalWrapper = styled.div`
   align-items: center;
   justify-content: center;
   min-height: 100%;
+  padding: 10px 0;
 `;
 
 const ModalBackground = styled.div`

@@ -18,42 +18,53 @@ const Wrapper = styled.div`
   position: relative;
 
   display: flex;
-  flex-basis: 588px;
+  flex-basis: 524px;
   flex-direction: column;
+  overflow: hidden;
 
-  background-color: #fff;
+  background: #fff;
   border-radius: 15px;
 `;
 
 const Header = styled.div`
   position: relative;
 
-  padding: 20px 20px 48px;
+  padding: 26px 20px 50px;
 
-  border-bottom: 1px solid ${rgba('#000', 0.05)};
+  background: #f6f6f8;
 `;
 
-const Title = styled.div`
-  color: #000;
-  font-size: 14px;
-  line-height: 17px;
+const Date = styled.div`
+  color: #a3a5ba;
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 100%;
   text-align: center;
 `;
 
-const CloseWrapper = styled.div``;
-
-const CloseIcon = styled(Icon)`
+const CloseWrapper = styled.div`
   position: absolute;
   top: 15px;
   right: 15px;
 
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 32px;
   height: 32px;
+
+  background: #fff;
+  border-radius: 8px;
 
   cursor: pointer;
 `;
 
-const CircleWrapper = styled.div`
+const CloseIcon = styled(Icon)`
+  width: 16px;
+  height: 16px;
+`;
+
+const BlockWrapper = styled.div`
   position: absolute;
   bottom: -28px;
   left: 50%;
@@ -61,54 +72,57 @@ const CircleWrapper = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 56px;
-  height: 56px;
-  margin-left: -28px;
+  width: 55px;
+  height: 55px;
+  margin-left: -27px;
 
-  background: #e1e1e1;
-  border-radius: 50%;
+  background: #5887ff;
+  border-radius: 12px;
 `;
 
-const BottomIcon = styled(Icon)`
-  width: 17px;
-  height: 17px;
+const BlockIcon = styled(Icon)`
+  width: 25px;
+  height: 25px;
+
+  color: #fff;
 `;
 
-const Content = styled.div`
-  padding: 0 30px 24px;
-`;
+const Content = styled.div``;
 
 const StatusWrapper = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin: 52px 0 32px;
+  margin: 40px 0 20px;
 `;
 
 const Value = styled.div`
   color: #000;
-  font-weight: 500;
+  font-weight: 600;
   font-size: 28px;
-  line-height: 33px;
+  line-height: 120%;
 `;
 
 const Status = styled.div`
-  margin-top: 12px;
-  padding: 5px 16px;
+  display: flex;
+  align-items: center;
+  height: 32px;
+  margin-top: 20px;
+  padding: 6px 12px;
 
-  color: ${rgba('#000', 0.5)};
-  font-weight: bold;
-  font-size: 12px;
-  line-height: 14px;
+  color: #17971d;
+  font-weight: 600;
+  font-size: 13px;
+  line-height: 20px;
 
-  background: #f4f4f4;
-  border-radius: 8px;
+  background: rgba(45, 181, 51, 0.3);
+  border-radius: 10px;
 `;
 
 const FieldsWrapper = styled.div``;
 
 const FieldWrapper = styled.div`
-  padding: 20px 0;
+  padding: 16px 30px;
 
   border-bottom: 1px solid ${rgba('#000', 0.05)};
 
@@ -118,20 +132,20 @@ const FieldWrapper = styled.div`
 `;
 
 const FieldTitle = styled.div`
-  color: ${rgba('#000', 0.5)};
-  font-weight: 500;
-  font-size: 12px;
-  line-height: 14px;
+  color: #a3a5ba;
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 21px;
 `;
 
 const FieldValue = styled.div`
   display: flex;
   align-items: center;
-  margin-top: 8px;
+  margin-top: 3px;
 
-  color: #000;
+  font-weight: 600;
   font-size: 14px;
-  line-height: 17px;
+  line-height: 21px;
 `;
 
 const AddressWrapper = styled.div`
@@ -208,20 +222,20 @@ export const TransactionDetailsModal: FunctionComponent<Props> = ({ signature, c
     return null;
   }
 
+  const date = transaction.timestamp
+    ? dayjs.unix(transaction.timestamp).format('LLL')
+    : `${transaction.slot} SLOT`;
+
   return (
     <Wrapper>
       <Header>
-        <Title title={`${transaction.slot} SLOT`}>
-          {transaction.timestamp
-            ? dayjs.unix(transaction.timestamp).format('LLL')
-            : `${transaction.slot} SLOT`}
-        </Title>
+        <Date title={`${transaction.slot} SLOT`}>{date}</Date>
         <CloseWrapper onClick={close}>
           <CloseIcon name="close" />
         </CloseWrapper>
-        <CircleWrapper>
-          <BottomIcon name="bottom" />
-        </CircleWrapper>
+        <BlockWrapper>
+          <BlockIcon name="bottom" />
+        </BlockWrapper>
       </Header>
       <Content>
         <StatusWrapper>
@@ -232,27 +246,6 @@ export const TransactionDetailsModal: FunctionComponent<Props> = ({ signature, c
           <Status>Completed</Status>
         </StatusWrapper>
         <FieldsWrapper>
-          <FieldWrapper>
-            <FieldTitle>Transaction ID</FieldTitle>
-            <FieldValue>{signature}</FieldValue>
-          </FieldWrapper>
-          <FieldWrapper>
-            <FieldTitle>Amount</FieldTitle>
-            <FieldValue>{transaction.short.amount.toNumber()}</FieldValue>
-            {/* <FieldValue>0,00344 BTC at 12 902, 07 US$</FieldValue> */}
-          </FieldWrapper>
-          <FieldWrapper>
-            <FieldTitle>Value</FieldTitle>
-            <FieldValue>{transaction.short.amount.toNumber()}</FieldValue>
-            {/* <FieldValue>0,00344 BTC at 12 902, 07 US$</FieldValue> */}
-          </FieldWrapper>
-          {transaction.meta ? (
-            <FieldWrapper>
-              <FieldTitle>Fee</FieldTitle>
-              <FieldValue>{transaction.meta.fee} lamports</FieldValue>
-              {/* <FieldValue>0,00009492 BTC</FieldValue> */}
-            </FieldWrapper>
-          ) : null}
           {transaction.short.sourceTokenAccount ? (
             <FieldWrapper>
               <FieldTitle>From</FieldTitle>
@@ -295,6 +288,32 @@ export const TransactionDetailsModal: FunctionComponent<Props> = ({ signature, c
               </FieldValue>
             </FieldWrapper>
           ) : undefined}
+          <FieldWrapper>
+            <FieldTitle>Date</FieldTitle>
+            <FieldValue>{date}</FieldValue>
+          </FieldWrapper>
+          <FieldWrapper>
+            <FieldTitle>Amount</FieldTitle>
+            <FieldValue>{transaction.short.amount.toNumber()}</FieldValue>
+          </FieldWrapper>
+          <FieldWrapper>
+            <FieldTitle>Value</FieldTitle>
+            <FieldValue>{transaction.short.amount.toNumber()}</FieldValue>
+          </FieldWrapper>
+          {transaction.meta ? (
+            <FieldWrapper>
+              <FieldTitle>Fee</FieldTitle>
+              <FieldValue>{transaction.meta.fee} lamports</FieldValue>
+            </FieldWrapper>
+          ) : null}
+          <FieldWrapper>
+            <FieldTitle>Block number</FieldTitle>
+            <FieldValue>#{transaction.slot}</FieldValue>
+          </FieldWrapper>
+          <FieldWrapper>
+            <FieldTitle>Transaction ID</FieldTitle>
+            <FieldValue>{signature}</FieldValue>
+          </FieldWrapper>
         </FieldsWrapper>
         {/* <ButtonExplorer */}
         {/*  gray */}
