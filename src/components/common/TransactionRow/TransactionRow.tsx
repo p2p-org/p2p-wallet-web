@@ -1,8 +1,7 @@
 import React, { FunctionComponent } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 
 import { styled } from '@linaria/react';
-import { TransactionSignature } from '@solana/web3.js';
 import dayjs from 'dayjs';
 import { rgba } from 'polished';
 
@@ -10,7 +9,6 @@ import { Transaction } from 'api/transaction/Transaction';
 import { Avatar } from 'components/ui';
 import { openModal } from 'store/_actions/modals';
 import { SHOW_MODAL_TRANSACTION_DETAILS } from 'store/constants/modalTypes';
-import { RootState } from 'store/rootReducer';
 
 import { AmountUSDT } from '../AmountUSDT';
 
@@ -90,18 +88,14 @@ const Bottom = styled.div`
 `;
 
 type Props = {
-  signature: TransactionSignature;
+  transaction: Transaction;
 };
 
-export const TransactionRow: FunctionComponent<Props> = ({ signature }) => {
+export const TransactionRow: FunctionComponent<Props> = ({ transaction }) => {
   const dispatch = useDispatch();
-  const transaction = useSelector(
-    (state: RootState) =>
-      state.transaction.items[signature] && Transaction.from(state.transaction.items[signature]),
-  );
 
   const handleClick = () => {
-    dispatch(openModal(SHOW_MODAL_TRANSACTION_DETAILS, { signature }));
+    dispatch(openModal(SHOW_MODAL_TRANSACTION_DETAILS, { signature: transaction.signature }));
   };
 
   return (
