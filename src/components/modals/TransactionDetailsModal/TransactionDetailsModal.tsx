@@ -71,6 +71,8 @@ const CloseWrapper = styled.div`
 const CloseIcon = styled(Icon)`
   width: 16px;
   height: 16px;
+
+  color: #a3a5ba;
 `;
 
 const BlockWrapper = styled.div`
