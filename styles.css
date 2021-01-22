@@ -680,7 +680,7 @@ html,body,#root{height:100%;}body{font-family:'Titillium Web',-apple-system,Blin
 .t1xsfu32{-webkit-flex-shrink:0;-ms-flex-negative:0;flex-shrink:0;width:24px;height:24px;}
 .thfo02f{display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;-webkit-box-flex:1;-webkit-flex-grow:1;-ms-flex-positive:1;flex-grow:1;-webkit-align-items:center;-webkit-box-align:center;-ms-flex-align:center;align-items:center;padding:0 10px 0 16px;font-size:15px;}
 .cnjglp9{-webkit-flex-shrink:0;-ms-flex-negative:0;flex-shrink:0;width:44px;height:44px;margin:-10px -12px -10px 0;color:#a5a7bd;background-color:transparent;border:0;outline:none;cursor:pointer;-webkit-transition:color 0.15s;transition:color 0.15s;-webkit-appearance:none;-moz-appearance:none;appearance:none;}.cnjglp9:hover{color:#000;}
-.c19lpd0f{width:28px;height:28px;}
+.c19lpd0f{width:20px;height:20px;}
 
 .cwl9jgr{width:20px;height:20px;color:transparent;}
 .wm08154{display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;-webkit-align-items:center;-webkit-box-align:center;-ms-flex-align:center;align-items:center;-webkit-box-pack:justify;-webkit-justify-content:space-between;-ms-flex-pack:justify;justify-content:space-between;height:36px;padding:8px;color:#000;font-weight:600;font-size:14px;line-height:140%;border-radius:8px;cursor:pointer;}.wm08154:hover{color:#5887ff;background:#f6f6f8;}.wm08154:hover .cwl9jgr{color:#a3a5ba;}.wm08154.isSelected .cwl9jgr{color:#5887ff;}
