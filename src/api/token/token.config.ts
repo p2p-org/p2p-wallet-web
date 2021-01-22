@@ -4,6 +4,7 @@ export type TokenConfig = {
   tokenSymbol: string;
   icon?: string;
   deprecated?: boolean;
+  noRate?: boolean;
 };
 
 type TokensByEntrypointType = {
@@ -82,6 +83,7 @@ export default {
       tokenName: 'Wrapped USDT',
       icon:
         'https://raw.githubusercontent.com/trustwallet/assets/f3ffd0b9ae2165336279ce2f8db1981a55ce30f8/blockchains/ethereum/assets/0xdAC17F958D2ee523a2206206994597C13D831ec7/logo.png',
+      noRate: true,
     },
     {
       tokenSymbol: 'USDC',
@@ -89,6 +91,7 @@ export default {
       tokenName: 'USD Coin',
       icon:
         'https://raw.githubusercontent.com/trustwallet/assets/f3ffd0b9ae2165336279ce2f8db1981a55ce30f8/blockchains/ethereum/assets/0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48/logo.png',
+      noRate: true,
     },
     {
       tokenSymbol: 'WUSDC',
@@ -97,6 +100,7 @@ export default {
       icon:
         'https://raw.githubusercontent.com/trustwallet/assets/f3ffd0b9ae2165336279ce2f8db1981a55ce30f8/blockchains/ethereum/assets/0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48/logo.png',
       deprecated: true,
+      noRate: true,
     },
     {
       tokenSymbol: 'SUSHI',
