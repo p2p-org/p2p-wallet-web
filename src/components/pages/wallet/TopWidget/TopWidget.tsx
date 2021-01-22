@@ -25,6 +25,8 @@ const Buttons = styled.div`
 const ButtonStyled = styled(Button)`
   width: 36px;
   padding: 0;
+
+  box-shadow: 0 4px 12px rgba(88, 135, 255, 0.25);
 `;
 
 const PlusIcon = styled(Icon)`
