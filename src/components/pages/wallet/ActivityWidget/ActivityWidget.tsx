@@ -17,6 +17,16 @@ import { getTransactions } from 'store/slices/transaction/TransactionSlice';
 
 const WrapperWidget = styled(Widget)``;
 
+const EmptyWrapper = styled.div`
+  margin: 20px 0;
+
+  color: #a3a5ba;
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 20px;
+  text-align: center;
+`;
+
 type Props = {
   publicKey: web3.PublicKey;
 };
@@ -58,11 +68,16 @@ export const ActivityWidget: FunctionComponent<Props> = ({ publicKey }) => {
     void fetchData(true);
   };
 
+  const renderEmpty = () => {
+    return <EmptyWrapper>History is empty</EmptyWrapper>;
+  };
+
   return (
     <WrapperWidget title="Activity">
       <InfinityScrollHelper disabled={isLoading || isEnd} onNeedLoadMore={handleNeedLoadMore}>
         <TransactionList order={order} />
         {isLoading ? <LoaderBlock /> : undefined}
+        {!isLoading && !order?.length ? renderEmpty() : undefined}
       </InfinityScrollHelper>
     </WrapperWidget>
   );
