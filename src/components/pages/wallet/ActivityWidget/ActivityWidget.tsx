@@ -8,6 +8,7 @@ import { ConfirmedSignaturesForAddress2Options } from '@solana/web3.js';
 import { last } from 'ramda';
 
 import { InfinityScrollHelper } from 'components/common/InfinityScrollHelper';
+import { LoaderBlock } from 'components/common/LoaderBlock';
 import { ToastManager } from 'components/common/ToastManager';
 import { TransactionList } from 'components/common/TransactionList';
 import { Widget } from 'components/common/Widget';
@@ -61,6 +62,7 @@ export const ActivityWidget: FunctionComponent<Props> = ({ publicKey }) => {
     <WrapperWidget title="Activity">
       <InfinityScrollHelper disabled={isLoading || isEnd} onNeedLoadMore={handleNeedLoadMore}>
         <TransactionList order={order} />
+        {isLoading ? <LoaderBlock /> : undefined}
       </InfinityScrollHelper>
     </WrapperWidget>
   );
