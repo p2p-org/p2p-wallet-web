@@ -8,7 +8,7 @@ const Wrapper = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 33px 0;
+  height: 86px;
 `;
 
 export const LoaderBlock: FunctionComponent = () => {

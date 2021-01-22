@@ -18,13 +18,15 @@ import { getTransactions } from 'store/slices/transaction/TransactionSlice';
 const WrapperWidget = styled(Widget)``;
 
 const EmptyWrapper = styled.div`
-  margin: 20px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 86px;
 
   color: #a3a5ba;
   font-weight: 600;
   font-size: 14px;
   line-height: 20px;
-  text-align: center;
 `;
 
 type Props = {
