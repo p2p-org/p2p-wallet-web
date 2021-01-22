@@ -111,7 +111,7 @@ export const TokenRow: FunctionComponent<Props> = ({ token }) => {
             />
           </Top>
           <Bottom>
-            <div>{shortAddress(token.address.toBase58())}</div>
+            <div title={token.address.toBase58()}>{shortAddress(token.address.toBase58())}</div>
             <div>
               {token.mint.toMajorDenomination(token.balance)} {token.mint.symbol}
             </div>

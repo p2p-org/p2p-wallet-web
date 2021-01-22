@@ -17,6 +17,10 @@ const Header = styled.div`
   justify-content: space-between;
   height: 70px;
   padding: 0 20px;
+
+  &:not(:last-child) {
+    border-bottom: 1px solid ${rgba(0, 0, 0, 0.05)};
+  }
 `;
 
 const Title = styled.div`
@@ -28,9 +32,7 @@ const Title = styled.div`
 
 const Action = styled.div``;
 
-const Content = styled.div`
-  border-top: 1px solid ${rgba(0, 0, 0, 0.05)};
-`;
+const Content = styled.div``;
 
 type Props = {
   title?: React.ReactNode;
