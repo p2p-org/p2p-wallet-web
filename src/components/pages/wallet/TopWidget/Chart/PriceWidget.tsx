@@ -10,7 +10,7 @@ import { rgba } from 'polished';
 import { TokenAccount } from 'api/token/TokenAccount';
 import { Card } from 'components/common/Card';
 import { RootState } from 'store/rootReducer';
-import { getCandleRates } from 'store/slices/rate/RateSlice';
+import { getRatesCandle } from 'store/slices/rate/RateSlice';
 
 // import { calculateInterval, calculateStart } from 'utils/charts';
 import { getConfig } from './utils';
@@ -65,7 +65,7 @@ export const PriceWidget: FunctionComponent<Props> = ({ publicKey }) => {
       }
 
       setIsLoading(true);
-      await dispatch(getCandleRates(tokenAccount.mint.symbol));
+      await dispatch(getRatesCandle(tokenAccount.mint.symbol));
       setIsLoading(false);
     };
 

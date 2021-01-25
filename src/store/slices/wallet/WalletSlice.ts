@@ -13,7 +13,7 @@ import { SYSTEM_PROGRAM_ID } from 'constants/solana/bufferLayouts';
 import { RootState } from 'store/rootReducer';
 import { getAvailableTokens } from 'store/slices/GlobalSlice';
 import { getPools } from 'store/slices/pool/PoolSlice';
-import { getCandleRates, getMarketsRates } from 'store/slices/rate/RateSlice';
+import { getRatesCandle, getRatesMarkets } from 'store/slices/rate/RateSlice';
 import { updateEntityArray } from 'store/slices/tokenPair/utils/tokenPair';
 
 const CLUSTER_STORAGE_KEY = 'cluster';
@@ -113,8 +113,8 @@ export const connect = createAsyncThunk<string, WalletDataType | undefined>(
     await thunkAPI.dispatch(getAvailableTokens());
     void thunkAPI.dispatch(getTokenAccounts());
     void thunkAPI.dispatch(getPools());
-    void thunkAPI.dispatch(getMarketsRates());
-    void thunkAPI.dispatch(getCandleRates('SOL'));
+    void thunkAPI.dispatch(getRatesMarkets());
+    void thunkAPI.dispatch(getRatesCandle('SOL'));
 
     if (swapHostFeeAddress) {
       void thunkAPI.dispatch(precacheTokenAccounts(swapHostFeeAddress));

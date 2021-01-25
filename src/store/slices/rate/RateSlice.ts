@@ -9,25 +9,25 @@ import { RootState } from 'store/rootReducer';
 
 const RATES_SLICE_NAME = 'rates';
 
-export const getMarketsRates = createAsyncThunk<SerializableMarketRate[]>(
-  `${RATES_SLICE_NAME}/getMarketsRates`,
+export const getRatesMarkets = createAsyncThunk<SerializableMarketRate[]>(
+  `${RATES_SLICE_NAME}/getRatesMarkets`,
   async (_, thunkAPI) => {
     const state: RootState = thunkAPI.getState() as RootState;
 
     const RateAPI = APIFactory(state.wallet.cluster);
-    const rates = await RateAPI.getMarketsRates();
+    const rates = await RateAPI.getRatesMarkets();
 
     return rates.map((rate) => rate.serialize());
   },
 );
 
-export const getCandleRates = createAsyncThunk<SerializableCandleRate[], string>(
-  `${RATES_SLICE_NAME}/getCandleRates`,
+export const getRatesCandle = createAsyncThunk<SerializableCandleRate[], string>(
+  `${RATES_SLICE_NAME}/getRatesCandle`,
   async (arg, thunkAPI) => {
     const state: RootState = thunkAPI.getState() as RootState;
 
     const PoolAPI = APIFactory(state.wallet.cluster);
-    const rates = await PoolAPI.getCandleRates(arg);
+    const rates = await PoolAPI.getRatesCandle(arg);
 
     return rates.map((rate) => rate.serialize());
   },
@@ -55,12 +55,12 @@ const transactionSlice = createSlice({
   initialState,
   reducers: {},
   extraReducers: (builder) => {
-    builder.addCase(getMarketsRates.fulfilled, (state, action) => {
+    builder.addCase(getRatesMarkets.fulfilled, (state, action) => {
       action.payload.forEach((rate) => {
         state.markets[rate.market] = rate.price;
       });
     });
-    builder.addCase(getCandleRates.fulfilled, (state, action) => {
+    builder.addCase(getRatesCandle.fulfilled, (state, action) => {
       action.payload
         .sort((a, b) => a.startTime - b.startTime)
         .forEach((rate) => {
@@ -74,7 +74,7 @@ const transactionSlice = createSlice({
           });
         });
     });
-    builder.addCase(getCandleRates.rejected, (state, action) => {
+    builder.addCase(getRatesCandle.rejected, (state, action) => {
       state.candles[`${action.meta.arg}/USDT`] = [];
     });
   },

@@ -21,7 +21,7 @@ type CandlesResponse = {
   }[];
 };
 
-const getMarketRate = async (symbol: string): Promise<MarketRate> => {
+const getRateMarket = async (symbol: string): Promise<MarketRate> => {
   try {
     const res = await fetch(`https://serum-api.bonfida.com/orderbooks/${symbol}USDT`);
 
@@ -39,11 +39,11 @@ const getMarketRate = async (symbol: string): Promise<MarketRate> => {
 };
 
 export interface API {
-  getMarketsRates: () => Promise<MarketRate[]>;
-  getCandleRates: (symbol: string) => Promise<CandleRate[]>;
+  getRatesMarkets: () => Promise<MarketRate[]>;
+  getRatesCandle: (symbol: string) => Promise<CandleRate[]>;
 }
 
-const getCandleRates = async (symbol: string): Promise<CandleRate[]> => {
+const getRatesCandle = async (symbol: string): Promise<CandleRate[]> => {
   try {
     const res = await fetch(
       `https://serum-api.bonfida.com/candles/${symbol}USDT?resolution=86400&limit=365`,
@@ -70,17 +70,17 @@ export const APIFactory = memoizeWith(
       tokenConfig[cluster]?.filter((rate) => !rate.noRate).map((token) => token.tokenSymbol) || [];
     tokenSymbols.push('SOL');
 
-    const getMarketsRates = async (): Promise<Array<MarketRate>> => {
+    const getRatesMarkets = async (): Promise<Array<MarketRate>> => {
       const rates = await Promise.all(
-        tokenSymbols.map((symbol) => getMarketRate(symbol).catch((error) => console.error(error))),
+        tokenSymbols.map((symbol) => getRateMarket(symbol).catch((error) => console.error(error))),
       );
 
       return rates.filter(complement(isNil)) as MarketRate[];
     };
 
     return {
-      getMarketsRates,
-      getCandleRates,
+      getRatesMarkets,
+      getRatesCandle,
     };
   },
 );
