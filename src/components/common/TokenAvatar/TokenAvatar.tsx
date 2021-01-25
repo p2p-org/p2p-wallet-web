@@ -1,6 +1,7 @@
 import React, { FunctionComponent } from 'react';
 import { useSelector } from 'react-redux';
 
+import { CSSProperties } from '@linaria/core';
 import { styled } from '@linaria/react';
 
 import tokenConfig from 'api/token/token.config';
@@ -8,13 +9,15 @@ import { Avatar } from 'components/ui';
 import { RootState } from 'store/rootReducer';
 
 const AvatarStyled = styled(Avatar)`
-  background: ${({ src }) => (src ? 'none' : '#c4c4c4')};
+  background: ${({ src }) => (src ? 'none' : '#f6f6f8')};
 `;
 
 type Props = {
   src?: string;
   size?: string | number;
   symbol?: string;
+  style?: CSSProperties;
+  className?: string;
 };
 
 export const TokenAvatar: FunctionComponent<Props> = ({ symbol, src, ...props }) => {

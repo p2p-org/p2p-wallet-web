@@ -4,6 +4,8 @@ import { NavLink } from 'react-router-dom';
 import { styled } from '@linaria/react';
 
 import { Icon } from 'components/ui';
+import { openModal } from 'store/_actions/modals';
+import { SHOW_MODAL_RECIEVE_TOKENS } from 'store/constants/modalTypes';
 
 const Wrapper = styled.div`
   display: grid;

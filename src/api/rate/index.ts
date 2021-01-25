@@ -66,7 +66,8 @@ const getCandleRates = async (symbol: string): Promise<CandleRate[]> => {
 export const APIFactory = memoizeWith(
   identity,
   (cluster: ExtendedCluster): API => {
-    const tokenSymbols = tokenConfig[cluster]?.map((token) => token.tokenSymbol) || [];
+    const tokenSymbols =
+      tokenConfig[cluster]?.filter((rate) => !rate.noRate).map((token) => token.tokenSymbol) || [];
     tokenSymbols.push('SOL');
 
     const getMarketsRates = async (): Promise<Array<MarketRate>> => {

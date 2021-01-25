@@ -2,13 +2,10 @@ import cache from '@civic/simple-cache';
 import {
   ConfirmedSignaturesForAddress2Options,
   LAMPORTS_PER_SOL,
-  ParsedInstruction,
-  PartiallyDecodedInstruction,
   PublicKey,
   TransactionSignature,
 } from '@solana/web3.js';
 import { Decimal } from 'decimal.js';
-import { stringify } from 'querystring';
 import { complement, identity, isNil, memoizeWith } from 'ramda';
 
 import { getConnection } from 'api/connection';
@@ -94,6 +91,7 @@ export const APIFactory = memoizeWith(
         amount = new Decimal(instruction?.parsed?.info.lamports || 0).div(LAMPORTS_PER_SOL);
       }
 
+      // TODO: I see that timestamp will be available in transactionInfo in future version of solana web3
       const timestamp = await connection.getBlockTime(transactionInfo.slot);
 
       return new Transaction(

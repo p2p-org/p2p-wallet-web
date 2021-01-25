@@ -11,8 +11,21 @@ import { TokenAvatar } from 'components/common/TokenAvatar';
 import { shortAddress } from 'utils/tokens';
 
 const Wrapper = styled.div`
+  position: relative;
+
+  padding: 10px 0;
+
   &:not(:last-child) {
-    border-bottom: 1px solid ${rgba(0, 0, 0, 0.05)};
+    &::after {
+      position: absolute;
+      right: 10px;
+      bottom: 0;
+      left: 10px;
+
+      border-bottom: 1px solid ${rgba(0, 0, 0, 0.05)};
+
+      content: '';
+    }
   }
 `;
 
@@ -42,10 +55,11 @@ const TokenName = styled.div`
   text-overflow: ellipsis;
 `;
 
+const TokenAvatarStyled = styled(TokenAvatar)``;
+
 const WrapperLink = styled(Link)`
   display: flex;
   align-items: center;
-  margin: 10px;
   padding: 10px;
 
   text-decoration: none;
@@ -55,6 +69,10 @@ const WrapperLink = styled(Link)`
   &:hover {
     background: #f6f6f8;
     border-radius: 12px;
+
+    ${TokenAvatarStyled} {
+      background: #fff;
+    }
 
     ${TokenName} {
       color: #5887ff;
@@ -81,7 +99,7 @@ export const TokenRow: FunctionComponent<Props> = ({ token }) => {
   return (
     <Wrapper>
       <WrapperLink to={`/wallet/${token.address.toBase58()}`}>
-        <TokenAvatar symbol={token.mint.symbol} size={48} />
+        <TokenAvatarStyled symbol={token.mint.symbol} size={48} />
         <Content>
           <Top>
             <TokenName title={token.mint.address.toBase58()}>
@@ -93,7 +111,7 @@ export const TokenRow: FunctionComponent<Props> = ({ token }) => {
             />
           </Top>
           <Bottom>
-            <div>{shortAddress(token.address.toBase58())}</div>
+            <div title={token.address.toBase58()}>{shortAddress(token.address.toBase58())}</div>
             <div>
               {token.mint.toMajorDenomination(token.balance)} {token.mint.symbol}
             </div>

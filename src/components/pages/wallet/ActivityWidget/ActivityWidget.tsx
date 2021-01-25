@@ -8,6 +8,7 @@ import { ConfirmedSignaturesForAddress2Options } from '@solana/web3.js';
 import { last } from 'ramda';
 
 import { InfinityScrollHelper } from 'components/common/InfinityScrollHelper';
+import { LoaderBlock } from 'components/common/LoaderBlock';
 import { ToastManager } from 'components/common/ToastManager';
 import { TransactionList } from 'components/common/TransactionList';
 import { Widget } from 'components/common/Widget';
@@ -15,6 +16,18 @@ import { RootState } from 'store/rootReducer';
 import { getTransactions } from 'store/slices/transaction/TransactionSlice';
 
 const WrapperWidget = styled(Widget)``;
+
+const EmptyWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 86px;
+
+  color: #a3a5ba;
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 20px;
+`;
 
 type Props = {
   publicKey: web3.PublicKey;
@@ -57,10 +70,16 @@ export const ActivityWidget: FunctionComponent<Props> = ({ publicKey }) => {
     void fetchData(true);
   };
 
+  const renderEmpty = () => {
+    return <EmptyWrapper>History is empty</EmptyWrapper>;
+  };
+
   return (
     <WrapperWidget title="Activity">
       <InfinityScrollHelper disabled={isLoading || isEnd} onNeedLoadMore={handleNeedLoadMore}>
         <TransactionList order={order} />
+        {isLoading ? <LoaderBlock /> : undefined}
+        {!isLoading && !order?.length ? renderEmpty() : undefined}
       </InfinityScrollHelper>
     </WrapperWidget>
   );

@@ -18,7 +18,9 @@ const Header = styled.div`
   height: 70px;
   padding: 0 20px;
 
-  border-bottom: 1px solid ${rgba(0, 0, 0, 0.05)};
+  &:not(:last-child) {
+    border-bottom: 1px solid ${rgba(0, 0, 0, 0.05)};
+  }
 `;
 
 const Title = styled.div`
@@ -33,7 +35,7 @@ const Action = styled.div``;
 const Content = styled.div``;
 
 type Props = {
-  title?: string;
+  title?: React.ReactNode;
   action?: React.ReactNode;
   className?: string;
 };
@@ -47,7 +49,7 @@ export const Widget: FunctionComponent<Props> = ({ title, action, children, clas
           {action ? <Action>{action}</Action> : undefined}
         </Header>
       ) : undefined}
-      <Content>{children}</Content>
+      {children ? <Content>{children}</Content> : undefined}
     </Wrapper>
   );
 };

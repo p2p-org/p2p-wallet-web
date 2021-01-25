@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useMemo } from 'react';
+import React, { FunctionComponent, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 
 import { styled } from '@linaria/react';
@@ -9,6 +9,7 @@ import QRCode from 'qrcode.react';
 import tokenConfig from 'api/token/token.config';
 import { TokenAccount } from 'api/token/TokenAccount';
 import { Card } from 'components/common/Card';
+import { ToastManager } from 'components/common/ToastManager';
 import { Icon } from 'components/ui';
 import { RootState } from 'store/rootReducer';
 
@@ -19,9 +20,9 @@ const WrapperCard = styled(Card)`
 
 const HeaderWrapper = styled.div`
   display: flex;
-  padding: 20px;
-
-  border-bottom: 1px solid ${rgba('#000', 0.05)};
+  align-items: center;
+  height: 64px;
+  padding: 0 8px 0 20px;
 `;
 
 const TokenWrapper = styled.div`
@@ -29,39 +30,50 @@ const TokenWrapper = styled.div`
   margin-right: 7px;
 `;
 
+const CopiedText = styled.div`
+  color: #2db533;
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 21px;
+`;
+
 const TokenName = styled.div`
   color: #000;
-  font-weight: 500;
+  font-weight: 600;
   font-size: 14px;
-  line-height: 17px;
+  line-height: 21px;
 `;
 
 const TokenAddress = styled.div`
-  margin-top: 6px;
-
-  color: ${rgba('#000', 0.5)};
-  font-size: 12px;
-  line-height: 14px;
-`;
-
-const ShareWrapper = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-
-  background: #f0f0f0;
-  border-radius: 10px;
+  color: #a3a5ba;
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 24px;
 
   cursor: pointer;
 `;
 
-const ShareIcon = styled(Icon)`
-  width: 18px;
-  height: 18px;
+const ExpandWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
 
-  color: #000;
+  border-radius: 12px;
+
+  cursor: pointer;
+
+  &:hover {
+    background: #f6f6f8;
+  }
+`;
+
+const ExpandIcon = styled(Icon)`
+  width: 32px;
+  height: 32px;
+
+  color: #5887ff;
 `;
 
 const Content = styled.div`
@@ -69,34 +81,28 @@ const Content = styled.div`
   flex-direction: column;
   align-items: center;
 
-  /* padding: 20px; */
-  padding: 20px 20px 40px;
+  border-top: 1px solid ${rgba('#000', 0.05)};
 `;
 
-// const ActionsWrapper = styled.div`
-//   display: flex;
-//   margin-top: 23px;
-//
-//   > :not(:last-child) {
-//     margin-right: 10px;
-//   }
-// `;
-//
-// const Action = styled.div`
-//   display: flex;
-//   align-items: center;
-//   height: 40px;
-//   padding: 0 22px;
-//
-//   color: #000000;
-//   font-size: 14px;
-//   line-height: 17px;
-//
-//   background: ${rgba('#E8E8E8', 0.5)};
-//   border-radius: 10px;
-//
-//   cursor: pointer;
-// `;
+const Text = styled.div`
+  margin: 20px 0;
+
+  color: #202020;
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 24px;
+`;
+
+const Footer = styled.div`
+  padding: 12px 20px 14px;
+
+  color: #a3a5ba;
+  font-size: 14px;
+  line-height: 21px;
+  text-align: center;
+
+  border-top: 1px solid ${rgba('#000', 0.05)};
+`;
 
 type Props = {
   publicKey: web3.PublicKey;
@@ -104,6 +110,8 @@ type Props = {
 };
 
 export const QRAddressWidget: FunctionComponent<Props> = ({ publicKey, className }) => {
+  const [copied, setCopied] = useState(false);
+  const [isExpand, setIsExpand] = useState(false);
   const cluster = useSelector((state: RootState) => state.wallet.cluster);
   const tokenAccounts = useSelector((state: RootState) => state.wallet.tokenAccounts);
   const tokenAccount = useMemo(() => {
@@ -115,17 +123,24 @@ export const QRAddressWidget: FunctionComponent<Props> = ({ publicKey, className
     return null;
   }
 
+  const handleExpandClick = () => {
+    setIsExpand(!isExpand);
+  };
+
   const handleCopyClick = () => {
     try {
       void navigator.clipboard.writeText(tokenAccount.address.toBase58());
+      setCopied(true);
+      ToastManager.info(`${tokenAccount.mint.symbol} Address Copied!`);
+
+      // fade copied after some seconds
+      setTimeout(() => {
+        setCopied(false);
+      }, 2000);
     } catch (error) {
       console.error(error);
     }
   };
-
-  // function handleShareClick() {
-  //   navigator.share({ text, title, url });
-  // }
 
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
@@ -148,23 +163,36 @@ export const QRAddressWidget: FunctionComponent<Props> = ({ publicKey, className
   }
 
   return (
-    <WrapperCard className={className}>
+    <WrapperCard className={className} withShadow>
       <HeaderWrapper>
         <TokenWrapper>
-          <TokenName>{tokenAccount.mint.name} Address</TokenName>
-          <TokenAddress>{tokenAccount.address.toBase58()}</TokenAddress>
+          {copied ? (
+            <CopiedText>{tokenAccount.mint.symbol} Address Copied!</CopiedText>
+          ) : (
+            <TokenName>{tokenAccount.mint.name} Address</TokenName>
+          )}
+          <TokenAddress onClick={handleCopyClick}>{tokenAccount.address.toBase58()}</TokenAddress>
         </TokenWrapper>
-        <ShareWrapper onClick={handleCopyClick}>
-          <ShareIcon name="copy" />
-        </ShareWrapper>
+        <ExpandWrapper onClick={handleExpandClick}>
+          <ExpandIcon name="qr" />
+        </ExpandWrapper>
       </HeaderWrapper>
-      <Content>
-        <QRCode value={tokenAccount.address.toBase58()} imageSettings={imageSettings} size={148} />
-        {/* <ActionsWrapper> */}
-        {/*  <Action>Copy image</Action> */}
-        {/*  <Action>Share</Action> */}
-        {/* </ActionsWrapper> */}
-      </Content>
+      {isExpand ? (
+        <>
+          <Content>
+            <Text>Send to your SOL wallet</Text>
+            <QRCode
+              value={tokenAccount.address.toBase58()}
+              imageSettings={imageSettings}
+              size={140}
+            />
+            <Text>maxburlak.p2pw.org</Text>
+          </Content>
+          <Footer>
+            All deposits are stored 100% non-custodiallity with keys held on this device
+          </Footer>
+        </>
+      ) : undefined}
     </WrapperCard>
   );
 };
