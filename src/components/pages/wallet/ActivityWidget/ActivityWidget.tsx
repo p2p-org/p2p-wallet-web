@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useEffect, useState } from 'react';
+import React, { FunctionComponent, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { styled } from '@linaria/react';
@@ -45,7 +45,7 @@ export const ActivityWidget: FunctionComponent<Props> = ({ publicKey }) => {
     };
 
     if (isPaging) {
-      options.before = last(order);
+      options.before = order ? last(order) : undefined;
     }
 
     setIsLoading(true);
@@ -61,10 +61,6 @@ export const ActivityWidget: FunctionComponent<Props> = ({ publicKey }) => {
       setIsLoading(false);
     }
   };
-
-  useEffect(() => {
-    void fetchData();
-  }, [publicKey.toBase58()]);
 
   const handleNeedLoadMore = () => {
     void fetchData(true);
