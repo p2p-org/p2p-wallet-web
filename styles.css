@@ -822,10 +822,10 @@ html,body,#root{height:100%;}body{font-family:'Titillium Web',-apple-system,Blin
 .bmfjnf6{width:15px;height:15px;color:#000;-webkit-transform:rotate(90deg);-ms-transform:rotate(90deg);transform:rotate(90deg);}
 .t17rnq8v{margin-left:20px;color:#000;font-weight:500;font-size:22px;line-height:120%;}
 .wkho99m{margin-top:20px;padding:0;}
-.f4ahxwx{position:relative;padding:20px 32px;border-bottom:1px solid rgba(0,0,0,0.1);}
+.f4ahxwx{position:relative;padding:20px 32px;border-bottom:1px solid rgba(0,0,0,0.05);}
 .r12gdpdy{position:absolute;top:-24px;right:32px;display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;-webkit-align-items:center;-webkit-box-align:center;-ms-flex-align:center;align-items:center;-webkit-box-pack:center;-webkit-justify-content:center;-ms-flex-pack:center;justify-content:center;width:44px;height:44px;background:#fff;border:1px solid #e7e7e7;border-radius:44px;cursor:pointer;}
 .rtmrgx6{width:24px;height:24px;}
-.twodw66{padding:16px 32px 32px;border-bottom:1px solid rgba(0,0,0,0.1);}
+.twodw66{padding:16px 32px 32px;border-bottom:1px solid rgba(0,0,0,0.05);}
 .tbi359z{display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;margin-bottom:20px;}.tbi359z > :not(:last-child){margin-right:10px;}
 .s1m4fhcc{color:rgba(0,0,0,0.5);font-size:14px;line-height:17px;}
 .ftsnmln{display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;-webkit-align-items:center;-webkit-box-align:center;-ms-flex-align:center;align-items:center;-webkit-box-pack:justify;-webkit-justify-content:space-between;-ms-flex-pack:justify;justify-content:space-between;height:35px;margin-top:10px;padding:0 18px;color:rgba(0,0,0,0.5);font-size:14px;line-height:17px;background:#f7f7f7;border-radius:8px;}
@@ -874,6 +874,9 @@ html,body,#root{height:100%;}body{font-family:'Titillium Web',-apple-system,Blin
 .bthrull{display:grid;grid-auto-flow:column;grid-gap:16px;}
 .ba8g7pn{width:36px;padding:0;box-shadow:0 4px 12px rgba(88,135,255,0.25);}
 .p35blbr{width:20px;height:20px;color:#fff;}
+.p1vsnxod{padding:16px 20px;}
+.v1mc833u{color:#000;font-weight:bold;font-size:22px;line-height:120%;}
+.v18nuck{display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;margin-top:4px;color:#a3a5ba;font-weight:600;font-size:14px;line-height:21px;}
 
 
 
