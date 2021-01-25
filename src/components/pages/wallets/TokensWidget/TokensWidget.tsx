@@ -6,7 +6,7 @@ import { styled } from '@linaria/react';
 import { TokenAccount } from 'api/token/TokenAccount';
 import { Widget } from 'components/common/Widget';
 import { Button, Icon } from 'components/ui';
-import { openModal } from 'store/_actions/modals';
+import { openModal } from 'store/actions/modals';
 import { SHOW_MODAL_ADD_COIN } from 'store/constants/modalTypes';
 import { RootState } from 'store/rootReducer';
 
