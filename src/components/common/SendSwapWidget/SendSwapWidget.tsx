@@ -60,7 +60,7 @@ const FromWrapper = styled.div`
 
   padding: 20px 32px;
 
-  border-bottom: 1px solid ${rgba('#000', 0.1)};
+  border-bottom: 1px solid ${rgba('#000', 0.05)};
 `;
 
 const ReverseWrapper = styled.div`
@@ -88,7 +88,7 @@ const ReverseIcon = styled(Icon)`
 const ToWrapper = styled.div`
   padding: 16px 32px 32px;
 
-  border-bottom: 1px solid ${rgba('#000', 0.1)};
+  border-bottom: 1px solid ${rgba('#000', 0.05)};
 `;
 
 const ToSelect = styled.div`
