@@ -50,14 +50,23 @@ const ValueCurrency = styled.div`
   line-height: 120%;
 `;
 
-const ValueDelta = styled.div`
+const BottomWrapper = styled.div`
   display: flex;
-  margin-top: 4px;
 
   color: #a3a5ba;
   font-weight: 600;
   font-size: 14px;
   line-height: 21px;
+
+  &:not(:first-child) {
+    margin-top: 4px;
+  }
+`;
+
+const ValueOriginal = styled.div``;
+
+const ValueDelta = styled.div`
+  display: flex;
 `;
 
 // const ValueGreen = styled.div`
@@ -151,7 +160,7 @@ export const TopWidget: FunctionComponent<Props> = ({ publicKey }) => {
           ) : undefined}
         </Buttons>
       }>
-      {tokenAccount && (rate || delta) ? (
+      {tokenAccount ? (
         <PriceWrapped>
           {rate ? (
             <ValueCurrency>
@@ -161,12 +170,18 @@ export const TopWidget: FunctionComponent<Props> = ({ publicKey }) => {
               />
             </ValueCurrency>
           ) : undefined}
-          {delta ? (
-            <ValueDelta>
-              {delta.diff.toFixed(2)} USD ({delta.percentage.toFixed(2)}%) 24 hrs{' '}
-              {/* <ValueGreen>+1.4%, 24 hours</ValueGreen> */}
-            </ValueDelta>
-          ) : undefined}
+          <BottomWrapper>
+            <ValueOriginal>
+              {tokenAccount.mint.toMajorDenomination(tokenAccount.balance)}{' '}
+              {tokenAccount.mint.symbol}
+            </ValueOriginal>
+            {delta ? (
+              <ValueDelta>
+                {delta.diff.toFixed(2)} USD ({delta.percentage.toFixed(2)}%) 24 hrs{' '}
+                {/* <ValueGreen>+1.4%, 24 hours</ValueGreen> */}
+              </ValueDelta>
+            ) : undefined}
+          </BottomWrapper>
         </PriceWrapped>
       ) : undefined}
     </WrapperWidget>
