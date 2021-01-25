@@ -9,6 +9,7 @@ import dayjs from 'dayjs';
 import { rgba } from 'polished';
 
 import { Transaction } from 'api/transaction/Transaction';
+import { AmountUSDT } from 'components/common/AmountUSDT';
 import { ToastManager } from 'components/common/ToastManager';
 import { TokenAvatar } from 'components/common/TokenAvatar';
 import { Button, Icon } from 'components/ui';
@@ -110,10 +111,19 @@ const StatusWrapper = styled.div`
   margin: 40px 0 20px;
 `;
 
-const Value = styled.div`
+const ValueCurrency = styled.div`
   color: #000;
   font-weight: 600;
   font-size: 28px;
+  line-height: 120%;
+`;
+
+const ValueOriginal = styled.div`
+  margin-top: 4px;
+
+  color: #a3a5ba;
+  font-weight: 600;
+  font-size: 16px;
   line-height: 120%;
 `;
 
@@ -269,10 +279,16 @@ export const TransactionDetailsModal: FunctionComponent<Props> = ({ signature, c
       </Header>
       <Content>
         <StatusWrapper>
-          <Value>
+          <ValueCurrency>
+            <AmountUSDT
+              symbol={transaction.short.sourceTokenAccount?.mint.symbol}
+              value={transaction.short.amount}
+            />
+          </ValueCurrency>
+          <ValueOriginal>
             {transaction.short.amount.toNumber()}{' '}
             {transaction.short.sourceTokenAccount?.mint.symbol}
-          </Value>
+          </ValueOriginal>
           <Status>Completed</Status>
         </StatusWrapper>
         <FieldsWrapper>
