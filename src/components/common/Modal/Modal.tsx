@@ -38,19 +38,28 @@ const Description = styled.div`
   line-height: 17px;
 `;
 
-const CloseWrapper = styled.div``;
-
-const CloseIcon = styled(Icon)`
+const CloseWrapper = styled.div`
   position: absolute;
   top: 15px;
   right: 15px;
 
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 32px;
   height: 32px;
 
-  color: #a5a7bd;
+  background: #f6f6f8;
+  border-radius: 8px;
 
   cursor: pointer;
+`;
+
+const CloseIcon = styled(Icon)`
+  width: 16px;
+  height: 16px;
+
+  color: #a3a5ba;
 `;
 
 const Content = styled.div``;
