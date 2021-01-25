@@ -48,6 +48,8 @@ const CloseIcon = styled(Icon)`
   width: 32px;
   height: 32px;
 
+  color: #a5a7bd;
+
   cursor: pointer;
 `;
 
