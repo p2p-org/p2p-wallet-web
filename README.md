@@ -36,10 +36,17 @@ If you'd rather build the application yourself, please ensure you have nodejs/np
 ```
 git clone https://github.com/p2p-org/p2p-wallet-web.git 
 cd p2p-wallet-web
-npm i
-npm start //to start a development
-npm run build //to create a production build 
+yarn
+yarn start // to start a development
+yarn build // to create a production build 
 ```
+
+# Development
+Install the following extensions in your code editor for linting and ease of work with the code:
+- eslint
+- prettier
+- stylint
+- styled-components
 
 # Contributing
 The best way to submit feedback and report bugs is to open a GitHub issue. Please be sure to include your operating system, device, version number, and steps to reproduce reported bugs. Keep in mind that all participants will be expected to follow our code of conduct.
