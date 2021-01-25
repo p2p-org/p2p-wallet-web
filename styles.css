@@ -876,7 +876,9 @@ html,body,#root{height:100%;}body{font-family:'Titillium Web',-apple-system,Blin
 .p35blbr{width:20px;height:20px;color:#fff;}
 .p1vsnxod{padding:16px 20px;}
 .v1mc833u{color:#000;font-weight:bold;font-size:22px;line-height:120%;}
-.v18nuck{display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;margin-top:4px;color:#a3a5ba;font-weight:600;font-size:14px;line-height:21px;}
+.b18nuck{display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;color:#a3a5ba;font-weight:600;font-size:14px;line-height:21px;}.b18nuck:not(:first-child){margin-top:4px;}
+
+.v18bvaz6{display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;}
 
 
 
