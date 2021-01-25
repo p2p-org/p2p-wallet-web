@@ -1,15 +1,12 @@
 import React, { FunctionComponent, useMemo } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 
 import { styled } from '@linaria/react';
-import { Account, clusterApiUrl } from '@solana/web3.js';
 
 import { Token } from 'api/token/Token';
 import { TokenAccount } from 'api/token/TokenAccount';
 import { Modal } from 'components/common/Modal';
-import { Button } from 'components/ui';
 import { RootState } from 'store/rootReducer';
-import { createMint } from 'store/slices/wallet/WalletSlice';
 
 import { TokenList } from './TokenList';
 
@@ -32,20 +29,12 @@ type Props = {
 };
 
 export const AddCoinModal: FunctionComponent<Props> = ({ close }) => {
-  const dispatch = useDispatch();
-  const cluster = useSelector((state: RootState) => state.wallet.cluster);
   const tokenAccounts = useSelector((state: RootState) =>
     state.wallet.tokenAccounts.map((token) => TokenAccount.from(token)),
   );
   const availableTokens = useSelector((state: RootState) =>
     state.global.availableTokens.map((token) => Token.from(token)),
   );
-
-  const isMainnetEntrypoint = cluster === 'mainnet-beta';
-
-  const handleMintTestTokenClick = () => {
-    void dispatch(createMint({ amount: 1000, decimals: 2, initialAccount: new Account() }));
-  };
 
   const closeModal = () => {
     close();
@@ -62,22 +51,7 @@ export const AddCoinModal: FunctionComponent<Props> = ({ close }) => {
   }, [availableTokens]);
 
   return (
-    <WrapperModal
-      title="Add coins"
-      description={
-        <>
-          Add a token to your wallet. This will cost some SOL
-          {!isMainnetEntrypoint ? (
-            <>
-              {' '}
-              <Button link onClick={handleMintTestTokenClick}>
-                Mint test token
-              </Button>
-            </>
-          ) : null}
-        </>
-      }
-      close={close}>
+    <WrapperModal title="Add coins" close={close}>
       {filteredTokens?.length ? (
         <ScrollableContainer>
           <TokenList items={filteredTokens} closeModal={closeModal} />
