@@ -155,8 +155,8 @@
   "lint-staged": {
     "./src/**/*.{js,jsx,ts,tsx}": [
       "pretty-quick --staged",
-      "eslint src/ --ext js,.jsx,.ts,.tsx --fix",
-      "stylelint ./src/**/*.tsx"
+      "eslint --fix",
+      "stylelint"
     ]
   }
 }
