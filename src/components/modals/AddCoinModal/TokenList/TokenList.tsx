@@ -3,7 +3,8 @@ import React, { FunctionComponent, useState } from 'react';
 import { styled } from '@linaria/react';
 
 import { Token } from 'api/token/Token';
-import { Icon, Input } from 'components/ui';
+import { Icon } from 'components/ui';
+import { SearchInput } from 'components/ui/SearchInput';
 
 import { TokenRow } from '../TokenRow';
 
@@ -12,26 +13,19 @@ const Wrapper = styled.div`
   grid-gap: 2px;
 `;
 
-const InputWrapper = styled.div`
-  position: relative;
+const SearchInputStyled = styled(SearchInput)`
+  margin: 15px 20px 0;
+`;
 
-  margin-top: 15px;
-  padding: 0 30px;
-
-  & label {
-    height: 48px;
-
-    & input {
-      padding-left: 30px;
-    }
-  }
+const SearchIconWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
 `;
 
 const SearchIcon = styled(Icon)`
-  position: absolute;
-  top: 12px;
-  left: 40px;
-
   width: 28px;
   height: 28px;
 
@@ -50,22 +44,27 @@ export const TokenList: FunctionComponent<Props> = ({ items, closeModal }) => {
 
   const [filterValue, setFilter] = useState('');
 
-  const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const searchValue = e.target.value.trim().toLowerCase();
+  const handleFilterChange = (value: string) => {
+    const searchValue = value.trim().toLowerCase();
     setFilter(searchValue);
   };
 
   const filteredItems =
     filterValue.length > 0
-      ? items.filter((item) => item.symbol?.toLowerCase().includes(filterValue))
+      ? items.filter(
+          (item) =>
+            item.symbol?.toLowerCase().includes(filterValue) ||
+            item.name?.toLowerCase().includes(filterValue),
+        )
       : items;
 
   return (
     <Wrapper>
-      <InputWrapper>
-        <SearchIcon name="search" />
-        <Input placeholder="Search token" value={filterValue} onChange={handleFilterChange} />
-      </InputWrapper>
+      <SearchInputStyled
+        placeholder="Search token"
+        value={filterValue}
+        onChange={handleFilterChange}
+      />
       {filteredItems.map((token) => (
         <TokenRow key={token.address.toBase58()} token={token} closeModal={closeModal} />
       ))}

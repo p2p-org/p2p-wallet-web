@@ -7,7 +7,6 @@ const Wrapper = styled.label`
   display: flex;
   align-items: center;
   height: 56px;
-  padding: 0 16px;
 
   background: #f4f4f4;
   border-radius: 10px;
@@ -19,6 +18,11 @@ const Content = styled.div`
   flex: 1;
   flex-direction: column;
   justify-content: center;
+  padding: 0 16px;
+`;
+
+const PrefixWrapper = styled.div`
+  margin-left: 10px;
 `;
 
 const Title = styled.div`
@@ -29,7 +33,9 @@ const Title = styled.div`
 `;
 
 const InputElement = styled.input`
-  padding: 4px 0 0;
+  padding: 0;
+
+  font-family: unset;
 
   background: transparent;
   border: 0;
@@ -37,35 +43,51 @@ const InputElement = styled.input`
   outline: none;
 
   appearance: none;
+
+  &:not(:first-child) {
+    padding-top: 4px;
+  }
 `;
 
-const PotfixWrapper = styled.div`
+const PostfixWrapper = styled.div`
   margin-left: 16px;
 `;
 
 type CustomProps = {
   forwardedRef?: React.Ref<HTMLInputElement>;
+  prefix?: React.ReactNode;
   title?: string;
   value?: string;
   postfix?: React.ReactNode;
+  onChange?: (value: string) => void;
 };
 
-type Props = CustomProps & React.InputHTMLAttributes<HTMLInputElement>;
+type Props = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange'> & CustomProps;
 
 const InputOriginal: FunctionComponent<Props> = ({
   forwardedRef,
+  prefix,
   title,
   value,
   postfix,
+  onChange,
+  className,
   ...props
 }) => {
+  const handleChange = (e: React.FocusEvent<HTMLInputElement>) => {
+    if (onChange) {
+      onChange(e.target.value);
+    }
+  };
+
   return (
-    <Wrapper>
+    <Wrapper className={className}>
+      {prefix ? <PrefixWrapper>{prefix}</PrefixWrapper> : undefined}
       <Content>
         {title ? <Title>{title}</Title> : undefined}
-        <InputElement ref={forwardedRef} value={value} {...props} />
+        <InputElement ref={forwardedRef} value={value} onChange={handleChange} {...props} />
       </Content>
-      {postfix ? <PotfixWrapper>{postfix}</PotfixWrapper> : undefined}
+      {postfix ? <PostfixWrapper>{postfix}</PostfixWrapper> : undefined}
     </Wrapper>
   );
 };

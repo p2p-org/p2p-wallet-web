@@ -4,37 +4,35 @@ import { useSelector } from 'react-redux';
 import { styled } from '@linaria/react';
 import classNames from 'classnames';
 import { Decimal } from 'decimal.js';
-import { rgba } from 'polished';
 
 import { TokenAccount } from 'api/token/TokenAccount';
 import { AmountUSDT } from 'components/common/AmountUSDT';
+import { SlideContainer } from 'components/common/SlideContainer';
 import { TokenAvatar } from 'components/common/TokenAvatar';
 import { Icon } from 'components/ui';
+import { SearchInput } from 'components/ui/SearchInput';
 import { RootState } from 'store/rootReducer';
 import { minorAmountToMajor } from 'utils/amount';
 import { shortAddress } from 'utils/tokens';
 
 import { TokenRow } from './TokenRow';
 
-const Wrapper = styled.div`
-  position: relative;
-
-  padding: 0 0 20px;
-`;
+const Wrapper = styled.div``;
 
 const TopWrapper = styled.div`
   display: flex;
   justify-content: space-between;
-
-  color: ${rgba('#000', 0.5)};
-  font-size: 14px;
-  line-height: 17px;
 `;
 
-const FromTitle = styled.div``;
+const FromTitle = styled.div`
+  color: #000;
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 24px;
+`;
 
 const AllBalance = styled.div`
-  text-decoration: underline;
+  color: #5887ff;
 
   cursor: pointer;
 
@@ -51,7 +49,31 @@ const MainWrapper = styled.div`
   margin-top: 20px;
 `;
 
-const TokenAvatarWrapper = styled.div``;
+const WalletIcon = styled(Icon)`
+  width: 24px;
+  height: 24px;
+
+  color: #5887ff;
+`;
+
+const TokenAvatarWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+
+  background: #f6f6f8;
+  border-radius: 12px;
+
+  &.isOpen {
+    background: #5887ff;
+
+    ${WalletIcon} {
+      color: #fff;
+    }
+  }
+`;
 
 const InfoWrapper = styled.div`
   display: flex;
@@ -69,43 +91,57 @@ const SpecifyTokenWrapper = styled.div`
   height: 44px;
 `;
 
-const TokenWrapper = styled.div`
-  display: flex;
-  min-width: 0;
-
-  cursor: pointer;
-`;
-
 const TokenName = styled.div`
   max-width: 200px;
   overflow: hidden;
 
   color: #000;
-  font-weight: 500;
-  font-size: 22px;
-  line-height: 26px;
+  font-weight: 600;
+  font-size: 24px;
+  line-height: 140%;
 
   white-space: nowrap;
   text-overflow: ellipsis;
 `;
 
-const ChevronWrapper = styled.div``;
+const EmptyName = styled.div`
+  color: #a3a5ba;
+`;
+
+const ChevronWrapper = styled.div`
+  display: flex;
+  align-items: center;
+
+  margin-left: 26px;
+`;
 
 const ChevronIcon = styled(Icon)`
-  width: 16px;
-  height: 16px;
-  margin-left: 16px;
+  width: 24px;
+  height: 24px;
 
   color: #000;
+`;
+
+const TokenWrapper = styled.div`
+  display: flex;
+  min-width: 0;
+
+  cursor: pointer;
+
+  &.isOpen {
+    ${TokenName}, ${ChevronIcon} {
+      color: #5887ff;
+    }
+  }
 `;
 
 const AmountInput = styled.input`
   max-width: 200px;
 
   color: #000;
-  font-weight: 500;
+  font-weight: 600;
   font-size: 28px;
-  line-height: 33px;
+  line-height: 120%;
   text-align: right;
 
   background: transparent;
@@ -116,19 +152,19 @@ const AmountInput = styled.input`
   appearance: none;
 
   &::placeholder {
-    color: #c2c2c2;
+    color: #a3a5ba;
   }
 `;
 
 const BalanceWrapper = styled.div`
   display: flex;
   justify-content: space-between;
-  margin-top: 5px;
+  margin-top: 3px;
 
-  color: ${rgba('#000', 0.3)};
-  font-size: 14px;
-  line-height: 17px;
-  letter-spacing: -0.3px;
+  color: #a3a5ba;
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 24px;
 `;
 
 const BalanceText = styled.div`
@@ -145,70 +181,93 @@ const DropDownListContainer = styled.div`
   left: 0;
   z-index: 1;
 
-  margin-top: 17px;
+  margin-top: 8px;
+  overflow: hidden;
 
-  background: #fefefe;
-  border: 1px solid #efefef;
-  border-radius: 0 0 10px 10px;
-  box-shadow: 0 12px 20px rgba(0, 0, 0, 0.15);
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 10px 32px rgba(0, 0, 0, 0.1);
 `;
 
 const DropDownHeader = styled.div`
-  display: flex;
-  padding: 15px 32px;
+  padding: 0 20px;
 
-  color: #000;
+  border-radius: 0 0 12px 12px;
+  box-shadow: 0 5px 10px rgba(56, 60, 71, 0.05);
+  backdrop-filter: blur(15px);
+`;
+
+const Title = styled.div`
+  padding: 12px 0;
+
+  color: #a3a5ba;
   font-weight: 600;
   font-size: 14px;
-  line-height: 17px;
-
-  border-bottom: 1px solid ${rgba('#000', 0.05)};
+  line-height: 140%;
 `;
 
-const SearchCircle = styled.div`
+const FiltersWrapper = styled.div`
   display: flex;
-  flex-shrink: 0;
+  flex: 1;
   align-items: center;
-  justify-content: center;
-  width: 44px;
-  height: 44px;
+  height: 66px;
 
-  background: #f5f5f5;
-  border-radius: 50%;
-`;
-
-const SearchIcon = styled(Icon)`
-  width: 24px;
-  height: 24px;
-`;
-
-const SearchInput = styled.input`
-  width: 100%;
-  margin-left: 20px;
-
-  color: #000;
-  font-size: 14px;
-  line-height: 17px;
-
-  background: transparent;
-  border: 0;
-
-  outline: none;
-
-  appearance: none;
-
-  &::placeholder {
-    color: ${rgba('#000', 0.5)};
+  & > :not(:last-child) {
+    margin-right: 12px;
   }
 `;
+
+//
+// Uncomment in the future
+//
+// const FilterName = styled.div`
+//   display: flex;
+//   align-items: center;
+//   height: 34px;
+//   padding: 0 12px;
+//
+//   color: #a3a5ba;
+//   font-weight: 600;
+//   font-size: 13px;
+//   line-height: 140%;
+//   white-space: nowrap;
+//
+//   background: rgba(163, 165, 186, 0.1);
+//   border-radius: 12px;
+//
+//   cursor: pointer;
+//
+//   &.active {
+//     color: #fff;
+//
+//     background: #5887ff;
+//   }
+// `;
+//
+// const SearchCircle = styled.div`
+//   display: flex;
+//   flex-shrink: 0;
+//   align-items: center;
+//   justify-content: center;
+//   width: 34px;
+//   height: 34px;
+//
+//   background: #f6f6f8;
+//   border-radius: 12px;
+//   cursor: pointer;
+// `;
+//
+// const SearchIcon = styled(Icon)`
+//   width: 24px;
+//   height: 24px;
+//
+//   color: #a3a5ba;
+// `;
 
 const DropDownList = styled.div`
   max-height: 400px;
+  padding-bottom: 14px;
   overflow-y: auto;
-
-  > :not(:last-child) {
-    border-bottom: 1px solid ${rgba('#000', 0.05)};
-  }
 `;
 
 type Props = {
@@ -219,6 +278,7 @@ type Props = {
   onTokenAccountChange: (tokenAccount: TokenAccount) => void;
   onAmountChange: (minorAmount: string) => void;
   disabled?: boolean;
+  className?: string;
 };
 
 export const FromToSelectInput: FunctionComponent<Props> = ({
@@ -229,6 +289,7 @@ export const FromToSelectInput: FunctionComponent<Props> = ({
   onTokenAccountChange,
   onAmountChange,
   disabled,
+  className,
 }) => {
   const selectorRef = useRef<HTMLDivElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -297,39 +358,53 @@ export const FromToSelectInput: FunctionComponent<Props> = ({
     }
   };
 
-  const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const nextFilter = e.target.value.trim();
+  const handleFilterChange = (value: string) => {
+    const nextFilter = value.trim().toLowerCase();
 
     setFilter(nextFilter);
   };
 
+  const renderBalance = () => {
+    if (!tokenAccount) {
+      return null;
+    }
+
+    return `${tokenAccount?.mint.toMajorDenomination(tokenAccount.balance)} ${
+      tokenAccount?.mint.symbol
+    }`;
+  };
+
   return (
-    <Wrapper>
+    <Wrapper className={className}>
       <TopWrapper>
         <FromTitle>{direction === 'from' ? 'From' : 'To'}</FromTitle>
-        {direction === 'from' ? (
-          <AllBalance onClick={handleAllBalanceClick} className={classNames({ disabled })}>
-            Use all balance
-          </AllBalance>
-        ) : undefined}
       </TopWrapper>
       <MainWrapper>
-        <TokenAvatarWrapper>
-          <TokenAvatar symbol={tokenAccount?.mint.symbol} size={44} />
+        <TokenAvatarWrapper className={classNames({ isOpen })}>
+          {tokenAccount ? (
+            <TokenAvatar symbol={tokenAccount?.mint.symbol} size={44} />
+          ) : (
+            <WalletIcon name="wallet" />
+          )}
         </TokenAvatarWrapper>
         <InfoWrapper>
           <SpecifyTokenWrapper>
-            <TokenWrapper ref={selectorRef} onClick={handleSelectorClick}>
+            <TokenWrapper
+              ref={selectorRef}
+              onClick={handleSelectorClick}
+              className={classNames({ isOpen })}>
               <TokenName title={tokenAccount?.address.toBase58()}>
                 {tokenAccount?.mint.symbol ||
-                  (tokenAccount && shortAddress(tokenAccount.address.toBase58()))}
+                  (tokenAccount && shortAddress(tokenAccount.address.toBase58())) || (
+                    <EmptyName>—</EmptyName>
+                  )}
               </TokenName>
               <ChevronWrapper>
                 <ChevronIcon name="arrow-triangle" />
               </ChevronWrapper>
             </TokenWrapper>
             <AmountInput
-              placeholder="0"
+              placeholder={tokenAccount?.mint.toMajorDenomination(0) || '0'}
               value={localAmount}
               onChange={handleAmountChange}
               disabled={disabled || direction === 'to'}
@@ -337,29 +412,53 @@ export const FromToSelectInput: FunctionComponent<Props> = ({
           </SpecifyTokenWrapper>
           <BalanceWrapper>
             <BalanceText>
-              Balance = {tokenAccount?.mint.toMajorDenomination(tokenAccount.balance)}{' '}
-              {tokenAccount?.mint.symbol}
+              {tokenAccount ? (
+                direction === 'from' ? (
+                  <AllBalance onClick={handleAllBalanceClick} className={classNames({ disabled })}>
+                    Available: {renderBalance()}
+                  </AllBalance>
+                ) : (
+                  <>Balance: {renderBalance()}</>
+                )
+              ) : (
+                'Select currency'
+              )}
             </BalanceText>
-            <BalanceText>
-              ={' '}
-              <AmountUSDTStyled
-                value={new Decimal(localAmount || 0)}
-                symbol={tokenAccount?.mint.symbol}
-              />
-            </BalanceText>
+            {tokenAccount ? (
+              <BalanceText>
+                ≈{' '}
+                <AmountUSDTStyled
+                  value={new Decimal(localAmount || 0)}
+                  symbol={tokenAccount?.mint.symbol}
+                />
+              </BalanceText>
+            ) : undefined}
           </BalanceWrapper>
         </InfoWrapper>
       </MainWrapper>
       {isOpen ? (
         <DropDownListContainer ref={dropdownRef}>
           <DropDownHeader>
-            <SearchCircle>
-              <SearchIcon name="search" />
-            </SearchCircle>
-            <SearchInput
-              placeholder={`Search for currency to ${type}`}
-              onChange={handleFilterChange}
-            />
+            <Title>Select token</Title>
+            <SlideContainer>
+              <FiltersWrapper>
+                {/* Uncomment in the future */}
+                {/* <SearchCircle> */}
+                {/*  <SearchIcon name="search" /> */}
+                {/* </SearchCircle> */}
+                {/* <FilterName>All</FilterName> */}
+                {/* <FilterName>My tokens set</FilterName> */}
+                {/* <FilterName>Token Exchange</FilterName> */}
+                {/* <FilterName>Aave</FilterName> */}
+                {/* <FilterName>Compound</FilterName> */}
+                {/* <FilterName>Last</FilterName> */}
+                <SearchInput
+                  placeholder={`Search for currency to ${type}`}
+                  value={filter}
+                  onChange={handleFilterChange}
+                />
+              </FiltersWrapper>
+            </SlideContainer>
           </DropDownHeader>
           <DropDownList>
             {tokenAccounts

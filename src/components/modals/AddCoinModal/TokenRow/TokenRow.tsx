@@ -50,7 +50,7 @@ const ChevronIcon = styled(Icon)`
 const Main = styled.div`
   flex: 1;
 
-  padding: 0 30px;
+  padding: 0 20px;
 
   &.opened {
     background: ${rgba('#f6f6f8', 0.5)};

@@ -1,27 +1,15 @@
 import React, { FunctionComponent } from 'react';
 
-import { styled } from '@linaria/react';
-
 import { Layout } from 'components/common/Layout';
 import { SwapWidget } from 'components/pages/swap/SwapWidget';
 
-const Wrapper = styled.div`
-  width: 100%;
-  max-width: 556px;
-  margin-top: 25px;
-`;
-
 export const Swap: FunctionComponent = () => {
-  const breadcrumbs = [{ name: 'Wallets', to: '/wallets' }, { name: 'Swap ' }];
+  // const breadcrumbs = [{ name: 'Wallets', to: '/wallets' }, { name: 'Swap ' }];
 
   return (
     <Layout
-      breadcrumbs={breadcrumbs}
-      centered={
-        <Wrapper>
-          <SwapWidget />
-        </Wrapper>
-      }
+      // breadcrumbs={breadcrumbs}
+      rightColumn={<SwapWidget />}
     />
   );
 };

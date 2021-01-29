@@ -1,6 +1,8 @@
-import React, { FunctionComponent } from 'react';
+import React, { FunctionComponent, useState } from 'react';
 
 import { styled } from '@linaria/react';
+import classNames from 'classnames';
+import { rgba } from 'polished';
 
 import { Icon } from 'components/ui';
 
@@ -8,7 +10,14 @@ const Wrapper = styled.div`
   display: flex;
 `;
 
-const Circle = styled.div`
+const WalletIcon = styled(Icon)`
+  width: 24px;
+  height: 24px;
+
+  color: #a3a5ba;
+`;
+
+const IconWrapper = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
@@ -16,12 +25,15 @@ const Circle = styled.div`
   height: 44px;
 
   background: #f6f6f8;
-  border-radius: 50%;
-`;
+  border-radius: 12px;
 
-const WalletIcon = styled(Icon)`
-  width: 24px;
-  height: 24px;
+  &.isFocused {
+    background: #eff3ff;
+
+    ${WalletIcon} {
+      color: #5887ff;
+    }
+  }
 `;
 
 const ToInput = styled.input`
@@ -29,9 +41,9 @@ const ToInput = styled.input`
   margin-left: 20px;
 
   color: #000;
-  font-weight: 500;
+  font-weight: 600;
   font-size: 18px;
-  line-height: 21px;
+  line-height: 120%;
 
   background: transparent;
   border: 0;
@@ -41,7 +53,7 @@ const ToInput = styled.input`
   appearance: none;
 
   &::placeholder {
-    color: #c2c2c2;
+    color: ${rgba('#A3A5BA', 0.5)};
   }
 `;
 
@@ -51,6 +63,8 @@ type Props = {
 };
 
 export const ToAddressInput: FunctionComponent<Props> = ({ value, onChange }) => {
+  const [isFocused, setIsFocused] = useState(false);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const nextValue = e.target.value.trim();
 
@@ -59,10 +73,16 @@ export const ToAddressInput: FunctionComponent<Props> = ({ value, onChange }) =>
 
   return (
     <Wrapper>
-      <Circle>
+      <IconWrapper className={classNames({ isFocused })}>
         <WalletIcon name="wallet" />
-      </Circle>
-      <ToInput placeholder="Enter wallet address" value={value} onChange={handleChange} />
+      </IconWrapper>
+      <ToInput
+        placeholder="Enter 0x address"
+        value={value}
+        onChange={handleChange}
+        onFocus={() => setIsFocused(true)}
+        onBlur={() => setIsFocused(false)}
+      />
     </Wrapper>
   );
 };
