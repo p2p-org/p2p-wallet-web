@@ -7,6 +7,7 @@ import { Icon } from 'components/ui';
 
 const Wrapper = styled.label`
   display: flex;
+  flex: 1;
   align-items: center;
   height: 42px;
 
