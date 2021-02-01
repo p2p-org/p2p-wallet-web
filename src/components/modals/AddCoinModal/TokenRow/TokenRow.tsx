@@ -6,6 +6,7 @@ import classNames from 'classnames';
 import { rgba } from 'polished';
 
 import { Token } from 'api/token/Token';
+import { LoaderBlock } from 'components/common/LoaderBlock';
 import { TokenAvatar } from 'components/common/TokenAvatar';
 import { Button, Icon, Input } from 'components/ui';
 import { createAccountForToken } from 'store/slices/wallet/WalletSlice';
@@ -50,7 +51,7 @@ const ChevronIcon = styled(Icon)`
 const Main = styled.div`
   flex: 1;
 
-  padding: 0 30px;
+  padding: 0 20px;
 
   &.opened {
     background: ${rgba('#f6f6f8', 0.5)};
@@ -118,6 +119,14 @@ const Additional = styled.div`
     padding-bottom: 15px;
 
     border-bottom: 1px dashed ${rgba('#000', 0.05)};
+  }
+
+  &.mint label div {
+    color: #2db533;
+  }
+
+  &.exec button {
+    background: ${rgba('#5887ff', 0.5)};
   }
 
   & label {
@@ -189,23 +198,41 @@ const Error = styled.div`
   color: #f43f3d;
 `;
 
+const LoaderBlockStyled = styled(LoaderBlock)`
+  margin-right: 8px;
+`;
+
 type Props = {
   token: Token;
+  isInfluencedFunds: boolean;
+  fee: number;
   closeModal: () => void;
 };
 
-export const TokenRow: FunctionComponent<Props> = ({ token, closeModal }) => {
+export const TokenRow: FunctionComponent<Props> = ({ token, fee, isInfluencedFunds, closeModal }) => {
   const dispatch = useDispatch();
   // eslint-disable-next-line unicorn/no-null
   const inputRef = useRef<HTMLInputElement>(null);
   const [isOpen, setIsOpen] = useState(false);
+
+  const [isExecuting, setIsExecuting] = useState(false);
+  const [isError, setError] = useState(false);
+  const [isMintCopied, setIsMintCopied] = useState(false);
 
   const handleChevronClick = () => {
     setIsOpen(!isOpen);
   };
 
   const handleAddClick = async () => {
-    await dispatch(createAccountForToken({ token }));
+    try {
+      setIsExecuting(true);
+      await dispatch(createAccountForToken({ token }));
+    } catch (error) {
+      setError(true);
+      console.log(error);
+    } finally {
+      setIsExecuting(false);
+    }
     // dispatch(getTokenAccounts());
     closeModal();
   };
@@ -217,11 +244,9 @@ export const TokenRow: FunctionComponent<Props> = ({ token, closeModal }) => {
       input.focus();
       input.setSelectionRange(0, input.value.length);
       document.execCommand('copy');
+      setIsMintCopied(true);
     }
   };
-
-  // TODO
-  const isError = false;
 
   return (
     <Wrapper>
@@ -242,18 +267,24 @@ export const TokenRow: FunctionComponent<Props> = ({ token, closeModal }) => {
             <ChevronIcon name="chevron" />
           </ChevronWrapper>
         </Content>
-        <Additional className={classNames({ opened: isOpen })}>
+        <Additional
+          className={classNames({ opened: isOpen, mint: isMintCopied, exec: isExecuting })}>
           <Input
             ref={inputRef}
-            title={`${token.symbol} Mint Address`}
+            title={isMintCopied ? 'Mint Address Copied!' : `${token.symbol} Mint Address`}
             value={token.address.toBase58()}
+            onClick={handleCopyClick}
             readOnly
           />
-          <Button primary onClick={handleAddClick}>
-            <PlusIconWrapper>
-              <PlusIcon name="plus" />
-            </PlusIconWrapper>
-            Add token
+          <Button primary disabled={isExecuting} onClick={handleAddClick}>
+            {isExecuting ? (
+              <LoaderBlockStyled />
+            ) : (
+              <PlusIconWrapper>
+                <PlusIcon name="plus" />
+              </PlusIconWrapper>
+            )}
+            {isExecuting ? 'Adding' : 'Add token'}
           </Button>
         </Additional>
         <BottomInfo className={classNames({ opened: isOpen, error: isError })}>
@@ -262,7 +293,13 @@ export const TokenRow: FunctionComponent<Props> = ({ token, closeModal }) => {
           ) : (
             <>
               <LeftInfo>View in Solana explorer</LeftInfo>
-              <RightInfo>will cost 0.002039 SOL</RightInfo>
+              <RightInfo
+                className={classNames({
+                  error: isInfluencedFunds,
+                })}>
+                {`will cost ${fee} SOL`}
+                {isInfluencedFunds ? ' (Influenced funds)' : ''}
+              </RightInfo>
             </>
           )}
         </BottomInfo>
