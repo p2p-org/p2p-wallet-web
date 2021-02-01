@@ -52,6 +52,19 @@ const Wrapper = styled.button`
     background: #f3f3f3;
   }
 
+  &.lightGray {
+    color: #a3a5ba;
+
+    background: #f6f6f8;
+  }
+
+  &.hollow {
+    color: #5887ff;
+
+    background: #fff;
+    border: 1px solid #5887ff;
+  }
+
   &.link {
     height: auto;
     padding: 0;
@@ -64,6 +77,10 @@ const Wrapper = styled.button`
 
   &.small {
     height: 36px;
+  }
+
+  &.medium {
+    height: 46px;
   }
 
   &.big {
@@ -86,8 +103,11 @@ type Props = {
   secondary?: boolean;
   light?: boolean;
   gray?: boolean;
+  lightGray?: boolean;
+  hollow?: boolean;
   link?: boolean;
   small?: boolean;
+  medium?: boolean;
   big?: boolean;
   full?: boolean;
 };
@@ -98,8 +118,11 @@ export const Button: FunctionComponent<Props & React.ButtonHTMLAttributes<HTMLBu
   secondary,
   light,
   gray,
+  lightGray,
   link,
+  hollow,
   small,
+  medium,
   big,
   full,
   children,
@@ -117,10 +140,13 @@ export const Button: FunctionComponent<Props & React.ButtonHTMLAttributes<HTMLBu
         secondary,
         light,
         gray,
+        lightGray,
         link,
+        hollow,
         small,
-        full,
+        medium,
         big,
+        full,
       })}>
       {children}
     </Wrapper>

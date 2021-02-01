@@ -3,7 +3,6 @@ import React, { FunctionComponent, useState } from 'react';
 import { styled } from '@linaria/react';
 
 import { Token } from 'api/token/Token';
-import { Icon } from 'components/ui';
 import { SearchInput } from 'components/ui/SearchInput';
 
 import { TokenRow } from '../TokenRow';
@@ -15,21 +14,6 @@ const Wrapper = styled.div`
 
 const SearchInputStyled = styled(SearchInput)`
   margin: 15px 20px 0;
-`;
-
-const SearchIconWrapper = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-`;
-
-const SearchIcon = styled(Icon)`
-  width: 28px;
-  height: 28px;
-
-  color: #a3a5ba;
 `;
 
 type Props = {

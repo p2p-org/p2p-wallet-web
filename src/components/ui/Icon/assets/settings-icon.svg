@@ -1,0 +1,8 @@
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path fill-rule="evenodd" clip-rule="evenodd" d="M8.88889 7.11103C9.37981 7.11103 9.77778 7.509 9.77778 7.99992L9.77778 23.9999C9.77778 24.4908 9.37981 24.8888 8.88889 24.8888C8.39797 24.8888 8 24.4908 8 23.9999L8 7.99992C8 7.509 8.39797 7.11103 8.88889 7.11103Z" fill="currentColor"/>
+<path fill-rule="evenodd" clip-rule="evenodd" d="M23.1106 7.11103C23.6015 7.11103 23.9995 7.509 23.9995 7.99992V23.9999C23.9995 24.4908 23.6015 24.8888 23.1106 24.8888C22.6196 24.8888 22.2217 24.4908 22.2217 23.9999V7.99992C22.2217 7.509 22.6196 7.11103 23.1106 7.11103Z" fill="currentColor"/>
+<rect x="21.4434" y="14.3333" width="3.33333" height="3.33333" rx="1.66667" fill="#F6F6F8" stroke="currentColor" stroke-width="2"/>
+<path fill-rule="evenodd" clip-rule="evenodd" d="M15.9992 7.11103C16.4902 7.11103 16.8881 7.509 16.8881 7.99992V23.9999C16.8881 24.4908 16.4902 24.8888 15.9992 24.8888C15.5083 24.8888 15.1104 24.4908 15.1104 23.9999L15.1104 7.99992C15.1104 7.509 15.5083 7.11103 15.9992 7.11103Z" fill="currentColor"/>
+<rect x="14.333" y="17.8888" width="3.33333" height="3.33333" rx="1.66667" fill="#F6F6F8" stroke="currentColor" stroke-width="2"/>
+<rect x="7.22168" y="10.7777" width="3.33333" height="3.33333" rx="1.66667" fill="#F6F6F8" stroke="currentColor" stroke-width="2"/>
+</svg>

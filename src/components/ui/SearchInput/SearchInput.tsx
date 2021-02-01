@@ -8,7 +8,6 @@ import { Icon } from 'components/ui';
 const Wrapper = styled.label`
   display: flex;
   align-items: center;
-  width: 100%;
   height: 42px;
 
   background: #f6f6f8;

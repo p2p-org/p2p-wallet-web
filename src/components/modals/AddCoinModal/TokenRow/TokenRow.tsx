@@ -29,6 +29,7 @@ const ChevronWrapper = styled.div`
   background: #f6f6f8;
   border-radius: 8px;
   transform: rotate(270deg);
+  cursor: pointer;
 
   &.opened {
     background: #a3a5ba;
@@ -119,31 +120,31 @@ const Additional = styled.div`
 
     border-bottom: 1px dashed ${rgba('#000', 0.05)};
   }
+`;
 
-  & label {
-    flex: 1;
+const TokenInfo = styled.div`
+  flex: 1;
 
-    height: 44px;
+  margin-right: 10px;
+`;
 
-    padding: 0;
+const AddButton = styled(Button)`
+  height: 44px;
+`;
 
-    background: inherit;
+const TokenName = styled.div`
+  color: #a3a5ba;
+  font-size: 14px;
+  line-height: 16px;
+`;
 
-    & div {
-      font-size: 14px;
-      line-height: 16px;
-    }
+const TokenAddress = styled.div`
+  margin-top: 4px;
 
-    & input {
-      font-weight: 600;
-      font-size: 13px;
-      line-height: 16px;
-    }
-  }
-
-  & button {
-    height: 44px;
-  }
+  color: #000;
+  font-weight: 600;
+  font-size: 13px;
+  line-height: 16px;
 `;
 
 const PlusIconWrapper = styled.div`
@@ -210,15 +211,15 @@ export const TokenRow: FunctionComponent<Props> = ({ token, closeModal }) => {
     closeModal();
   };
 
-  const handleCopyClick = () => {
-    const input = inputRef.current;
-
-    if (input) {
-      input.focus();
-      input.setSelectionRange(0, input.value.length);
-      document.execCommand('copy');
-    }
-  };
+  // const handleCopyClick = () => {
+  //   const input = inputRef.current;
+  //
+  //   if (input) {
+  //     input.focus();
+  //     input.setSelectionRange(0, input.value.length);
+  //     document.execCommand('copy');
+  //   }
+  // };
 
   // TODO
   const isError = false;
@@ -243,18 +244,16 @@ export const TokenRow: FunctionComponent<Props> = ({ token, closeModal }) => {
           </ChevronWrapper>
         </Content>
         <Additional className={classNames({ opened: isOpen })}>
-          <Input
-            ref={inputRef}
-            title={`${token.symbol} Mint Address`}
-            value={token.address.toBase58()}
-            readOnly
-          />
-          <Button primary onClick={handleAddClick}>
+          <TokenInfo>
+            <TokenName>{token.symbol} Mint Address</TokenName>
+            <TokenAddress>{token.address.toBase58()}</TokenAddress>
+          </TokenInfo>
+          <AddButton primary onClick={handleAddClick}>
             <PlusIconWrapper>
               <PlusIcon name="plus" />
             </PlusIconWrapper>
             Add token
-          </Button>
+          </AddButton>
         </Additional>
         <BottomInfo className={classNames({ opened: isOpen, error: isError })}>
           {isError ? (

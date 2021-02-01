@@ -4,7 +4,6 @@ import { batch, useDispatch, useSelector } from 'react-redux';
 import { styled } from '@linaria/react';
 import { Cluster } from '@solana/web3.js';
 import classNames from 'classnames';
-import { rgba } from 'polished';
 
 import { Icon } from 'components/ui';
 import { CLUSTERS } from 'config/constants';

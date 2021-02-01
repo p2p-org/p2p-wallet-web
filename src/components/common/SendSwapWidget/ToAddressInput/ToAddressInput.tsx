@@ -6,10 +6,6 @@ import { rgba } from 'polished';
 
 import { Icon } from 'components/ui';
 
-const Wrapper = styled.div`
-  display: flex;
-`;
-
 const WalletIcon = styled(Icon)`
   width: 24px;
   height: 24px;
@@ -28,10 +24,24 @@ const IconWrapper = styled.div`
   border-radius: 12px;
 
   &.isFocused {
-    background: #eff3ff;
+    background: #5887ff !important;
 
     ${WalletIcon} {
-      color: #5887ff;
+      color: #fff !important;
+    }
+  }
+`;
+
+const WrapperLabel = styled.label`
+  display: flex;
+
+  &:hover {
+    ${IconWrapper} {
+      background: #eff3ff;
+
+      ${WalletIcon} {
+        color: #5887ff;
+      }
     }
   }
 `;
@@ -72,7 +82,7 @@ export const ToAddressInput: FunctionComponent<Props> = ({ value, onChange }) =>
   };
 
   return (
-    <Wrapper>
+    <WrapperLabel>
       <IconWrapper className={classNames({ isFocused })}>
         <WalletIcon name="wallet" />
       </IconWrapper>
@@ -83,6 +93,6 @@ export const ToAddressInput: FunctionComponent<Props> = ({ value, onChange }) =>
         onFocus={() => setIsFocused(true)}
         onBlur={() => setIsFocused(false)}
       />
-    </Wrapper>
+    </WrapperLabel>
   );
 };

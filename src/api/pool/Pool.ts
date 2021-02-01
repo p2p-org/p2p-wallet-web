@@ -23,7 +23,7 @@ export type SerializablePool = {
   feeRatio: number;
 };
 
-export const DEFAULT_SLIPPAGE = 0.01;
+export const DEFAULT_SLIPPAGE = 0.1;
 type SlippageDirection = 'down' | 'up';
 
 export type TokenAmounts = {
@@ -48,7 +48,8 @@ export const adjustForSlippage = (
   direction: SlippageDirection,
   slippage = DEFAULT_SLIPPAGE,
 ): Decimal => {
-  const slippageMultiplier = 1 + (direction === 'up' ? slippage : -slippage);
+  const slippageFractional = slippage / 100;
+  const slippageMultiplier = 1 + (direction === 'up' ? slippageFractional : -slippageFractional);
 
   return toDecimal(amount).mul(slippageMultiplier); // TODO: check its need or not ".floor()"
 };

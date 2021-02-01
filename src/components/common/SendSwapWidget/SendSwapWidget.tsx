@@ -5,6 +5,7 @@ import { rgba } from 'polished';
 
 import { TokenAccount } from 'api/token/TokenAccount';
 import { RateUSDT } from 'components/common/RateUSDT';
+import { SettingsAction } from 'components/common/SendSwapWidget/SettingsAction';
 import { Widget } from 'components/common/Widget';
 import { Button, Icon } from 'components/ui';
 
@@ -43,6 +44,14 @@ const Title = styled.div`
   font-weight: 600;
   font-size: 20px;
   line-height: 120%;
+`;
+
+const ActionsWrapper = styled.div`
+  display: flex;
+
+  &:not(:last-child) {
+    margin-right: 10px;
+  }
 `;
 
 const FromWrapper = styled.div`
@@ -134,7 +143,7 @@ const BottomWrapper = styled.div`
   }
 `;
 
-const ActionWrapper = styled.div``;
+const ButtonWrapper = styled.div``;
 
 const Hint = styled.div`
   margin-top: 20px;
@@ -194,6 +203,11 @@ export const SendSwapWidget: FunctionComponent<Props> = ({
           </IconWrapper>
           <Title>{title}</Title>
         </TitleWrapper>
+      }
+      action={
+        <ActionsWrapper>
+          <SettingsAction />
+        </ActionsWrapper>
       }>
       <FromWrapper>
         <FromToSelectInputStyled
@@ -245,12 +259,12 @@ export const SendSwapWidget: FunctionComponent<Props> = ({
       )}
       <BottomWrapper>
         {properties}
-        <ActionWrapper>
+        <ButtonWrapper>
           <Button primary={!disabled} disabled={disabled} big full onClick={onSubmit}>
             {actionText}
           </Button>
           <Hint>All deposits are stored 100% non-custodiallity with keys held on this device</Hint>
-        </ActionWrapper>
+        </ButtonWrapper>
       </BottomWrapper>
     </WrapperWidget>
   );

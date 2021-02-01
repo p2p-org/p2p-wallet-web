@@ -1,10 +1,7 @@
 import React, { FunctionComponent, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useHistory } from 'react-router';
 
 import { styled } from '@linaria/react';
-import classNames from 'classnames';
-import { rgba } from 'polished';
 
 import { adjustForSlippage } from 'api/pool/Pool';
 import { usePoolFromLocation } from 'api/pool/utils/state';
@@ -62,32 +59,6 @@ const PropertyLine = styled.div`
 
 const PropertyValue = styled.div`
   color: #000;
-`;
-
-const SlippageOption = styled.button`
-  height: 35px;
-  padding: 0 18px;
-
-  color: ${rgba('#000', 0.5)};
-
-  background: #f7f7f7;
-  border: 1px solid transparent;
-  border-radius: 8px;
-
-  outline: none;
-  cursor: pointer;
-
-  appearance: none;
-
-  &.active {
-    color: #000;
-
-    border-color: rgba(0, 0, 0, 0.5);
-  }
-
-  &:not(:last-child) {
-    margin-right: 10px;
-  }
 `;
 
 export const SwapWidget: FunctionComponent = () => {
@@ -166,14 +137,6 @@ export const SwapWidget: FunctionComponent = () => {
     );
   };
 
-  const handleSlippageChange = (newSlippage: number) => {
-    dispatch(
-      updateTokenPairState({
-        slippage: newSlippage,
-      }),
-    );
-  };
-
   const selectFirstTokenHandleChange = handleTokenSelectionChange('firstToken');
   const selectSecondTokenHandleChange = handleTokenSelectionChange('secondToken');
 
@@ -222,7 +185,7 @@ export const SwapWidget: FunctionComponent = () => {
       disabled={isExecuting || !selectedPool}
       actionText={
         // eslint-disable-next-line unicorn/no-nested-ternary
-        isExecuting ? 'Processing...' : selectedPool ? 'Swap' : 'This pair is unavailable'
+        isExecuting ? 'Processing...' : selectedPool ? 'Swap now' : 'This pair is unavailable'
       }
       rate={
         rate ? (
@@ -250,19 +213,12 @@ export const SwapWidget: FunctionComponent = () => {
               Liquidity Provider Fee: <PropertyValue>{fee} SOL</PropertyValue>
             </PropertyLine>
           ) : undefined}
-          <PropertyLine>
-            Slippage:
-            <PropertyValue>
-              {[0.001, 0.005, 0.01, 0.25].map((value) => (
-                <SlippageOption
-                  key={value}
-                  onClick={() => handleSlippageChange(value)}
-                  className={classNames({ active: slippage === value })}>
-                  {value * 100}%
-                </SlippageOption>
-              ))}
-            </PropertyValue>
-          </PropertyLine>
+          {slippage ? (
+            <PropertyLine>
+              Slippage:
+              <PropertyValue>{slippage} %</PropertyValue>
+            </PropertyLine>
+          ) : undefined}
         </PropertiesWrapper>
       }
       fromTokenAccount={firstTokenAccount}

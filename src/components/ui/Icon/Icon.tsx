@@ -13,10 +13,12 @@ import close from './assets/close-icon.svg';
 import copy from './assets/copy-icon.svg';
 import gear from './assets/gear-icon.svg';
 import home from './assets/home-icon.svg';
+import pen from './assets/pen-icon.svg';
 import plug from './assets/plug-icon.svg';
 import plus from './assets/plus-icon.svg';
 import qr from './assets/qr-icon.svg';
 import search from './assets/search-icon.svg';
+import settings from './assets/settings-icon.svg';
 import success from './assets/success-icon.svg';
 import swap from './assets/swap-icon.svg';
 import top from './assets/top-icon.svg';
@@ -39,9 +41,11 @@ const iconsMap = new Map<string, SvgIconType>([
   ['copy', copy],
   ['gear', gear],
   ['search', search],
+  ['settings', settings],
   ['success', success],
   ['swap', swap],
   ['home', home],
+  ['pen', pen],
   ['plug', plug],
   ['plus', plus],
   ['qr', qr],

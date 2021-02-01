@@ -1,9 +1,11 @@
-import React, { FunctionComponent, useEffect, useRef, useState } from 'react';
+import React, { FunctionComponent, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 
 import { styled } from '@linaria/react';
+import emptyImg from 'assets/images/empty.png';
 import classNames from 'classnames';
 import { Decimal } from 'decimal.js';
+import throttle from 'lodash.throttle';
 
 import { TokenAccount } from 'api/token/TokenAccount';
 import { AmountUSDT } from 'components/common/AmountUSDT';
@@ -16,6 +18,8 @@ import { minorAmountToMajor } from 'utils/amount';
 import { shortAddress } from 'utils/tokens';
 
 import { TokenRow } from './TokenRow';
+
+const emptyImage = 'assets/images/';
 
 const Wrapper = styled.div``;
 
@@ -53,7 +57,7 @@ const WalletIcon = styled(Icon)`
   width: 24px;
   height: 24px;
 
-  color: #5887ff;
+  color: #a3a5ba;
 `;
 
 const TokenAvatarWrapper = styled.div`
@@ -193,7 +197,7 @@ const DropDownHeader = styled.div`
   padding: 0 20px;
 
   border-radius: 0 0 12px 12px;
-  box-shadow: 0 5px 10px rgba(56, 60, 71, 0.05);
+  box-shadow: none;
   backdrop-filter: blur(15px);
 `;
 
@@ -270,6 +274,33 @@ const DropDownList = styled.div`
   overflow-y: auto;
 `;
 
+const EmptyWrapper = styled.div`
+  margin: 50px 0;
+
+  text-align: center;
+`;
+
+const EmptyImg = styled.img`
+  width: 82px;
+  height: 78px;
+`;
+
+const EmptyTitle = styled.div`
+  margin-top: 12px;
+
+  color: #000;
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 140%;
+`;
+
+const EmptyDescription = styled.div`
+  color: #a3a5ba;
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 140%;
+`;
+
 type Props = {
   type?: 'send' | 'swap';
   direction?: 'from' | 'to';
@@ -280,6 +311,8 @@ type Props = {
   disabled?: boolean;
   className?: string;
 };
+
+const SCROLL_THRESHOLD = 15;
 
 export const FromToSelectInput: FunctionComponent<Props> = ({
   type = 'send',
@@ -293,9 +326,11 @@ export const FromToSelectInput: FunctionComponent<Props> = ({
 }) => {
   const selectorRef = useRef<HTMLDivElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const listRef = useRef<HTMLDivElement>(null);
   const [filter, setFilter] = useState('');
   const [localAmount, setLocalAmount] = useState(`${amount}`);
   const [isOpen, setIsOpen] = useState(false);
+  const [scrollTop, setScrollTop] = useState(0);
   const tokenAccounts = useSelector((state: RootState) =>
     state.wallet.tokenAccounts.map((account) => TokenAccount.from(account)),
   );
@@ -305,6 +340,24 @@ export const FromToSelectInput: FunctionComponent<Props> = ({
       setLocalAmount(amount);
     }
   }, [amount]);
+
+  const handleScroll = throttle(() => {
+    if (!listRef.current) {
+      return;
+    }
+
+    if (listRef.current.scrollTop <= SCROLL_THRESHOLD) {
+      setScrollTop(listRef.current.scrollTop);
+    } else {
+      setScrollTop(SCROLL_THRESHOLD);
+    }
+  }, 100);
+
+  const boxShadow = useMemo(() => {
+    return `0 5px 10px rgba(56, 60, 71, ${
+      scrollTop >= SCROLL_THRESHOLD ? '0.05' : 0.003 * scrollTop
+    }`;
+  }, [scrollTop]);
 
   const handleAwayClick = (e: MouseEvent) => {
     if (
@@ -322,6 +375,22 @@ export const FromToSelectInput: FunctionComponent<Props> = ({
       window.removeEventListener('click', handleAwayClick);
     };
   }, []);
+
+  useEffect(() => {
+    if (!listRef.current) {
+      return;
+    }
+
+    listRef.current.addEventListener('scroll', handleScroll);
+
+    return () => {
+      if (!listRef.current) {
+        return;
+      }
+
+      listRef.current.removeEventListener('scroll', handleScroll);
+    };
+  }, [isOpen, listRef.current]);
 
   const handleSelectorClick = () => {
     if (!tokenAccounts) {
@@ -374,13 +443,39 @@ export const FromToSelectInput: FunctionComponent<Props> = ({
     }`;
   };
 
+  const filteredTokens = useMemo(() => {
+    if (!tokenAccounts) {
+      return;
+    }
+
+    return tokenAccounts
+      .filter((account) => direction === 'to' || account.balance.toNumber() > 0)
+      .filter(
+        (account) =>
+          !filter ||
+          account.mint.symbol?.toLowerCase().includes(filter) ||
+          account.mint.name?.toLowerCase().includes(filter),
+      )
+      .sort((a, b) => b.balance.cmp(a.balance));
+  }, [tokenAccounts, direction, filter]);
+
+  const renderEmpty = () => {
+    return (
+      <EmptyWrapper>
+        <EmptyImg src={emptyImg as string} />
+        <EmptyTitle>Nothing found</EmptyTitle>
+        <EmptyDescription>Change your search phrase and try again</EmptyDescription>
+      </EmptyWrapper>
+    );
+  };
+
   return (
     <Wrapper className={className}>
       <TopWrapper>
         <FromTitle>{direction === 'from' ? 'From' : 'To'}</FromTitle>
       </TopWrapper>
       <MainWrapper>
-        <TokenAvatarWrapper className={classNames({ isOpen })}>
+        <TokenAvatarWrapper className={classNames({ isOpen: isOpen && !tokenAccount })}>
           {tokenAccount ? (
             <TokenAvatar symbol={tokenAccount?.mint.symbol} size={44} />
           ) : (
@@ -413,7 +508,7 @@ export const FromToSelectInput: FunctionComponent<Props> = ({
           <BalanceWrapper>
             <BalanceText>
               {tokenAccount ? (
-                direction === 'from' ? (
+                direction === 'from' && !disabled ? (
                   <AllBalance onClick={handleAllBalanceClick} className={classNames({ disabled })}>
                     Available: {renderBalance()}
                   </AllBalance>
@@ -438,7 +533,10 @@ export const FromToSelectInput: FunctionComponent<Props> = ({
       </MainWrapper>
       {isOpen ? (
         <DropDownListContainer ref={dropdownRef}>
-          <DropDownHeader>
+          <DropDownHeader
+            style={{
+              boxShadow,
+            }}>
             <Title>Select token</Title>
             <SlideContainer>
               <FiltersWrapper>
@@ -453,30 +551,23 @@ export const FromToSelectInput: FunctionComponent<Props> = ({
                 {/* <FilterName>Compound</FilterName> */}
                 {/* <FilterName>Last</FilterName> */}
                 <SearchInput
-                  placeholder={`Search for currency to ${type}`}
+                  placeholder="Search uniswap"
                   value={filter}
                   onChange={handleFilterChange}
                 />
               </FiltersWrapper>
             </SlideContainer>
           </DropDownHeader>
-          <DropDownList>
-            {tokenAccounts
-              .filter((account) => direction === 'to' || account.balance.toNumber() > 0)
-              .filter(
-                (account) =>
-                  !filter ||
-                  account.mint.symbol?.toLowerCase().includes(filter) ||
-                  account.mint.name?.toLowerCase().includes(filter),
-              )
-              .sort((a, b) => b.balance.cmp(a.balance))
-              .map((account) => (
-                <TokenRow
-                  key={account.address.toBase58()}
-                  tokenAccount={account}
-                  onClick={handleItemClick}
-                />
-              ))}
+          <DropDownList ref={listRef}>
+            {filteredTokens?.length
+              ? filteredTokens.map((account) => (
+                  <TokenRow
+                    key={account.address.toBase58()}
+                    tokenAccount={account}
+                    onClick={handleItemClick}
+                  />
+                ))
+              : renderEmpty()}
           </DropDownList>
         </DropDownListContainer>
       ) : undefined}
