@@ -121,14 +121,6 @@ const Additional = styled.div`
     border-bottom: 1px dashed ${rgba('#000', 0.05)};
   }
 
-  &.mint label div {
-    color: #2db533;
-  }
-
-  &.exec button {
-    background: ${rgba('#5887ff', 0.5)};
-  }
-
   & label {
     flex: 1;
 
@@ -150,8 +142,16 @@ const Additional = styled.div`
     }
   }
 
+  &.mint label div {
+    color: #2db533;
+  }
+
   & button {
     height: 44px;
+  }
+
+  &.exec button {
+    background: ${rgba('#5887ff', 0.5)};
   }
 `;
 
@@ -209,7 +209,12 @@ type Props = {
   closeModal: () => void;
 };
 
-export const TokenRow: FunctionComponent<Props> = ({ token, fee, isInfluencedFunds, closeModal }) => {
+export const TokenRow: FunctionComponent<Props> = ({
+  token,
+  fee,
+  isInfluencedFunds,
+  closeModal,
+}) => {
   const dispatch = useDispatch();
   // eslint-disable-next-line unicorn/no-null
   const inputRef = useRef<HTMLInputElement>(null);
