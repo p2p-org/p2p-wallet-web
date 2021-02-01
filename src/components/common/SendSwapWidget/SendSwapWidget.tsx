@@ -4,63 +4,60 @@ import { styled } from '@linaria/react';
 import { rgba } from 'polished';
 
 import { TokenAccount } from 'api/token/TokenAccount';
-import { Card } from 'components/common/Card';
 import { RateUSDT } from 'components/common/RateUSDT';
+import { Widget } from 'components/common/Widget';
 import { Button, Icon } from 'components/ui';
 
 import { FromToSelectInput } from './FromToSelectInput';
 import { ToAddressInput } from './ToAddressInput';
 
-const Wrapper = styled.div``;
+const WrapperWidget = styled(Widget)``;
 
 const TitleWrapper = styled.div`
   display: flex;
   align-items: center;
 `;
 
-const BackWrapper = styled.div`
+const IconWrapper = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 35px;
-  height: 35px;
+  width: 36px;
+  height: 36px;
 
-  background: #fcfcfc;
-  border: 1px solid ${rgba('#000', 0.1)};
-  border-radius: 10px;
-  cursor: pointer;
+  background: #5887ff;
+  border-radius: 12px;
 `;
 
-const BackIcon = styled(Icon)`
-  width: 15px;
-  height: 15px;
+const IconStyled = styled(Icon)`
+  width: 24px;
+  height: 24px;
 
-  color: #000;
-
-  transform: rotate(90deg);
+  color: #fff;
 `;
 
 const Title = styled.div`
-  margin-left: 20px;
+  margin-left: 16px;
 
   color: #000;
-
-  font-weight: 500;
-  font-size: 22px;
+  font-weight: 600;
+  font-size: 20px;
   line-height: 120%;
-`;
-
-const WrapperCard = styled(Card)`
-  margin-top: 20px;
-  padding: 0;
 `;
 
 const FromWrapper = styled.div`
   position: relative;
 
-  padding: 20px 32px;
+  display: flex;
+  flex-direction: column; /* to don't collapse margins of children */
+
+  padding: 24px 20px 20px;
 
   border-bottom: 1px solid ${rgba('#000', 0.05)};
+`;
+
+const FromToSelectInputStyled = styled(FromToSelectInput)`
+  margin-bottom: 26px;
 `;
 
 const ReverseWrapper = styled.div`
@@ -74,74 +71,49 @@ const ReverseWrapper = styled.div`
   width: 44px;
   height: 44px;
 
-  background: #fff;
-  border: 1px solid #e7e7e7;
-  border-radius: 44px;
+  background: #5887ff;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
   cursor: pointer;
 `;
 
 const ReverseIcon = styled(Icon)`
   width: 24px;
   height: 24px;
+
+  color: #fff;
 `;
 
-const ToWrapper = styled.div`
-  padding: 16px 32px 32px;
+const ToSendWrapper = styled(FromWrapper)``;
 
-  border-bottom: 1px solid ${rgba('#000', 0.05)};
+const ToSwapWrapper = styled(FromWrapper)`
+  padding-top: 34px;
 `;
 
-const ToSelect = styled.div`
-  display: flex;
-
-  /* margin-bottom: 32px; */
+const FromTitle = styled.div`
   margin-bottom: 20px;
 
-  > :not(:last-child) {
-    margin-right: 10px;
-  }
-`;
-
-// const ToOption = styled.div`
-//   display: flex;
-//   align-items: center;
-//   height: 32px;
-//   padding: 0 20px;
-//
-//   color: ${rgba('#000', 0.5)};
-//   font-size: 14px;
-//   line-height: 17px;
-//
-//   background: #fafafa;
-//   border-radius: 10px;
-//
-//   &.active {
-//     color: #000;
-//
-//     background: #e6e6e6;
-//   }
-// `;
-
-const SendTo = styled.div`
-  color: ${rgba('#000', 0.5)};
-  font-size: 14px;
-  line-height: 17px;
+  color: #000;
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 24px;
 `;
 
 const FeeLine = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 35px;
+  height: 44px;
   margin-top: 10px;
-  padding: 0 18px;
+  padding: 0 20px;
 
-  color: ${rgba('#000', 0.5)};
-  font-size: 14px;
-  line-height: 17px;
+  color: #a3a5ba;
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 24px;
 
-  background: #f7f7f7;
-  border-radius: 8px;
+  background: #f6f6f8;
+  border-radius: 12px;
 `;
 
 const FeeLeft = styled.div`
@@ -154,17 +126,24 @@ const FeeRight = styled.div`
   text-align: right;
 `;
 
-const ActionWrapper = styled.div`
-  padding: 32px;
+const BottomWrapper = styled.div`
+  padding: 20px 20px 24px;
+
+  &:not(:has(div:only-child)) {
+    padding: 20px;
+  }
 `;
 
-// const Hint = styled.div`
-//   margin-top: 24px;
-//
-//   color: ${rgba('#000', 0.5)};
-//   font-size: 14px;
-//   line-height: 17px;
-// `;
+const ActionWrapper = styled.div``;
+
+const Hint = styled.div`
+  margin-top: 20px;
+
+  color: #a3a5ba;
+  font-size: 14px;
+  line-height: 21px;
+  text-align: center;
+`;
 
 // TODO: make amounts with decimal type
 type Props = {
@@ -182,7 +161,6 @@ type Props = {
   onFromAmountChange: (minorAmount: string) => void;
   onToTokenAccountChange: (tokenAccount: TokenAccount | string) => void;
   onToAmountChange?: (minorAmount: string) => void;
-  onBackClick: () => void;
   onSubmit: () => void;
   onReverseClick?: () => void;
   disabled?: boolean;
@@ -203,87 +181,77 @@ export const SendSwapWidget: FunctionComponent<Props> = ({
   onFromAmountChange,
   onToTokenAccountChange,
   onToAmountChange = () => {},
-  onBackClick,
   onSubmit,
   onReverseClick,
   disabled,
 }) => {
   return (
-    <Wrapper>
-      <TitleWrapper>
-        <BackWrapper onClick={onBackClick}>
-          <BackIcon name="chevron-1" />
-        </BackWrapper>
-        <Title>{title}</Title>
-      </TitleWrapper>
-      <WrapperCard>
-        <FromWrapper>
-          <FromToSelectInput
+    <WrapperWidget
+      title={
+        <TitleWrapper>
+          <IconWrapper>
+            <IconStyled name="top" />
+          </IconWrapper>
+          <Title>{title}</Title>
+        </TitleWrapper>
+      }>
+      <FromWrapper>
+        <FromToSelectInputStyled
+          type={type}
+          tokenAccount={fromTokenAccount}
+          amount={fromAmount}
+          onTokenAccountChange={onFromTokenAccountChange}
+          onAmountChange={onFromAmountChange}
+          disabled={disabled}
+        />
+        {type === 'send' ? (
+          <FeeLine>
+            {fromTokenAccount?.mint ? (
+              <FeeLeft>
+                1 {fromTokenAccount?.mint.symbol} =&nbsp;
+                <RateUSDT symbol={fromTokenAccount?.mint.symbol} />
+              </FeeLeft>
+            ) : undefined}
+            {fee ? <FeeRight>Fee: {fee} SOL</FeeRight> : undefined}
+          </FeeLine>
+        ) : undefined}
+      </FromWrapper>
+      {type === 'send' ? (
+        <ToSendWrapper>
+          <FromTitle>Send to</FromTitle>
+          <ToAddressInput value={String(toTokenAccount) || ''} onChange={onToTokenAccountChange} />
+        </ToSendWrapper>
+      ) : (
+        <ToSwapWrapper>
+          <ReverseWrapper onClick={onReverseClick}>
+            <ReverseIcon name="swap" />
+          </ReverseWrapper>
+          <FromToSelectInputStyled
             type={type}
-            tokenAccount={fromTokenAccount}
-            amount={fromAmount}
-            onTokenAccountChange={onFromTokenAccountChange}
-            onAmountChange={onFromAmountChange}
+            direction="to"
+            tokenAccount={toTokenAccount as TokenAccount}
+            amount={toAmount}
+            onTokenAccountChange={onToTokenAccountChange}
+            onAmountChange={onToAmountChange}
             disabled={disabled}
           />
-          {type === 'send' ? (
+          {rate ? (
             <FeeLine>
-              {fromTokenAccount?.mint ? (
-                <FeeLeft>
-                  1 {fromTokenAccount?.mint.symbol} =&nbsp;
-                  <RateUSDT symbol={fromTokenAccount?.mint.symbol} />
-                </FeeLeft>
-              ) : undefined}
-
-              {fee ? <FeeRight>Fee: {fee} SOL</FeeRight> : undefined}
+              <FeeLeft>Price:</FeeLeft>
+              <FeeRight>{rate}</FeeRight>
             </FeeLine>
           ) : undefined}
-        </FromWrapper>
-        {type === 'send' ? (
-          <ToWrapper>
-            <ToSelect>
-              {/* <ToOption>To user</ToOption> */}
-              {/* <ToOption className="active">To wallet</ToOption> */}
-              <SendTo>Send to</SendTo>
-            </ToSelect>
-            <ToAddressInput
-              value={String(toTokenAccount) || ''}
-              onChange={onToTokenAccountChange}
-            />
-          </ToWrapper>
-        ) : (
-          <FromWrapper>
-            <ReverseWrapper onClick={onReverseClick}>
-              <ReverseIcon name="change" />
-            </ReverseWrapper>
-            <FromToSelectInput
-              type={type}
-              direction="to"
-              tokenAccount={toTokenAccount as TokenAccount}
-              amount={toAmount}
-              onTokenAccountChange={onToTokenAccountChange}
-              onAmountChange={onToAmountChange}
-              disabled={disabled}
-            />
-            {rate ? (
-              <FeeLine>
-                <FeeLeft>Price:</FeeLeft>
-                <FeeRight>{rate}</FeeRight>
-              </FeeLine>
-            ) : undefined}
-          </FromWrapper>
-        )}
+        </ToSwapWrapper>
+      )}
+      <BottomWrapper>
         {properties}
         <ActionWrapper>
           <Button primary={!disabled} disabled={disabled} big full onClick={onSubmit}>
             {actionText}
           </Button>
-          {/* <Hint> */}
-          {/*  Physical space is often conceived in three linear dimensions, although modern physicists */}
-          {/*  usually consider it, with time */}
-          {/* </Hint> */}
+          <Hint>All deposits are stored 100% non-custodiallity with keys held on this device</Hint>
         </ActionWrapper>
-      </WrapperCard>
-    </Wrapper>
+      </BottomWrapper>
+    </WrapperWidget>
   );
 };

@@ -159,11 +159,11 @@ export const Create: FunctionComponent = () => {
     });
   };
 
-  const handleChangeNewPassword = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setNewPassword(e.target.value);
+  const handleChangeNewPassword = (value: string) => {
+    setNewPassword(value);
   };
-  const handleChangeConfirmPassword = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setConfirmPassword(e.target.value);
+  const handleChangeConfirmPassword = (value: string) => {
+    setConfirmPassword(value);
   };
 
   return (

@@ -7,7 +7,8 @@ import Decimal from 'decimal.js';
 
 import { Token } from 'api/token/Token';
 import { TokenAccount } from 'api/token/TokenAccount';
-import { Icon, Input } from 'components/ui';
+import { Icon } from 'components/ui';
+import { SearchInput } from 'components/ui/SearchInput';
 import { RootState } from 'store/rootReducer';
 import { getMinimumBalanceForRentExemption } from 'store/slices/wallet/WalletSlice';
 
@@ -18,30 +19,8 @@ const Wrapper = styled.div`
   grid-gap: 2px;
 `;
 
-const InputWrapper = styled.div`
-  position: relative;
-
-  margin-top: 15px;
-  padding: 0 20px;
-
-  & label {
-    height: 48px;
-
-    & input {
-      padding-left: 30px;
-    }
-  }
-`;
-
-const SearchIcon = styled(Icon)`
-  position: absolute;
-  top: 12px;
-  left: 40px;
-
-  width: 28px;
-  height: 28px;
-
-  color: #a3a5ba;
+const SearchInputStyled = styled(SearchInput)`
+  margin: 15px 20px 0;
 `;
 
 const EmptyBlock = styled.div`
@@ -107,24 +86,29 @@ export const TokenList: FunctionComponent<Props> = ({ items, closeModal }) => {
     void mount();
   }, []);
 
-  const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const searchValue = e.target.value.trim().toLowerCase();
+  const handleFilterChange = (value: string) => {
+    const searchValue = value.trim().toLowerCase();
     setFilter(searchValue);
   };
 
   const filteredItems =
     filterValue.length > 0
-      ? items.filter((item) => item.symbol?.toLowerCase().includes(filterValue))
+      ? items.filter(
+          (item) =>
+            item.symbol?.toLowerCase().includes(filterValue) ||
+            item.name?.toLowerCase().includes(filterValue),
+        )
       : items;
 
   const isInfluencedFunds = Boolean(solAccount?.balance.lt(rawFee));
 
   return (
     <Wrapper>
-      <InputWrapper>
-        <SearchIcon name="search" />
-        <Input placeholder="Search token" value={filterValue} onChange={handleFilterChange} />
-      </InputWrapper>
+      <SearchInputStyled
+        placeholder="Search token"
+        value={filterValue}
+        onChange={handleFilterChange}
+      />
       {filteredItems.length > 0 ? (
         filteredItems.map((token) => (
           <TokenRow

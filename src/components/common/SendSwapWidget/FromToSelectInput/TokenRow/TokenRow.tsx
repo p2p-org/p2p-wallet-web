@@ -4,10 +4,12 @@ import { styled } from '@linaria/react';
 import { rgba } from 'polished';
 
 import { TokenAccount } from 'api/token/TokenAccount';
+import { AmountUSDT } from 'components/common/AmountUSDT';
 import { TokenAvatar } from 'components/common/TokenAvatar';
+import { shortAddress } from 'utils/tokens';
 
 const Wrapper = styled.div`
-  padding: 15px 32px;
+  padding: 10px 20px;
 
   cursor: pointer;
 `;
@@ -28,9 +30,9 @@ const Top = styled.div`
   justify-content: space-between;
 
   color: #000;
-  font-weight: 500;
-  font-size: 18px;
-  line-height: 21px;
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 140%;
 `;
 
 const TokenName = styled.div`
@@ -45,11 +47,12 @@ const TokenName = styled.div`
 const Bottom = styled.div`
   display: flex;
   justify-content: space-between;
-  margin-top: 4px;
+  margin-top: 2px;
 
-  color: ${rgba('#000', 0.5)};
+  color: #a3a5ba;
+  font-weight: 600;
   font-size: 14px;
-  line-height: 17px;
+  line-height: 140%;
 `;
 
 type Props = {
@@ -71,10 +74,14 @@ export const TokenRow: FunctionComponent<Props> = ({ tokenAccount, onClick }) =>
             <TokenName title={tokenAccount.address.toBase58()}>
               {tokenAccount.mint.name || tokenAccount.address.toBase58()}
             </TokenName>
-            <div>{tokenAccount.mint.toMajorDenomination(tokenAccount.balance)}</div>
+            <AmountUSDT symbol={tokenAccount.mint.symbol} value={tokenAccount.balance} />
           </Top>
           <Bottom>
-            <div>{tokenAccount.mint.symbol}</div> <div>Current balance</div>
+            <div>{shortAddress(tokenAccount.address.toBase58())}</div>
+            <div>
+              {tokenAccount?.mint.toMajorDenomination(tokenAccount.balance)}{' '}
+              {tokenAccount.mint.symbol}
+            </div>
           </Bottom>
         </Info>
       </ItemWrapper>

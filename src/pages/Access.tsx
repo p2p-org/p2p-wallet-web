@@ -119,8 +119,8 @@ export const Access: FunctionComponent = () => {
     setMnemonic(nextMnemonic);
   };
 
-  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const nextPassword = e.target.value.trim();
+  const handlePasswordChange = (value: string) => {
+    const nextPassword = value.trim();
     setPassword(nextPassword);
   };
 

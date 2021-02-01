@@ -23,31 +23,29 @@ const Rate = styled.div`
   align-items: center;
   justify-content: flex-end;
   margin-right: -8px;
+
+  color: #000;
 `;
 
 const ChangeRateWrapper = styled.div`
-  margin-left: 12px;
+  margin-left: 20px;
 
   cursor: pointer;
 `;
 
 const ChangeRateIcon = styled(Icon)`
   display: flex;
-  width: 15px;
-  height: 15px;
+  width: 24px;
+  height: 24px;
 
   color: #a3a5ba;
 `;
 
 const PropertiesWrapper = styled.div`
-  padding: 0 50px;
-
-  > :first-child {
-    margin-top: 20px;
-  }
+  padding-bottom: 20px;
 
   > :not(:last-child) {
-    margin-bottom: 16px;
+    margin-bottom: 8px;
   }
 `;
 
@@ -56,9 +54,14 @@ const PropertyLine = styled.div`
   align-items: center;
   justify-content: space-between;
 
-  color: ${rgba('#000', 0.5)};
-  font-size: 14px;
-  line-height: 17px;
+  color: #a3a5ba;
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 24px;
+`;
+
+const PropertyValue = styled.div`
+  color: #000;
 `;
 
 const SlippageOption = styled.button`
@@ -89,7 +92,6 @@ const SlippageOption = styled.button`
 
 export const SwapWidget: FunctionComponent = () => {
   const dispatch = useDispatch();
-  const history = useHistory();
   const [isExecuting, setIsExecuting] = useState(false);
   const [isReverseRate, setIsReverseRate] = useState(false);
 
@@ -124,10 +126,6 @@ export const SwapWidget: FunctionComponent = () => {
     tokenAccounts,
     updateAction: updateTokenPairState,
   });
-
-  const handleBackClick = () => {
-    history.replace('/wallets');
-  };
 
   const handleSubmit = async () => {
     try {
@@ -232,7 +230,7 @@ export const SwapWidget: FunctionComponent = () => {
             {rate} {(isReverseRate ? secondToken : firstToken)?.symbol} per{' '}
             {(isReverseRate ? firstToken : secondToken)?.symbol}
             <ChangeRateWrapper onClick={handleChangeRateClick}>
-              <ChangeRateIcon name="change" />
+              <ChangeRateIcon name="swap" />
             </ChangeRateWrapper>
           </Rate>
         ) : undefined
@@ -242,19 +240,19 @@ export const SwapWidget: FunctionComponent = () => {
           {minimumToAmountWithSlippage ? (
             <PropertyLine>
               Minimum Received:
-              <div>
+              <PropertyValue>
                 {minimumToAmountWithSlippage.toNumber()} {secondToken?.symbol}
-              </div>
+              </PropertyValue>
             </PropertyLine>
           ) : undefined}
           {fee ? (
             <PropertyLine>
-              Liquidity Provider Fee: <div>{fee} SOL</div>
+              Liquidity Provider Fee: <PropertyValue>{fee} SOL</PropertyValue>
             </PropertyLine>
           ) : undefined}
           <PropertyLine>
-            <div>Slippage:</div>
-            <div>
+            Slippage:
+            <PropertyValue>
               {[0.001, 0.005, 0.01, 0.25].map((value) => (
                 <SlippageOption
                   key={value}
@@ -263,7 +261,7 @@ export const SwapWidget: FunctionComponent = () => {
                   {value * 100}%
                 </SlippageOption>
               ))}
-            </div>
+            </PropertyValue>
           </PropertyLine>
         </PropertiesWrapper>
       }
@@ -275,7 +273,6 @@ export const SwapWidget: FunctionComponent = () => {
       onFromAmountChange={updateFirstAmount}
       onToTokenAccountChange={selectSecondTokenHandleChange}
       // onToAmountChange={handleToAmountChange}
-      onBackClick={handleBackClick}
       onSubmit={handleSubmit}
       onReverseClick={handleReverseClick}
     />

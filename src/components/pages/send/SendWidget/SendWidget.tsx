@@ -50,10 +50,6 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
     void mount();
   }, []);
 
-  const handleBackClick = () => {
-    history.replace('/wallets');
-  };
-
   const handleSubmit = async () => {
     if (!fromTokenAccount) {
       throw new Error(`Didn't find token`);
@@ -100,7 +96,7 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
   return (
     <SendSwapWidget
       type="send"
-      title="Send tokens"
+      title="Send"
       actionText={isExecuting ? 'Processing...' : 'Send'}
       fee={fee}
       fromTokenAccount={fromTokenAccount}
@@ -109,7 +105,6 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
       onFromAmountChange={handleFromAmountChange}
       toTokenAccount={toTokenPublicKey}
       onToTokenAccountChange={handleToPublicKeyChange}
-      onBackClick={handleBackClick}
       onSubmit={handleSubmit}
       disabled={isExecuting}
     />
