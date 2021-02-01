@@ -11,9 +11,13 @@ const Wrapper = styled.div`
   height: 86px;
 `;
 
-export const LoaderBlock: FunctionComponent = () => {
+type Props = {
+  className?: string;
+};
+
+export const LoaderBlock: FunctionComponent<Props> = ({ className }) => {
   return (
-    <Wrapper>
+    <Wrapper className={className}>
       <Loader />
     </Wrapper>
   );

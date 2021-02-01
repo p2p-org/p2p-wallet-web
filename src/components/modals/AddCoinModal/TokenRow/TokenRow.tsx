@@ -6,6 +6,8 @@ import classNames from 'classnames';
 import { rgba } from 'polished';
 
 import { Token } from 'api/token/Token';
+import { LoaderBlock } from 'components/common/LoaderBlock';
+import { ToastManager } from 'components/common/ToastManager';
 import { TokenAvatar } from 'components/common/TokenAvatar';
 import { Button, Icon, Input } from 'components/ui';
 import { createAccountForToken } from 'store/slices/wallet/WalletSlice';
@@ -112,7 +114,7 @@ const Additional = styled.div`
 
   margin-top: 15px;
 
-  &.opened {
+  &.isOpen {
     display: flex;
     align-items: center;
 
@@ -126,16 +128,26 @@ const TokenInfo = styled.div`
   flex: 1;
 
   margin-right: 10px;
+
+  cursor: pointer;
 `;
 
 const AddButton = styled(Button)`
   height: 44px;
+
+  &.isExecuting {
+    background: ${rgba('#5887ff', 0.5)};
+  }
 `;
 
 const TokenName = styled.div`
   color: #a3a5ba;
   font-size: 14px;
   line-height: 16px;
+
+  &.isMintCopied {
+    color: #2db533;
+  }
 `;
 
 const TokenAddress = styled.div`
@@ -190,39 +202,62 @@ const Error = styled.div`
   color: #f43f3d;
 `;
 
+const LoaderBlockStyled = styled(LoaderBlock)`
+  margin-right: 8px;
+`;
+
 type Props = {
   token: Token;
+  isInfluencedFunds: boolean;
+  fee: number;
   closeModal: () => void;
 };
 
-export const TokenRow: FunctionComponent<Props> = ({ token, closeModal }) => {
+export const TokenRow: FunctionComponent<Props> = ({
+  token,
+  fee,
+  isInfluencedFunds,
+  closeModal,
+}) => {
   const dispatch = useDispatch();
-  // eslint-disable-next-line unicorn/no-null
-  const inputRef = useRef<HTMLInputElement>(null);
   const [isOpen, setIsOpen] = useState(false);
+
+  const [isExecuting, setIsExecuting] = useState(false);
+  const [isError, setError] = useState(false);
+  const [isMintCopied, setIsMintCopied] = useState(false);
 
   const handleChevronClick = () => {
     setIsOpen(!isOpen);
   };
 
   const handleAddClick = async () => {
-    await dispatch(createAccountForToken({ token }));
+    try {
+      setIsExecuting(true);
+      await dispatch(createAccountForToken({ token }));
+    } catch (error) {
+      setError(true);
+      console.log(error);
+    } finally {
+      setIsExecuting(false);
+    }
     // dispatch(getTokenAccounts());
     closeModal();
   };
 
-  // const handleCopyClick = () => {
-  //   const input = inputRef.current;
-  //
-  //   if (input) {
-  //     input.focus();
-  //     input.setSelectionRange(0, input.value.length);
-  //     document.execCommand('copy');
-  //   }
-  // };
+  const handleCopyClick = () => {
+    try {
+      void navigator.clipboard.writeText(token.address.toBase58());
+      setIsMintCopied(true);
+      ToastManager.info(`${token.address.toBase58()} Address Copied!`);
 
-  // TODO
-  const isError = false;
+      // fade copied after some seconds
+      setTimeout(() => {
+        setIsMintCopied(false);
+      }, 2000);
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   return (
     <Wrapper>
@@ -243,16 +278,26 @@ export const TokenRow: FunctionComponent<Props> = ({ token, closeModal }) => {
             <ChevronIcon name="chevron" />
           </ChevronWrapper>
         </Content>
-        <Additional className={classNames({ opened: isOpen })}>
-          <TokenInfo>
-            <TokenName>{token.symbol} Mint Address</TokenName>
+        <Additional className={classNames({ isOpen })}>
+          <TokenInfo onClick={handleCopyClick}>
+            <TokenName className={classNames({ isMintCopied })}>
+              {isMintCopied ? 'Mint Address Copied!' : `${token.symbol} Mint Address`}
+            </TokenName>
             <TokenAddress>{token.address.toBase58()}</TokenAddress>
           </TokenInfo>
-          <AddButton primary onClick={handleAddClick}>
-            <PlusIconWrapper>
-              <PlusIcon name="plus" />
-            </PlusIconWrapper>
-            Add token
+          <AddButton
+            primary
+            disabled={isExecuting}
+            onClick={handleAddClick}
+            className={classNames({ isExecuting })}>
+            {isExecuting ? (
+              <LoaderBlockStyled />
+            ) : (
+              <PlusIconWrapper>
+                <PlusIcon name="plus" />
+              </PlusIconWrapper>
+            )}
+            {isExecuting ? 'Adding' : 'Add token'}
           </AddButton>
         </Additional>
         <BottomInfo className={classNames({ opened: isOpen, error: isError })}>
@@ -261,7 +306,13 @@ export const TokenRow: FunctionComponent<Props> = ({ token, closeModal }) => {
           ) : (
             <>
               <LeftInfo>View in Solana explorer</LeftInfo>
-              <RightInfo>will cost 0.002039 SOL</RightInfo>
+              <RightInfo
+                className={classNames({
+                  error: isInfluencedFunds,
+                })}>
+                {`will cost ${fee} SOL`}
+                {isInfluencedFunds ? ' (Influenced funds)' : ''}
+              </RightInfo>
             </>
           )}
         </BottomInfo>
