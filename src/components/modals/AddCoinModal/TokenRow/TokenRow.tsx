@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useRef, useState } from 'react';
+import React, { FunctionComponent, useState } from 'react';
 import { useDispatch } from 'react-redux';
 
 import { styled } from '@linaria/react';
@@ -9,7 +9,7 @@ import { Token } from 'api/token/Token';
 import { LoaderBlock } from 'components/common/LoaderBlock';
 import { ToastManager } from 'components/common/ToastManager';
 import { TokenAvatar } from 'components/common/TokenAvatar';
-import { Button, Icon, Input } from 'components/ui';
+import { Button, Icon } from 'components/ui';
 import { createAccountForToken } from 'store/slices/wallet/WalletSlice';
 
 const Wrapper = styled.div`
@@ -33,7 +33,7 @@ const ChevronWrapper = styled.div`
   transform: rotate(270deg);
   cursor: pointer;
 
-  &.opened {
+  &.isOpen {
     background: #a3a5ba;
     transform: rotate(0deg);
 
@@ -55,7 +55,7 @@ const Main = styled.div`
 
   padding: 0 20px;
 
-  &.opened {
+  &.isOpen {
     background: ${rgba('#f6f6f8', 0.5)};
   }
 `;
@@ -66,7 +66,7 @@ const Content = styled.div`
 
   padding: 10px 0;
 
-  &.opened {
+  &.isOpen {
     padding-bottom: 20px;
 
     border-bottom: 1px dashed ${rgba('#000', 0.05)};
@@ -173,13 +173,13 @@ const BottomInfo = styled.div`
   font-weight: 600;
   font-size: 14px;
 
-  &.opened {
+  &.isOpen {
     display: flex;
 
     padding: 15px 0;
   }
 
-  &.error {
+  &.isError {
     justify-content: center;
   }
 `;
@@ -193,7 +193,7 @@ const LeftInfo = styled.div`
 const RightInfo = styled.div`
   color: #5887ff;
 
-  &.error {
+  &.isError {
     color: #f43f3d;
   }
 `;
@@ -261,8 +261,8 @@ export const TokenRow: FunctionComponent<Props> = ({
 
   return (
     <Wrapper>
-      <Main className={classNames({ opened: isOpen })}>
-        <Content className={classNames({ opened: isOpen })}>
+      <Main className={classNames({ isOpen })}>
+        <Content className={classNames({ isOpen })}>
           <InfoWrapper onClick={handleChevronClick}>
             <TokenAvatar symbol={token.symbol} size={45} />
             <Info>
@@ -274,7 +274,7 @@ export const TokenRow: FunctionComponent<Props> = ({
               </Bottom>
             </Info>
           </InfoWrapper>
-          <ChevronWrapper onClick={handleChevronClick} className={classNames({ opened: isOpen })}>
+          <ChevronWrapper onClick={handleChevronClick} className={classNames({ isOpen })}>
             <ChevronIcon name="chevron" />
           </ChevronWrapper>
         </Content>
@@ -300,7 +300,7 @@ export const TokenRow: FunctionComponent<Props> = ({
             {isExecuting ? 'Adding' : 'Add token'}
           </AddButton>
         </Additional>
-        <BottomInfo className={classNames({ opened: isOpen, error: isError })}>
+        <BottomInfo className={classNames({ isOpen, isError })}>
           {isError ? (
             <Error>Something went wrong. We couldn’t add a token to your list.</Error>
           ) : (
@@ -308,7 +308,7 @@ export const TokenRow: FunctionComponent<Props> = ({
               <LeftInfo>View in Solana explorer</LeftInfo>
               <RightInfo
                 className={classNames({
-                  error: isInfluencedFunds,
+                  isError: isInfluencedFunds,
                 })}>
                 {`will cost ${fee} SOL`}
                 {isInfluencedFunds ? ' (Influenced funds)' : ''}
