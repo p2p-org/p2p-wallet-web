@@ -17,6 +17,7 @@ const Wrapper = styled.div`
 type Props = {
   forwardedRef?: React.Ref<HTMLDivElement>;
   withShadow?: boolean;
+  children?: React.ReactNode;
   className?: string;
 };
 

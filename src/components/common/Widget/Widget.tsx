@@ -1,4 +1,4 @@
-import React, { forwardRef, FunctionComponent } from 'react';
+import React, { forwardRef, FunctionComponent, ReactNode } from 'react';
 
 import { styled } from '@linaria/react';
 import { rgba } from 'polished';
@@ -38,6 +38,7 @@ type Props = {
   forwardedRef?: React.Ref<HTMLDivElement>;
   title?: React.ReactNode;
   action?: React.ReactNode;
+  children?: React.ReactNode;
   className?: string;
 };
 
