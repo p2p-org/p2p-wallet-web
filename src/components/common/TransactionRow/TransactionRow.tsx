@@ -107,9 +107,7 @@ export const TransactionRow: FunctionComponent<Props> = ({ transaction, source }
     dispatch(openModal(SHOW_MODAL_TRANSACTION_DETAILS, { signature: transaction.signature }));
   };
 
-  const isReceiver = !transaction.short.source?.equals(source);
-
-  console.log(111, isReceiver, transaction.short.source?.toBase58(), source.toBase58());
+  const isReceiver = transaction.short.destination?.equals(source);
 
   return (
     <Wrapper>
