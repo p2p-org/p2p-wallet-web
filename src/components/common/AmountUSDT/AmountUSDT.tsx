@@ -25,13 +25,13 @@ export const AmountUSDT: FunctionComponent<Props> = ({
 }) => {
   const rate = useSelector((state: RootState) => state.rate.markets[`${symbol}/USDT`]);
 
-  if (!rate && !['USDT', 'USDC'].includes(symbol)) {
-    return null;
-  }
-
   const calculatedValue = useMemo(() => {
     return value.times(rate || 1).toNumber();
   }, [rate, value?.toNumber()]);
+
+  if (!rate && !['USDT', 'USDC'].includes(symbol)) {
+    return null;
+  }
 
   return (
     <Wrapper title="Amount in USDT" {...props}>
