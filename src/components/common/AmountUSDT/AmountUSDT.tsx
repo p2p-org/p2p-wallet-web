@@ -1,4 +1,4 @@
-import React, { FunctionComponent } from 'react';
+import React, { FunctionComponent, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 
 import { CSSProperties } from '@linaria/core';
@@ -25,15 +25,19 @@ export const AmountUSDT: FunctionComponent<Props> = ({
 }) => {
   const rate = useSelector((state: RootState) => state.rate.markets[`${symbol}/USDT`]);
 
-  if (!rate) {
+  if (!rate && !['USDT', 'USDC'].includes(symbol)) {
     return null;
   }
+
+  const calculatedValue = useMemo(() => {
+    return value.times(rate || 1).toNumber();
+  }, [rate, value]);
 
   return (
     <Wrapper title="Amount in USDT" {...props}>
       {prefix ? `${prefix} ` : undefined}
       {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(
-        value.times(rate).toNumber(),
+        calculatedValue,
       )}
     </Wrapper>
   );

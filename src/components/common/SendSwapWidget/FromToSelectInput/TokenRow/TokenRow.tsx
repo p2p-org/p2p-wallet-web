@@ -1,7 +1,6 @@
 import React, { FunctionComponent } from 'react';
 
 import { styled } from '@linaria/react';
-import { rgba } from 'polished';
 
 import { TokenAccount } from 'api/token/TokenAccount';
 import { AmountUSDT } from 'components/common/AmountUSDT';
