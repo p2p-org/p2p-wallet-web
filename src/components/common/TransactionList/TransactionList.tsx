@@ -2,7 +2,7 @@ import React, { FunctionComponent, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 
 import { styled } from '@linaria/react';
-import { TransactionSignature } from '@solana/web3.js';
+import { PublicKey, TransactionSignature } from '@solana/web3.js';
 import dayjs from 'dayjs';
 
 import { Transaction } from 'api/transaction/Transaction';
@@ -35,10 +35,6 @@ type Dates = {
   yesterday: string;
 };
 
-type Props = {
-  order?: TransactionSignature[];
-};
-
 const renderDate = (currentDate: string | null, dates: Dates) => {
   let dateHeader = null;
 
@@ -60,7 +56,12 @@ const renderDate = (currentDate: string | null, dates: Dates) => {
   return <TitleDate>{dateHeader}</TitleDate>;
 };
 
-export const TransactionList: FunctionComponent<Props> = ({ order }) => {
+type Props = {
+  order?: TransactionSignature[];
+  source: PublicKey;
+};
+
+export const TransactionList: FunctionComponent<Props> = ({ order, source }) => {
   const transactions = useSelector((state: RootState) => state.transaction.items);
 
   const groupedTransactions = useMemo(() => {
@@ -128,7 +129,7 @@ export const TransactionList: FunctionComponent<Props> = ({ order }) => {
         <Group>
           {renderDate(group.date, dates)}
           {group.items.map((transaction) => (
-            <TransactionRow key={transaction.signature} transaction={transaction} />
+            <TransactionRow key={transaction.signature} transaction={transaction} source={source} />
           ))}
         </Group>
       ))}

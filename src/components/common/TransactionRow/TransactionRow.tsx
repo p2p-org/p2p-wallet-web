@@ -1,7 +1,9 @@
 import React, { FunctionComponent } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 import { styled } from '@linaria/react';
+import { PublicKey } from '@solana/web3.js';
+import classNames from 'classnames';
 import dayjs from 'dayjs';
 import { rgba } from 'polished';
 
@@ -55,6 +57,12 @@ const Top = styled.div`
 
 const Type = styled.div``;
 
+const Amount = styled.div`
+  &.isReceiver {
+    color: #2db533;
+  }
+`;
+
 const Main = styled.div`
   display: flex;
   align-items: center;
@@ -89,14 +97,19 @@ const Bottom = styled.div`
 
 type Props = {
   transaction: Transaction;
+  source: PublicKey;
 };
 
-export const TransactionRow: FunctionComponent<Props> = ({ transaction }) => {
+export const TransactionRow: FunctionComponent<Props> = ({ transaction, source }) => {
   const dispatch = useDispatch();
 
   const handleClick = () => {
     dispatch(openModal(SHOW_MODAL_TRANSACTION_DETAILS, { signature: transaction.signature }));
   };
+
+  const isReceiver = !transaction.short.source?.equals(source);
+
+  console.log(111, isReceiver, transaction.short.source?.toBase58(), source.toBase58());
 
   return (
     <Wrapper>
@@ -105,10 +118,13 @@ export const TransactionRow: FunctionComponent<Props> = ({ transaction }) => {
         <Content>
           <Top>
             <Type>{transaction.short.type}</Type>
-            <AmountUSDT
-              value={transaction.short.amount}
-              symbol={transaction.short.sourceTokenAccount?.mint.symbol}
-            />
+            <Amount className={classNames({ isReceiver })}>
+              <AmountUSDT
+                prefix={isReceiver ? '+' : '-'}
+                value={transaction.short.amount}
+                symbol={transaction.short.sourceTokenAccount?.mint.symbol}
+              />
+            </Amount>
           </Top>
           <Bottom>
             <div title={`${transaction.slot} SLOT`}>
@@ -117,7 +133,7 @@ export const TransactionRow: FunctionComponent<Props> = ({ transaction }) => {
                 : `${transaction.slot} SLOT`}
             </div>
             <div>
-              {transaction.short.amount.toNumber()}{' '}
+              {isReceiver ? '+' : '-'} {transaction.short.amount.toNumber()}{' '}
               {transaction.short.sourceTokenAccount?.mint.symbol}
             </div>
           </Bottom>

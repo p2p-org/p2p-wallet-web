@@ -73,7 +73,7 @@ export const ActivityWidget: FunctionComponent<Props> = ({ publicKey }) => {
   return (
     <WrapperWidget title="Activity">
       <InfinityScrollHelper disabled={isLoading || isEnd} onNeedLoadMore={handleNeedLoadMore}>
-        <TransactionList order={order} />
+        <TransactionList order={order} source={publicKey} />
         {isLoading ? <LoaderBlock /> : undefined}
         {!isLoading && !order?.length ? renderEmpty() : undefined}
       </InfinityScrollHelper>

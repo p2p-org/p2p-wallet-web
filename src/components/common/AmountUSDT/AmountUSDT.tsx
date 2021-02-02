@@ -10,6 +10,7 @@ import { RootState } from 'store/rootReducer';
 const Wrapper = styled.div``;
 
 type Props = {
+  prefix?: string;
   value?: Decimal;
   symbol?: string;
   style?: CSSProperties;
@@ -17,6 +18,7 @@ type Props = {
 };
 
 export const AmountUSDT: FunctionComponent<Props> = ({
+  prefix,
   value = new Decimal(0),
   symbol = '',
   ...props
@@ -29,6 +31,7 @@ export const AmountUSDT: FunctionComponent<Props> = ({
 
   return (
     <Wrapper title="Amount in USDT" {...props}>
+      {prefix ? `${prefix} ` : undefined}
       {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(
         value.times(rate).toNumber(),
       )}
