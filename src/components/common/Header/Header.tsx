@@ -6,28 +6,51 @@ import Logo from 'assets/images/logo.png';
 
 import { ClusterSelector } from 'components/common/ClusterSelector';
 
+import { ScrollFix } from '../ScollFix';
+import { HEADER_HEIGHT } from './constants';
+
 const Wrapper = styled.header`
   position: relative;
 
-  display: flex;
-  justify-content: center;
+  height: ${HEADER_HEIGHT}px;
+`;
 
-  height: 64px;
-  padding: 0 20px;
+const FixedContainer = styled.div`
+  position: fixed;
+  z-index: 1;
 
-  white-space: nowrap;
+  width: 100%;
+  height: ${HEADER_HEIGHT}px;
 
   background: #fff;
   border-bottom: 1px solid #f6f6f8;
   box-shadow: 0 1px 8px rgba(0, 0, 0, 0.05);
 `;
 
-const ContainerScrollFix = styled.div`
+const ScrollFixContainer = styled(ScrollFix)`
+  height: 100%;
+  padding: 0 20px;
+`;
+
+const MainContainer = styled.div`
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+
+  width: 100%;
+  max-width: 796px;
+  height: 100%;
+  margin: 0 auto;
+`;
+
+const Content = styled.div`
+  position: relative;
+
   display: flex;
   align-items: center;
   justify-content: space-between;
   width: 100%;
-  max-width: 796px;
+  height: 100%;
 `;
 
 const LogoLink = styled(Link)`
@@ -65,18 +88,24 @@ const LogoImg = styled.img`
 export const Header: FunctionComponent = () => {
   return (
     <Wrapper>
-      <ContainerScrollFix>
-        <LogoLink to="/wallets">
-          <LogoImg src={Logo as string} />
-        </LogoLink>
-        {/* <Nav> */}
-        {/*  /!*<NavLink to="/wallets">Wallets</NavLink>*!/ */}
-        {/*  /!* <NavLink to="/">Investments</NavLink> *!/ */}
-        {/*  /!* <NavLink to="/">Explore</NavLink> *!/ */}
-        {/*  /!* <NavLink to="/dashboard_old">Contacts</NavLink> *!/ */}
-        {/* </Nav> */}
-        <ClusterSelector />
-      </ContainerScrollFix>
+      <FixedContainer>
+        <ScrollFixContainer>
+          <MainContainer>
+            <Content>
+              <LogoLink to="/wallets">
+                <LogoImg src={Logo as string} />
+              </LogoLink>
+              {/* <Nav> */}
+              {/*  /!*<NavLink to="/wallets">Wallets</NavLink>*!/ */}
+              {/*  /!* <NavLink to="/">Investments</NavLink> *!/ */}
+              {/*  /!* <NavLink to="/">Explore</NavLink> *!/ */}
+              {/*  /!* <NavLink to="/dashboard_old">Contacts</NavLink> *!/ */}
+              {/* </Nav> */}
+              <ClusterSelector />
+            </Content>
+          </MainContainer>
+        </ScrollFixContainer>
+      </FixedContainer>
     </Wrapper>
   );
 };

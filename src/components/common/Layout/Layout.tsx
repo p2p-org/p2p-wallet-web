@@ -1,12 +1,14 @@
 import React, { FunctionComponent, useEffect } from 'react';
 import { useSelector } from 'react-redux';
+import Sticky from 'react-stickynode';
 
 import { styled } from '@linaria/react';
 import NProgress from 'nprogress';
 
+import { CONTAINER_PADDING_TOP } from 'components/common/Layout/constants';
 import { RootState } from 'store/rootReducer';
 
-import { Header } from '../Header';
+import { Header, HEADER_HEIGHT } from '../Header';
 import { ScrollFix } from '../ScollFix';
 import { Breadcrumbs, BreadcrumbType } from './Breadcrumbs';
 import { LeftNavMenu } from './LeftNavMenu';
@@ -22,7 +24,7 @@ const Container = styled.div`
   width: 100%;
   max-width: 796px;
   margin: 0 auto;
-  padding-top: 16px;
+  padding-top: ${CONTAINER_PADDING_TOP}px;
 `;
 
 const Content = styled.div``;
@@ -33,13 +35,15 @@ const ColumnsWrapper = styled.div`
   grid-gap: 20px;
 `;
 
+const ColumnLeftSticky = styled(Sticky)`
+  width: 252px;
+  height: fit-content;
+`;
+
 const ColumnLeft = styled.div`
   display: grid;
   grid-gap: 16px;
   grid-template-rows: min-content;
-
-  width: 252px;
-  height: fit-content;
 `;
 
 const ColumnRight = styled.div`
@@ -94,14 +98,16 @@ export const Layout: FunctionComponent<Props> = ({
             <Content>
               {rightColumn ? (
                 <ColumnsWrapper>
-                  <ColumnLeft>
-                    {leftColumn || (
-                      <>
-                        <ProfileWidget />
-                        <LeftNavMenu />
-                      </>
-                    )}
-                  </ColumnLeft>
+                  <ColumnLeftSticky top={HEADER_HEIGHT + CONTAINER_PADDING_TOP}>
+                    <ColumnLeft>
+                      {leftColumn || (
+                        <>
+                          <ProfileWidget />
+                          <LeftNavMenu />
+                        </>
+                      )}
+                    </ColumnLeft>
+                  </ColumnLeftSticky>
                   <ColumnRight>{rightColumn}</ColumnRight>
                 </ColumnsWrapper>
               ) : // eslint-disable-next-line unicorn/no-nested-ternary
