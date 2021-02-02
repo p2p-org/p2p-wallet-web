@@ -126,7 +126,7 @@ export const TransactionList: FunctionComponent<Props> = ({ order, source }) => 
   return (
     <Wrapper>
       {groupedTransactions.map((group) => (
-        <Group>
+        <Group key={group.date}>
           {renderDate(group.date, dates)}
           {group.items.map((transaction) => (
             <TransactionRow key={transaction.signature} transaction={transaction} source={source} />
