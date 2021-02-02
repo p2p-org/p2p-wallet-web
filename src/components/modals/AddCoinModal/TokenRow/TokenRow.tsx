@@ -18,6 +18,13 @@ const Wrapper = styled.div`
   padding-top: 10px;
 `;
 
+const ChevronIcon = styled(Icon)`
+  width: 16px;
+  height: 16px;
+
+  color: #a3a5ba;
+`;
+
 const ChevronWrapper = styled.div`
   display: flex;
   align-items: center;
@@ -25,8 +32,6 @@ const ChevronWrapper = styled.div`
 
   width: 24px;
   height: 24px;
-
-  color: #a3a5ba;
 
   background: #f6f6f8;
   border-radius: 8px;
@@ -37,17 +42,10 @@ const ChevronWrapper = styled.div`
     background: #a3a5ba;
     transform: rotate(0deg);
 
-    & svg {
+    ${ChevronIcon} {
       color: #fff;
     }
   }
-`;
-
-const ChevronIcon = styled(Icon)`
-  width: 16px;
-  height: 16px;
-
-  color: ${rgba('#000', 0.4)};
 `;
 
 const Main = styled.div`

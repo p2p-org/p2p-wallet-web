@@ -94,7 +94,7 @@ const Wrapper = styled.button`
   &:disabled {
     color: #fff;
 
-    background: #7b7b7b;
+    background: #a3a5ba;
   }
 `;
 
