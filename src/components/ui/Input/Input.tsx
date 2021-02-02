@@ -2,7 +2,6 @@ import React, { forwardRef, FunctionComponent, useState } from 'react';
 
 import { styled } from '@linaria/react';
 import classNames from 'classnames';
-import { rgba } from 'polished';
 
 import { Icon } from 'components/ui';
 

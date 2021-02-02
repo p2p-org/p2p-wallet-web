@@ -1,4 +1,4 @@
-import React, { FunctionComponent } from 'react';
+import React, { forwardRef, FunctionComponent } from 'react';
 
 import { styled } from '@linaria/react';
 import { rgba } from 'polished';
@@ -35,14 +35,21 @@ const Action = styled.div``;
 const Content = styled.div``;
 
 type Props = {
+  forwardedRef?: React.Ref<HTMLDivElement>;
   title?: React.ReactNode;
   action?: React.ReactNode;
   className?: string;
 };
 
-export const Widget: FunctionComponent<Props> = ({ title, action, children, className }) => {
+const WidgetOriginal: FunctionComponent<Props> = ({
+  forwardedRef,
+  title,
+  action,
+  children,
+  className,
+}) => {
   return (
-    <Wrapper className={className}>
+    <Wrapper ref={forwardedRef} className={className}>
       {title || action ? (
         <Header>
           {title ? <Title>{title}</Title> : undefined}
@@ -53,3 +60,7 @@ export const Widget: FunctionComponent<Props> = ({ title, action, children, clas
     </Wrapper>
   );
 };
+
+export const Widget = forwardRef<HTMLDivElement, Props>((props, ref: React.Ref<HTMLDivElement>) => (
+  <WidgetOriginal {...props} forwardedRef={ref} />
+));

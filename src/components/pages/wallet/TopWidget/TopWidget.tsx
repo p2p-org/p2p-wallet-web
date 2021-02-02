@@ -1,14 +1,18 @@
-import React, { FunctionComponent, useEffect, useMemo, useState } from 'react';
+import React, { FunctionComponent, useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router';
 import { Link } from 'react-router-dom';
 
 import { styled } from '@linaria/react';
 import { PublicKey } from '@solana/web3.js';
+import classNames from 'classnames';
 import { Decimal } from 'decimal.js';
+import throttle from 'lodash.throttle';
 
 import { TokenAccount } from 'api/token/TokenAccount';
 import { AmountUSDT } from 'components/common/AmountUSDT';
+import { COLUMN_RIGHT_WIDTH } from 'components/common/Layout/constants';
+import { TokenAvatar } from 'components/common/TokenAvatar';
 import { Widget } from 'components/common/Widget';
 import { Button, Icon } from 'components/ui';
 import { RootState } from 'store/rootReducer';
@@ -41,6 +45,10 @@ const PlusIcon = styled(Icon)`
 
 const PriceWrapped = styled.div`
   padding: 16px 20px;
+
+  &.isSticky {
+    padding: 0 16px;
+  }
 `;
 
 const ValueCurrency = styled.div`
@@ -48,6 +56,12 @@ const ValueCurrency = styled.div`
   font-weight: bold;
   font-size: 22px;
   line-height: 120%;
+
+  &.isSticky {
+    font-weight: bold;
+    font-size: 16px;
+    line-height: 120%;
+  }
 `;
 
 const BottomWrapper = styled.div`
@@ -60,6 +74,14 @@ const BottomWrapper = styled.div`
 
   &:not(:first-child) {
     margin-top: 4px;
+  }
+
+  &.isSticky {
+    margin-top: 0;
+
+    font-weight: 600;
+    font-size: 14px;
+    line-height: 120%;
   }
 `;
 
@@ -75,6 +97,29 @@ const ValueDelta = styled.div`
 //   color: #2db533;
 // `;
 
+const WrapperFixed = styled.div`
+  position: fixed;
+  top: 64px;
+  z-index: 2;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  width: ${COLUMN_RIGHT_WIDTH}px;
+  height: 72px;
+  padding: 0 20px;
+
+  background: #fff;
+  border-radius: 0 0 12px 12px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+`;
+
+const FixedInfoWrapper = styled.div`
+  display: flex;
+  align-items: center;
+`;
+
 type Props = {
   publicKey: PublicKey;
 };
@@ -82,7 +127,9 @@ type Props = {
 export const TopWidget: FunctionComponent<Props> = ({ publicKey }) => {
   const dispatch = useDispatch();
   const history = useHistory();
+  const widgetRef = useRef<HTMLDivElement>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isShowFixed, setIsShowFixed] = useState(false);
   const cluster = useSelector((state: RootState) => state.wallet.cluster);
   const tokenAccounts = useSelector((state: RootState) =>
     state.wallet.tokenAccounts.map((account) => TokenAccount.from(account)),
@@ -113,6 +160,28 @@ export const TopWidget: FunctionComponent<Props> = ({ publicKey }) => {
     void loadCandles();
   }, [tokenAccount?.mint.symbol]);
 
+  const handleScroll = throttle(() => {
+    if (!widgetRef.current) {
+      return;
+    }
+
+    const { bottom } = widgetRef.current.getBoundingClientRect();
+
+    if (bottom <= 150) {
+      setIsShowFixed(true);
+    } else {
+      setIsShowFixed(false);
+    }
+  }, 100);
+
+  useEffect(() => {
+    window.addEventListener('scroll', handleScroll);
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
+
   const delta = useMemo(() => {
     if (!rates || rates.length === 0) {
       return null;
@@ -133,57 +202,80 @@ export const TopWidget: FunctionComponent<Props> = ({ publicKey }) => {
     void dispatch(airdrop());
   };
 
+  const renderButtons = () => {
+    return (
+      <Buttons>
+        {/* <Link to={`/send/${publicKey.toBase58()}`} className="button"> */}
+        {/*  <ButtonStyled primary small> */}
+        {/*    <PlusIcon name="plus" /> */}
+        {/*  </ButtonStyled> */}
+        {/* </Link> */}
+        <Link to={`/send/${publicKey.toBase58()}`} title="Send" className="button">
+          <ButtonStyled primary small>
+            <PlusIcon name="top" />
+          </ButtonStyled>
+        </Link>
+        <Link to={`/swap/${publicKey.toBase58()}`} title="Swap" className="button">
+          <ButtonStyled primary small>
+            <PlusIcon name="swap" />
+          </ButtonStyled>
+        </Link>
+        {!isMainnet && tokenAccount?.mint.symbol === 'SOL' ? (
+          <ButtonStyled primary small title="Airdrop" onClick={handleAirdropClick}>
+            <PlusIcon name="plug" />
+          </ButtonStyled>
+        ) : undefined}
+      </Buttons>
+    );
+  };
+
+  const renderContent = (isSticky?: boolean) => {
+    if (!tokenAccount) {
+      return;
+    }
+
+    return (
+      <PriceWrapped className={classNames({ isSticky })}>
+        {rate ? (
+          <ValueCurrency className={classNames({ isSticky })}>
+            <AmountUSDT
+              value={new Decimal(tokenAccount.mint.toMajorDenomination(tokenAccount.balance))}
+              symbol={tokenAccount.mint.symbol}
+            />
+          </ValueCurrency>
+        ) : undefined}
+        <BottomWrapper className={classNames({ isSticky })}>
+          <ValueOriginal>
+            {tokenAccount.mint.toMajorDenomination(tokenAccount.balance)} {tokenAccount.mint.symbol}
+          </ValueOriginal>
+          {delta ? (
+            <ValueDelta>
+              {delta.diff.toFixed(2)} USD ({delta.percentage.toFixed(2)}%) 24 hrs{' '}
+              {/* <ValueGreen>+1.4%, 24 hours</ValueGreen> */}
+            </ValueDelta>
+          ) : undefined}
+        </BottomWrapper>
+      </PriceWrapped>
+    );
+  };
+
   return (
-    <WrapperWidget
-      title={<TokenSelector value={publicKey.toBase58()} onChange={handleTokenChange} />}
-      action={
-        <Buttons>
-          {/* <Link to={`/send/${publicKey.toBase58()}`} className="button"> */}
-          {/*  <ButtonStyled primary small> */}
-          {/*    <PlusIcon name="plus" /> */}
-          {/*  </ButtonStyled> */}
-          {/* </Link> */}
-          <Link to={`/send/${publicKey.toBase58()}`} title="Send" className="button">
-            <ButtonStyled primary small>
-              <PlusIcon name="top" />
-            </ButtonStyled>
-          </Link>
-          <Link to={`/swap/${publicKey.toBase58()}`} title="Swap" className="button">
-            <ButtonStyled primary small>
-              <PlusIcon name="swap" />
-            </ButtonStyled>
-          </Link>
-          {!isMainnet && tokenAccount?.mint.symbol === 'SOL' ? (
-            <ButtonStyled primary small title="Airdrop" onClick={handleAirdropClick}>
-              <PlusIcon name="plug" />
-            </ButtonStyled>
-          ) : undefined}
-        </Buttons>
-      }>
-      {tokenAccount ? (
-        <PriceWrapped>
-          {rate ? (
-            <ValueCurrency>
-              <AmountUSDT
-                value={new Decimal(tokenAccount.mint.toMajorDenomination(tokenAccount.balance))}
-                symbol={tokenAccount.mint.symbol}
-              />
-            </ValueCurrency>
-          ) : undefined}
-          <BottomWrapper>
-            <ValueOriginal>
-              {tokenAccount.mint.toMajorDenomination(tokenAccount.balance)}{' '}
-              {tokenAccount.mint.symbol}
-            </ValueOriginal>
-            {delta ? (
-              <ValueDelta>
-                {delta.diff.toFixed(2)} USD ({delta.percentage.toFixed(2)}%) 24 hrs{' '}
-                {/* <ValueGreen>+1.4%, 24 hours</ValueGreen> */}
-              </ValueDelta>
-            ) : undefined}
-          </BottomWrapper>
-        </PriceWrapped>
+    <>
+      <WrapperWidget
+        ref={widgetRef}
+        title={<TokenSelector value={publicKey.toBase58()} onChange={handleTokenChange} />}
+        action={renderButtons()}>
+        {renderContent()}
+      </WrapperWidget>
+      {isShowFixed ? (
+        <WrapperFixed>
+          <FixedInfoWrapper>
+            <TokenAvatar symbol={tokenAccount?.mint.symbol} size={36} />
+            {renderContent(true)}
+          </FixedInfoWrapper>
+          {renderButtons()}
+        </WrapperFixed>
       ) : undefined}
-    </WrapperWidget>
+    </>
   );
 };

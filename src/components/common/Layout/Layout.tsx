@@ -5,12 +5,12 @@ import Sticky from 'react-stickynode';
 import { styled } from '@linaria/react';
 import NProgress from 'nprogress';
 
-import { CONTAINER_PADDING_TOP } from 'components/common/Layout/constants';
 import { RootState } from 'store/rootReducer';
 
 import { Header, HEADER_HEIGHT } from '../Header';
 import { ScrollFix } from '../ScollFix';
 import { Breadcrumbs, BreadcrumbType } from './Breadcrumbs';
+import { COLUMN_RIGHT_WIDTH, CONTAINER_PADDING_TOP } from './constants';
 import { LeftNavMenu } from './LeftNavMenu';
 import { ProfileWidget } from './ProfileWidget';
 
@@ -51,7 +51,7 @@ const ColumnRight = styled.div`
   grid-gap: 24px;
   grid-template-rows: min-content;
 
-  width: 524px;
+  width: ${COLUMN_RIGHT_WIDTH}px;
   height: fit-content;
 `;
 

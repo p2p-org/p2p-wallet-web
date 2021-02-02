@@ -1,4 +1,4 @@
-import React, { FunctionComponent } from 'react';
+import React, { forwardRef, FunctionComponent } from 'react';
 
 import { styled } from '@linaria/react';
 import classNames from 'classnames';
@@ -15,14 +15,25 @@ const Wrapper = styled.div`
 `;
 
 type Props = {
+  forwardedRef?: React.Ref<HTMLDivElement>;
   withShadow?: boolean;
   className?: string;
 };
 
-export const Card: FunctionComponent<Props> = ({ withShadow, children, className, ...props }) => {
+const CardOriginal: FunctionComponent<Props> = ({
+  forwardedRef,
+  withShadow,
+  children,
+  className,
+  ...props
+}) => {
   return (
-    <Wrapper {...props} className={classNames(className, { withShadow })}>
+    <Wrapper ref={forwardedRef} {...props} className={classNames(className, { withShadow })}>
       {children}
     </Wrapper>
   );
 };
+
+export const Card = forwardRef<HTMLDivElement, Props>((props, ref: React.Ref<HTMLDivElement>) => (
+  <CardOriginal {...props} forwardedRef={ref} />
+));
