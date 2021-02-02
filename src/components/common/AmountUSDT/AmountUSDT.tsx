@@ -31,7 +31,7 @@ export const AmountUSDT: FunctionComponent<Props> = ({
 
   const calculatedValue = useMemo(() => {
     return value.times(rate || 1).toNumber();
-  }, [rate, value]);
+  }, [rate, value?.toNumber()]);
 
   return (
     <Wrapper title="Amount in USDT" {...props}>
