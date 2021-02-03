@@ -561,7 +561,7 @@ export const FromToSelectInput: FunctionComponent<Props> = ({
                 {/* <FilterName>Compound</FilterName> */}
                 {/* <FilterName>Last</FilterName> */}
                 <SearchInput
-                  placeholder="Search uniswap"
+                  placeholder="Search for token"
                   value={filter}
                   onChange={handleFilterChange}
                 />
