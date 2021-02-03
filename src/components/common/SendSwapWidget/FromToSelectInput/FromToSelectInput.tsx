@@ -14,7 +14,7 @@ import { TokenAvatar } from 'components/common/TokenAvatar';
 import { Icon } from 'components/ui';
 import { SearchInput } from 'components/ui/SearchInput';
 import { RootState } from 'store/rootReducer';
-import { minorAmountToMajor } from 'utils/amount';
+import { minorAmountToMajor, toDecimal } from 'utils/amount';
 import { shortAddress } from 'utils/tokens';
 
 import { TokenRow } from './TokenRow';
@@ -44,6 +44,10 @@ const AllBalance = styled.div`
     cursor: auto;
 
     pointer-events: none;
+  }
+
+  &.error {
+    color: #f43d3d;
   }
 `;
 
@@ -469,6 +473,10 @@ export const FromToSelectInput: FunctionComponent<Props> = ({
     );
   };
 
+  const hasBalance = tokenAccount
+    ? Number(tokenAccount.mint.toMajorDenomination(tokenAccount.balance)) >= Number(localAmount)
+    : false;
+
   return (
     <Wrapper className={className}>
       <TopWrapper>
@@ -509,7 +517,9 @@ export const FromToSelectInput: FunctionComponent<Props> = ({
             <BalanceText>
               {tokenAccount ? (
                 direction === 'from' && !disabled ? (
-                  <AllBalance onClick={handleAllBalanceClick} className={classNames({ disabled })}>
+                  <AllBalance
+                    onClick={handleAllBalanceClick}
+                    className={classNames({ disabled, error: !hasBalance })}>
                     Available: {renderBalance()}
                   </AllBalance>
                 ) : (
