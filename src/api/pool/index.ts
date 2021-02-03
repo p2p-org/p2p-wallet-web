@@ -1,5 +1,5 @@
 import { AccountLayout, Token as SPLToken } from '@solana/spl-token';
-import { Numberu64, TokenSwap, TokenSwapInfo, TokenSwapLayout } from '@solana/spl-token-swap';
+import { Numberu64, TokenSwap, TokenSwapLayout } from '@solana/spl-token-swap';
 import { Account, PublicKey, SystemProgram, TransactionInstruction } from '@solana/web3.js';
 import { Decimal } from 'decimal.js';
 import { complement, isNil } from 'ramda';
