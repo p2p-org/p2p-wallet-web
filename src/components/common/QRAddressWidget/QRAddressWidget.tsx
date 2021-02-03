@@ -180,7 +180,7 @@ export const QRAddressWidget: FunctionComponent<Props> = ({ publicKey, className
       {isExpand ? (
         <>
           <Content>
-            <Text>Send to your SOL wallet</Text>
+            <Text>Send to your {tokenAccount.mint.symbol} wallet</Text>
             <QRCode
               value={tokenAccount.address.toBase58()}
               imageSettings={imageSettings}
