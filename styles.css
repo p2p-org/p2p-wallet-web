@@ -703,6 +703,9 @@ html,body,#root{height:100%;}body{font-family:'Titillium Web',-apple-system,Blin
 .c1gyjr0u{position:relative;display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;-webkit-align-items:center;-webkit-box-align:center;-ms-flex-align:center;align-items:center;-webkit-box-pack:justify;-webkit-justify-content:space-between;-ms-flex-pack:justify;justify-content:space-between;width:100%;height:100%;}
 .l1r08nhz{color:#000;font-weight:bold;font-size:22px;line-height:120%;-webkit-text-decoration:none;text-decoration:none;}
 .l1pmujzi{width:108px;height:38px;}
+.b1hsvjbd{position:absolute;left:272px;display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;-webkit-align-items:center;-webkit-box-align:center;-ms-flex-align:center;align-items:center;color:#a3a5ba;font-weight:600;font-size:20px;line-height:120%;}
+.b1u14hfi{width:22px;height:22px;margin-left:-2px;color:#a3a5ba;-webkit-transform:rotate(90deg);-ms-transform:rotate(90deg);transform:rotate(90deg);}
+.buqkb97{display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;-webkit-align-items:center;-webkit-box-align:center;-ms-flex-align:center;align-items:center;-webkit-box-pack:center;-webkit-justify-content:center;-ms-flex-pack:center;justify-content:center;width:32px;height:32px;margin-right:16px;background:#f6f6f8;border-radius:12px;cursor:pointer;}.buqkb97:hover{background:#eff3ff;}.buqkb97:hover .b1u14hfi{color:#5887ff;}
 
 .w1jsrnpr{height:100%;background:#fff;}
 .f1hssxqa{display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;-webkit-flex-direction:column;-ms-flex-direction:column;flex-direction:column;}
@@ -731,13 +734,6 @@ html,body,#root{height:100%;}body{font-family:'Titillium Web',-apple-system,Blin
 .tjwf4o{color:#000;font-weight:500;font-size:27px;line-height:120%;text-align:center;}
 .s1dxl215{margin-bottom:28px;color:#000;font-weight:500;font-size:27px;line-height:120%;text-align:center;}
 .hd7pl6h{width:219px;height:209px;margin:91px auto 48px;background-image:url(/p2p-wallet-web/4090a32279ed56d79744b0ba4422e330.png);}
-
-.w14yf8tm{display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;-webkit-align-items:center;-webkit-box-align:center;-ms-flex-align:center;align-items:center;-webkit-text-decoration:none;text-decoration:none;}
-.p1uu769x{display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;-webkit-align-items:center;-webkit-box-align:center;-ms-flex-align:center;align-items:center;color:#000;}
-.b12v14gg{color:#000;font-size:14px;line-height:140%;-webkit-text-decoration:none;text-decoration:none;}
-.c1rnkll2{padding:0 8px;}
-.c269t7g{width:12px;height:12px;color:#000;-webkit-transform:rotate(-90deg);-ms-transform:rotate(-90deg);transform:rotate(-90deg);}
-.b15bdx59{color:rgba(0,0,0,0.5);font-size:14px;line-height:140%;}
 
 .w1igbngq{display:grid;grid-gap:8px;}
 .n9qzuwb{display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;-webkit-align-items:center;-webkit-box-align:center;-ms-flex-align:center;align-items:center;height:56px;padding:10px 20px;color:#000;font-weight:600;font-size:16px;line-height:140%;background:#fff;border-radius:12px;}
