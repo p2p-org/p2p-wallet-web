@@ -131,7 +131,7 @@ export const QRAddressWidget: FunctionComponent<Props> = ({ publicKey, className
     try {
       void navigator.clipboard.writeText(tokenAccount.address.toBase58());
       setCopied(true);
-      ToastManager.info(`${tokenAccount.mint.symbol} Address Copied!`);
+      ToastManager.info(`Wallet Address Copied!`);
 
       // fade copied after some seconds
       setTimeout(() => {
@@ -167,9 +167,9 @@ export const QRAddressWidget: FunctionComponent<Props> = ({ publicKey, className
       <HeaderWrapper>
         <TokenWrapper>
           {copied ? (
-            <CopiedText>{tokenAccount.mint.symbol} Address Copied!</CopiedText>
+            <CopiedText>Wallet Address Copied!</CopiedText>
           ) : (
-            <TokenName>{tokenAccount.mint.name} Address</TokenName>
+            <TokenName>Wallet Address</TokenName>
           )}
           <TokenAddress onClick={handleCopyClick}>{tokenAccount.address.toBase58()}</TokenAddress>
         </TokenWrapper>
