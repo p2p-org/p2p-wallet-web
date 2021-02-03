@@ -1,6 +1,5 @@
 import React, { FunctionComponent, useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useHistory } from 'react-router';
 import { Link } from 'react-router-dom';
 
 import { styled } from '@linaria/react';
@@ -144,7 +143,6 @@ type Props = {
 
 export const TopWidget: FunctionComponent<Props> = ({ publicKey }) => {
   const dispatch = useDispatch();
-  const history = useHistory();
   const widgetRef = useRef<HTMLDivElement>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isShowFixed, setIsShowFixed] = useState(false);

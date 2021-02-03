@@ -7,10 +7,14 @@ import NProgress from 'nprogress';
 
 import { RootState } from 'store/rootReducer';
 
-import { Header, HEADER_HEIGHT } from '../Header';
+import { BreadcrumbType, Header, HEADER_HEIGHT } from '../Header';
 import { ScrollFix } from '../ScollFix';
-import { Breadcrumbs, BreadcrumbType } from './Breadcrumbs';
-import { COLUMN_RIGHT_WIDTH, CONTAINER_PADDING_TOP } from './constants';
+import {
+  COLUMN_LEFT_WIDTH,
+  COLUMN_RIGHT_WIDTH,
+  COLUMNS_GRID_GUTTER,
+  CONTAINER_PADDING_TOP,
+} from './constants';
 import { LeftNavMenu } from './LeftNavMenu';
 import { ProfileWidget } from './ProfileWidget';
 
@@ -32,11 +36,11 @@ const Content = styled.div``;
 const ColumnsWrapper = styled.div`
   display: grid;
   grid-auto-flow: column;
-  grid-gap: 20px;
+  grid-gap: ${COLUMNS_GRID_GUTTER}px;
 `;
 
 const ColumnLeftSticky = styled(Sticky)`
-  width: 252px;
+  width: ${COLUMN_LEFT_WIDTH}px;
   height: fit-content;
 `;
 
@@ -64,14 +68,14 @@ const CenteredWrapper = styled.div`
 NProgress.configure({ showSpinner: false, parent: '#container' });
 
 type Props = {
-  breadcrumbs?: BreadcrumbType[];
+  breadcrumb?: BreadcrumbType;
   leftColumn?: React.ReactNode;
   rightColumn?: React.ReactNode;
   centered?: React.ReactNode;
 };
 
 export const Layout: FunctionComponent<Props> = ({
-  breadcrumbs,
+  breadcrumb,
   leftColumn,
   rightColumn,
   centered,
@@ -90,10 +94,9 @@ export const Layout: FunctionComponent<Props> = ({
 
   return (
     <Wrapper>
-      <Header />
+      <Header breadcrumb={breadcrumb} />
       <MainScrollFix id="container">
         <Container>
-          {breadcrumbs ? <Breadcrumbs breadcrumbs={breadcrumbs} /> : undefined}
           {connected ? (
             <Content>
               {rightColumn ? (

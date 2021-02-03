@@ -1,10 +1,12 @@
 import React, { FunctionComponent } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, NavLink } from 'react-router-dom';
 
 import { styled } from '@linaria/react';
 import Logo from 'assets/images/logo.png';
 
 import { ClusterSelector } from 'components/common/ClusterSelector';
+import { COLUMN_LEFT_WIDTH, COLUMNS_GRID_GUTTER } from 'components/common/Layout/constants';
+import { Icon } from 'components/ui';
 
 import { ScrollFix } from '../ScollFix';
 import { HEADER_HEIGHT } from './constants';
@@ -66,26 +68,60 @@ const LogoImg = styled.img`
   height: 38px;
 `;
 
-// const Nav = styled.div`
-//   display: grid;
-//   grid-auto-flow: column;
-//   grid-gap: 40px;
-//
-//   padding: 0 16px;
-// `;
+const BreadcrumbWrapper = styled.div`
+  position: absolute;
+  left: ${COLUMN_LEFT_WIDTH + COLUMNS_GRID_GUTTER}px;
 
-// const NavLink = styled(Link)`
-//   color: ${rgba('#000', 0.5)};
-//   font-size: 14px;
-//   line-height: 140%;
-//   text-decoration: none;
-//
-//   &:hover {
-//     color: #000;
-//   }
-// `;
+  display: flex;
+  align-items: center;
 
-export const Header: FunctionComponent = () => {
+  color: #a3a5ba;
+  font-weight: 600;
+  font-size: 20px;
+  line-height: 120%;
+`;
+
+const BackIcon = styled(Icon)`
+  width: 22px;
+  height: 22px;
+  margin-left: -2px;
+
+  color: #a3a5ba;
+
+  transform: rotate(90deg);
+`;
+
+const BackLink = styled(NavLink)`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  margin-right: 16px;
+
+  background: #f6f6f8;
+  border-radius: 12px;
+  cursor: pointer;
+
+  &:hover {
+    background: #eff3ff;
+
+    ${BackIcon} {
+      color: #5887ff;
+    }
+  }
+`;
+
+export type BreadcrumbType = {
+  currentName: string;
+  backTo?: string;
+};
+
+type Props = {
+  breadcrumb?: BreadcrumbType;
+};
+
+export const Header: FunctionComponent<Props> = ({ breadcrumb }) => {
   return (
     <Wrapper>
       <FixedContainer>
@@ -95,12 +131,16 @@ export const Header: FunctionComponent = () => {
               <LogoLink to="/wallets">
                 <LogoImg src={Logo as string} />
               </LogoLink>
-              {/* <Nav> */}
-              {/*  /!*<NavLink to="/wallets">Wallets</NavLink>*!/ */}
-              {/*  /!* <NavLink to="/">Investments</NavLink> *!/ */}
-              {/*  /!* <NavLink to="/">Explore</NavLink> *!/ */}
-              {/*  /!* <NavLink to="/dashboard_old">Contacts</NavLink> *!/ */}
-              {/* </Nav> */}
+              {breadcrumb ? (
+                <BreadcrumbWrapper>
+                  {breadcrumb.backTo ? (
+                    <BackLink to={breadcrumb.backTo}>
+                      <BackIcon name="chevron" />
+                    </BackLink>
+                  ) : undefined}
+                  {breadcrumb.currentName}
+                </BreadcrumbWrapper>
+              ) : undefined}
               <ClusterSelector />
             </Content>
           </MainContainer>

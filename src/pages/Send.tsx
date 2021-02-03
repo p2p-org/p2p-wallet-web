@@ -8,17 +8,11 @@ import { SendWidget } from 'components/pages/send/SendWidget';
 export const Send: FunctionComponent = () => {
   const { publicKey, status } = useParams<{ publicKey: string; status: string }>();
 
-  // const breadcrumbs: { name: string; to?: string }[] = [{ name: 'Wallets', to: '/wallets' }];
-  //
-  // if (status === 'result') {
-  //   breadcrumbs.push({ name: 'Send', to: `/send/${publicKey}` }, { name: 'Result' });
-  // } else {
-  //   breadcrumbs.push({ name: 'Send' });
-  // }
-
   return (
     <Layout
-      // breadcrumbs={breadcrumbs}
+      breadcrumb={
+        status === 'result' ? { currentName: 'Result', backTo: `/send/${publicKey}` } : undefined
+      }
       rightColumn={status !== 'result' ? <SendWidget publicKey={publicKey} /> : <ResultWidget />}
     />
   );
