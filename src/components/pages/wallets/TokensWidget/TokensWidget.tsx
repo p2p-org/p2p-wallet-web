@@ -14,6 +14,14 @@ import { TokenList } from './TokenList';
 
 const WrapperWidget = styled(Widget)``;
 
+const AddButton = styled(Button)`
+  color: #5887ff !important;
+
+  &:hover {
+    background: #eff3ff !important;
+  }
+`;
+
 const IconPlus = styled(Icon)`
   width: 20px;
   height: 20px;
@@ -32,11 +40,11 @@ export const TokensWidget: FunctionComponent = () => {
 
   return (
     <WrapperWidget
-      title="Currencies"
+      title="Wallets"
       action={
-        <Button light small onClick={handleAddCoinClick}>
+        <AddButton lightGray small onClick={handleAddCoinClick}>
           <IconPlus name="plus" /> Add Token
-        </Button>
+        </AddButton>
       }>
       <TokenList items={tokenAccounts} />
     </WrapperWidget>
