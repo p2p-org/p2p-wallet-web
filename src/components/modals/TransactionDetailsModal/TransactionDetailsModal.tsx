@@ -1,6 +1,5 @@
-import React, { FunctionComponent, useEffect } from 'react';
+import React, { FunctionComponent, useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link } from 'react-router-dom';
 
 import { styled } from '@linaria/react';
 import { unwrapResult } from '@reduxjs/toolkit';
@@ -14,6 +13,7 @@ import { ToastManager } from 'components/common/ToastManager';
 import { TokenAvatar } from 'components/common/TokenAvatar';
 import { Button, Icon } from 'components/ui';
 import { getTransaction } from 'store/slices/transaction/TransactionSlice';
+import { shortAddress } from 'utils/tokens';
 
 const Wrapper = styled.div`
   position: relative;
@@ -157,6 +157,19 @@ const FieldWrapper = styled.div`
   }
 `;
 
+const FieldRowWrapper = styled(FieldWrapper)`
+  display: grid;
+  grid-auto-flow: column;
+  grid-gap: 36px;
+`;
+
+const ColumnWrapper = styled.div``;
+
+const FieldInfo = styled.div`
+  display: flex;
+  margin-top: 15px;
+`;
+
 const FieldTitle = styled.div`
   color: #a3a5ba;
   font-weight: 600;
@@ -197,13 +210,33 @@ const AddressValue = styled.div`
   line-height: 16px;
 `;
 
-const CopyWrapper = styled.div`
-  cursor: pointer;
-`;
-
 const CopyIcon = styled(Icon)`
   width: 24px;
   height: 24px;
+
+  color: #a3a5ba;
+`;
+
+const CopyWrapper = styled.div`
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  margin-left: 20px;
+
+  background: rgba(163, 165, 186, 0.1);
+  border-radius: 8px;
+  cursor: pointer;
+
+  &:hover {
+    background: #eff3ff;
+
+    ${CopyIcon} {
+      color: #5887ff;
+    }
+  }
 `;
 
 const Footer = styled.div`
@@ -242,6 +275,7 @@ export const TransactionDetailsModal: FunctionComponent<Props> = ({ signature, c
       state.transaction.items[signature] && Transaction.from(state.transaction.items[signature]),
   );
   const cluster = useSelector((state) => state.wallet.cluster);
+  const tokenAccounts = useSelector((state) => state.wallet.tokenAccounts);
 
   useEffect(() => {
     const mount = async () => {
@@ -256,6 +290,12 @@ export const TransactionDetailsModal: FunctionComponent<Props> = ({ signature, c
       void mount();
     }
   }, [signature]);
+
+  const isReceiver = useMemo(() => {
+    return tokenAccounts.find(
+      (tokenAccount) => tokenAccount.address === transaction.short.destination?.toBase58(),
+    );
+  }, [transaction.short.destination, tokenAccounts]);
 
   if (!transaction) {
     return null;
@@ -274,66 +314,63 @@ export const TransactionDetailsModal: FunctionComponent<Props> = ({ signature, c
           <CloseIcon name="close" />
         </CloseWrapper>
         <BlockWrapper>
-          <BlockIcon name="bottom" />
+          <BlockIcon name={isReceiver ? 'top' : 'bottom'} />
         </BlockWrapper>
       </Header>
       <Content>
         <StatusWrapper>
           <ValueCurrency>
             <AmountUSDT
+              prefix={isReceiver ? '+' : '-'}
               symbol={transaction.short.sourceTokenAccount?.mint.symbol}
               value={transaction.short.amount}
             />
           </ValueCurrency>
           <ValueOriginal>
-            {transaction.short.amount.toNumber()}{' '}
+            {isReceiver ? '+' : '-'} {transaction.short.amount.toNumber()}{' '}
             {transaction.short.sourceTokenAccount?.mint.symbol}
           </ValueOriginal>
           <Status>Completed</Status>
         </StatusWrapper>
         <FieldsWrapper>
-          {transaction.short.sourceTokenAccount ? (
-            <FieldWrapper>
-              <FieldTitle>From</FieldTitle>
-              <FieldValue>
-                <TokenAvatar symbol={undefined} size={48} />
-                <AddressWrapper>
-                  <AddressTitle>{transaction.short.sourceTokenAccount.mint.symbol}</AddressTitle>
-                  <AddressValue>
-                    {transaction.short.sourceTokenAccount.address.toBase58()}
-                  </AddressValue>
-                </AddressWrapper>
-                <CopyWrapper
-                  onClick={handleCopyClick(
-                    transaction.short.sourceTokenAccount.address.toBase58(),
-                  )}>
-                  <CopyIcon name="copy" />
-                </CopyWrapper>
-              </FieldValue>
-            </FieldWrapper>
-          ) : undefined}
-          {transaction.short.destinationTokenAccount ? (
-            <FieldWrapper>
-              <FieldTitle>To</FieldTitle>
-              <FieldValue>
-                <TokenAvatar symbol={undefined} size={48} />
-                <AddressWrapper>
-                  <AddressTitle>
-                    {transaction.short.destinationTokenAccount.mint.symbol}
-                  </AddressTitle>
-                  <AddressValue>
-                    {transaction.short.destinationTokenAccount.address.toBase58()}
-                  </AddressValue>
-                </AddressWrapper>
-                <CopyWrapper
-                  onClick={handleCopyClick(
-                    transaction.short.destinationTokenAccount.address.toBase58(),
-                  )}>
-                  <CopyIcon name="copy" />
-                </CopyWrapper>
-              </FieldValue>
-            </FieldWrapper>
-          ) : undefined}
+          <FieldRowWrapper>
+            {transaction.short.sourceTokenAccount ? (
+              <ColumnWrapper>
+                <FieldTitle>From</FieldTitle>
+                <FieldInfo>
+                  <TokenAvatar
+                    symbol={transaction.short.sourceTokenAccount.mint.symbol}
+                    size={48}
+                  />
+                  <AddressWrapper>
+                    <AddressTitle>{transaction.short.sourceTokenAccount.mint.symbol}</AddressTitle>
+                    <AddressValue>
+                      {shortAddress(transaction.short.sourceTokenAccount.address.toBase58())}
+                    </AddressValue>
+                  </AddressWrapper>
+                </FieldInfo>
+              </ColumnWrapper>
+            ) : undefined}
+            {transaction.short.destinationTokenAccount ? (
+              <ColumnWrapper>
+                <FieldTitle>To</FieldTitle>
+                <FieldInfo>
+                  <TokenAvatar
+                    symbol={transaction.short.destinationTokenAccount.mint.symbol}
+                    size={48}
+                  />
+                  <AddressWrapper>
+                    <AddressTitle>
+                      {transaction.short.destinationTokenAccount.mint.symbol}
+                    </AddressTitle>
+                    <AddressValue>
+                      {shortAddress(transaction.short.destinationTokenAccount.address.toBase58())}
+                    </AddressValue>
+                  </AddressWrapper>
+                </FieldInfo>
+              </ColumnWrapper>
+            ) : undefined}
+          </FieldRowWrapper>
           <FieldWrapper>
             <FieldTitle>Date</FieldTitle>
             <FieldValue>{date}</FieldValue>
@@ -358,7 +395,12 @@ export const TransactionDetailsModal: FunctionComponent<Props> = ({ signature, c
           </FieldWrapper>
           <FieldWrapper>
             <FieldTitle>Transaction ID</FieldTitle>
-            <FieldValue>{signature}</FieldValue>
+            <FieldValue>
+              {signature}{' '}
+              <CopyWrapper onClick={handleCopyClick(signature)}>
+                <CopyIcon name="copy" />
+              </CopyWrapper>
+            </FieldValue>
           </FieldWrapper>
         </FieldsWrapper>
       </Content>
