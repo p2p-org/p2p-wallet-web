@@ -20,6 +20,7 @@ module.exports = {
     'no-console': 'off',
     'no-void': 'off',
     'no-plusplus': 'off',
+    'no-unused-vars': 'error',
     'unicorn/no-null': 'off',
     'unicorn/prefer-ternary': 'off',
     '@typescript-eslint/restrict-template-expressions': 'off',
