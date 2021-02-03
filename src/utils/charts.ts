@@ -13,10 +13,10 @@ const start: { [key: string]: number } = {
 
 export const calculateStart = (symbol: string, time: string): number => {
   const coinStart = prop(symbol, start);
-  const dayStart = dayjs().subtract(1, 'day').format('X');
-  const weekStart = dayjs().subtract(7, 'day').format('X');
-  const monthStart = dayjs().subtract(1, 'month').format('X');
-  const yearStart = dayjs().subtract(1, 'year').format('X');
+  const dayStart = dayjs().subtract(1, 'day').unix();
+  const weekStart = dayjs().subtract(7, 'day').unix();
+  const monthStart = dayjs().subtract(1, 'month').unix();
+  const yearStart = dayjs().subtract(1, 'year').unix();
 
   switch (time) {
     case 'all':
