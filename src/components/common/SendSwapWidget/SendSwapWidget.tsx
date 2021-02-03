@@ -205,9 +205,11 @@ export const SendSwapWidget: FunctionComponent<Props> = ({
         </TitleWrapper>
       }
       action={
-        <ActionsWrapper>
-          <SettingsAction />
-        </ActionsWrapper>
+        type === 'swap' ? (
+          <ActionsWrapper>
+            <SettingsAction />
+          </ActionsWrapper>
+        ) : undefined
       }>
       <FromWrapper>
         <FromToSelectInputStyled
