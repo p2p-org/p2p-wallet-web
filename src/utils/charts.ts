@@ -39,7 +39,7 @@ const INTERVALS = {
   DAY: 24 * 60 * 60 * 1000,
 };
 
-export const calculateInterval = (time) => {
+export const calculateInterval = (time: string) => {
   switch (time) {
     case 'year':
       return INTERVALS.DAY;
