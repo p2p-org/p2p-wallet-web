@@ -1,7 +1,7 @@
 import { PublicKey } from '@solana/web3.js';
 
 declare module '@solana/spl-token-swap' {
-  export type TokenSwapInfo = {
+  export interface TokenSwap {
     poolToken: PublicKey;
 
     feeAccount: PublicKey;
@@ -33,5 +33,5 @@ declare module '@solana/spl-token-swap' {
     hostFeeNumerator: Numberu64;
 
     hostFeeDenominator: Numberu64;
-  };
+  }
 }

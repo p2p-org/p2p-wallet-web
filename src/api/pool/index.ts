@@ -1,5 +1,5 @@
 import { AccountLayout, Token as SPLToken } from '@solana/spl-token';
-import { TokenSwap, TokenSwapInfo, TokenSwapLayout } from '@solana/spl-token-swap';
+import { Numberu64, TokenSwap, TokenSwapInfo, TokenSwapLayout } from '@solana/spl-token-swap';
 import { Account, PublicKey, SystemProgram, TransactionInstruction } from '@solana/web3.js';
 import { Decimal } from 'decimal.js';
 import { complement, isNil } from 'ramda';
@@ -118,21 +118,93 @@ export const APIFactory = (cluster: ExtendedCluster): API => {
 
   const tokenAPI = TokenAPIFactory(cluster);
 
-  /**
-   * Given a pool address, look up its information
-   * @param address
-   */
-  const getPool = async (address: PublicKey): Promise<Pool> => {
+  const parseTokenSwap = async (
+    address: PublicKey,
+    programId: PublicKey,
+    payer: Account,
+    data: Buffer,
+  ): Promise<TokenSwap> => {
+    const tokenSwapData = TokenSwapLayout.decode(data) as {
+      isInitialized: boolean;
+      tokenPool: string;
+      feeAccount: string;
+      tokenAccountA: string;
+      tokenAccountB: string;
+      mintA: string;
+      mintB: string;
+      tokenProgramId: string;
+      tradeFeeNumerator: Buffer;
+      tradeFeeDenominator: Buffer;
+      ownerTradeFeeNumerator: Buffer;
+      ownerTradeFeeDenominator: Buffer;
+      ownerWithdrawFeeNumerator: Buffer;
+      ownerWithdrawFeeDenominator: Buffer;
+      hostFeeNumerator: Buffer;
+      hostFeeDenominator: Buffer;
+      curveType: number;
+    };
+    if (!tokenSwapData.isInitialized) {
+      throw new Error(`Invalid token swap state`);
+    }
+
+    const [authority] = await PublicKey.findProgramAddress([address.toBuffer()], programId);
+
+    const poolToken = new PublicKey(tokenSwapData.tokenPool);
+    const feeAccount = new PublicKey(tokenSwapData.feeAccount);
+    const tokenAccountA = new PublicKey(tokenSwapData.tokenAccountA);
+    const tokenAccountB = new PublicKey(tokenSwapData.tokenAccountB);
+    const mintA = new PublicKey(tokenSwapData.mintA);
+    const mintB = new PublicKey(tokenSwapData.mintB);
+    const tokenProgramId = new PublicKey(tokenSwapData.tokenProgramId);
+
+    const tradeFeeNumerator = Numberu64.fromBuffer(tokenSwapData.tradeFeeNumerator);
+    const tradeFeeDenominator = Numberu64.fromBuffer(tokenSwapData.tradeFeeDenominator);
+    const ownerTradeFeeNumerator = Numberu64.fromBuffer(tokenSwapData.ownerTradeFeeNumerator);
+    const ownerTradeFeeDenominator = Numberu64.fromBuffer(tokenSwapData.ownerTradeFeeDenominator);
+    const ownerWithdrawFeeNumerator = Numberu64.fromBuffer(tokenSwapData.ownerWithdrawFeeNumerator);
+    const ownerWithdrawFeeDenominator = Numberu64.fromBuffer(
+      tokenSwapData.ownerWithdrawFeeDenominator,
+    );
+    const hostFeeNumerator = Numberu64.fromBuffer(tokenSwapData.hostFeeNumerator);
+    const hostFeeDenominator = Numberu64.fromBuffer(tokenSwapData.hostFeeDenominator);
+    const { curveType } = tokenSwapData;
+
+    return new TokenSwap(
+      connection,
+      address,
+      programId,
+      tokenProgramId,
+      poolToken,
+      feeAccount,
+      authority,
+      tokenAccountA,
+      tokenAccountB,
+      mintA,
+      mintB,
+      curveType,
+      tradeFeeNumerator,
+      tradeFeeDenominator,
+      ownerTradeFeeNumerator,
+      ownerTradeFeeDenominator,
+      ownerWithdrawFeeNumerator,
+      ownerWithdrawFeeDenominator,
+      hostFeeNumerator,
+      hostFeeDenominator,
+      payer,
+    );
+  };
+
+  const getPool = async (address: PublicKey, data?: Buffer): Promise<Pool> => {
     const payer = new Account();
 
     // load the pool
     console.log('swap Address', address.toBase58());
-    const swapInfo = ((await TokenSwap.loadTokenSwap(
-      connection,
-      address,
-      swapProgramId,
-      payer,
-    )) as unknown) as TokenSwapInfo;
+    let swapInfo;
+    if (data) {
+      swapInfo = await parseTokenSwap(address, swapProgramId, payer, data);
+    } else {
+      swapInfo = await TokenSwap.loadTokenSwap(connection, address, swapProgramId, payer);
+    }
 
     // load the token account and mint info for tokens A and B
     const tokenAccountAInfo = await tokenAPI.tokenAccountInfo(swapInfo.tokenAccountA);
@@ -204,7 +276,7 @@ export const APIFactory = (cluster: ExtendedCluster): API => {
     ).filter((item) => item.account.data.length === TokenSwapLayout.span);
 
     const poolPromises = poolInfos.map((poolInfo) =>
-      getPool(poolInfo.pubkey).catch((error: Error) => {
+      getPool(poolInfo.pubkey, Buffer.from(poolInfo.account.data)).catch((error: Error) => {
         ToastManager.error(error.toString());
         return null;
       }),
