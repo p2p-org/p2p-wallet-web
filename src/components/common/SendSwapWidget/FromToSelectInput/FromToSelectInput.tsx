@@ -14,12 +14,10 @@ import { TokenAvatar } from 'components/common/TokenAvatar';
 import { Icon } from 'components/ui';
 import { SearchInput } from 'components/ui/SearchInput';
 import { RootState } from 'store/rootReducer';
-import { minorAmountToMajor, toDecimal } from 'utils/amount';
+import { minorAmountToMajor } from 'utils/amount';
 import { shortAddress } from 'utils/tokens';
 
 import { TokenRow } from './TokenRow';
-
-const emptyImage = 'assets/images/';
 
 const Wrapper = styled.div``;
 

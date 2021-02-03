@@ -18,10 +18,28 @@ import { Button, Icon } from 'components/ui';
 import { RootState } from 'store/rootReducer';
 import { getRatesCandle } from 'store/slices/rate/RateSlice';
 import { airdrop } from 'store/slices/wallet/WalletSlice';
-
-import { TokenSelector } from './TokenSelector';
+import { shortAddress } from 'utils/tokens';
 
 const WrapperWidget = styled(Widget)``;
+
+const TokenInfo = styled.div`
+  display: flex;
+  align-items: center;
+`;
+
+const TokenName = styled.div`
+  max-width: 230px;
+  margin-left: 16px;
+  overflow: hidden;
+
+  color: #000;
+  font-weight: 600;
+  font-size: 20px;
+  line-height: 120%;
+  white-space: nowrap;
+
+  text-overflow: ellipsis;
+`;
 
 const Buttons = styled.div`
   display: grid;
@@ -194,10 +212,6 @@ export const TopWidget: FunctionComponent<Props> = ({ publicKey }) => {
     return { diff, percentage };
   }, [rates]);
 
-  const handleTokenChange = (token: string) => {
-    history.push(`/wallet/${token}`);
-  };
-
   const handleAirdropClick = () => {
     void dispatch(airdrop());
   };
@@ -263,7 +277,16 @@ export const TopWidget: FunctionComponent<Props> = ({ publicKey }) => {
     <>
       <WrapperWidget
         ref={widgetRef}
-        title={<TokenSelector value={publicKey.toBase58()} onChange={handleTokenChange} />}
+        title={
+          tokenAccount ? (
+            <TokenInfo>
+              <TokenAvatar symbol={tokenAccount?.mint.symbol} size="36" />
+              <TokenName title={tokenAccount.address.toBase58()}>
+                {tokenAccount?.mint.name || shortAddress(tokenAccount.address.toBase58())}
+              </TokenName>
+            </TokenInfo>
+          ) : undefined
+        }
         action={renderButtons()}>
         {renderContent()}
       </WrapperWidget>
