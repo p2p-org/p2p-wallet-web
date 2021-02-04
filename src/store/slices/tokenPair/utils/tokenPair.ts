@@ -1,4 +1,4 @@
-import { any, complement, curry, eqProps, find, indexOf, propEq, update } from 'ramda';
+import { eqProps, find, indexOf, update } from 'ramda';
 
 import { Pool, SerializablePool } from 'api/pool/Pool';
 import { SerializableToken, Token } from 'api/token/Token';
@@ -26,13 +26,6 @@ export const selectPoolForTokenPair = (
   const foundPool = pools.find(matchesPool(firstToken, secondToken));
   return foundPool && foundPool.serialize();
 };
-
-const isPoolToken = (pools: Array<Pool>) => (token: Token) =>
-  any(propEq('poolToken', token), pools);
-
-export const withoutPoolTokens = curry((pools: Array<Pool>, tokens: Array<Token>) =>
-  tokens.filter(complement(isPoolToken(pools))),
-);
 
 export const getToAmount = (
   firstAmount: number,

@@ -1,1 +1,0 @@
-export { SendSwapWidget } from './SendSwapWidget';

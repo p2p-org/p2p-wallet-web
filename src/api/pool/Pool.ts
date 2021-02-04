@@ -297,6 +297,10 @@ export class Pool extends OnChainEntity<Pool> implements Serializable<Serializab
     return this.poolToken.mintAuthority;
   }
 
+  // match(tokenAccount: TokenAccount): boolean {
+  //
+  // }
+
   matches(firstTokenAccount: TokenAccount, secondTokenAccount: TokenAccount): boolean {
     return (
       (this.tokenA.sameToken(firstTokenAccount) && this.tokenB.sameToken(secondTokenAccount)) ||

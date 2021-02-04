@@ -1,5 +1,4 @@
 import React, { FunctionComponent, useEffect, useMemo, useRef, useState } from 'react';
-import { useSelector } from 'react-redux';
 
 import { styled } from '@linaria/react';
 import emptyImg from 'assets/images/empty.png';
@@ -13,7 +12,6 @@ import { SlideContainer } from 'components/common/SlideContainer';
 import { TokenAvatar } from 'components/common/TokenAvatar';
 import { Icon } from 'components/ui';
 import { SearchInput } from 'components/ui/SearchInput';
-import { RootState } from 'store/rootReducer';
 import { minorAmountToMajor } from 'utils/amount';
 import { shortAddress } from 'utils/tokens';
 
@@ -306,6 +304,7 @@ const EmptyDescription = styled.div`
 type Props = {
   // type?: 'send' | 'swap';
   direction?: 'from' | 'to';
+  tokenAccounts: TokenAccount[];
   tokenAccount?: TokenAccount;
   amount?: string;
   onTokenAccountChange: (tokenAccount: TokenAccount) => void;
@@ -319,6 +318,7 @@ const SCROLL_THRESHOLD = 15;
 export const FromToSelectInput: FunctionComponent<Props> = ({
   // type = 'send',
   direction = 'from',
+  tokenAccounts,
   tokenAccount,
   amount,
   onTokenAccountChange,
@@ -330,12 +330,9 @@ export const FromToSelectInput: FunctionComponent<Props> = ({
   const dropdownRef = useRef<HTMLDivElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
   const [filter, setFilter] = useState('');
-  const [localAmount, setLocalAmount] = useState(`${amount}`);
+  const [localAmount, setLocalAmount] = useState(String(amount));
   const [isOpen, setIsOpen] = useState(false);
   const [scrollTop, setScrollTop] = useState(0);
-  const tokenAccounts = useSelector((state: RootState) =>
-    state.wallet.tokenAccounts.map((account) => TokenAccount.from(account)),
-  );
 
   useEffect(() => {
     if (amount && amount !== localAmount) {

@@ -2,18 +2,71 @@ import React, { FunctionComponent, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { styled } from '@linaria/react';
+import { any, or, pipe, prop, propEq } from 'ramda';
 
-import { adjustForSlippage } from 'api/pool/Pool';
+import { adjustForSlippage, Pool } from 'api/pool/Pool';
 import { usePoolFromLocation } from 'api/pool/utils/state';
 import { TokenAccount } from 'api/token/TokenAccount';
-import { SendSwapWidget } from 'components/common/SendSwapWidget';
+import { SettingsAction } from 'components/common/SendSwapWidget/SwapWidget/SettingsAction';
 import { ToastManager } from 'components/common/ToastManager';
-import { Icon } from 'components/ui';
+import { Button, Icon } from 'components/ui';
 import { SYSTEM_PROGRAM_ID, WRAPPED_SOL_MINT } from 'constants/solana/bufferLayouts';
 import { executeSwap } from 'store/slices/swap/SwapSlice';
 import { updateTokenPairState } from 'store/slices/tokenPair/TokenPairSlice';
 import { tokenPairSelector } from 'store/slices/tokenPair/utils/tokenPair';
 import { majorAmountToMinor, minorAmountToMajor } from 'utils/amount';
+
+import {
+  BottomWrapper,
+  ButtonWrapper,
+  FeeLeft,
+  FeeLine,
+  FeeRight,
+  FromToSelectInputStyled,
+  FromWrapper,
+  Hint,
+  IconStyled,
+  IconWrapper,
+  Title,
+  TitleWrapper,
+  WrapperWidget,
+} from '../common/styled';
+
+const ActionsWrapper = styled.div`
+  display: flex;
+
+  &:not(:last-child) {
+    margin-right: 10px;
+  }
+`;
+
+const ReverseWrapper = styled.div`
+  position: absolute;
+  top: -24px;
+  right: 32px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+
+  background: #5887ff;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+  cursor: pointer;
+`;
+
+const ReverseIcon = styled(Icon)`
+  width: 24px;
+  height: 24px;
+
+  color: #fff;
+`;
+
+const ToSwapWrapper = styled(FromWrapper)`
+  padding-top: 34px;
+`;
 
 const Rate = styled.div`
   display: flex;
@@ -61,10 +114,22 @@ const PropertyValue = styled.div`
   color: #000;
 `;
 
+const isAvailableTokenAccounts = (pools: Pool[]) => (tokenAccount: TokenAccount) =>
+  any(
+    or(
+      pipe(prop('tokenA'), prop('mint'), propEq('address', tokenAccount.mint.address)),
+      pipe(prop('tokenB'), prop('mint'), propEq('address', tokenAccount.mint.address)),
+    ),
+    pools,
+  );
+
 export const SwapWidget: FunctionComponent = () => {
   const dispatch = useDispatch();
   const [isExecuting, setIsExecuting] = useState(false);
   const [isReverseRate, setIsReverseRate] = useState(false);
+  // const availableTokens = useSelector((state) =>
+  //   state.global.availableTokens.map((token) => Token.from(token)),
+  // );
 
   const {
     firstAmount,
@@ -75,8 +140,30 @@ export const SwapWidget: FunctionComponent = () => {
     secondToken,
     selectedPool,
     tokenAccounts,
+    availablePools,
     slippage,
   } = useSelector(tokenPairSelector);
+
+  // const availableTokenAccounts = useMemo(() => {
+  //   const isAvailableTokenAccounts = (availableTokens: Token[]) => (tokenAccount: TokenAccount) =>
+  //     any(propEq('address', tokenAccount.mint.address), availableTokens);
+  //
+  //   return tokenAccounts.filter(isAvailableTokenAccounts(availableTokens));
+  // }, [availableTokens, tokenAccounts]);
+
+  const availableTokenAccounts = useMemo(() => {
+    return tokenAccounts.filter(isAvailableTokenAccounts(availablePools));
+  }, [tokenAccounts, availablePools]);
+
+  const selectableTokenAccounts = useMemo(() => {
+    if (!firstTokenAccount) {
+      return [];
+    }
+
+    return tokenAccounts
+      .filter(isAvailableTokenAccounts(availablePools))
+      .filter((tokenAccount) => !tokenAccount.address.equals(firstTokenAccount.address));
+  }, [firstTokenAccount, tokenAccounts, availablePools]);
 
   const feeProperties = useMemo(() => {
     if (selectedPool && firstToken && firstAmount) {
@@ -178,27 +265,62 @@ export const SwapWidget: FunctionComponent = () => {
       ? selectedPool.impliedRate(isReverseRate ? firstToken : secondToken, firstAmount).toNumber()
       : undefined;
 
+  const isDisabled = isExecuting || !selectedPool;
+
   return (
-    <SendSwapWidget
-      type="swap"
-      title="Swap"
-      disabled={isExecuting || !selectedPool}
-      actionText={
-        // eslint-disable-next-line unicorn/no-nested-ternary
-        isExecuting ? 'Processing...' : selectedPool ? 'Swap now' : 'This pair is unavailable'
+    <WrapperWidget
+      title={
+        <TitleWrapper>
+          <IconWrapper>
+            <IconStyled name="top" />
+          </IconWrapper>
+          <Title>Swap</Title>
+        </TitleWrapper>
       }
-      rate={
-        rate ? (
-          <Rate>
-            {rate} {(isReverseRate ? secondToken : firstToken)?.symbol} per{' '}
-            {(isReverseRate ? firstToken : secondToken)?.symbol}
-            <ChangeRateWrapper onClick={handleChangeRateClick}>
-              <ChangeRateIcon name="swap" />
-            </ChangeRateWrapper>
-          </Rate>
-        ) : undefined
-      }
-      properties={
+      action={
+        <ActionsWrapper>
+          <SettingsAction />
+        </ActionsWrapper>
+      }>
+      <FromWrapper>
+        <FromToSelectInputStyled
+          tokenAccounts={availableTokenAccounts}
+          tokenAccount={firstTokenAccount}
+          amount={firstToken ? minorAmountToMajor(firstAmount, firstToken).toString() : ''}
+          onTokenAccountChange={selectFirstTokenHandleChange}
+          onAmountChange={updateFirstAmount}
+          disabled={isDisabled}
+        />
+      </FromWrapper>
+      <ToSwapWrapper>
+        <ReverseWrapper onClick={handleReverseClick}>
+          <ReverseIcon name="swap" />
+        </ReverseWrapper>
+        <FromToSelectInputStyled
+          direction="to"
+          tokenAccounts={selectableTokenAccounts}
+          tokenAccount={secondTokenAccount}
+          amount={secondToken ? minorAmountToMajor(secondAmount, secondToken).toString() : ''}
+          onTokenAccountChange={selectSecondTokenHandleChange}
+          onAmountChange={() => {}}
+          disabled={isDisabled}
+        />
+        {rate ? (
+          <FeeLine>
+            <FeeLeft>Price:</FeeLeft>
+            <FeeRight>
+              <Rate>
+                {rate} {(isReverseRate ? secondToken : firstToken)?.symbol} per{' '}
+                {(isReverseRate ? firstToken : secondToken)?.symbol}
+                <ChangeRateWrapper onClick={handleChangeRateClick}>
+                  <ChangeRateIcon name="swap" />
+                </ChangeRateWrapper>
+              </Rate>
+            </FeeRight>
+          </FeeLine>
+        ) : undefined}
+      </ToSwapWrapper>
+      <BottomWrapper>
         <PropertiesWrapper>
           {minimumToAmountWithSlippage ? (
             <PropertyLine>
@@ -220,17 +342,14 @@ export const SwapWidget: FunctionComponent = () => {
             </PropertyLine>
           ) : undefined}
         </PropertiesWrapper>
-      }
-      fromTokenAccount={firstTokenAccount}
-      fromAmount={firstToken ? minorAmountToMajor(firstAmount, firstToken).toString() : ''}
-      toTokenAccount={secondTokenAccount}
-      toAmount={secondToken ? minorAmountToMajor(secondAmount, secondToken).toString() : ''}
-      onFromTokenAccountChange={selectFirstTokenHandleChange}
-      onFromAmountChange={updateFirstAmount}
-      onToTokenAccountChange={selectSecondTokenHandleChange}
-      // onToAmountChange={handleToAmountChange}
-      onSubmit={handleSubmit}
-      onReverseClick={handleReverseClick}
-    />
+        <ButtonWrapper>
+          <Button primary={!isDisabled} disabled={isDisabled} big full onClick={handleSubmit}>
+            {/* eslint-disable-next-line unicorn/no-nested-ternary */}
+            {isExecuting ? 'Processing...' : selectedPool ? 'Swap now' : 'This pair is unavailable'}
+          </Button>
+          <Hint>All deposits are stored 100% non-custodiallity with keys held on this device</Hint>
+        </ButtonWrapper>
+      </BottomWrapper>
+    </WrapperWidget>
   );
 };
