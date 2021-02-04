@@ -449,15 +449,17 @@ export const FromToSelectInput: FunctionComponent<Props> = ({
 
     const filterLower = filter.toLowerCase();
 
-    return tokenAccounts
-      .filter((account) => direction === 'to' || account.balance.toNumber() > 0)
-      .filter(
-        (account) =>
-          !filter ||
-          account.mint.symbol?.toLowerCase().includes(filterLower) ||
-          account.mint.name?.toLowerCase().includes(filterLower),
-      )
-      .sort((a, b) => b.balance.cmp(a.balance));
+    return (
+      tokenAccounts
+        // .filter((account) => direction === 'to' || account.balance.toNumber() > 0)
+        .filter(
+          (account) =>
+            !filter ||
+            account.mint.symbol?.toLowerCase().includes(filterLower) ||
+            account.mint.name?.toLowerCase().includes(filterLower),
+        )
+        .sort((a, b) => b.balance.cmp(a.balance))
+    );
   }, [tokenAccounts, direction, filter]);
 
   const renderEmpty = () => {

@@ -2,7 +2,7 @@ import React, { FunctionComponent, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { styled } from '@linaria/react';
-import { any, or, pipe, prop, propEq } from 'ramda';
+import { any, both, or, pathEq } from 'ramda';
 
 import { adjustForSlippage, Pool } from 'api/pool/Pool';
 import { usePoolFromLocation } from 'api/pool/utils/state';
@@ -114,14 +114,33 @@ const PropertyValue = styled.div`
   color: #000;
 `;
 
-const isAvailableTokenAccounts = (pools: Pool[]) => (tokenAccount: TokenAccount) =>
-  any(
+const isInPoolsTokenAccounts = (pools: Pool[], selectedTokenAccount?: TokenAccount) => (
+  tokenAccount: TokenAccount,
+) => {
+  if (selectedTokenAccount) {
+    return any(
+      or(
+        both(
+          pathEq(['tokenA', 'mint', 'address'], selectedTokenAccount?.mint.address),
+          pathEq(['tokenB', 'mint', 'address'], tokenAccount.mint.address),
+        ),
+        both(
+          pathEq(['tokenA', 'mint', 'address'], tokenAccount.mint.address),
+          pathEq(['tokenB', 'mint', 'address'], selectedTokenAccount?.mint.address),
+        ),
+      ),
+      pools,
+    );
+  }
+
+  return any(
     or(
-      pipe(prop('tokenA'), prop('mint'), propEq('address', tokenAccount.mint.address)),
-      pipe(prop('tokenB'), prop('mint'), propEq('address', tokenAccount.mint.address)),
+      pathEq(['tokenA', 'mint', 'address'], tokenAccount.mint.address),
+      pathEq(['tokenB', 'mint', 'address'], tokenAccount.mint.address),
     ),
     pools,
   );
+};
 
 export const SwapWidget: FunctionComponent = () => {
   const dispatch = useDispatch();
@@ -144,6 +163,11 @@ export const SwapWidget: FunctionComponent = () => {
     slippage,
   } = useSelector(tokenPairSelector);
 
+  usePoolFromLocation({
+    tokenAccounts,
+    updateAction: updateTokenPairState,
+  });
+
   // const availableTokenAccounts = useMemo(() => {
   //   const isAvailableTokenAccounts = (availableTokens: Token[]) => (tokenAccount: TokenAccount) =>
   //     any(propEq('address', tokenAccount.mint.address), availableTokens);
@@ -151,18 +175,22 @@ export const SwapWidget: FunctionComponent = () => {
   //   return tokenAccounts.filter(isAvailableTokenAccounts(availableTokens));
   // }, [availableTokens, tokenAccounts]);
 
-  const availableTokenAccounts = useMemo(() => {
-    return tokenAccounts.filter(isAvailableTokenAccounts(availablePools));
-  }, [tokenAccounts, availablePools]);
-
-  const selectableTokenAccounts = useMemo(() => {
-    if (!firstTokenAccount) {
-      return [];
-    }
-
+  const firstTokenAccounts = useMemo(() => {
     return tokenAccounts
-      .filter(isAvailableTokenAccounts(availablePools))
-      .filter((tokenAccount) => !tokenAccount.address.equals(firstTokenAccount.address));
+      .filter(isInPoolsTokenAccounts(availablePools))
+      .filter(
+        (tokenAccount) =>
+          !(secondTokenAccount && tokenAccount.address.equals(secondTokenAccount.address)),
+      );
+  }, [secondTokenAccount, tokenAccounts, availablePools]);
+
+  const secondTokenAccounts = useMemo(() => {
+    return tokenAccounts
+      .filter(isInPoolsTokenAccounts(availablePools, firstTokenAccount))
+      .filter(
+        (tokenAccount) =>
+          !(firstTokenAccount && tokenAccount.address.equals(firstTokenAccount.address)),
+      );
   }, [firstTokenAccount, tokenAccounts, availablePools]);
 
   const feeProperties = useMemo(() => {
@@ -179,11 +207,6 @@ export const SwapWidget: FunctionComponent = () => {
       return adjustForSlippage(minorAmountToMajor(secondAmount, secondToken), 'down', slippage);
     }
   }, [secondToken, secondAmount, slippage]);
-
-  usePoolFromLocation({
-    tokenAccounts,
-    updateAction: updateTokenPairState,
-  });
 
   const handleSubmit = async () => {
     try {
@@ -284,12 +307,12 @@ export const SwapWidget: FunctionComponent = () => {
       }>
       <FromWrapper>
         <FromToSelectInputStyled
-          tokenAccounts={availableTokenAccounts}
+          tokenAccounts={firstTokenAccounts}
           tokenAccount={firstTokenAccount}
           amount={firstToken ? minorAmountToMajor(firstAmount, firstToken).toString() : ''}
           onTokenAccountChange={selectFirstTokenHandleChange}
           onAmountChange={updateFirstAmount}
-          disabled={isDisabled}
+          disabled={isExecuting}
         />
       </FromWrapper>
       <ToSwapWrapper>
@@ -298,12 +321,12 @@ export const SwapWidget: FunctionComponent = () => {
         </ReverseWrapper>
         <FromToSelectInputStyled
           direction="to"
-          tokenAccounts={selectableTokenAccounts}
+          tokenAccounts={secondTokenAccounts}
           tokenAccount={secondTokenAccount}
           amount={secondToken ? minorAmountToMajor(secondAmount, secondToken).toString() : ''}
           onTokenAccountChange={selectSecondTokenHandleChange}
           onAmountChange={() => {}}
-          disabled={isDisabled}
+          disabled={isExecuting}
         />
         {rate ? (
           <FeeLine>
