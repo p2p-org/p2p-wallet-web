@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux';
 
 import { styled } from '@linaria/react';
 
-import { RootState } from 'store/rootReducer';
+import { rateSelector } from 'store/selectors/rates';
 
 const Wrapper = styled.div``;
 
@@ -12,7 +12,7 @@ type Props = {
 };
 
 export const RateUSDT: FunctionComponent<Props> = ({ symbol = '', ...props }) => {
-  const rate = useSelector((state: RootState) => state.rate.markets[`${symbol}/USDT`]);
+  const rate = useSelector(rateSelector(symbol));
 
   if (!rate) {
     return null;

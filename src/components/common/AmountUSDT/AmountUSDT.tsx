@@ -1,11 +1,11 @@
-import React, { FunctionComponent, useMemo } from 'react';
+import React, { FunctionComponent } from 'react';
 import { useSelector } from 'react-redux';
 
 import { CSSProperties } from '@linaria/core';
 import { styled } from '@linaria/react';
 import { Decimal } from 'decimal.js';
 
-import { RootState } from 'store/rootReducer';
+import { rateSelector } from 'store/selectors/rates';
 
 const Wrapper = styled.div``;
 
@@ -23,13 +23,9 @@ export const AmountUSDT: FunctionComponent<Props> = ({
   symbol = '',
   ...props
 }) => {
-  const rate = useSelector((state: RootState) => state.rate.markets[`${symbol}/USDT`]);
+  const rate = useSelector(rateSelector(symbol));
 
-  const calculatedValue = useMemo(() => {
-    return value.times(rate || 1).toNumber();
-  }, [rate, value?.toNumber()]);
-
-  if (!rate && !['USDT', 'USDC'].includes(symbol)) {
+  if (!rate) {
     return null;
   }
 
@@ -37,7 +33,7 @@ export const AmountUSDT: FunctionComponent<Props> = ({
     <Wrapper title="Amount in USDT" {...props}>
       {prefix ? `${prefix} ` : undefined}
       {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(
-        calculatedValue,
+        value.times(rate).toNumber(),
       )}
     </Wrapper>
   );

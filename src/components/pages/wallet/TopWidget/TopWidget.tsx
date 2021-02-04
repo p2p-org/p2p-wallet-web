@@ -15,6 +15,7 @@ import { TokenAvatar } from 'components/common/TokenAvatar';
 import { Widget } from 'components/common/Widget';
 import { Button, Icon } from 'components/ui';
 import { RootState } from 'store/rootReducer';
+import { rateSelector } from 'store/selectors/rates';
 import { getRatesCandle } from 'store/slices/rate/RateSlice';
 import { airdrop } from 'store/slices/wallet/WalletSlice';
 import { shortAddress } from 'utils/tokens';
@@ -154,9 +155,7 @@ export const TopWidget: FunctionComponent<Props> = ({ publicKey }) => {
     () => tokenAccounts.find((account) => account.address.equals(publicKey)),
     [tokenAccounts, publicKey],
   );
-  const rate = useSelector(
-    (state: RootState) => state.rate.markets[`${tokenAccount?.mint.symbol}/USDT`],
-  );
+  const rate = useSelector(rateSelector(tokenAccount?.mint.symbol));
   const rates = useSelector(
     (state: RootState) => state.rate.candles[`${tokenAccount?.mint.symbol}/USDT`],
   );

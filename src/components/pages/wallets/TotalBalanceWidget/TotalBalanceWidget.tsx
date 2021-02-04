@@ -8,6 +8,8 @@ import { Decimal } from 'decimal.js';
 import { TokenAccount } from 'api/token/TokenAccount';
 import { Widget } from 'components/common/Widget';
 import { RootState } from 'store/rootReducer';
+import { rateSelector } from 'store/selectors/rates';
+
 // import { calculateInterval, calculateStart } from 'utils/charts';
 //
 // import { serials } from './data';
@@ -54,13 +56,13 @@ export const TotalBalanceWidget: FunctionComponent = () => {
   const tokenAccounts = useSelector((state: RootState) =>
     state.wallet.tokenAccounts.map((account) => TokenAccount.from(account)),
   );
-  const rates = useSelector((state: RootState) => state.rate);
+  const state = useSelector((currentState: RootState) => currentState);
 
   const totalBalance = useMemo(
     () =>
       // eslint-disable-next-line unicorn/no-reduce
       tokenAccounts.reduce((prev, tokenAccount) => {
-        const rate = rates.markets[`${tokenAccount.mint.symbol}/USDT`];
+        const rate = rateSelector(tokenAccount.mint.symbol)(state);
         if (rate) {
           return new Decimal(tokenAccount.mint.toMajorDenomination(tokenAccount.balance))
             .times(rate)
@@ -77,7 +79,7 @@ export const TotalBalanceWidget: FunctionComponent = () => {
 
         return prev;
       }, 0),
-    [tokenAccounts, rates],
+    [tokenAccounts, state.rate.markets],
   );
 
   const greeting = useMemo(() => {
