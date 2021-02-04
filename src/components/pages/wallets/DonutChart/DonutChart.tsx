@@ -1,6 +1,8 @@
 import React, { FunctionComponent, memo } from 'react';
 import isEqual from 'react-fast-compare';
 
+import { CacheTTL } from 'lib/cachettl';
+
 import { arc } from './utils';
 
 export type DonutChartData = {
@@ -8,6 +10,8 @@ export type DonutChartData = {
   value: number;
   color?: string;
 }[];
+
+const colorsCache = new CacheTTL<string>();
 
 const randomColor = () => `#${Math.floor(Math.random() * 16777215).toString(16)}`;
 
@@ -29,7 +33,12 @@ const renderSegments = (
 
   return data.map((slice) => {
     const { value, color, label } = slice;
-    const fillColor = color || randomColor();
+
+    let fillColor = colorsCache.get(label);
+    if (!fillColor) {
+      fillColor = color || randomColor();
+    }
+    colorsCache.set(label, fillColor);
 
     const sectorAngle = valueToDeg(value, total);
     const d = arc(
