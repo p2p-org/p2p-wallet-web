@@ -279,7 +279,7 @@ export const TopWidget: FunctionComponent<Props> = ({ publicKey }) => {
             <TokenInfo>
               <TokenAvatar symbol={tokenAccount?.mint.symbol} size="36" />
               <TokenName title={tokenAccount.address.toBase58()}>
-                {tokenAccount?.mint.name || shortAddress(tokenAccount.address.toBase58())}
+                {tokenAccount?.mint.name || shortAddress(tokenAccount.address.toBase58())} wallet
               </TokenName>
             </TokenInfo>
           ) : undefined
