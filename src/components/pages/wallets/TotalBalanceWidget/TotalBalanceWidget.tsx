@@ -1,19 +1,18 @@
 import React, { FunctionComponent, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 
-// import ReactHighcharts from 'react-highcharts';
 import { styled } from '@linaria/react';
 import { Decimal } from 'decimal.js';
 
 import { TokenAccount } from 'api/token/TokenAccount';
+import { LoaderBlock } from 'components/common/LoaderBlock';
 import { Widget } from 'components/common/Widget';
 import { RootState } from 'store/rootReducer';
 import { rateSelector } from 'store/selectors/rates';
 
-// import { calculateInterval, calculateStart } from 'utils/charts';
-//
-// import { serials } from './data';
-// import { getConfig } from './utils';
+import { DonutChart, DonutChartData } from '../DonutChart';
+
+const CHART_SIZE = 110;
 
 const WrapperWidget = styled(Widget)``;
 
@@ -48,9 +47,13 @@ const AllTokensText = styled.div`
   line-height: 140%;
 `;
 
-// const ChartWrapper = styled.div`
-//   width: 254px;
-// `;
+const ChartWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: ${CHART_SIZE}px;
+  height: ${CHART_SIZE}px;
+`;
 
 export const TotalBalanceWidget: FunctionComponent = () => {
   const tokenAccounts = useSelector((state: RootState) =>
@@ -103,15 +106,36 @@ export const TotalBalanceWidget: FunctionComponent = () => {
     return `Good ${dayTime}!`;
   }, [new Date().getHours()]);
 
-  // const coin = 'BTC';
-  // const currency = 'BTC';
-  // const time = 'day';
-  //
-  // const data = serials.map((d) => [d.timestamp * 1000, d.price]);
-  // const decimals = 2;
-  // const start = calculateStart(coin, time);
-  // const interval = calculateInterval(time);
-  // const config = getConfig(coin, currency, data, decimals, interval, start);
+  const donutData = useMemo(() => {
+    const data: DonutChartData = [];
+
+    tokenAccounts.forEach((tokenAccount) => {
+      if (!tokenAccount.mint.symbol || tokenAccount.balance.lte(0)) {
+        return;
+      }
+
+      const rate = rateSelector(tokenAccount.mint.symbol)(state);
+
+      if (!rate) {
+        return;
+      }
+
+      const balance = new Decimal(tokenAccount.mint.toMajorDenomination(tokenAccount.balance))
+        .times(rate)
+        .toNumber();
+      const balanceUSD = new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD',
+      }).format(balance);
+
+      data.push({
+        label: `${tokenAccount.mint.symbol} ${balanceUSD}`,
+        value: balance,
+      });
+    });
+
+    return data;
+  }, [tokenAccounts]);
 
   return (
     <WrapperWidget title={`${greeting} 👋`}>
@@ -125,9 +149,13 @@ export const TotalBalanceWidget: FunctionComponent = () => {
           </Price>
           <AllTokensText>All tokens</AllTokensText>
         </PriceWrapper>
-        {/* <ChartWrapper> */}
-        {/*  <ReactHighcharts config={config} isPureConfig /> */}
-        {/* </ChartWrapper> */}
+        <ChartWrapper>
+          {tokenAccounts.length === 0 ? (
+            <LoaderBlock />
+          ) : (
+            <DonutChart size={CHART_SIZE} data={donutData} />
+          )}
+        </ChartWrapper>
       </TotalWrapper>
     </WrapperWidget>
   );
