@@ -314,7 +314,7 @@ export const TransactionDetailsModal: FunctionComponent<Props> = ({ signature, c
           <CloseIcon name="close" />
         </CloseWrapper>
         <BlockWrapper>
-          <BlockIcon name={isReceiver ? 'top' : 'bottom'} />
+          <BlockIcon name={isReceiver ? 'bottom' : 'top'} />
         </BlockWrapper>
       </Header>
       <Content>
