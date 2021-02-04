@@ -48,11 +48,10 @@ type Props = {
 };
 
 export const TokenList: FunctionComponent<Props> = ({ items, closeModal }) => {
-  if (!items) {
-    return null;
-  }
-
   const dispatch = useDispatch();
+  const [fee, setFee] = useState(0);
+  const [rawFee, setRawFee] = useState(0);
+  const [filter, setFilter] = useState('');
   const publicKey = useSelector((state: RootState) => state.wallet.publicKey);
   const tokenAccounts = useSelector((state: RootState) =>
     state.wallet.tokenAccounts.map((account) => TokenAccount.from(account)),
@@ -61,10 +60,6 @@ export const TokenList: FunctionComponent<Props> = ({ items, closeModal }) => {
     () => tokenAccounts.find((account) => account.address.toBase58() === publicKey),
     [tokenAccounts, publicKey],
   );
-
-  const [fee, setFee] = useState(0);
-  const [rawFee, setRawFee] = useState(0);
-  const [filterValue, setFilter] = useState('');
 
   useEffect(() => {
     const mount = async () => {
@@ -86,30 +81,37 @@ export const TokenList: FunctionComponent<Props> = ({ items, closeModal }) => {
     void mount();
   }, []);
 
-  const handleFilterChange = (value: string) => {
-    const searchValue = value.trim().toLowerCase();
-    setFilter(searchValue);
-  };
+  const filteredItems = useMemo(() => {
+    if (!items) {
+      return;
+    }
 
-  const filteredItems =
-    filterValue.length > 0
+    const filterLower = filter.toLowerCase();
+
+    return filterLower.length > 0
       ? items.filter(
           (item) =>
-            item.symbol?.toLowerCase().includes(filterValue) ||
-            item.name?.toLowerCase().includes(filterValue),
+            item.symbol?.toLowerCase().includes(filterLower) ||
+            item.name?.toLowerCase().includes(filterLower),
         )
       : items;
+  }, [filter, items]);
+
+  if (!items) {
+    return null;
+  }
+
+  const handleFilterChange = (value: string) => {
+    const nextFilter = value.trim();
+    setFilter(nextFilter);
+  };
 
   const isInfluencedFunds = Boolean(solAccount?.balance.lt(rawFee));
 
   return (
     <Wrapper>
-      <SearchInputStyled
-        placeholder="Search token"
-        value={filterValue}
-        onChange={handleFilterChange}
-      />
-      {filteredItems.length > 0 ? (
+      <SearchInputStyled placeholder="Search token" value={filter} onChange={handleFilterChange} />
+      {filteredItems?.length ? (
         filteredItems.map((token) => (
           <TokenRow
             key={token.address.toBase58()}

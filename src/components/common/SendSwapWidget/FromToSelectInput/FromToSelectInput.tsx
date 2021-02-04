@@ -304,7 +304,7 @@ const EmptyDescription = styled.div`
 `;
 
 type Props = {
-  type?: 'send' | 'swap';
+  // type?: 'send' | 'swap';
   direction?: 'from' | 'to';
   tokenAccount?: TokenAccount;
   amount?: string;
@@ -317,7 +317,7 @@ type Props = {
 const SCROLL_THRESHOLD = 15;
 
 export const FromToSelectInput: FunctionComponent<Props> = ({
-  type = 'send',
+  // type = 'send',
   direction = 'from',
   tokenAccount,
   amount,
@@ -430,7 +430,7 @@ export const FromToSelectInput: FunctionComponent<Props> = ({
   };
 
   const handleFilterChange = (value: string) => {
-    const nextFilter = value.trim().toLowerCase();
+    const nextFilter = value.trim();
 
     setFilter(nextFilter);
   };
@@ -450,13 +450,15 @@ export const FromToSelectInput: FunctionComponent<Props> = ({
       return;
     }
 
+    const filterLower = filter.toLowerCase();
+
     return tokenAccounts
       .filter((account) => direction === 'to' || account.balance.toNumber() > 0)
       .filter(
         (account) =>
           !filter ||
-          account.mint.symbol?.toLowerCase().includes(filter) ||
-          account.mint.name?.toLowerCase().includes(filter),
+          account.mint.symbol?.toLowerCase().includes(filterLower) ||
+          account.mint.name?.toLowerCase().includes(filterLower),
       )
       .sort((a, b) => b.balance.cmp(a.balance));
   }, [tokenAccounts, direction, filter]);

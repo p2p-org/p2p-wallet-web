@@ -213,7 +213,7 @@ export const SendSwapWidget: FunctionComponent<Props> = ({
       }>
       <FromWrapper>
         <FromToSelectInputStyled
-          type={type}
+          // type={type}
           tokenAccount={fromTokenAccount}
           amount={fromAmount}
           onTokenAccountChange={onFromTokenAccountChange}
@@ -243,7 +243,7 @@ export const SendSwapWidget: FunctionComponent<Props> = ({
             <ReverseIcon name="swap" />
           </ReverseWrapper>
           <FromToSelectInputStyled
-            type={type}
+            // type={type}
             direction="to"
             tokenAccount={toTokenAccount as TokenAccount}
             amount={toAmount}
