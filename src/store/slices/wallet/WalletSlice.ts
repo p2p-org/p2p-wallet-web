@@ -104,11 +104,12 @@ export const connect = createAsyncThunk<string, WalletDataType | undefined>(
       ? (JSON.parse(localStorage.getItem(STORAGE_KEY_SEED) as string) as string)
       : null;
 
-    const wallet = await WalletAPI.connect(
-      cluster,
-      type,
-      <ManualCredentialsData>data || <ManualSeedData>{ seed },
-    );
+    const processedData =
+      type === WalletType.MANUAL
+        ? <ManualCredentialsData>data || <ManualSeedData>{ seed }
+        : undefined;
+
+    const wallet = await WalletAPI.connect(cluster, type, processedData);
 
     wallet.on(WalletEvent.DISCONNECT, () => {
       void thunkAPI.dispatch(disconnect());
@@ -205,9 +206,9 @@ const makeInitialState = (): WalletsState => ({
   cluster: (localStorage.getItem(STORAGE_KEY_CLUSTER) as Cluster) || DEFAULT_CLUSTER,
   connected: false,
   publicKey: null,
-  type:
-    WalletType[localStorage.getItem(STORAGE_KEY_TYPE) as keyof typeof WalletType] ||
-    WalletType.SOLLET,
+  type: localStorage.getItem(STORAGE_KEY_TYPE)
+    ? Number(localStorage.getItem(STORAGE_KEY_TYPE))
+    : WalletType.MANUAL,
   tokenAccounts: [],
 });
 
