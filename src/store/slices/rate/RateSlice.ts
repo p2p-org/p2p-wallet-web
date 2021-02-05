@@ -6,6 +6,7 @@ import { APIFactory } from 'api/rate';
 import { SerializableCandleRate } from 'api/rate/CandleRate';
 import { SerializableMarketRate } from 'api/rate/MarketRate';
 import { RootState } from 'store/rootReducer';
+import { wipeAction } from 'store/slices/GlobalSlice';
 
 const RATES_SLICE_NAME = 'rates';
 
@@ -77,6 +78,7 @@ const transactionSlice = createSlice({
     builder.addCase(getRatesCandle.rejected, (state, action) => {
       state.candles[`${action.meta.arg}/USDT`] = [];
     });
+    builder.addCase(wipeAction, () => initialState);
   },
 });
 

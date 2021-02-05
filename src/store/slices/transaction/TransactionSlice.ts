@@ -9,6 +9,7 @@ import { mergeRight, pathOr, uniq } from 'ramda';
 import { APIFactory } from 'api/transaction';
 import { SerializableTransaction } from 'api/transaction/Transaction';
 import { RootState } from 'store/rootReducer';
+import { wipeAction } from 'store/slices/GlobalSlice';
 
 const TRANSACTION_SLICE_NAME = 'transaction';
 
@@ -100,6 +101,7 @@ const transactionSlice = createSlice({
         pathOr<string[]>([], ['order', action.payload.signature], state).concat(newPubkeys),
       );
     });
+    builder.addCase(wipeAction, () => initialState);
   },
 });
 

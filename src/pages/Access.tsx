@@ -7,11 +7,10 @@ import * as bip39 from 'bip39';
 import throttle from 'lodash.throttle';
 
 import { WalletType } from 'api/wallet';
+import { Header } from 'components/common/Header';
 import { Button, Input } from 'components/ui';
 import { localMnemonic } from 'config/constants';
 import { connect, selectType } from 'store/slices/wallet/WalletSlice';
-
-import { Header } from '../components/common/Header';
 
 const Wrapper = styled.div`
   height: 100%;

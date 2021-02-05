@@ -8,7 +8,8 @@ import classNames from 'classnames';
 import { Icon } from 'components/ui';
 import { CLUSTERS } from 'config/constants';
 import { RootState } from 'store/rootReducer';
-import { disconnect, selectCluster } from 'store/slices/wallet/WalletSlice';
+import { wipeAction } from 'store/slices/GlobalSlice';
+import { connect, selectCluster } from 'store/slices/wallet/WalletSlice';
 
 import { ClusterRow } from './ClusterRow';
 
@@ -119,9 +120,10 @@ export const ClusterSelector: FunctionComponent = () => {
 
   const handleItemClick = (newCluster: Cluster) => {
     setIsOpen(false);
-    batch(() => {
+    batch(async () => {
       dispatch(selectCluster(newCluster));
-      void dispatch(disconnect());
+      dispatch(wipeAction());
+      await dispatch(connect());
     });
   };
 

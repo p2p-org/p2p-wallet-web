@@ -5,6 +5,7 @@ import { DEFAULT_SLIPPAGE, Pool, SerializablePool } from 'api/pool/Pool';
 import { Token } from 'api/token/Token';
 import { SerializableTokenAccount, TokenAccount } from 'api/token/TokenAccount';
 import { SYSTEM_PROGRAM_ID, WRAPPED_SOL_MINT } from 'constants/solana/bufferLayouts';
+import { wipeAction } from 'store/slices/GlobalSlice';
 import { TokenPairState } from 'utils/types';
 
 import { getPools, updatePool } from '../pool/PoolSlice';
@@ -137,6 +138,7 @@ const tokenPairSlice = createSlice({
 
     builder.addCase(updatePool, updatePoolReducer);
     builder.addCase(updateAccount, updateAccountReducer);
+    builder.addCase(wipeAction, () => initialState);
   },
 });
 

@@ -7,6 +7,7 @@ import { Pool, SerializablePool } from 'api/pool/Pool';
 // import * as WalletAPI from 'api/wallet';
 // import { getTokenAccounts } from 'features/wallet/WalletSlice';
 import { RootState } from 'store/rootReducer';
+import { wipeAction } from 'store/slices/GlobalSlice';
 import { updateEntityArray } from 'store/slices/tokenPair/utils/tokenPair';
 
 export interface PoolsState {
@@ -87,6 +88,7 @@ const poolSlice = createSlice({
       ...state,
       availablePools: action.payload,
     }));
+    builder.addCase(wipeAction, () => initialState);
   },
 });
 

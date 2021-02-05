@@ -5,10 +5,16 @@ import nacl from 'tweetnacl';
 
 import { Wallet, WalletEvent } from './Wallet';
 
-export type ManualWalletData = {
+export type ManualCredentialsData = {
   mnemonic: string;
-  password: string;
+  password?: string;
 };
+
+export type ManualSeedData = {
+  seed: string;
+};
+
+export type ManualWalletData = ManualCredentialsData | ManualSeedData;
 
 /**
  * Manual wallet implementation that uses a private key
@@ -21,26 +27,32 @@ export class ManualWallet extends Wallet {
   constructor(network: string, data?: ManualWalletData) {
     super(network);
 
-    if (!data) {
-      throw new Error('Must have mnemonic');
+    void this.init(data);
+  }
+
+  async init(data?: ManualWalletData): Promise<void> {
+    if (!(<ManualCredentialsData>data).mnemonic && !(<ManualSeedData>data).seed) {
+      throw new Error('Wallet data must have credentials');
     }
 
-    bip39
-      .mnemonicToSeed(data.mnemonic)
-      // eslint-disable-next-line promise/always-return
-      .then((seed) => {
-        const derivedSeed = bip32.fromSeed(seed).derivePath(`m/501'/0'/0/0`).privateKey;
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        const keyPair = nacl.sign.keyPair.fromSeed(derivedSeed);
+    try {
+      const seed = (<ManualSeedData>data).seed
+        ? Buffer.from((<ManualSeedData>data).seed)
+        : await bip39.mnemonicToSeed((<ManualCredentialsData>data).mnemonic);
+      localStorage.setItem('seed', JSON.stringify(seed));
 
-        this.account = new Account(keyPair.secretKey);
+      const derivedSeed = bip32.fromSeed(seed).derivePath(`m/501'/0'/0/0`).privateKey as Uint8Array;
+      const keyPair = nacl.sign.keyPair.fromSeed(derivedSeed);
 
+      this.account = new Account(keyPair.secretKey);
+
+      // can be too fast and handler will not be set
+      setTimeout(() => {
         this.emit(WalletEvent.CONNECT);
-      })
-      .catch(() => {
-        this.emit(WalletEvent.DISCONNECT);
-      });
+      }, 1000);
+    } catch (error) {
+      this.emit(WalletEvent.DISCONNECT, error);
+    }
   }
 
   get pubkey(): PublicKey {

@@ -6,17 +6,21 @@ import { Token } from 'api/token/Token';
 import { SerializableTokenAccount, TokenAccount } from 'api/token/TokenAccount';
 import * as WalletAPI from 'api/wallet';
 import { getBalance, getWallet, WalletDataType, WalletType } from 'api/wallet';
+import { ManualCredentialsData, ManualSeedData } from 'api/wallet/ManualWallet';
 import { WalletEvent } from 'api/wallet/Wallet';
 import { ToastManager } from 'components/common/ToastManager';
 import { swapHostFeeAddress } from 'config/constants';
 import { SYSTEM_PROGRAM_ID } from 'constants/solana/bufferLayouts';
 import { RootState } from 'store/rootReducer';
-import { getAvailableTokens } from 'store/slices/GlobalSlice';
+import { getAvailableTokens, wipeAction } from 'store/slices/GlobalSlice';
 import { getPools } from 'store/slices/pool/PoolSlice';
 import { getRatesCandle, getRatesMarkets } from 'store/slices/rate/RateSlice';
 import { updateEntityArray } from 'store/slices/tokenPair/utils/tokenPair';
 
-const CLUSTER_STORAGE_KEY = 'cluster';
+const STORAGE_KEY_CLUSTER = 'cluster';
+const STORAGE_KEY_TYPE = 'type';
+export const STORAGE_KEY_SEED = 'seed';
+
 export const DEFAULT_CLUSTER: Cluster = 'devnet';
 export const WALLET_SLICE_NAME = 'wallet';
 
@@ -95,7 +99,16 @@ export const connect = createAsyncThunk<string, WalletDataType | undefined>(
     const {
       wallet: { cluster, type },
     }: RootState = thunkAPI.getState() as RootState;
-    const wallet = await WalletAPI.connect(cluster, type, data);
+
+    const seed = localStorage.getItem(STORAGE_KEY_SEED)
+      ? (JSON.parse(localStorage.getItem(STORAGE_KEY_SEED) as string) as string)
+      : null;
+
+    const wallet = await WalletAPI.connect(
+      cluster,
+      type,
+      <ManualCredentialsData>data || <ManualSeedData>{ seed },
+    );
 
     wallet.on(WalletEvent.DISCONNECT, () => {
       void thunkAPI.dispatch(disconnect());
@@ -189,10 +202,12 @@ export const updateAccountReducer = (
 
 // The initial wallet state. No wallet is connected yet.
 const makeInitialState = (): WalletsState => ({
-  cluster: (localStorage.getItem(CLUSTER_STORAGE_KEY) as Cluster) || DEFAULT_CLUSTER,
+  cluster: (localStorage.getItem(STORAGE_KEY_CLUSTER) as Cluster) || DEFAULT_CLUSTER,
   connected: false,
   publicKey: null,
-  type: WalletType.SOLLET,
+  type:
+    WalletType[localStorage.getItem(STORAGE_KEY_TYPE) as keyof typeof WalletType] ||
+    WalletType.SOLLET,
   tokenAccounts: [],
 });
 
@@ -205,17 +220,21 @@ const walletSlice = createSlice({
   reducers: {
     updateAccount: updateAccountReducer,
     selectCluster: (state, action: PayloadAction<Cluster>) => {
-      localStorage.setItem(CLUSTER_STORAGE_KEY, action.payload);
+      localStorage.setItem(STORAGE_KEY_CLUSTER, action.payload);
 
       return {
         ...state,
         cluster: action.payload,
       };
     },
-    selectType: (state, action: PayloadAction<WalletType>) => ({
-      ...state,
-      type: action.payload,
-    }),
+    selectType: (state, action: PayloadAction<WalletType>) => {
+      localStorage.setItem(STORAGE_KEY_TYPE, String(action.payload));
+
+      return {
+        ...state,
+        type: action.payload,
+      };
+    },
   },
   extraReducers: (builder) => {
     // Triggered when the connect async action is completed
@@ -237,6 +256,10 @@ const walletSlice = createSlice({
     builder.addCase(createAccountForToken.fulfilled, (state, action) => ({
       ...state,
       tokenAccounts: state.tokenAccounts.concat(action.payload.serialize()),
+    }));
+    builder.addCase(wipeAction, (state) => ({
+      ...state,
+      tokenAccounts: [],
     }));
   },
 });

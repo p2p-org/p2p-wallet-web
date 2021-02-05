@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { useDispatch } from 'react-redux';
 import { BrowserRouter as Router, Route, Switch, useHistory } from 'react-router-dom';
 
 import dayjs from 'dayjs';
@@ -14,6 +15,7 @@ import { Send } from 'pages/Send';
 import { Swap } from 'pages/Swap';
 import { Wallet } from 'pages/Wallet';
 import { Wallets } from 'pages/Wallets';
+import { connect } from 'store/slices/wallet/WalletSlice';
 import { AuthRequiredRoute } from 'utils/routes/UserRequiredRoute';
 
 dayjs.extend(localizedFormat);
@@ -31,6 +33,25 @@ const FixRoute = () => {
   return null;
 };
 
+const Authorize = () => {
+  const dispatch = useDispatch();
+  const history = useHistory();
+
+  useEffect(() => {
+    const mount = async () => {
+      await dispatch(connect());
+
+      setTimeout(() => {
+        history.push('/wallets');
+      }, 100);
+    };
+
+    void mount();
+  }, []);
+
+  return null;
+};
+
 const App: React.FC = () => {
   return (
     <>
@@ -38,6 +59,7 @@ const App: React.FC = () => {
       <Router basename={process.env.BASENAME || `${window.location.pathname}#`}>
         {/* Hack for states and hash routing until use own host */}
         <FixRoute />
+        <Authorize />
         <Switch>
           <Route path="/" component={Home} exact />
           <Route path="/create" component={Create} />

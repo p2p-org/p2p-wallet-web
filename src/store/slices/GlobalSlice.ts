@@ -1,4 +1,4 @@
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { createAction, createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 
 import { APIFactory } from 'api/token';
 import { SerializableToken } from 'api/token/Token';
@@ -35,6 +35,8 @@ export const getAvailableTokens = createAsyncThunk(
     return tokens.map((token) => token.serialize());
   },
 );
+
+export const wipeAction = createAction('wipe');
 
 const globalSlice = createSlice({
   name: GLOBAL_SLICE_NAME,

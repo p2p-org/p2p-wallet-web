@@ -6,9 +6,8 @@ import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
 
 import { isDev } from 'config/constants';
+import { store } from 'store';
 import { globalCss } from 'styles/global';
-
-import { store } from './store';
 
 export const global = globalCss;
 

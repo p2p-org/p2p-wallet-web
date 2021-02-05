@@ -72,7 +72,7 @@ export const connect = async (
 
   // connect is done once the wallet reports that it is connected.
   return new Promise((resolve) => {
-    newWallet.on('connect', () => resolve(newWallet));
+    newWallet.on(WalletEvent.CONNECT, () => resolve(newWallet));
   });
 };
 
