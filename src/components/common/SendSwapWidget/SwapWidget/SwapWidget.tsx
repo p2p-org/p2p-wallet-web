@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useMemo, useState } from 'react';
+import React, { FunctionComponent, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { styled } from '@linaria/react';
@@ -12,7 +12,7 @@ import { ToastManager } from 'components/common/ToastManager';
 import { Button, Icon } from 'components/ui';
 import { SYSTEM_PROGRAM_ID, WRAPPED_SOL_MINT } from 'constants/solana/bufferLayouts';
 import { executeSwap } from 'store/slices/swap/SwapSlice';
-import { updateTokenPairState } from 'store/slices/tokenPair/TokenPairSlice';
+import { clearTokenPairState, updateTokenPairState } from 'store/slices/tokenPair/TokenPairSlice';
 import { tokenPairSelector } from 'store/slices/tokenPair/utils/tokenPair';
 import { majorAmountToMinor, minorAmountToMajor } from 'utils/amount';
 
@@ -167,6 +167,12 @@ export const SwapWidget: FunctionComponent = () => {
     tokenAccounts,
     updateAction: updateTokenPairState,
   });
+
+  useEffect(() => {
+    return () => {
+      dispatch(clearTokenPairState());
+    };
+  }, []);
 
   // const availableTokenAccounts = useMemo(() => {
   //   const isAvailableTokenAccounts = (availableTokens: Token[]) => (tokenAccount: TokenAccount) =>
