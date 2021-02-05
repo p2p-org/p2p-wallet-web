@@ -49,7 +49,7 @@ export class ManualWallet extends Wallet {
       // can be too fast and handler will not be set
       setTimeout(() => {
         this.emit(WalletEvent.CONNECT);
-      }, 1000);
+      }, 0);
     } catch (error) {
       this.emit(WalletEvent.DISCONNECT, error);
     }
