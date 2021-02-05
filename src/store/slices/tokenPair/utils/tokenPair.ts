@@ -28,17 +28,17 @@ export const selectPoolForTokenPair = (
 };
 
 export const getToAmount = (
-  firstAmount: number,
-  fromSerializableToken?: SerializableToken,
+  amount: number,
+  serializableToken?: SerializableToken,
   serializablePool?: SerializablePool,
 ): number => {
-  if (!firstAmount || !serializablePool || !fromSerializableToken) {
+  if (!amount || !serializablePool || !serializableToken) {
     return 0;
   }
 
   const pool = Pool.from(serializablePool);
-  const firstToken = Token.from(fromSerializableToken);
-  return pool.calculateAmountInOtherToken(firstToken, firstAmount, false);
+  const firstToken = Token.from(serializableToken);
+  return pool.calculateAmountInOtherToken(firstToken, amount, false);
 };
 
 export const getSortedTokenAccountsByHighestBalance = (
@@ -76,7 +76,7 @@ export const syncTokenAccounts = (
         ...tokenAccount,
         mint: {
           ...tokenAccount.mint,
-          symbol: 'WSOL',
+          symbol: 'SOL',
           address: WRAPPED_SOL_MINT.toBase58(),
           isSimulated: true,
         },

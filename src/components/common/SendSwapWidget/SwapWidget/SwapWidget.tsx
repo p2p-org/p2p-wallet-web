@@ -225,6 +225,7 @@ export const SwapWidget: FunctionComponent = () => {
     let newSelectedAccountToken: TokenAccount = selectedAccountToken as TokenAccount;
 
     // Change SOL to WSOL in token pair
+    console.log(111, newSelectedAccountToken.serialize());
     if (newSelectedAccountToken?.mint.address.equals(SYSTEM_PROGRAM_ID)) {
       const serialized = newSelectedAccountToken.serialize();
 
@@ -232,7 +233,7 @@ export const SwapWidget: FunctionComponent = () => {
         ...serialized,
         mint: {
           ...serialized.mint,
-          symbol: 'WSOL',
+          symbol: 'SOL',
           address: WRAPPED_SOL_MINT.toBase58(),
           isSimulated: true,
         },
@@ -250,17 +251,22 @@ export const SwapWidget: FunctionComponent = () => {
   const selectFirstTokenHandleChange = handleTokenSelectionChange('firstToken');
   const selectSecondTokenHandleChange = handleTokenSelectionChange('secondToken');
 
-  const updateFirstAmount = (minorAmount: string) => {
-    if (!firstToken) {
+  const handleAmountChange = (key: 'firstAmount' | 'secondAmount') => (minorAmount: string) => {
+    const token = key === 'firstAmount' ? firstToken : secondToken;
+
+    if (!token) {
       return;
     }
 
     dispatch(
       updateTokenPairState({
-        firstAmount: majorAmountToMinor(Number(minorAmount), firstToken).toNumber(),
+        [key]: majorAmountToMinor(Number(minorAmount), token).toNumber(),
       }),
     );
   };
+
+  const updateFirstAmount = handleAmountChange('firstAmount');
+  const updateSecondAmount = handleAmountChange('secondAmount');
 
   const handleReverseClick = () => {
     dispatch(
@@ -313,6 +319,7 @@ export const SwapWidget: FunctionComponent = () => {
           onTokenAccountChange={selectFirstTokenHandleChange}
           onAmountChange={updateFirstAmount}
           disabled={isExecuting}
+          disabledInput={!firstToken}
         />
       </FromWrapper>
       <ToSwapWrapper>
@@ -325,8 +332,9 @@ export const SwapWidget: FunctionComponent = () => {
           tokenAccount={secondTokenAccount}
           amount={secondToken ? minorAmountToMajor(secondAmount, secondToken).toString() : ''}
           onTokenAccountChange={selectSecondTokenHandleChange}
-          onAmountChange={() => {}}
+          onAmountChange={updateSecondAmount}
           disabled={isExecuting}
+          disabledInput={!secondToken}
         />
         {rate ? (
           <FeeLine>

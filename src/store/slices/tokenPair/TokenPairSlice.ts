@@ -1,4 +1,5 @@
 import { createSlice, Draft, PayloadAction } from '@reduxjs/toolkit';
+import { isNil } from 'ramda';
 
 import { DEFAULT_SLIPPAGE, Pool, SerializablePool } from 'api/pool/Pool';
 import { Token } from 'api/token/Token';
@@ -32,39 +33,40 @@ const initialState: TokenPairState = {
 
 export const TOKEN_PAIR_SLICE_NAME = 'tokenPair';
 
-const normalize = (tokenPairState: TokenPairState): TokenPairState => {
-  const firstTokenAccount = syncTokenAccount(
-    tokenPairState.tokenAccounts,
-    tokenPairState.firstTokenAccount,
-  );
-  const secondTokenAccount = syncTokenAccount(
-    tokenPairState.tokenAccounts,
-    tokenPairState.secondTokenAccount,
-  );
+const normalize = (
+  oldState: TokenPairState,
+  updatedState: Partial<TokenPairState>,
+): TokenPairState => {
+  const newState = {
+    ...oldState,
+    ...updatedState,
+  };
+
+  const firstTokenAccount = syncTokenAccount(newState.tokenAccounts, newState.firstTokenAccount);
+  const secondTokenAccount = syncTokenAccount(newState.tokenAccounts, newState.secondTokenAccount);
 
   const selectedPool = selectPoolForTokenPair(
-    tokenPairState.availablePools,
-    tokenPairState.firstToken,
-    tokenPairState.secondToken,
+    newState.availablePools,
+    newState.firstToken,
+    newState.secondToken,
   );
 
   const poolTokenAccount = selectedPool
     ? selectTokenAccount(
         Token.from(selectedPool.poolToken),
-        tokenPairState.tokenAccounts.map((account) => TokenAccount.from(account)),
+        newState.tokenAccounts.map((account) => TokenAccount.from(account)),
         false,
       )
     : undefined;
 
-  const secondAmount = getToAmount(
-    tokenPairState.firstAmount,
-    tokenPairState.firstToken,
-    selectedPool,
-  );
+  if (!isNil(updatedState.firstAmount) || updatedState.secondToken) {
+    newState.secondAmount = getToAmount(newState.firstAmount, newState.firstToken, selectedPool);
+  } else if (!isNil(updatedState.secondAmount) || updatedState.firstToken) {
+    newState.firstAmount = getToAmount(newState.secondAmount, newState.secondToken, selectedPool);
+  }
 
   return {
-    ...tokenPairState,
-    secondAmount,
+    ...newState,
     selectedPool,
     firstTokenAccount,
     secondTokenAccount,
@@ -97,8 +99,7 @@ const updateAccountReducer = (
     state.tokenAccounts.map((account) => TokenAccount.from(account)),
   );
 
-  return normalize({
-    ...state,
+  return normalize(state, {
     tokenAccounts: updatedAccounts.map((account) => account.serialize()),
   });
 };
@@ -111,8 +112,7 @@ const updatePoolReducer = (
     Pool.from(action.payload),
     state.availablePools.map((pool) => Pool.from(pool)),
   );
-  return normalize({
-    ...state,
+  return normalize(state, {
     availablePools: updatedPools.map((pool) => pool.serialize()),
   });
 };
@@ -122,10 +122,7 @@ const tokenPairSlice = createSlice({
   initialState,
   reducers: {
     updateTokenPairState: (state, action: PayloadAction<Partial<TokenPairState>>) =>
-      normalize({
-        ...state,
-        ...action.payload,
-      }),
+      normalize(state, action.payload),
   },
   extraReducers: (builder) => {
     builder.addCase(getTokenAccounts.fulfilled, (state, action) =>

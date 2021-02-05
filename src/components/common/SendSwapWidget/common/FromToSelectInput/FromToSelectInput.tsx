@@ -5,6 +5,7 @@ import emptyImg from 'assets/images/empty.png';
 import classNames from 'classnames';
 import { Decimal } from 'decimal.js';
 import throttle from 'lodash.throttle';
+import { isNil } from 'ramda';
 
 import { TokenAccount } from 'api/token/TokenAccount';
 import { AmountUSDT } from 'components/common/AmountUSDT';
@@ -310,6 +311,7 @@ type Props = {
   onTokenAccountChange: (tokenAccount: TokenAccount) => void;
   onAmountChange: (minorAmount: string) => void;
   disabled?: boolean;
+  disabledInput?: boolean;
   className?: string;
 };
 
@@ -324,6 +326,7 @@ export const FromToSelectInput: FunctionComponent<Props> = ({
   onTokenAccountChange,
   onAmountChange,
   disabled,
+  disabledInput,
   className,
 }) => {
   const selectorRef = useRef<HTMLDivElement>(null);
@@ -421,7 +424,7 @@ export const FromToSelectInput: FunctionComponent<Props> = ({
 
     setLocalAmount(nextAmount);
 
-    if (Number(nextAmount)) {
+    if (!isNil(Number(nextAmount))) {
       onAmountChange(nextAmount);
     }
   };
@@ -509,7 +512,7 @@ export const FromToSelectInput: FunctionComponent<Props> = ({
               placeholder={tokenAccount?.mint.toMajorDenomination(0) || '0'}
               value={localAmount}
               onChange={handleAmountChange}
-              disabled={disabled || direction === 'to'}
+              disabled={disabled || disabledInput}
             />
           </SpecifyTokenWrapper>
           <BalanceWrapper>
