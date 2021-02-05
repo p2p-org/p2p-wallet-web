@@ -307,7 +307,7 @@ export const SwapWidget: FunctionComponent = () => {
       title={
         <TitleWrapper>
           <IconWrapper>
-            <IconStyled name="top" />
+            <IconStyled name="swap" />
           </IconWrapper>
           <Title>Swap</Title>
         </TitleWrapper>
