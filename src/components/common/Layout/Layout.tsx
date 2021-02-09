@@ -50,13 +50,15 @@ const ColumnLeft = styled.div`
   grid-template-rows: min-content;
 `;
 
+const ColumnRightWrapper = styled.div`
+  width: ${COLUMN_RIGHT_WIDTH}px;
+  height: fit-content;
+`;
+
 const ColumnRight = styled.div`
   display: grid;
   grid-gap: 24px;
   grid-template-rows: min-content;
-
-  width: ${COLUMN_RIGHT_WIDTH}px;
-  height: fit-content;
 `;
 
 const CenteredWrapper = styled.div`
@@ -111,7 +113,9 @@ export const Layout: FunctionComponent<Props> = ({
                       )}
                     </ColumnLeft>
                   </ColumnLeftSticky>
-                  <ColumnRight>{rightColumn}</ColumnRight>
+                  <ColumnRightWrapper>
+                    <ColumnRight>{rightColumn}</ColumnRight>
+                  </ColumnRightWrapper>
                 </ColumnsWrapper>
               ) : // eslint-disable-next-line unicorn/no-nested-ternary
               centered ? (

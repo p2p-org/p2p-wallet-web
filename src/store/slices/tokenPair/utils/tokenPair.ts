@@ -51,7 +51,7 @@ export const getSortedTokenAccountsByHighestBalance = (
       (tokenAccount) =>
         tokenAccount.mint.equals(token) && (excludeZeroBalance ? tokenAccount.balance.gt(0) : true),
     )
-    .sort((a1, a2) => a2.balance.cmp(a1.balance));
+    .sort((a, b) => b.balance.cmp(a.balance));
 
 export const syncTokenAccount = (
   tokenAccounts: Array<SerializableTokenAccount>,

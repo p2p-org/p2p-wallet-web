@@ -1,44 +1,11 @@
 import { styled } from '@linaria/react';
 import { rgba } from 'polished';
 
-import { Widget } from 'components/common/Widget';
-import { Icon } from 'components/ui';
+import { WidgetPage } from 'components/common/WidgetPage';
 
 import { FromToSelectInput } from './FromToSelectInput';
 
-export const WrapperWidget = styled(Widget)``;
-
-export const TitleWrapper = styled.div`
-  display: flex;
-  align-items: center;
-`;
-
-export const IconWrapper = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 36px;
-  height: 36px;
-
-  background: #5887ff;
-  border-radius: 12px;
-`;
-
-export const IconStyled = styled(Icon)`
-  width: 24px;
-  height: 24px;
-
-  color: #fff;
-`;
-
-export const Title = styled.div`
-  margin-left: 16px;
-
-  color: #000;
-  font-weight: 600;
-  font-size: 20px;
-  line-height: 120%;
-`;
+export const WrapperWidgetPage = styled(WidgetPage)``;
 
 export const FromWrapper = styled.div`
   position: relative;

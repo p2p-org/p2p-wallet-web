@@ -47,8 +47,7 @@ const Wrapper = styled.div`
   overflow-y: hidden;
 
   &::-webkit-scrollbar {
-    width: 8px !important;
-    height: 4px !important;
+    display: none;
   }
 
   &::-webkit-scrollbar-track {
@@ -56,8 +55,7 @@ const Wrapper = styled.div`
   }
 
   &::-webkit-scrollbar-thumb {
-    background-color: rgba(0, 0, 0, 0.2);
-    border-radius: 4px;
+    background: none;
   }
 `;
 

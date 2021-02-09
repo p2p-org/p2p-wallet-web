@@ -4,8 +4,6 @@ import { NavLink } from 'react-router-dom';
 import { styled } from '@linaria/react';
 
 import { Icon } from 'components/ui';
-import { openModal } from 'store/actions/modals';
-import { SHOW_MODAL_RECIEVE_TOKENS } from 'store/constants/modalTypes';
 
 const Wrapper = styled.div`
   display: grid;
@@ -98,7 +96,7 @@ export const LeftNavMenu: FunctionComponent = () => {
           Wallets
         </NavButton>
       </NavLinkMenu>
-      <NavLinkMenu to="/receive" className="button disabled">
+      <NavLinkMenu to="/receive" className="button">
         <NavButton>
           <IconBlock>
             <NavIcon name="bottom" />

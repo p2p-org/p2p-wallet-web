@@ -47,7 +47,7 @@ const getSolToken = async () => {
 
   // Fake token to simulate SOL as Token
   const mint = new Token(SYSTEM_PROGRAM_ID, 9, 0, undefined, 'Solana', 'SOL');
-  return new TokenAccount(mint, SYSTEM_PROGRAM_ID, publicKey, balance);
+  return new TokenAccount(mint, SYSTEM_PROGRAM_ID, SYSTEM_PROGRAM_ID, publicKey, balance);
 };
 
 export const getTokenAccounts = createAsyncThunk<Array<SerializableTokenAccount>>(

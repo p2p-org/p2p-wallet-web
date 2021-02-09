@@ -23,11 +23,7 @@ import {
   FromToSelectInputStyled,
   FromWrapper,
   Hint,
-  IconStyled,
-  IconWrapper,
-  Title,
-  TitleWrapper,
-  WrapperWidget,
+  WrapperWidgetPage,
 } from '../common/styled';
 import { ToAddressInput } from './ToAddressInput';
 
@@ -126,15 +122,7 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
   const isDisabled = isExecuting;
 
   return (
-    <WrapperWidget
-      title={
-        <TitleWrapper>
-          <IconWrapper>
-            <IconStyled name="top" />
-          </IconWrapper>
-          <Title>Send</Title>
-        </TitleWrapper>
-      }>
+    <WrapperWidgetPage title="Send" icon="top">
       <FromWrapper>
         <FromToSelectInputStyled
           tokenAccounts={tokenAccounts}
@@ -166,6 +154,6 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
           <Hint>All deposits are stored 100% non-custodiallity with keys held on this device</Hint>
         </ButtonWrapper>
       </BottomWrapper>
-    </WrapperWidget>
+    </WrapperWidgetPage>
   );
 };

@@ -11,7 +11,6 @@ import { TokenAccount } from 'api/token/TokenAccount';
 import { Card } from 'components/common/Card';
 import { ToastManager } from 'components/common/ToastManager';
 import { Icon } from 'components/ui';
-import { RootState } from 'store/rootReducer';
 
 const WrapperCard = styled(Card)`
   flex: 1;
@@ -112,8 +111,8 @@ type Props = {
 export const QRAddressWidget: FunctionComponent<Props> = ({ publicKey, className }) => {
   const [copied, setCopied] = useState(false);
   const [isExpand, setIsExpand] = useState(false);
-  const cluster = useSelector((state: RootState) => state.wallet.cluster);
-  const tokenAccounts = useSelector((state: RootState) => state.wallet.tokenAccounts);
+  const cluster = useSelector((state) => state.wallet.cluster);
+  const tokenAccounts = useSelector((state) => state.wallet.tokenAccounts);
   const tokenAccount = useMemo(() => {
     const foundToken = tokenAccounts.find((account) => account.address === publicKey.toBase58());
     return foundToken && TokenAccount.from(foundToken);
@@ -144,13 +143,13 @@ export const QRAddressWidget: FunctionComponent<Props> = ({ publicKey, className
 
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
-  const imageSettings: QRCode.ImageSettings = {
+  const qrImageSettings: QRCode.ImageSettings = {
     height: 28,
     width: 28,
   };
 
   if (tokenAccount.mint.symbol === 'SOL') {
-    imageSettings.src =
+    qrImageSettings.src =
       'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/solana/info/logo.png';
   } else {
     const iconSrc = tokenConfig[cluster]?.find(
@@ -158,7 +157,7 @@ export const QRAddressWidget: FunctionComponent<Props> = ({ publicKey, className
     )?.icon;
 
     if (iconSrc) {
-      imageSettings.src = iconSrc;
+      qrImageSettings.src = iconSrc;
     }
   }
 
@@ -183,7 +182,7 @@ export const QRAddressWidget: FunctionComponent<Props> = ({ publicKey, className
             <Text>Send to your {tokenAccount.mint.symbol} wallet</Text>
             <QRCode
               value={tokenAccount.address.toBase58()}
-              imageSettings={imageSettings}
+              imageSettings={qrImageSettings}
               size={140}
             />
             <Text>maxburlak.p2pw.org</Text>

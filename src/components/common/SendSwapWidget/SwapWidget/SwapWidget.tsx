@@ -25,11 +25,7 @@ import {
   FromToSelectInputStyled,
   FromWrapper,
   Hint,
-  IconStyled,
-  IconWrapper,
-  Title,
-  TitleWrapper,
-  WrapperWidget,
+  WrapperWidgetPage,
 } from '../common/styled';
 
 const ActionsWrapper = styled.div`
@@ -303,15 +299,9 @@ export const SwapWidget: FunctionComponent = () => {
   const isDisabled = isExecuting || !selectedPool;
 
   return (
-    <WrapperWidget
-      title={
-        <TitleWrapper>
-          <IconWrapper>
-            <IconStyled name="swap" />
-          </IconWrapper>
-          <Title>Swap</Title>
-        </TitleWrapper>
-      }
+    <WrapperWidgetPage
+      title="Swap"
+      icon="swap"
       action={
         <ActionsWrapper>
           <SettingsAction />
@@ -387,6 +377,6 @@ export const SwapWidget: FunctionComponent = () => {
           <Hint>All deposits are stored 100% non-custodiallity with keys held on this device</Hint>
         </ButtonWrapper>
       </BottomWrapper>
-    </WrapperWidget>
+    </WrapperWidgetPage>
   );
 };

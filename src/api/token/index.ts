@@ -266,6 +266,7 @@ export const APIFactory = memoizeWith(
      * @param account
      */
     const tokenAccountInfo = async (account: PublicKey): Promise<TokenAccount | null> => {
+      console.log('Getting info for token account:', account.toBase58());
       const getParsedAccountInfoResult = await connection.getParsedAccountInfo(account);
 
       // For Tokens
@@ -282,6 +283,7 @@ export const APIFactory = memoizeWith(
         return new TokenAccount(
           mintTokenInfo,
           new PublicKey(parsedInfo.owner),
+          getParsedAccountInfoResult.value?.owner,
           account,
           toDecimal(new BN(parsedInfo.tokenAmount.amount)),
           getParsedAccountInfoResult.context.slot,
@@ -293,7 +295,7 @@ export const APIFactory = memoizeWith(
         const balance = await connection.getBalance(account);
         const mint = new Token(SYSTEM_PROGRAM_ID, 9, 0, undefined, 'Solana', 'SOL');
 
-        return new TokenAccount(mint, SYSTEM_PROGRAM_ID, account, balance);
+        return new TokenAccount(mint, SYSTEM_PROGRAM_ID, SYSTEM_PROGRAM_ID, account, balance);
       }
 
       // For SOL tokens
@@ -302,6 +304,7 @@ export const APIFactory = memoizeWith(
 
         return new TokenAccount(
           mint,
+          SYSTEM_PROGRAM_ID,
           SYSTEM_PROGRAM_ID,
           account,
           getParsedAccountInfoResult.value?.lamports,
@@ -373,6 +376,7 @@ export const APIFactory = memoizeWith(
         return new TokenAccount(
           token,
           new PublicKey(parsedTokenAccountInfo.owner),
+          accountResult.account.owner,
           accountResult.pubkey,
           toDecimal(new BN(parsedTokenAccountInfo.tokenAmount.amount)),
         );

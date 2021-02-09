@@ -12,6 +12,7 @@ import { SerializableToken, Token } from './Token';
 export type SerializableTokenAccount = {
   mint: SerializableToken;
   owner: string;
+  ownerProgram: string;
   address: string;
   balance: string;
   lastUpdatedSlot?: number;
@@ -25,6 +26,9 @@ export class TokenAccount
 
   readonly owner: PublicKey;
 
+  // pubkey of the program this account has been assigned to
+  readonly ownerProgram: PublicKey;
+
   readonly address: PublicKey;
 
   readonly balance: Decimal;
@@ -32,6 +36,7 @@ export class TokenAccount
   constructor(
     mint: Token,
     owner: PublicKey,
+    ownerProgram: PublicKey,
     address: PublicKey,
     balance: number | BN | Decimal,
     currentSlot?: number,
@@ -41,6 +46,7 @@ export class TokenAccount
 
     this.mint = mint;
     this.owner = owner;
+    this.ownerProgram = ownerProgram;
     this.address = address;
     this.balance = toDecimal(balance);
   }
@@ -86,6 +92,7 @@ export class TokenAccount
     return {
       mint: this.mint.serialize(),
       owner: this.owner.toBase58(),
+      ownerProgram: this.ownerProgram.toBase58(),
       address: this.address.toBase58(),
       balance: this.balance.toString(),
       lastUpdatedSlot: this.lastUpdatedSlot,
@@ -101,6 +108,7 @@ export class TokenAccount
     return new TokenAccount(
       Token.from(serializableTokenAccount.mint),
       new PublicKey(serializableTokenAccount.owner),
+      new PublicKey(serializableTokenAccount.ownerProgram),
       new PublicKey(serializableTokenAccount.address),
       new Decimal(serializableTokenAccount.balance),
       serializableTokenAccount.lastUpdatedSlot,

@@ -384,7 +384,13 @@ export const APIFactory = (cluster: ExtendedCluster): API => {
 
     signers.push(newAccount);
 
-    return new TokenAccount(fromAccount.mint, TOKEN_PROGRAM_ID, newAccount.publicKey, amount);
+    return new TokenAccount(
+      fromAccount.mint,
+      TOKEN_PROGRAM_ID,
+      TOKEN_PROGRAM_ID,
+      newAccount.publicKey,
+      amount,
+    );
   };
 
   const createAccountByMint = async (
@@ -450,6 +456,7 @@ export const APIFactory = (cluster: ExtendedCluster): API => {
     const newTokenAccount = new TokenAccount(
       mintToken,
       owner || TOKEN_PROGRAM_ID,
+      TOKEN_PROGRAM_ID,
       newAccount.publicKey,
       0,
     );

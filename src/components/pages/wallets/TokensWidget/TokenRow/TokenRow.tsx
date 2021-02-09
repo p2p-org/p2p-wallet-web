@@ -103,7 +103,7 @@ export const TokenRow: FunctionComponent<Props> = ({ token }) => {
         <Content>
           <Top>
             <TokenName title={token.mint.address.toBase58()}>
-              {token.mint.symbol || token.mint.address.toBase58()}
+              {token.mint.symbol || shortAddress(token.mint.address.toBase58())}
             </TokenName>
             <AmountUSDT
               value={new Decimal(token.mint.toMajorDenomination(token.balance))}

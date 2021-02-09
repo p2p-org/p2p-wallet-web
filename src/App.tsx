@@ -11,6 +11,7 @@ import { ToastManager } from 'components/common/ToastManager';
 import { Access } from 'pages/Access';
 import { Create } from 'pages/Create';
 import { Home } from 'pages/Home';
+import { Receive } from 'pages/Receive';
 import { Send } from 'pages/Send';
 import { Swap } from 'pages/Swap';
 import { Wallet } from 'pages/Wallet';
@@ -66,6 +67,7 @@ const App: React.FC = () => {
           <Route path="/access" component={Access} />
           <AuthRequiredRoute path="/wallets" component={Wallets} />
           <AuthRequiredRoute path="/wallet/:publicKey" component={Wallet} />
+          <AuthRequiredRoute path="/receive" component={Receive} />
           <AuthRequiredRoute path="/send/:publicKey/:status(result)" component={Send} />
           <AuthRequiredRoute path="/send/:publicKey?" component={Send} />
           <AuthRequiredRoute path="/swap/:publicKey?" component={Swap} />
