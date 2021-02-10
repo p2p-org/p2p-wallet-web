@@ -85,12 +85,24 @@ const OptionButton = styled(Button)`
   min-width: 52px;
   padding: 8px;
 
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 140%;
+
   border: 1px solid transparent;
 
-  &.active {
-    color: #000;
+  &:hover {
+    color: #5887ff;
 
-    border-color: rgba(0, 0, 0, 0.5);
+    background: #eff3ff;
+    border-color: transparent;
+  }
+
+  &.active {
+    color: #5887ff;
+
+    background: #fff;
+    border-color: #5887ff;
   }
 `;
 
@@ -117,6 +129,10 @@ const ButtonsWrapper = styled.div`
   }
 `;
 
+const BottomButton = styled(Button)`
+  min-width: 104px;
+`;
+
 export const SettingsAction: FunctionComponent = () => {
   const dispatch = useDispatch();
   const [isShow, setIsShow] = useState(false);
@@ -132,7 +148,7 @@ export const SettingsAction: FunctionComponent = () => {
     setIsCustomShow((state) => !state);
   };
 
-  const handeDoneClick = () => {
+  const handleDoneClick = () => {
     dispatch(
       updateTokenPairState({
         slippage: Number(nextSlippage),
@@ -202,12 +218,12 @@ export const SettingsAction: FunctionComponent = () => {
             </CustomWrapper>
           ) : undefined}
           <ButtonsWrapper>
-            <Button primary medium disabled={isDisabled} onClick={handeDoneClick}>
+            <BottomButton primary medium disabled={isDisabled} onClick={handleDoneClick}>
               Done
-            </Button>
-            <Button lightGray medium onClick={handleCloseClick}>
+            </BottomButton>
+            <BottomButton lightGray medium onClick={handleCloseClick}>
               Cancel
-            </Button>
+            </BottomButton>
           </ButtonsWrapper>
         </SettingsWrapper>
       ) : undefined}

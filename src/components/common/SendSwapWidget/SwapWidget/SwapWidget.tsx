@@ -227,7 +227,6 @@ export const SwapWidget: FunctionComponent = () => {
     let newSelectedAccountToken: TokenAccount = selectedAccountToken as TokenAccount;
 
     // Change SOL to WSOL in token pair
-    console.log(111, newSelectedAccountToken.serialize());
     if (newSelectedAccountToken?.mint.address.equals(SYSTEM_PROGRAM_ID)) {
       const serialized = newSelectedAccountToken.serialize();
 
