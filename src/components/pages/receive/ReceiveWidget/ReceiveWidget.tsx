@@ -357,7 +357,7 @@ export const ReceiveWidget: FunctionComponent = () => {
       .sort((a, b) => b.balance.cmp(a.balance))
       .filter(
         (value, index, self) =>
-          value.mint.symbol && index === self.findIndex((t) => t.equals(value)),
+          value.mint.symbol && index === self.findIndex((t) => t.sameToken(value)),
       );
     const renderSortedUniqTokenAccounts = sortedUniqTokenAccounts.map((tokenAccount) =>
       renderToken(tokenAccount.mint, tokenAccount),
@@ -365,7 +365,7 @@ export const ReceiveWidget: FunctionComponent = () => {
 
     // get tokens not included in sortedUniqTokenAccounts
     const otherAvailableTokens = availableTokens.filter(
-      (token) => !sortedUniqTokenAccounts.find((tokenAccount) => token.equals(tokenAccount.mint)),
+      (token) => !sortedUniqTokenAccounts.find((tokenAccount) => tokenAccount.mint.equals(token)),
     );
     const renderOtherTokens = otherAvailableTokens.map((token) => renderToken(token));
 
