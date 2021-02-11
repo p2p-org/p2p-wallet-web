@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import { styled } from '@linaria/react';
 import classNames from 'classnames';
+import { isNil } from 'ramda';
 
 import { DEFAULT_SLIPPAGE } from 'api/pool/Pool';
 import { Button, Icon, Input } from 'components/ui';
@@ -143,7 +144,9 @@ export const SettingsAction: FunctionComponent = () => {
   const [isShow, setIsShow] = useState(false);
   const [isCustomShow, setIsCustomShow] = useState(false);
   const { slippage } = useSelector(tokenPairSelector);
-  const [nextSlippage, setNextSlippage] = useState(String(slippage || DEFAULT_SLIPPAGE));
+  const [nextSlippage, setNextSlippage] = useState(
+    isNil(slippage) ? DEFAULT_SLIPPAGE : String(slippage),
+  );
 
   const handleToggleShow = () => {
     setIsShow((state) => !state);

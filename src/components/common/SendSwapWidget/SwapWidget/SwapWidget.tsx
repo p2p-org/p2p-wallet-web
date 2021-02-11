@@ -2,7 +2,7 @@ import React, { FunctionComponent, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { styled } from '@linaria/react';
-import { any, both, or, pathEq } from 'ramda';
+import { any, both, isNil, or, pathEq } from 'ramda';
 
 import { adjustForSlippage, Pool } from 'api/pool/Pool';
 import { usePoolFromLocation } from 'api/pool/utils/state';
@@ -205,7 +205,7 @@ export const SwapWidget: FunctionComponent = () => {
   }, [selectedPool, firstToken, firstAmount]);
 
   const minimumToAmountWithSlippage = useMemo(() => {
-    if (secondToken && secondAmount && slippage) {
+    if (secondToken && secondAmount && !isNil(slippage)) {
       return adjustForSlippage(minorAmountToMajor(secondAmount, secondToken), 'down', slippage);
     }
   }, [secondToken, secondAmount, slippage]);
@@ -361,7 +361,7 @@ export const SwapWidget: FunctionComponent = () => {
               Liquidity Provider Fee: <PropertyValue>{fee} SOL</PropertyValue>
             </PropertyLine>
           ) : undefined}
-          {slippage ? (
+          {!isNil(slippage) ? (
             <PropertyLine>
               Slippage:
               <PropertyValue>{slippage} %</PropertyValue>

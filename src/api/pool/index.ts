@@ -15,7 +15,7 @@ import { localSwapProgramId, swapHostFeeAddress } from 'config/constants';
 import { WRAPPED_SOL_MINT } from 'constants/solana/bufferLayouts';
 import { ExtendedCluster } from 'utils/types';
 
-import { adjustForSlippage, DEFAULT_SLIPPAGE, Pool } from './Pool';
+import { adjustForSlippage, Pool } from './Pool';
 import poolConfig from './pool.config';
 import { POOL_UPDATED_EVENT, PoolListener, PoolUpdatedEvent } from './PoolListener';
 
@@ -526,7 +526,7 @@ export const APIFactory = (cluster: ExtendedCluster): API => {
           fromAmount: parameters.fromAmount,
           toAccount,
           hostFeePublicKey: feeAccount?.address,
-          slippage: parameters.slippage || DEFAULT_SLIPPAGE,
+          slippage: parameters.slippage || 0,
           pool: parameters.pool,
         }),
       );

@@ -46,7 +46,7 @@ export type TokenAmounts = {
 export const adjustForSlippage = (
   amount: number | Decimal,
   direction: SlippageDirection,
-  slippage = DEFAULT_SLIPPAGE,
+  slippage = 0,
 ): Decimal => {
   const slippageFractional = slippage / 100;
   const slippageMultiplier = 1 + (direction === 'up' ? slippageFractional : -slippageFractional);
