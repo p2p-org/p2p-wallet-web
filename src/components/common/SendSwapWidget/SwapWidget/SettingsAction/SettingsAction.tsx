@@ -16,6 +16,7 @@ const Wrapper = styled.div`
 const ActionIcon = styled(Icon)`
   width: 32px;
   height: 32px;
+  margin-right: 8px;
 
   color: #a3a5ba;
 `;
@@ -23,16 +24,20 @@ const ActionIcon = styled(Icon)`
 const ActionWrapper = styled.div`
   display: flex;
   align-items: center;
-  justify-content: center;
-  width: 36px;
   height: 36px;
+  padding: 0 12px 0 2px;
+
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 140%;
 
   background: #f6f6f8;
   border-radius: 12px;
-
   cursor: pointer;
 
   &:hover {
+    color: #5887ff;
+
     background: #eff3ff;
 
     ${ActionIcon} {
@@ -182,6 +187,7 @@ export const SettingsAction: FunctionComponent = () => {
     <Wrapper>
       <ActionWrapper onClick={handleToggleShow}>
         <ActionIcon name="settings" />
+        Slippage
       </ActionWrapper>
       {isShow ? (
         <SettingsWrapper>
