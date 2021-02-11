@@ -35,8 +35,9 @@ export interface WalletsState {
 /**
  * Async action to disconnect from a wallet.
  */
-export const disconnect = createAsyncThunk(`${WALLET_SLICE_NAME}/disconnect`, () => {
+export const disconnect = createAsyncThunk(`${WALLET_SLICE_NAME}/disconnect`, (_, thunkAPI) => {
   WalletAPI.disconnect();
+  thunkAPI.dispatch(wipeAction());
   ToastManager.error('Wallet disconnected');
 });
 

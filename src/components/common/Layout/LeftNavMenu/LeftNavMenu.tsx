@@ -120,7 +120,7 @@ export const LeftNavMenu: FunctionComponent = () => {
           Swap
         </NavButton>
       </NavLinkMenu>
-      <NavLinkMenu to="/settings" className="button disabled">
+      <NavLinkMenu to="/settings" className="button">
         <NavButton>
           <IconBlock>
             <NavIcon name="gear" />

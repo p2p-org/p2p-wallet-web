@@ -13,6 +13,7 @@ import { Create } from 'pages/Create';
 import { Home } from 'pages/Home';
 import { Receive } from 'pages/Receive';
 import { Send } from 'pages/Send';
+import { Settings } from 'pages/Settings';
 import { Swap } from 'pages/Swap';
 import { Wallet } from 'pages/Wallet';
 import { Wallets } from 'pages/Wallets';
@@ -71,6 +72,7 @@ const App: React.FC = () => {
           <AuthRequiredRoute path="/send/:publicKey/:status(result)" component={Send} />
           <AuthRequiredRoute path="/send/:publicKey?" component={Send} />
           <AuthRequiredRoute path="/swap/:publicKey?" component={Swap} />
+          <AuthRequiredRoute path="/settings" component={Settings} />
         </Switch>
       </Router>
       <ModalManager />
