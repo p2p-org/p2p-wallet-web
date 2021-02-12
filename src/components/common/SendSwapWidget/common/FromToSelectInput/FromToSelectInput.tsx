@@ -1,7 +1,6 @@
 import React, { FunctionComponent, useEffect, useMemo, useRef, useState } from 'react';
 
 import { styled } from '@linaria/react';
-import emptyImg from 'assets/images/empty.png';
 import classNames from 'classnames';
 import { Decimal } from 'decimal.js';
 import throttle from 'lodash.throttle';
@@ -16,6 +15,7 @@ import { SearchInput } from 'components/ui/SearchInput';
 import { minorAmountToMajor } from 'utils/amount';
 import { shortAddress } from 'utils/tokens';
 
+import { Empty } from './Empty';
 import { TokenRow } from './TokenRow';
 
 const Wrapper = styled.div``;
@@ -275,33 +275,6 @@ const DropDownList = styled.div`
   overflow-y: auto;
 `;
 
-const EmptyWrapper = styled.div`
-  margin: 50px 0;
-
-  text-align: center;
-`;
-
-const EmptyImg = styled.img`
-  width: 82px;
-  height: 78px;
-`;
-
-const EmptyTitle = styled.div`
-  margin-top: 12px;
-
-  color: #000;
-  font-weight: 600;
-  font-size: 16px;
-  line-height: 140%;
-`;
-
-const EmptyDescription = styled.div`
-  color: #a3a5ba;
-  font-weight: 600;
-  font-size: 14px;
-  line-height: 140%;
-`;
-
 type Props = {
   // type?: 'send' | 'swap';
   direction?: 'from' | 'to';
@@ -450,6 +423,10 @@ export const FromToSelectInput: FunctionComponent<Props> = ({
       return;
     }
 
+    if (!filter) {
+      return tokenAccounts;
+    }
+
     const filterLower = filter.toLowerCase();
 
     return (
@@ -457,23 +434,12 @@ export const FromToSelectInput: FunctionComponent<Props> = ({
         // .filter((account) => direction === 'to' || account.balance.toNumber() > 0)
         .filter(
           (account) =>
-            !filter ||
             account.mint.symbol?.toLowerCase().includes(filterLower) ||
             account.mint.name?.toLowerCase().includes(filterLower),
         )
         .sort((a, b) => b.balance.cmp(a.balance))
     );
   }, [tokenAccounts, direction, filter]);
-
-  const renderEmpty = () => {
-    return (
-      <EmptyWrapper>
-        <EmptyImg src={emptyImg as string} />
-        <EmptyTitle>Nothing found</EmptyTitle>
-        <EmptyDescription>Change your search phrase and try again</EmptyDescription>
-      </EmptyWrapper>
-    );
-  };
 
   const hasBalance = tokenAccount
     ? Number(tokenAccount.mint.toMajorDenomination(tokenAccount.balance)) >= Number(localAmount)
@@ -571,15 +537,17 @@ export const FromToSelectInput: FunctionComponent<Props> = ({
             </SlideContainer>
           </DropDownHeader>
           <DropDownList ref={listRef}>
-            {filteredTokens?.length
-              ? filteredTokens.map((account) => (
-                  <TokenRow
-                    key={account.address.toBase58()}
-                    tokenAccount={account}
-                    onClick={handleItemClick}
-                  />
-                ))
-              : renderEmpty()}
+            {filteredTokens?.length ? (
+              filteredTokens.map((account) => (
+                <TokenRow
+                  key={account.address.toBase58()}
+                  tokenAccount={account}
+                  onClick={handleItemClick}
+                />
+              ))
+            ) : (
+              <Empty />
+            )}
           </DropDownList>
         </DropDownListContainer>
       ) : undefined}
