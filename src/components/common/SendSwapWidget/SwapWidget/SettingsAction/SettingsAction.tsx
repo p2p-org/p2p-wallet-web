@@ -184,7 +184,7 @@ export const SettingsAction: FunctionComponent = () => {
     setNextSlippage(cleanSlippage);
   };
 
-  const isDisabled = Number.parseFloat(nextSlippage) > 100;
+  const isDisabled = Number.parseFloat(String(nextSlippage)) > 100;
 
   return (
     <Wrapper>
