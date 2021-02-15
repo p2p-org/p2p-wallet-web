@@ -7,6 +7,7 @@ import { unwrapResult } from '@reduxjs/toolkit';
 import { PublicKey } from '@solana/web3.js';
 import Decimal from 'decimal.js';
 
+import { Token } from 'api/token/Token';
 import { TokenAccount } from 'api/token/TokenAccount';
 import { RateUSDT } from 'components/common/RateUSDT';
 import { ToastManager } from 'components/common/ToastManager';
@@ -107,7 +108,14 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
     }
   };
 
-  const handleFromTokenAccountChange = (nextTokenAccount: TokenAccount) => {
+  const handleFromTokenAccountChange = (
+    nextToken: Token,
+    nextTokenAccount: TokenAccount | null,
+  ) => {
+    if (!nextTokenAccount) {
+      return;
+    }
+
     history.replace(`/send/${nextTokenAccount.address.toBase58()}`);
   };
 
@@ -126,6 +134,7 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
       <FromWrapper>
         <FromToSelectInputStyled
           tokenAccounts={tokenAccounts}
+          token={fromTokenAccount?.mint}
           tokenAccount={fromTokenAccount}
           amount={fromAmount}
           onTokenAccountChange={handleFromTokenAccountChange}

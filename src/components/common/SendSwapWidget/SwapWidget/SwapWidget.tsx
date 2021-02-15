@@ -2,18 +2,18 @@ import React, { FunctionComponent, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { styled } from '@linaria/react';
-import { any, both, isNil, or, pathEq } from 'ramda';
+import { any, complement, isNil, or, pathEq } from 'ramda';
 
 import { adjustForSlippage, Pool } from 'api/pool/Pool';
 import { usePoolFromLocation } from 'api/pool/utils/state';
+import { Token } from 'api/token/Token';
 import { TokenAccount } from 'api/token/TokenAccount';
 import { SettingsAction } from 'components/common/SendSwapWidget/SwapWidget/SettingsAction';
 import { ToastManager } from 'components/common/ToastManager';
 import { Button, Icon } from 'components/ui';
-import { SYSTEM_PROGRAM_ID, WRAPPED_SOL_MINT } from 'constants/solana/bufferLayouts';
 import { executeSwap } from 'store/slices/swap/SwapSlice';
 import { clearTokenPairState, updateTokenPairState } from 'store/slices/tokenPair/TokenPairSlice';
-import { tokenPairSelector } from 'store/slices/tokenPair/utils/tokenPair';
+import { matchesPool, tokenPairSelector } from 'store/slices/tokenPair/utils/tokenPair';
 import { majorAmountToMinor, minorAmountToMajor } from 'utils/amount';
 
 import {
@@ -114,19 +114,7 @@ const isInPoolsTokenAccounts = (pools: Pool[], selectedTokenAccount?: TokenAccou
   tokenAccount: TokenAccount,
 ) => {
   if (selectedTokenAccount) {
-    return any(
-      or(
-        both(
-          pathEq(['tokenA', 'mint', 'address'], selectedTokenAccount?.mint.address),
-          pathEq(['tokenB', 'mint', 'address'], tokenAccount.mint.address),
-        ),
-        both(
-          pathEq(['tokenA', 'mint', 'address'], tokenAccount.mint.address),
-          pathEq(['tokenB', 'mint', 'address'], selectedTokenAccount?.mint.address),
-        ),
-      ),
-      pools,
-    );
+    return any(matchesPool(selectedTokenAccount.mint, tokenAccount.mint), pools);
   }
 
   return any(
@@ -138,13 +126,27 @@ const isInPoolsTokenAccounts = (pools: Pool[], selectedTokenAccount?: TokenAccou
   );
 };
 
+const isInPoolsToken = (pools: Pool[], selectedToken?: Token) => (token: Token) => {
+  if (selectedToken) {
+    return any(matchesPool(selectedToken, token), pools);
+  }
+
+  return any(
+    or(
+      pathEq(['tokenA', 'mint', 'address'], token.address),
+      pathEq(['tokenB', 'mint', 'address'], token.address),
+    ),
+    pools,
+  );
+};
+
 export const SwapWidget: FunctionComponent = () => {
   const dispatch = useDispatch();
   const [isExecuting, setIsExecuting] = useState(false);
   const [isReverseRate, setIsReverseRate] = useState(false);
-  // const availableTokens = useSelector((state) =>
-  //   state.global.availableTokens.map((token) => Token.from(token)),
-  // );
+  const availableTokens = useSelector((state) =>
+    state.global.availableTokens.map((token) => Token.from(token)),
+  );
 
   const {
     firstAmount,
@@ -170,20 +172,8 @@ export const SwapWidget: FunctionComponent = () => {
     };
   }, []);
 
-  // const availableTokenAccounts = useMemo(() => {
-  //   const isAvailableTokenAccounts = (availableTokens: Token[]) => (tokenAccount: TokenAccount) =>
-  //     any(propEq('address', tokenAccount.mint.address), availableTokens);
-  //
-  //   return tokenAccounts.filter(isAvailableTokenAccounts(availableTokens));
-  // }, [availableTokens, tokenAccounts]);
-
   const firstTokenAccounts = useMemo(() => {
-    return tokenAccounts
-      .filter(isInPoolsTokenAccounts(availablePools))
-      .filter(
-        (tokenAccount) =>
-          !(secondTokenAccount && tokenAccount.address.equals(secondTokenAccount.address)),
-      );
+    return tokenAccounts.filter(isInPoolsTokenAccounts(availablePools));
   }, [secondTokenAccount, tokenAccounts, availablePools]);
 
   const secondTokenAccounts = useMemo(() => {
@@ -194,6 +184,16 @@ export const SwapWidget: FunctionComponent = () => {
           !(firstTokenAccount && tokenAccount.address.equals(firstTokenAccount.address)),
       );
   }, [firstTokenAccount, tokenAccounts, availablePools]);
+
+  const secondTokens = useMemo(() => {
+    // eslint-disable-next-line no-shadow
+    const isAvailableTokenAccounts = (tokenAccounts: TokenAccount[]) => (token: Token) =>
+      any(pathEq(['mint', 'address'], token.address), tokenAccounts);
+
+    return availableTokens
+      .filter(isInPoolsToken(availablePools, firstToken))
+      .filter(complement(isAvailableTokenAccounts(tokenAccounts)));
+  }, [firstTokenAccount, tokenAccounts, availableTokens, availablePools]);
 
   const feeProperties = useMemo(() => {
     if (selectedPool && firstToken && firstAmount) {
@@ -222,29 +222,29 @@ export const SwapWidget: FunctionComponent = () => {
   };
 
   const handleTokenSelectionChange = (key: 'firstToken' | 'secondToken') => (
-    selectedAccountToken: TokenAccount | string,
+    selectedToken: Token,
+    selectedAccountToken: TokenAccount | null,
   ) => {
-    let newSelectedAccountToken: TokenAccount = selectedAccountToken as TokenAccount;
-
     // Change SOL to WSOL in token pair
-    if (newSelectedAccountToken?.mint.address.equals(SYSTEM_PROGRAM_ID)) {
-      const serialized = newSelectedAccountToken.serialize();
-
-      newSelectedAccountToken = TokenAccount.from({
-        ...serialized,
-        mint: {
-          ...serialized.mint,
-          symbol: 'SOL',
-          address: WRAPPED_SOL_MINT.toBase58(),
-          isSimulated: true,
-        },
-      });
-    }
+    // if (selectedToken.address.equals(SYSTEM_PROGRAM_ID)) {
+    //   let newSelectedAccountToken: TokenAccount = selectedAccountToken as TokenAccount;
+    //   const serialized = newSelectedAccountToken.serialize();
+    //
+    //   newSelectedAccountToken = TokenAccount.from({
+    //     ...serialized,
+    //     mint: {
+    //       ...serialized.mint,
+    //       symbol: 'SOL',
+    //       address: WRAPPED_SOL_MINT.toBase58(),
+    //       isSimulated: true,
+    //     },
+    //   });
+    // }
 
     dispatch(
       updateTokenPairState({
-        [key]: newSelectedAccountToken.mint.serialize(),
-        [`${key}Account`]: newSelectedAccountToken.serialize(),
+        [key]: selectedToken.serialize(),
+        [`${key}Account`]: selectedAccountToken ? selectedAccountToken.serialize() : null,
       }),
     );
   };
@@ -309,6 +309,7 @@ export const SwapWidget: FunctionComponent = () => {
       <FromWrapper>
         <FromToSelectInputStyled
           tokenAccounts={firstTokenAccounts}
+          token={firstToken}
           tokenAccount={firstTokenAccount}
           amount={firstToken ? minorAmountToMajor(firstAmount, firstToken).toString() : ''}
           onTokenAccountChange={selectFirstTokenHandleChange}
@@ -323,7 +324,9 @@ export const SwapWidget: FunctionComponent = () => {
         </ReverseWrapper>
         <FromToSelectInputStyled
           direction="to"
+          tokens={secondTokens}
           tokenAccounts={secondTokenAccounts}
+          token={secondToken}
           tokenAccount={secondTokenAccount}
           amount={secondToken ? minorAmountToMajor(secondAmount, secondToken).toString() : ''}
           onTokenAccountChange={selectSecondTokenHandleChange}

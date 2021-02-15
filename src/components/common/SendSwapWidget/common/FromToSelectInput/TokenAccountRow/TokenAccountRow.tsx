@@ -1,8 +1,10 @@
 import React, { FunctionComponent } from 'react';
 
 import { styled } from '@linaria/react';
+import { Decimal } from 'decimal.js';
 
-import { Token } from 'api/token/Token';
+import { TokenAccount } from 'api/token/TokenAccount';
+import { AmountUSDT } from 'components/common/AmountUSDT';
 import { TokenAvatar } from 'components/common/TokenAvatar';
 import { shortAddress } from 'utils/tokens';
 
@@ -54,27 +56,35 @@ const Bottom = styled.div`
 `;
 
 type Props = {
-  token: Token;
-  onClick: (token: Token) => void;
+  tokenAccount: TokenAccount;
+  onClick: (tokenAccount: TokenAccount) => void;
 };
 
-export const TokenRow: FunctionComponent<Props> = ({ token, onClick }) => {
+export const TokenAccountRow: FunctionComponent<Props> = ({ tokenAccount, onClick }) => {
   const handleClick = () => {
-    onClick(token);
+    onClick(tokenAccount);
   };
 
   return (
     <Wrapper onClick={handleClick}>
       <ItemWrapper>
-        <TokenAvatar symbol={token.symbol} size={44} />
+        <TokenAvatar symbol={tokenAccount.mint.symbol} size={44} />
         <Info>
           <Top>
-            <TokenName title={token.address.toBase58()}>
-              {token.name || shortAddress(token.address.toBase58())}
+            <TokenName title={tokenAccount.mint.address.toBase58()}>
+              {tokenAccount.mint.name || shortAddress(tokenAccount.mint.address.toBase58())}
             </TokenName>
+            <AmountUSDT
+              symbol={tokenAccount.mint.symbol}
+              value={new Decimal(tokenAccount.mint.toMajorDenomination(tokenAccount.balance))}
+            />
           </Top>
           <Bottom>
-            <div>{token.symbol}</div>
+            <div>{shortAddress(tokenAccount.address.toBase58())}</div>
+            <div>
+              {tokenAccount?.mint.toMajorDenomination(tokenAccount.balance)}{' '}
+              {tokenAccount.mint.symbol}
+            </div>
           </Bottom>
         </Info>
       </ItemWrapper>

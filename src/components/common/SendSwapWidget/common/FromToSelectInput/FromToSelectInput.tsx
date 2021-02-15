@@ -6,6 +6,7 @@ import { Decimal } from 'decimal.js';
 import throttle from 'lodash.throttle';
 import { isNil } from 'ramda';
 
+import { Token } from 'api/token/Token';
 import { TokenAccount } from 'api/token/TokenAccount';
 import { AmountUSDT } from 'components/common/AmountUSDT';
 import { SlideContainer } from 'components/common/SlideContainer';
@@ -16,6 +17,7 @@ import { minorAmountToMajor } from 'utils/amount';
 import { shortAddress } from 'utils/tokens';
 
 import { Empty } from './Empty';
+import { TokenAccountRow } from './TokenAccountRow';
 import { TokenRow } from './TokenRow';
 
 const Wrapper = styled.div``;
@@ -275,13 +277,33 @@ const DropDownList = styled.div`
   overflow-y: auto;
 `;
 
+const TitleTokens = styled.div`
+  display: flex;
+  align-items: center;
+  margin: 0 20px;
+
+  color: #a3a5ba;
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 140%;
+`;
+
+const YourTokens = styled(TitleTokens)`
+  height: 32px;
+`;
+
+const AllTokens = styled(TitleTokens)`
+  height: 44px;
+`;
+
 type Props = {
-  // type?: 'send' | 'swap';
   direction?: 'from' | 'to';
+  tokens?: Token[];
   tokenAccounts: TokenAccount[];
+  token?: Token;
   tokenAccount?: TokenAccount;
   amount?: string;
-  onTokenAccountChange: (tokenAccount: TokenAccount) => void;
+  onTokenAccountChange: (token: Token, tokenAccount: TokenAccount | null) => void;
   onAmountChange: (minorAmount: string) => void;
   disabled?: boolean;
   disabledInput?: boolean;
@@ -291,9 +313,10 @@ type Props = {
 const SCROLL_THRESHOLD = 15;
 
 export const FromToSelectInput: FunctionComponent<Props> = ({
-  // type = 'send',
   direction = 'from',
+  tokens,
   tokenAccounts,
+  token,
   tokenAccount,
   amount,
   onTokenAccountChange,
@@ -375,9 +398,14 @@ export const FromToSelectInput: FunctionComponent<Props> = ({
     setIsOpen(!isOpen);
   };
 
-  const handleItemClick = (nextTokenAccount: TokenAccount) => {
+  const handleTokenAccountClick = (nextTokenAccount: TokenAccount) => {
     setIsOpen(false);
-    onTokenAccountChange(nextTokenAccount);
+    onTokenAccountChange(nextTokenAccount.mint, nextTokenAccount);
+  };
+
+  const handleTokenClick = (nextToken: Token) => {
+    setIsOpen(false);
+    onTokenAccountChange(nextToken, null);
   };
 
   const handleAllBalanceClick = () => {
@@ -418,9 +446,9 @@ export const FromToSelectInput: FunctionComponent<Props> = ({
     }`;
   };
 
-  const filteredTokens = useMemo(() => {
+  const filteredTokenAccounts = useMemo(() => {
     if (!tokenAccounts) {
-      return;
+      return [];
     }
 
     if (!filter) {
@@ -429,17 +457,33 @@ export const FromToSelectInput: FunctionComponent<Props> = ({
 
     const filterLower = filter.toLowerCase();
 
-    return (
-      tokenAccounts
-        // .filter((account) => direction === 'to' || account.balance.toNumber() > 0)
-        .filter(
-          (account) =>
-            account.mint.symbol?.toLowerCase().includes(filterLower) ||
-            account.mint.name?.toLowerCase().includes(filterLower),
-        )
-        .sort((a, b) => b.balance.cmp(a.balance))
+    return tokenAccounts
+      .filter(
+        (account) =>
+          account.mint.symbol?.toLowerCase().includes(filterLower) ||
+          account.mint.name?.toLowerCase().includes(filterLower),
+      )
+      .sort((a, b) => b.balance.cmp(a.balance));
+  }, [tokenAccounts, filter]);
+
+  const filteredTokens = useMemo(() => {
+    if (!tokens) {
+      return [];
+    }
+
+    if (!filter) {
+      return tokens;
+    }
+
+    const filterLower = filter.toLowerCase();
+
+    return tokens.filter(
+      // eslint-disable-next-line no-shadow
+      (token) =>
+        token.symbol?.toLowerCase().includes(filterLower) ||
+        token.name?.toLowerCase().includes(filterLower),
     );
-  }, [tokenAccounts, direction, filter]);
+  }, [tokens, filteredTokenAccounts, filter]);
 
   const hasBalance = tokenAccount
     ? Number(tokenAccount.mint.toMajorDenomination(tokenAccount.balance)) >= Number(localAmount)
@@ -451,12 +495,8 @@ export const FromToSelectInput: FunctionComponent<Props> = ({
         <FromTitle>{direction === 'from' ? 'From' : 'To'}</FromTitle>
       </TopWrapper>
       <MainWrapper>
-        <TokenAvatarWrapper className={classNames({ isOpen: isOpen && !tokenAccount })}>
-          {tokenAccount ? (
-            <TokenAvatar symbol={tokenAccount?.mint.symbol} size={44} />
-          ) : (
-            <WalletIcon name="wallet" />
-          )}
+        <TokenAvatarWrapper className={classNames({ isOpen: isOpen && !token })}>
+          {token ? <TokenAvatar symbol={token.symbol} size={44} /> : <WalletIcon name="wallet" />}
         </TokenAvatarWrapper>
         <InfoWrapper>
           <SpecifyTokenWrapper>
@@ -464,8 +504,8 @@ export const FromToSelectInput: FunctionComponent<Props> = ({
               ref={selectorRef}
               onClick={handleSelectorClick}
               className={classNames({ isOpen })}>
-              <TokenName title={tokenAccount?.address.toBase58()}>
-                {tokenAccount?.mint.symbol ||
+              <TokenName title={token?.address.toBase58()}>
+                {token?.symbol ||
                   (tokenAccount && shortAddress(tokenAccount.address.toBase58())) || (
                     <EmptyName>—</EmptyName>
                   )}
@@ -475,7 +515,7 @@ export const FromToSelectInput: FunctionComponent<Props> = ({
               </ChevronWrapper>
             </TokenWrapper>
             <AmountInput
-              placeholder={tokenAccount?.mint.toMajorDenomination(0) || '0'}
+              placeholder={token?.toMajorDenomination(0) || '0'}
               value={localAmount}
               onChange={handleAmountChange}
               disabled={disabled || disabledInput}
@@ -483,7 +523,7 @@ export const FromToSelectInput: FunctionComponent<Props> = ({
           </SpecifyTokenWrapper>
           <BalanceWrapper>
             <BalanceText>
-              {tokenAccount ? (
+              {token && tokenAccount ? (
                 direction === 'from' && !disabled ? (
                   <AllBalance
                     onClick={handleAllBalanceClick}
@@ -493,17 +533,12 @@ export const FromToSelectInput: FunctionComponent<Props> = ({
                 ) : (
                   <>Balance: {renderBalance()}</>
                 )
-              ) : (
-                'Select currency'
-              )}
+              ) : undefined}
+              {!token ? 'Select currency' : undefined}
             </BalanceText>
-            {tokenAccount ? (
+            {token ? (
               <BalanceText>
-                ≈{' '}
-                <AmountUSDTStyled
-                  value={new Decimal(localAmount || 0)}
-                  symbol={tokenAccount?.mint.symbol}
-                />
+                ≈ <AmountUSDTStyled value={new Decimal(localAmount || 0)} symbol={token?.symbol} />
               </BalanceText>
             ) : undefined}
           </BalanceWrapper>
@@ -537,17 +572,32 @@ export const FromToSelectInput: FunctionComponent<Props> = ({
             </SlideContainer>
           </DropDownHeader>
           <DropDownList ref={listRef}>
+            {filteredTokenAccounts?.length ? (
+              <>
+                {direction === 'to' ? <YourTokens>Your tokens</YourTokens> : undefined}
+                {filteredTokenAccounts.map((account) => (
+                  <TokenAccountRow
+                    key={account.address.toBase58()}
+                    tokenAccount={account}
+                    onClick={handleTokenAccountClick}
+                  />
+                ))}
+              </>
+            ) : undefined}
             {filteredTokens?.length ? (
-              filteredTokens.map((account) => (
-                <TokenRow
-                  key={account.address.toBase58()}
-                  tokenAccount={account}
-                  onClick={handleItemClick}
-                />
-              ))
-            ) : (
-              <Empty />
-            )}
+              <>
+                <AllTokens>All tokens</AllTokens>
+                {/* eslint-disable-next-line no-shadow */}
+                {filteredTokens.map((token) => (
+                  <TokenRow
+                    key={token.address.toBase58()}
+                    token={token}
+                    onClick={handleTokenClick}
+                  />
+                ))}
+              </>
+            ) : undefined}
+            {!filteredTokenAccounts?.length && !filteredTokens?.length ? <Empty /> : undefined}
           </DropDownList>
         </DropDownListContainer>
       ) : undefined}

@@ -7,7 +7,7 @@ import { SYSTEM_PROGRAM_ID, WRAPPED_SOL_MINT } from 'constants/solana/bufferLayo
 import { RootState } from 'store/rootReducer';
 import { HasEqual, TokenPairState } from 'utils/types';
 
-const matchesPool = (firstToken: Token, secondToken: Token) => (pool: Pool): boolean =>
+export const matchesPool = (firstToken: Token, secondToken: Token) => (pool: Pool): boolean =>
   pool.matchesTokens(firstToken, secondToken);
 
 export const selectPoolForTokenPair = (

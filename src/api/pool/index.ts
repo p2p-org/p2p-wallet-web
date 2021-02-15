@@ -394,23 +394,19 @@ export const APIFactory = (cluster: ExtendedCluster): API => {
   };
 
   const createAccountByMint = async (
+    owner: PublicKey,
     mintToken: Token,
     instructions: TransactionInstruction[],
     cleanupInstructions: TransactionInstruction[],
     signers: Account[],
-    owner?: PublicKey,
   ): Promise<TokenAccount> => {
     // if account for owner with same token already exists
-    if (owner) {
-      const account = tokenAccountsPrecache
-        .toArray()
-        .find(
-          (tokenAccount) => tokenAccount.matchToken(mintToken) && tokenAccount.matchOwner(owner),
-        );
+    const account = tokenAccountsPrecache
+      .toArray()
+      .find((tokenAccount) => tokenAccount.matchToken(mintToken) && tokenAccount.matchOwner(owner));
 
-      if (account) {
-        return account;
-      }
+    if (account) {
+      return account;
     }
 
     const accountRentExempt = await connection.getMinimumBalanceForRentExemption(
@@ -435,7 +431,7 @@ export const APIFactory = (cluster: ExtendedCluster): API => {
         TOKEN_PROGRAM_ID,
         mintToken.address,
         newAccount.publicKey,
-        owner || getWallet().pubkey,
+        owner,
       ),
     );
 
@@ -455,7 +451,7 @@ export const APIFactory = (cluster: ExtendedCluster): API => {
 
     const newTokenAccount = new TokenAccount(
       mintToken,
-      owner || TOKEN_PROGRAM_ID,
+      owner,
       TOKEN_PROGRAM_ID,
       newAccount.publicKey,
       0,
@@ -499,7 +495,13 @@ export const APIFactory = (cluster: ExtendedCluster): API => {
       const toAccount =
         parameters.toAccount && !parameters.toAccount.mint.address.equals(WRAPPED_SOL_MINT)
           ? parameters.toAccount
-          : await createAccountByMint(toToken, instructions, cleanupInstructions, signers);
+          : await createAccountByMint(
+              getWallet().pubkey,
+              toToken,
+              instructions,
+              cleanupInstructions,
+              signers,
+            );
 
       console.log('Executing swap:', parameters);
 
@@ -511,11 +513,11 @@ export const APIFactory = (cluster: ExtendedCluster): API => {
       // TODO: host fee
       const feeAccount = swapHostFeeAddress
         ? await createAccountByMint(
+            swapHostFeeAddress,
             parameters.pool.poolToken,
             instructions,
             cleanupInstructions,
             signers,
-            swapHostFeeAddress,
           )
         : null;
 
