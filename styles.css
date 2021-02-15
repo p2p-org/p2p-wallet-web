@@ -822,6 +822,13 @@ html,body,#root{height:100%;}body{font-family:'Titillium Web',-apple-system,Blin
 .t1p0mxzm{margin-top:12px;color:#000;font-weight:600;font-size:16px;line-height:140%;}
 .d1cnjblm{color:#a3a5ba;font-weight:600;font-size:14px;line-height:140%;}
 
+.w16nsvv7{padding:10px 20px;cursor:pointer;}
+.i9diswc{display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;-webkit-align-items:center;-webkit-box-align:center;-ms-flex-align:center;align-items:center;height:44px;}
+.i15u367g{-webkit-flex:1;-ms-flex:1;flex:1;margin-left:20px;}
+.t877wvo{display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;-webkit-box-pack:justify;-webkit-justify-content:space-between;-ms-flex-pack:justify;justify-content:space-between;color:#000;font-weight:600;font-size:16px;line-height:140%;}
+.t1kpiomo{max-width:300px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;}
+.b18cdoew{display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;-webkit-box-pack:justify;-webkit-justify-content:space-between;-ms-flex-pack:justify;justify-content:space-between;margin-top:2px;color:#a3a5ba;font-weight:600;font-size:14px;line-height:140%;}
+
 .w99e132{padding:10px 20px;cursor:pointer;}
 .ipsz7r3{display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;-webkit-align-items:center;-webkit-box-align:center;-ms-flex-align:center;align-items:center;height:44px;}
 .i3ggljh{-webkit-flex:1;-ms-flex:1;flex:1;margin-left:20px;}
@@ -852,6 +859,9 @@ html,body,#root{height:100%;}body{font-family:'Titillium Web',-apple-system,Blin
 .t1myly0v{padding:12px 0;color:#a3a5ba;font-weight:600;font-size:14px;line-height:140%;}
 .f1l5j5io{display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;-webkit-flex:1;-ms-flex:1;flex:1;-webkit-align-items:center;-webkit-box-align:center;-ms-flex-align:center;align-items:center;height:66px;}.f1l5j5io > :not(:last-child){margin-right:12px;}
 .d1f0krdt{max-height:400px;padding-bottom:14px;overflow-y:auto;}
+.te67vfs{display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;-webkit-align-items:center;-webkit-box-align:center;-ms-flex-align:center;align-items:center;margin:0 20px;color:#a3a5ba;font-weight:600;font-size:14px;line-height:140%;}
+.y1oz1x07.te67vfs{height:32px;}
+.a18hgbw4.te67vfs{height:44px;}
 
 
 .fx27oku{position:relative;display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;-webkit-flex-direction:column;-ms-flex-direction:column;flex-direction:column;padding:24px 20px 20px;border-bottom:1px solid rgba(0,0,0,0.05);}
