@@ -56,7 +56,9 @@ module.exports = {
           ['^\\u0000'], // bare imports
           ['^react'], // react
           ['^[^\\.]'], // non-local imports
-          ['^constants|^config|^lib|^utils|^store|^api|^features|^pages|^components|^styles'], // internal
+          [
+            '^constants|^config|^lib|^utils|^store|^api|^features|^pages|^components|^styles|^assets',
+          ], // internal
           ['^\\.'], // local imports
         ],
       },

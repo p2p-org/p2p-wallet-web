@@ -2,8 +2,8 @@ import React, { FunctionComponent } from 'react';
 import { Link, NavLink } from 'react-router-dom';
 
 import { styled } from '@linaria/react';
-import Logo from 'assets/images/logo.png';
 
+import Logo from 'assets/images/logo.png';
 import { ClusterSelector } from 'components/common/ClusterSelector';
 import { COLUMN_LEFT_WIDTH, COLUMNS_GRID_GUTTER } from 'components/common/Layout/constants';
 import { Icon } from 'components/ui';

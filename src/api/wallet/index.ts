@@ -8,13 +8,13 @@ import {
   TransactionInstructionCtorFields,
 } from '@solana/web3.js';
 
-import { ManualWallet, ManualWalletData } from 'api/wallet/ManualWallet';
 import { postTransactionSleepMS } from 'config/constants';
 import { sleep } from 'utils/common';
 import { ExtendedCluster } from 'utils/types';
 
 import { confirmTransaction, DEFAULT_COMMITMENT, getConnection, getNetwork } from '../connection';
 import { LocalWallet } from './LocalWallet';
+import { ManualWallet, ManualWalletData } from './ManualWallet';
 import { SolletWallet } from './SolletWallet';
 import { Wallet, WalletEvent } from './Wallet';
 
