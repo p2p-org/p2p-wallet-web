@@ -172,6 +172,17 @@ export const createAccountForToken = createAsyncThunk<TokenAccount, { token: Tok
   },
 );
 
+export const closeTokenAccount = createAsyncThunk<string, { publicKey: PublicKey }>(
+  `${WALLET_SLICE_NAME}/closeAccount`,
+  async (parameters, thunkAPI) => {
+    const state: RootState = thunkAPI.getState() as RootState;
+    const walletState = state.wallet;
+    const TokenAPI = TokenAPIFactory(walletState.cluster);
+
+    return TokenAPI.closeAccount(parameters.publicKey);
+  },
+);
+
 export const airdrop = createAsyncThunk<void>(
   `${WALLET_SLICE_NAME}/airdrop`,
   async (): Promise<void> => {

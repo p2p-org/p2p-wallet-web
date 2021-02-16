@@ -80,6 +80,7 @@ export interface API {
     accounts: Array<TokenAccount>,
     callback: TokenAccountUpdateCallback,
   ) => void;
+  closeAccount: (publicKey: PublicKey) => Promise<string>;
 }
 
 const mintTo = async (recipient: TokenAccount, tokenAmount: number): Promise<string> => {
@@ -829,6 +830,20 @@ export const APIFactory = memoizeWith(
       return transferTokens(parameters);
     };
 
+    const closeAccount = async (publicKey: PublicKey): Promise<string> => {
+      const closeAccountInstruction = SPLToken.createCloseAccountInstruction(
+        TOKEN_PROGRAM_ID,
+        publicKey,
+        getWallet().pubkey,
+        getWallet().pubkey,
+        [],
+      );
+
+      const transaction = await makeTransaction([closeAccountInstruction]);
+
+      return sendTransaction(transaction);
+    };
+
     return {
       getTokens,
       tokenInfo,
@@ -847,6 +862,7 @@ export const APIFactory = memoizeWith(
       getAccountsForWallet,
       precacheTokenAccounts,
       listenToTokenAccountChanges,
+      closeAccount,
     };
   },
 );

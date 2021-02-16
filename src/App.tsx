@@ -17,6 +17,7 @@ import { Settings } from 'pages/Settings';
 import { Swap } from 'pages/Swap';
 import { Wallet } from 'pages/Wallet';
 import { Wallets } from 'pages/Wallets';
+import { WalletSettings } from 'pages/WalletSettings';
 import { connect } from 'store/slices/wallet/WalletSlice';
 import { AuthRequiredRoute } from 'utils/routes/UserRequiredRoute';
 
@@ -67,6 +68,7 @@ const App: React.FC = () => {
           <Route path="/create" component={Create} />
           <Route path="/access" component={Access} />
           <AuthRequiredRoute path="/wallets" component={Wallets} />
+          <AuthRequiredRoute path="/wallet/:publicKey/settings" component={WalletSettings} />
           <AuthRequiredRoute path="/wallet/:publicKey" component={Wallet} />
           <AuthRequiredRoute path="/receive" component={Receive} />
           <AuthRequiredRoute path="/send/:publicKey/:status(result)" component={Send} />

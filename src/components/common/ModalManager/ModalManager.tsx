@@ -6,7 +6,11 @@ import loadable, { LoadableComponent } from '@loadable/component';
 import { last } from 'ramda';
 import { closeModal, ModalComponentType, ModalState } from 'redux-modals-manager';
 
-import { SHOW_MODAL_ADD_COIN, SHOW_MODAL_TRANSACTION_DETAILS } from 'store/constants/modalTypes';
+import {
+  SHOW_MODAL_ADD_COIN,
+  SHOW_MODAL_CLOSE_TOKEN_ACCOUNT,
+  SHOW_MODAL_TRANSACTION_DETAILS,
+} from 'store/constants/modalTypes';
 import { RootState } from 'store/rootReducer';
 
 const Wrapper = styled.div`
@@ -63,6 +67,10 @@ const modalsMap = new Map<string, LoadableComponent<any>>([
   [
     SHOW_MODAL_TRANSACTION_DETAILS,
     loadable(() => import('components/modals/TransactionDetailsModal')),
+  ],
+  [
+    SHOW_MODAL_CLOSE_TOKEN_ACCOUNT,
+    loadable(() => import('components/modals/CloseTokenAccountModal')),
   ],
 ]);
 
