@@ -359,9 +359,12 @@ export const SwapWidget: FunctionComponent = () => {
               </PropertyValue>
             </PropertyLine>
           ) : undefined}
-          {fee ? (
+          {firstToken && fee ? (
             <PropertyLine>
-              Liquidity Provider Fee: <PropertyValue>{fee} SOL</PropertyValue>
+              Liquidity Provider Fee:{' '}
+              <PropertyValue>
+                {fee} {firstToken.symbol}
+              </PropertyValue>
             </PropertyLine>
           ) : undefined}
           {!isNil(slippage) ? (
