@@ -6,6 +6,7 @@ import { CSSProperties } from '@linaria/core';
 import arrowTriangle from './assets/arrow-triangle-icon.svg';
 import bottom from './assets/bottom-icon.svg';
 import branch from './assets/branch-icon.svg';
+import bucket from './assets/bucket-icon.svg';
 import card from './assets/card-icon.svg';
 import change from './assets/change-icon.svg';
 import checkmark from './assets/checkmark-icon.svg';
@@ -49,6 +50,7 @@ const iconsMap = new Map<string, SvgIconType>([
   ['close', close],
   ['copy', copy],
   ['currency', currency],
+  ['bucket', bucket],
   ['gear', gear],
   ['search', search],
   ['settings', settings],

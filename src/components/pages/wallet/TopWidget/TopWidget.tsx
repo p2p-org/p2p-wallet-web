@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 
 import { styled } from '@linaria/react';
-import { PublicKey } from '@solana/web3.js';
+import { PublicKey, SystemProgram } from '@solana/web3.js';
 import classNames from 'classnames';
 import { Decimal } from 'decimal.js';
 import throttle from 'lodash.throttle';
@@ -136,6 +136,22 @@ const WrapperFixed = styled.div`
 const FixedInfoWrapper = styled.div`
   display: flex;
   align-items: center;
+`;
+
+const TokenSettings = styled.div`
+  margin-left: 10px;
+`;
+
+const TokenSettingsButton = styled(Button)`
+  width: 36px;
+  padding: 0;
+`;
+
+const TokenSettingsIcon = styled(Icon)`
+  width: 20px;
+  height: 20px;
+
+  color: #a3a5ba;
 `;
 
 type Props = {
@@ -281,6 +297,18 @@ export const TopWidget: FunctionComponent<Props> = ({ publicKey }) => {
               <TokenName title={tokenAccount.address.toBase58()}>
                 {tokenAccount?.mint.name || shortAddress(tokenAccount.address.toBase58())} wallet
               </TokenName>
+              {tokenAccount?.mint.address.equals(SystemProgram.programId) ? undefined : (
+                <TokenSettings>
+                  <Link
+                    to={`/wallet/${publicKey.toBase58()}/settings`}
+                    title="Settings"
+                    className="button">
+                    <TokenSettingsButton small>
+                      <TokenSettingsIcon name="gear" />
+                    </TokenSettingsButton>
+                  </Link>
+                </TokenSettings>
+              )}
             </TokenInfo>
           ) : undefined
         }
