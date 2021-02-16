@@ -218,14 +218,8 @@ export const APIFactory = (cluster: ExtendedCluster): API => {
       throw new Error('Error collecting pool data');
     }
 
-    // Looks like a typescript issue - TS is not recognising inherited functions from BN
     const feeRatio =
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      swapInfo.tradeFeeNumerator.toNumber() /
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      swapInfo.tradeFeeDenominator.toNumber();
+      swapInfo.tradeFeeNumerator.toNumber() / swapInfo.tradeFeeDenominator.toNumber();
 
     return new Pool(
       address,
