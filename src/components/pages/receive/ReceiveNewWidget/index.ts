@@ -1,0 +1,1 @@
+export { ReceiveNewWidget } from './ReceiveNewWidget';

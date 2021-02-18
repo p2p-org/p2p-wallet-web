@@ -13,6 +13,7 @@ import { ToastManager } from 'components/common/ToastManager';
 import { TokenAvatar } from 'components/common/TokenAvatar';
 import { Button, Icon } from 'components/ui';
 import { getTransaction } from 'store/slices/transaction/TransactionSlice';
+import { getExplorerUrl } from 'utils/connection';
 import { shortAddress } from 'utils/tokens';
 
 const Wrapper = styled.div`
@@ -406,7 +407,7 @@ export const TransactionDetailsModal: FunctionComponent<Props> = ({ signature, c
       </Content>
       <Footer>
         <a
-          href={`https://explorer.solana.com/tx/${signature}?cluster=${cluster}`}
+          href={getExplorerUrl('tx', signature, cluster)}
           target="_blank"
           rel="noopener noreferrer noindex"
           className="button">

@@ -5,22 +5,6 @@ import classNames from 'classnames';
 
 import { Icon } from 'components/ui';
 
-const Wrapper = styled.label`
-  display: flex;
-  flex: 1;
-  align-items: center;
-  height: 42px;
-
-  background: #f6f6f8;
-  border: 1px solid transparent;
-  border-radius: 12px;
-  cursor: text;
-
-  &.isFocused {
-    border: 1px solid rgba(163, 165, 186, 0.5);
-  }
-`;
-
 const SearchIconWrapper = styled.div`
   display: flex;
   align-items: center;
@@ -34,7 +18,27 @@ const SearchIcon = styled(Icon)`
   width: 34px;
   height: 34px;
 
-  color: #000;
+  color: #a3a5ba;
+`;
+
+const Wrapper = styled.label`
+  display: flex;
+  flex: 1;
+  align-items: center;
+  height: 42px;
+
+  background: #f6f6f8;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  cursor: text;
+
+  &.isFocused {
+    border: 1px solid rgba(163, 165, 186, 0.5);
+
+    ${SearchIcon} {
+      color: #000;
+    }
+  }
 `;
 
 const Content = styled.div`

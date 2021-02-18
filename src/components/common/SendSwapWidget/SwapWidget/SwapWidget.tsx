@@ -359,11 +359,11 @@ export const SwapWidget: FunctionComponent = () => {
               </PropertyValue>
             </PropertyLine>
           ) : undefined}
-          {firstToken && fee ? (
+          {firstToken && fee && feeProperties ? (
             <PropertyLine>
               Liquidity Provider Fee:{' '}
               <PropertyValue>
-                {fee} {firstToken.symbol}
+                {fee} {feeProperties.token.symbol}
               </PropertyValue>
             </PropertyLine>
           ) : undefined}

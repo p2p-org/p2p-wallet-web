@@ -399,7 +399,7 @@ export const APIFactory = (cluster: ExtendedCluster): API => {
       .toArray()
       .find((tokenAccount) => tokenAccount.matchToken(mintToken) && tokenAccount.matchOwner(owner));
 
-    if (account) {
+    if (account && !account.mint.address.equals(WRAPPED_SOL_MINT)) {
       return account;
     }
 
@@ -485,6 +485,7 @@ export const APIFactory = (cluster: ExtendedCluster): API => {
       const isReverse = isReverseSwap(parameters);
       const toToken = isReverse ? parameters.pool.tokenA.mint : parameters.pool.tokenB.mint;
 
+      console.log(111, parameters.toAccount?.serialize());
       // Token account or Create Token account
       const toAccount =
         parameters.toAccount && !parameters.toAccount.mint.address.equals(WRAPPED_SOL_MINT)
