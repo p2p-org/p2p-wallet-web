@@ -1,26 +1,20 @@
-import React, { FunctionComponent } from 'react';
+import React, { FunctionComponent, useEffect, useState } from 'react';
 import { batch, useDispatch } from 'react-redux';
 import { Link, useHistory } from 'react-router-dom';
 
 import { styled } from '@linaria/react';
-import bgImg from 'assets/images/sun.png';
 
 import { WalletType } from 'api/wallet';
+import bgImg from 'assets/images/sun.png';
+import { LayoutUnauthed } from 'components/common/LayoutUnauthed';
+import { LoaderBlock } from 'components/common/LoaderBlock';
+import { ToastManager } from 'components/common/ToastManager';
 import { Button } from 'components/ui';
 import { connect, selectType } from 'store/slices/wallet/WalletSlice';
+import { sleep } from 'utils/common';
 
-import { Header } from '../components/common/Header';
-
-const Wrapper = styled.div`
-  height: auto !important;
-  min-height: 100%;
-
-  background: #fff;
-`;
-
-const Box = styled.div`
-  max-width: 364px;
-  margin: auto;
+const LoaderBlockStyled = styled(LoaderBlock)`
+  height: 200px;
 `;
 
 const Actions = styled.div`
@@ -61,44 +55,70 @@ const HeaderImage = styled.div`
 export const Home: FunctionComponent = () => {
   const history = useHistory();
   const dispatch = useDispatch();
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const mount = async () => {
+      try {
+        setIsLoading(true);
+        await dispatch(connect());
+        await sleep(100);
+        history.push('/wallets');
+      } catch (error) {
+        ToastManager.error(error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    void mount();
+  }, []);
 
   const handleConnectByClick = (type: WalletType) => {
     batch(async () => {
-      dispatch(selectType(type));
-      await dispatch(connect());
-
-      setTimeout(() => {
+      try {
+        setIsLoading(true);
+        dispatch(selectType(type));
+        await dispatch(connect());
+        await sleep(100);
         history.push('/wallets');
-      }, 100);
+      } catch (error) {
+        ToastManager.error(error);
+      } finally {
+        setIsLoading(false);
+      }
     });
   };
 
   return (
-    <Wrapper>
-      <Header />
-      <Box>
-        <HeaderImage />
-        <Title>P2P Wallet </Title>
-        <SubTitle> Own Your Money </SubTitle>
-        <Actions>
-          <Link to="/create" className="button">
-            <Button primary big full>
-              Create new wallet
+    <LayoutUnauthed>
+      {isLoading ? (
+        <LoaderBlockStyled />
+      ) : (
+        <>
+          <HeaderImage />
+          <Title>P2P Wallet </Title>
+          <SubTitle> Own Your Money </SubTitle>
+          <Actions>
+            <Link to="/create" className="button">
+              <Button primary big full>
+                Create new wallet
+              </Button>
+            </Link>
+            <Link to="/access" className="button">
+              <Button gray big full>
+                I already have a wallet
+              </Button>
+            </Link>
+            <Button gray big full onClick={() => handleConnectByClick(WalletType.SOLLET)}>
+              Connect by Sollet
             </Button>
-          </Link>
-          <Link to="/access" className="button">
-            <Button gray big full>
-              I already have a wallet
+            <Button gray big full onClick={() => handleConnectByClick(WalletType.BONFIDA)}>
+              Connect by Bonfida
             </Button>
-          </Link>
-          <Button gray big full onClick={() => handleConnectByClick(WalletType.SOLLET)}>
-            Connect by Sollet
-          </Button>
-          <Button gray big full onClick={() => handleConnectByClick(WalletType.BONFIDA)}>
-            Connect by Bonfida
-          </Button>
-        </Actions>
-      </Box>
-    </Wrapper>
+          </Actions>
+        </>
+      )}
+    </LayoutUnauthed>
   );
 };

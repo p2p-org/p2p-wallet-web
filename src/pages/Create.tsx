@@ -6,21 +6,9 @@ import { styled } from '@linaria/react';
 import * as bip39 from 'bip39';
 
 import { WalletType } from 'api/wallet';
+import { LayoutUnauthed } from 'components/common/LayoutUnauthed';
 import { Button, Input } from 'components/ui';
 import { connect, selectType } from 'store/slices/wallet/WalletSlice';
-
-import { Header } from '../components/common/Header';
-
-const Wrapper = styled.div`
-  height: 100%;
-
-  background: #fff;
-`;
-
-const Box = styled.div`
-  max-width: 364px;
-  margin: auto;
-`;
 
 const Form = styled.form`
   display: flex;
@@ -167,78 +155,75 @@ export const Create: FunctionComponent = () => {
   };
 
   return (
-    <Wrapper>
-      <Header />
-      <Box>
-        {isFirstStep ? (
-          <Form onSubmit={handleSubmit}>
-            <Title>Create Password (Optional)</Title>
-            <Text>
-              Create password to protect your wallet. It’s will be used for security actions
-              confirmation and for editing your profile info.
-            </Text>
+    <LayoutUnauthed>
+      {isFirstStep ? (
+        <Form onSubmit={handleSubmit}>
+          <Title>Create Password (Optional)</Title>
+          <Text>
+            Create password to protect your wallet. It’s will be used for security actions
+            confirmation and for editing your profile info.
+          </Text>
 
-            <SubTitle>Create password</SubTitle>
-            <Input
-              name="newPassword"
-              type="password"
-              value={newPassword}
-              onChange={handleChangeNewPassword}
-              // postfix={
-              //   <EyeIcon name="eye" onclick={handleVisibility} />
-              // }
-            />
+          <SubTitle>Create password</SubTitle>
+          <Input
+            name="newPassword"
+            type="password"
+            value={newPassword}
+            onChange={handleChangeNewPassword}
+            // postfix={
+            //   <EyeIcon name="eye" onclick={handleVisibility} />
+            // }
+          />
 
-            <SubTitle>Confirm password </SubTitle>
-            <Input
-              name="confirmPassword"
-              type="password"
-              value={confirmPassword}
-              onChange={handleChangeConfirmPassword}
-              // postfix={
-              //   <EyeIcon name="eye" onclick={handleVisibility} />
-              // }
-            />
+          <SubTitle>Confirm password </SubTitle>
+          <Input
+            name="confirmPassword"
+            type="password"
+            value={confirmPassword}
+            onChange={handleChangeConfirmPassword}
+            // postfix={
+            //   <EyeIcon name="eye" onclick={handleVisibility} />
+            // }
+          />
 
-            <ContinueButton onClick={handleContinueClick}>Continue</ContinueButton>
+          <ContinueButton onClick={handleContinueClick}>Continue</ContinueButton>
 
-            <LinkStyled to="/access">Already have wallet? Access it</LinkStyled>
-          </Form>
-        ) : (
-          <Form onSubmit={handleSubmit}>
-            <Title>Create New Wallet</Title>
+          <LinkStyled to="/access">Already have wallet? Access it</LinkStyled>
+        </Form>
+      ) : (
+        <Form onSubmit={handleSubmit}>
+          <Title>Create New Wallet</Title>
 
-            <TextWithCover>
-              <BoldText>
-                Please write down the following twelve words and keep them in a safe place.
-              </BoldText>
-              Your private keys are only stored on your current computer or device. You will need
-              these words to restore your wallet if your browser’s storage is cleared or your device
-              is damaged or lost.
-            </TextWithCover>
+          <TextWithCover>
+            <BoldText>
+              Please write down the following twelve words and keep them in a safe place.
+            </BoldText>
+            Your private keys are only stored on your current computer or device. You will need
+            these words to restore your wallet if your browser’s storage is cleared or your device
+            is damaged or lost.
+          </TextWithCover>
 
-            <InputSeed name="mnemonic" value={mnemonic} readOnly={!!mnemonic} />
+          <InputSeed name="mnemonic" value={mnemonic} readOnly={!!mnemonic} />
 
-            <div>
-              <Label>
-                <input
-                  type="checkbox"
-                  name="agree"
-                  checked={isAgreed}
-                  onChange={() => setIsAgreed(!isAgreed)}
-                />{' '}
-                I have saved these words in a safe place.
-              </Label>
-            </div>
+          <div>
+            <Label>
+              <input
+                type="checkbox"
+                name="agree"
+                checked={isAgreed}
+                onChange={() => setIsAgreed(!isAgreed)}
+              />{' '}
+              I have saved these words in a safe place.
+            </Label>
+          </div>
 
-            <ContinueButton type="submit" disabled={!isAgreed}>
-              Continue
-            </ContinueButton>
+          <ContinueButton type="submit" disabled={!isAgreed}>
+            Continue
+          </ContinueButton>
 
-            <LinkStyled to="/access">Already have wallet? Access it</LinkStyled>
-          </Form>
-        )}
-      </Box>
-    </Wrapper>
+          <LinkStyled to="/access">Already have wallet? Access it</LinkStyled>
+        </Form>
+      )}
+    </LayoutUnauthed>
   );
 };

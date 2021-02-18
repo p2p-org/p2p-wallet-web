@@ -7,16 +7,10 @@ import * as bip39 from 'bip39';
 import throttle from 'lodash.throttle';
 
 import { WalletType } from 'api/wallet';
-import { Header } from 'components/common/Header';
+import { LayoutUnauthed } from 'components/common/LayoutUnauthed';
 import { Button, Input } from 'components/ui';
 import { localMnemonic } from 'config/constants';
 import { connect, selectType } from 'store/slices/wallet/WalletSlice';
-
-const Wrapper = styled.div`
-  height: 100%;
-
-  background: #fff;
-`;
 
 const Form = styled.form`
   display: flex;
@@ -47,11 +41,6 @@ const SubTitle = styled.div`
 
 const CreateButton = styled(Button)`
   margin-top: 32px;
-`;
-
-const Box = styled.div`
-  max-width: 364px;
-  margin: auto;
 `;
 
 const TextareaSeed = styled.textarea`
@@ -128,29 +117,26 @@ export const Access: FunctionComponent = () => {
   const isDisabled = error || !mnemonic;
 
   return (
-    <Wrapper>
-      <Header />
-      <Box>
-        <Form onSubmit={handleSubmit}>
-          <Title>Access Wallet</Title>
+    <LayoutUnauthed>
+      <Form onSubmit={handleSubmit}>
+        <Title>Access Wallet</Title>
 
-          <SubTitle>Enter your Seed, to get access to wallet </SubTitle>
-          <TextareaSeed name="mnemonic" value={mnemonic} onChange={handleMnemonicChange} />
+        <SubTitle>Enter your Seed, to get access to wallet </SubTitle>
+        <TextareaSeed name="mnemonic" value={mnemonic} onChange={handleMnemonicChange} />
 
-          <SubTitle>Enter Password (optional) </SubTitle>
-          <Input
-            name="password"
-            type="password"
-            value={password}
-            onChange={handlePasswordChange}
-            // postfix={<EyeIcon name="eye" onClick={handleVisibility} />}
-          />
+        <SubTitle>Enter Password (optional) </SubTitle>
+        <Input
+          name="password"
+          type="password"
+          value={password}
+          onChange={handlePasswordChange}
+          // postfix={<EyeIcon name="eye" onClick={handleVisibility} />}
+        />
 
-          <CreateButton type="submit" primary big disabled={isDisabled}>
-            Continue
-          </CreateButton>
-        </Form>
-      </Box>
-    </Wrapper>
+        <CreateButton type="submit" primary big disabled={isDisabled}>
+          Continue
+        </CreateButton>
+      </Form>
+    </LayoutUnauthed>
   );
 };
