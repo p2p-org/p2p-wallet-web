@@ -9,7 +9,7 @@ import { Icon } from 'components/ui';
 import { CLUSTERS } from 'config/constants';
 import { RootState } from 'store/rootReducer';
 import { wipeAction } from 'store/slices/GlobalSlice';
-import { connect, selectCluster } from 'store/slices/wallet/WalletSlice';
+import { autoConnect, selectCluster } from 'store/slices/wallet/WalletSlice';
 
 import { ClusterRow } from './ClusterRow';
 
@@ -123,7 +123,7 @@ export const ClusterSelector: FunctionComponent = () => {
     batch(async () => {
       dispatch(selectCluster(newCluster));
       dispatch(wipeAction());
-      await dispatch(connect());
+      await dispatch(autoConnect());
     });
   };
 

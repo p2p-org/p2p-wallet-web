@@ -3,6 +3,7 @@ import { batch, useDispatch } from 'react-redux';
 import { Link, useHistory } from 'react-router-dom';
 
 import { styled } from '@linaria/react';
+import { unwrapResult } from '@reduxjs/toolkit';
 
 import { WalletType } from 'api/wallet';
 import bgImg from 'assets/images/sun.png';
@@ -10,7 +11,12 @@ import { LayoutUnauthed } from 'components/common/LayoutUnauthed';
 import { LoaderBlock } from 'components/common/LoaderBlock';
 import { ToastManager } from 'components/common/ToastManager';
 import { Button } from 'components/ui';
-import { connect, selectType } from 'store/slices/wallet/WalletSlice';
+import {
+  autoConnect,
+  connect,
+  selectType,
+  STORAGE_KEY_SEED,
+} from 'store/slices/wallet/WalletSlice';
 import { sleep } from 'utils/common';
 
 const LoaderBlockStyled = styled(LoaderBlock)`
@@ -55,17 +61,21 @@ const HeaderImage = styled.div`
 export const Home: FunctionComponent = () => {
   const history = useHistory();
   const dispatch = useDispatch();
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const mount = async () => {
+      if (!localStorage.getItem(STORAGE_KEY_SEED)) {
+        return;
+      }
+
       try {
         setIsLoading(true);
-        await dispatch(connect());
+        unwrapResult(await dispatch(autoConnect()));
         await sleep(100);
         history.push('/wallets');
       } catch (error) {
-        ToastManager.error(error);
+        ToastManager.error(String(error));
       } finally {
         setIsLoading(false);
       }
@@ -79,11 +89,11 @@ export const Home: FunctionComponent = () => {
       try {
         setIsLoading(true);
         dispatch(selectType(type));
-        await dispatch(connect());
+        unwrapResult(await dispatch(connect()));
         await sleep(100);
         history.push('/wallets');
       } catch (error) {
-        ToastManager.error(error);
+        ToastManager.error(String(error));
       } finally {
         setIsLoading(false);
       }

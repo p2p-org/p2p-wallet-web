@@ -30,7 +30,7 @@ export class ManualWallet extends Wallet {
     void this.init(data);
   }
 
-  async init(data?: ManualWalletData): Promise<void> {
+  init(data?: ManualWalletData): void {
     if (!(<ManualCredentialsData>data).mnemonic && !(<ManualSeedData>data).seed) {
       throw new Error('Wallet data must have credentials');
     }
@@ -38,7 +38,7 @@ export class ManualWallet extends Wallet {
     try {
       const seed = (<ManualSeedData>data).seed
         ? Buffer.from((<ManualSeedData>data).seed)
-        : await bip39.mnemonicToSeed((<ManualCredentialsData>data).mnemonic);
+        : bip39.mnemonicToSeedSync((<ManualCredentialsData>data).mnemonic);
       localStorage.setItem('seed', JSON.stringify(seed));
 
       const derivedSeed = bip32.fromSeed(seed).derivePath(`m/501'/0'/0/0`).privateKey as Uint8Array;

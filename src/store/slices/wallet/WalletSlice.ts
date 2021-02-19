@@ -1,4 +1,10 @@
-import { createAsyncThunk, createSlice, Draft, PayloadAction } from '@reduxjs/toolkit';
+import {
+  createAsyncThunk,
+  createSlice,
+  Draft,
+  PayloadAction,
+  unwrapResult,
+} from '@reduxjs/toolkit';
 import { Account, Cluster, PublicKey } from '@solana/web3.js';
 
 import { APIFactory as TokenAPIFactory, TransferParameters } from 'api/token';
@@ -6,7 +12,7 @@ import { Token } from 'api/token/Token';
 import { SerializableTokenAccount, TokenAccount } from 'api/token/TokenAccount';
 import * as WalletAPI from 'api/wallet';
 import { getBalance, getWallet, WalletDataType, WalletType } from 'api/wallet';
-import { ManualCredentialsData, ManualSeedData } from 'api/wallet/ManualWallet';
+import { ManualSeedData } from 'api/wallet/ManualWallet';
 import { WalletEvent } from 'api/wallet/Wallet';
 import { ToastManager } from 'components/common/ToastManager';
 import { swapHostFeeAddress } from 'config/constants';
@@ -86,6 +92,24 @@ export const precacheTokenAccounts = createAsyncThunk<void, PublicKey>(
   },
 );
 
+export const autoConnect = createAsyncThunk<string | undefined>(
+  `${WALLET_SLICE_NAME}/autoConnect`,
+  async (_, thunkAPI) => {
+    const {
+      wallet: { type },
+    }: RootState = thunkAPI.getState() as RootState;
+
+    const seed = localStorage.getItem(STORAGE_KEY_SEED)
+      ? (JSON.parse(localStorage.getItem(STORAGE_KEY_SEED) as string) as string)
+      : null;
+
+    const processedData = type === WalletType.MANUAL ? <ManualSeedData>{ seed } : undefined;
+
+    // eslint-disable-next-line @typescript-eslint/no-use-before-define
+    return unwrapResult(await thunkAPI.dispatch(connect(processedData)));
+  },
+);
+
 /**
  * Async action to connect to a wallet. Creates a new wallet instance,
  * connects to it, and connects action dispatchers, when a disconnect event
@@ -101,16 +125,7 @@ export const connect = createAsyncThunk<string, WalletDataType | undefined>(
       wallet: { cluster, type },
     }: RootState = thunkAPI.getState() as RootState;
 
-    const seed = localStorage.getItem(STORAGE_KEY_SEED)
-      ? (JSON.parse(localStorage.getItem(STORAGE_KEY_SEED) as string) as string)
-      : null;
-
-    const processedData =
-      type === WalletType.MANUAL
-        ? <ManualCredentialsData>data || <ManualSeedData>{ seed }
-        : undefined;
-
-    const wallet = await WalletAPI.connect(cluster, type, processedData);
+    const wallet = await WalletAPI.connect(cluster, type, data);
 
     wallet.on(WalletEvent.DISCONNECT, () => {
       void thunkAPI.dispatch(disconnect());
