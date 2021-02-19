@@ -1,5 +1,5 @@
 import React, { FunctionComponent, useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 import { styled } from '@linaria/react';
 import classNames from 'classnames';
@@ -11,6 +11,7 @@ import { ToastManager } from 'components/common/ToastManager';
 import { TokenAvatar } from 'components/common/TokenAvatar';
 import { Button, Icon } from 'components/ui';
 import { createAccountForToken } from 'store/slices/wallet/WalletSlice';
+import { getExplorerUrl } from 'utils/connection';
 
 const Wrapper = styled.div`
   display: flex;
@@ -168,6 +169,8 @@ const PlusIcon = styled(Icon)`
 const BottomInfo = styled.div`
   display: none;
 
+  justify-content: space-between;
+
   font-weight: 600;
   font-size: 14px;
 
@@ -182,9 +185,7 @@ const BottomInfo = styled.div`
   }
 `;
 
-const LeftInfo = styled.div`
-  flex: 1;
-
+const ExplorerA = styled.a`
   color: #a3a5ba;
 `;
 
@@ -223,6 +224,7 @@ export const TokenRow: FunctionComponent<Props> = ({
   const [isExecuting, setIsExecuting] = useState(false);
   const [isError, setError] = useState(false);
   const [isMintCopied, setIsMintCopied] = useState(false);
+  const cluster = useSelector((state) => state.wallet.cluster);
 
   const handleChevronClick = () => {
     setIsOpen(!isOpen);
@@ -303,7 +305,13 @@ export const TokenRow: FunctionComponent<Props> = ({
             <Error>Something went wrong. We couldn’t add a token to your list.</Error>
           ) : (
             <>
-              <LeftInfo>View in Solana explorer</LeftInfo>
+              <ExplorerA
+                href={getExplorerUrl('address', token.address.toBase58(), cluster)}
+                target="_blank"
+                rel="noopener noreferrer noindex"
+                className="button">
+                View in Solana explorer
+              </ExplorerA>
               <RightInfo
                 className={classNames({
                   isError: isInfluencedFunds,

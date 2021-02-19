@@ -3,22 +3,31 @@ import { useSelector } from 'react-redux';
 
 import { styled } from '@linaria/react';
 import classNames from 'classnames';
+import { rgba } from 'polished';
 
 import { Token } from 'api/token/Token';
 import { TokenAccount } from 'api/token/TokenAccount';
-import { Widget } from 'components/common/Widget';
+import { Card } from 'components/common/Card';
 import { Icon } from 'components/ui';
 
 import { TokenList } from '../common/TokenList';
 
-const WrapperWidget = styled(Widget)``;
+const Wrapper = styled(Card)`
+  padding: 0;
+
+  box-shadow: 0 4px 4px #f6f6f9;
+`;
 
 const Title = styled.div`
-  color: #5887ff;
+  color: #000;
   font-weight: 600;
   font-size: 18px;
   line-height: 120%;
 `;
+
+const Action = styled.div``;
+
+const Content = styled.div``;
 
 const ChevronIcon = styled(Icon)`
   width: 16px;
@@ -37,15 +46,41 @@ const ChevronWrapper = styled.div`
 
   border-radius: 8px;
   transform: rotate(-90deg);
-  cursor: pointer;
 
   &:hover {
     background: #f6f6f8;
   }
+`;
+
+const Header = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 20px;
+
+  cursor: pointer;
+
+  &:not(:last-child) {
+    border-bottom: 1px solid ${rgba(0, 0, 0, 0.05)};
+  }
+
+  &:hover {
+    ${Title} {
+      color: #5887ff;
+    }
+  }
+
+  &.isOpen,
+  &:hover {
+    ${ChevronWrapper} {
+      background: #f6f6f8;
+    }
+  }
 
   &.isOpen {
-    background: #f6f6f8;
-    transform: rotate(0deg);
+    ${ChevronWrapper} {
+      transform: rotate(0deg);
+    }
   }
 `;
 
@@ -57,10 +92,6 @@ export const ReceiveNewWidget: FC = () => {
   const availableTokens = useSelector((state) =>
     state.global.availableTokens.map((token) => Token.from(token)),
   );
-  const initialTokenAccount = tokenAccounts.find(
-    (tokenAccount) => tokenAccount.mint.symbol === 'SOL',
-  );
-  const [selectedToken, setSelectedToken] = useState<Token | undefined>(initialTokenAccount?.mint);
 
   const tokens = useMemo(() => {
     // sort, uniq, and with symbol
@@ -73,33 +104,29 @@ export const ReceiveNewWidget: FC = () => {
 
     // get tokens not included in sortedUniqTokenAccounts
     return availableTokens.filter(
-      (token) =>
-        !sortedUniqTokenAccounts.find(
-          (tokenAccount) =>
-            tokenAccount.mint.equals(token) && !selectedToken?.equals(tokenAccount.mint),
-        ),
+      (token) => !sortedUniqTokenAccounts.find((tokenAccount) => tokenAccount.mint.equals(token)),
     );
-  }, [selectedToken, availableTokens, tokenAccounts]);
+  }, [availableTokens, tokenAccounts]);
 
   const handleChevronClick = () => {
     setIsOpen(!isOpen);
   };
 
-  const handleSelect = (token?: Token) => {
-    setSelectedToken(token);
-  };
-
   return (
-    <WrapperWidget
-      title={<Title>Receive to a new wallet</Title>}
-      action={
-        <ChevronWrapper onClick={handleChevronClick} className={classNames({ isOpen })}>
-          <ChevronIcon name="chevron" />
-        </ChevronWrapper>
-      }>
+    <Wrapper>
+      <Header className={classNames({ isOpen })} onClick={handleChevronClick}>
+        <Title>Receive to a new wallet</Title>
+        <Action>
+          <ChevronWrapper>
+            <ChevronIcon name="chevron" />
+          </ChevronWrapper>
+        </Action>
+      </Header>
       {isOpen ? (
-        <TokenList items={tokens} selectedToken={selectedToken} onSelect={handleSelect} />
+        <Content>
+          <TokenList items={tokens} />
+        </Content>
       ) : undefined}
-    </WrapperWidget>
+    </Wrapper>
   );
 };

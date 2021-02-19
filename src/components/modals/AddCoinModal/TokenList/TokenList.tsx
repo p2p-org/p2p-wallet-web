@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import { styled } from '@linaria/react';
 import { unwrapResult } from '@reduxjs/toolkit';
+import { AccountLayout } from '@solana/spl-token';
 import Decimal from 'decimal.js';
 
 import { Token } from 'api/token/Token';
@@ -65,7 +66,9 @@ export const TokenList: FunctionComponent<Props> = ({ items, closeModal }) => {
     const mount = async () => {
       try {
         // TODO: not 0
-        const resultFee = unwrapResult(await dispatch(getMinimumBalanceForRentExemption(0)));
+        const resultFee = unwrapResult(
+          await dispatch(getMinimumBalanceForRentExemption(AccountLayout.span)),
+        );
         setRawFee(resultFee);
         setFee(
           new Decimal(resultFee)

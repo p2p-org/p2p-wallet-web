@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import { styled } from '@linaria/react';
 import { unwrapResult } from '@reduxjs/toolkit';
+import { AccountLayout } from '@solana/spl-token';
 import Decimal from 'decimal.js';
 
 import { Token } from 'api/token/Token';
@@ -45,10 +46,9 @@ const EmptyBlockDesc = styled.div`
 type Props = {
   items?: Token[];
   selectedToken?: Token;
-  onSelect: (token?: Token) => void;
 };
 
-export const TokenList: FunctionComponent<Props> = ({ items, selectedToken, onSelect }) => {
+export const TokenList: FunctionComponent<Props> = ({ items, selectedToken }) => {
   const dispatch = useDispatch();
   const [fee, setFee] = useState(0);
   const [rawFee, setRawFee] = useState(0);
@@ -66,7 +66,9 @@ export const TokenList: FunctionComponent<Props> = ({ items, selectedToken, onSe
     const mount = async () => {
       try {
         // TODO: not 0
-        const resultFee = unwrapResult(await dispatch(getMinimumBalanceForRentExemption(0)));
+        const resultFee = unwrapResult(
+          await dispatch(getMinimumBalanceForRentExemption(AccountLayout.span)),
+        );
         setRawFee(resultFee);
         setFee(
           new Decimal(resultFee)
@@ -114,7 +116,6 @@ export const TokenList: FunctionComponent<Props> = ({ items, selectedToken, onSe
             key={token.address.toBase58()}
             token={token}
             isSelected={selectedToken?.equals(token)}
-            onSelect={onSelect}
             fee={fee}
             isInfluencedFunds={isInfluencedFunds}
           />

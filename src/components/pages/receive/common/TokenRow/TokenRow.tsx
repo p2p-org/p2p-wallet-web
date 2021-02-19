@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useEffect, useState } from 'react';
+import React, { FunctionComponent, useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { styled } from '@linaria/react';
@@ -39,7 +39,46 @@ const QRIconWrapper = styled.div`
   height: 48px;
 
   border-radius: 12px;
+
+  &:hover {
+    background: #fff;
+  }
+`;
+
+const InfoWrapper = styled.div`
+  display: flex;
+  flex: 1;
+  margin-right: 10px;
+`;
+
+const Info = styled.div`
+  flex: 1;
+  margin-left: 20px;
+`;
+
+const Top = styled.div`
+  color: #202020;
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 24px;
+
+  &.isAddressCopied {
+    color: #2db533 !important;
+  }
+`;
+
+const Content = styled.div`
+  display: flex;
+  align-items: center;
+
+  margin: 0 10px;
+  padding: 10px 0;
+
   cursor: pointer;
+
+  &.isOpen {
+    border-bottom: 1px dashed ${rgba('#000', 0.05)};
+  }
 `;
 
 const Main = styled.div`
@@ -59,49 +98,23 @@ const Main = styled.div`
   }
 `;
 
-const Content = styled.div`
-  display: flex;
-  align-items: center;
-
-  margin: 0 10px;
-  padding: 10px 0;
-
-  &.isOpen {
-    border-bottom: 1px dashed ${rgba('#000', 0.05)};
-  }
-`;
-
-const InfoWrapper = styled.div`
-  display: flex;
-  flex: 1;
-  margin-right: 10px;
-
-  &.isCopyAvailable {
-    cursor: pointer;
-  }
-`;
-
-const Info = styled.div`
-  flex: 1;
-  margin-left: 20px;
-`;
-
-const Top = styled.div`
-  color: #202020;
-  font-weight: 600;
-  font-size: 16px;
-  line-height: 24px;
-
-  &.isAddressCopied {
-    color: #2db533;
-  }
-`;
-
 const Bottom = styled.div`
   color: #a3a5ba;
   font-weight: 600;
   font-size: 14px;
   line-height: 21px;
+
+  &.isNew {
+    color: #5887ff;
+  }
+
+  &.isCopyAvailable {
+    cursor: pointer;
+
+    &:hover {
+      color: #5887ff;
+    }
+  }
 `;
 
 const QRWrapper = styled.div`
@@ -196,7 +209,7 @@ const AddButton = styled(Button)`
   font-size: 14px;
 
   &.isExecuting {
-    background: ${rgba('#5887ff', 0.5)};
+    background: #82a5ff;
   }
 `;
 
@@ -217,9 +230,9 @@ const TokenInfo = styled.div`
 `;
 
 const TokenName = styled.div`
-  color: #a3a5ba;
+  color: #000;
   font-weight: 600;
-  font-size: 14px;
+  font-size: 13px;
   line-height: 16px;
 
   &.isMintCopied {
@@ -230,10 +243,10 @@ const TokenName = styled.div`
 const TokenAddress = styled.div`
   margin-top: 4px;
 
-  color: #000;
+  color: #a3a5ba;
   font-weight: 600;
-  font-size: 13px;
-  line-height: 16px;
+  font-size: 14px;
+  line-height: 21px;
 `;
 
 const PlusIconWrapper = styled.div`
@@ -253,6 +266,7 @@ const BottomInfo = styled.div`
 
   font-weight: 600;
   font-size: 14px;
+  line-height: 140%;
 
   &.isError {
     justify-content: center;
@@ -316,7 +330,7 @@ const setToClipboard = async (blob: Blob | null) => {
   }
 };
 
-const handleCopyClick = (value: string, cb: (state: boolean) => void) => () => {
+const copy = (value: string, cb: (state: boolean) => void) => {
   try {
     void navigator.clipboard.writeText(value);
     cb(true);
@@ -331,13 +345,16 @@ const handleCopyClick = (value: string, cb: (state: boolean) => void) => () => {
   }
 };
 
+const handleCopyClick = (value: string, cb: (state: boolean) => void) => () => {
+  return copy(value, cb);
+};
+
 type Props = {
   token: Token;
   tokenAccount?: TokenAccount;
   isInfluencedFunds?: boolean;
   fee?: number;
   isSelected?: boolean;
-  onSelect: (token?: Token, tokenAccount?: TokenAccount) => void;
 };
 
 export const TokenRow: FunctionComponent<Props> = ({
@@ -346,10 +363,12 @@ export const TokenRow: FunctionComponent<Props> = ({
   fee,
   isInfluencedFunds,
   isSelected,
-  onSelect,
 }) => {
   const dispatch = useDispatch();
+  const addressRef = useRef<HTMLDivElement>(null);
+  const qrIconRef = useRef<HTMLDivElement>(null);
 
+  const [isOpen, setIsOpen] = useState(isSelected);
   const [isExecuting, setIsExecuting] = useState(false);
   const [isError, setError] = useState(false);
   const [isAddressCopied, setIsAddressCopied] = useState(false);
@@ -387,8 +406,16 @@ export const TokenRow: FunctionComponent<Props> = ({
     }
   };
 
-  const handleToggleOpenClick = () => {
-    onSelect(isSelected ? undefined : token, isSelected ? undefined : tokenAccount);
+  const handleToggleOpenClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!addressRef.current?.contains(e.target as HTMLDivElement)) {
+      setIsOpen(!isOpen);
+    }
+
+    if (qrIconRef.current?.contains(e.target as HTMLDivElement)) {
+      if (!isOpen && currentTokenAccount) {
+        copy(currentTokenAccount.address.toBase58(), setIsAddressCopied);
+      }
+    }
   };
 
   const handleAddClick = async () => {
@@ -427,32 +454,31 @@ export const TokenRow: FunctionComponent<Props> = ({
 
   return (
     <Wrapper>
-      <Main className={classNames({ isOpen: isSelected })}>
-        <Content className={classNames({ isOpen: isSelected })}>
-          <InfoWrapper
-            className={classNames({ isCopyAvailable: Boolean(currentTokenAccount) })}
-            onClick={
-              currentTokenAccount
-                ? handleCopyClick(currentTokenAccount.address.toBase58(), setIsAddressCopied)
-                : undefined
-            }>
+      <Main className={classNames({ isOpen })}>
+        <Content className={classNames({ isOpen })} onClick={handleToggleOpenClick}>
+          <InfoWrapper>
             <TokenAvatar symbol={token.symbol} size={44} />
             <Info>
               <Top className={classNames({ isAddressCopied })}>
-                {isAddressCopied ? 'Mint Address Copied!' : token.symbol}
+                {isAddressCopied ? 'Address Copied!' : token.symbol}
               </Top>
-              <Bottom className={classNames({ isNew })}>
+              <Bottom
+                ref={addressRef}
+                className={classNames({ isNew, isCopyAvailable: Boolean(currentTokenAccount) })}
+                onClick={
+                  currentTokenAccount
+                    ? handleCopyClick(currentTokenAccount.address.toBase58(), setIsAddressCopied)
+                    : undefined
+                }>
                 {currentTokenAccount?.address.toBase58() || token.name}
               </Bottom>
             </Info>
           </InfoWrapper>
-          <QRIconWrapper
-            className={classNames({ isOpen: isSelected })}
-            onClick={handleToggleOpenClick}>
+          <QRIconWrapper ref={qrIconRef} className={classNames({ isOpen })}>
             <QRIcon name="qr" />
           </QRIconWrapper>
         </Content>
-        {isSelected ? (
+        {isOpen ? (
           <>
             {currentTokenAccount ? (
               <QRWrapper>
@@ -507,21 +533,27 @@ export const TokenRow: FunctionComponent<Props> = ({
                 </QRCodeWrapper>
               </QRCreateWrapper>
             )}
-            <Additional>
-              <TokenInfo onClick={handleCopyClick(token.address.toBase58(), setIsMintCopied)}>
-                <TokenName className={classNames({ isMintCopied })}>
-                  {isMintCopied ? 'Mint Address Copied!' : `${token.symbol} Mint Address`}
-                </TokenName>
-                <TokenAddress>{token.address.toBase58()}</TokenAddress>
-              </TokenInfo>
-            </Additional>
+            {token.symbol !== 'SOL' ? (
+              <Additional>
+                <TokenInfo onClick={handleCopyClick(token.address.toBase58(), setIsMintCopied)}>
+                  <TokenName className={classNames({ isMintCopied })}>
+                    {isMintCopied ? 'Mint Address Copied!' : `${token.symbol} Mint Address`}
+                  </TokenName>
+                  <TokenAddress>{token.address.toBase58()}</TokenAddress>
+                </TokenInfo>
+              </Additional>
+            ) : undefined}
             <BottomInfo className={classNames({ isError })}>
               {isError ? (
                 <Error>Something went wrong. We couldn’t add a token to your list.</Error>
               ) : (
                 <>
                   <ExplorerA
-                    href={getExplorerUrl('address', token.address.toBase58(), cluster)}
+                    href={getExplorerUrl(
+                      'address',
+                      (currentTokenAccount || token).address.toBase58(),
+                      cluster,
+                    )}
                     target="_blank"
                     rel="noopener noreferrer noindex"
                     className="button">

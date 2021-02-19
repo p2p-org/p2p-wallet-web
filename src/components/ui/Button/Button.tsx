@@ -32,6 +32,10 @@ const Wrapper = styled.button`
     color: #fff;
 
     background: #5887ff;
+
+    &:hover {
+      background: #82a5ff;
+    }
   }
 
   &.secondary {

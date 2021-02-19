@@ -1,4 +1,4 @@
-import React, { FC, useCallback, useMemo, useState } from 'react';
+import React, { FC, useCallback, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 
 import { styled } from '@linaria/react';
@@ -24,27 +24,16 @@ export const ReceiveWalletsWidget: FC = () => {
   const initialTokenAccount = tokenAccounts.find(
     (tokenAccount) => tokenAccount.mint.symbol === 'SOL',
   );
-  const [selectedTokenAccount, setSelectedTokenAccount] = useState<TokenAccount | undefined>(
-    initialTokenAccount,
-  );
 
-  const handleSelect = (_?: Token, tokenAccount?: TokenAccount) => {
-    setSelectedTokenAccount(tokenAccount);
-  };
-
-  const renderToken = useCallback(
-    (token: Token, tokenAccount: TokenAccount) => {
-      return (
-        <TokenRow
-          token={token}
-          tokenAccount={tokenAccount}
-          isSelected={selectedTokenAccount?.equals(tokenAccount)}
-          onSelect={handleSelect}
-        />
-      );
-    },
-    [selectedTokenAccount],
-  );
+  const renderToken = useCallback((token: Token, tokenAccount: TokenAccount) => {
+    return (
+      <TokenRow
+        token={token}
+        tokenAccount={tokenAccount}
+        isSelected={initialTokenAccount?.equals(tokenAccount)}
+      />
+    );
+  }, []);
 
   const renderedTokens = useMemo(() => {
     // sort, uniq, and with symbol
@@ -58,7 +47,7 @@ export const ReceiveWalletsWidget: FC = () => {
     return sortedUniqTokenAccounts.map((tokenAccount) =>
       renderToken(tokenAccount.mint, tokenAccount),
     );
-  }, [selectedTokenAccount]);
+  }, [tokenAccounts]);
 
   return <WrapperWidget title={<Title>My wallets</Title>}>{renderedTokens}</WrapperWidget>;
 };
