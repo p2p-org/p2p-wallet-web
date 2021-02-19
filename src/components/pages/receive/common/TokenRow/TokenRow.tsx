@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useState } from 'react';
+import React, { FunctionComponent, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { styled } from '@linaria/react';
@@ -8,7 +8,6 @@ import { rgba } from 'polished';
 import QRCode from 'qrcode.react';
 
 import { Token } from 'api/token/Token';
-import tokenConfig from 'api/token/token.config';
 import { TokenAccount } from 'api/token/TokenAccount';
 import { LoaderBlock } from 'components/common/LoaderBlock';
 import { ToastManager } from 'components/common/ToastManager';
@@ -40,6 +39,7 @@ const QRIconWrapper = styled.div`
   height: 48px;
 
   border-radius: 12px;
+  cursor: pointer;
 `;
 
 const Main = styled.div`
@@ -66,8 +66,6 @@ const Content = styled.div`
   margin: 0 10px;
   padding: 10px 0;
 
-  cursor: pointer;
-
   &.isOpen {
     border-bottom: 1px dashed ${rgba('#000', 0.05)};
   }
@@ -77,6 +75,10 @@ const InfoWrapper = styled.div`
   display: flex;
   flex: 1;
   margin-right: 10px;
+
+  &.isCopyAvailable {
+    cursor: pointer;
+  }
 `;
 
 const Info = styled.div`
@@ -85,19 +87,17 @@ const Info = styled.div`
 `;
 
 const Top = styled.div`
-  display: flex;
-  justify-content: space-between;
-
   color: #202020;
   font-weight: 600;
   font-size: 16px;
   line-height: 24px;
+
+  &.isAddressCopied {
+    color: #2db533;
+  }
 `;
 
 const Bottom = styled.div`
-  display: flex;
-  justify-content: space-between;
-
   color: #a3a5ba;
   font-weight: 600;
   font-size: 14px;
@@ -121,8 +121,6 @@ const QRContent = styled.div`
 `;
 
 const QRText = styled.div`
-  margin-bottom: 27px;
-
   color: #202020;
   font-weight: 600;
   font-size: 16px;
@@ -130,8 +128,6 @@ const QRText = styled.div`
 `;
 
 const QRFooter = styled.div`
-  margin-top: 37px;
-
   color: #a3a5ba;
   font-size: 14px;
   line-height: 21px;
@@ -147,6 +143,45 @@ const QRCodeWrapper = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
+
+  margin: 10px 0 20px;
+  padding: 17px;
+
+  border-radius: 12px;
+
+  &.isImageCopyAvailable:hover {
+    background: #f6f6f8;
+    cursor: pointer;
+  }
+`;
+
+const QRCopiedWrapper = styled.div`
+  position: absolute;
+  right: 0;
+  bottom: 10px;
+  left: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+const QRCopied = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  height: 29px;
+  padding: 0 11px;
+
+  color: #5887ff;
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 21px;
+
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
 `;
 
 const QRCodeBg = styled.div`
@@ -244,6 +279,58 @@ const LoaderBlockStyled = styled(LoaderBlock)`
   margin-right: 8px;
 `;
 
+// @return Promise<boolean>
+async function askClipboardWritePermission() {
+  try {
+    // The clipboard-write permission is granted automatically to pages
+    // when they are the active tab. So it's not required, but it's more safe.
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    const { state } = await navigator.permissions.query({ name: 'clipboard-write' });
+    return state === 'granted';
+  } catch {
+    // Browser compatibility / Security error (ONLY HTTPS) ...
+    return false;
+  }
+}
+
+// @params blob - The ClipboardItem takes an object with the MIME type as key, and the actual blob as the value.
+// @return Promise<void>
+const setToClipboard = async (blob: Blob | null) => {
+  if (!blob) {
+    ToastManager.error(`Can't copy to clipboard`);
+    return;
+  }
+
+  try {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-assignment
+    const data = [new ClipboardItem({ [blob.type]: blob })];
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+    await navigator.clipboard.write(data);
+  } catch (error) {
+    ToastManager.error((error as Error).toString());
+  }
+};
+
+const handleCopyClick = (value: string, cb: (state: boolean) => void) => () => {
+  try {
+    void navigator.clipboard.writeText(value);
+    cb(true);
+    ToastManager.info(`${value} Address Copied!`);
+
+    // fade copied after some seconds
+    setTimeout(() => {
+      cb(false);
+    }, 2000);
+  } catch (error) {
+    console.error(error);
+  }
+};
+
 type Props = {
   token: Token;
   tokenAccount?: TokenAccount;
@@ -265,12 +352,40 @@ export const TokenRow: FunctionComponent<Props> = ({
 
   const [isExecuting, setIsExecuting] = useState(false);
   const [isError, setError] = useState(false);
+  const [isAddressCopied, setIsAddressCopied] = useState(false);
   const [isMintCopied, setIsMintCopied] = useState(false);
   const [isNew, setIsNew] = useState(false);
+  const [isImageCopied, setIsImageCopied] = useState(false);
+  const [isImageCopyAvailable, setIsImageCopyAvailable] = useState(false);
   const [currentTokenAccount, setCurrentTokenAccount] = useState<TokenAccount | undefined>(
     tokenAccount,
   );
   const cluster = useSelector((state) => state.wallet.cluster);
+
+  useEffect(() => {
+    askClipboardWritePermission()
+      .then((state) => setIsImageCopyAvailable(state))
+      .catch(() => setIsImageCopyAvailable(false));
+  }, []);
+
+  const handleImageCopyClick = () => {
+    const qrElement = document.querySelector<HTMLCanvasElement>('#qrcode');
+    if (!qrElement) {
+      return;
+    }
+
+    try {
+      qrElement.toBlob((blob: Blob | null) => setToClipboard(blob));
+      setIsImageCopied(true);
+
+      // fade copied after some seconds
+      setTimeout(() => {
+        setIsImageCopied(false);
+      }, 2000);
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   const handleToggleOpenClick = () => {
     onSelect(isSelected ? undefined : token, isSelected ? undefined : tokenAccount);
@@ -290,21 +405,6 @@ export const TokenRow: FunctionComponent<Props> = ({
     }
   };
 
-  const handleCopyClick = () => {
-    try {
-      void navigator.clipboard.writeText(token.address.toBase58());
-      setIsMintCopied(true);
-      ToastManager.info(`${token.address.toBase58()} Address Copied!`);
-
-      // fade copied after some seconds
-      setTimeout(() => {
-        setIsMintCopied(false);
-      }, 2000);
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   const qrImageSettings: QRCode.ImageSettings = {
@@ -312,36 +412,43 @@ export const TokenRow: FunctionComponent<Props> = ({
     width: 36,
   };
 
-  if (token.symbol === 'SOL') {
-    qrImageSettings.src =
-      'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/solana/info/logo.png';
-  } else {
-    const iconSrc = tokenConfig[cluster]?.find(
-      (tokenItem) => tokenItem.tokenSymbol === token.symbol,
-    )?.icon;
-
-    if (iconSrc) {
-      qrImageSettings.src = iconSrc;
-    }
-  }
+  // if (token.symbol === 'SOL') {
+  //   qrImageSettings.src =
+  //     'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/solana/info/logo.png';
+  // } else {
+  //   const iconSrc = tokenConfig[cluster]?.find(
+  //     (tokenItem) => tokenItem.tokenSymbol === token.symbol,
+  //   )?.icon;
+  //
+  //   if (iconSrc) {
+  //     qrImageSettings.src = iconSrc;
+  //   }
+  // }
 
   return (
     <Wrapper>
       <Main className={classNames({ isOpen: isSelected })}>
-        <Content onClick={handleToggleOpenClick} className={classNames({ isOpen: isSelected })}>
-          <InfoWrapper>
+        <Content className={classNames({ isOpen: isSelected })}>
+          <InfoWrapper
+            className={classNames({ isCopyAvailable: Boolean(currentTokenAccount) })}
+            onClick={
+              currentTokenAccount
+                ? handleCopyClick(currentTokenAccount.address.toBase58(), setIsAddressCopied)
+                : undefined
+            }>
             <TokenAvatar symbol={token.symbol} size={44} />
             <Info>
-              <Top>
-                <div>{token.symbol}</div> <div />
+              <Top className={classNames({ isAddressCopied })}>
+                {isAddressCopied ? 'Mint Address Copied!' : token.symbol}
               </Top>
-              <Bottom>
-                <div>{currentTokenAccount?.address.toBase58() || token.name}</div>
-                <div />
+              <Bottom className={classNames({ isNew })}>
+                {currentTokenAccount?.address.toBase58() || token.name}
               </Bottom>
             </Info>
           </InfoWrapper>
-          <QRIconWrapper className={classNames({ isOpen: isSelected })}>
+          <QRIconWrapper
+            className={classNames({ isOpen: isSelected })}
+            onClick={handleToggleOpenClick}>
             <QRIcon name="qr" />
           </QRIconWrapper>
         </Content>
@@ -353,11 +460,22 @@ export const TokenRow: FunctionComponent<Props> = ({
                   <QRText>
                     {isNew ? 'Now you can receive tokens on your wallet' : 'Scan or copy QR code'}
                   </QRText>
-                  <QRCode
-                    value={currentTokenAccount.address.toBase58()}
-                    imageSettings={qrImageSettings}
-                    size={150}
-                  />
+                  <QRCodeWrapper
+                    className={classNames({ isImageCopyAvailable })}
+                    onClick={isImageCopyAvailable ? handleImageCopyClick : undefined}>
+                    {isImageCopied ? (
+                      <QRCopiedWrapper>
+                        <QRCopied>Copied</QRCopied>
+                      </QRCopiedWrapper>
+                    ) : undefined}
+                    <QRCode
+                      id="qrcode"
+                      value={currentTokenAccount.address.toBase58()}
+                      imageSettings={qrImageSettings}
+                      size={150}
+                      renderAs="canvas"
+                    />
+                  </QRCodeWrapper>
                 </QRContent>
                 {!isNew ? (
                   <QRFooter>
@@ -390,7 +508,7 @@ export const TokenRow: FunctionComponent<Props> = ({
               </QRCreateWrapper>
             )}
             <Additional>
-              <TokenInfo onClick={handleCopyClick}>
+              <TokenInfo onClick={handleCopyClick(token.address.toBase58(), setIsMintCopied)}>
                 <TokenName className={classNames({ isMintCopied })}>
                   {isMintCopied ? 'Mint Address Copied!' : `${token.symbol} Mint Address`}
                 </TokenName>
