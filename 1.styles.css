@@ -22,8 +22,8 @@
 .t1p1n0ee{margin-top:4px;color:#000;font-weight:600;font-size:13px;line-height:16px;}
 .p1sgvivf{padding-right:5px;}
 .p1jvde4q{width:24px;}
-.b13pkjo5{display:none;font-weight:600;font-size:14px;}.b13pkjo5.isOpen{display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;padding:15px 0;}.b13pkjo5.isError{-webkit-box-pack:center;-webkit-justify-content:center;-ms-flex-pack:center;justify-content:center;}
-.l1tqxv0s{-webkit-flex:1;-ms-flex:1;flex:1;color:#a3a5ba;}
+.b13pkjo5{display:none;-webkit-box-pack:justify;-webkit-justify-content:space-between;-ms-flex-pack:justify;justify-content:space-between;font-weight:600;font-size:14px;}.b13pkjo5.isOpen{display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;padding:15px 0;}.b13pkjo5.isError{-webkit-box-pack:center;-webkit-justify-content:center;-ms-flex-pack:center;justify-content:center;}
+.e1tqxv0s{color:#a3a5ba;}
 .ryjcfxl{color:#5887ff;}.ryjcfxl.isError{color:#f43f3d;}
 .ezozms8{color:#f43f3d;}
 .ldjkvyd{margin-right:8px;}
