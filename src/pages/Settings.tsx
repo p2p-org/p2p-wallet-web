@@ -8,7 +8,7 @@ import { Card } from 'components/common/Card';
 import { Layout } from 'components/common/Layout';
 import { WidgetPage } from 'components/common/WidgetPage';
 import { Icon } from 'components/ui';
-import { disconnect } from 'store/slices/wallet/WalletSlice';
+import { disconnect, STORAGE_KEY_SEED } from 'store/slices/wallet/WalletSlice';
 
 const Wrapper = styled.div`
   display: grid;
@@ -138,6 +138,7 @@ export const Settings: FunctionComponent = () => {
   const dispatch = useDispatch();
 
   const handleLogoutClick = () => {
+    localStorage.removeItem(STORAGE_KEY_SEED);
     void dispatch(disconnect());
   };
 
