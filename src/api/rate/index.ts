@@ -52,12 +52,12 @@ const getRatesCandle = async (symbol: string): Promise<CandleRate[]> => {
 export const APIFactory = memoizeWith(
   identity,
   (cluster: ExtendedCluster): API => {
+    assert(cryptoCompareApiKey, 'Define crypto compare api key in .env');
+
     const tokenSymbols = tokenConfig[cluster]?.map((token) => token.tokenSymbol) || [];
     tokenSymbols.push('SOL');
 
     const getRatesMarkets = async (): Promise<Array<MarketRate>> => {
-      assert(cryptoCompareApiKey, 'Define crypto compare api key in .env');
-
       const CURRENCY = 'USD';
 
       try {

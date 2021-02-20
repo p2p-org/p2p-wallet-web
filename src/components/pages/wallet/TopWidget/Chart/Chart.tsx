@@ -46,7 +46,7 @@ type Props = {
   publicKey: web3.PublicKey;
 };
 
-export const PriceWidget: FunctionComponent<Props> = ({ publicKey }) => {
+export const Chart: FunctionComponent<Props> = ({ publicKey }) => {
   const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(false);
   const tokenAccounts = useSelector((state: RootState) => state.wallet.tokenAccounts);

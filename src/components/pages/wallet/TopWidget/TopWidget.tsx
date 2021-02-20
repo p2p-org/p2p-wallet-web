@@ -20,6 +20,8 @@ import { getRatesCandle } from 'store/slices/rate/RateSlice';
 import { airdrop } from 'store/slices/wallet/WalletSlice';
 import { shortAddress } from 'utils/tokens';
 
+import { Chart } from './Chart';
+
 const WrapperWidget = styled(Widget)``;
 
 const TokenInfo = styled.div`
@@ -314,6 +316,7 @@ export const TopWidget: FunctionComponent<Props> = ({ publicKey }) => {
         }
         action={renderButtons()}>
         {renderContent()}
+        {tokenAccount ? <Chart publicKey={tokenAccount.address} /> : undefined}
       </WrapperWidget>
       {isShowFixed ? (
         <WrapperFixed>

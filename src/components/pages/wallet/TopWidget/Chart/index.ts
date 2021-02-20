@@ -1,1 +1,1 @@
-export { PriceWidget } from './PriceWidget';
+export { Chart } from './Chart';
