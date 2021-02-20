@@ -1,1 +1,0 @@
-export { RateUSDT } from './RateUSDT';

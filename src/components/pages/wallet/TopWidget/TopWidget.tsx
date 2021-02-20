@@ -9,7 +9,7 @@ import { Decimal } from 'decimal.js';
 import throttle from 'lodash.throttle';
 
 import { TokenAccount } from 'api/token/TokenAccount';
-import { AmountUSDT } from 'components/common/AmountUSDT';
+import { AmountUSD } from 'components/common/AmountUSD';
 import { COLUMN_RIGHT_WIDTH } from 'components/common/Layout/constants';
 import { TokenAvatar } from 'components/common/TokenAvatar';
 import { Widget } from 'components/common/Widget';
@@ -173,7 +173,7 @@ export const TopWidget: FunctionComponent<Props> = ({ publicKey }) => {
   );
   const rate = useSelector(rateSelector(tokenAccount?.mint.symbol));
   const rates = useSelector(
-    (state: RootState) => state.rate.candles[`${tokenAccount?.mint.symbol}/USDT`],
+    (state: RootState) => state.rate.candles[`${tokenAccount?.mint.symbol}/USD`],
   );
   const isMainnet = cluster === 'mainnet-beta';
 
@@ -265,7 +265,7 @@ export const TopWidget: FunctionComponent<Props> = ({ publicKey }) => {
       <PriceWrapped className={classNames({ isSticky })}>
         {rate ? (
           <ValueCurrency className={classNames({ isSticky })}>
-            <AmountUSDT
+            <AmountUSD
               value={new Decimal(tokenAccount.mint.toMajorDenomination(tokenAccount.balance))}
               symbol={tokenAccount.mint.symbol}
             />

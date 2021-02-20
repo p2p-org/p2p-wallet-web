@@ -55,7 +55,7 @@ export const PriceWidget: FunctionComponent<Props> = ({ publicKey }) => {
     return foundToken && TokenAccount.from(foundToken);
   }, [tokenAccounts, publicKey]);
   const rates = useSelector(
-    (state: RootState) => state.rate.candles[`${tokenAccount?.mint.symbol}/USDT`],
+    (state: RootState) => state.rate.candles[`${tokenAccount?.mint.symbol}/USD`],
   );
 
   useEffect(() => {

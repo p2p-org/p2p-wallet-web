@@ -9,7 +9,7 @@ import Decimal from 'decimal.js';
 
 import { Token } from 'api/token/Token';
 import { TokenAccount } from 'api/token/TokenAccount';
-import { RateUSDT } from 'components/common/RateUSDT';
+import { RateUSD } from 'components/common/RateUSD';
 import { ToastManager } from 'components/common/ToastManager';
 import { Button } from 'components/ui';
 import { RootState } from 'store/rootReducer';
@@ -145,7 +145,7 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
           {fromTokenAccount?.mint ? (
             <FeeLeft>
               1 {fromTokenAccount?.mint.symbol} =&nbsp;
-              <RateUSDT symbol={fromTokenAccount?.mint.symbol} />
+              <RateUSD symbol={fromTokenAccount?.mint.symbol} />
             </FeeLeft>
           ) : undefined}
           {fee ? <FeeRight>Fee: {fee} SOL</FeeRight> : undefined}

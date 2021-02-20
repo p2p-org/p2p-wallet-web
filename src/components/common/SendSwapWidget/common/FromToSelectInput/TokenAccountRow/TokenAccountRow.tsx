@@ -4,7 +4,7 @@ import { styled } from '@linaria/react';
 import { Decimal } from 'decimal.js';
 
 import { TokenAccount } from 'api/token/TokenAccount';
-import { AmountUSDT } from 'components/common/AmountUSDT';
+import { AmountUSD } from 'components/common/AmountUSD';
 import { TokenAvatar } from 'components/common/TokenAvatar';
 import { shortAddress } from 'utils/tokens';
 
@@ -74,7 +74,7 @@ export const TokenAccountRow: FunctionComponent<Props> = ({ tokenAccount, onClic
             <TokenName title={tokenAccount.mint.address.toBase58()}>
               {tokenAccount.mint.name || shortAddress(tokenAccount.mint.address.toBase58())}
             </TokenName>
-            <AmountUSDT
+            <AmountUSD
               symbol={tokenAccount.mint.symbol}
               value={new Decimal(tokenAccount.mint.toMajorDenomination(tokenAccount.balance))}
             />

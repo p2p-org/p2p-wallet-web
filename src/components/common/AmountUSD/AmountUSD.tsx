@@ -17,7 +17,7 @@ type Props = {
   className?: string;
 };
 
-export const AmountUSDT: FunctionComponent<Props> = ({
+export const AmountUSD: FunctionComponent<Props> = ({
   prefix,
   value = new Decimal(0),
   symbol = '',
@@ -30,7 +30,7 @@ export const AmountUSDT: FunctionComponent<Props> = ({
   }
 
   return (
-    <Wrapper title="Amount in USDT" {...props}>
+    <Wrapper title="Amount in USD" {...props}>
       {prefix ? `${prefix} ` : undefined}
       {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(
         value.times(rate).toNumber(),

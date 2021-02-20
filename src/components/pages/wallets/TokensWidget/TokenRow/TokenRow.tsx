@@ -6,7 +6,7 @@ import { Decimal } from 'decimal.js';
 import { rgba } from 'polished';
 
 import { TokenAccount } from 'api/token/TokenAccount';
-import { AmountUSDT } from 'components/common/AmountUSDT';
+import { AmountUSD } from 'components/common/AmountUSD';
 import { TokenAvatar } from 'components/common/TokenAvatar';
 import { shortAddress } from 'utils/tokens';
 
@@ -105,7 +105,7 @@ export const TokenRow: FunctionComponent<Props> = ({ token }) => {
             <TokenName title={token.mint.address.toBase58()}>
               {token.mint.symbol || shortAddress(token.mint.address.toBase58())}
             </TokenName>
-            <AmountUSDT
+            <AmountUSD
               value={new Decimal(token.mint.toMajorDenomination(token.balance))}
               symbol={token.mint.symbol}
             />

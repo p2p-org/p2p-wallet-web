@@ -4,7 +4,7 @@ import { styled } from '@linaria/react';
 import { rgba } from 'polished';
 
 import { TokenAccount } from 'api/token/TokenAccount';
-import { RateUSDT } from 'components/common/RateUSDT';
+import { RateUSD } from 'components/common/RateUSD';
 import { TokenAvatar } from 'components/common/TokenAvatar';
 
 const Wrapper = styled.div`
@@ -70,7 +70,7 @@ export const TokenRow: FunctionComponent<Props> = ({ token, onItemClick }) => {
         <Info>
           <Top>
             <TokenName>{token.mint.name || token.address.toBase58()}</TokenName>{' '}
-            <RateUSDT symbol={token.mint.symbol} />
+            <RateUSD symbol={token.mint.symbol} />
           </Top>
           <Bottom>
             <div>{token.mint.symbol}</div>{' '}

@@ -5,11 +5,7 @@ export const rateSelector = (symbol?: string) => (state: RootState) => {
     return null;
   }
 
-  const rate = state.rate.markets[`${symbol}/USDT`];
-
-  if (['USDT', 'USDC'].includes(symbol)) {
-    return rate || 1;
-  }
+  const rate = state.rate.markets[symbol];
 
   if (!rate) {
     return null;

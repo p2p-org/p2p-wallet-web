@@ -13,6 +13,8 @@ export const swapHostFeeAddress = process.env.SWAP_HOST_FEE_ADDRESS
   ? new PublicKey(process.env.SWAP_HOST_FEE_ADDRESS)
   : null;
 
+export const cryptoCompareApiKey = process.env.CRYPTO_COMPARE_API_KEY;
+
 // Env vars that do not start with "REACT_APP_" are available in tests only
 export const localSwapProgramId = process.env.SWAP_PROGRAM_ID
   ? new PublicKey(process.env.SWAP_PROGRAM_ID)

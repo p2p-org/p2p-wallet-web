@@ -11,7 +11,7 @@ type Props = {
   symbol?: string;
 };
 
-export const RateUSDT: FunctionComponent<Props> = ({ symbol = '', ...props }) => {
+export const RateUSD: FunctionComponent<Props> = ({ symbol = '', ...props }) => {
   const rate = useSelector(rateSelector(symbol));
 
   if (!rate) {
@@ -19,7 +19,7 @@ export const RateUSDT: FunctionComponent<Props> = ({ symbol = '', ...props }) =>
   }
 
   return (
-    <Wrapper title="Rate in USDT" {...props}>
+    <Wrapper title="Rate in USD" {...props}>
       {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(rate)}
     </Wrapper>
   );

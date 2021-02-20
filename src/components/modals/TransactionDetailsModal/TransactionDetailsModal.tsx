@@ -8,7 +8,7 @@ import dayjs from 'dayjs';
 import { rgba } from 'polished';
 
 import { Transaction } from 'api/transaction/Transaction';
-import { AmountUSDT } from 'components/common/AmountUSDT';
+import { AmountUSD } from 'components/common/AmountUSD';
 import { ToastManager } from 'components/common/ToastManager';
 import { TokenAvatar } from 'components/common/TokenAvatar';
 import { Button, Icon } from 'components/ui';
@@ -321,7 +321,7 @@ export const TransactionDetailsModal: FunctionComponent<Props> = ({ signature, c
       <Content>
         <StatusWrapper>
           <ValueCurrency>
-            <AmountUSDT
+            <AmountUSD
               prefix={isReceiver ? '+' : '-'}
               symbol={transaction.short.sourceTokenAccount?.mint.symbol}
               value={transaction.short.amount}

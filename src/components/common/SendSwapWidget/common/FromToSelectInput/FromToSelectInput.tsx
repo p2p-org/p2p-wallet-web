@@ -8,7 +8,7 @@ import { isNil } from 'ramda';
 
 import { Token } from 'api/token/Token';
 import { TokenAccount } from 'api/token/TokenAccount';
-import { AmountUSDT } from 'components/common/AmountUSDT';
+import { AmountUSD } from 'components/common/AmountUSD';
 import { SlideContainer } from 'components/common/SlideContainer';
 import { TokenAvatar } from 'components/common/TokenAvatar';
 import { Icon } from 'components/ui';
@@ -178,7 +178,7 @@ const BalanceText = styled.div`
   display: flex;
 `;
 
-const AmountUSDTStyled = styled(AmountUSDT)`
+const AmountUSDStyled = styled(AmountUSD)`
   margin-left: 3px;
 `;
 
@@ -538,7 +538,7 @@ export const FromToSelectInput: FunctionComponent<Props> = ({
             </BalanceText>
             {token ? (
               <BalanceText>
-                ≈ <AmountUSDTStyled value={new Decimal(localAmount || 0)} symbol={token?.symbol} />
+                ≈ <AmountUSDStyled value={new Decimal(localAmount || 0)} symbol={token?.symbol} />
               </BalanceText>
             ) : undefined}
           </BalanceWrapper>

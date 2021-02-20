@@ -76,7 +76,7 @@ const transactionSlice = createSlice({
         });
     });
     builder.addCase(getRatesCandle.rejected, (state, action) => {
-      state.candles[`${action.meta.arg}/USDT`] = [];
+      state.candles[`${action.meta.arg}/USD`] = [];
     });
     builder.addCase(wipeAction, () => initialState);
   },

@@ -12,7 +12,7 @@ import { Avatar } from 'components/ui';
 import { openModal } from 'store/actions/modals';
 import { SHOW_MODAL_TRANSACTION_DETAILS } from 'store/constants/modalTypes';
 
-import { AmountUSDT } from '../AmountUSDT';
+import { AmountUSD } from '../AmountUSD';
 
 const Wrapper = styled.div`
   position: relative;
@@ -117,7 +117,7 @@ export const TransactionRow: FunctionComponent<Props> = ({ transaction, source }
           <Top>
             <Type>{transaction.short.type}</Type>
             <Amount className={classNames({ isReceiver })}>
-              <AmountUSDT
+              <AmountUSD
                 prefix={isReceiver ? '+' : '-'}
                 value={transaction.short.amount}
                 symbol={transaction.short.sourceTokenAccount?.mint.symbol}

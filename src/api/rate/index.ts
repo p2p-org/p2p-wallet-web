@@ -1,15 +1,18 @@
 import { complement, identity, isNil, memoizeWith } from 'ramda';
+import assert from 'ts-invariant';
 
 import tokenConfig from 'api/token/token.config';
+import { cryptoCompareApiKey } from 'config/constants';
 import { ExtendedCluster } from 'utils/types';
 
 import { CandleRate } from './CandleRate';
 import { MarketRate } from './MarketRate';
 
+const CRYPTO_COMPARE_API_URL = 'https://min-api.cryptocompare.com/data';
+
 type OrderbooksResponse = {
-  data: {
-    market: string;
-    bids: { price: number }[];
+  [market: string]: {
+    [currency: string]: number;
   };
 };
 
@@ -21,23 +24,6 @@ type CandlesResponse = {
   }[];
 };
 
-const getRateMarket = async (symbol: string): Promise<MarketRate> => {
-  try {
-    const res = await fetch(`https://serum-api.bonfida.com/orderbooks/${symbol}USDT`);
-
-    if (!res.ok) {
-      throw new Error('Something wrong');
-    }
-
-    const result = (await res.json()) as OrderbooksResponse;
-
-    return new MarketRate(result.data.market, result.data.bids[0]?.price);
-  } catch (error) {
-    console.error(`Can't get rates for ${symbol}:`, error);
-    throw error;
-  }
-};
-
 export interface API {
   getRatesMarkets: () => Promise<MarketRate[]>;
   getRatesCandle: (symbol: string) => Promise<CandleRate[]>;
@@ -46,7 +32,7 @@ export interface API {
 const getRatesCandle = async (symbol: string): Promise<CandleRate[]> => {
   try {
     const res = await fetch(
-      `https://serum-api.bonfida.com/candles/${symbol}USDT?resolution=86400&limit=365`,
+      `https://serum-api.bonfida.com/candles/${symbol}USD?resolution=86400&limit=365`,
     );
 
     if (!res.ok) {
@@ -66,16 +52,36 @@ const getRatesCandle = async (symbol: string): Promise<CandleRate[]> => {
 export const APIFactory = memoizeWith(
   identity,
   (cluster: ExtendedCluster): API => {
-    const tokenSymbols =
-      tokenConfig[cluster]?.filter((rate) => !rate.noRate).map((token) => token.tokenSymbol) || [];
+    const tokenSymbols = tokenConfig[cluster]?.map((token) => token.tokenSymbol) || [];
     tokenSymbols.push('SOL');
 
     const getRatesMarkets = async (): Promise<Array<MarketRate>> => {
-      const rates = await Promise.all(
-        tokenSymbols.map((symbol) => getRateMarket(symbol).catch((error) => console.error(error))),
-      );
+      assert(cryptoCompareApiKey, 'Define crypto compare api key in .env');
 
-      return rates.filter(complement(isNil)) as MarketRate[];
+      const CURRENCY = 'USD';
+
+      try {
+        const res = await fetch(
+          `${CRYPTO_COMPARE_API_URL}/pricemulti?api_key=${cryptoCompareApiKey}&fsyms=${tokenSymbols.join(
+            ',',
+          )}&tsyms=${CURRENCY}`,
+        );
+
+        if (!res.ok) {
+          throw new Error('Something wrong');
+        }
+
+        const result = (await res.json()) as OrderbooksResponse;
+
+        const rates = tokenSymbols.map((symbol) =>
+          result[symbol] ? new MarketRate(symbol, result[symbol][CURRENCY]) : null,
+        );
+
+        return rates.filter(complement(isNil)) as MarketRate[];
+      } catch (error) {
+        console.error(`Can't get rates for tokens:`, error);
+        throw error;
+      }
     };
 
     return {

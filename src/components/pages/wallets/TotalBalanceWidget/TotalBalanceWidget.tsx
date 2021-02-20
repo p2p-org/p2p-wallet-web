@@ -74,7 +74,7 @@ export const TotalBalanceWidget: FunctionComponent = () => {
         }
 
         // Same as USD
-        if (tokenAccount.mint.symbol && ['USDT', 'USDC'].includes(tokenAccount.mint.symbol)) {
+        if (tokenAccount.mint.symbol) {
           return new Decimal(tokenAccount.mint.toMajorDenomination(tokenAccount.balance))
             .plus(prev)
             .toNumber();

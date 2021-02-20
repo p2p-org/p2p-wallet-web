@@ -49,6 +49,7 @@ module.exports = {
         NODE_ENV: JSON.stringify(process.env.NODE_ENV),
         APP_LOCAL_WALLET_PRIVATE_KEY: JSON.stringify(process.env.APP_LOCAL_WALLET_PRIVATE_KEY),
         APP_LOCAL_WALLET_MNEMONIC: JSON.stringify(process.env.APP_LOCAL_WALLET_MNEMONIC),
+        CRYPTO_COMPARE_API_KEY: JSON.stringify(process.env.CRYPTO_COMPARE_API_KEY),
         SWAP_PROGRAM_ID: JSON.stringify(process.env.SWAP_PROGRAM_ID),
         SWAP_HOST_FEE_ADDRESS: JSON.stringify(process.env.SWAP_HOST_FEE_ADDRESS),
         DEFAULT_COMMITMENT: JSON.stringify(process.env.DEFAULT_COMMITMENT),
