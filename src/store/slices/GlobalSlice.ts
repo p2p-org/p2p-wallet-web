@@ -6,16 +6,20 @@ import { ToastManager } from 'components/common/ToastManager';
 import { RootState } from 'store/rootReducer';
 import { isFulfilledAction, isPendingAction, isRejectedAction } from 'utils/redux';
 
+export const STORAGE_KEY_FEATURES_FLAGS = 'all_features';
+
 export interface GlobalState {
   loading: number;
   error: string | null;
   availableTokens: Array<SerializableToken>;
+  featureFlagsEnabled: boolean;
 }
 
 const initialState: GlobalState = {
   loading: 0,
   error: null,
   availableTokens: [],
+  featureFlagsEnabled: Boolean(localStorage.getItem(STORAGE_KEY_FEATURES_FLAGS)) || false,
 };
 
 export const GLOBAL_SLICE_NAME = 'global';
@@ -36,7 +40,9 @@ export const getAvailableTokens = createAsyncThunk(
   },
 );
 
-export const wipeAction = createAction('wipe');
+export const wipeAction = createAction('wipeAction');
+
+export const setFeatureFlagsAction = createAction<boolean>('setFeatureFlagsAction');
 
 const globalSlice = createSlice({
   name: GLOBAL_SLICE_NAME,
@@ -46,6 +52,10 @@ const globalSlice = createSlice({
     builder.addCase(getAvailableTokens.fulfilled, (state, action) => ({
       ...state,
       availableTokens: action.payload,
+    }));
+    builder.addCase(setFeatureFlagsAction, (state, action) => ({
+      ...state,
+      featureFlagsEnabled: action.payload,
     }));
     builder.addMatcher(isPendingAction, (state) => ({
       ...state,

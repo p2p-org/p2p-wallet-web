@@ -1,11 +1,13 @@
 import React, { FunctionComponent, useState } from 'react';
 
 import { styled } from '@linaria/react';
+import { Feature } from 'flagged';
 import { rgba } from 'polished';
 
 import { ToastManager } from 'components/common/ToastManager';
 import { Widget } from 'components/common/Widget';
 import { Avatar, Icon } from 'components/ui';
+import { FEATURE_LEFT_NAV_MENU_POFILE } from 'config/featureFlags';
 
 const WrapperWidget = styled(Widget)``;
 
@@ -97,17 +99,19 @@ export const ProfileWidget: FunctionComponent = () => {
   };
 
   return (
-    <WrapperWidget>
-      <Top>
-        <Avatar src="https://i.pravatar.cc/100" size={36} />
-        <Username>@{username}</Username>
-      </Top>
-      <Bottom>
-        {copied ? <CopiedText>URL Copied!</CopiedText> : <Address>{address}</Address>}
-        <CopyWrapper onClick={handleCopyClick}>
-          <CopyIcon name="copy" />
-        </CopyWrapper>
-      </Bottom>
-    </WrapperWidget>
+    <Feature name={FEATURE_LEFT_NAV_MENU_POFILE}>
+      <WrapperWidget>
+        <Top>
+          <Avatar src="https://i.pravatar.cc/100" size={36} />
+          <Username>@{username}</Username>
+        </Top>
+        <Bottom>
+          {copied ? <CopiedText>URL Copied!</CopiedText> : <Address>{address}</Address>}
+          <CopyWrapper onClick={handleCopyClick}>
+            <CopyIcon name="copy" />
+          </CopyWrapper>
+        </Bottom>
+      </WrapperWidget>
+    </Feature>
   );
 };

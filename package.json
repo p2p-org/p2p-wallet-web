@@ -39,6 +39,7 @@
     "decimal.js": "^10.2.1",
     "dotenv-cli": "^4.0.0",
     "eventemitter3": "^4.0.7",
+    "flagged": "^2.0.1",
     "highcharts": "^8.2.2",
     "history": "^5.0.0",
     "html-webpack-plugin": "^4.5.0",

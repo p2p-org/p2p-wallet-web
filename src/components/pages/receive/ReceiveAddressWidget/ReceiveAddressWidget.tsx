@@ -1,11 +1,13 @@
 import React, { FunctionComponent, useState } from 'react';
 
 import { styled } from '@linaria/react';
+import { Feature } from 'flagged';
 import { rgba } from 'polished';
 
 import { ToastManager } from 'components/common/ToastManager';
 import { WidgetPage } from 'components/common/WidgetPage';
 import { Icon } from 'components/ui';
+import { FEATURE_RECEIVE_ADDRESS } from 'config/featureFlags';
 
 const WrapperWidgetPage = styled(WidgetPage)`
   overflow: hidden;
@@ -103,18 +105,20 @@ export const ReceiveAddressWidget: FunctionComponent = () => {
 
   return (
     <WrapperWidgetPage title="Receive" icon="bottom">
-      <URLWrapper>
-        <URLTitle>Send tokens directly to you wallet via URL</URLTitle>
-        <URLValue onClick={handleCopyClick(urlAddress, setIsUrlCopied)}>
-          konstantink.p2pwallet.org
-          <RightWrapper>
-            {isUrlCopied ? <CopiedText>Copied!</CopiedText> : undefined}
-            <CopyWrapper>
-              <CopyIcon name="copy" />
-            </CopyWrapper>
-          </RightWrapper>
-        </URLValue>
-      </URLWrapper>
+      <Feature name={FEATURE_RECEIVE_ADDRESS}>
+        <URLWrapper>
+          <URLTitle>Send tokens directly to you wallet via URL</URLTitle>
+          <URLValue onClick={handleCopyClick(urlAddress, setIsUrlCopied)}>
+            konstantink.p2pwallet.org
+            <RightWrapper>
+              {isUrlCopied ? <CopiedText>Copied!</CopiedText> : undefined}
+              <CopyWrapper>
+                <CopyIcon name="copy" />
+              </CopyWrapper>
+            </RightWrapper>
+          </URLValue>
+        </URLWrapper>
+      </Feature>
     </WrapperWidgetPage>
   );
 };

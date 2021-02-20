@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Route, Switch, useHistory } from 'react-router
 import dayjs from 'dayjs';
 import localizedFormat from 'dayjs/plugin/localizedFormat';
 
+import { FeaturesToggle } from 'components/common/FeaturesToggle';
 import { ModalManager } from 'components/common/ModalManager';
 import { NotifyToast } from 'components/common/NotifyToast';
 import { ToastManager } from 'components/common/ToastManager';
@@ -57,6 +58,7 @@ const App: React.FC = () => {
       </Router>
       <ModalManager />
       <ToastManager anchor="right" renderToast={(props) => <NotifyToast {...props} />} />
+      <FeaturesToggle />
     </>
   );
 };

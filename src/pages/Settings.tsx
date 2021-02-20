@@ -2,12 +2,14 @@ import React, { FunctionComponent } from 'react';
 import { useDispatch } from 'react-redux';
 
 import { styled } from '@linaria/react';
+import { Feature } from 'flagged';
 import { rgba } from 'polished';
 
 import { Card } from 'components/common/Card';
 import { Layout } from 'components/common/Layout';
 import { WidgetPage } from 'components/common/WidgetPage';
 import { Icon } from 'components/ui';
+import { FEATURE_SETTINGS_LIST } from 'config/featureFlags';
 import { disconnect, STORAGE_KEY_SEED } from 'store/slices/wallet/WalletSlice';
 
 const Wrapper = styled.div`
@@ -147,15 +149,17 @@ export const Settings: FunctionComponent = () => {
       rightColumn={
         <Wrapper>
           <WidgetPage icon="gear" title="Settings">
-            <RowsWrapper>
-              <Row icon="reload" title="Backup" />
-              <Row icon="currency" title="Currency" />
-              <Row icon="plug" title="Network" />
-              <Row icon="card" title="Payment methods" />
-              <Row icon="branch" title="Node" />
-              <Row icon="lock" title="Security" />
-              <Row icon="sun" title="Appearance" />
-            </RowsWrapper>
+            <Feature name={FEATURE_SETTINGS_LIST}>
+              <RowsWrapper>
+                <Row icon="reload" title="Backup" />
+                <Row icon="currency" title="Currency" />
+                <Row icon="plug" title="Network" />
+                <Row icon="card" title="Payment methods" />
+                <Row icon="branch" title="Node" />
+                <Row icon="lock" title="Security" />
+                <Row icon="sun" title="Appearance" />
+              </RowsWrapper>
+            </Feature>
           </WidgetPage>
           <LogoutCard withShadow>
             <LogoutWrapper onClick={handleLogoutClick}>

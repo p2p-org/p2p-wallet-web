@@ -5,6 +5,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
 
+import { FeatureProvider } from 'components/common/FeatureProvider';
 import { isDev } from 'config/constants';
 import { store } from 'store';
 import { globalCss } from 'styles/global';
@@ -19,7 +20,9 @@ const render = () => {
   ReactDOM.render(
     <React.StrictMode>
       <Provider store={store}>
-        <App />
+        <FeatureProvider>
+          <App />
+        </FeatureProvider>
       </Provider>
     </React.StrictMode>,
     document.querySelector('#root'),
