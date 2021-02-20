@@ -6,9 +6,11 @@ import { styled } from '@linaria/react';
 import { unwrapResult } from '@reduxjs/toolkit';
 
 import { WalletType } from 'api/wallet';
+import logo from 'assets/images/logo-blue.png';
 import bgImg from 'assets/images/sun.png';
+import { HEADER_HEIGHT } from 'components/common/Header/constants';
 import { LayoutUnauthed } from 'components/common/LayoutUnauthed';
-import { LoaderBlock } from 'components/common/LoaderBlock';
+import { Loader } from 'components/common/Loader';
 import { ToastManager } from 'components/common/ToastManager';
 import { Button } from 'components/ui';
 import {
@@ -19,8 +21,39 @@ import {
 } from 'store/slices/wallet/WalletSlice';
 import { sleep } from 'utils/common';
 
-const LoaderBlockStyled = styled(LoaderBlock)`
-  height: 200px;
+const LoaderPage = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  height: 100%;
+`;
+
+const LoaderWrapper = styled.div`
+  position: relative;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  margin-top: -${HEADER_HEIGHT}px;
+`;
+
+const LoaderStyled = styled(Loader)`
+  width: 64px;
+  height: 64px;
+
+  &::after {
+    width: 88%;
+    height: 88%;
+  }
+`;
+
+const LogoImg = styled.img`
+  position: absolute;
+
+  width: 44px;
+  height: 44px;
 `;
 
 const Actions = styled.div`
@@ -103,7 +136,12 @@ export const Home: FunctionComponent = () => {
   return (
     <LayoutUnauthed>
       {isLoading ? (
-        <LoaderBlockStyled />
+        <LoaderPage>
+          <LoaderWrapper>
+            <LoaderStyled />
+            <LogoImg src={logo as string} />
+          </LoaderWrapper>
+        </LoaderPage>
       ) : (
         <>
           <HeaderImage />

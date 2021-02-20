@@ -5,13 +5,18 @@ import { styled } from '@linaria/react';
 import { Header } from 'components/common/Header';
 
 const Wrapper = styled.div`
+  display: flex;
+
   height: 100%;
 
   background: #fff;
 `;
 
 const Box = styled.div`
-  max-width: 364px;
+  display: flex;
+  flex-direction: column;
+
+  width: 364px;
   margin: auto;
 `;
 

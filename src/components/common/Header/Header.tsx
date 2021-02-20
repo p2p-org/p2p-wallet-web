@@ -1,4 +1,5 @@
 import React, { FunctionComponent } from 'react';
+import { useSelector } from 'react-redux';
 import { Link, NavLink } from 'react-router-dom';
 
 import { styled } from '@linaria/react';
@@ -122,13 +123,15 @@ type Props = {
 };
 
 export const Header: FunctionComponent<Props> = ({ breadcrumb }) => {
+  const connected = useSelector((state) => state.wallet.connected);
+
   return (
     <Wrapper>
       <FixedContainer>
         <ScrollFixContainer>
           <MainContainer>
             <Content>
-              <LogoLink to="/wallets">
+              <LogoLink to={connected ? '/wallets' : '/'}>
                 <LogoImg src={Logo as string} />
               </LogoLink>
               {breadcrumb ? (
