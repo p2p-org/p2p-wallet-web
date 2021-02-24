@@ -26,3 +26,9 @@ export type ExtendedCluster = Cluster | 'localnet';
 export interface Serializable<T> {
   serialize(): T;
 }
+
+export interface WalletSettings {
+  currency: string;
+  appearance: string;
+  network: string;
+}
