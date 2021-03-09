@@ -1,6 +1,7 @@
 import { WalletSettings } from 'utils/types';
 
 const WALLET_SETTINGS_KEY = 'walletSettings';
+const WALLET_HIDDEN_TOKENS_KEY = 'walletHiddenTokens';
 
 export const currencies = [
   {
@@ -48,4 +49,34 @@ export function loadSettings(): WalletSettings {
 
 export function saveSettings(settings: WalletSettings) {
   localStorage.setItem(WALLET_SETTINGS_KEY, JSON.stringify(settings));
+}
+
+export function loadHiddenTokens(): Set<string> {
+  const hiddenTokens = localStorage.getItem(WALLET_HIDDEN_TOKENS_KEY) as string;
+  let tokens: string[] = [];
+
+  if (!hiddenTokens) {
+    return new Set();
+  }
+
+  try {
+    tokens = JSON.parse(hiddenTokens) as string[];
+  } catch (error) {
+    console.error(error);
+  }
+
+  return new Set([...tokens]);
+}
+
+export function hideUnhideToken(pubkey: string) {
+  const tokens = loadHiddenTokens();
+
+  if (tokens.has(pubkey)) {
+    tokens.delete(pubkey);
+  } else {
+    tokens.add(pubkey);
+  }
+
+  // eslint-disable-next-line unicorn/prefer-spread
+  localStorage.setItem(WALLET_HIDDEN_TOKENS_KEY, JSON.stringify(Array.from(tokens)));
 }

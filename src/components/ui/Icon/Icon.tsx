@@ -16,6 +16,7 @@ import close from './assets/close-icon.svg';
 import copy from './assets/copy-icon.svg';
 import currency from './assets/currency-icon.svg';
 import gear from './assets/gear-icon.svg';
+import hide from './assets/hide-icon.svg';
 import home from './assets/home-icon.svg';
 import lock from './assets/lock-icon.svg';
 import logout from './assets/logout-icon.svg';
@@ -58,6 +59,7 @@ const iconsMap = new Map<string, SvgIconType>([
   ['sun', sun],
   ['swap', swap],
   ['home', home],
+  ['hide', hide],
   ['lock', lock],
   ['logout', logout],
   ['pen', pen],

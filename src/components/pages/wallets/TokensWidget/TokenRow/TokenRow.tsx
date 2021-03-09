@@ -2,6 +2,7 @@ import React, { FunctionComponent } from 'react';
 import { Link } from 'react-router-dom';
 
 import { styled } from '@linaria/react';
+import classNames from 'classnames';
 import { Decimal } from 'decimal.js';
 import { rgba } from 'polished';
 
@@ -14,6 +15,14 @@ const Wrapper = styled.div`
   position: relative;
 
   padding: 10px 0;
+
+  &.isHidden {
+    opacity: 0.5;
+
+    &:hover {
+      opacity: 1;
+    }
+  }
 
   &:not(:last-child) {
     &::after {
@@ -93,11 +102,12 @@ const Bottom = styled.div`
 
 type Props = {
   token: TokenAccount;
+  isHidden?: boolean;
 };
 
-export const TokenRow: FunctionComponent<Props> = ({ token }) => {
+export const TokenRow: FunctionComponent<Props> = ({ token, isHidden = false }) => {
   return (
-    <Wrapper>
+    <Wrapper className={classNames({ isHidden })}>
       <WrapperLink to={`/wallet/${token.address.toBase58()}`}>
         <TokenAvatarStyled symbol={token.mint.symbol} size={48} />
         <Content>

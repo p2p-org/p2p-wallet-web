@@ -4,11 +4,13 @@ import { useHistory } from 'react-router';
 
 import { styled } from '@linaria/react';
 import * as web3 from '@solana/web3.js';
+import { rgba } from 'polished';
 
 import { Widget } from 'components/common/Widget';
-import { Button, Icon } from 'components/ui';
+import { Button, Icon, Switch } from 'components/ui';
 import { openModal } from 'store/actions/modals';
 import { SHOW_MODAL_CLOSE_TOKEN_ACCOUNT } from 'store/constants/modalTypes';
+import { hideUnhideToken, loadHiddenTokens } from 'utils/settings';
 
 const WrapperWidget = styled(Widget)``;
 
@@ -46,6 +48,12 @@ const Settings = styled.div`
 const SettingItem = styled.div`
   display: flex;
   align-items: center;
+
+  padding: 20px 0;
+
+  &:not(:last-child) {
+    border-bottom: 1px solid ${rgba('#000', 0.05)};
+  }
 `;
 
 const ButtonStyled = styled(Button)`
@@ -73,11 +81,18 @@ const IconWrapper = styled.div`
   border-radius: 12px;
 `;
 
-const CloseAccountIcon = styled(Icon)`
+const StyledIcon = styled(Icon)`
   width: 20px;
   height: 20px;
 
   color: #a3a5ba;
+`;
+
+const Text = styled.div`
+  flex-grow: 1;
+
+  font-weight: 600;
+  font-size: 16px;
 `;
 
 type Props = {
@@ -94,24 +109,41 @@ export const TokenSettingsWidget: FunctionComponent<Props> = ({
   const history = useHistory();
   const dispatch = useDispatch();
 
+  const hiddenTokens = loadHiddenTokens();
+  const isHidden = hiddenTokens.has(publicKey.toBase58());
+
   const handleCloseTokenAccountClick = () => {
     dispatch(openModal(SHOW_MODAL_CLOSE_TOKEN_ACCOUNT, { publicKey, tokenName, history }));
   };
 
+  // eslint-disable-next-line unicorn/consistent-function-scoping
+  const handleHideTokenClick = (pubKey: web3.PublicKey) => () => {
+    hideUnhideToken(pubKey.toBase58());
+  };
+
   const renderSettings = () => {
     return (
-      <ButtonStyled
-        disabled={isBalanceEmpty}
-        small
-        title="Close token account"
-        onClick={handleCloseTokenAccountClick}>
+      <>
         <SettingItem>
           <IconWrapper>
-            <CloseAccountIcon name="bucket" />
+            <StyledIcon name="hide" />
           </IconWrapper>
-          Close token account
+          <Text>Hide in token list</Text>
+          <Switch checked={isHidden} onChange={handleHideTokenClick(publicKey)} />
         </SettingItem>
-      </ButtonStyled>
+        <SettingItem>
+          <ButtonStyled
+            disabled={isBalanceEmpty}
+            small
+            title="Close token account"
+            onClick={handleCloseTokenAccountClick}>
+            <IconWrapper>
+              <StyledIcon name="bucket" />
+            </IconWrapper>
+            Close token account
+          </ButtonStyled>
+        </SettingItem>
+      </>
     );
   };
 

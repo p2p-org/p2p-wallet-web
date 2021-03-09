@@ -13,9 +13,10 @@ const Wrapper = styled.div`
 
 type Props = {
   items: TokenAccount[];
+  isHidden?: boolean;
 };
 
-export const TokenList: FunctionComponent<Props> = ({ items = [] }) => {
+export const TokenList: FunctionComponent<Props> = ({ items = [], isHidden = false }) => {
   if (items.length === 0) {
     return <LoaderBlock />;
   }
@@ -25,7 +26,7 @@ export const TokenList: FunctionComponent<Props> = ({ items = [] }) => {
       {items
         .sort((a, b) => b.balance.cmp(a.balance))
         .map((item) => (
-          <TokenRow key={item.address.toBase58()} token={item} />
+          <TokenRow key={item.address.toBase58()} token={item} isHidden={isHidden} />
         ))}
     </Wrapper>
   );
