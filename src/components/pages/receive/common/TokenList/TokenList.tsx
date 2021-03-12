@@ -8,7 +8,7 @@ import Decimal from 'decimal.js';
 
 import { Token } from 'api/token/Token';
 import { TokenAccount } from 'api/token/TokenAccount';
-import { Icon } from 'components/ui';
+import { Empty } from 'components/common/Empty';
 import { SearchInput } from 'components/ui/SearchInput';
 import { RootState } from 'store/rootReducer';
 import { getMinimumBalanceForRentExemption } from 'store/slices/wallet/WalletSlice';
@@ -22,25 +22,6 @@ const Wrapper = styled.div`
 
 const SearchInputStyled = styled(SearchInput)`
   margin: 20px 20px 0;
-`;
-
-const EmptyBlock = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-
-  padding: 8em 0;
-`;
-
-const EmptyBlockText = styled.div`
-  font-weight: 600;
-  font-size: 16px;
-`;
-
-const EmptyBlockDesc = styled.div`
-  color: #a3a5ba;
-  font-weight: 600;
-  font-size: 14px;
 `;
 
 type Props = {
@@ -121,11 +102,7 @@ export const TokenList: FunctionComponent<Props> = ({ items, selectedToken }) =>
           />
         ))
       ) : (
-        <EmptyBlock>
-          <Icon name="search" width="100" height="100" />
-          <EmptyBlockText>Nothing found</EmptyBlockText>
-          <EmptyBlockDesc>Change your search phrase and try again</EmptyBlockDesc>
-        </EmptyBlock>
+        <Empty type="search" />
       )}
     </Wrapper>
   );

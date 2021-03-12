@@ -16,7 +16,7 @@ import { SearchInput } from 'components/ui/SearchInput';
 import { minorAmountToMajor } from 'utils/amount';
 import { shortAddress } from 'utils/tokens';
 
-import { Empty } from './Empty';
+import { Empty } from '../../../Empty';
 import { TokenAccountRow } from './TokenAccountRow';
 import { TokenRow } from './TokenRow';
 
