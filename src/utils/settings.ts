@@ -21,13 +21,26 @@ export const currencies = [
   },
 ];
 
+type ClusterEntrypoint = {
+  [cluster: string]: string;
+};
+
+export const clusters = {
+  'mainnet-beta': 'https://solana-api.projectserum.com/',
+  devnet: 'https://devnet.solana.com',
+  testnet: 'https://testnet.solana.com',
+  localnet: 'http://localhost:8899',
+} as ClusterEntrypoint;
+
 export const appearance = ['system', 'light', 'dark'];
 
 export const defaultSettings = {
   currency: 'USD',
   appearance: 'system',
-  network: 'mainnet-beta',
-};
+  network: {
+    current: 'mainnet-beta',
+  },
+} as WalletSettings;
 
 export function loadSettings(): WalletSettings {
   const localSettings = localStorage.getItem(WALLET_SETTINGS_KEY) as string;

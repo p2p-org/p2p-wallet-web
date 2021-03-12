@@ -27,8 +27,15 @@ export interface Serializable<T> {
   serialize(): T;
 }
 
-export interface WalletSettings {
+export type Network = {
+  current: string;
+  custom?: {
+    [property: string]: string;
+  };
+};
+
+export type WalletSettings = {
   currency: string;
   appearance: string;
-  network: string;
-}
+  network: Network;
+};

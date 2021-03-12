@@ -1,5 +1,6 @@
 import React, { FunctionComponent, useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
+import { useHistory } from 'react-router';
 
 import { styled } from '@linaria/react';
 import { Feature } from 'flagged';
@@ -10,11 +11,11 @@ import { Layout } from 'components/common/Layout';
 import { WidgetPage } from 'components/common/WidgetPage';
 import { Icon, Select } from 'components/ui';
 import { MenuItem } from 'components/ui/Select/MenuItem';
-import { CLUSTERS } from 'config/constants';
 import { FEATURE_SETTINGS_LIST } from 'config/featureFlags';
 import { disconnect, STORAGE_KEY_SEED } from 'store/slices/wallet/WalletSlice';
 import {
   appearance,
+  clusters,
   currencies,
   defaultSettings,
   loadSettings,
@@ -96,7 +97,9 @@ const CenterWrapper = styled.div`
   }
 `;
 
-const SecondaryWrapper = styled.div``;
+const SecondaryWrapper = styled.div`
+  display: flex;
+`;
 
 const FieldNameWrapper = styled.div`
   display: flex;
@@ -142,15 +145,35 @@ const Capitalize = styled.span`
   text-transform: capitalize;
 `;
 
+const Title = styled.div`
+  color: #a3a5ba;
+  font-weight: 600;
+  font-size: 16px;
+`;
+
+const ChevronIcon = styled(Icon)`
+  width: 16px;
+  height: 16px;
+
+  color: #a3a5ba;
+`;
+
+const ChevronWrapper = styled.div`
+  margin-left: 20px;
+
+  transform: rotate(270deg);
+`;
+
 type RowProps = {
   icon: string;
   title: React.ReactNode;
   secondary?: React.ReactNode;
+  onClick?: () => void;
 };
 
-const Row: FunctionComponent<RowProps> = ({ icon, title, secondary }) => {
+const Row: FunctionComponent<RowProps> = ({ icon, title, secondary, onClick }) => {
   return (
-    <RowWrapper>
+    <RowWrapper onClick={onClick}>
       <CenterWrapper>
         <FieldNameWrapper>
           <RowIconWrapper>
@@ -165,6 +188,7 @@ const Row: FunctionComponent<RowProps> = ({ icon, title, secondary }) => {
 };
 
 export const Settings: FunctionComponent = () => {
+  const history = useHistory();
   const dispatch = useDispatch();
   const [settings, setSettings] = useState(defaultSettings);
 
@@ -190,6 +214,15 @@ export const Settings: FunctionComponent = () => {
     setSettings(newSettings);
     saveSettings(newSettings);
   };
+
+  const currentCluster = settings.network.current;
+
+  let clusterUrl;
+  if (Object.keys(clusters).includes(currentCluster)) {
+    clusterUrl = clusters[currentCluster];
+  } else {
+    clusterUrl = settings.network.custom ? settings.network.custom[currentCluster] : '';
+  }
 
   return (
     <Layout
@@ -218,24 +251,22 @@ export const Settings: FunctionComponent = () => {
                     </Select>
                   }
                 />
+                <Row icon="card" title="Payment methods" />
                 <Row
-                  icon="plug"
+                  icon="branch"
                   title="Network"
                   secondary={
-                    <Select value={settings.network}>
-                      {CLUSTERS.map((value) => (
-                        <MenuItem
-                          key={value}
-                          isSelected={value === settings.network}
-                          onItemClick={onItemSelectHandler({ network: value })}>
-                          <Capitalize>{value}</Capitalize>
-                        </MenuItem>
-                      ))}
-                    </Select>
+                    <>
+                      <Title>{clusterUrl}</Title>{' '}
+                      <ChevronWrapper>
+                        <ChevronIcon name="chevron" />
+                      </ChevronWrapper>
+                    </>
                   }
+                  onClick={() => {
+                    history.push('/settings/network');
+                  }}
                 />
-                <Row icon="card" title="Payment methods" />
-                <Row icon="branch" title="Node" />
                 <Row icon="lock" title="Security" />
                 <Row
                   icon="sun"
