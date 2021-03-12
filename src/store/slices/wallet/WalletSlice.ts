@@ -22,8 +22,8 @@ import { getAvailableTokens, wipeAction } from 'store/slices/GlobalSlice';
 import { getPools } from 'store/slices/pool/PoolSlice';
 import { getRatesCandle, getRatesMarkets } from 'store/slices/rate/RateSlice';
 import { updateEntityArray } from 'store/slices/tokenPair/utils/tokenPair';
+import { loadSettings } from 'utils/settings';
 
-const STORAGE_KEY_CLUSTER = 'cluster';
 const STORAGE_KEY_TYPE = 'type';
 export const STORAGE_KEY_SEED = 'seed';
 
@@ -230,7 +230,7 @@ export const updateAccountReducer = (
 
 // The initial wallet state. No wallet is connected yet.
 const makeInitialState = (): WalletsState => ({
-  cluster: (localStorage.getItem(STORAGE_KEY_CLUSTER) as Cluster) || DEFAULT_CLUSTER,
+  cluster: (loadSettings().network.current as Cluster) || DEFAULT_CLUSTER,
   connected: false,
   publicKey: null,
   type: localStorage.getItem(STORAGE_KEY_TYPE)
@@ -247,14 +247,10 @@ const walletSlice = createSlice({
   initialState: makeInitialState(),
   reducers: {
     updateAccount: updateAccountReducer,
-    selectCluster: (state, action: PayloadAction<Cluster>) => {
-      localStorage.setItem(STORAGE_KEY_CLUSTER, action.payload);
-
-      return {
-        ...state,
-        cluster: action.payload,
-      };
-    },
+    selectCluster: (state, action: PayloadAction<Cluster>) => ({
+      ...state,
+      cluster: action.payload,
+    }),
     selectType: (state, action: PayloadAction<WalletType>) => {
       localStorage.setItem(STORAGE_KEY_TYPE, String(action.payload));
 

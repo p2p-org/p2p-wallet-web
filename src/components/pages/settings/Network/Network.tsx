@@ -1,11 +1,15 @@
 import React, { FunctionComponent, useEffect, useState } from 'react';
+import { batch, useDispatch } from 'react-redux';
 
 import { styled } from '@linaria/react';
+import { Cluster } from '@solana/web3.js';
 import { rgba } from 'polished';
 import { mergeDeepRight } from 'ramda';
 
 import { WidgetPage } from 'components/common/WidgetPage';
 import { Button, Input, RadioButton } from 'components/ui';
+import { wipeAction } from 'store/slices/GlobalSlice';
+import { autoConnect, selectCluster } from 'store/slices/wallet/WalletSlice';
 import { clusters, defaultSettings, loadSettings, saveSettings } from 'utils/settings';
 
 const URL_REGEX = new RegExp(
@@ -67,6 +71,7 @@ const Buttons = styled.div`
 `;
 
 export const Network: FunctionComponent = () => {
+  const dispatch = useDispatch();
   const [settings, setSettings] = useState(defaultSettings);
   const [isOpenAddUrl, setIsOpenAddUrl] = useState(false);
   const [customUrl, setCustomUrl] = useState('');
@@ -87,6 +92,12 @@ export const Network: FunctionComponent = () => {
 
     setSettings(newSettings);
     saveSettings(newSettings);
+
+    batch(async () => {
+      dispatch(selectCluster(value as Cluster));
+      dispatch(wipeAction());
+      await dispatch(autoConnect());
+    });
   };
 
   const renderClustersRadioButtons = () =>
@@ -176,7 +187,7 @@ export const Network: FunctionComponent = () => {
             </Buttons>
           </AddUrlWrapper>
         ) : (
-          <Button light onClick={handleOpenAddUrl}>
+          <Button light onClick={handleOpenAddUrl} style={{ display: 'none' }}>
             + Add custom URL
           </Button>
         )}

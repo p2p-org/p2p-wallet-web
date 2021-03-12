@@ -87,7 +87,7 @@ export const RadioButton: FunctionComponent<Props> = ({
   onChange,
   className,
 }) => {
-  const handleTogglerClick = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     onChange(e.target.value);
   };
 
@@ -98,7 +98,7 @@ export const RadioButton: FunctionComponent<Props> = ({
         checked={checked}
         name="radio-button"
         type="radio"
-        onChange={handleTogglerClick}
+        onChange={handleChange}
       />
       <Label>{label}</Label>
     </Wrapper>

@@ -229,8 +229,8 @@ export const Settings: FunctionComponent = () => {
       rightColumn={
         <Wrapper>
           <WidgetPage icon="gear" title="Settings">
-            <Feature name={FEATURE_SETTINGS_LIST}>
-              <RowsWrapper>
+            <RowsWrapper>
+              <Feature name={FEATURE_SETTINGS_LIST}>
                 <Row icon="reload" title="Backup" />
                 <Row
                   icon="currency"
@@ -252,21 +252,6 @@ export const Settings: FunctionComponent = () => {
                   }
                 />
                 <Row icon="card" title="Payment methods" />
-                <Row
-                  icon="branch"
-                  title="Network"
-                  secondary={
-                    <>
-                      <Title>{clusterUrl}</Title>{' '}
-                      <ChevronWrapper>
-                        <ChevronIcon name="chevron" />
-                      </ChevronWrapper>
-                    </>
-                  }
-                  onClick={() => {
-                    history.push('/settings/network');
-                  }}
-                />
                 <Row icon="lock" title="Security" />
                 <Row
                   icon="sun"
@@ -284,8 +269,23 @@ export const Settings: FunctionComponent = () => {
                     </Select>
                   }
                 />
-              </RowsWrapper>
-            </Feature>
+              </Feature>
+              <Row
+                icon="branch"
+                title="Network"
+                secondary={
+                  <>
+                    <Title>{clusterUrl}</Title>{' '}
+                    <ChevronWrapper>
+                      <ChevronIcon name="chevron" />
+                    </ChevronWrapper>
+                  </>
+                }
+                onClick={() => {
+                  history.push('/settings/network');
+                }}
+              />
+            </RowsWrapper>
           </WidgetPage>
           <LogoutCard withShadow>
             <LogoutWrapper onClick={handleLogoutClick}>
