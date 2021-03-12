@@ -40,7 +40,7 @@ const FromTitle = styled.div`
 `;
 
 type Props = {
-  publicKey: string;
+  publicKey: string | null;
 };
 
 export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
