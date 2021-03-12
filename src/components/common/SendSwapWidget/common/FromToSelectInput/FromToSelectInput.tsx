@@ -597,7 +597,9 @@ export const FromToSelectInput: FunctionComponent<Props> = ({
                 ))}
               </>
             ) : undefined}
-            {!filteredTokenAccounts?.length && !filteredTokens?.length ? <Empty /> : undefined}
+            {!filteredTokenAccounts?.length && !filteredTokens?.length ? (
+              <Empty type="search" />
+            ) : undefined}
           </DropDownList>
         </DropDownListContainer>
       ) : undefined}
