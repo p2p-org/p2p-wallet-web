@@ -14,7 +14,6 @@ import { COLUMN_RIGHT_WIDTH } from 'components/common/Layout/constants';
 import { TokenAvatar } from 'components/common/TokenAvatar';
 import { Widget } from 'components/common/Widget';
 import { Button, Icon } from 'components/ui';
-import { RootState } from 'store/rootReducer';
 import { rateSelector } from 'store/selectors/rates';
 import { getRatesCandle } from 'store/slices/rate/RateSlice';
 import { airdrop } from 'store/slices/wallet/WalletSlice';
@@ -86,6 +85,7 @@ const ValueCurrency = styled.div`
 
 const BottomWrapper = styled.div`
   display: flex;
+  justify-content: space-between;
 
   color: #a3a5ba;
   font-weight: 600;
@@ -165,8 +165,9 @@ export const TopWidget: FunctionComponent<Props> = ({ publicKey }) => {
   const widgetRef = useRef<HTMLDivElement>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isShowFixed, setIsShowFixed] = useState(false);
-  const cluster = useSelector((state: RootState) => state.wallet.cluster);
-  const tokenAccounts = useSelector((state: RootState) =>
+  const type = useSelector((state) => state.rate.candlesType);
+  const cluster = useSelector((state) => state.wallet.cluster);
+  const tokenAccounts = useSelector((state) =>
     state.wallet.tokenAccounts.map((account) => TokenAccount.from(account)),
   );
   const tokenAccount = useMemo(
@@ -174,8 +175,8 @@ export const TopWidget: FunctionComponent<Props> = ({ publicKey }) => {
     [tokenAccounts, publicKey],
   );
   const rate = useSelector(rateSelector(tokenAccount?.mint.symbol));
-  const rates = useSelector(
-    (state: RootState) => state.rate.candles[`${tokenAccount?.mint.symbol}/USD`],
+  const rates = useSelector((state) =>
+    tokenAccount?.mint.symbol ? state.rate.candles[tokenAccount?.mint.symbol] : undefined,
   );
   const isMainnet = cluster === 'mainnet-beta';
 
@@ -186,7 +187,7 @@ export const TopWidget: FunctionComponent<Props> = ({ publicKey }) => {
       }
 
       setIsLoading(true);
-      await dispatch(getRatesCandle(tokenAccount.mint.symbol));
+      await dispatch(getRatesCandle({ symbol: tokenAccount.mint.symbol, type: 'month' }));
       setIsLoading(false);
     };
 
@@ -258,6 +259,35 @@ export const TopWidget: FunctionComponent<Props> = ({ publicKey }) => {
     );
   };
 
+  const renderDelta = (isSticky?: boolean) => {
+    if (isSticky || !delta) {
+      return null;
+    }
+
+    let period = '';
+
+    // eslint-disable-next-line default-case
+    switch (type) {
+      case 'last1h':
+      case 'last4h':
+        period = '1 minute';
+        break;
+      case 'day':
+        period = '1 hour';
+        break;
+      case 'week':
+      case 'month':
+        period = '24 hrs';
+        break;
+    }
+
+    return (
+      <ValueDelta>
+        {delta.diff.toFixed(2)} USD ({delta.percentage.toFixed(2)}%) {period}
+      </ValueDelta>
+    );
+  };
+
   const renderContent = (isSticky?: boolean) => {
     if (!tokenAccount) {
       return;
@@ -277,12 +307,7 @@ export const TopWidget: FunctionComponent<Props> = ({ publicKey }) => {
           <ValueOriginal>
             {tokenAccount.mint.toMajorDenomination(tokenAccount.balance)} {tokenAccount.mint.symbol}
           </ValueOriginal>
-          {delta ? (
-            <ValueDelta>
-              {delta.diff.toFixed(2)} USD ({delta.percentage.toFixed(2)}%) 24 hrs{' '}
-              {/* <ValueGreen>+1.4%, 24 hours</ValueGreen> */}
-            </ValueDelta>
-          ) : undefined}
+          {renderDelta(isSticky)}
         </BottomWrapper>
       </PriceWrapped>
     );

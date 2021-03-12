@@ -5,10 +5,11 @@ import tokenConfig from 'api/token/token.config';
 import { cryptoCompareApiKey } from 'config/constants';
 import { ExtendedCluster } from 'utils/types';
 
-import { CandleRate } from './CandleRate';
+import { CandleLimitType, CandleRate } from './CandleRate';
 import { MarketRate } from './MarketRate';
 
 const CRYPTO_COMPARE_API_URL = 'https://min-api.cryptocompare.com/data';
+const CURRENCY = 'USD';
 
 type OrderbooksResponse = {
   [market: string]: {
@@ -17,36 +18,61 @@ type OrderbooksResponse = {
 };
 
 type CandlesResponse = {
-  data: {
-    market: string;
-    close: number;
-    startTime: number;
-  }[];
+  Data: {
+    Data: {
+      close: number;
+      open: number;
+      low: number;
+      high: number;
+      time: number;
+    }[];
+  };
 };
 
-export interface API {
-  getRatesMarkets: () => Promise<MarketRate[]>;
-  getRatesCandle: (symbol: string) => Promise<CandleRate[]>;
-}
+const getRatesCandle = async (symbol: string, type: CandleLimitType): Promise<CandleRate[]> => {
+  let path = '/v2';
 
-const getRatesCandle = async (symbol: string): Promise<CandleRate[]> => {
+  // eslint-disable-next-line default-case
+  switch (type) {
+    case 'last1h':
+      path += '/histominute?limit=60';
+      break;
+    case 'last4h':
+      path += '/histominute?limit=240';
+      break;
+    case 'day':
+      path += '/histohour?limit=24';
+      break;
+    case 'week':
+      path += '/histoday?limit=7';
+      break;
+    case 'month':
+      path += '/histoday?limit=30';
+      break;
+  }
+
   try {
     const res = await fetch(
-      `https://serum-api.bonfida.com/candles/${symbol}USD?resolution=86400&limit=365`,
+      `${CRYPTO_COMPARE_API_URL}${path}&api_key=${cryptoCompareApiKey}&fsym=${symbol}&tsym=${CURRENCY}`,
     );
 
     if (!res.ok) {
-      throw new Error('Something wrong');
+      throw new Error('getRatesCandle something wrong');
     }
 
     const result = (await res.json()) as CandlesResponse;
 
-    return result.data.map((rate) => new CandleRate(rate.market, rate.close, rate.startTime));
+    return result.Data.Data.map((rate) => new CandleRate(symbol, type, rate.close, rate.time));
   } catch (error) {
     console.error(`Can't get rates for ${symbol}:`, error);
     throw new Error(`Can't get rates for ${symbol}`);
   }
 };
+
+export interface API {
+  getRatesMarkets: () => Promise<MarketRate[]>;
+  getRatesCandle: (symbol: string, type: CandleLimitType) => Promise<CandleRate[]>;
+}
 
 // The API is a singleton per cluster. This ensures requests can be cached
 export const APIFactory = memoizeWith(
@@ -58,8 +84,6 @@ export const APIFactory = memoizeWith(
     tokenSymbols.push('SOL');
 
     const getRatesMarkets = async (): Promise<Array<MarketRate>> => {
-      const CURRENCY = 'USD';
-
       try {
         const res = await fetch(
           `${CRYPTO_COMPARE_API_URL}/pricemulti?api_key=${cryptoCompareApiKey}&fsyms=${tokenSymbols.join(
@@ -68,7 +92,7 @@ export const APIFactory = memoizeWith(
         );
 
         if (!res.ok) {
-          throw new Error('Something wrong');
+          throw new Error('getRatesMarkets something wrong');
         }
 
         const result = (await res.json()) as OrderbooksResponse;

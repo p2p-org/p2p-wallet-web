@@ -38,7 +38,7 @@ export const APIFactory = memoizeWith(
       const transactionInfo = await connection
         .getParsedConfirmedTransaction(signature)
         .catch((error) => {
-          console.error(`Error getting details for ${signature}`, error);
+          console.error(`Error getting details for transaction ${signature}`, error);
           throw error;
         });
 

@@ -27,7 +27,6 @@ module.exports = {
           components: './src/components',
           assets: './src/assets',
           styles: './src/styles',
-          assets: './src/assets',
         },
       },
     ],

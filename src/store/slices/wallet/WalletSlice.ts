@@ -144,7 +144,7 @@ export const connect = createAsyncThunk<string, WalletDataType | undefined>(
     void thunkAPI.dispatch(getTokenAccounts());
     void thunkAPI.dispatch(getPools());
     void thunkAPI.dispatch(getRatesMarkets());
-    void thunkAPI.dispatch(getRatesCandle('SOL'));
+    void thunkAPI.dispatch(getRatesCandle({ symbol: 'SOL', type: 'month' }));
 
     if (swapHostFeeAddress) {
       void thunkAPI.dispatch(precacheTokenAccounts(swapHostFeeAddress));

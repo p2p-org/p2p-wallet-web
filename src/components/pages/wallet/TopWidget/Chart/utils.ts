@@ -2,9 +2,9 @@ import Highcharts from 'highcharts';
 
 export const getConfig = (data: number[][]): Highcharts.Options => ({
   chart: {
-    height: 196,
+    height: 180,
     type: 'area',
-    spacing: [0, 0, 0, 0],
+    spacing: [5, 0, 0, 0],
   },
   title: {
     text: undefined,
@@ -16,7 +16,7 @@ export const getConfig = (data: number[][]): Highcharts.Options => ({
     gridLineColor: 'transparent',
   },
   xAxis: {
-    visible: true,
+    visible: false,
     minPadding: 0,
     maxPadding: 0,
     type: 'datetime',
@@ -49,15 +49,15 @@ export const getConfig = (data: number[][]): Highcharts.Options => ({
           y2: 1,
         },
         stops: [
-          [0, new Highcharts.Color('#C4C4C4').get('rgb') as string],
-          [1, new Highcharts.Color('#C4C4C4').setOpacity(0).get('rgba') as string],
+          [0, new Highcharts.Color('#CEDCFF').get('rgb') as string],
+          [1, new Highcharts.Color('#E6EDFF').get('rgba') as string],
         ],
       },
-      lineWidth: 0,
-      color: 'transparent', // rgba('#000', 0.1),
+      lineWidth: 1,
+      color: '#5887FF',
       states: {
         hover: {
-          lineWidth: 0,
+          lineWidth: 1,
         },
       },
       marker: {

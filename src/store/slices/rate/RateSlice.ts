@@ -1,9 +1,9 @@
 // eslint-disable-next-line eslint-comments/disable-enable-pair
 /* eslint-disable no-param-reassign */
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { createAction, createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 
 import { APIFactory } from 'api/rate';
-import { SerializableCandleRate } from 'api/rate/CandleRate';
+import { CandleLimitType, SerializableCandleRate } from 'api/rate/CandleRate';
 import { SerializableMarketRate } from 'api/rate/MarketRate';
 import { RootState } from 'store/rootReducer';
 import { wipeAction } from 'store/slices/GlobalSlice';
@@ -22,24 +22,29 @@ export const getRatesMarkets = createAsyncThunk<SerializableMarketRate[]>(
   },
 );
 
-export const getRatesCandle = createAsyncThunk<SerializableCandleRate[], string>(
-  `${RATES_SLICE_NAME}/getRatesCandle`,
-  async (arg, thunkAPI) => {
-    const state: RootState = thunkAPI.getState() as RootState;
+export const getRatesCandle = createAsyncThunk<
+  SerializableCandleRate[],
+  { symbol: string; type: CandleLimitType }
+>(`${RATES_SLICE_NAME}/getRatesCandle`, async (args, thunkAPI) => {
+  const state: RootState = thunkAPI.getState() as RootState;
 
-    const PoolAPI = APIFactory(state.wallet.cluster);
-    const rates = await PoolAPI.getRatesCandle(arg);
+  const PoolAPI = APIFactory(state.wallet.cluster);
+  const rates = await PoolAPI.getRatesCandle(args.symbol, args.type);
 
-    return rates.map((rate) => rate.serialize());
-  },
-);
+  return rates.map((rate) => rate.serialize());
+});
+
+export const changeCandlesType = createAction<CandleLimitType>('changeCandlesType');
+
+type CandleRate = {
+  price: number;
+  startTime: number;
+};
 
 export interface RatesState {
+  candlesType: CandleLimitType;
   candles: {
-    [pair: string]: {
-      price: number;
-      startTime: number;
-    }[];
+    [pair: string]: CandleRate[];
   };
   markets: {
     [pair: string]: number;
@@ -47,6 +52,7 @@ export interface RatesState {
 }
 
 const initialState: RatesState = {
+  candlesType: 'month',
   candles: {},
   markets: {},
 };
@@ -62,21 +68,24 @@ const transactionSlice = createSlice({
       });
     });
     builder.addCase(getRatesCandle.fulfilled, (state, action) => {
+      state.candles[action.meta.arg.symbol] = [];
+
       action.payload
         .sort((a, b) => a.startTime - b.startTime)
         .forEach((rate) => {
-          if (!state.candles[rate.market]) {
-            state.candles[rate.market] = [];
-          }
-
-          state.candles[rate.market].push({
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
+          state.candles[action.meta.arg.symbol].push({
             price: rate.price,
             startTime: rate.startTime,
           });
         });
     });
     builder.addCase(getRatesCandle.rejected, (state, action) => {
-      state.candles[`${action.meta.arg}/USD`] = [];
+      state.candles[action.meta.arg.symbol] = [];
+    });
+    builder.addCase(changeCandlesType, (state, action) => {
+      state.candlesType = action.payload;
     });
     builder.addCase(wipeAction, () => initialState);
   },
