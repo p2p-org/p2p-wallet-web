@@ -39,6 +39,7 @@ cd p2p-wallet-web
 yarn
 yarn start // to start a development
 yarn build // to create a production build 
+yarn deploy // to deploy a production build 
 ```
 
 # Development

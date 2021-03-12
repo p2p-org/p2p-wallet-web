@@ -20,17 +20,13 @@ import {
   updateEntityArray,
 } from './utils/tokenPair';
 
-const initialSwapState = {
+const initialState: TokenPairState = {
   firstAmount: 0,
   secondAmount: 0,
   firstToken: undefined,
   secondToken: undefined,
   firstTokenAccount: undefined,
   secondTokenAccount: undefined,
-};
-
-const initialState: TokenPairState = {
-  ...initialSwapState,
   tokenAccounts: [],
   availablePools: [],
   slippage: DEFAULT_SLIPPAGE,
@@ -135,7 +131,7 @@ const tokenPairSlice = createSlice({
   reducers: {
     updateTokenPairState: (state, action: PayloadAction<Partial<TokenPairState>>) =>
       normalize({ ...state, ...action.payload }, action.payload),
-    clearTokenPairState: (state) => ({ ...state, ...initialSwapState }),
+    clearTokenPairState: (state) => ({ ...state, ...initialState }),
   },
   extraReducers: (builder) => {
     builder.addCase(getTokenAccounts.fulfilled, (state, action) =>

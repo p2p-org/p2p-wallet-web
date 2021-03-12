@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 
 import { PayloadAction } from '@reduxjs/toolkit';
@@ -30,12 +30,13 @@ type PoolState = {
  */
 export const usePoolFromLocation = ({ updateAction, tokenAccounts }: PoolState): void => {
   const { publicKey } = useParams<Params>();
+  const publicKeySol = useSelector((state) => state.wallet.publicKey);
   const dispatch = useDispatch();
 
   useEffect(() => {
-    if (publicKey) {
+    if (publicKey || publicKeySol) {
       const locationTokenAccount = tokenAccounts.find((token) => {
-        return token.address.toBase58() === publicKey;
+        return token.address.toBase58() === publicKey || publicKeySol;
       });
 
       const firstToken = locationTokenAccount?.mint;
@@ -51,5 +52,5 @@ export const usePoolFromLocation = ({ updateAction, tokenAccounts }: PoolState):
         );
       }
     }
-  }, [publicKey]);
+  }, [publicKey, publicKeySol]);
 };

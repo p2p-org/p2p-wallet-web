@@ -286,6 +286,22 @@ export const SwapWidget: FunctionComponent = () => {
     setIsReverseRate((state) => !state);
   };
 
+  const renderActionText = () => {
+    if (isExecuting) {
+      return 'Processing...';
+    }
+
+    if (selectedPool) {
+      return 'Swap now';
+    }
+
+    if (!firstToken || !secondToken) {
+      return 'Choose tokens for swap';
+    }
+
+    return 'This pair is unavailable';
+  };
+
   const fee = feeProperties
     ? minorAmountToMajor(feeProperties.amount, feeProperties.token).toNumber()
     : undefined;
@@ -376,8 +392,7 @@ export const SwapWidget: FunctionComponent = () => {
         </PropertiesWrapper>
         <ButtonWrapper>
           <Button primary={!isDisabled} disabled={isDisabled} big full onClick={handleSubmit}>
-            {/* eslint-disable-next-line unicorn/no-nested-ternary */}
-            {isExecuting ? 'Processing...' : selectedPool ? 'Swap now' : 'This pair is unavailable'}
+            {renderActionText()}
           </Button>
           <Hint>All deposits are stored 100% non-custodiallity with keys held on this device</Hint>
         </ButtonWrapper>
