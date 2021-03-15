@@ -62,7 +62,9 @@ const getRatesCandle = async (symbol: string, type: CandleLimitType): Promise<Ca
 
     const result = (await res.json()) as CandlesResponse;
 
-    return result.Data.Data.map((rate) => new CandleRate(symbol, type, rate.close, rate.time));
+    return result.Data.Data.map(
+      (rate) => new CandleRate(symbol, type, rate.close, rate.time * 1000),
+    );
   } catch (error) {
     console.error(`Can't get rates for ${symbol}:`, error);
     throw new Error(`Can't get rates for ${symbol}`);
