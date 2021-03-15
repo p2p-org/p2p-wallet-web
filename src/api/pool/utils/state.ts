@@ -36,7 +36,7 @@ export const usePoolFromLocation = ({ updateAction, tokenAccounts }: PoolState):
   useEffect(() => {
     if (publicKey || publicKeySol) {
       const locationTokenAccount = tokenAccounts.find((token) => {
-        return token.address.toBase58() === publicKey || publicKeySol;
+        return token.address.toBase58() === (publicKey || publicKeySol);
       });
 
       const firstToken = locationTokenAccount?.mint;
