@@ -71,7 +71,11 @@ const HideIconWrapper = styled.div`
 
 const IconHide = styled(Icon)`
   width: 24px;
-  height: 20px;
+  height: 24px;
+
+  &.isOpen {
+    height: 18px;
+  }
 
   color: #a3a5ba;
 `;
@@ -148,7 +152,7 @@ export const TokensWidget: FunctionComponent = () => {
       {hiddenTokensList.length > 0 ? (
         <HiddenTokens onClick={handleChevronClick} className={classNames({ isOpen })}>
           <HideIconWrapper>
-            <IconHide name={isOpen ? 'hide' : 'eye'} />
+            <IconHide name={isOpen ? 'hide' : 'eye'} className={classNames({ isOpen })} />
           </HideIconWrapper>
           <Text>{`${hiddenTokensList.length} hidden wallet${
             hiddenTokensList.length !== 1 ? 's' : ''
