@@ -150,7 +150,9 @@ export const TokensWidget: FunctionComponent = () => {
           <HideIconWrapper>
             <IconHide name="hide" />
           </HideIconWrapper>
-          <Text>{`${hiddenTokensList.length} hidden wallets`}</Text>
+          <Text>{`${hiddenTokensList.length} hidden wallet${
+            hiddenTokensList.length !== 1 ? 's' : ''
+          }`}</Text>
           <ChevronWrapper className={classNames({ isOpen })}>
             <ChevronIcon name="chevron" />
           </ChevronWrapper>

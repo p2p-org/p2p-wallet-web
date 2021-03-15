@@ -92,3 +92,13 @@ export function hideUnhideToken(pubkey: string) {
   // eslint-disable-next-line unicorn/prefer-spread
   localStorage.setItem(WALLET_HIDDEN_TOKENS_KEY, JSON.stringify(Array.from(tokens)));
 }
+
+export function removeHiddenToken(pubkey: string) {
+  const tokens = loadHiddenTokens();
+
+  if (tokens.has(pubkey)) {
+    tokens.delete(pubkey);
+    // eslint-disable-next-line unicorn/prefer-spread
+    localStorage.setItem(WALLET_HIDDEN_TOKENS_KEY, JSON.stringify(Array.from(tokens)));
+  }
+}
