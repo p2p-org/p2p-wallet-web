@@ -10,6 +10,7 @@ import { Widget } from 'components/common/Widget';
 import { Button, Icon, Switch } from 'components/ui';
 import { openModal } from 'store/actions/modals';
 import { SHOW_MODAL_CLOSE_TOKEN_ACCOUNT } from 'store/constants/modalTypes';
+import { updateHiddenTokens } from 'store/slices/wallet/WalletSlice';
 import { hideUnhideToken, loadHiddenTokens } from 'utils/settings';
 
 const WrapperWidget = styled(Widget)``;
@@ -119,6 +120,7 @@ export const TokenSettingsWidget: FunctionComponent<Props> = ({
   // eslint-disable-next-line unicorn/consistent-function-scoping
   const handleHideTokenClick = (pubKey: web3.PublicKey) => () => {
     hideUnhideToken(pubKey.toBase58());
+    dispatch(updateHiddenTokens());
   };
 
   const renderSettings = () => {

@@ -7,7 +7,7 @@ import { History } from 'history';
 
 import { Button, Icon } from 'components/ui';
 import { closeTokenAccount } from 'store/slices/wallet/WalletSlice';
-import { hideUnhideToken } from 'utils/settings';
+import { removeHiddenToken } from 'utils/settings';
 
 const Wrapper = styled.div`
   position: relative;
@@ -108,7 +108,7 @@ export const CloseTokenAccountModal: FunctionComponent<Props> = ({
     try {
       setIsExecuting(true);
       await dispatch(closeTokenAccount({ publicKey }));
-      hideUnhideToken(publicKey.toBase58());
+      removeHiddenToken(publicKey.toBase58());
     } catch (error) {
       console.log(error);
     } finally {
