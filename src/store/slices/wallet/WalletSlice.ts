@@ -22,7 +22,7 @@ import { getAvailableTokens, wipeAction } from 'store/slices/GlobalSlice';
 import { getPools } from 'store/slices/pool/PoolSlice';
 import { getRatesCandle, getRatesMarkets } from 'store/slices/rate/RateSlice';
 import { updateEntityArray } from 'store/slices/tokenPair/utils/tokenPair';
-import { loadSettings } from 'utils/settings';
+import { loadHiddenTokens, loadSettings } from 'utils/settings';
 
 const STORAGE_KEY_TYPE = 'type';
 export const STORAGE_KEY_SEED = 'seed';
@@ -36,6 +36,7 @@ export interface WalletsState {
   publicKey: string | null;
   type: WalletType;
   tokenAccounts: Array<SerializableTokenAccount>;
+  hiddenTokens: Array<string> | null;
 }
 
 /**
@@ -237,6 +238,8 @@ const makeInitialState = (): WalletsState => ({
     ? Number(localStorage.getItem(STORAGE_KEY_TYPE))
     : WalletType.MANUAL,
   tokenAccounts: [],
+  // eslint-disable-next-line unicorn/prefer-spread
+  hiddenTokens: Array.from(loadHiddenTokens()),
 });
 
 /**
@@ -259,6 +262,11 @@ const walletSlice = createSlice({
         type: action.payload,
       };
     },
+    updateHiddenTokens: (state) => ({
+      ...state,
+      // eslint-disable-next-line unicorn/prefer-spread
+      hiddenTokens: Array.from(loadHiddenTokens()),
+    }),
   },
   extraReducers: (builder) => {
     // Triggered when the connect async action is completed
@@ -288,6 +296,6 @@ const walletSlice = createSlice({
   },
 });
 
-export const { selectCluster, selectType, updateAccount } = walletSlice.actions;
+export const { selectCluster, selectType, updateAccount, updateHiddenTokens } = walletSlice.actions;
 // eslint-disable-next-line import/no-default-export
 export default walletSlice.reducer;

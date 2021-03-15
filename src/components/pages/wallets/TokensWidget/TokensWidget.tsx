@@ -11,7 +11,6 @@ import { Button, Icon } from 'components/ui';
 import { openModal } from 'store/actions/modals';
 import { SHOW_MODAL_ADD_COIN } from 'store/constants/modalTypes';
 import { RootState } from 'store/rootReducer';
-import { loadHiddenTokens } from 'utils/settings';
 
 import { TokenList } from './TokenList';
 
@@ -119,10 +118,10 @@ export const TokensWidget: FunctionComponent = () => {
   const tokens = [];
   const hiddenTokensList = [];
 
-  const hiddenTokens = loadHiddenTokens();
+  const hiddenTokens = useSelector((state: RootState) => state.wallet.hiddenTokens) || [];
 
   for (const token of tokenAccounts) {
-    if (hiddenTokens.has(token.address.toBase58())) {
+    if (hiddenTokens.includes(token.address.toBase58())) {
       hiddenTokensList.push(token);
     } else {
       tokens.push(token);

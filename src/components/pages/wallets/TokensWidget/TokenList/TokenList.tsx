@@ -17,7 +17,7 @@ type Props = {
 };
 
 export const TokenList: FunctionComponent<Props> = ({ items = [], isHidden = false }) => {
-  if (items.length === 0) {
+  if (items.length === 0 && !isHidden) {
     return <LoaderBlock />;
   }
 

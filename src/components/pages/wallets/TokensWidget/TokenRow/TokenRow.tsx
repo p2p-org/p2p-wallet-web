@@ -1,4 +1,5 @@
 import React, { FunctionComponent } from 'react';
+import { useDispatch } from 'react-redux';
 import { Link } from 'react-router-dom';
 
 import { styled } from '@linaria/react';
@@ -9,36 +10,15 @@ import { rgba } from 'polished';
 import { TokenAccount } from 'api/token/TokenAccount';
 import { AmountUSD } from 'components/common/AmountUSD';
 import { TokenAvatar } from 'components/common/TokenAvatar';
+import { Menu } from 'components/ui';
+import { MenuItem } from 'components/ui/Menu/MenuItem';
+import { updateHiddenTokens } from 'store/slices/wallet/WalletSlice';
+import { hideUnhideToken } from 'utils/settings';
 import { shortAddress } from 'utils/tokens';
 
-const Wrapper = styled.div`
+const Content = styled.div`
   position: relative;
 
-  padding: 10px 0;
-
-  &.isHidden {
-    opacity: 0.5;
-
-    &:hover {
-      opacity: 1;
-    }
-  }
-
-  &:not(:last-child) {
-    &::after {
-      position: absolute;
-      right: 10px;
-      bottom: 0;
-      left: 10px;
-
-      border-bottom: 1px solid ${rgba(0, 0, 0, 0.05)};
-
-      content: '';
-    }
-  }
-`;
-
-const Content = styled.div`
   display: flex;
   flex: 1;
   flex-direction: column;
@@ -74,19 +54,6 @@ const WrapperLink = styled(Link)`
   text-decoration: none;
 
   cursor: pointer;
-
-  &:hover {
-    background: #f6f6f8;
-    border-radius: 12px;
-
-    ${TokenAvatarStyled} {
-      background: #fff;
-    }
-
-    ${TokenName} {
-      color: #5887ff;
-    }
-  }
 `;
 
 const Bottom = styled.div`
@@ -105,7 +72,74 @@ type Props = {
   isHidden?: boolean;
 };
 
+const MenuWrapper = styled.div`
+  position: absolute;
+
+  top: 30%;
+  right: -45px;
+
+  padding-left: 15px;
+
+  opacity: 0;
+`;
+
+const Wrapper = styled.div`
+  position: relative;
+
+  padding: 10px 0;
+
+  &.isHidden {
+    opacity: 0.5;
+
+    &:hover {
+      opacity: 1;
+    }
+  }
+
+  &:hover {
+    ${MenuWrapper} {
+      opacity: 1;
+    }
+
+    ${WrapperLink} {
+      background: #f6f6f8;
+      border-radius: 12px;
+    }
+
+    ${TokenAvatarStyled} {
+      background: #fff;
+    }
+
+    ${TokenName} {
+      color: #5887ff;
+    }
+  }
+
+  &:not(:last-child) {
+    &::after {
+      position: absolute;
+      right: 10px;
+      bottom: 0;
+      left: 10px;
+
+      border-bottom: 1px solid ${rgba(0, 0, 0, 0.05)};
+
+      content: '';
+    }
+  }
+`;
+
 export const TokenRow: FunctionComponent<Props> = ({ token, isHidden = false }) => {
+  const dispatch = useDispatch();
+  // eslint-disable-next-line unicorn/consistent-function-scoping
+  const handleMenuItemClick = () => {
+    hideUnhideToken(token.address.toBase58());
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+    dispatch(updateHiddenTokens());
+  };
+
+  const isNotSOL = token.mint.symbol !== 'SOL';
+
   return (
     <Wrapper className={classNames({ isHidden })}>
       <WrapperLink to={`/wallet/${token.address.toBase58()}`}>
@@ -128,6 +162,15 @@ export const TokenRow: FunctionComponent<Props> = ({ token, isHidden = false }) 
           </Bottom>
         </Content>
       </WrapperLink>
+      {isNotSOL ? (
+        <MenuWrapper>
+          <Menu vertical>
+            <MenuItem onItemClick={handleMenuItemClick} icon={isHidden ? 'eye' : 'hide'}>
+              {isHidden ? 'Show' : 'Hide'}
+            </MenuItem>
+          </Menu>
+        </MenuWrapper>
+      ) : undefined}
     </Wrapper>
   );
 };

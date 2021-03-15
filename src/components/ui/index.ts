@@ -5,3 +5,4 @@ export * from './Avatar';
 export * from './Select';
 export * from './Switch';
 export * from './RadioButton';
+export * from './Menu';

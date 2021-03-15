@@ -15,11 +15,13 @@ import chevron from './assets/chevron-icon.svg';
 import close from './assets/close-icon.svg';
 import copy from './assets/copy-icon.svg';
 import currency from './assets/currency-icon.svg';
+import eye from './assets/eye-icon.svg';
 import gear from './assets/gear-icon.svg';
 import hide from './assets/hide-icon.svg';
 import home from './assets/home-icon.svg';
 import lock from './assets/lock-icon.svg';
 import logout from './assets/logout-icon.svg';
+import more from './assets/more-icon.svg';
 import pen from './assets/pen-icon.svg';
 import plug from './assets/plug-icon.svg';
 import plus from './assets/plus-icon.svg';
@@ -53,6 +55,8 @@ const iconsMap = new Map<string, SvgIconType>([
   ['currency', currency],
   ['bucket', bucket],
   ['gear', gear],
+  ['more', more],
+  ['eye', eye],
   ['search', search],
   ['settings', settings],
   ['success', success],
