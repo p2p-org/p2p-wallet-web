@@ -79,7 +79,7 @@ export interface API {
   listenToTokenAccountChanges: (
     accounts: Array<TokenAccount>,
     callback: TokenAccountUpdateCallback,
-  ) => void;
+  ) => AccountListener;
   closeAccount: (publicKey: PublicKey) => Promise<string>;
 }
 
@@ -447,6 +447,8 @@ export const APIFactory = memoizeWith(
           callback(updatedAccount);
         }
       });
+
+      return accountListener;
     };
 
     const createToken = async (decimals?: number, mintAuthority?: PublicKey) => {

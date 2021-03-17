@@ -22,7 +22,7 @@ export const localSwapProgramId = process.env.SWAP_PROGRAM_ID
 
 // the default commitment uesd by the Solana web3 connection when checking the blockchain state
 export const defaultCommitment: Commitment =
-  (process.env.DEFAULT_COMMITMENT as Commitment) || 'singleGossip';
+  (process.env.DEFAULT_COMMITMENT as Commitment) || 'confirmed';
 
 // the amount of time to sleep after sending a transaction
 // in order to work around a known solana web3 bug

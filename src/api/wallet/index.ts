@@ -114,10 +114,7 @@ const defaultSendOptions = {
   preflightCommitment: DEFAULT_COMMITMENT,
 };
 
-async function awaitConfirmation(
-  signature: string,
-  commitment: 'max' | 'recent' | 'root' | 'single' | 'singleGossip' | undefined,
-) {
+async function awaitConfirmation(signature: string, commitment: Commitment | undefined) {
   console.log(`Submitted transaction ${signature}, awaiting confirmation`);
   await confirmTransaction(signature, commitment);
   console.log(`Transaction ${signature} confirmed`);

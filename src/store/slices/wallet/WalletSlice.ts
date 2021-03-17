@@ -8,6 +8,7 @@ import {
 import { Account, Cluster, PublicKey } from '@solana/web3.js';
 
 import { APIFactory as TokenAPIFactory, TransferParameters } from 'api/token';
+import { AccountListener } from 'api/token/AccountListener';
 import { Token } from 'api/token/Token';
 import { SerializableTokenAccount, TokenAccount } from 'api/token/TokenAccount';
 import * as WalletAPI from 'api/wallet';
@@ -29,6 +30,8 @@ export const STORAGE_KEY_SEED = 'seed';
 
 export const DEFAULT_CLUSTER: Cluster = 'devnet';
 export const WALLET_SLICE_NAME = 'wallet';
+
+const accountsListeners: AccountListener[] = [];
 
 export interface WalletsState {
   cluster: Cluster;
@@ -73,10 +76,12 @@ export const getTokenAccounts = createAsyncThunk<Array<SerializableTokenAccount>
     // Merge SOL and Tokens as token accounts
     const tokenAccounts = [solToken, ...accountsForWallet];
 
-    TokenAPI.listenToTokenAccountChanges(tokenAccounts, (updatedTokenAccount) => {
+    const listener = TokenAPI.listenToTokenAccountChanges(tokenAccounts, (updatedTokenAccount) => {
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
       thunkAPI.dispatch(updateAccount(updatedTokenAccount.serialize()));
     });
+
+    accountsListeners.push(listener);
 
     return tokenAccounts.map((tokenAccount) => tokenAccount.serialize());
   },
@@ -289,10 +294,14 @@ const walletSlice = createSlice({
       ...state,
       tokenAccounts: state.tokenAccounts.concat(action.payload.serialize()),
     }));
-    builder.addCase(wipeAction, (state) => ({
-      ...state,
-      tokenAccounts: [],
-    }));
+    builder.addCase(wipeAction, (state) => {
+      accountsListeners.map((listener) => listener.removeAllListeners());
+
+      return {
+        ...state,
+        tokenAccounts: [],
+      };
+    });
   },
 });
 

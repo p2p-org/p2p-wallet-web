@@ -3,6 +3,7 @@ import { createAsyncThunk, createSlice, Draft, PayloadAction } from '@reduxjs/to
 // import { APIFactory as IdentityAPIFactory } from 'api/identity';
 import { APIFactory } from 'api/pool';
 import { Pool, SerializablePool } from 'api/pool/Pool';
+import { PoolListener } from 'api/pool/PoolListener';
 // import { APIFactory as TokenAPIFactory } from 'api/token';
 // import * as WalletAPI from 'api/wallet';
 // import { getTokenAccounts } from 'features/wallet/WalletSlice';
@@ -16,6 +17,8 @@ export interface PoolsState {
 
 export const POOL_SLICE_NAME = 'pool';
 
+const poolsListeners: PoolListener[] = [];
+
 export const getPools = createAsyncThunk(
   `${POOL_SLICE_NAME}/getPools`,
   async (_, thunkAPI): Promise<Array<SerializablePool>> => {
@@ -24,10 +27,12 @@ export const getPools = createAsyncThunk(
     const PoolAPI = APIFactory(state.wallet.cluster);
     const pools = await PoolAPI.getPools();
 
-    PoolAPI.listenToPoolChanges(pools, (pool) => {
+    const listener = PoolAPI.listenToPoolChanges(pools, (pool) => {
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
       thunkAPI.dispatch(poolSlice.actions.updatePool(pool.serialize()));
     });
+
+    poolsListeners.push(listener);
 
     return pools.map((pool) => pool.serialize());
   },
@@ -88,7 +93,11 @@ const poolSlice = createSlice({
       ...state,
       availablePools: action.payload,
     }));
-    builder.addCase(wipeAction, () => initialState);
+    builder.addCase(wipeAction, () => {
+      poolsListeners.map((listener) => listener.removeAllListeners());
+
+      return initialState;
+    });
   },
 });
 

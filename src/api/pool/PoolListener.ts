@@ -15,7 +15,6 @@ export class PoolListener extends EventEmitter {
 
   constructor(connection: Connection) {
     super();
-
     this.connection = connection;
   }
 

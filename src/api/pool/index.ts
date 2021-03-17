@@ -81,7 +81,7 @@ export interface API {
   getPool: (address: PublicKey) => Promise<Pool>;
   updatePool: (pool: Pool) => Promise<Pool>;
   swap: (parameters: SwapParameters) => Promise<string>;
-  listenToPoolChanges: (pools: Array<Pool>, callback: PoolUpdateCallback) => void;
+  listenToPoolChanges: (pools: Array<Pool>, callback: PoolUpdateCallback) => PoolListener;
 }
 
 const validateSwapParameters = (parameters: SwapParameters): void => {
@@ -290,6 +290,8 @@ export const APIFactory = (cluster: ExtendedCluster): API => {
       const updatedPool = await updatePool(event.pool);
       callback(updatedPool);
     });
+
+    return poolListener;
   };
 
   const createSwapTransactionInstruction = (
