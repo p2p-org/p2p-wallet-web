@@ -10,6 +10,7 @@ import {
   SHOW_MODAL_ADD_COIN,
   SHOW_MODAL_CLOSE_TOKEN_ACCOUNT,
   SHOW_MODAL_TRANSACTION_DETAILS,
+  SHOW_MODAL_TRANSACTION_STATUS,
 } from 'store/constants/modalTypes';
 import { RootState } from 'store/rootReducer';
 
@@ -62,11 +63,16 @@ const ModalBackground = styled.div`
 `;
 
 // TODO: types
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const modalsMap = new Map<string, LoadableComponent<any>>([
   [SHOW_MODAL_ADD_COIN, loadable(() => import('components/modals/AddCoinModal'))],
   [
     SHOW_MODAL_TRANSACTION_DETAILS,
     loadable(() => import('components/modals/TransactionDetailsModal')),
+  ],
+  [
+    SHOW_MODAL_TRANSACTION_STATUS,
+    loadable(() => import('components/modals/TransactionStatusModal')),
   ],
   [
     SHOW_MODAL_CLOSE_TOKEN_ACCOUNT,
@@ -110,6 +116,7 @@ export const ModalManager: FunctionComponent = () => {
 
   const getReadyDialogs = () => {
     const dialogs: (ModalState & {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       ModalComponent: LoadableComponent<any>;
     })[] = [];
 
@@ -150,6 +157,7 @@ export const ModalManager: FunctionComponent = () => {
               {...props}
               modalId={modalId}
               modalRef={modalRef}
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
               close={(result: any) => dispatch(closeModal(modalId, result))}
             />
           </ModalWrapper>

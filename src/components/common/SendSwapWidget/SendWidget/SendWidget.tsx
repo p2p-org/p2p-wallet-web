@@ -12,6 +12,8 @@ import { TokenAccount } from 'api/token/TokenAccount';
 import { RateUSD } from 'components/common/RateUSD';
 import { ToastManager } from 'components/common/ToastManager';
 import { Button } from 'components/ui';
+import { openModal } from 'store/actions/modals';
+import { SHOW_MODAL_TRANSACTION_STATUS } from 'store/constants/modalTypes';
 import { RootState } from 'store/rootReducer';
 import { getMinimumBalanceForRentExemption, transfer } from 'store/slices/wallet/WalletSlice';
 
@@ -90,17 +92,26 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
 
     try {
       setIsExecuting(true);
-      const signature = unwrapResult(
+
+      const action = transfer({
+        source: fromTokenAccount.address,
+        destination: new PublicKey(toTokenPublicKey),
+        amount,
+      });
+
+      unwrapResult(
         await dispatch(
-          transfer({
-            source: fromTokenAccount.address,
-            destination: new PublicKey(toTokenPublicKey),
-            amount,
+          openModal({
+            modalType: SHOW_MODAL_TRANSACTION_STATUS,
+            props: {
+              type: 'send',
+              action,
+              fromToken: fromTokenAccount.mint,
+              fromAmount: new Decimal(amount),
+            },
           }),
         ),
       );
-
-      history.push(`/send/${publicKey}/result`, { signature });
     } catch (error) {
       ToastManager.error(error);
     } finally {
@@ -158,7 +169,7 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
       <BottomWrapper>
         <ButtonWrapper>
           <Button primary={!isDisabled} disabled={isDisabled} big full onClick={handleSubmit}>
-            {isExecuting ? 'Processing...' : 'Send'}
+            Send
           </Button>
           <Hint>All deposits are stored 100% non-custodiallity with keys held on this device</Hint>
         </ButtonWrapper>

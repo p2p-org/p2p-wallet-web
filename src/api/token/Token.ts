@@ -49,8 +49,8 @@ export class Token implements Serializable<SerializableToken> {
     this.isSimulated = isSimulated;
   }
 
-  toMajorDenomination(amountInMinorDenomination: number | Decimal): string {
-    return minorAmountToMajor(amountInMinorDenomination, this).toFixed(this.decimals);
+  toMajorDenomination(amountInMinorDenomination: number | Decimal): Decimal {
+    return minorAmountToMajor(amountInMinorDenomination, this).toDecimalPlaces(this.decimals);
   }
 
   toString(): string {

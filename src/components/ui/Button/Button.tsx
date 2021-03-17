@@ -99,6 +99,10 @@ const Wrapper = styled.button`
     color: #fff;
 
     background: #a3a5ba;
+
+    &:hover {
+      background: #a3a5ba;
+    }
   }
 `;
 

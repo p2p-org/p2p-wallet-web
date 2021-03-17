@@ -16,6 +16,8 @@ const ignoredActions = [
   // we do not want to wait for this pending event, therefore it does not
   // enable the "loading" view, and we can trigger it multiple times if needed.
   'wallet/connect',
+  'swap/executeSwap',
+  'openModal',
 ];
 
 const isIgnored = (action: AnyAction) =>

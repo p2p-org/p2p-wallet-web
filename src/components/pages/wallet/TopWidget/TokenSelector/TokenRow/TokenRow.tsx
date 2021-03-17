@@ -75,7 +75,7 @@ export const TokenRow: FunctionComponent<Props> = ({ token, onItemClick }) => {
           <Bottom>
             <div>{token.mint.symbol}</div>{' '}
             <div>
-              {token.mint.toMajorDenomination(token.balance)} {token.mint.symbol}
+              {token.mint.toMajorDenomination(token.balance).toString()} {token.mint.symbol}
             </div>
           </Bottom>
         </Info>

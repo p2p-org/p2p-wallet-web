@@ -104,7 +104,12 @@ export const TransactionRow: FunctionComponent<Props> = ({ transaction, source }
   const dispatch = useDispatch();
 
   const handleClick = () => {
-    dispatch(openModal(SHOW_MODAL_TRANSACTION_DETAILS, { signature: transaction.signature }));
+    void dispatch(
+      openModal({
+        modalType: SHOW_MODAL_TRANSACTION_DETAILS,
+        props: { signature: transaction.signature },
+      }),
+    );
   };
 
   const isReceiver = transaction.short.destination?.equals(source);

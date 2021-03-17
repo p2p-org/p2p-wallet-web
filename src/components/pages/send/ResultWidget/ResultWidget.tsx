@@ -5,10 +5,10 @@ import { Link } from 'react-router-dom';
 
 import { styled } from '@linaria/react';
 import { unwrapResult } from '@reduxjs/toolkit';
-import bgImg from 'assets/images/sun.png';
 import { rgba } from 'polished';
 
 import { Transaction } from 'api/transaction/Transaction';
+import bgImg from 'assets/images/sun.png';
 import { Card } from 'components/common/Card';
 import { Button, Icon } from 'components/ui';
 import { openModal } from 'store/actions/modals';
@@ -114,7 +114,12 @@ export const ResultWidget: FunctionComponent = () => {
   }, []);
 
   const handleDetailsClick = () => {
-    dispatch(openModal(SHOW_MODAL_TRANSACTION_DETAILS, { signature: locationState?.signature }));
+    void dispatch(
+      openModal({
+        modalType: SHOW_MODAL_TRANSACTION_DETAILS,
+        props: { signature: locationState?.signature },
+      }),
+    );
   };
 
   return (

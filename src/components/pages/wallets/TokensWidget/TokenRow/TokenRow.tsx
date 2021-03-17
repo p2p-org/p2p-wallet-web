@@ -4,7 +4,6 @@ import { Link } from 'react-router-dom';
 
 import { styled } from '@linaria/react';
 import classNames from 'classnames';
-import { Decimal } from 'decimal.js';
 import { rgba } from 'polished';
 
 import { TokenAccount } from 'api/token/TokenAccount';
@@ -150,14 +149,14 @@ export const TokenRow: FunctionComponent<Props> = ({ token, isHidden = false }) 
               {token.mint.symbol || shortAddress(token.mint.address.toBase58())}
             </TokenName>
             <AmountUSD
-              value={new Decimal(token.mint.toMajorDenomination(token.balance))}
+              value={token.mint.toMajorDenomination(token.balance)}
               symbol={token.mint.symbol}
             />
           </Top>
           <Bottom>
             <div title={token.address.toBase58()}>{shortAddress(token.address.toBase58())}</div>
             <div>
-              {token.mint.toMajorDenomination(token.balance)} {token.mint.symbol}
+              {token.mint.toMajorDenomination(token.balance).toString()} {token.mint.symbol}
             </div>
           </Bottom>
         </Content>

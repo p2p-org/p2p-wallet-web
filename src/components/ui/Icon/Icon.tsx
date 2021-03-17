@@ -32,6 +32,7 @@ import settings from './assets/settings-icon.svg';
 import success from './assets/success-icon.svg';
 import sun from './assets/sun-icon.svg';
 import swap from './assets/swap-icon.svg';
+import timer from './assets/timer-icon.svg';
 import top from './assets/top-icon.svg';
 import wallet from './assets/wallet-icon.svg';
 import warning from './assets/warning-icon.svg';
@@ -62,6 +63,7 @@ const iconsMap = new Map<string, SvgIconType>([
   ['success', success],
   ['sun', sun],
   ['swap', swap],
+  ['timer', timer],
   ['home', home],
   ['hide', hide],
   ['lock', lock],
@@ -93,6 +95,7 @@ export const Icon: React.FunctionComponent<IconType> = ({
   ...props
 }) => {
   const validProps: {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     [prop: string]: any;
   } = {};
 

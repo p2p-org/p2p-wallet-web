@@ -114,7 +114,12 @@ export const TokenSettingsWidget: FunctionComponent<Props> = ({
   const isHidden = hiddenTokens.has(publicKey.toBase58());
 
   const handleCloseTokenAccountClick = () => {
-    dispatch(openModal(SHOW_MODAL_CLOSE_TOKEN_ACCOUNT, { publicKey, tokenName, history }));
+    void dispatch(
+      openModal({
+        modalType: SHOW_MODAL_CLOSE_TOKEN_ACCOUNT,
+        props: { publicKey, tokenName, history },
+      }),
+    );
   };
 
   // eslint-disable-next-line unicorn/consistent-function-scoping

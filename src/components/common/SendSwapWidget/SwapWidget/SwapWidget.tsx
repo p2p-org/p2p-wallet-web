@@ -2,6 +2,8 @@ import React, { FunctionComponent, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { styled } from '@linaria/react';
+import { unwrapResult } from '@reduxjs/toolkit';
+import { Decimal } from 'decimal.js';
 import { any, complement, isNil, or, pathEq } from 'ramda';
 
 import { adjustForSlippage, Pool } from 'api/pool/Pool';
@@ -11,6 +13,8 @@ import { TokenAccount } from 'api/token/TokenAccount';
 import { SettingsAction } from 'components/common/SendSwapWidget/SwapWidget/SettingsAction';
 import { ToastManager } from 'components/common/ToastManager';
 import { Button, Icon } from 'components/ui';
+import { openModal } from 'store/actions/modals';
+import { SHOW_MODAL_TRANSACTION_STATUS } from 'store/constants/modalTypes';
 import { executeSwap } from 'store/slices/swap/SwapSlice';
 import { clearTokenPairState, updateTokenPairState } from 'store/slices/tokenPair/TokenPairSlice';
 import { matchesPool, tokenPairSelector } from 'store/slices/tokenPair/utils/tokenPair';
@@ -213,7 +217,23 @@ export const SwapWidget: FunctionComponent = () => {
   const handleSubmit = async () => {
     try {
       setIsExecuting(true);
-      await dispatch(executeSwap());
+      const action = executeSwap();
+
+      unwrapResult(
+        await dispatch(
+          openModal({
+            modalType: SHOW_MODAL_TRANSACTION_STATUS,
+            props: {
+              type: 'swap',
+              action,
+              fromToken: firstToken,
+              fromAmount: new Decimal(firstAmount),
+              toToken: secondToken,
+              toAmount: new Decimal(secondAmount),
+            },
+          }),
+        ),
+      );
     } catch (error) {
       ToastManager.error(error);
     } finally {

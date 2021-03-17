@@ -28,6 +28,7 @@ export const ReceiveWalletsWidget: FC = () => {
   const renderToken = useCallback((token: Token, tokenAccount: TokenAccount) => {
     return (
       <TokenRow
+        key={tokenAccount.address.toBase58()}
         token={token}
         tokenAccount={tokenAccount}
         isSelected={initialTokenAccount?.equals(tokenAccount)}

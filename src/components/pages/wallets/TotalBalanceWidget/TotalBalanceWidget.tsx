@@ -2,7 +2,6 @@ import React, { FunctionComponent, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 
 import { styled } from '@linaria/react';
-import { Decimal } from 'decimal.js';
 
 import { TokenAccount } from 'api/token/TokenAccount';
 import { LoaderBlock } from 'components/common/LoaderBlock';
@@ -67,7 +66,8 @@ export const TotalBalanceWidget: FunctionComponent = () => {
       tokenAccounts.reduce((prev, tokenAccount) => {
         const rate = rateSelector(tokenAccount.mint.symbol)(state);
         if (rate) {
-          return new Decimal(tokenAccount.mint.toMajorDenomination(tokenAccount.balance))
+          return tokenAccount.mint
+            .toMajorDenomination(tokenAccount.balance)
             .times(rate)
             .plus(prev)
             .toNumber();
@@ -75,9 +75,7 @@ export const TotalBalanceWidget: FunctionComponent = () => {
 
         // Same as USD
         if (tokenAccount.mint.symbol) {
-          return new Decimal(tokenAccount.mint.toMajorDenomination(tokenAccount.balance))
-            .plus(prev)
-            .toNumber();
+          return tokenAccount.mint.toMajorDenomination(tokenAccount.balance).plus(prev).toNumber();
         }
 
         return prev;
@@ -120,7 +118,8 @@ export const TotalBalanceWidget: FunctionComponent = () => {
         return;
       }
 
-      const balance = new Decimal(tokenAccount.mint.toMajorDenomination(tokenAccount.balance))
+      const balance = tokenAccount.mint
+        .toMajorDenomination(tokenAccount.balance)
         .times(rate)
         .toNumber();
       const balanceUSD = new Intl.NumberFormat('en-US', {

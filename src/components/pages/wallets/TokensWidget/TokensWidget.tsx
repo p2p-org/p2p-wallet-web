@@ -133,7 +133,7 @@ export const TokensWidget: FunctionComponent = () => {
   }
 
   const handleAddCoinClick = () => {
-    dispatch(openModal(SHOW_MODAL_ADD_COIN));
+    void dispatch(openModal({ modalType: SHOW_MODAL_ADD_COIN }));
   };
 
   const handleChevronClick = () => {

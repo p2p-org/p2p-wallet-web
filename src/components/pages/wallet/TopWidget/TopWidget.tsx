@@ -5,7 +5,6 @@ import { Link } from 'react-router-dom';
 import { styled } from '@linaria/react';
 import { PublicKey, SystemProgram } from '@solana/web3.js';
 import classNames from 'classnames';
-import { Decimal } from 'decimal.js';
 import throttle from 'lodash.throttle';
 
 import { TokenAccount } from 'api/token/TokenAccount';
@@ -298,14 +297,15 @@ export const TopWidget: FunctionComponent<Props> = ({ publicKey }) => {
         {rate ? (
           <ValueCurrency className={classNames({ isSticky })}>
             <AmountUSD
-              value={new Decimal(tokenAccount.mint.toMajorDenomination(tokenAccount.balance))}
+              value={tokenAccount.mint.toMajorDenomination(tokenAccount.balance)}
               symbol={tokenAccount.mint.symbol}
             />
           </ValueCurrency>
         ) : undefined}
         <BottomWrapper className={classNames({ isSticky })}>
           <ValueOriginal>
-            {tokenAccount.mint.toMajorDenomination(tokenAccount.balance)} {tokenAccount.mint.symbol}
+            {tokenAccount.mint.toMajorDenomination(tokenAccount.balance).toString()}{' '}
+            {tokenAccount.mint.symbol}
           </ValueOriginal>
           {renderDelta(isSticky)}
         </BottomWrapper>

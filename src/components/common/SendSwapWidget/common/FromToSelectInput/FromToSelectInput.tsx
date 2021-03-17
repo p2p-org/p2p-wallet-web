@@ -441,7 +441,7 @@ export const FromToSelectInput: FunctionComponent<Props> = ({
       return null;
     }
 
-    return `${tokenAccount?.mint.toMajorDenomination(tokenAccount.balance)} ${
+    return `${tokenAccount?.mint.toMajorDenomination(tokenAccount.balance).toString()} ${
       tokenAccount?.mint.symbol
     }`;
   };
@@ -486,7 +486,7 @@ export const FromToSelectInput: FunctionComponent<Props> = ({
   }, [tokens, filteredTokenAccounts, filter]);
 
   const hasBalance = tokenAccount
-    ? Number(tokenAccount.mint.toMajorDenomination(tokenAccount.balance)) >= Number(localAmount)
+    ? tokenAccount.mint.toMajorDenomination(tokenAccount.balance).toNumber() >= Number(localAmount)
     : false;
 
   return (
@@ -515,7 +515,7 @@ export const FromToSelectInput: FunctionComponent<Props> = ({
               </ChevronWrapper>
             </TokenWrapper>
             <AmountInput
-              placeholder={token?.toMajorDenomination(0) || '0'}
+              placeholder={token?.toMajorDenomination(0).toString() || '0'}
               value={localAmount}
               onChange={handleAmountChange}
               disabled={disabled || disabledInput}
