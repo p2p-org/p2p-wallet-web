@@ -326,7 +326,7 @@ const setToClipboard = async (blob: Blob | null) => {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-call
     await navigator.clipboard.write(data);
   } catch (error) {
-    ToastManager.error((error as Error).toString());
+    ToastManager.error((error as Error).message);
   }
 };
 

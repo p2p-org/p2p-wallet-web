@@ -108,7 +108,7 @@ export const Home: FunctionComponent = () => {
         await sleep(100);
         history.push('/wallets');
       } catch (error) {
-        ToastManager.error(String(error));
+        ToastManager.error((error as Error).message);
       } finally {
         setIsLoading(false);
       }
@@ -126,7 +126,7 @@ export const Home: FunctionComponent = () => {
         await sleep(100);
         history.push('/wallets');
       } catch (error) {
-        ToastManager.error(String(error));
+        ToastManager.error((error as Error).message);
       } finally {
         setIsLoading(false);
       }

@@ -17,6 +17,7 @@ const ignoredActions = [
   // enable the "loading" view, and we can trigger it multiple times if needed.
   'wallet/connect',
   'swap/executeSwap',
+  'transaction/getTransaction',
   'openModal',
 ];
 

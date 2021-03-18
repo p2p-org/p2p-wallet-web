@@ -72,7 +72,7 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
             .toNumber(),
         );
       } catch (error) {
-        ToastManager.error(error);
+        ToastManager.error((error as Error).message);
       }
     };
 
@@ -113,7 +113,7 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
         ),
       );
     } catch (error) {
-      ToastManager.error(error);
+      ToastManager.error((error as Error).message);
     } finally {
       setIsExecuting(false);
     }

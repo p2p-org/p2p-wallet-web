@@ -53,7 +53,11 @@ export const retryableProxy = <U, R>(
     }
 
     //  if it has been called, and failed, catch the error, wait and retry
-    return previousValue.catch((error) => {
+    return previousValue.catch((error: Error) => {
+      if (error.toString().includes('Transaction simulation failed')) {
+        throw error;
+      }
+
       const sleepMs = options.intervalMS * options.backoutMultiplier ** currentIndex;
       console.error(error);
       console.log(`Retrying after ${sleepMs}ms. (Retried ${currentIndex} times)`);

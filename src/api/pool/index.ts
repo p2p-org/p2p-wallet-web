@@ -271,7 +271,7 @@ export const APIFactory = (cluster: ExtendedCluster): API => {
 
     const poolPromises = poolInfos.map((poolInfo) =>
       getPool(poolInfo.pubkey, Buffer.from(poolInfo.account.data)).catch((error: Error) => {
-        ToastManager.error(error.toString());
+        ToastManager.error(error.message);
         return null;
       }),
     );

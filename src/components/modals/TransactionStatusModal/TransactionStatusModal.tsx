@@ -135,7 +135,7 @@ const ProgressLine = styled.div`
 
   background: #5887ff;
 
-  transition: width 1.15s;
+  transition: width 0.15s;
 `;
 
 const Content = styled.div``;
@@ -349,18 +349,18 @@ export const TransactionStatusModal: FunctionComponent<Props> = ({
     }
 
     const timerId = setInterval(() => {
-      if (progress <= 100) {
+      if (progress <= 95) {
         newProgress += 7;
         setProgress(newProgress);
       } else {
-        newProgress = 100;
+        newProgress = 95;
         setProgress(newProgress);
       }
     }, 2500);
 
     return () => {
       clearTimeout(timerId);
-      setProgress(0);
+      setProgress(100);
     };
   }, [isExecuting]);
 
@@ -373,7 +373,7 @@ export const TransactionStatusModal: FunctionComponent<Props> = ({
     } catch (error) {
       setIsError(true);
       setIsExecuting(false);
-      ToastManager.error((error as Error).toString());
+      ToastManager.error((error as Error).message);
     }
   };
 
@@ -387,11 +387,17 @@ export const TransactionStatusModal: FunctionComponent<Props> = ({
         return;
       }
 
-      const trx = unwrapResult(await dispatch(getTransaction(signature)));
+      try {
+        const trx = unwrapResult(await dispatch(getTransaction(signature)));
 
-      if (!trx) {
-        setTimeout(mount, 3000);
-        return;
+        if (!trx) {
+          setTimeout(mount, 3000);
+          return;
+        }
+      } catch (error) {
+        setIsError(true);
+        setIsExecuting(false);
+        ToastManager.error((error as Error).message);
       }
 
       setIsExecuting(false);
@@ -475,31 +481,28 @@ export const TransactionStatusModal: FunctionComponent<Props> = ({
         {type === 'send' ? (
           <SendWrapper>
             <ValueCurrency>
+              {isReceiver ? '+' : '-'}{' '}
+              {transaction?.short.amount.toNumber() ||
+                fromToken.toMajorDenomination(fromAmount).toString()}{' '}
+              {transaction?.short.sourceTokenAccount?.mint.symbol || fromToken.symbol}
+            </ValueCurrency>
+            <ValueOriginal>
               <AmountUSD
                 prefix={isReceiver ? '+' : '-'}
                 symbol={transaction?.short.sourceTokenAccount?.mint.symbol || fromToken.symbol}
                 value={transaction?.short.amount || fromToken.toMajorDenomination(fromAmount)}
               />
-            </ValueCurrency>
-            <ValueOriginal>
-              {isReceiver ? '+' : '-'}{' '}
-              {transaction?.short.amount.toNumber() ||
-                fromToken.toMajorDenomination(fromAmount).toString()}{' '}
-              {transaction?.short.sourceTokenAccount?.mint.symbol || fromToken.symbol}
             </ValueOriginal>
           </SendWrapper>
         ) : undefined}
+        {/* // TODO: actual swap transaction details */}
         {type === 'swap' && toToken && toAmount ? (
           <SwapWrapper>
             <SwapColumn>
               <SwapInfo>
-                <TokenAvatar
-                  size={44}
-                  symbol={transaction?.short.sourceTokenAccount?.mint.symbol || fromToken.symbol}
-                />
+                <TokenAvatar size={44} symbol={fromToken.symbol} />
                 <SwapAmount>
-                  - {fromToken.toMajorDenomination(fromAmount).toString()}{' '}
-                  {transaction?.short.sourceTokenAccount?.mint.symbol || fromToken.symbol}
+                  - {fromToken.toMajorDenomination(fromAmount).toString()} {fromToken.symbol}
                 </SwapAmount>
               </SwapInfo>
             </SwapColumn>
@@ -508,14 +511,9 @@ export const TransactionStatusModal: FunctionComponent<Props> = ({
             </SwapBlock>
             <SwapColumn>
               <SwapInfo>
-                <TokenAvatar
-                  size={44}
-                  symbol={transaction?.short.destinationTokenAccount?.mint.symbol || toToken.symbol}
-                />
+                <TokenAvatar size={44} symbol={toToken.symbol} />
                 <SwapAmount>
-                  +{' '}
-                  {(transaction?.short.amount || toToken.toMajorDenomination(toAmount)).toString()}{' '}
-                  {transaction?.short.destinationTokenAccount?.mint.symbol || toToken.symbol}
+                  + {toToken.toMajorDenomination(toAmount).toString()} {toToken.symbol}
                 </SwapAmount>
               </SwapInfo>
             </SwapColumn>
@@ -539,7 +537,7 @@ export const TransactionStatusModal: FunctionComponent<Props> = ({
         {isError ? (
           <>
             <Button primary disabled={isExecuting} onClick={handleRetryClick}>
-              Retry
+              Try again
             </Button>
             <Button lightGray disabled={isExecuting} onClick={handleCloseClick}>
               Cancel

@@ -138,9 +138,9 @@ export const connect = createAsyncThunk<string, WalletDataType | undefined>(
       ToastManager.error('Wallet disconnected');
     });
 
-    wallet.on(WalletEvent.CONFIRMED, ({ transactionSignature }) =>
-      ToastManager.info(`Confirmed: ${transactionSignature}`),
-    );
+    // wallet.on(WalletEvent.CONFIRMED, ({ transactionSignature }) =>
+    //   ToastManager.info(`Confirmed: ${transactionSignature}`),
+    // );
 
     ToastManager.info('Wallet connected');
 

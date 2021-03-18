@@ -45,7 +45,7 @@ export const ActivityWidget: FunctionComponent<Props> = ({ publicKey }) => {
         setIsEnd(true);
       }
     } catch (error) {
-      ToastManager.error(String(error));
+      ToastManager.error((error as Error).message);
     } finally {
       setIsLoading(false);
     }

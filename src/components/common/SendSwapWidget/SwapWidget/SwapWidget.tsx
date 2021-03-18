@@ -235,7 +235,7 @@ export const SwapWidget: FunctionComponent = () => {
         ),
       );
     } catch (error) {
-      ToastManager.error(error);
+      ToastManager.error((error as Error).message);
     } finally {
       setIsExecuting(false);
     }
