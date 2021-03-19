@@ -23,7 +23,7 @@ export const WalletSettings: FunctionComponent = () => {
   );
 
   const tokenName = tokenAccount?.mint.symbol ? tokenAccount.mint.symbol : shortAddress(publicKey);
-  const isBalanceEmpty = Boolean(tokenAccount?.balance.gt(0));
+  const isZeroBalance = Boolean(tokenAccount?.balance.lte(0));
 
   return (
     <Layout
@@ -35,7 +35,7 @@ export const WalletSettings: FunctionComponent = () => {
         <TokenSettingsWidget
           publicKey={tokenPublicKey}
           tokenName={tokenName}
-          isBalanceEmpty={isBalanceEmpty}
+          isZeroBalance={isZeroBalance}
         />
       }
     />

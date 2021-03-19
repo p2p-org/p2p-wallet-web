@@ -332,6 +332,7 @@ export const SwapWidget: FunctionComponent = () => {
       : undefined;
 
   const isDisabled = isExecuting || !selectedPool;
+  const isShowFee = firstToken && fee && feeProperties;
 
   return (
     <WrapperWidgetPage
@@ -395,15 +396,15 @@ export const SwapWidget: FunctionComponent = () => {
               </PropertyValue>
             </PropertyLine>
           ) : undefined}
-          {firstToken && fee && feeProperties ? (
+          {isShowFee ? (
             <PropertyLine>
               Liquidity Provider Fee:{' '}
               <PropertyValue>
-                {fee} {feeProperties.token.symbol}
+                {fee} {feeProperties?.token.symbol}
               </PropertyValue>
             </PropertyLine>
           ) : undefined}
-          {!isNil(slippage) ? (
+          {isShowFee && !isNil(slippage) ? (
             <PropertyLine>
               Slippage:
               <PropertyValue>{slippage} %</PropertyValue>
