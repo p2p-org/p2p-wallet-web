@@ -17,7 +17,15 @@ export const ProtectedRoute: FunctionComponent<
     return <Route {...props} />;
   }
 
-  return <Redirect to={redirect} from={location.pathname} />;
+  return (
+    <Redirect
+      to={{
+        pathname: redirect,
+        state: { from: location.pathname },
+      }}
+      from={location.pathname}
+    />
+  );
 };
 
 // ProtectedRoute is used to create specific types of protected routes like this...

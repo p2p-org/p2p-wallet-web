@@ -1,5 +1,6 @@
 import React, { FunctionComponent, useEffect, useState } from 'react';
 import { batch, useDispatch } from 'react-redux';
+import { useLocation } from 'react-router';
 import { Link, useHistory } from 'react-router-dom';
 
 import { styled } from '@linaria/react';
@@ -92,6 +93,7 @@ const HeaderImage = styled.div`
 `;
 
 export const Home: FunctionComponent = () => {
+  const location = useLocation<{ from?: string }>();
   const history = useHistory();
   const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(false);
@@ -105,8 +107,10 @@ export const Home: FunctionComponent = () => {
       try {
         setIsLoading(true);
         unwrapResult(await dispatch(autoConnect()));
+
         await sleep(100);
-        history.push('/wallets');
+
+        history.push(location.state.from || '/wallets');
       } catch (error) {
         ToastManager.error((error as Error).message);
       } finally {
