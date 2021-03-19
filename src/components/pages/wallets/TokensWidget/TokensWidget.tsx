@@ -123,9 +123,16 @@ export const TokensWidget: FunctionComponent = () => {
   const hiddenTokensList = [];
 
   const hiddenTokens = useSelector((state: RootState) => state.wallet.hiddenTokens) || [];
+  const zeroBalanceTokens = useSelector((state: RootState) => state.wallet.zeroBalanceTokens) || [];
+  const { isZeroBalancesHidden } = useSelector((state: RootState) => state.wallet.settings);
 
   for (const token of tokenAccounts) {
-    if (hiddenTokens.includes(token.address.toBase58())) {
+    if (
+      hiddenTokens.includes(token.address.toBase58()) ||
+      (isZeroBalancesHidden &&
+        token.balance.lte(0) &&
+        !zeroBalanceTokens.includes(token.address.toBase58()))
+    ) {
       hiddenTokensList.push(token);
     } else {
       tokens.push(token);
@@ -148,7 +155,7 @@ export const TokensWidget: FunctionComponent = () => {
           <IconPlus name="plus" /> Add Token
         </AddButton>
       }>
-      <TokenList items={tokens} />
+      <TokenList items={tokens} isZeroBalancesHidden={isZeroBalancesHidden} />
       {hiddenTokensList.length > 0 ? (
         <HiddenTokens onClick={handleChevronClick} className={classNames({ isOpen })}>
           <HideIconWrapper>
@@ -162,7 +169,9 @@ export const TokensWidget: FunctionComponent = () => {
           </ChevronWrapper>
         </HiddenTokens>
       ) : undefined}
-      {isOpen ? <TokenList items={hiddenTokensList} isHidden /> : undefined}
+      {isOpen ? (
+        <TokenList items={hiddenTokensList} isHidden isZeroBalancesHidden={isZeroBalancesHidden} />
+      ) : undefined}
     </WrapperWidget>
   );
 };

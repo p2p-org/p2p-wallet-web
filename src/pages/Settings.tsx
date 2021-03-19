@@ -9,7 +9,7 @@ import { rgba } from 'polished';
 import { Card } from 'components/common/Card';
 import { Layout } from 'components/common/Layout';
 import { WidgetPage } from 'components/common/WidgetPage';
-import { Icon, Select } from 'components/ui';
+import { Icon, Select, Switch } from 'components/ui';
 import { MenuItem } from 'components/ui/Select/MenuItem';
 import { FEATURE_SETTINGS_LIST } from 'config/featureFlags';
 import { RootState } from 'store/rootReducer';
@@ -265,6 +265,18 @@ export const Settings: FunctionComponent = () => {
                 onClick={() => {
                   history.push('/settings/network');
                 }}
+              />
+              <Row
+                icon="hide"
+                title="Hide zero balances"
+                secondary={
+                  <Switch
+                    checked={settings.isZeroBalancesHidden}
+                    onChange={onItemClickHandler({
+                      isZeroBalancesHidden: !settings.isZeroBalancesHidden,
+                    })}
+                  />
+                }
               />
             </RowsWrapper>
           </WidgetPage>
