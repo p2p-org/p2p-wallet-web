@@ -21,7 +21,7 @@ export const ProtectedRoute: FunctionComponent<
     <Redirect
       to={{
         pathname: redirect,
-        state: { from: location.pathname },
+        state: { from: location.pathname !== '/' ? location.pathname : undefined },
       }}
       from={location.pathname}
     />
