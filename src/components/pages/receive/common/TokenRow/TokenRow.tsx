@@ -440,8 +440,7 @@ export const TokenRow: FunctionComponent<Props> = ({
   };
 
   // if (token.symbol === 'SOL') {
-  //   qrImageSettings.src =
-  //     'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/solana/info/logo.png';
+  //   qrImageSettings.src = SOL_AVATAR_URL;
   // } else {
   //   const iconSrc = tokenConfig[cluster]?.find(
   //     (tokenItem) => tokenItem.tokenSymbol === token.symbol,

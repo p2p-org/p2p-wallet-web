@@ -12,6 +12,9 @@ type TokensByEntrypointType = {
 
 // TODO: change branch to master
 
+export const SOL_AVATAR_URL =
+  'https://raw.githubusercontent.com/p2p-org/p2p-wallet-web/develop/public/assets/images/tokens/SOL.png';
+
 // eslint-disable-next-line import/no-default-export
 export default {
   'mainnet-beta': [

@@ -4,7 +4,7 @@ import { useSelector } from 'react-redux';
 import { CSSProperties } from '@linaria/core';
 import { styled } from '@linaria/react';
 
-import tokenConfig from 'api/token/token.config';
+import tokenConfig, { SOL_AVATAR_URL } from 'api/token/token.config';
 import { Avatar } from 'components/ui';
 import { RootState } from 'store/rootReducer';
 
@@ -27,8 +27,7 @@ export const TokenAvatar: FunctionComponent<Props> = ({ symbol, src, ...props })
 
   if (!src) {
     if (symbol === 'SOL') {
-      newSrc =
-        'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/solana/info/logo.png';
+      newSrc = SOL_AVATAR_URL;
     } else {
       newSrc = tokenConfig[cluster]?.find((token) => token.tokenSymbol === symbol)?.icon;
     }
