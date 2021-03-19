@@ -2,6 +2,7 @@ import { WalletSettings } from 'utils/types';
 
 const WALLET_SETTINGS_KEY = 'walletSettings';
 const WALLET_HIDDEN_TOKENS_KEY = 'walletHiddenTokens';
+const WALLET_DISPLAYED_ZERO_BALANCE_TOKENS = 'walletDisplayedZeroBalanceTokens';
 
 export const currencies = [
   {
@@ -39,6 +40,7 @@ export const defaultSettings = {
   network: {
     current: 'mainnet-beta',
   },
+  isZeroBalancesHidden: true,
 } as WalletSettings;
 
 export function loadSettings(): WalletSettings {
@@ -63,42 +65,75 @@ export function saveSettings(settings: WalletSettings) {
   localStorage.setItem(WALLET_SETTINGS_KEY, JSON.stringify(settings));
 }
 
-export function loadHiddenTokens(): Set<string> {
-  const hiddenTokens = localStorage.getItem(WALLET_HIDDEN_TOKENS_KEY) as string;
-  let tokens: string[] = [];
+function loadSetFromLocalStorage(itemKey: string): Set<string> {
+  const itemString = localStorage.getItem(itemKey) as string;
+  let items: string[] = [];
 
-  if (!hiddenTokens) {
+  if (!itemString) {
     return new Set();
   }
 
   try {
-    tokens = JSON.parse(hiddenTokens) as string[];
+    items = JSON.parse(itemString) as string[];
   } catch (error) {
     console.error(error);
   }
 
-  return new Set([...tokens]);
+  return new Set([...items]);
+}
+
+function addOrDeleteItem(set: Set<string>, item: string, itemKey: string) {
+  if (set.has(item)) {
+    set.delete(item);
+  } else {
+    set.add(item);
+  }
+
+  // eslint-disable-next-line unicorn/prefer-spread
+  localStorage.setItem(itemKey, JSON.stringify(Array.from(set)));
+}
+
+function removeItem(set: Set<string>, item: string, itemKey: string) {
+  if (set.has(item)) {
+    set.delete(item);
+    // eslint-disable-next-line unicorn/prefer-spread
+    localStorage.setItem(itemKey, JSON.stringify(Array.from(set)));
+  }
+}
+
+export function loadHiddenTokens(): Set<string> {
+  return loadSetFromLocalStorage(WALLET_HIDDEN_TOKENS_KEY);
 }
 
 export function hideUnhideToken(pubkey: string) {
   const tokens = loadHiddenTokens();
 
-  if (tokens.has(pubkey)) {
-    tokens.delete(pubkey);
-  } else {
-    tokens.add(pubkey);
-  }
-
-  // eslint-disable-next-line unicorn/prefer-spread
-  localStorage.setItem(WALLET_HIDDEN_TOKENS_KEY, JSON.stringify(Array.from(tokens)));
+  addOrDeleteItem(tokens, pubkey, WALLET_HIDDEN_TOKENS_KEY);
 }
 
 export function removeHiddenToken(pubkey: string) {
   const tokens = loadHiddenTokens();
 
-  if (tokens.has(pubkey)) {
-    tokens.delete(pubkey);
-    // eslint-disable-next-line unicorn/prefer-spread
-    localStorage.setItem(WALLET_HIDDEN_TOKENS_KEY, JSON.stringify(Array.from(tokens)));
-  }
+  removeItem(tokens, pubkey, WALLET_HIDDEN_TOKENS_KEY);
+}
+
+export function loadZeroBalanceTokens(): Set<string> {
+  return loadSetFromLocalStorage(WALLET_DISPLAYED_ZERO_BALANCE_TOKENS);
+}
+
+export function hideUnhideZeroBalanceToken(pubkey: string) {
+  const tokens = loadZeroBalanceTokens();
+
+  addOrDeleteItem(tokens, pubkey, WALLET_DISPLAYED_ZERO_BALANCE_TOKENS);
+}
+
+export function removeZeroBalanceToken(pubkey: string) {
+  const tokens = loadZeroBalanceTokens();
+
+  removeItem(tokens, pubkey, WALLET_DISPLAYED_ZERO_BALANCE_TOKENS);
+}
+
+export function removeClosedTokenKeys(pubkey: string) {
+  removeHiddenToken(pubkey);
+  removeZeroBalanceToken(pubkey);
 }

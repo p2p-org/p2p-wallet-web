@@ -12,7 +12,12 @@ import { TokenAvatar } from 'components/common/TokenAvatar';
 import { Menu } from 'components/ui';
 import { MenuItem } from 'components/ui/Menu/MenuItem';
 import { updateHiddenTokens } from 'store/slices/wallet/WalletSlice';
-import { hideUnhideToken } from 'utils/settings';
+import {
+  hideUnhideToken,
+  hideUnhideZeroBalanceToken,
+  removeHiddenToken,
+  removeZeroBalanceToken,
+} from 'utils/settings';
 import { shortAddress } from 'utils/tokens';
 
 const Content = styled.div`
@@ -65,11 +70,6 @@ const Bottom = styled.div`
   font-size: 14px;
   line-height: 140%;
 `;
-
-type Props = {
-  token: TokenAccount;
-  isHidden?: boolean;
-};
 
 const MenuWrapper = styled.div`
   position: absolute;
@@ -128,11 +128,29 @@ const Wrapper = styled.div`
   }
 `;
 
-export const TokenRow: FunctionComponent<Props> = ({ token, isHidden = false }) => {
+type Props = {
+  token: TokenAccount;
+  isHidden?: boolean;
+  isZeroBalancesHidden?: boolean;
+};
+
+export const TokenRow: FunctionComponent<Props> = ({
+  token,
+  isHidden = false,
+  isZeroBalancesHidden = true,
+}) => {
   const dispatch = useDispatch();
   // eslint-disable-next-line unicorn/consistent-function-scoping
   const handleMenuItemClick = () => {
-    hideUnhideToken(token.address.toBase58());
+    const tokenAddress = token.address.toBase58();
+    if (isZeroBalancesHidden && token.balance.lte(0)) {
+      hideUnhideZeroBalanceToken(tokenAddress);
+      removeHiddenToken(tokenAddress);
+    } else {
+      hideUnhideToken(tokenAddress);
+      removeZeroBalanceToken(tokenAddress);
+    }
+
     // eslint-disable-next-line @typescript-eslint/no-unsafe-call
     dispatch(updateHiddenTokens());
   };

@@ -38,4 +38,5 @@ export type WalletSettings = {
   currency: string;
   appearance: string;
   network: Network;
+  isZeroBalancesHidden: boolean;
 };

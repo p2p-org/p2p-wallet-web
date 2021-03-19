@@ -1,5 +1,5 @@
 import React, { FunctionComponent } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router';
 
 import { styled } from '@linaria/react';
@@ -10,8 +10,15 @@ import { Widget } from 'components/common/Widget';
 import { Button, Icon, Switch } from 'components/ui';
 import { openModal } from 'store/actions/modals';
 import { SHOW_MODAL_CLOSE_TOKEN_ACCOUNT } from 'store/constants/modalTypes';
+import { RootState } from 'store/rootReducer';
 import { updateHiddenTokens } from 'store/slices/wallet/WalletSlice';
-import { hideUnhideToken, loadHiddenTokens } from 'utils/settings';
+import {
+  hideUnhideToken,
+  hideUnhideZeroBalanceToken,
+  loadHiddenTokens,
+  removeHiddenToken,
+  removeZeroBalanceToken,
+} from 'utils/settings';
 
 const WrapperWidget = styled(Widget)``;
 
@@ -110,6 +117,8 @@ export const TokenSettingsWidget: FunctionComponent<Props> = ({
   const history = useHistory();
   const dispatch = useDispatch();
 
+  const { isZeroBalancesHidden } = useSelector((state: RootState) => state.wallet.settings);
+
   const hiddenTokens = loadHiddenTokens();
   const isHidden = hiddenTokens.has(publicKey.toBase58());
 
@@ -124,7 +133,15 @@ export const TokenSettingsWidget: FunctionComponent<Props> = ({
 
   // eslint-disable-next-line unicorn/consistent-function-scoping
   const handleHideTokenClick = (pubKey: web3.PublicKey) => () => {
-    hideUnhideToken(pubKey.toBase58());
+    const tokenAddress = pubKey.toBase58();
+    if (isZeroBalancesHidden && isBalanceEmpty) {
+      hideUnhideZeroBalanceToken(tokenAddress);
+      removeHiddenToken(tokenAddress);
+    } else {
+      hideUnhideToken(tokenAddress);
+      removeZeroBalanceToken(tokenAddress);
+    }
+
     dispatch(updateHiddenTokens());
   };
 
