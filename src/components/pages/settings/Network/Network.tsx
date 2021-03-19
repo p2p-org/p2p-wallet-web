@@ -1,5 +1,5 @@
-import React, { FunctionComponent, useEffect, useState } from 'react';
-import { batch, useDispatch } from 'react-redux';
+import React, { FunctionComponent, useState } from 'react';
+import { batch, useDispatch, useSelector } from 'react-redux';
 
 import { styled } from '@linaria/react';
 import { Cluster } from '@solana/web3.js';
@@ -8,9 +8,10 @@ import { mergeDeepRight } from 'ramda';
 
 import { WidgetPage } from 'components/common/WidgetPage';
 import { Button, Input, RadioButton } from 'components/ui';
+import { RootState } from 'store/rootReducer';
 import { wipeAction } from 'store/slices/GlobalSlice';
-import { autoConnect, selectCluster } from 'store/slices/wallet/WalletSlice';
-import { clusters, defaultSettings, loadSettings, saveSettings } from 'utils/settings';
+import { autoConnect, selectCluster, updateSettings } from 'store/slices/wallet/WalletSlice';
+import { clusters } from 'utils/settings';
 
 const URL_REGEX = new RegExp(
   /https?:\/\/(?:w{1,3}\.)?[^\s.]+(?:\.[a-z]+)*(?::\d+)?((?:\/\w+)|(?:-\w+))*\/?(?![^<]*(?:<\/\w+>|\/?>))/,
@@ -72,26 +73,13 @@ const Buttons = styled.div`
 
 export const Network: FunctionComponent = () => {
   const dispatch = useDispatch();
-  const [settings, setSettings] = useState(defaultSettings);
   const [isOpenAddUrl, setIsOpenAddUrl] = useState(false);
   const [customUrl, setCustomUrl] = useState('');
 
-  useEffect(() => {
-    // eslint-disable-next-line @typescript-eslint/require-await
-    const mount = async () => {
-      const currentSetting = loadSettings();
-      setSettings(currentSetting);
-    };
-    void mount();
-  }, []);
+  const { network } = useSelector((state: RootState) => state.wallet.settings);
 
   const handleChange = (value: string) => {
-    const newSettings = mergeDeepRight(settings, {
-      network: { current: value },
-    });
-
-    setSettings(newSettings);
-    saveSettings(newSettings);
+    dispatch(updateSettings({ network: { current: value } }));
 
     batch(async () => {
       dispatch(selectCluster(value as Cluster));
@@ -108,7 +96,7 @@ export const Network: FunctionComponent = () => {
           <RadioButton
             label={url}
             value={key}
-            checked={key === settings.network.current}
+            checked={key === network.current}
             onChange={handleChange}
           />
         </RadioButtonItem>
@@ -116,7 +104,7 @@ export const Network: FunctionComponent = () => {
     });
 
   const renderCustomClustersRadioButtons = () => {
-    const { custom } = settings.network;
+    const { custom } = network;
 
     if (!custom) {
       return null;
@@ -129,7 +117,7 @@ export const Network: FunctionComponent = () => {
           <RadioButton
             label={url}
             value={key}
-            checked={key === settings.network.current}
+            checked={key === network.current}
             onChange={handleChange}
           />
         </RadioButtonItem>
@@ -146,12 +134,11 @@ export const Network: FunctionComponent = () => {
   };
 
   const handleSaveButtonClick = () => {
-    const newSettings = mergeDeepRight(settings, {
-      network: { custom: { [`custom-${new Date().getTime()}`]: customUrl } },
+    const newSettings = mergeDeepRight(network, {
+      custom: { [`custom-${new Date().getTime()}`]: customUrl },
     });
 
-    setSettings(newSettings);
-    saveSettings(newSettings);
+    dispatch(updateSettings({ network: newSettings }));
     setCustomUrl('');
     setIsOpenAddUrl(!isOpenAddUrl);
   };

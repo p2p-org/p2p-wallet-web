@@ -6,6 +6,7 @@ import {
   unwrapResult,
 } from '@reduxjs/toolkit';
 import { Account, Cluster, PublicKey } from '@solana/web3.js';
+import { mergeDeepRight } from 'ramda';
 
 import { APIFactory as TokenAPIFactory, TransferParameters } from 'api/token';
 import { AccountListener } from 'api/token/AccountListener';
@@ -23,7 +24,8 @@ import { getAvailableTokens, wipeAction } from 'store/slices/GlobalSlice';
 import { getPools } from 'store/slices/pool/PoolSlice';
 import { getRatesCandle, getRatesMarkets } from 'store/slices/rate/RateSlice';
 import { updateEntityArray } from 'store/slices/tokenPair/utils/tokenPair';
-import { loadHiddenTokens, loadSettings } from 'utils/settings';
+import { loadHiddenTokens, loadSettings, saveSettings } from 'utils/settings';
+import { WalletSettings } from 'utils/types';
 
 const STORAGE_KEY_TYPE = 'type';
 export const STORAGE_KEY_SEED = 'seed';
@@ -40,6 +42,7 @@ export interface WalletsState {
   type: WalletType;
   tokenAccounts: Array<SerializableTokenAccount>;
   hiddenTokens: Array<string> | null;
+  settings: WalletSettings;
 }
 
 /**
@@ -245,6 +248,7 @@ const makeInitialState = (): WalletsState => ({
   tokenAccounts: [],
   // eslint-disable-next-line unicorn/prefer-spread
   hiddenTokens: Array.from(loadHiddenTokens()),
+  settings: loadSettings(),
 });
 
 /**
@@ -272,6 +276,16 @@ const walletSlice = createSlice({
       // eslint-disable-next-line unicorn/prefer-spread
       hiddenTokens: Array.from(loadHiddenTokens()),
     }),
+    updateSettings: (state, action: PayloadAction<Partial<WalletSettings>>) => {
+      const newSettings = mergeDeepRight(state.settings, action.payload);
+
+      saveSettings(newSettings);
+
+      return {
+        ...state,
+        settings: newSettings,
+      };
+    },
   },
   extraReducers: (builder) => {
     // Triggered when the connect async action is completed
@@ -294,6 +308,15 @@ const walletSlice = createSlice({
       ...state,
       tokenAccounts: state.tokenAccounts.concat(action.payload.serialize()),
     }));
+    builder.addCase(closeTokenAccount.fulfilled, (state, action) => {
+      const { publicKey } = action.meta.arg;
+      const address = publicKey.toBase58();
+
+      return {
+        ...state,
+        tokenAccounts: state.tokenAccounts.filter((token) => token.address !== address),
+      };
+    });
     builder.addCase(wipeAction, (state) => {
       accountsListeners.map((listener) => listener.removeAllListeners());
 
@@ -305,6 +328,12 @@ const walletSlice = createSlice({
   },
 });
 
-export const { selectCluster, selectType, updateAccount, updateHiddenTokens } = walletSlice.actions;
+export const {
+  selectCluster,
+  selectType,
+  updateAccount,
+  updateHiddenTokens,
+  updateSettings,
+} = walletSlice.actions;
 // eslint-disable-next-line import/no-default-export
 export default walletSlice.reducer;

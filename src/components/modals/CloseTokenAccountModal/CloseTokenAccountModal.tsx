@@ -6,8 +6,7 @@ import * as web3 from '@solana/web3.js';
 import { History } from 'history';
 
 import { Button, Icon } from 'components/ui';
-import { wipeAction } from 'store/slices/GlobalSlice';
-import { closeTokenAccount, getTokenAccounts } from 'store/slices/wallet/WalletSlice';
+import { closeTokenAccount } from 'store/slices/wallet/WalletSlice';
 import { removeHiddenToken } from 'utils/settings';
 
 const Wrapper = styled.div`
@@ -110,8 +109,6 @@ export const CloseTokenAccountModal: FunctionComponent<Props> = ({
     try {
       setIsExecuting(true);
       await dispatch(closeTokenAccount({ publicKey }));
-      dispatch(wipeAction());
-      await dispatch(getTokenAccounts());
       removeHiddenToken(publicKey.toBase58());
     } catch (error) {
       console.log(error);

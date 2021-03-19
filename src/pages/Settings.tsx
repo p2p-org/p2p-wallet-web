@@ -1,5 +1,5 @@
-import React, { FunctionComponent, useEffect, useState } from 'react';
-import { useDispatch } from 'react-redux';
+import React, { FunctionComponent } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router';
 
 import { styled } from '@linaria/react';
@@ -12,15 +12,9 @@ import { WidgetPage } from 'components/common/WidgetPage';
 import { Icon, Select } from 'components/ui';
 import { MenuItem } from 'components/ui/Select/MenuItem';
 import { FEATURE_SETTINGS_LIST } from 'config/featureFlags';
-import { disconnect, STORAGE_KEY_SEED } from 'store/slices/wallet/WalletSlice';
-import {
-  appearance,
-  clusters,
-  currencies,
-  defaultSettings,
-  loadSettings,
-  saveSettings,
-} from 'utils/settings';
+import { RootState } from 'store/rootReducer';
+import { disconnect, STORAGE_KEY_SEED, updateSettings } from 'store/slices/wallet/WalletSlice';
+import { appearance, clusters, currencies } from 'utils/settings';
 import { WalletSettings } from 'utils/types';
 
 const Wrapper = styled.div`
@@ -190,29 +184,16 @@ const Row: FunctionComponent<RowProps> = ({ icon, title, secondary, onClick }) =
 export const Settings: FunctionComponent = () => {
   const history = useHistory();
   const dispatch = useDispatch();
-  const [settings, setSettings] = useState(defaultSettings);
 
-  useEffect(() => {
-    // eslint-disable-next-line @typescript-eslint/require-await
-    const mount = async () => {
-      const currentSetting = loadSettings();
-      setSettings(currentSetting);
-    };
-    void mount();
-  }, []);
+  const settings = useSelector((state: RootState) => state.wallet.settings);
 
   const handleLogoutClick = () => {
     localStorage.removeItem(STORAGE_KEY_SEED);
     void dispatch(disconnect());
   };
 
-  const onItemSelectHandler = (option: Partial<WalletSettings> = settings) => () => {
-    const newSettings = {
-      ...settings,
-      ...option,
-    };
-    setSettings(newSettings);
-    saveSettings(newSettings);
+  const onItemClickHandler = (option: Partial<WalletSettings> = settings) => () => {
+    dispatch(updateSettings(option));
   };
 
   const currentCluster = settings.network.current;
@@ -241,7 +222,7 @@ export const Settings: FunctionComponent = () => {
                         <MenuItem
                           key={ticker}
                           isSelected={ticker === settings.currency}
-                          onItemClick={onItemSelectHandler({ currency: ticker })}>
+                          onItemClick={onItemClickHandler({ currency: ticker })}>
                           <CurrencyItem>
                             {name}
                             <Symbol>{`(${symbol})`}</Symbol>
@@ -262,7 +243,7 @@ export const Settings: FunctionComponent = () => {
                         <MenuItem
                           key={value}
                           isSelected={value === settings.appearance}
-                          onItemClick={onItemSelectHandler({ appearance: value })}>
+                          onItemClick={onItemClickHandler({ appearance: value })}>
                           <Capitalize>{value}</Capitalize>
                         </MenuItem>
                       ))}
@@ -275,7 +256,7 @@ export const Settings: FunctionComponent = () => {
                 title="Network"
                 secondary={
                   <>
-                    <Title>{clusterUrl}</Title>{' '}
+                    <Title>{clusterUrl}</Title>
                     <ChevronWrapper>
                       <ChevronIcon name="chevron" />
                     </ChevronWrapper>
