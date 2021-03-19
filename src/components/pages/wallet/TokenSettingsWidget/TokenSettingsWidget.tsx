@@ -118,10 +118,12 @@ export const TokenSettingsWidget: FunctionComponent<Props> = ({
   const dispatch = useDispatch();
 
   const { isZeroBalancesHidden } = useSelector((state: RootState) => state.wallet.settings);
+  const zeroBalanceTokens = useSelector((state: RootState) => state.wallet.zeroBalanceTokens) || [];
 
   const hiddenTokens = loadHiddenTokens();
   const isHidden =
-    (isZeroBalancesHidden && isZeroBalance) || hiddenTokens.has(publicKey.toBase58());
+    (isZeroBalancesHidden && isZeroBalance && !zeroBalanceTokens.includes(publicKey.toBase58())) ||
+    hiddenTokens.has(publicKey.toBase58());
 
   const handleCloseTokenAccountClick = () => {
     void dispatch(
