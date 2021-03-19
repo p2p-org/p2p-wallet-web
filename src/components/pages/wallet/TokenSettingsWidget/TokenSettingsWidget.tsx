@@ -71,7 +71,7 @@ const ButtonStyled = styled(Button)`
   &:disabled {
     color: #a3a5ba;
 
-    background: #fff;
+    background: #fff !important;
   }
 `;
 
@@ -106,13 +106,13 @@ const Text = styled.div`
 type Props = {
   publicKey: web3.PublicKey;
   tokenName: string;
-  isBalanceEmpty: boolean;
+  isZeroBalance: boolean;
 };
 
 export const TokenSettingsWidget: FunctionComponent<Props> = ({
   publicKey,
   tokenName,
-  isBalanceEmpty,
+  isZeroBalance,
 }) => {
   const history = useHistory();
   const dispatch = useDispatch();
@@ -120,7 +120,8 @@ export const TokenSettingsWidget: FunctionComponent<Props> = ({
   const { isZeroBalancesHidden } = useSelector((state: RootState) => state.wallet.settings);
 
   const hiddenTokens = loadHiddenTokens();
-  const isHidden = hiddenTokens.has(publicKey.toBase58());
+  const isHidden =
+    (isZeroBalancesHidden && isZeroBalance) || hiddenTokens.has(publicKey.toBase58());
 
   const handleCloseTokenAccountClick = () => {
     void dispatch(
@@ -134,7 +135,7 @@ export const TokenSettingsWidget: FunctionComponent<Props> = ({
   // eslint-disable-next-line unicorn/consistent-function-scoping
   const handleHideTokenClick = (pubKey: web3.PublicKey) => () => {
     const tokenAddress = pubKey.toBase58();
-    if (isZeroBalancesHidden && isBalanceEmpty) {
+    if (isZeroBalancesHidden && isZeroBalance) {
       hideUnhideZeroBalanceToken(tokenAddress);
       removeHiddenToken(tokenAddress);
     } else {
@@ -157,7 +158,7 @@ export const TokenSettingsWidget: FunctionComponent<Props> = ({
         </SettingItem>
         <SettingItem>
           <ButtonStyled
-            disabled={isBalanceEmpty}
+            disabled={!isZeroBalance}
             small
             title="Close token account"
             onClick={handleCloseTokenAccountClick}>
