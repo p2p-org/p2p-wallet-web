@@ -610,47 +610,16 @@ textarea,
   opacity: 1;
 }
 
-/* Remove these to get rid of the spinner */
-#nprogress .spinner {
-  position: fixed;
-  top: 15px;
-  right: 15px;
-  z-index: 1031;
-
-  display: block;
-}
-
-#nprogress .spinner-icon {
-  box-sizing: border-box;
-  width: 18px;
-  height: 18px;
-
-  border: solid 2px transparent;
-  border-top-color: #5887ff;
-  border-left-color: #5887ff;
-  border-radius: 50%;
-
-  animation: nprogress-spinner 400ms linear infinite;
-}
-
 .nprogress-custom-parent {
   position: relative;
-
-  overflow: hidden;
 }
 
-.nprogress-custom-parent #nprogress .spinner,
+.nprogress-custom-parent #nprogress {
+  position: fixed;
+}
+
 .nprogress-custom-parent #nprogress .bar {
-  position: absolute;
-}
-
-@keyframes nprogress-spinner {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
+  top: 64px;
 }
 
 .tyyw6dd{display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;box-sizing:border-box;width:100%;max-width:100%;min-height:40px;padding:16px;word-break:break-all;word-break:break-word;background:#fff;border-radius:8px;box-shadow:0 10px 30px rgba(0,0,0,0.15);cursor:initial;}@media (min-width:500px){.tyyw6dd{width:304px;}}
