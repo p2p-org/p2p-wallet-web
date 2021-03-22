@@ -49,6 +49,7 @@ export const ReceiveAddressWidget: FunctionComponent = () => {
     // get tokens not included in sortedUniqTokenAccounts
     return availableTokens.filter(
       (itemToken) =>
+        itemToken.symbol?.toLowerCase() !== 'wsol' &&
         !tokenAccounts.find((itemTokenAccount) => itemTokenAccount.mint.equals(itemToken)),
     );
   }, [availableTokens, tokenAccounts]);
