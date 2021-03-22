@@ -209,6 +209,7 @@ export const SelectTokenAccount: FunctionComponent<Props> = ({
   className,
 }) => {
   const selectorRef = useRef<HTMLDivElement>(null);
+  const tokenAddressRef = useRef<HTMLDivElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
   const [filter, setFilter] = useState('');
@@ -286,12 +287,14 @@ export const SelectTokenAccount: FunctionComponent<Props> = ({
     };
   }, [isOpen, listRef.current]);
 
-  const handleSelectorClick = () => {
+  const handleSelectorClick = (e: MouseEvent) => {
     if (!tokenAccounts) {
       return;
     }
 
-    setIsOpen(!isOpen);
+    if (!tokenAddressRef.current?.contains(e.target as HTMLDivElement)) {
+      setIsOpen(!isOpen);
+    }
   };
 
   const handleTokenAccountClick = (nextTokenAccount: TokenAccount) => {
@@ -369,7 +372,7 @@ export const SelectTokenAccount: FunctionComponent<Props> = ({
             </TokenName>
           )}
           {tokenAccount ? (
-            <TokenAccountAddress onClick={handleCopyClick}>
+            <TokenAccountAddress ref={tokenAddressRef} onClick={handleCopyClick}>
               {tokenAccount.address.toBase58()}
             </TokenAccountAddress>
           ) : undefined}
