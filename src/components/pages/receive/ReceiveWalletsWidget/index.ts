@@ -1,1 +1,0 @@
-export { ReceiveWalletsWidget } from './ReceiveWalletsWidget';

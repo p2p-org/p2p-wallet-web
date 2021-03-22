@@ -2,8 +2,8 @@ import React, { FunctionComponent } from 'react';
 
 import { Layout } from 'components/common/Layout';
 import { ReceiveAddressWidget } from 'components/pages/receive/ReceiveAddressWidget';
-import { ReceiveNewWidget } from 'components/pages/receive/ReceiveNewWidget';
-import { ReceiveWalletsWidget } from 'components/pages/receive/ReceiveWalletsWidget';
+// import { ReceiveNewWidget } from 'components/pages/receive/ReceiveNewWidget';
+// import { ReceiveWalletsWidget } from 'components/pages/receive/ReceiveWalletsWidget';
 
 export const Receive: FunctionComponent = () => {
   return (
@@ -11,8 +11,8 @@ export const Receive: FunctionComponent = () => {
       rightColumn={
         <>
           <ReceiveAddressWidget />
-          <ReceiveWalletsWidget />
-          <ReceiveNewWidget />
+          {/* <ReceiveWalletsWidget /> */}
+          {/* <ReceiveNewWidget /> */}
         </>
       }
     />

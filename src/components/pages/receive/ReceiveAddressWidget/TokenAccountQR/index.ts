@@ -1,0 +1,1 @@
+export { TokenAccountQR } from './TokenAccountQR';

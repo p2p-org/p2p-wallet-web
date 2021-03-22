@@ -2,58 +2,40 @@ import React, { FunctionComponent, useEffect, useMemo, useRef, useState } from '
 
 import { styled } from '@linaria/react';
 import classNames from 'classnames';
-import { Decimal } from 'decimal.js';
 import throttle from 'lodash.throttle';
-import { isNil } from 'ramda';
 
 import { Token } from 'api/token/Token';
 import { TokenAccount } from 'api/token/TokenAccount';
-import { AmountUSD } from 'components/common/AmountUSD';
+import { Empty } from 'components/common/Empty';
 import { SlideContainer } from 'components/common/SlideContainer';
+import { ToastManager } from 'components/common/ToastManager';
+import { TokenAccountRow } from 'components/common/TokenAccountRow';
 import { TokenAvatar } from 'components/common/TokenAvatar';
+import { TokenRow } from 'components/common/TokenRow';
 import { Icon } from 'components/ui';
 import { SearchInput } from 'components/ui/SearchInput';
-import { minorAmountToMajor } from 'utils/amount';
 import { shortAddress } from 'utils/tokens';
 
-import { Empty } from '../../../Empty';
-import { TokenAccountRow } from '../../../TokenAccountRow';
-import { TokenRow } from '../../../TokenRow';
+const Wrapper = styled.div`
+  position: relative;
 
-const Wrapper = styled.div``;
-
-const TopWrapper = styled.div`
-  display: flex;
-  justify-content: space-between;
-`;
-
-const FromTitle = styled.div`
-  color: #000;
-  font-weight: 600;
-  font-size: 16px;
-  line-height: 24px;
-`;
-
-const AllBalance = styled.div`
-  color: #5887ff;
-
-  cursor: pointer;
-
-  &.disabled {
-    cursor: auto;
-
-    pointer-events: none;
-  }
-
-  &.error {
-    color: #f43d3d;
-  }
+  margin: 20px;
 `;
 
 const MainWrapper = styled.div`
   display: flex;
 
-  margin-top: 20px;
+  padding: 10px 12px;
+
+  background: #f6f6f8;
+  border: 1px solid transparent;
+  border-radius: 12px;
+
+  cursor: pointer;
+
+  &.isOpen {
+    border-color: rgba(163, 165, 186, 0.5);
+  }
 `;
 
 const WalletIcon = styled(Icon)`
@@ -86,40 +68,49 @@ const InfoWrapper = styled.div`
   display: flex;
   flex: 1;
   flex-direction: column;
+  justify-content: center;
   min-width: 0;
 
-  margin-left: 20px;
+  margin-left: 16px;
 `;
 
-const SpecifyTokenWrapper = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  height: 44px;
+const CopiedText = styled.div`
+  color: #2db533;
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 140%;
 `;
 
 const TokenName = styled.div`
-  max-width: 200px;
   overflow: hidden;
 
   color: #000;
   font-weight: 600;
-  font-size: 24px;
+  font-size: 16px;
   line-height: 140%;
 
   white-space: nowrap;
   text-overflow: ellipsis;
 `;
 
-const EmptyName = styled.div`
+const TokenAccountAddress = styled.div`
+  overflow: hidden;
+
   color: #a3a5ba;
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 140%;
+
+  white-space: nowrap;
+  text-overflow: ellipsis;
+
+  &:hover {
+    color: #5887ff;
+  }
 `;
 
-const ChevronWrapper = styled.div`
-  display: flex;
-  align-items: center;
-
-  margin-left: 26px;
+const EmptyName = styled.div`
+  color: #a3a5ba;
 `;
 
 const ChevronIcon = styled(Icon)`
@@ -129,57 +120,15 @@ const ChevronIcon = styled(Icon)`
   color: #000;
 `;
 
-const TokenWrapper = styled.div`
+const ChevronWrapper = styled.div`
   display: flex;
-  min-width: 0;
+  align-items: center;
 
-  cursor: pointer;
+  margin-left: 26px;
 
   &.isOpen {
-    ${TokenName}, ${ChevronIcon} {
-      color: #5887ff;
-    }
+    transform: rotate(180deg);
   }
-`;
-
-const AmountInput = styled.input`
-  max-width: 200px;
-
-  color: #000;
-  font-weight: 600;
-  font-size: 28px;
-  line-height: 120%;
-  text-align: right;
-
-  background: transparent;
-  border: 0;
-
-  outline: none;
-
-  appearance: none;
-
-  &::placeholder {
-    color: #a3a5ba;
-  }
-`;
-
-const BalanceWrapper = styled.div`
-  display: flex;
-  justify-content: space-between;
-  margin-top: 3px;
-
-  color: #a3a5ba;
-  font-weight: 600;
-  font-size: 16px;
-  line-height: 24px;
-`;
-
-const BalanceText = styled.div`
-  display: flex;
-`;
-
-const AmountUSDStyled = styled(AmountUSD)`
-  margin-left: 3px;
 `;
 
 const DropDownListContainer = styled.div`
@@ -204,15 +153,6 @@ const DropDownHeader = styled.div`
   backdrop-filter: blur(15px);
 `;
 
-const Title = styled.div`
-  padding: 12px 0;
-
-  color: #a3a5ba;
-  font-weight: 600;
-  font-size: 14px;
-  line-height: 140%;
-`;
-
 const FiltersWrapper = styled.div`
   display: flex;
   flex: 1;
@@ -223,53 +163,6 @@ const FiltersWrapper = styled.div`
     margin-right: 12px;
   }
 `;
-
-//
-// Uncomment in the future
-//
-// const FilterName = styled.div`
-//   display: flex;
-//   align-items: center;
-//   height: 34px;
-//   padding: 0 12px;
-//
-//   color: #a3a5ba;
-//   font-weight: 600;
-//   font-size: 13px;
-//   line-height: 140%;
-//   white-space: nowrap;
-//
-//   background: rgba(163, 165, 186, 0.1);
-//   border-radius: 12px;
-//
-//   cursor: pointer;
-//
-//   &.active {
-//     color: #fff;
-//
-//     background: #5887ff;
-//   }
-// `;
-//
-// const SearchCircle = styled.div`
-//   display: flex;
-//   flex-shrink: 0;
-//   align-items: center;
-//   justify-content: center;
-//   width: 34px;
-//   height: 34px;
-//
-//   background: #f6f6f8;
-//   border-radius: 12px;
-//   cursor: pointer;
-// `;
-//
-// const SearchIcon = styled(Icon)`
-//   width: 24px;
-//   height: 24px;
-//
-//   color: #a3a5ba;
-// `;
 
 const DropDownList = styled.div`
   max-height: 400px;
@@ -297,47 +190,31 @@ const AllTokens = styled(TitleTokens)`
 `;
 
 type Props = {
-  direction?: 'from' | 'to';
   tokens?: Token[];
   tokenAccounts: TokenAccount[];
   token?: Token;
-  tokenAccount?: TokenAccount;
-  amount?: string;
+  tokenAccount?: TokenAccount | null;
   onTokenAccountChange: (token: Token, tokenAccount: TokenAccount | null) => void;
-  onAmountChange: (minorAmount: string) => void;
-  disabled?: boolean;
-  disabledInput?: boolean;
   className?: string;
 };
 
 const SCROLL_THRESHOLD = 15;
 
-export const FromToSelectInput: FunctionComponent<Props> = ({
-  direction = 'from',
+export const SelectTokenAccount: FunctionComponent<Props> = ({
   tokens,
   tokenAccounts,
   token,
   tokenAccount,
-  amount,
   onTokenAccountChange,
-  onAmountChange,
-  disabled,
-  disabledInput,
   className,
 }) => {
   const selectorRef = useRef<HTMLDivElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
   const [filter, setFilter] = useState('');
-  const [localAmount, setLocalAmount] = useState(String(amount));
   const [isOpen, setIsOpen] = useState(false);
   const [scrollTop, setScrollTop] = useState(0);
-
-  useEffect(() => {
-    if (amount && amount !== localAmount) {
-      setLocalAmount(amount);
-    }
-  }, [amount]);
+  const [copied, setCopied] = useState(false);
 
   const handleScroll = throttle(() => {
     if (!listRef.current) {
@@ -363,6 +240,25 @@ export const FromToSelectInput: FunctionComponent<Props> = ({
       !dropdownRef.current?.contains(e.target as HTMLDivElement)
     ) {
       setIsOpen(false);
+    }
+  };
+
+  const handleCopyClick = () => {
+    if (!tokenAccount) {
+      return;
+    }
+
+    try {
+      void navigator.clipboard.writeText(tokenAccount.address.toBase58());
+      setCopied(true);
+      ToastManager.info(`Wallet Address Copied!`);
+
+      // fade copied after some seconds
+      setTimeout(() => {
+        setCopied(false);
+      }, 2000);
+    } catch (error) {
+      console.error(error);
     }
   };
 
@@ -408,42 +304,10 @@ export const FromToSelectInput: FunctionComponent<Props> = ({
     onTokenAccountChange(nextToken, null);
   };
 
-  const handleAllBalanceClick = () => {
-    if (!tokenAccount) {
-      return;
-    }
-
-    onAmountChange(minorAmountToMajor(tokenAccount.balance, tokenAccount.mint).toString());
-  };
-
-  const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    let nextAmount = e.target.value.replace(/[^\d.]/g, '').replace(/^(\d*\.?)|(\d*)\.?/g, '$1$2');
-
-    if (nextAmount === '.') {
-      nextAmount = '0.';
-    }
-
-    setLocalAmount(nextAmount);
-
-    if (!isNil(Number(nextAmount))) {
-      onAmountChange(nextAmount);
-    }
-  };
-
   const handleFilterChange = (value: string) => {
     const nextFilter = value.trim();
 
     setFilter(nextFilter);
-  };
-
-  const renderBalance = () => {
-    if (!tokenAccount) {
-      return null;
-    }
-
-    return `${tokenAccount?.mint.toMajorDenomination(tokenAccount.balance).toString()} ${
-      tokenAccount?.mint.symbol
-    }`;
   };
 
   const filteredTokenAccounts = useMemo(() => {
@@ -485,64 +349,34 @@ export const FromToSelectInput: FunctionComponent<Props> = ({
     );
   }, [tokens, filteredTokenAccounts, filter]);
 
-  const hasBalance = tokenAccount
-    ? tokenAccount.mint.toMajorDenomination(tokenAccount.balance).toNumber() >= Number(localAmount)
-    : false;
-
   return (
     <Wrapper className={className}>
-      <TopWrapper>
-        <FromTitle>{direction === 'from' ? 'From' : 'To'}</FromTitle>
-      </TopWrapper>
-      <MainWrapper>
+      <MainWrapper
+        ref={selectorRef}
+        onClick={handleSelectorClick}
+        className={classNames({ isOpen })}>
         <TokenAvatarWrapper className={classNames({ isOpen: isOpen && !token })}>
-          {token ? <TokenAvatar symbol={token.symbol} size={44} /> : <WalletIcon name="wallet" />}
+          {token ? <TokenAvatar symbol={token.symbol} size={40} /> : <WalletIcon name="wallet" />}
         </TokenAvatarWrapper>
         <InfoWrapper>
-          <SpecifyTokenWrapper>
-            <TokenWrapper
-              ref={selectorRef}
-              onClick={handleSelectorClick}
-              className={classNames({ isOpen })}>
-              <TokenName title={token?.address.toBase58()}>
-                {token?.symbol ||
-                  (tokenAccount && shortAddress(tokenAccount.address.toBase58())) || (
-                    <EmptyName>—</EmptyName>
-                  )}
-              </TokenName>
-              <ChevronWrapper>
-                <ChevronIcon name="arrow-triangle" />
-              </ChevronWrapper>
-            </TokenWrapper>
-            <AmountInput
-              placeholder={token?.toMajorDenomination(0).toString() || '0'}
-              value={localAmount}
-              onChange={handleAmountChange}
-              disabled={disabled || disabledInput}
-            />
-          </SpecifyTokenWrapper>
-          <BalanceWrapper>
-            <BalanceText>
-              {token && tokenAccount ? (
-                direction === 'from' && !disabled ? (
-                  <AllBalance
-                    onClick={handleAllBalanceClick}
-                    className={classNames({ disabled, error: !hasBalance })}>
-                    Available: {renderBalance()}
-                  </AllBalance>
-                ) : (
-                  <>Balance: {renderBalance()}</>
-                )
-              ) : undefined}
-              {!token ? 'Select currency' : undefined}
-            </BalanceText>
-            {token ? (
-              <BalanceText>
-                ≈ <AmountUSDStyled value={new Decimal(localAmount || 0)} symbol={token?.symbol} />
-              </BalanceText>
-            ) : undefined}
-          </BalanceWrapper>
+          {copied ? (
+            <CopiedText>Copied!</CopiedText>
+          ) : (
+            <TokenName title={token?.address.toBase58()}>
+              {token?.symbol || (tokenAccount && shortAddress(tokenAccount.address.toBase58())) || (
+                <EmptyName>—</EmptyName>
+              )}
+            </TokenName>
+          )}
+          {tokenAccount ? (
+            <TokenAccountAddress onClick={handleCopyClick}>
+              {tokenAccount.address.toBase58()}
+            </TokenAccountAddress>
+          ) : undefined}
         </InfoWrapper>
+        <ChevronWrapper className={classNames({ isOpen })}>
+          <ChevronIcon name="arrow-triangle" />
+        </ChevronWrapper>
       </MainWrapper>
       {isOpen ? (
         <DropDownListContainer ref={dropdownRef}>
@@ -550,19 +384,8 @@ export const FromToSelectInput: FunctionComponent<Props> = ({
             style={{
               boxShadow,
             }}>
-            <Title>Select token</Title>
             <SlideContainer>
               <FiltersWrapper>
-                {/* Uncomment in the future */}
-                {/* <SearchCircle> */}
-                {/*  <SearchIcon name="search" /> */}
-                {/* </SearchCircle> */}
-                {/* <FilterName>All</FilterName> */}
-                {/* <FilterName>My tokens set</FilterName> */}
-                {/* <FilterName>Token Exchange</FilterName> */}
-                {/* <FilterName>Aave</FilterName> */}
-                {/* <FilterName>Compound</FilterName> */}
-                {/* <FilterName>Last</FilterName> */}
                 <SearchInput
                   placeholder="Search for token"
                   value={filter}
@@ -574,7 +397,7 @@ export const FromToSelectInput: FunctionComponent<Props> = ({
           <DropDownList ref={listRef}>
             {filteredTokenAccounts?.length ? (
               <>
-                {direction === 'to' ? <YourTokens>Your tokens</YourTokens> : undefined}
+                <YourTokens>Your tokens</YourTokens>
                 {filteredTokenAccounts.map((account) => (
                   <TokenAccountRow
                     key={account.address.toBase58()}
