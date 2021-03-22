@@ -90,7 +90,7 @@ export const Layout: FunctionComponent<Props> = ({
     if (loading) {
       NProgress.start();
     } else {
-      // NProgress.done();
+      NProgress.done();
     }
   }, [Boolean(loading)]);
 
