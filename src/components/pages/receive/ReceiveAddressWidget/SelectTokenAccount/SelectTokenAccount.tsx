@@ -114,10 +114,10 @@ const EmptyName = styled.div`
 `;
 
 const ChevronIcon = styled(Icon)`
-  width: 24px;
-  height: 24px;
+  width: 20px;
+  height: 20px;
 
-  color: #000;
+  color: #a3a5ba;
 `;
 
 const ChevronWrapper = styled.div`
@@ -128,6 +128,10 @@ const ChevronWrapper = styled.div`
 
   &.isOpen {
     transform: rotate(180deg);
+
+    ${ChevronIcon} {
+      color: #000;
+    }
   }
 `;
 
@@ -287,7 +291,7 @@ export const SelectTokenAccount: FunctionComponent<Props> = ({
     };
   }, [isOpen, listRef.current]);
 
-  const handleSelectorClick = (e: MouseEvent) => {
+  const handleSelectorClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!tokenAccounts) {
       return;
     }
@@ -375,7 +379,9 @@ export const SelectTokenAccount: FunctionComponent<Props> = ({
             <TokenAccountAddress ref={tokenAddressRef} onClick={handleCopyClick}>
               {tokenAccount.address.toBase58()}
             </TokenAccountAddress>
-          ) : undefined}
+          ) : (
+            <TokenAccountAddress>Add token to your list to see token address</TokenAccountAddress>
+          )}
         </InfoWrapper>
         <ChevronWrapper className={classNames({ isOpen })}>
           <ChevronIcon name="arrow-triangle" />
