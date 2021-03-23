@@ -328,7 +328,7 @@ export const SwapWidget: FunctionComponent = () => {
 
   const rate =
     selectedPool && firstToken && secondToken
-      ? selectedPool.impliedRate(isReverseRate ? firstToken : secondToken, firstAmount).toNumber()
+      ? selectedPool.impliedRate(isReverseRate ? firstToken : secondToken, 1).toNumber()
       : undefined;
 
   const isDisabled = isExecuting || !selectedPool;
@@ -404,7 +404,7 @@ export const SwapWidget: FunctionComponent = () => {
               </PropertyValue>
             </PropertyLine>
           ) : undefined}
-          {isShowFee && !isNil(slippage) ? (
+          {selectedPool && firstToken && secondToken && !isNil(slippage) ? (
             <PropertyLine>
               Slippage:
               <PropertyValue>{slippage} %</PropertyValue>
