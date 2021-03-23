@@ -3,11 +3,13 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import { styled } from '@linaria/react';
 import classNames from 'classnames';
+import { Feature } from 'flagged';
 import { rgba } from 'polished';
 
 import { TokenAccount } from 'api/token/TokenAccount';
 import { Widget } from 'components/common/Widget';
 import { Button, Icon } from 'components/ui';
+import { FEATURE_ADD_TOKEN_BUTTON } from 'config/featureFlags';
 import { openModal } from 'store/actions/modals';
 import { SHOW_MODAL_ADD_COIN } from 'store/constants/modalTypes';
 import { RootState } from 'store/rootReducer';
@@ -151,9 +153,11 @@ export const TokensWidget: FunctionComponent = () => {
     <WrapperWidget
       title="Wallets"
       action={
-        <AddButton lightGray small onClick={handleAddCoinClick}>
-          <IconPlus name="plus" /> Add Token
-        </AddButton>
+        <Feature name={FEATURE_ADD_TOKEN_BUTTON}>
+          <AddButton lightGray small onClick={handleAddCoinClick}>
+            <IconPlus name="plus" /> Add Token
+          </AddButton>
+        </Feature>
       }>
       <TokenList items={tokens} isZeroBalancesHidden={isZeroBalancesHidden} />
       {hiddenTokensList.length > 0 ? (
