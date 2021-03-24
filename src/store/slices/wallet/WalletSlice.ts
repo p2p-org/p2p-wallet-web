@@ -11,6 +11,7 @@ import { mergeDeepRight } from 'ramda';
 import { APIFactory as TokenAPIFactory, TransferParameters } from 'api/token';
 import { AccountListener } from 'api/token/AccountListener';
 import { Token } from 'api/token/Token';
+import { SOL_AVATAR_URL, SOL_COLOR } from 'api/token/token.config';
 import { SerializableTokenAccount, TokenAccount } from 'api/token/TokenAccount';
 import * as WalletAPI from 'api/wallet';
 import { getBalance, getWallet, WalletDataType, WalletType } from 'api/wallet';
@@ -67,7 +68,16 @@ const getSolToken = async () => {
   const balance = await getBalance(publicKey);
 
   // Fake token to simulate SOL as Token
-  const mint = new Token(SYSTEM_PROGRAM_ID, 9, 0, undefined, 'Solana', 'SOL');
+  const mint = new Token(
+    SYSTEM_PROGRAM_ID,
+    9,
+    0,
+    undefined,
+    'Solana',
+    'SOL',
+    SOL_COLOR,
+    SOL_AVATAR_URL,
+  );
   return new TokenAccount(mint, SYSTEM_PROGRAM_ID, SYSTEM_PROGRAM_ID, publicKey, balance);
 };
 

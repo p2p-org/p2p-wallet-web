@@ -130,6 +130,7 @@ export const TotalBalanceWidget: FunctionComponent = () => {
       data.push({
         label: `${tokenAccount.mint.symbol} ${balanceUSD}`,
         value: balance,
+        color: tokenAccount.mint.color,
       });
     });
 

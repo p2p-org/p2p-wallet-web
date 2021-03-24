@@ -31,7 +31,7 @@ import { ExtendedCluster } from 'utils/types';
 
 import { ACCOUNT_UPDATED_EVENT, AccountListener, AccountUpdateEvent } from './AccountListener';
 import { Token } from './Token';
-import tokenConfig, { TokenConfig } from './token.config';
+import tokenConfig, { SOL_AVATAR_URL, SOL_COLOR, TokenConfig } from './token.config';
 import { TokenAccount } from './TokenAccount';
 
 export const TOKEN_PROGRAM_ID = new PublicKey('TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA');
@@ -179,6 +179,8 @@ export const APIFactory = memoizeWith(
         mintInfo.mintAuthority || undefined, // maps a null mintAuthority to undefined
         configForToken?.tokenName,
         configForToken?.tokenSymbol,
+        configForToken?.color,
+        configForToken?.icon,
       );
     };
 
@@ -230,6 +232,8 @@ export const APIFactory = memoizeWith(
           mintInfo.mintAuthority ? new PublicKey(mintInfo.mintAuthority) : undefined, // maps a null mintAuthority to undefined
           configForToken?.tokenName,
           configForToken?.tokenSymbol,
+          configForToken?.color,
+          configForToken?.icon,
         );
 
         // set cache
@@ -294,14 +298,32 @@ export const APIFactory = memoizeWith(
       // For SOL simulated token
       if (account.equals(getWallet().pubkey)) {
         const balance = await connection.getBalance(account);
-        const mint = new Token(SYSTEM_PROGRAM_ID, 9, 0, undefined, 'Solana', 'SOL');
+        const mint = new Token(
+          SYSTEM_PROGRAM_ID,
+          9,
+          0,
+          undefined,
+          'Solana',
+          'SOL',
+          SOL_COLOR,
+          SOL_AVATAR_URL,
+        );
 
         return new TokenAccount(mint, SYSTEM_PROGRAM_ID, SYSTEM_PROGRAM_ID, account, balance);
       }
 
       // For SOL tokens
       if (getParsedAccountInfoResult.value?.owner.equals(SYSTEM_PROGRAM_ID)) {
-        const mint = new Token(SYSTEM_PROGRAM_ID, 9, 0, undefined, 'Solana', 'SOL');
+        const mint = new Token(
+          SYSTEM_PROGRAM_ID,
+          9,
+          0,
+          undefined,
+          'Solana',
+          'SOL',
+          SOL_COLOR,
+          SOL_AVATAR_URL,
+        );
 
         return new TokenAccount(
           mint,
