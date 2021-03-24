@@ -341,6 +341,7 @@ export const APIFactory = (cluster: ExtendedCluster): API => {
   const createWrappedSolAccount = async (
     fromAccount: TokenAccount,
     amount: number,
+    payer: PublicKey,
     instructions: TransactionInstruction[],
     cleanupInstructions: TransactionInstruction[],
     signers: Account[],
@@ -366,7 +367,7 @@ export const APIFactory = (cluster: ExtendedCluster): API => {
         TOKEN_PROGRAM_ID,
         WRAPPED_SOL_MINT,
         newAccount.publicKey,
-        getWallet().pubkey,
+        payer,
       ),
     );
 
@@ -374,8 +375,8 @@ export const APIFactory = (cluster: ExtendedCluster): API => {
       SPLToken.createCloseAccountInstruction(
         TOKEN_PROGRAM_ID,
         newAccount.publicKey,
-        getWallet().pubkey,
-        getWallet().pubkey,
+        payer,
+        payer,
         [],
       ),
     );
@@ -481,6 +482,7 @@ export const APIFactory = (cluster: ExtendedCluster): API => {
           ? await createWrappedSolAccount(
               parameters.fromAccount,
               parameters.fromAmount,
+              getWallet().pubkey,
               instructions,
               cleanupInstructions,
               signers,
@@ -505,10 +507,14 @@ export const APIFactory = (cluster: ExtendedCluster): API => {
 
       console.log('Executing swap:', parameters);
 
-      const delegate = parameters.pool.tokenSwapAuthority();
-
       // approveInstruction
-      instructions.push(tokenAPI.approveInstruction(fromAccount, delegate, parameters.fromAmount));
+      instructions.push(
+        tokenAPI.approveInstruction(
+          fromAccount,
+          userTransferAuthority.publicKey,
+          parameters.fromAmount,
+        ),
+      );
 
       // TODO: host fee
       const feeAccount = swapHostFeeAddress
