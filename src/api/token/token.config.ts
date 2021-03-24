@@ -82,9 +82,16 @@ export default {
         'https://raw.githubusercontent.com/p2p-org/p2p-wallet-web/develop/public/assets/images/tokens/XRP.png',
     },
     {
-      tokenSymbol: 'USDT',
+      tokenSymbol: 'WUSDT',
       mintAddress: 'BQcdHdAQW1hczDbBi9hiegXAR7A98Q9jx3X3iBBBDiq4',
-      tokenName: 'Wrapped USDT',
+      tokenName: 'Wrapped USDT (Sollet)',
+      icon:
+        'https://raw.githubusercontent.com/p2p-org/p2p-wallet-web/develop/public/assets/images/tokens/USDT.png',
+    },
+    {
+      tokenSymbol: 'USDT',
+      mintAddress: 'Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB',
+      tokenName: 'USDT',
       icon:
         'https://raw.githubusercontent.com/p2p-org/p2p-wallet-web/develop/public/assets/images/tokens/USDT.png',
     },
@@ -98,7 +105,7 @@ export default {
     {
       tokenSymbol: 'WUSDC',
       mintAddress: 'BXXkv6z8ykpG1yuvUDPgh732wzVHB69RnB9YgSYh3itW',
-      tokenName: 'Wrapped USDC',
+      tokenName: 'Wrapped USD Tether',
       icon:
         'https://raw.githubusercontent.com/p2p-org/p2p-wallet-web/develop/public/assets/images/tokens/USDC.png',
       deprecated: true,

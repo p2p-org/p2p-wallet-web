@@ -14,12 +14,12 @@ export default {
     swapProgramId: null,
   },
   devnet: {
-    swapProgramId: new PublicKey('E7G3NKPwVcuPXjqL11J2ZZWBVRsocb6Lu3nK5BrRwBNd'),
+    swapProgramId: new PublicKey('SwaPpA9LAaLfeLi3a68M4DjnLqgtticKg6CnyNwgAC8'),
   },
   testnet: {
-    swapProgramId: new PublicKey('FmgrCQX1JJSAkJEk8fiL85Cgnh7g3DS1rmakEjP1eCyL'),
+    swapProgramId: new PublicKey('SwaPpA9LAaLfeLi3a68M4DjnLqgtticKg6CnyNwgAC8'),
   },
   'mainnet-beta': {
-    swapProgramId: new PublicKey('9qvG1zUp8xF1Bi4m6UdRNby1BAAuaDrUxSpv4CmRRMjL'),
+    swapProgramId: new PublicKey('SwaPpA9LAaLfeLi3a68M4DjnLqgtticKg6CnyNwgAC8'),
   },
 } as PoolsByEntrypointType;

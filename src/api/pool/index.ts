@@ -181,7 +181,6 @@ export const APIFactory = (cluster: ExtendedCluster): API => {
       tokenAccountB,
       mintA,
       mintB,
-      curveType,
       tradeFeeNumerator,
       tradeFeeDenominator,
       ownerTradeFeeNumerator,
@@ -190,6 +189,7 @@ export const APIFactory = (cluster: ExtendedCluster): API => {
       ownerWithdrawFeeDenominator,
       hostFeeNumerator,
       hostFeeDenominator,
+      curveType,
       payer,
     );
   };
@@ -296,6 +296,7 @@ export const APIFactory = (cluster: ExtendedCluster): API => {
 
   const createSwapTransactionInstruction = (
     parameters: Required<SwapParameters> & {
+      userTransferAuthority: PublicKey;
       hostFeePublicKey?: PublicKey;
     },
   ): TransactionInstruction => {
@@ -322,6 +323,7 @@ export const APIFactory = (cluster: ExtendedCluster): API => {
     return TokenSwap.swapInstruction(
       parameters.pool.address,
       authority,
+      parameters.userTransferAuthority,
       parameters.fromAccount.address,
       poolIntoAccount.address,
       poolFromAccount.address,
@@ -466,9 +468,11 @@ export const APIFactory = (cluster: ExtendedCluster): API => {
     try {
       validateSwapParameters(parameters);
 
+      const userTransferAuthority = new Account();
+
       const instructions: TransactionInstruction[] = [];
       const cleanupInstructions: TransactionInstruction[] = [];
-      const signers: Account[] = [];
+      const signers: Account[] = [userTransferAuthority];
 
       // Create WSOL or Token account
       const fromAccount =
@@ -526,6 +530,7 @@ export const APIFactory = (cluster: ExtendedCluster): API => {
           hostFeePublicKey: feeAccount?.address,
           slippage: parameters.slippage || 0,
           pool: parameters.pool,
+          userTransferAuthority: userTransferAuthority.publicKey,
         }),
       );
 
