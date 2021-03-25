@@ -13,6 +13,7 @@ import { Token } from 'api/token/Token';
 import { TokenAccount } from 'api/token/TokenAccount';
 import { SettingsAction } from 'components/common/SendSwapWidget/SwapWidget/SettingsAction';
 import { ToastManager } from 'components/common/ToastManager';
+import { TokenAvatar } from 'components/common/TokenAvatar';
 import { Button, Icon, Tooltip } from 'components/ui';
 import { openModal } from 'store/actions/modals';
 import { SHOW_MODAL_TRANSACTION_STATUS } from 'store/constants/modalTypes';
@@ -133,6 +134,23 @@ const TxName = styled.div`
 `;
 
 const TxValue = styled.div`
+  font-weight: 600;
+  font-size: 14px;
+`;
+
+const PoweredByBannerWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding-bottom: 22px;
+`;
+
+const PoweredBy = styled.div`
+  margin-right: 10px;
+
+  color: #a3a5ba;
+
   font-weight: 600;
   font-size: 14px;
 `;
@@ -490,6 +508,10 @@ export const SwapWidget: FunctionComponent = () => {
           <Hint>All deposits are stored 100% non-custodiallity with keys held on this device</Hint>
         </ButtonWrapper>
       </BottomWrapper>
+      <PoweredByBannerWrapper>
+        <PoweredBy>Powered by Project Serum</PoweredBy>
+        <TokenAvatar symbol="SRM" size={24} />
+      </PoweredByBannerWrapper>
     </WrapperWidgetPage>
   );
 };
