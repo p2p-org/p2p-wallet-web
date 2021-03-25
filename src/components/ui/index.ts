@@ -6,3 +6,4 @@ export * from './Select';
 export * from './Switch';
 export * from './RadioButton';
 export * from './Menu';
+export * from './Tooltip';

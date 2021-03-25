@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import { styled } from '@linaria/react';
 import { unwrapResult } from '@reduxjs/toolkit';
+import { AccountLayout } from '@solana/spl-token';
 import { Decimal } from 'decimal.js';
 import { any, complement, isNil, or, pathEq } from 'ramda';
 
@@ -12,12 +13,16 @@ import { Token } from 'api/token/Token';
 import { TokenAccount } from 'api/token/TokenAccount';
 import { SettingsAction } from 'components/common/SendSwapWidget/SwapWidget/SettingsAction';
 import { ToastManager } from 'components/common/ToastManager';
-import { Button, Icon } from 'components/ui';
+import { Button, Icon, Tooltip } from 'components/ui';
 import { openModal } from 'store/actions/modals';
 import { SHOW_MODAL_TRANSACTION_STATUS } from 'store/constants/modalTypes';
 import { executeSwap } from 'store/slices/swap/SwapSlice';
 import { clearTokenPairState, updateTokenPairState } from 'store/slices/tokenPair/TokenPairSlice';
 import { matchesPool, tokenPairSelector } from 'store/slices/tokenPair/utils/tokenPair';
+import {
+  getMinimumBalanceForRentExemption,
+  getRecentBlockhash,
+} from 'store/slices/wallet/WalletSlice';
 import { majorAmountToMinor, minorAmountToMajor } from 'utils/amount';
 
 import {
@@ -114,6 +119,30 @@ const PropertyValue = styled.div`
   color: #000;
 `;
 
+const TooltipRow = styled.div`
+  display: flex;
+`;
+
+const TxName = styled.div`
+  flex-grow: 1;
+
+  margin-right: 5px;
+
+  font-weight: normal;
+  font-size: 14px;
+`;
+
+const TxValue = styled.div`
+  font-weight: 600;
+  font-size: 14px;
+`;
+
+const formatFee = (amount: number): number =>
+  new Decimal(amount)
+    .div(10 ** 9)
+    .toDecimalPlaces(9)
+    .toNumber();
+
 const isInPoolsTokenAccounts = (pools: Pool[], selectedTokenAccount?: TokenAccount) => (
   tokenAccount: TokenAccount,
 ) => {
@@ -148,6 +177,8 @@ export const SwapWidget: FunctionComponent = () => {
   const dispatch = useDispatch();
   const [isExecuting, setIsExecuting] = useState(false);
   const [isReverseRate, setIsReverseRate] = useState(false);
+  const [rentFee, setRentFee] = useState(0);
+  const [txFee, setTxFee] = useState(0);
   const availableTokens = useSelector((state) =>
     state.global.availableTokens.map((token) => Token.from(token)),
   );
@@ -174,6 +205,25 @@ export const SwapWidget: FunctionComponent = () => {
     return () => {
       dispatch(clearTokenPairState());
     };
+  }, []);
+
+  useEffect(() => {
+    const mount = async () => {
+      try {
+        const resultRentFee = unwrapResult(
+          await dispatch(getMinimumBalanceForRentExemption(AccountLayout.span)),
+        );
+
+        const resultRecentBlockhash = unwrapResult(await dispatch(getRecentBlockhash()));
+
+        setRentFee(formatFee(resultRentFee));
+        setTxFee(formatFee(resultRecentBlockhash.feeCalculator.lamportsPerSignature));
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    void mount();
   }, []);
 
   const firstTokenAccounts = useMemo(() => {
@@ -220,8 +270,10 @@ export const SwapWidget: FunctionComponent = () => {
       const action = executeSwap();
 
       unwrapResult(
+        // eslint-disable-next-line @typescript-eslint/await-thenable
         await dispatch(
           openModal({
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
             modalType: SHOW_MODAL_TRANSACTION_STATUS,
             props: {
               type: 'swap',
@@ -333,6 +385,7 @@ export const SwapWidget: FunctionComponent = () => {
 
   const isDisabled = isExecuting || !selectedPool;
   const isShowFee = firstToken && fee && feeProperties;
+  const isNeedCreateWallet = isNil(secondTokenAccount);
 
   return (
     <WrapperWidgetPage
@@ -397,12 +450,31 @@ export const SwapWidget: FunctionComponent = () => {
             </PropertyLine>
           ) : undefined}
           {isShowFee ? (
-            <PropertyLine>
-              Liquidity Provider Fee:{' '}
-              <PropertyValue>
-                {fee} {feeProperties?.token.symbol}
-              </PropertyValue>
-            </PropertyLine>
+            <>
+              <PropertyLine>
+                Liquidity Provider Fee:
+                <PropertyValue>
+                  {fee} {feeProperties?.token.symbol}
+                </PropertyValue>
+              </PropertyLine>
+              <PropertyLine>
+                Fee:
+                <PropertyValue>
+                  <Tooltip title={`${isNeedCreateWallet ? txFee + rentFee : txFee} SOL`}>
+                    <TooltipRow>
+                      <TxName>Transaction:</TxName>
+                      <TxValue>{`${txFee} SOL`}</TxValue>
+                    </TooltipRow>
+                    {isNeedCreateWallet ? (
+                      <TooltipRow>
+                        <TxName>Wallet creation:</TxName>
+                        <TxValue>{`${rentFee} SOL`}</TxValue>
+                      </TooltipRow>
+                    ) : undefined}
+                  </Tooltip>
+                </PropertyValue>
+              </PropertyLine>
+            </>
           ) : undefined}
           {selectedPool && firstToken && secondToken && !isNil(slippage) ? (
             <PropertyLine>

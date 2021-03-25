@@ -5,7 +5,7 @@ import {
   PayloadAction,
   unwrapResult,
 } from '@reduxjs/toolkit';
-import { Account, Cluster, PublicKey } from '@solana/web3.js';
+import { Account, BlockhashAndFeeCalculator, Cluster, PublicKey } from '@solana/web3.js';
 import { mergeDeepRight } from 'ramda';
 
 import { APIFactory as TokenAPIFactory, TransferParameters } from 'api/token';
@@ -225,6 +225,13 @@ export const getMinimumBalanceForRentExemption = createAsyncThunk<number, number
   `${WALLET_SLICE_NAME}/getMinimumBalanceForRentExemption`,
   async (length) => {
     return WalletAPI.getMinimumBalanceForRentExemption(length);
+  },
+);
+
+export const getRecentBlockhash = createAsyncThunk<BlockhashAndFeeCalculator>(
+  `${WALLET_SLICE_NAME}/getRecentBlockhash`,
+  async () => {
+    return WalletAPI.getRecentBlockhash();
   },
 );
 

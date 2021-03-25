@@ -1,5 +1,6 @@
 import {
   Account,
+  BlockhashAndFeeCalculator,
   Commitment,
   Connection,
   PublicKey,
@@ -199,6 +200,14 @@ export const getMinimumBalanceForRentExemption = (length: number): Promise<numbe
   }
 
   return connection.getMinimumBalanceForRentExemption(length);
+};
+
+export const getRecentBlockhash = (): Promise<BlockhashAndFeeCalculator> => {
+  if (!wallet || !connection) {
+    throw new Error('Connect first');
+  }
+
+  return connection.getRecentBlockhash();
 };
 
 export const airdrop = (): null | Promise<string> => wallet && airdropTo(wallet.pubkey);
