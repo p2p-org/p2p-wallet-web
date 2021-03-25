@@ -133,7 +133,8 @@ export const TokensWidget: FunctionComponent = () => {
       hiddenTokens.includes(token.address.toBase58()) ||
       (isZeroBalancesHidden &&
         token.balance.lte(0) &&
-        !zeroBalanceTokens.includes(token.address.toBase58()))
+        !zeroBalanceTokens.includes(token.address.toBase58()) &&
+        token.mint.symbol !== 'SOL')
     ) {
       hiddenTokensList.push(token);
     } else {
