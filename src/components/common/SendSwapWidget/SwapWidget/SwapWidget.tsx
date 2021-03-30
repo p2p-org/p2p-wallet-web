@@ -405,8 +405,6 @@ export const SwapWidget: FunctionComponent = () => {
   const isShowFee = firstToken && fee && feeProperties;
   const isNeedCreateWallet = isNil(secondTokenAccount);
 
-  console.log('---', feeProperties);
-
   return (
     <WrapperWidgetPage
       title="Swap"
