@@ -271,7 +271,7 @@ export const SwapWidget: FunctionComponent = () => {
     if (selectedPool && firstToken && firstAmount) {
       return {
         amount: selectedPool.impliedFee(firstToken, firstAmount),
-        token: selectedPool.otherToken(firstToken),
+        token: firstToken,
       };
     }
   }, [selectedPool, firstToken, firstAmount]);
@@ -404,6 +404,8 @@ export const SwapWidget: FunctionComponent = () => {
   const isDisabled = isExecuting || !selectedPool;
   const isShowFee = firstToken && fee && feeProperties;
   const isNeedCreateWallet = isNil(secondTokenAccount);
+
+  console.log('---', feeProperties);
 
   return (
     <WrapperWidgetPage

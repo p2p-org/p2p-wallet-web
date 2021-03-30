@@ -68,6 +68,7 @@ const HiddenTokens = styled.div`
 `;
 
 const HideIconWrapper = styled.div`
+  height: 24px;
   padding: 0 15px;
 `;
 

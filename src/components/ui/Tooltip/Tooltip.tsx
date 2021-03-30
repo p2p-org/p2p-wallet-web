@@ -20,7 +20,7 @@ const Popover = styled.div`
 
   min-width: max-content;
   margin-top: 8px;
-  padding: 8px;
+  padding: 10px 12px;
 
   color: #fff;
 
