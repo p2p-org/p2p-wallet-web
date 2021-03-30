@@ -34,5 +34,5 @@ export const TokenAvatar: FunctionComponent<Props & HTMLAttributes<HTMLDivElemen
     }
   }
 
-  return <AvatarStyled src={newSrc} {...props} />;
+  return <AvatarStyled src={newSrc && `${process.env.PUBLIC_URL}${newSrc}`} {...props} />;
 };

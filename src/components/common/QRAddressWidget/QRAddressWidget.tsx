@@ -149,14 +149,14 @@ export const QRAddressWidget: FunctionComponent<Props> = ({ publicKey, className
   };
 
   if (tokenAccount.mint.symbol === 'SOL') {
-    qrImageSettings.src = SOL_AVATAR_URL;
+    qrImageSettings.src = `${process.env.PUBLIC_URL}${SOL_AVATAR_URL}`;
   } else {
     const iconSrc = tokenConfig[cluster]?.find(
       (token) => token.tokenSymbol === tokenAccount.mint.symbol,
     )?.icon;
 
     if (iconSrc) {
-      qrImageSettings.src = iconSrc;
+      qrImageSettings.src = `${process.env.PUBLIC_URL}${iconSrc}`;
     }
   }
 

@@ -333,14 +333,14 @@ export const TokenAccountQR: FunctionComponent<Props> = ({
   };
 
   if (token.symbol === 'SOL') {
-    qrImageSettings.src = SOL_AVATAR_URL;
+    qrImageSettings.src = `${process.env.PUBLIC_URL}${SOL_AVATAR_URL}`;
   } else {
     const iconSrc = tokenConfig[cluster]?.find(
       (tokenItem) => tokenItem.tokenSymbol === token.symbol,
     )?.icon;
 
     if (iconSrc) {
-      qrImageSettings.src = iconSrc;
+      qrImageSettings.src = `${process.env.PUBLIC_URL}${iconSrc}`;
     }
   }
 
