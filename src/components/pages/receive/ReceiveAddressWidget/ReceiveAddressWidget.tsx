@@ -104,6 +104,7 @@ export const ReceiveAddressWidget: FunctionComponent = () => {
       />
       {token ? (
         <TokenAccountQR
+          key={token.address.toBase58()}
           token={token}
           tokenAccount={tokenAccount}
           onTokenAccountCreate={handleTokenAccountChange}
