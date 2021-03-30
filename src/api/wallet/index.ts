@@ -1,8 +1,9 @@
 import {
   Account,
-  BlockhashAndFeeCalculator,
+  Blockhash,
   Commitment,
   Connection,
+  FeeCalculator,
   PublicKey,
   Transaction,
   TransactionInstruction,
@@ -89,12 +90,11 @@ export const makeTransaction = async (
 
   const { blockhash: recentBlockhash } = await connection.getRecentBlockhash();
 
-  const signatures = [{ publicKey: wallet.pubkey }, ...signers];
   const transaction = new Transaction({
     recentBlockhash,
-    signatures,
   });
   transaction.add(...instructions);
+  transaction.setSigners(wallet.pubkey, ...signers.map((s) => s.publicKey));
 
   // if there are any cosigners (other than the current wallet)
   // sign the transaction
@@ -202,7 +202,10 @@ export const getMinimumBalanceForRentExemption = (length: number): Promise<numbe
   return connection.getMinimumBalanceForRentExemption(length);
 };
 
-export const getRecentBlockhash = (): Promise<BlockhashAndFeeCalculator> => {
+export const getRecentBlockhash = (): Promise<{
+  blockhash: Blockhash;
+  feeCalculator: FeeCalculator;
+}> => {
   if (!wallet || !connection) {
     throw new Error('Connect first');
   }

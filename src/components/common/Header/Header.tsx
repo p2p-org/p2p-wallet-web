@@ -131,7 +131,7 @@ export const Header: FunctionComponent<Props> = ({ breadcrumb }) => {
           <MainContainer>
             <Content>
               <LogoLink to={connected ? '/wallets' : '/'}>
-                <LogoImg src={Logo as string} />
+                <LogoImg src={Logo} />
               </LogoLink>
               {breadcrumb ? (
                 <BreadcrumbWrapper>

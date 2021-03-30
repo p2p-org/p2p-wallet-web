@@ -1,11 +1,12 @@
 {
+  "extends": "./tsconfig.base.json",
   "compilerOptions": {
     "target": "es5",
-    "lib": ["dom", "dom.iterable", "esnext"],
-    "declaration": true,
-    "emitDeclarationOnly": true,
-    "experimentalDecorators": true,
-    "emitDecoratorMetadata": true,
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     "allowJs": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
@@ -17,19 +18,7 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "jsx": "react",
-    "baseUrl": ".",
-    "paths": {
-      "*": ["src/*"],
-      "@solana/web3.js": ["./node_modules/@solana/web3.js/lib/types/index.d.ts"]
-    }
-  },
-  "exclude": ["node_modules"],
-  "include": [
-    "*.js",
-    "src/**/*",
-    "test/[^e2e]/*",
-    "scripts/**/*",
-    "./node_modules/@solana/web3.js/lib/types/index.d.ts"
-  ]
+    "jsx": "react-jsx",
+    "noFallthroughCasesInSwitch": true
+  }
 }

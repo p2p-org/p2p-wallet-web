@@ -540,7 +540,7 @@ export const APIFactory = (cluster: ExtendedCluster): API => {
       );
 
       const transaction = await makeTransaction([...instructions, ...cleanupInstructions], signers);
-      return sendTransaction(transaction);
+      return await sendTransaction(transaction);
     } catch (error) {
       console.error(error);
       throw error;

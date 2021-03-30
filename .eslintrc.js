@@ -1,5 +1,6 @@
 module.exports = {
   root: true,
+  parser: '@typescript-eslint/parser',
   parserOptions: {
     project: './tsconfig.json',
   },
@@ -23,6 +24,7 @@ module.exports = {
     'no-unused-vars': 'error',
     'unicorn/no-null': 'off',
     'unicorn/prefer-ternary': 'off',
+    'prettier/prettier': 'off',
     '@typescript-eslint/restrict-template-expressions': 'off',
     '@typescript-eslint/explicit-module-boundary-types': 'off',
     '@typescript-eslint/no-misused-promises': [
@@ -57,7 +59,7 @@ module.exports = {
           ['^react'], // react
           ['^[^\\.]'], // non-local imports
           [
-            '^constants|^config|^lib|^utils|^store|^api|^features|^pages|^components|^styles|^assets',
+            '^constants|^config|^lib|^utils|^types|^store|^api|^features|^pages|^components|^styles|^assets',
           ], // internal
           ['^\\.'], // local imports
         ],

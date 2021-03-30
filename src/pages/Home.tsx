@@ -143,7 +143,7 @@ export const Home: FunctionComponent = () => {
         <LoaderPage>
           <LoaderWrapper>
             <LoaderStyled />
-            <LogoImg src={logo as string} />
+            <LogoImg src={logo} />
           </LoaderWrapper>
         </LoaderPage>
       ) : (

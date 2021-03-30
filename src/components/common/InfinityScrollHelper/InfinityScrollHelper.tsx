@@ -8,7 +8,7 @@ const Wrapper = styled.div``;
 
 type Props = {
   disabled: boolean;
-  onNeedLoadMore: () => Promise<any> | void;
+  onNeedLoadMore: () => Promise<never> | void;
 };
 
 export class InfinityScrollHelper extends Component<Props> {

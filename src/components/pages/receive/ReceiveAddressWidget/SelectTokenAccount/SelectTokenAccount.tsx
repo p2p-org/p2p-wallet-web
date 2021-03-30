@@ -349,7 +349,7 @@ export const SelectTokenAccount: FunctionComponent<Props> = ({
     const filterLower = filter.toLowerCase();
 
     return tokens.filter(
-      // eslint-disable-next-line no-shadow
+      // eslint-disable-next-line @typescript-eslint/no-shadow
       (token) =>
         token.symbol?.toLowerCase().includes(filterLower) ||
         token.name?.toLowerCase().includes(filterLower),
@@ -419,7 +419,7 @@ export const SelectTokenAccount: FunctionComponent<Props> = ({
             {filteredTokens?.length ? (
               <>
                 <AllTokens>All tokens</AllTokens>
-                {/* eslint-disable-next-line no-shadow */}
+                {/* eslint-disable-next-line @typescript-eslint/no-shadow */}
                 {filteredTokens.map((token) => (
                   <TokenRow
                     key={token.address.toBase58()}

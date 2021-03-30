@@ -478,10 +478,9 @@ export const FromToSelectInput: FunctionComponent<Props> = ({
     const filterLower = filter.toLowerCase();
 
     return tokens.filter(
-      // eslint-disable-next-line no-shadow
-      (token) =>
-        token.symbol?.toLowerCase().includes(filterLower) ||
-        token.name?.toLowerCase().includes(filterLower),
+      (itemToken) =>
+        itemToken.symbol?.toLowerCase().includes(filterLower) ||
+        itemToken.name?.toLowerCase().includes(filterLower),
     );
   }, [tokens, filteredTokenAccounts, filter]);
 
@@ -587,7 +586,7 @@ export const FromToSelectInput: FunctionComponent<Props> = ({
             {filteredTokens?.length ? (
               <>
                 <AllTokens>All tokens</AllTokens>
-                {/* eslint-disable-next-line no-shadow */}
+                {/* eslint-disable-next-line @typescript-eslint/no-shadow */}
                 {filteredTokens.map((token) => (
                   <TokenRow
                     key={token.address.toBase58()}

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FC } from 'react';
 
 import isPropValid from '@emotion/is-prop-valid';
 import { CSSProperties } from '@linaria/core';
@@ -37,12 +37,7 @@ import top from './assets/top-icon.svg';
 import wallet from './assets/wallet-icon.svg';
 import warning from './assets/warning-icon.svg';
 
-export type SvgIconType = {
-  viewBox: string;
-  id: string;
-};
-
-const iconsMap = new Map<string, SvgIconType>([
+const iconsMap = new Map<string, string>([
   ['arrow-triangle', arrowTriangle],
   ['bottom', bottom],
   ['branch', branch],
@@ -78,7 +73,7 @@ const iconsMap = new Map<string, SvgIconType>([
   ['warning', warning],
 ]);
 
-export type IconType = {
+export type Props = {
   name: string;
   size?: string | number;
   height?: string | number;
@@ -87,16 +82,9 @@ export type IconType = {
   className?: string;
 };
 
-export const Icon: React.FunctionComponent<IconType> = ({
-  name,
-  size,
-  height,
-  width,
-  ...props
-}) => {
+export const Icon: FC<Props> = ({ name, size, height, width, ...props }) => {
   const validProps: {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    [prop: string]: any;
+    [prop: string]: never;
   } = {};
 
   Object.keys(props).forEach((prop) => {
@@ -108,7 +96,7 @@ export const Icon: React.FunctionComponent<IconType> = ({
     }
   });
 
-  const icon = iconsMap.get(name);
+  const icon = iconsMap.get(name) as BrowserSpriteSymbol | undefined;
 
   if (!icon) {
     return null;

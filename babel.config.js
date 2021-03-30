@@ -1,15 +1,5 @@
 module.exports = {
-  presets: [
-    [
-      '@babel/preset-env',
-      {
-        targets: { node: 'current' },
-      },
-    ],
-    '@babel/preset-react',
-    '@babel/preset-typescript',
-    'module:@linaria/babel-preset',
-  ],
+  presets: [['react-app', { flow: false, typescript: true }], '@linaria'],
   plugins: [
     [
       'module-resolver',

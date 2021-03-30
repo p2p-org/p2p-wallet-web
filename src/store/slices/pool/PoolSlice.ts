@@ -1,12 +1,8 @@
 import { createAsyncThunk, createSlice, Draft, PayloadAction } from '@reduxjs/toolkit';
 
-// import { APIFactory as IdentityAPIFactory } from 'api/identity';
 import { APIFactory } from 'api/pool';
 import { Pool, SerializablePool } from 'api/pool/Pool';
 import { PoolListener } from 'api/pool/PoolListener';
-// import { APIFactory as TokenAPIFactory } from 'api/token';
-// import * as WalletAPI from 'api/wallet';
-// import { getTokenAccounts } from 'features/wallet/WalletSlice';
 import { RootState } from 'store/rootReducer';
 import { wipeAction } from 'store/slices/GlobalSlice';
 import { updateEntityArray } from 'store/slices/tokenPair/utils/tokenPair';

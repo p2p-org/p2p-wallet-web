@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "baseUrl": "./",
+    "paths": {
+      "*": ["src/*"],
+      "@solana/web3.js": ["./node_modules/@solana/web3.js/lib/types/index.d.ts"]
+    }
+  },
+  "exclude": ["node_modules"],
+  "include": [
+    "./src/**/*",
+    "./test/[^e2e]/*",
+    "./node_modules/@solana/web3.js/lib/types/index.d.ts"
+  ]
+}

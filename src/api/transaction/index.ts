@@ -75,8 +75,6 @@ export const APIFactory = memoizeWith(
     // Create Account
     // Close Account
     const makeTransactionShortInfo = async (transactionInfo: ParsedConfirmedTransaction) => {
-      console.log(222, transactionInfo);
-
       let type: string | null = null;
       let source: PublicKey | null = null;
       let sourceTokenAccount: TokenAccount | null = null;
@@ -272,10 +270,9 @@ export const APIFactory = memoizeWith(
         return [];
       }
 
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
       const parsedTransactions = await connection
         .getParsedConfirmedTransactions(confirmedSignatures)
-        .catch((error) => {
+        .catch((error: Error) => {
           console.error(`Error getting transaction signatures for ${account.toBase58()}`, error);
           throw error;
         });

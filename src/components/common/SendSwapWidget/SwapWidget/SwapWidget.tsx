@@ -258,7 +258,7 @@ export const SwapWidget: FunctionComponent = () => {
   }, [firstTokenAccount, tokenAccounts, availablePools]);
 
   const secondTokens = useMemo(() => {
-    // eslint-disable-next-line no-shadow
+    // eslint-disable-next-line @typescript-eslint/no-shadow
     const isAvailableTokenAccounts = (tokenAccounts: TokenAccount[]) => (token: Token) =>
       any(pathEq(['mint', 'address'], token.address), tokenAccounts);
 
@@ -404,8 +404,6 @@ export const SwapWidget: FunctionComponent = () => {
   const isDisabled = isExecuting || !selectedPool;
   const isShowFee = firstToken && fee && feeProperties;
   const isNeedCreateWallet = isNil(secondTokenAccount);
-
-  console.log('---', feeProperties);
 
   return (
     <WrapperWidgetPage

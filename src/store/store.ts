@@ -1,6 +1,6 @@
 import { configureStore } from '@reduxjs/toolkit';
 import logger from 'redux-logger';
-import { modalsMiddleware } from 'redux-modals-manager'; // TODO: types
+import { modalsMiddleware } from 'redux-modals-manager';
 
 import { isDev } from 'config/constants';
 

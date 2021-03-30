@@ -19,7 +19,7 @@ const getScrollbarWidth = (() => {
   };
 })();
 
-const listeners: React.Dispatch<any>[] = [];
+const listeners: React.Dispatch<number | null>[] = [];
 
 let width: number | null;
 let prevWidth: number | null;

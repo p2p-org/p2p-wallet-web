@@ -34,7 +34,7 @@ export const executeSwap = createAsyncThunk(
       };
 
       const PoolAPI = APIFactory(walletState.cluster);
-      return PoolAPI.swap(swapParameters);
+      return await PoolAPI.swap(swapParameters);
     } catch (error) {
       console.error('Something wrong with swap:', error);
       throw error;
