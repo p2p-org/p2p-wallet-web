@@ -1,11 +1,7 @@
 {
   "compilerOptions": {
     "target": "es5",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
+    "lib": ["dom", "dom.iterable", "esnext"],
     "declaration": true,
     "emitDeclarationOnly": true,
     "experimentalDecorators": true,
@@ -24,7 +20,8 @@
     "jsx": "react",
     "baseUrl": ".",
     "paths": {
-      "*": ["src/*"]
+      "*": ["src/*"],
+      "@solana/web3.js": ["./node_modules/@solana/web3.js/lib/types/index.d.ts"]
     }
   },
   "exclude": ["node_modules"],
@@ -32,6 +29,7 @@
     "*.js",
     "src/**/*",
     "test/[^e2e]/*",
-    "scripts/**/*"
+    "scripts/**/*",
+    "./node_modules/@solana/web3.js/lib/types/index.d.ts"
   ]
 }

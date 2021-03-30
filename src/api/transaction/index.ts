@@ -144,7 +144,7 @@ export const APIFactory = memoizeWith(
           destinationAmount = new Decimal(info?.lamports || 0).div(LAMPORTS_PER_SOL);
         } else if (type === 'closeAccount' && preTokenBalances) {
           const preToken = preTokenBalances[0];
-          const preBalance = preBalances[1];
+          const preBalance = preBalances?.[1];
 
           source = info?.account ? new PublicKey(info?.account) : null;
           if (info?.owner && source) {
@@ -272,9 +272,10 @@ export const APIFactory = memoizeWith(
         return [];
       }
 
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
       const parsedTransactions = await connection
         .getParsedConfirmedTransactions(confirmedSignatures)
-        .catch((error: Error) => {
+        .catch((error) => {
           console.error(`Error getting transaction signatures for ${account.toBase58()}`, error);
           throw error;
         });
