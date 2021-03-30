@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import { styled } from '@linaria/react';
 import { unwrapResult } from '@reduxjs/toolkit';
-import * as web3 from '@solana/web3.js';
+import { PublicKey, TransactionSignature } from '@solana/web3.js';
 import dayjs from 'dayjs';
 import { rgba } from 'polished';
 
@@ -37,13 +37,14 @@ const Header = styled.div`
   text-align: center;
 `;
 
-const Title = styled.div`
+const Type = styled.div`
   margin-bottom: 10px;
 
   color: #000;
   font-weight: bold;
   font-size: 20px;
   line-height: 100%;
+  text-transform: capitalize;
 `;
 
 const Date = styled.div`
@@ -256,7 +257,8 @@ const ButtonExplorer = styled(Button)`
 `;
 
 type Props = {
-  signature: web3.TransactionSignature;
+  signature: TransactionSignature;
+  source: PublicKey;
   close: () => void;
 };
 
@@ -269,7 +271,7 @@ const handleCopyClick = (publicKey: string) => () => {
   }
 };
 
-export const TransactionDetailsModal: FunctionComponent<Props> = ({ signature, close }) => {
+export const TransactionDetailsModal: FunctionComponent<Props> = ({ signature, source, close }) => {
   const dispatch = useDispatch();
   const transaction = useSelector(
     (state) =>
@@ -292,13 +294,15 @@ export const TransactionDetailsModal: FunctionComponent<Props> = ({ signature, c
     }
   }, [signature]);
 
-  const isReceiver = useMemo(() => {
-    return tokenAccounts.find(
-      (tokenAccount) => tokenAccount.address === transaction.short.destination?.toBase58(),
-    );
-  }, [transaction.short.destination, tokenAccounts]);
+  const details = useMemo(() => {
+    if (!transaction) {
+      return null;
+    }
 
-  if (!transaction) {
+    return transaction.details(transaction.short.destination?.equals(source));
+  }, [transaction?.short.destination, tokenAccounts]);
+
+  if (!details || !transaction) {
     return null;
   }
 
@@ -309,63 +313,53 @@ export const TransactionDetailsModal: FunctionComponent<Props> = ({ signature, c
   return (
     <Wrapper>
       <Header>
-        <Title>{transaction.short.type}</Title>
+        <Type>{details.type}</Type>
         <Date title={`${transaction.slot} SLOT`}>{date}</Date>
         <CloseWrapper onClick={close}>
           <CloseIcon name="close" />
         </CloseWrapper>
-        <BlockWrapper>
-          <BlockIcon name={isReceiver ? 'bottom' : 'top'} />
-        </BlockWrapper>
+        <BlockWrapper>{details.icon ? <BlockIcon name={details.icon} /> : undefined}</BlockWrapper>
       </Header>
       <Content>
         <StatusWrapper>
           <ValueCurrency>
             <AmountUSD
-              prefix={isReceiver ? '+' : '-'}
-              symbol={transaction.short.sourceTokenAccount?.mint.symbol}
-              value={transaction.short.amount}
+              prefix={details.isReceiver ? '+' : '-'}
+              symbol={details.tokenAccount?.mint.symbol}
+              value={details.amount}
             />
           </ValueCurrency>
           <ValueOriginal>
-            {isReceiver ? '+' : '-'} {transaction.short.amount.toNumber()}{' '}
-            {transaction.short.sourceTokenAccount?.mint.symbol}
+            {details.isReceiver ? '+' : '-'} {details.amount.toNumber()}{' '}
+            {details.tokenAccount?.mint.symbol}
           </ValueOriginal>
           <Status>Completed</Status>
         </StatusWrapper>
         <FieldsWrapper>
           <FieldRowWrapper>
-            {transaction.short.sourceTokenAccount ? (
+            {details.sourceTokenAccount ? (
               <ColumnWrapper>
                 <FieldTitle>From</FieldTitle>
                 <FieldInfo>
-                  <TokenAvatar
-                    symbol={transaction.short.sourceTokenAccount.mint.symbol}
-                    size={48}
-                  />
+                  <TokenAvatar symbol={details.sourceTokenAccount.mint.symbol} size={48} />
                   <AddressWrapper>
-                    <AddressTitle>{transaction.short.sourceTokenAccount.mint.symbol}</AddressTitle>
+                    <AddressTitle>{details.sourceTokenAccount.mint.symbol}</AddressTitle>
                     <AddressValue>
-                      {shortAddress(transaction.short.sourceTokenAccount.address.toBase58())}
+                      {shortAddress(details.sourceTokenAccount.address.toBase58())}
                     </AddressValue>
                   </AddressWrapper>
                 </FieldInfo>
               </ColumnWrapper>
             ) : undefined}
-            {transaction.short.destinationTokenAccount ? (
+            {details.destinationTokenAccount ? (
               <ColumnWrapper>
                 <FieldTitle>To</FieldTitle>
                 <FieldInfo>
-                  <TokenAvatar
-                    symbol={transaction.short.destinationTokenAccount.mint.symbol}
-                    size={48}
-                  />
+                  <TokenAvatar symbol={details.destinationTokenAccount.mint.symbol} size={48} />
                   <AddressWrapper>
-                    <AddressTitle>
-                      {transaction.short.destinationTokenAccount.mint.symbol}
-                    </AddressTitle>
+                    <AddressTitle>{details.destinationTokenAccount.mint.symbol}</AddressTitle>
                     <AddressValue>
-                      {shortAddress(transaction.short.destinationTokenAccount.address.toBase58())}
+                      {shortAddress(details.destinationTokenAccount.address.toBase58())}
                     </AddressValue>
                   </AddressWrapper>
                 </FieldInfo>
@@ -378,11 +372,11 @@ export const TransactionDetailsModal: FunctionComponent<Props> = ({ signature, c
           </FieldWrapper>
           <FieldWrapper>
             <FieldTitle>Amount</FieldTitle>
-            <FieldValue>{transaction.short.amount.toNumber()}</FieldValue>
+            <FieldValue>{details.amount.toNumber()}</FieldValue>
           </FieldWrapper>
           <FieldWrapper>
             <FieldTitle>Value</FieldTitle>
-            <FieldValue>{transaction.short.amount.toNumber()}</FieldValue>
+            <FieldValue>{details.amount.toNumber()}</FieldValue>
           </FieldWrapper>
           {transaction.meta ? (
             <FieldWrapper>

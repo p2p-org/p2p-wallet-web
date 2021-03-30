@@ -4,7 +4,6 @@ import {
   AccountInfo,
   ParsedAccountData,
   PublicKey,
-  PublicKeyAndAccount,
   RpcResponseAndContext,
   SystemProgram,
   TransactionInstruction,
@@ -203,12 +202,22 @@ export const APIFactory = memoizeWith(
       return tokenUncached;
     };
 
+    type GetMultipleAccountsResultType = RpcResponseAndContext<AccountInfo<
+      Buffer | ParsedAccountData
+    > | null>;
+
     const tokensInfo = retryableProxy<PublicKey[], Token[]>(async (mints: PublicKey[]) => {
       const publicKeys = mints.map((publicKey) => publicKey.toBase58());
 
-      const getMultipleAccountsResult = <
-        RpcResponseAndContext<AccountInfo<Buffer | ParsedAccountData> | null> // eslint-disable-next-line @typescript-eslint/no-unsafe-call,no-underscore-dangle
-      >await connection._rpcRequest('getMultipleAccounts', [publicKeys, { commiment: connection.commitment, encoding: 'jsonParsed' }]);
+      const getMultipleAccountsResult = <GetMultipleAccountsResultType>(
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call,no-underscore-dangle
+        await connection._rpcRequest('getMultipleAccounts', [
+          publicKeys,
+          { commitment: connection.commitment, encoding: 'jsonParsed' },
+        ])
+      );
 
       const tokens: Token[] = [];
 
@@ -384,9 +393,10 @@ export const APIFactory = memoizeWith(
       //   },
       // ]);
 
-      const secondTokenAccount = async (
-        accountResult: PublicKeyAndAccount<Buffer | ParsedAccountData>,
-      ): Promise<TokenAccount | null> => {
+      const secondTokenAccount = async (accountResult: {
+        pubkey: PublicKey;
+        account: AccountInfo<ParsedAccountData>;
+      }): Promise<TokenAccount | null> => {
         const parsedTokenAccountInfo = extractParsedTokenAccountInfo(accountResult.account);
 
         if (!parsedTokenAccountInfo) {

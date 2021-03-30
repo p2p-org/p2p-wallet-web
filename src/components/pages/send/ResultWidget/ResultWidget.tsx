@@ -131,7 +131,7 @@ export const ResultWidget: FunctionComponent = () => {
       <InfoWrapper>
         {transaction ? (
           <Value>
-            {transaction.short.amount.toNumber()}{' '}
+            {transaction.short.destinationAmount.toNumber()}{' '}
             {transaction.short.sourceTokenAccount?.mint.symbol}
           </Value>
         ) : undefined}

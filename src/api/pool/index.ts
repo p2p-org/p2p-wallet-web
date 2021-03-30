@@ -107,6 +107,7 @@ const isReverseSwap = ({ pool, fromAccount }: Pick<SwapParameters, 'pool' | 'fro
 
 export const APIFactory = (cluster: ExtendedCluster): API => {
   const connection = getConnection(cluster);
+  const tokenAPI = TokenAPIFactory(cluster);
   const poolConfigForCluster = poolConfig[cluster];
 
   const swapProgramId = poolConfigForCluster.swapProgramId || localSwapProgramId;
@@ -115,8 +116,6 @@ export const APIFactory = (cluster: ExtendedCluster): API => {
   }
 
   console.log(`Swap Program ID ${swapProgramId.toBase58()}.`);
-
-  const tokenAPI = TokenAPIFactory(cluster);
 
   const parseTokenSwap = async (
     address: PublicKey,

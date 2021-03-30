@@ -482,7 +482,7 @@ export const TransactionStatusModal: FunctionComponent<Props> = ({
           <SendWrapper>
             <ValueCurrency>
               {isReceiver ? '+' : '-'}{' '}
-              {transaction?.short.amount.toNumber() ||
+              {transaction?.short.destinationAmount.toNumber() ||
                 fromToken.toMajorDenomination(fromAmount).toString()}{' '}
               {transaction?.short.sourceTokenAccount?.mint.symbol || fromToken.symbol}
             </ValueCurrency>
@@ -490,7 +490,9 @@ export const TransactionStatusModal: FunctionComponent<Props> = ({
               <AmountUSD
                 prefix={isReceiver ? '+' : '-'}
                 symbol={transaction?.short.sourceTokenAccount?.mint.symbol || fromToken.symbol}
-                value={transaction?.short.amount || fromToken.toMajorDenomination(fromAmount)}
+                value={
+                  transaction?.short.destinationAmount || fromToken.toMajorDenomination(fromAmount)
+                }
               />
             </ValueOriginal>
           </SendWrapper>

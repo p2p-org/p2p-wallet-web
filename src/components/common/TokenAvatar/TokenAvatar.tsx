@@ -1,7 +1,6 @@
-import React, { FunctionComponent } from 'react';
+import React, { FunctionComponent, HTMLAttributes } from 'react';
 import { useSelector } from 'react-redux';
 
-import { CSSProperties } from '@linaria/core';
 import { styled } from '@linaria/react';
 
 import tokenConfig, { SOL_AVATAR_URL } from 'api/token/token.config';
@@ -16,11 +15,13 @@ type Props = {
   src?: string;
   size?: string | number;
   symbol?: string;
-  style?: CSSProperties;
-  className?: string;
 };
 
-export const TokenAvatar: FunctionComponent<Props> = ({ symbol, src, ...props }) => {
+export const TokenAvatar: FunctionComponent<Props & HTMLAttributes<HTMLDivElement>> = ({
+  symbol,
+  src,
+  ...props
+}) => {
   const cluster = useSelector((state: RootState) => state.wallet.cluster);
 
   let newSrc: string | undefined = src;

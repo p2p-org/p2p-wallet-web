@@ -9,6 +9,7 @@ import {
 import { Decimal } from 'decimal.js';
 
 import { SerializableTokenAccount, TokenAccount } from 'api/token/TokenAccount';
+import { titleCase } from 'utils/common';
 import { Serializable } from 'utils/types';
 
 export type ParsedConfirmedTransactionMeta = {
@@ -29,7 +30,8 @@ type ParsedShort = {
   sourceTokenAccount: TokenAccount | null;
   destination: PublicKey | null;
   destinationTokenAccount: TokenAccount | null;
-  amount: Decimal;
+  sourceAmount: Decimal;
+  destinationAmount: Decimal;
 };
 
 type SerializedShort = {
@@ -38,7 +40,8 @@ type SerializedShort = {
   sourceTokenAccount: SerializableTokenAccount | null;
   destination: string | null;
   destinationTokenAccount: SerializableTokenAccount | null;
-  amount: number;
+  sourceAmount: number;
+  destinationAmount: number;
 };
 
 type SerializedParsedInstruction = {
@@ -69,7 +72,7 @@ type SerializedTransactionMessage = {
 export type SerializableTransaction = {
   signature: string;
   slot: number;
-  timestamp: number | null;
+  timestamp: number | null | undefined;
   meta: ParsedConfirmedTransactionMeta | null;
   message: SerializedTransactionMessage;
   short: SerializedShort;
@@ -80,7 +83,7 @@ export class Transaction implements Serializable<SerializableTransaction> {
 
   readonly slot: number;
 
-  readonly timestamp: number | null;
+  readonly timestamp: number | null | undefined;
 
   readonly meta: ParsedConfirmedTransactionMeta | null;
 
@@ -91,7 +94,7 @@ export class Transaction implements Serializable<SerializableTransaction> {
   constructor(
     signature: TransactionSignature,
     slot: number,
-    timestamp: number | null,
+    timestamp: number | null | undefined,
     meta: ParsedConfirmedTransactionMeta | null,
     message: TransactionMessage,
     short: ParsedShort,
@@ -144,8 +147,64 @@ export class Transaction implements Serializable<SerializableTransaction> {
         sourceTokenAccount: this.short.sourceTokenAccount?.serialize() || null,
         destination: this.short.destination?.toBase58() || null,
         destinationTokenAccount: this.short.destinationTokenAccount?.serialize() || null,
-        amount: this.short.amount.toNumber(),
+        sourceAmount: this.short.sourceAmount.toNumber(),
+        destinationAmount: this.short.destinationAmount.toNumber(),
       },
+    };
+  }
+
+  details(isReceiver?: boolean) {
+    let { type } = this.short;
+    const typeOriginal = type;
+    let icon: string | undefined;
+    const {
+      source,
+      destination,
+      sourceTokenAccount,
+      destinationTokenAccount,
+      sourceAmount,
+      destinationAmount,
+    } = this.short;
+    let amount: Decimal | null = this.short.sourceAmount;
+    let tokenAccount: TokenAccount | null = this.short.sourceTokenAccount;
+
+    if (type === 'swap') {
+      icon = 'swap';
+    } else if (type === 'createAccount') {
+      icon = 'wallet';
+    } else if (type === 'closeAccount') {
+      icon = 'bucket';
+    }
+
+    if (isReceiver) {
+      if (type === 'transfer') {
+        type = 'receive';
+        icon = 'bottom';
+      }
+
+      amount = this.short.destinationAmount;
+      tokenAccount = this.short.destinationTokenAccount;
+    } else if (type === 'transfer') {
+      icon = 'top';
+    }
+
+    if (type) {
+      type = titleCase(type);
+    }
+
+    return {
+      isReceiver,
+      type,
+      typeOriginal,
+      icon,
+      source,
+      destination,
+      sourceTokenAccount,
+      destinationTokenAccount,
+      tokenAccount,
+      sourceAmount,
+      destinationAmount,
+      amount,
     };
   }
 
@@ -194,7 +253,8 @@ export class Transaction implements Serializable<SerializableTransaction> {
         destinationTokenAccount: serializableTransaction.short.destinationTokenAccount
           ? TokenAccount.from(serializableTransaction.short.destinationTokenAccount)
           : null,
-        amount: new Decimal(serializableTransaction.short.amount),
+        sourceAmount: new Decimal(serializableTransaction.short.sourceAmount),
+        destinationAmount: new Decimal(serializableTransaction.short.destinationAmount),
       },
     );
   }
