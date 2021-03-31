@@ -214,6 +214,8 @@ export const APIFactory = memoizeWith(
             );
           }
           destinationAmount = new Decimal(info?.lamports || 0).div(LAMPORTS_PER_SOL);
+
+          console.log(111, transactionInfo);
         } else if (type === 'closeAccount' && preTokenBalances) {
           const preToken = preTokenBalances[0];
           const preBalance = preBalances?.[1];
