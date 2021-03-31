@@ -129,22 +129,36 @@ export const APIFactory = memoizeWith(
 
           if (sourceTokenAccount) {
             sourceToken = sourceTokenAccount.mint;
-          } else if (sourceInfo?.source) {
+          } else if (source && sourceInfo?.destination) {
             const tokenAccount = await tokenAPI.tokenAccountInfo(
               new PublicKey(sourceInfo?.destination),
             );
             if (tokenAccount) {
               sourceToken = tokenAccount.mint;
+              sourceTokenAccount = new TokenAccount(
+                sourceToken,
+                new PublicKey(sourceInfo?.owner),
+                TOKEN_PROGRAM_ID,
+                source,
+                0,
+              );
             }
           }
           if (destinationTokenAccount) {
             destinationToken = destinationTokenAccount.mint;
-          } else if (destinationInfo?.source) {
+          } else if (destination && destinationInfo?.source) {
             const tokenAccount = await tokenAPI.tokenAccountInfo(
               new PublicKey(destinationInfo?.source),
             );
             if (tokenAccount) {
               destinationToken = tokenAccount.mint;
+              destinationTokenAccount = new TokenAccount(
+                destinationToken,
+                new PublicKey(destinationInfo?.owner),
+                TOKEN_PROGRAM_ID,
+                destination,
+                0,
+              );
             }
           }
 
@@ -176,9 +190,6 @@ export const APIFactory = memoizeWith(
 
           destination = info?.newAccount ? new PublicKey(info?.newAccount) : null;
           if (initializeAccountInfo?.mint && destination) {
-            // destinationTokenAccount = destination
-            //   ? await tokenAPI.tokenAccountInfo(destination)
-            //   : null;
             const mint = await tokenAPI.tokenInfo(new PublicKey(initializeAccountInfo?.mint));
             destinationTokenAccount = new TokenAccount(
               mint,
