@@ -8,6 +8,7 @@ import {
 } from '@solana/web3.js';
 import { Decimal } from 'decimal.js';
 
+import { SerializableToken, Token } from 'api/token/Token';
 import { SerializableTokenAccount, TokenAccount } from 'api/token/TokenAccount';
 import { titleCase } from 'utils/common';
 import { Serializable } from 'utils/types';
@@ -28,8 +29,10 @@ type ParsedShort = {
   type: string | null;
   source: PublicKey | null;
   sourceTokenAccount: TokenAccount | null;
+  sourceToken: Token | null;
   destination: PublicKey | null;
   destinationTokenAccount: TokenAccount | null;
+  destinationToken: Token | null;
   sourceAmount: Decimal;
   destinationAmount: Decimal;
 };
@@ -38,8 +41,10 @@ type SerializedShort = {
   type: string | null;
   source: string | null;
   sourceTokenAccount: SerializableTokenAccount | null;
+  sourceToken: SerializableToken | null;
   destination: string | null;
   destinationTokenAccount: SerializableTokenAccount | null;
+  destinationToken: SerializableToken | null;
   sourceAmount: number;
   destinationAmount: number;
 };
@@ -145,8 +150,16 @@ export class Transaction implements Serializable<SerializableTransaction> {
         type: this.short.type || null,
         source: this.short.source?.toBase58() || null,
         sourceTokenAccount: this.short.sourceTokenAccount?.serialize() || null,
+        sourceToken:
+          this.short.sourceToken?.serialize() ||
+          this.short.sourceTokenAccount?.mint.serialize() ||
+          null,
         destination: this.short.destination?.toBase58() || null,
         destinationTokenAccount: this.short.destinationTokenAccount?.serialize() || null,
+        destinationToken:
+          this.short.destinationToken?.serialize() ||
+          this.short.destinationTokenAccount?.mint.serialize() ||
+          null,
         sourceAmount: this.short.sourceAmount.toNumber(),
         destinationAmount: this.short.destinationAmount.toNumber(),
       },
@@ -161,12 +174,15 @@ export class Transaction implements Serializable<SerializableTransaction> {
       source,
       destination,
       sourceTokenAccount,
+      sourceToken,
       destinationTokenAccount,
+      destinationToken,
       sourceAmount,
       destinationAmount,
     } = this.short;
     let amount: Decimal | null = this.short.sourceAmount;
     let tokenAccount: TokenAccount | null = this.short.sourceTokenAccount;
+    let token: Token | null = this.short.sourceToken;
 
     if (type === 'swap') {
       icon = 'swap';
@@ -184,6 +200,7 @@ export class Transaction implements Serializable<SerializableTransaction> {
 
       amount = this.short.destinationAmount;
       tokenAccount = this.short.destinationTokenAccount;
+      token = this.short.destinationToken;
     } else if (type === 'transfer') {
       icon = 'top';
     }
@@ -200,8 +217,11 @@ export class Transaction implements Serializable<SerializableTransaction> {
       source,
       destination,
       sourceTokenAccount,
+      sourceToken,
       destinationTokenAccount,
+      destinationToken,
       tokenAccount,
+      token,
       sourceAmount,
       destinationAmount,
       amount,
@@ -247,11 +267,23 @@ export class Transaction implements Serializable<SerializableTransaction> {
         sourceTokenAccount: serializableTransaction.short.sourceTokenAccount
           ? TokenAccount.from(serializableTransaction.short.sourceTokenAccount)
           : null,
+        sourceToken: serializableTransaction.short.sourceToken
+          ? Token.from(
+              serializableTransaction.short.sourceToken ||
+                serializableTransaction.short.sourceTokenAccount?.mint,
+            )
+          : null,
         destination: serializableTransaction.short.destination
           ? new PublicKey(serializableTransaction.short.destination)
           : null,
         destinationTokenAccount: serializableTransaction.short.destinationTokenAccount
           ? TokenAccount.from(serializableTransaction.short.destinationTokenAccount)
+          : null,
+        destinationToken: serializableTransaction.short.destinationToken
+          ? Token.from(
+              serializableTransaction.short.destinationToken ||
+                serializableTransaction.short.destinationTokenAccount?.mint,
+            )
           : null,
         sourceAmount: new Decimal(serializableTransaction.short.sourceAmount),
         destinationAmount: new Decimal(serializableTransaction.short.destinationAmount),

@@ -8,13 +8,13 @@ import classNames from 'classnames';
 import { rgba } from 'polished';
 
 import { Transaction } from 'api/transaction/Transaction';
+import { TokenAvatar } from 'components/common/TokenAvatar';
 import { Icon } from 'components/ui';
 import { openModal } from 'store/actions/modals';
 import { SHOW_MODAL_TRANSACTION_DETAILS } from 'store/constants/modalTypes';
 import { shortAddress } from 'utils/tokens';
 
 import { AmountUSD } from '../AmountUSD';
-import { TokenAvatar } from '../TokenAvatar';
 
 const Wrapper = styled.div`
   position: relative;
@@ -35,13 +35,16 @@ const Wrapper = styled.div`
   }
 `;
 
-const TransactionIconWrapper = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
+const BaseWrapper = styled.div`
   width: 48px;
   height: 48px;
   margin-right: 12px;
+`;
+
+const TransactionIconWrapper = styled(BaseWrapper)`
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
   background: #f6f6f8;
   border-radius: 12px;
@@ -52,6 +55,22 @@ const TransactionIcon = styled(Icon)`
   height: 25px;
 
   color: #a3a5ba;
+`;
+
+const SwapAvatarsWrapper = styled(BaseWrapper)`
+  position: relative;
+
+  & > :nth-child(1) {
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+
+  & > :nth-child(2) {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+  }
 `;
 
 const Content = styled.div`
@@ -110,14 +129,9 @@ const Bottom = styled.div`
   line-height: 16px;
 `;
 
-const RightIcon = styled(Icon)`
-  width: 14px;
-  height: 14px;
-  margin: 0 6px;
-
+const LinkStyled = styled(Link)`
   color: #a3a5ba;
-
-  transform: rotate(-90deg);
+  text-decoration: none;
 `;
 
 type Props = {
@@ -143,24 +157,24 @@ export const TransactionRow: FunctionComponent<Props> = ({ transaction, source }
   };
 
   const renderBottomLeft = () => {
-    if (details.type === 'swap') {
+    if (details.type === 'swap' && details.sourceToken && details.destinationToken) {
       return (
         <>
-          <Link to={`/wallet/${details.sourceTokenAccount?.address.toBase58()}`}>
-            <TokenAvatar
-              title={details.sourceTokenAccount?.mint.symbol}
-              symbol={details.sourceTokenAccount?.mint.symbol}
-              size={18}
-            />
-          </Link>
-          <RightIcon name="chevron" />
-          <Link to={`/wallet/${details.destinationTokenAccount?.address.toBase58()}`}>
-            <TokenAvatar
-              title={details.destinationTokenAccount?.mint.symbol}
-              symbol={details.destinationTokenAccount?.mint.symbol}
-              size={18}
-            />
-          </Link>
+          <LinkStyled
+            to={
+              details.sourceTokenAccount &&
+              `/wallet/${details.sourceTokenAccount.address.toBase58()}`
+            }>
+            {details.sourceToken.symbol}
+          </LinkStyled>{' '}
+          to{' '}
+          <LinkStyled
+            to={
+              details.destinationTokenAccount &&
+              `/wallet/${details.destinationTokenAccount.address.toBase58()}`
+            }>
+            {details.destinationToken.symbol}
+          </LinkStyled>
         </>
       );
     }
@@ -197,25 +211,33 @@ export const TransactionRow: FunctionComponent<Props> = ({ transaction, source }
   return (
     <Wrapper>
       <Main onClick={handleClick}>
-        <TransactionIconWrapper>
-          {details.icon ? <TransactionIcon name={details.icon} /> : undefined}
-        </TransactionIconWrapper>
+        {details.type === 'swap' ? (
+          <SwapAvatarsWrapper>
+            <TokenAvatar symbol={details.sourceToken?.symbol} size={32} />
+            <TokenAvatar symbol={details.destinationToken?.symbol} size={32} />
+          </SwapAvatarsWrapper>
+        ) : (
+          <TransactionIconWrapper>
+            {details.icon ? <TransactionIcon name={details.icon} /> : undefined}
+          </TransactionIconWrapper>
+        )}
         <Content>
           <Top>
             <Type>{details.type}</Type>
-            <Amount className={classNames({ isReceiver: details.isReceiver })}>
-              <AmountUSD
-                prefix={details.isReceiver ? '+' : '-'}
-                value={details.destinationAmount}
-                symbol={details.tokenAccount?.mint.symbol}
-              />
-            </Amount>
+            {details.token ? (
+              <Amount className={classNames({ isReceiver: details.isReceiver })}>
+                <AmountUSD
+                  prefix={details.isReceiver ? '+' : '-'}
+                  value={details.amount}
+                  symbol={details.token.symbol}
+                />
+              </Amount>
+            ) : undefined}
           </Top>
           <Bottom>
             <div>{renderBottomLeft()}</div>
             <div>
-              {details.isReceiver ? '+' : '-'} {details.amount.toNumber()}{' '}
-              {details.tokenAccount?.mint.symbol}
+              {details.isReceiver ? '+' : '-'} {details.amount.toNumber()} {details.token?.symbol}
             </div>
           </Bottom>
         </Content>

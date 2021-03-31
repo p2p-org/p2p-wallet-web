@@ -1,4 +1,3 @@
-import cache from '@civic/simple-cache';
 import {
   ConfirmedSignaturesForAddress2Options,
   LAMPORTS_PER_SOL,
@@ -14,12 +13,16 @@ import { complement, identity, isNil, memoizeWith } from 'ramda';
 import { getConnection } from 'api/connection';
 import poolConfig from 'api/pool/pool.config';
 import { APIFactory as TokenAPIFactory } from 'api/token';
+import { Token } from 'api/token/Token';
 import { TokenAccount } from 'api/token/TokenAccount';
 import { localSwapProgramId } from 'config/constants';
 import { SYSTEM_PROGRAM_ID, TOKEN_PROGRAM_ID } from 'constants/solana/bufferLayouts';
+import { CacheTTL } from 'lib/cachettl';
 import { ExtendedCluster } from 'utils/types';
 
 import { Transaction } from './Transaction';
+
+const transactionsCache = new CacheTTL<Transaction>({ ttl: 5000 });
 
 export interface API {
   transactionInfo: (
@@ -78,49 +81,107 @@ export const APIFactory = memoizeWith(
       let type: string | null = null;
       let source: PublicKey | null = null;
       let sourceTokenAccount: TokenAccount | null = null;
+      let sourceToken: Token | null = null;
       let destination: PublicKey | null = null;
       let destinationTokenAccount: TokenAccount | null = null;
+      let destinationToken: Token | null = null;
       let sourceAmount = new Decimal(0);
       let destinationAmount = new Decimal(0);
 
-      const innerInstructions = transactionInfo?.meta?.innerInstructions?.[0]?.instructions;
+      const innerInstructions = transactionInfo?.meta?.innerInstructions;
       const instructions = transactionInfo?.transaction.message.instructions;
+      const accountKeys = transactionInfo?.transaction.message.accountKeys;
       const preBalances = transactionInfo?.meta?.preBalances;
       const preTokenBalances = transactionInfo?.meta?.preTokenBalances;
+      const postTokenBalances = transactionInfo?.meta?.postTokenBalances;
 
       // swap contract
-      const swapInstruction = instructions.find((inst) => inst.programId.equals(swapProgramId)) as
-        | PartiallyDecodedInstruction
-        | undefined;
-      if (swapInstruction) {
+      const swapInstructionIndex = instructions.findIndex(
+        (inst) =>
+          inst.programId.equals(swapProgramId) ||
+          inst.programId.toBase58() === '9qvG1zUp8xF1Bi4m6UdRNby1BAAuaDrUxSpv4CmRRMjL' || // main old swap
+          inst.programId.toBase58() === 'DjVE6JNiYqPL2QXyCUUh8rNjHrbz9hXHNYt99MQ59qw1', // main ocra
+      );
+      if (swapInstructionIndex && instructions[swapInstructionIndex]) {
+        const swapInstruction = instructions[swapInstructionIndex] as PartiallyDecodedInstruction;
         const buf = Buffer.from(bs58.decode(swapInstruction.data));
-        const index = buf.readUInt8(0);
+        const instructionIndex = buf.readUInt8(0);
 
+        const swapInner = innerInstructions?.find((item) => item.index === swapInstructionIndex);
         // swap instruction
-        if (index === 1 && innerInstructions?.[0] && innerInstructions?.[1]) {
+        if (instructionIndex === 1 && swapInner) {
           type = 'swap';
-          const sourceInstruction = innerInstructions[0] as ConfirmedTransaction;
-          const destinationInstruction = innerInstructions[1] as ConfirmedTransaction;
+          const transfersInstructions = swapInner.instructions.filter(
+            (inst: ConfirmedTransaction) => inst?.parsed?.type === 'transfer',
+          );
+          const transferAccountKeys = swapInstruction.accounts;
+          const sourceInstruction = transfersInstructions[0] as ConfirmedTransaction;
+          const destinationInstruction = transfersInstructions[1] as ConfirmedTransaction;
           const sourceInfo = sourceInstruction?.parsed?.info;
           const destinationInfo = destinationInstruction?.parsed?.info;
 
-          source = sourceInfo?.source ? new PublicKey(sourceInfo.source) : null;
-          destination = destinationInfo?.destination
+          const a = Math.random();
+          transferAccountKeys.map((acc) => console.log(444, a, acc.toBase58()));
+
+          // source = sourceInfo?.source ? new PublicKey(sourceInfo.source) : null;
+          source = transferAccountKeys[4] || null;
+          /*  destination = destinationInfo?.destination
             ? new PublicKey(destinationInfo.destination)
-            : null;
+            : null; */
+          destination = transferAccountKeys[5] || null;
           sourceTokenAccount = source ? await tokenAPI.tokenAccountInfo(source) : null;
           destinationTokenAccount = destination
             ? await tokenAPI.tokenAccountInfo(destination)
             : null;
 
+          if (sourceTokenAccount) {
+            sourceToken = sourceTokenAccount.mint;
+          } else if (source && postTokenBalances) {
+            // const accountIndex = accountKeys?.findIndex((item) => item.pubkey.equals(source));
+            //
+            // if (accountIndex) {
+            //   const tokenBalance = postTokenBalances.find(
+            //     (item) => item.accountIndex === accountIndex,
+            //   );
+            //
+            //   if (tokenBalance) {
+            //     sourceToken = await tokenAPI.tokenInfo(new PublicKey(tokenBalance.mint));
+            //   }
+            // }
+          }
+          if (destinationTokenAccount) {
+            destinationToken = destinationTokenAccount.mint;
+          } else if (destination && postTokenBalances) {
+            // const accountIndex = accountKeys?.findIndex((item) => item.pubkey.equals(destination));
+            //
+            // if (accountIndex) {
+            //   const tokenBalance = postTokenBalances.find(
+            //     (item) => item.accountIndex === accountIndex,
+            //   );
+            //
+            //   if (tokenBalance) {
+            //     destinationToken = await tokenAPI.tokenInfo(new PublicKey(tokenBalance.mint));
+            //   }
+            // }
+          }
+
+          console.log(
+            444,
+            5,
+            transactionInfo,
+            accountKeys.map((item) => item.pubkey.toBase58()),
+            source?.toBase58(),
+            destination?.toBase58(),
+          );
+
           sourceAmount = new Decimal(sourceInfo?.amount || 0);
           destinationAmount = new Decimal(destinationInfo?.amount || 0);
 
-          if (sourceTokenAccount?.mint.decimals) {
-            sourceAmount = sourceAmount.div(10 ** sourceTokenAccount?.mint.decimals);
+          if (sourceToken?.decimals) {
+            sourceAmount = sourceAmount.div(10 ** sourceToken?.decimals);
           }
-          if (destinationTokenAccount?.mint.decimals) {
-            destinationAmount = destinationAmount.div(10 ** destinationTokenAccount?.mint.decimals);
+          if (destinationToken?.decimals) {
+            destinationAmount = destinationAmount.div(10 ** destinationToken?.decimals);
           }
         }
       } else {
@@ -187,12 +248,17 @@ export const APIFactory = memoizeWith(
         }
       }
 
+      sourceToken = sourceToken || sourceTokenAccount?.mint || null;
+      destinationToken = destinationToken || sourceTokenAccount?.mint || null;
+
       return {
         type,
         source,
         sourceTokenAccount,
+        sourceToken,
         destination,
         destinationTokenAccount,
+        destinationToken,
         sourceAmount,
         destinationAmount,
       };
@@ -240,8 +306,29 @@ export const APIFactory = memoizeWith(
     /**
      * Given a signature, return its transaction information
      * @param signature
+     * @param parsedTransaction
      */
-    const transactionInfo = cache(transactionInfoUncached, { ttl: 5000 });
+    const transactionInfo = async (
+      signature: TransactionSignature,
+      parsedTransaction: ParsedConfirmedTransaction | null = null,
+    ): Promise<Transaction | null> => {
+      // try to get cached version
+      const transactionCached = transactionsCache.get(signature);
+      if (transactionCached) {
+        return transactionCached;
+      }
+
+      const transactionUncached = await transactionInfoUncached(signature, parsedTransaction);
+
+      if (!transactionUncached) {
+        return null;
+      }
+
+      // set cache
+      transactionsCache.set(signature, transactionUncached);
+
+      return transactionUncached;
+    };
 
     /**
      * Get transactions for a address
