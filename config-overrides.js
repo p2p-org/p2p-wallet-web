@@ -11,7 +11,7 @@ const isDev = process.env.NODE_ENV === 'development';
 
 module.exports = override(
   useBabelRc(),
-  setWebpackPublicPath(isDev ? '/' : '/p2p-wallet-web/'),
+  setWebpackPublicPath(process.env.REACT_APP_BASENAME || '/'),
   addWebpackPlugin(new SpritePlugin()),
   addWebpackModuleRule({
     test: /\.tsx?$/,

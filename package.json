@@ -20,7 +20,6 @@
     "solana:localnet:logs": "yarn solana-localnet logs -f"
   },
   "dependencies": {
-    "@civic/simple-cache": "^1.0.1",
     "@emotion/is-prop-valid": "^0.8.8",
     "@linaria/babel-preset": "^3.0.0-beta.1",
     "@linaria/core": "^3.0.0-beta.1",
