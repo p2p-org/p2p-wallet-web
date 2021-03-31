@@ -1,11 +1,12 @@
 {
   "name": "p2p-wallet-web",
   "version": "1.0.0",
-  "homepage": ".",
+  "homepage": "https://p2p-org.github.io/p2p-wallet-web",
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "deploy": "yarn build && gh-pages -d build",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build",
     "start": "react-app-rewired start",
     "build": "react-app-rewired build",
     "test": "react-app-rewired test --env=jsdom",

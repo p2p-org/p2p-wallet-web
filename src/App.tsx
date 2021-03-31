@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react';
-import { BrowserRouter as Router, Route, Switch, useHistory } from 'react-router-dom';
+import React from 'react';
+import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 
 import dayjs from 'dayjs';
 import localizedFormat from 'dayjs/plugin/localizedFormat';
@@ -23,26 +23,10 @@ import { AuthRequiredRoute } from 'utils/routes/UserRequiredRoute';
 
 dayjs.extend(localizedFormat);
 
-/* Hack for states and hash routing until use own host */
-const FixRoute = () => {
-  const history = useHistory();
-
-  useEffect(() => {
-    if (!window.location.hash.includes('#')) {
-      history.replace('/');
-    }
-  }, []);
-
-  return null;
-};
-
 const App: React.FC = () => {
   return (
     <>
-      {/* Hack for states and hash routing until use own host */}
-      <Router basename={process.env.BASENAME || `${window.location.pathname}#`}>
-        {/* Hack for states and hash routing until use own host */}
-        <FixRoute />
+      <Router basename={process.env.REACT_APP_BASENAME}>
         <Switch>
           <Route path="/" component={Home} exact />
           <Route path="/create" component={Create} />

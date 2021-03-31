@@ -110,7 +110,7 @@ export const Home: FunctionComponent = () => {
 
         await sleep(100);
 
-        history.push(location.state.from || '/wallets');
+        history.push(location.state?.from || '/wallets');
       } catch (error) {
         ToastManager.error((error as Error).message);
       } finally {
