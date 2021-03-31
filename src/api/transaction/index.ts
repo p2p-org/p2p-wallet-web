@@ -66,6 +66,7 @@ export const APIFactory = memoizeWith(
           newAccount: string;
           // close account
           account: string;
+          mint: string;
         };
         type: string;
       };
@@ -125,7 +126,7 @@ export const APIFactory = memoizeWith(
           /*  destination = destinationInfo?.destination
             ? new PublicKey(destinationInfo.destination)
             : null; */
-          destination = transferAccountKeys[5] || null;
+          destination = transferAccountKeys[6] || null;
           sourceTokenAccount = source ? await tokenAPI.tokenAccountInfo(source) : null;
           destinationTokenAccount = destination
             ? await tokenAPI.tokenAccountInfo(destination)
@@ -162,17 +163,18 @@ export const APIFactory = memoizeWith(
             // }
           }
 
+          sourceAmount = new Decimal(sourceInfo?.amount || 0);
+          destinationAmount = new Decimal(destinationInfo?.amount || 0);
+
           // console.log(
           //   444,
           //   5,
           //   transactionInfo,
-          //   accountKeys.map((item) => item.pubkey.toBase58()),
           //   source?.toBase58(),
           //   destination?.toBase58(),
+          //   sourceAmount.toNumber(),
+          //   destinationAmount.toNumber(),
           // );
-
-          sourceAmount = new Decimal(sourceInfo?.amount || 0);
-          destinationAmount = new Decimal(destinationInfo?.amount || 0);
 
           if (sourceToken?.decimals) {
             sourceAmount = sourceAmount.div(10 ** sourceToken?.decimals);
@@ -190,14 +192,30 @@ export const APIFactory = memoizeWith(
         sourceTokenAccount = source ? await tokenAPI.tokenAccountInfo(source) : null;
 
         if (type === 'createAccount') {
+          const initializeAccountInstruction = instructions[1] as ConfirmedTransaction;
+          const initializeAccountInfo = initializeAccountInstruction.parsed?.info;
+
           source = info?.source ? new PublicKey(info?.source) : null;
           sourceTokenAccount = source ? await tokenAPI.tokenAccountInfo(source) : null;
           sourceAmount = new Decimal(info?.lamports || 0).div(LAMPORTS_PER_SOL);
+
           destination = info?.newAccount ? new PublicKey(info?.newAccount) : null;
-          destinationTokenAccount = destination
-            ? await tokenAPI.tokenAccountInfo(destination)
-            : null;
+          if (initializeAccountInfo?.mint && destination) {
+            // destinationTokenAccount = destination
+            //   ? await tokenAPI.tokenAccountInfo(destination)
+            //   : null;
+            const mint = await tokenAPI.tokenInfo(new PublicKey(initializeAccountInfo?.mint));
+            destinationTokenAccount = new TokenAccount(
+              mint,
+              new PublicKey(initializeAccountInfo?.owner),
+              TOKEN_PROGRAM_ID,
+              destination,
+              0,
+            );
+          }
           destinationAmount = new Decimal(info?.lamports || 0).div(LAMPORTS_PER_SOL);
+
+          console.log(111, transactionInfo);
         } else if (type === 'closeAccount' && preTokenBalances) {
           const preToken = preTokenBalances[0];
           const preBalance = preBalances?.[1];
@@ -246,7 +264,7 @@ export const APIFactory = memoizeWith(
       }
 
       sourceToken = sourceToken || sourceTokenAccount?.mint || null;
-      destinationToken = destinationToken || sourceTokenAccount?.mint || null;
+      destinationToken = destinationToken || destinationTokenAccount?.mint || null;
 
       return {
         type,
