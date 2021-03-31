@@ -1,7 +1,6 @@
 import { AccountLayout, Token as SPLToken } from '@solana/spl-token';
 import { Numberu64, TokenSwap, TokenSwapLayout } from '@solana/spl-token-swap';
 import { Account, PublicKey, SystemProgram, TransactionInstruction } from '@solana/web3.js';
-import { Decimal } from 'decimal.js';
 import { complement, isNil } from 'ramda';
 import assert from 'ts-invariant';
 
@@ -10,7 +9,6 @@ import { APIFactory as TokenAPIFactory, TOKEN_PROGRAM_ID, tokenAccountsPrecache 
 import { Token } from 'api/token/Token';
 import { TokenAccount } from 'api/token/TokenAccount';
 import { getWallet, makeTransaction, sendTransaction } from 'api/wallet';
-import { ToastManager } from 'components/common/ToastManager';
 import { localSwapProgramId, swapHostFeeAddress } from 'config/constants';
 import { WRAPPED_SOL_MINT } from 'constants/solana/bufferLayouts';
 import { ExtendedCluster } from 'utils/types';
@@ -20,15 +18,6 @@ import poolConfig from './pool.config';
 import { POOL_UPDATED_EVENT, PoolListener, PoolUpdatedEvent } from './PoolListener';
 
 type PoolUpdateCallback = (pool: Pool) => void;
-
-export type PoolCreationParameters = {
-  donorAccountA: TokenAccount;
-  donorAccountB: TokenAccount;
-  feeNumerator: number;
-  feeDenominator: number;
-  tokenAAmount?: number; // if missing, donate the full amount in donorAccountA
-  tokenBAmount?: number; // if missing, donate the full amount in donorAccountB
-};
 
 type PoolOperationParameters = {
   // The liquidity pool to use when executing the transaction
@@ -48,31 +37,6 @@ export type SwapParameters = PoolOperationParameters & {
 
   // The amount of source tokens to swap
   fromAmount: number;
-  slippage?: number;
-};
-
-export type DepositParameters = PoolOperationParameters & {
-  // The user account containing token A
-  fromAAccount: TokenAccount;
-  // The user account containing token B
-  fromBAccount: TokenAccount;
-  // The amount to deposit in terms of token A
-  fromAAmount: number | Decimal;
-  // The user account to receive pool tokens.
-  // If missing, a new account will be created (incurring a fee)
-  poolTokenAccount?: TokenAccount;
-  slippage?: number;
-};
-
-export type WithdrawalParameters = PoolOperationParameters & {
-  // The user account containing pool tokens
-  fromPoolTokenAccount: TokenAccount;
-  // The user account to receive token A
-  toAAccount?: TokenAccount;
-  // The user account to receive token B
-  toBAccount?: TokenAccount;
-  // The amount to withdraw (in terms of pool tokens)
-  fromPoolTokenAmount: number | Decimal;
   slippage?: number;
 };
 
@@ -270,7 +234,7 @@ export const APIFactory = (cluster: ExtendedCluster): API => {
 
     const poolPromises = poolInfos.map((poolInfo) =>
       getPool(poolInfo.pubkey, Buffer.from(poolInfo.account.data)).catch((error: Error) => {
-        ToastManager.error(error.message);
+        console.error(error.message);
         return null;
       }),
     );
