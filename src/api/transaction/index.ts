@@ -91,10 +91,8 @@ export const APIFactory = memoizeWith(
 
       const innerInstructions = transactionInfo?.meta?.innerInstructions;
       const instructions = transactionInfo?.transaction.message.instructions;
-      // const accountKeys = transactionInfo?.transaction.message.accountKeys;
       const preBalances = transactionInfo?.meta?.preBalances;
       const preTokenBalances = transactionInfo?.meta?.preTokenBalances;
-      const postTokenBalances = transactionInfo?.meta?.postTokenBalances;
 
       // swap contract
       const swapInstructionIndex = instructions.findIndex(
@@ -115,18 +113,15 @@ export const APIFactory = memoizeWith(
           const transfersInstructions = swapInner.instructions.filter(
             (inst: ConfirmedTransaction) => inst?.parsed?.type === 'transfer',
           );
-          const transferAccountKeys = swapInstruction.accounts;
           const sourceInstruction = transfersInstructions[0] as ConfirmedTransaction;
           const destinationInstruction = transfersInstructions[1] as ConfirmedTransaction;
           const sourceInfo = sourceInstruction?.parsed?.info;
           const destinationInfo = destinationInstruction?.parsed?.info;
 
-          // source = sourceInfo?.source ? new PublicKey(sourceInfo.source) : null;
-          source = transferAccountKeys[4] || null;
-          /*  destination = destinationInfo?.destination
+          source = sourceInfo?.source ? new PublicKey(sourceInfo.source) : null;
+          destination = destinationInfo?.destination
             ? new PublicKey(destinationInfo.destination)
-            : null; */
-          destination = transferAccountKeys[6] || null;
+            : null;
           sourceTokenAccount = source ? await tokenAPI.tokenAccountInfo(source) : null;
           destinationTokenAccount = destination
             ? await tokenAPI.tokenAccountInfo(destination)
@@ -134,47 +129,27 @@ export const APIFactory = memoizeWith(
 
           if (sourceTokenAccount) {
             sourceToken = sourceTokenAccount.mint;
-          } else if (source && postTokenBalances) {
-            // const accountIndex = accountKeys?.findIndex((item) => item.pubkey.equals(source));
-            //
-            // if (accountIndex) {
-            //   const tokenBalance = postTokenBalances.find(
-            //     (item) => item.accountIndex === accountIndex,
-            //   );
-            //
-            //   if (tokenBalance) {
-            //     sourceToken = await tokenAPI.tokenInfo(new PublicKey(tokenBalance.mint));
-            //   }
-            // }
+          } else if (sourceInfo?.source) {
+            const tokenAccount = await tokenAPI.tokenAccountInfo(
+              new PublicKey(sourceInfo?.destination),
+            );
+            if (tokenAccount) {
+              sourceToken = tokenAccount.mint;
+            }
           }
           if (destinationTokenAccount) {
             destinationToken = destinationTokenAccount.mint;
-          } else if (destination && postTokenBalances) {
-            // const accountIndex = accountKeys?.findIndex((item) => item.pubkey.equals(destination));
-            //
-            // if (accountIndex) {
-            //   const tokenBalance = postTokenBalances.find(
-            //     (item) => item.accountIndex === accountIndex,
-            //   );
-            //
-            //   if (tokenBalance) {
-            //     destinationToken = await tokenAPI.tokenInfo(new PublicKey(tokenBalance.mint));
-            //   }
-            // }
+          } else if (destinationInfo?.source) {
+            const tokenAccount = await tokenAPI.tokenAccountInfo(
+              new PublicKey(destinationInfo?.source),
+            );
+            if (tokenAccount) {
+              destinationToken = tokenAccount.mint;
+            }
           }
 
           sourceAmount = new Decimal(sourceInfo?.amount || 0);
           destinationAmount = new Decimal(destinationInfo?.amount || 0);
-
-          // console.log(
-          //   444,
-          //   5,
-          //   transactionInfo,
-          //   source?.toBase58(),
-          //   destination?.toBase58(),
-          //   sourceAmount.toNumber(),
-          //   destinationAmount.toNumber(),
-          // );
 
           if (sourceToken?.decimals) {
             sourceAmount = sourceAmount.div(10 ** sourceToken?.decimals);
