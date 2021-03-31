@@ -90,7 +90,7 @@ export const APIFactory = memoizeWith(
 
       const innerInstructions = transactionInfo?.meta?.innerInstructions;
       const instructions = transactionInfo?.transaction.message.instructions;
-      const accountKeys = transactionInfo?.transaction.message.accountKeys;
+      // const accountKeys = transactionInfo?.transaction.message.accountKeys;
       const preBalances = transactionInfo?.meta?.preBalances;
       const preTokenBalances = transactionInfo?.meta?.preTokenBalances;
       const postTokenBalances = transactionInfo?.meta?.postTokenBalances;
@@ -119,9 +119,6 @@ export const APIFactory = memoizeWith(
           const destinationInstruction = transfersInstructions[1] as ConfirmedTransaction;
           const sourceInfo = sourceInstruction?.parsed?.info;
           const destinationInfo = destinationInstruction?.parsed?.info;
-
-          const a = Math.random();
-          transferAccountKeys.map((acc) => console.log(444, a, acc.toBase58()));
 
           // source = sourceInfo?.source ? new PublicKey(sourceInfo.source) : null;
           source = transferAccountKeys[4] || null;
@@ -165,14 +162,14 @@ export const APIFactory = memoizeWith(
             // }
           }
 
-          console.log(
-            444,
-            5,
-            transactionInfo,
-            accountKeys.map((item) => item.pubkey.toBase58()),
-            source?.toBase58(),
-            destination?.toBase58(),
-          );
+          // console.log(
+          //   444,
+          //   5,
+          //   transactionInfo,
+          //   accountKeys.map((item) => item.pubkey.toBase58()),
+          //   source?.toBase58(),
+          //   destination?.toBase58(),
+          // );
 
           sourceAmount = new Decimal(sourceInfo?.amount || 0);
           destinationAmount = new Decimal(destinationInfo?.amount || 0);
