@@ -328,8 +328,8 @@ export const TokenAccountQR: FunctionComponent<Props> = ({
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   const qrImageSettings: QRCode.ImageSettings = {
-    height: 36,
-    width: 36,
+    height: 28,
+    width: 28,
   };
 
   if (token.symbol === 'SOL') {
