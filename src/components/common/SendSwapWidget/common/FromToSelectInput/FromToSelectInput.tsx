@@ -452,9 +452,9 @@ export const FromToSelectInput: FunctionComponent<Props> = ({
     }
 
     // Token with balance in from selector
-    const filteredWithBalance = tokenAccounts;
+    let filteredWithBalance = tokenAccounts;
     if (direction === 'from') {
-      // filteredWithBalance = tokenAccounts.filter((account) => account.balance.gt(0));
+      filteredWithBalance = tokenAccounts.filter((account) => account.balance.gt(0));
     }
 
     if (!filter) {
