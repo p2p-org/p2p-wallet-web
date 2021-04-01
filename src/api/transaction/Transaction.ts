@@ -196,11 +196,11 @@ export class Transaction implements Serializable<SerializableTransaction> {
       if (type === 'transfer') {
         type = 'receive';
         icon = 'bottom';
+      } else if (type !== 'createAccount') {
+        amount = this.short.destinationAmount;
+        tokenAccount = this.short.destinationTokenAccount;
+        token = this.short.destinationToken;
       }
-
-      amount = this.short.destinationAmount;
-      tokenAccount = this.short.destinationTokenAccount;
-      token = this.short.destinationToken;
     } else if (type === 'transfer') {
       icon = 'top';
     }

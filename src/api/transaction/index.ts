@@ -205,7 +205,7 @@ export const APIFactory = memoizeWith(
           const preBalance = preBalances?.[1];
 
           source = info?.account ? new PublicKey(info?.account) : null;
-          if (info?.owner && source) {
+          if (info?.owner && source && preToken) {
             const mint = await tokenAPI.tokenInfo(new PublicKey(preToken.mint));
             sourceTokenAccount = new TokenAccount(
               mint,
