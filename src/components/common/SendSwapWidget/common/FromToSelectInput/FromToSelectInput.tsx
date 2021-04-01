@@ -451,13 +451,18 @@ export const FromToSelectInput: FunctionComponent<Props> = ({
       return [];
     }
 
+    // Token with balance in from selector
+    const filteredWithBalance = tokenAccounts;
+    if (direction === 'from') {
+      // filteredWithBalance = tokenAccounts.filter((account) => account.balance.gt(0));
+    }
+
     if (!filter) {
-      return tokenAccounts;
+      return filteredWithBalance;
     }
 
     const filterLower = filter.toLowerCase();
-
-    return tokenAccounts
+    return filteredWithBalance
       .filter(
         (account) =>
           account.mint.symbol?.toLowerCase().includes(filterLower) ||
