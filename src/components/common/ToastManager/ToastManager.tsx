@@ -86,6 +86,7 @@ const ToastWrapper = styled.div`
 
 export type RendererParams = {
   type: string;
+  header?: string;
   text?: string;
   onClose?: () => void;
 };
@@ -93,6 +94,7 @@ type RendererType = (params: RendererParams) => ReactNode;
 
 type ToastParams = {
   type: string;
+  header?: string;
   text?: string;
   renderer?: RendererType;
 };
@@ -139,23 +141,26 @@ export class ToastManager extends PureComponent<Props, State> {
     renderToast: undefined,
   };
 
-  static info(text: string) {
+  static info(header: string, text?: string) {
     addToast({
       type: 'info',
+      header,
       text,
     });
   }
 
-  static warn(text: string) {
+  static warn(header: string, text?: string) {
     addToast({
       type: 'warn',
+      header,
       text,
     });
   }
 
-  static error(text: string) {
+  static error(header: string, text?: string) {
     addToast({
       type: 'error',
+      header,
       text,
     });
   }
@@ -330,7 +335,7 @@ export class ToastManager extends PureComponent<Props, State> {
     this.showToast(toastParams);
   }
 
-  showToast({ type, text, renderer }: ToastParams) {
+  showToast({ type, header, text, renderer }: ToastParams) {
     const { currentToasts, isHovered } = this.state;
 
     this.lastId += 1;
@@ -347,6 +352,7 @@ export class ToastManager extends PureComponent<Props, State> {
       currentToasts: currentToasts.concat({
         id,
         type,
+        header,
         text,
         renderer,
       }),
@@ -437,7 +443,7 @@ export class ToastManager extends PureComponent<Props, State> {
 
     const isRight = anchor === 'right';
 
-    return currentToasts.map(({ id, type, text, renderer, isHiding }) => {
+    return currentToasts.map(({ id, type, header, text, renderer, isHiding }) => {
       const bottomOffset = bottomOffsets[id];
       const isOffsetCalculated = bottomOffset !== undefined;
 
@@ -454,9 +460,9 @@ export class ToastManager extends PureComponent<Props, State> {
           <ToastWrapper
             className={classNames({ isRight, isAppearing: isOffsetCalculated, isHiding })}>
             {render ? (
-              render({ type, text, onClose: () => this.onCloseClick(id) })
+              render({ type, header, text, onClose: () => this.onCloseClick(id) })
             ) : (
-              <Toast>{text}</Toast>
+              <Toast>{header}</Toast>
             )}
           </ToastWrapper>
         </ToastContainer>

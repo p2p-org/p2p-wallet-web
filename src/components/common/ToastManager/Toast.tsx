@@ -2,6 +2,7 @@ import { styled } from '@linaria/react';
 
 export const Toast = styled.div`
   display: flex;
+  align-items: center;
   box-sizing: border-box;
   width: 100%;
   max-width: 100%;
@@ -17,6 +18,6 @@ export const Toast = styled.div`
   cursor: initial;
 
   @media (min-width: 500px) {
-    width: 304px;
+    width: 282px;
   }
 `;

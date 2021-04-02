@@ -4,6 +4,7 @@ import isPropValid from '@emotion/is-prop-valid';
 import { CSSProperties } from '@linaria/core';
 
 import arrowTriangle from './assets/arrow-triangle-icon.svg';
+import attention from './assets/attention-icon.svg';
 import bottom from './assets/bottom-icon.svg';
 import branch from './assets/branch-icon.svg';
 import bucket from './assets/bucket-icon.svg';
@@ -12,9 +13,11 @@ import change from './assets/change-icon.svg';
 import checkmark from './assets/checkmark-icon.svg';
 import chevron1 from './assets/chevron-1-icon.svg';
 import chevron from './assets/chevron-icon.svg';
+import clock from './assets/clock-icon.svg';
 import close from './assets/close-icon.svg';
 import copy from './assets/copy-icon.svg';
 import currency from './assets/currency-icon.svg';
+import error from './assets/error-icon.svg';
 import eye from './assets/eye-icon.svg';
 import gear from './assets/gear-icon.svg';
 import hide from './assets/hide-icon.svg';
@@ -71,6 +74,9 @@ const iconsMap = new Map<string, string>([
   ['top', top],
   ['wallet', wallet],
   ['warning', warning],
+  ['error', error],
+  ['attention', attention],
+  ['clock', clock],
 ]);
 
 export type Props = {
