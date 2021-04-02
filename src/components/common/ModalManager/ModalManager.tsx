@@ -68,11 +68,11 @@ const modalsMap = new Map<string, LoadableComponent<any>>([
   [SHOW_MODAL_ADD_COIN, loadable(() => import('components/modals/AddCoinModal'))],
   [
     SHOW_MODAL_TRANSACTION_DETAILS,
-    loadable(() => import('components/modals/TransactionDetailsModal')),
+    loadable(() => import('components/modals/TransactionInfoModals/TransactionDetailsModal')),
   ],
   [
     SHOW_MODAL_TRANSACTION_STATUS,
-    loadable(() => import('components/modals/TransactionStatusModal')),
+    loadable(() => import('components/modals/TransactionInfoModals/TransactionStatusModal')),
   ],
   [
     SHOW_MODAL_CLOSE_TOKEN_ACCOUNT,

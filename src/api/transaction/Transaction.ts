@@ -170,7 +170,7 @@ export class Transaction implements Serializable<SerializableTransaction> {
     let { type } = this.short;
     const typeOriginal = type;
     let icon: string | undefined;
-    let isReceiver: boolean = isSameAccount;
+    let isReceiver: boolean | undefined = isSameAccount;
     const {
       source,
       destination,
