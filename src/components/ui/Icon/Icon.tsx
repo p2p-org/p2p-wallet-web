@@ -8,6 +8,7 @@ import bottom from './assets/bottom-icon.svg';
 import branch from './assets/branch-icon.svg';
 import bucket from './assets/bucket-icon.svg';
 import card from './assets/card-icon.svg';
+import chain from './assets/chain-icon.svg';
 import change from './assets/change-icon.svg';
 import checkmark from './assets/checkmark-icon.svg';
 import chevron1 from './assets/chevron-1-icon.svg';
@@ -42,6 +43,7 @@ const iconsMap = new Map<string, string>([
   ['bottom', bottom],
   ['branch', branch],
   ['card', card],
+  ['chain', chain],
   ['change', change],
   ['checkmark', checkmark],
   ['chevron-1', chevron1],

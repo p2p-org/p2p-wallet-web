@@ -24,8 +24,6 @@ import {
   CloseIcon,
   CloseWrapper,
   Content,
-  CopyIcon,
-  CopyWrapper,
   Desc,
   FieldsWrapper,
   FieldTitle,
@@ -36,6 +34,8 @@ import {
   OtherIcon,
   ProgressWrapper,
   SendWrapper,
+  ShareIcon,
+  ShareWrapper,
   SwapAmount,
   SwapBlock,
   SwapColumn,
@@ -289,9 +289,15 @@ export const TransactionStatusModal: FunctionComponent<Props> = ({
               <FieldTitle>Transaction ID</FieldTitle>
               <FieldValue>
                 {signature}{' '}
-                <CopyWrapper onClick={handleCopyClick(signature)}>
-                  <CopyIcon name="copy" />
-                </CopyWrapper>
+                <a
+                  href={getExplorerUrl('tx', signature, cluster)}
+                  target="_blank"
+                  rel="noopener noreferrer noindex"
+                  className="button">
+                  <ShareWrapper onClick={handleCopyClick(signature)}>
+                    <ShareIcon name="copy" />
+                  </ShareWrapper>
+                </a>
               </FieldValue>
             </FieldWrapper>
           </FieldsWrapper>

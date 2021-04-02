@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useEffect, useMemo, useState } from 'react';
+import React, { FC, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { styled } from '@linaria/react';
@@ -9,9 +9,9 @@ import dayjs from 'dayjs';
 
 import { Transaction } from 'api/transaction/Transaction';
 import { AmountUSD } from 'components/common/AmountUSD';
-import { ToastManager } from 'components/common/ToastManager';
 import { TokenAvatar } from 'components/common/TokenAvatar';
 import { getTransaction } from 'store/slices/transaction/TransactionSlice';
+import { getExplorerUrl } from 'utils/connection';
 import { shortAddress } from 'utils/tokens';
 
 import {
@@ -20,8 +20,6 @@ import {
   CloseIcon,
   CloseWrapper,
   Content,
-  CopyIcon,
-  CopyWrapper,
   Desc,
   FieldsWrapper,
   FieldTitle,
@@ -32,6 +30,8 @@ import {
   OtherIcon,
   ProgressWrapper,
   SendWrapper,
+  ShareIcon,
+  ShareWrapper,
   SwapAmount,
   SwapBlock,
   SwapColumn,
@@ -116,18 +116,10 @@ type Props = {
   close: () => void;
 };
 
-const handleCopyClick = (publicKey: string) => () => {
-  try {
-    void navigator.clipboard.writeText(publicKey);
-    ToastManager.info('Copied to buffer!');
-  } catch (error) {
-    console.error(error);
-  }
-};
-
-export const TransactionDetailsModal: FunctionComponent<Props> = ({ signature, source, close }) => {
+export const TransactionDetailsModal: FC<Props> = ({ signature, source, close }) => {
   const dispatch = useDispatch();
   const [isShowDetails, setShowDetails] = useState(false);
+  const cluster = useSelector((state) => state.wallet.cluster);
   const transaction = useSelector(
     (state) =>
       state.transaction.items[signature] && Transaction.from(state.transaction.items[signature]),
@@ -302,9 +294,15 @@ export const TransactionDetailsModal: FunctionComponent<Props> = ({ signature, s
             <FieldTitle>Transaction ID</FieldTitle>
             <FieldValue>
               {signature}{' '}
-              <CopyWrapper onClick={handleCopyClick(signature)}>
-                <CopyIcon name="copy" />
-              </CopyWrapper>
+              <a
+                href={getExplorerUrl('tx', signature, cluster)}
+                target="_blank"
+                rel="noopener noreferrer noindex"
+                className="button">
+                <ShareWrapper>
+                  <ShareIcon name="chain" />
+                </ShareWrapper>
+              </a>
             </FieldValue>
           </FieldWrapper>
         </FieldsWrapper>

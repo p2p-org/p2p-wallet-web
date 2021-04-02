@@ -225,14 +225,14 @@ export const FieldValue = styled.div`
   line-height: 21px;
 `;
 
-export const CopyIcon = styled(Icon)`
+export const ShareIcon = styled(Icon)`
   width: 24px;
   height: 24px;
 
   color: #a3a5ba;
 `;
 
-export const CopyWrapper = styled.div`
+export const ShareWrapper = styled.div`
   display: flex;
   flex-shrink: 0;
   align-items: center;
@@ -248,7 +248,7 @@ export const CopyWrapper = styled.div`
   &:hover {
     background: #eff3ff;
 
-    ${CopyIcon} {
+    ${ShareIcon} {
       color: #5887ff;
     }
   }
