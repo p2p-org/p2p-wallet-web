@@ -56,6 +56,7 @@ const Settings = styled.div`
 const SettingItem = styled.div`
   display: flex;
   align-items: center;
+  justify-content: space-between;
 
   padding: 20px 0;
 
@@ -97,10 +98,21 @@ const StyledIcon = styled(Icon)`
 `;
 
 const Text = styled.div`
-  flex-grow: 1;
-
   font-weight: 600;
   font-size: 16px;
+`;
+
+const Warning = styled.div`
+  display: flex;
+  align-items: center;
+`;
+
+const WarningIcon = styled(Icon)`
+  margin-left: 10px;
+  width: 18px;
+  height: 18px;
+
+  color: #ffa631;
 `;
 
 type Props = {
@@ -169,6 +181,12 @@ export const TokenSettingsWidget: FunctionComponent<Props> = ({
             </IconWrapper>
             Close token account
           </ButtonStyled>
+          {!isZeroBalance ? (
+            <Warning>
+              <Text>Token account should be empty</Text>
+              <WarningIcon name="warning" />
+            </Warning>
+          ) : undefined}
         </SettingItem>
       </>
     );
