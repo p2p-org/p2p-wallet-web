@@ -290,7 +290,22 @@ export const TransactionDetailsModal: FC<Props> = ({ signature, source, close })
               <FieldWrapper>
                 <FieldTitle>Amount</FieldTitle>
                 <FieldValue>
-                  {details.amount.toNumber()} {details.token?.symbol}
+                  {details.type === 'swap' ? (
+                    <>
+                      {details.sourceAmount.toNumber()} {details.sourceToken?.symbol} to{' '}
+                      {details.destinationAmount.toNumber()} {details.destinationToken?.symbol}
+                    </>
+                  ) : (
+                    <>
+                      {details.amount.toNumber()} {details.token?.symbol}
+                    </>
+                  )}
+                </FieldValue>
+              </FieldWrapper>
+              <FieldWrapper>
+                <FieldTitle>Value</FieldTitle>
+                <FieldValue>
+                  <AmountUSD symbol={details.token?.symbol} value={details.amount} />
                 </FieldValue>
               </FieldWrapper>
               {transaction.meta ? (
