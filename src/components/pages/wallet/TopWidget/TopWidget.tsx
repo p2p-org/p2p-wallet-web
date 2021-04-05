@@ -22,23 +22,34 @@ import { Chart } from './Chart';
 
 const WrapperWidget = styled(Widget)``;
 
-const TokenInfo = styled.div`
+const Header = styled.div`
   display: flex;
   align-items: center;
 `;
 
-const TokenName = styled.div`
+const TokenInfo = styled.div`
   max-width: 230px;
   margin-left: 16px;
   overflow: hidden;
 
+  white-space: nowrap;
+  text-overflow: ellipsis;
+`;
+
+const TokenSymbol = styled.div`
   color: #000;
   font-weight: 600;
   font-size: 20px;
-  line-height: 120%;
-  white-space: nowrap;
+  line-height: 100%;
+`;
 
-  text-overflow: ellipsis;
+const TokenName = styled.div`
+  margin-top: 4px;
+
+  color: #a3a5ba;
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 140%;
 `;
 
 const Buttons = styled.div`
@@ -319,11 +330,14 @@ export const TopWidget: FunctionComponent<Props> = ({ publicKey }) => {
         ref={widgetRef}
         title={
           tokenAccount ? (
-            <TokenInfo>
-              <TokenAvatar symbol={tokenAccount?.mint.symbol} size="36" />
-              <TokenName title={tokenAccount.address.toBase58()}>
-                {tokenAccount?.mint.name || shortAddress(tokenAccount.address.toBase58())} wallet
-              </TokenName>
+            <Header>
+              <TokenAvatar symbol={tokenAccount?.mint.symbol} size="44" />
+              <TokenInfo>
+                <TokenSymbol>{tokenAccount?.mint.symbol}</TokenSymbol>
+                <TokenName title={tokenAccount.address.toBase58()}>
+                  {tokenAccount?.mint.name || shortAddress(tokenAccount.address.toBase58())}
+                </TokenName>
+              </TokenInfo>
               {tokenAccount?.mint.address.equals(SystemProgram.programId) ? undefined : (
                 <TokenSettings>
                   <Link
@@ -336,7 +350,7 @@ export const TopWidget: FunctionComponent<Props> = ({ publicKey }) => {
                   </Link>
                 </TokenSettings>
               )}
-            </TokenInfo>
+            </Header>
           ) : undefined
         }
         action={renderButtons()}>
