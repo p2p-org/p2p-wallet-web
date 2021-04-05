@@ -98,6 +98,8 @@ const StyledIcon = styled(Icon)`
 `;
 
 const Text = styled.div`
+  flex-grow: 1;
+
   font-weight: 600;
   font-size: 16px;
 `;
