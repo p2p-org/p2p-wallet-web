@@ -34,7 +34,7 @@ const Top = styled.div`
   line-height: 140%;
 `;
 
-const TokenName = styled.div`
+const TokenSymbol = styled.div`
   max-width: 300px;
 
   overflow: hidden;
@@ -70,9 +70,9 @@ export const TokenAccountRow: FunctionComponent<Props> = ({ tokenAccount, onClic
         <TokenAvatar symbol={tokenAccount.mint.symbol} size={44} />
         <Info>
           <Top>
-            <TokenName title={tokenAccount.mint.address.toBase58()}>
-              {tokenAccount.mint.name || shortAddress(tokenAccount.mint.address.toBase58())}
-            </TokenName>
+            <TokenSymbol title={tokenAccount.mint.address.toBase58()}>
+              {tokenAccount.mint.symbol || shortAddress(tokenAccount.mint.address.toBase58())}
+            </TokenSymbol>
             <AmountUSD
               symbol={tokenAccount.mint.symbol}
               value={tokenAccount.mint.toMajorDenomination(tokenAccount.balance)}

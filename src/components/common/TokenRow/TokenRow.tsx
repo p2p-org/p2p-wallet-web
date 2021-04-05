@@ -70,11 +70,11 @@ export const TokenRow: FunctionComponent<Props> = ({ token, onClick }) => {
         <Info>
           <Top>
             <TokenName title={token.address.toBase58()}>
-              {token.name || shortAddress(token.address.toBase58())}
+              {token.symbol || shortAddress(token.address.toBase58())}
             </TokenName>
           </Top>
           <Bottom>
-            <div>{token.symbol}</div>
+            <div>{token.name}</div>
           </Bottom>
         </Info>
       </ItemWrapper>
