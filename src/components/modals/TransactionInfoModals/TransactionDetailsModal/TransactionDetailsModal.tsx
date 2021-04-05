@@ -226,21 +226,21 @@ export const TransactionDetailsModal: FC<Props> = ({ signature, source, close })
       </Header>
       <ProgressWrapper />
       <Content>
-        {details.typeOriginal === 'transfer' ? (
-          <SendWrapper>
-            <ValueCurrency>
-              {details.isReceiver ? '+' : '-'} {details.sourceAmount.toNumber()}{' '}
-              {details.sourceToken?.symbol}
-            </ValueCurrency>
-            <ValueOriginal>
-              <AmountUSD
-                prefix={details.isReceiver ? '+' : '-'}
-                symbol={details.sourceToken?.symbol}
-                value={details.sourceAmount}
-              />
-            </ValueOriginal>
-          </SendWrapper>
-        ) : undefined}
+        {/* {details.typeOriginal === 'transfer' ? ( */}
+        {/*  <SendWrapper> */}
+        {/*    <ValueCurrency> */}
+        {/*      {details.isReceiver ? '+' : '-'} {details.sourceAmount.toNumber()}{' '} */}
+        {/*      {details.sourceToken?.symbol} */}
+        {/*    </ValueCurrency> */}
+        {/*    <ValueOriginal> */}
+        {/*      <AmountUSD */}
+        {/*        prefix={details.isReceiver ? '+' : '-'} */}
+        {/*        symbol={details.sourceToken?.symbol} */}
+        {/*        value={details.sourceAmount} */}
+        {/*      /> */}
+        {/*    </ValueOriginal> */}
+        {/*  </SendWrapper> */}
+        {/* ) : undefined} */}
         {details.type === 'swap' ? (
           <SwapWrapper>
             <SwapColumn>
@@ -263,7 +263,20 @@ export const TransactionDetailsModal: FC<Props> = ({ signature, source, close })
               </SwapInfo>
             </SwapColumn>
           </SwapWrapper>
-        ) : undefined}
+        ) : (
+          <SendWrapper>
+            <ValueCurrency>
+              {details.isReceiver ? '+' : '-'} {details.amount.toNumber()} {details.token?.symbol}
+            </ValueCurrency>
+            <ValueOriginal>
+              <AmountUSD
+                prefix={details.isReceiver ? '+' : '-'}
+                symbol={details.token?.symbol}
+                value={details.amount}
+              />
+            </ValueOriginal>
+          </SendWrapper>
+        )}
         <StatusWrapper>
           <Status>
             <StatusIndicator /> Completed
@@ -276,7 +289,9 @@ export const TransactionDetailsModal: FC<Props> = ({ signature, source, close })
 
               <FieldWrapper>
                 <FieldTitle>Amount</FieldTitle>
-                <FieldValue>{details.amount.toNumber()}</FieldValue>
+                <FieldValue>
+                  {details.amount.toNumber()} {details.token?.symbol}
+                </FieldValue>
               </FieldWrapper>
               {transaction.meta ? (
                 <FieldWrapper>

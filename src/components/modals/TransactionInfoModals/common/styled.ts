@@ -113,13 +113,15 @@ export const ProgressWrapper = styled.div`
   background: rgba(0, 0, 0, 0.05);
 `;
 
-export const Content = styled.div``;
+export const Content = styled.div`
+  padding-top: 40px;
+`;
 
 export const SendWrapper = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin: 40px 0 20px;
+  margin-bottom: 20px;
 `;
 
 export const ValueCurrency = styled.div`
@@ -142,7 +144,7 @@ export const SwapWrapper = styled.div`
   display: flex;
   justify-content: center;
 
-  margin: 70px 0 40px;
+  margin-bottom: 40px;
 `;
 
 export const SwapColumn = styled.div`
