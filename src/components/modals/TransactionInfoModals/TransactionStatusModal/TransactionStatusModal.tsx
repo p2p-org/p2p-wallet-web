@@ -16,6 +16,7 @@ import { TokenAvatar } from 'components/common/TokenAvatar';
 import { Button } from 'components/ui';
 import { getTransaction } from 'store/slices/transaction/TransactionSlice';
 import { getExplorerUrl } from 'utils/connection';
+import { transferNotification } from 'utils/transactionNotifications';
 
 import {
   BlockWrapper,
@@ -132,6 +133,14 @@ export const TransactionStatusModal: FunctionComponent<Props> = ({
 
       const resultSignature = unwrapResult(await dispatch(action));
       setSignature(resultSignature);
+
+      if (type === 'send') {
+        transferNotification({
+          header: 'Sent',
+          text: `- ${fromToken.toMajorDenomination(fromAmount).toString()} ${fromToken.symbol}`,
+          symbol: fromToken.symbol,
+        });
+      }
     } catch (error) {
       setIsError(true);
       setIsExecuting(false);

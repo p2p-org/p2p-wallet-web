@@ -6,6 +6,7 @@ import {
   unwrapResult,
 } from '@reduxjs/toolkit';
 import { Account, Blockhash, Cluster, FeeCalculator, PublicKey } from '@solana/web3.js';
+import Decimal from 'decimal.js';
 import { mergeDeepRight } from 'ramda';
 
 import { APIFactory as TokenAPIFactory, TransferParameters } from 'api/token';
@@ -25,6 +26,7 @@ import { getAvailableTokens, wipeAction } from 'store/slices/GlobalSlice';
 import { getPools } from 'store/slices/pool/PoolSlice';
 import { getRatesCandle, getRatesMarkets } from 'store/slices/rate/RateSlice';
 import { updateEntityArray } from 'store/slices/tokenPair/utils/tokenPair';
+import { minorAmountToMajor } from 'utils/amount';
 import {
   loadHiddenTokens,
   loadSettings,
@@ -32,6 +34,7 @@ import {
   removeZeroBalanceToken,
   saveSettings,
 } from 'utils/settings';
+import { transferNotification } from 'utils/transactionNotifications';
 import { WalletSettings } from 'utils/types';
 
 const STORAGE_KEY_TYPE = 'type';
@@ -258,6 +261,21 @@ export const updateAccountReducer = (
 
   if (token.balance.gte(0) && state.zeroBalanceTokens.includes(token.address.toBase58())) {
     removeZeroBalanceToken(action.payload.address);
+  }
+
+  const prevBalance =
+    state.tokenAccounts.find((account) => account.mint.symbol === token.mint.symbol)?.balance ||
+    new Decimal(0);
+  const amount = token.balance.sub(prevBalance);
+
+  if (amount.gt(0)) {
+    const { symbol } = token.mint;
+
+    transferNotification({
+      header: 'Received',
+      text: `+ ${minorAmountToMajor(amount, token.mint).toString()} ${symbol}`,
+      symbol,
+    });
   }
 
   return {
