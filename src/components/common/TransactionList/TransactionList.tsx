@@ -6,7 +6,6 @@ import { PublicKey, TransactionSignature } from '@solana/web3.js';
 import dayjs from 'dayjs';
 
 import { Transaction } from 'api/transaction/Transaction';
-import { RootState } from 'store/rootReducer';
 
 import { TransactionRow } from '../TransactionRow';
 
@@ -62,7 +61,7 @@ type Props = {
 };
 
 export const TransactionList: FunctionComponent<Props> = ({ order, source }) => {
-  const transactions = useSelector((state: RootState) => state.transaction.items);
+  const transactions = useSelector((state) => state.transaction.items);
 
   const groupedTransactions = useMemo(() => {
     if (!order) {
@@ -70,7 +69,7 @@ export const TransactionList: FunctionComponent<Props> = ({ order, source }) => 
     }
 
     const txs: { date: string | null; items: Transaction[] }[] = [];
-    let group: Transaction[] = [];
+    const group: Transaction[] = [];
     let lastDate: string | null = null;
 
     order.forEach((signature, index) => {
@@ -87,11 +86,11 @@ export const TransactionList: FunctionComponent<Props> = ({ order, source }) => 
         : null;
 
       if (currentDate !== lastDate && group.length > 0) {
+        group.push(transaction);
         txs.push({
           date: lastDate,
           items: group,
         });
-        group = [];
       } else if (order.length === index + 1) {
         group.push(transaction);
         txs.push({
