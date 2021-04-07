@@ -119,11 +119,24 @@ export const APIFactory = memoizeWith(
           const destinationInstruction = transfersInstructions[1] as ConfirmedTransaction;
           const sourceInfo = sourceInstruction?.parsed?.info;
           const destinationInfo = destinationInstruction?.parsed?.info;
+          const closeInstruction = instructions.find(
+            (inst: ConfirmedTransaction) => inst.parsed?.type === 'closeAccount',
+          ) as ConfirmedTransaction;
 
           source = sourceInfo?.source ? new PublicKey(sourceInfo.source) : null;
           destination = destinationInfo?.destination
             ? new PublicKey(destinationInfo.destination)
             : null;
+
+          if (closeInstruction?.parsed) {
+            if (closeInstruction.parsed.info.account === source?.toBase58()) {
+              source = new PublicKey(closeInstruction.parsed.info.destination);
+            }
+            if (closeInstruction.parsed.info.account === destination?.toBase58()) {
+              destination = new PublicKey(closeInstruction.parsed.info.destination);
+            }
+          }
+
           sourceTokenAccount = source ? await tokenAPI.tokenAccountInfo(source) : null;
           destinationTokenAccount = destination
             ? await tokenAPI.tokenAccountInfo(destination)
@@ -294,17 +307,17 @@ export const APIFactory = memoizeWith(
       sourceToken = sourceToken || sourceTokenAccount?.mint || null;
       destinationToken = destinationToken || destinationTokenAccount?.mint || null;
 
-      console.log(111, transactionInfo, {
-        type,
-        source: source?.toBase58(),
-        sourceTokenAccount: sourceTokenAccount?.serialize(),
-        sourceToken: sourceToken?.serialize(),
-        destination: destination?.toBase58(),
-        destinationTokenAccount: destinationTokenAccount?.serialize(),
-        destinationToken: destinationToken?.serialize(),
-        sourceAmount: sourceAmount.toNumber(),
-        destinationAmount: destinationAmount.toNumber(),
-      });
+      // console.log(111, transactionInfo, {
+      //   type,
+      //   source: source?.toBase58(),
+      //   sourceTokenAccount: sourceTokenAccount?.serialize(),
+      //   sourceToken: sourceToken?.serialize(),
+      //   destination: destination?.toBase58(),
+      //   destinationTokenAccount: destinationTokenAccount?.serialize(),
+      //   destinationToken: destinationToken?.serialize(),
+      //   sourceAmount: sourceAmount.toNumber(),
+      //   destinationAmount: destinationAmount.toNumber(),
+      // });
 
       return {
         type,
