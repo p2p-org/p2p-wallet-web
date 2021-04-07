@@ -13,14 +13,16 @@ const Wrapper = styled.div`
 
 type Props = {
   items: TokenAccount[];
-  isHidden?: boolean;
+  selectedSymbol: string;
   isZeroBalancesHidden?: boolean;
+  isHidden?: boolean;
 };
 
 export const TokenList: FunctionComponent<Props> = ({
   items = [],
-  isHidden = false,
+  selectedSymbol,
   isZeroBalancesHidden = true,
+  isHidden = false,
 }) => {
   if (items.length === 0 && !isHidden) {
     return <LoaderBlock />;
@@ -34,6 +36,7 @@ export const TokenList: FunctionComponent<Props> = ({
           <TokenRow
             key={item.address.toBase58()}
             token={item}
+            isSelected={item.mint.symbol === selectedSymbol}
             isHidden={isHidden}
             isZeroBalancesHidden={isZeroBalancesHidden}
           />

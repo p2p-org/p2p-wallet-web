@@ -54,7 +54,11 @@ const ChartWrapper = styled.div`
   height: ${CHART_SIZE}px;
 `;
 
-export const TotalBalanceWidget: FunctionComponent = () => {
+type Props = {
+  onSymbolChange: (symbol: string) => void;
+};
+
+export const TotalBalanceWidget: FunctionComponent<Props> = ({ onSymbolChange }) => {
   const tokenAccounts = useSelector((state: RootState) =>
     state.wallet.tokenAccounts.map((account) => TokenAccount.from(account)),
   );
@@ -128,8 +132,9 @@ export const TotalBalanceWidget: FunctionComponent = () => {
       }).format(balance);
 
       data.push({
-        label: `${tokenAccount.mint.symbol} ${balanceUSD}`,
-        value: balance,
+        symbol: tokenAccount.mint.symbol,
+        amount: balance,
+        amountUSD: balanceUSD,
         color: tokenAccount.mint.color,
       });
     });
@@ -153,7 +158,7 @@ export const TotalBalanceWidget: FunctionComponent = () => {
           {tokenAccounts.length === 0 ? (
             <LoaderBlock />
           ) : (
-            <DonutChart size={CHART_SIZE} data={donutData} />
+            <DonutChart size={CHART_SIZE} data={donutData} onSymbolChange={onSymbolChange} />
           )}
         </ChartWrapper>
       </TotalWrapper>

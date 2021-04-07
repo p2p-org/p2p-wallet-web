@@ -57,6 +57,7 @@ const WrapperLink = styled(Link)`
 
   text-decoration: none;
 
+  border-radius: 12px;
   cursor: pointer;
 `;
 
@@ -95,6 +96,12 @@ const Wrapper = styled.div`
     }
   }
 
+  &.isSelected {
+    ${WrapperLink} {
+      background: #eff3ff;
+    }
+  }
+
   &:hover {
     ${MenuWrapper} {
       opacity: 1;
@@ -102,7 +109,6 @@ const Wrapper = styled.div`
 
     ${WrapperLink} {
       background: #f6f6f8;
-      border-radius: 12px;
     }
 
     ${TokenAvatarStyled} {
@@ -130,14 +136,16 @@ const Wrapper = styled.div`
 
 type Props = {
   token: TokenAccount;
-  isHidden?: boolean;
+  isSelected: boolean;
   isZeroBalancesHidden?: boolean;
+  isHidden?: boolean;
 };
 
 export const TokenRow: FunctionComponent<Props> = ({
   token,
-  isHidden = false,
+  isSelected = false,
   isZeroBalancesHidden = true,
+  isHidden = false,
 }) => {
   const dispatch = useDispatch();
   // eslint-disable-next-line unicorn/consistent-function-scoping
@@ -158,7 +166,7 @@ export const TokenRow: FunctionComponent<Props> = ({
   const isNotSOL = token.mint.symbol !== 'SOL';
 
   return (
-    <Wrapper className={classNames({ isHidden })}>
+    <Wrapper className={classNames({ isHidden, isSelected })}>
       <WrapperLink to={`/wallet/${token.address.toBase58()}`}>
         <TokenAvatarStyled symbol={token.mint.symbol} size={48} />
         <Content>

@@ -1,4 +1,4 @@
-import React, { FunctionComponent } from 'react';
+import React, { FunctionComponent, useState } from 'react';
 
 import { styled } from '@linaria/react';
 
@@ -17,12 +17,18 @@ const WrapperTemp = styled.div`
 `;
 
 export const Wallets: FunctionComponent = () => {
+  const [selectedSymbol, setSelectedSymbol] = useState('');
+
+  const handleSymbolChange = (symbol: string) => {
+    setSelectedSymbol(symbol);
+  };
+
   return (
     <Layout
       rightColumn={
         <WrapperTemp>
-          <TotalBalanceWidget />
-          <TokensWidget />
+          <TotalBalanceWidget onSymbolChange={handleSymbolChange} />
+          <TokensWidget selectedSymbol={selectedSymbol} />
         </WrapperTemp>
       }
     />
