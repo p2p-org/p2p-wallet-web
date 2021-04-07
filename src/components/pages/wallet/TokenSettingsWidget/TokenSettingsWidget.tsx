@@ -185,7 +185,7 @@ export const TokenSettingsWidget: FunctionComponent<Props> = ({
           </ButtonStyled>
           {!isZeroBalance ? (
             <Warning>
-              <Text>Token account should be empty</Text>
+              <Text>Token account should be zero</Text>
               <WarningIcon name="warning" />
             </Warning>
           ) : undefined}
