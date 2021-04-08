@@ -13,9 +13,13 @@ import { RateUSD } from 'components/common/RateUSD';
 import { ToastManager } from 'components/common/ToastManager';
 import { Button } from 'components/ui';
 import { openModal } from 'store/actions/modals';
-import { SHOW_MODAL_TRANSACTION_STATUS } from 'store/constants/modalTypes';
+import { SHOW_MODAL_ERROR, SHOW_MODAL_TRANSACTION_STATUS } from 'store/constants/modalTypes';
 import { RootState } from 'store/rootReducer';
-import { getMinimumBalanceForRentExemption, transfer } from 'store/slices/wallet/WalletSlice';
+import {
+  getMinimumBalanceForRentExemption,
+  getTokenAccount,
+  transfer,
+} from 'store/slices/wallet/WalletSlice';
 
 import {
   BottomWrapper,
@@ -43,6 +47,22 @@ const FromTitle = styled.div`
 
 type Props = {
   publicKey: string | null;
+};
+
+const isValidAmount = (amount: string): boolean => {
+  const amountValue = Number.parseFloat(amount);
+
+  return amount === '' || amountValue === 0;
+};
+
+const isValidAddress = (address: string): boolean => {
+  try {
+    // eslint-disable-next-line no-new
+    new PublicKey(address);
+    return true;
+  } catch {
+    return false;
+  }
 };
 
 export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
@@ -90,12 +110,47 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
       throw new Error('Invalid amount');
     }
 
+    const destination = new PublicKey(toTokenPublicKey);
+
+    if (fromTokenAccount?.mint.symbol !== 'SOL') {
+      const account = unwrapResult(await dispatch(getTokenAccount(destination)));
+
+      if (!account) {
+        void dispatch(
+          openModal({
+            modalType: SHOW_MODAL_ERROR,
+            props: {
+              icon: 'branch',
+              header: 'Current SOL Address are not in blockchain network',
+              text:
+                'If you are sending tokens to a new SOL wallet make sure that recepient’s balance is’n empty.',
+            },
+          }),
+        );
+        return;
+      }
+
+      if (!account.mint.address.equals(fromTokenAccount?.mint.address)) {
+        void dispatch(
+          openModal({
+            modalType: SHOW_MODAL_ERROR,
+            props: {
+              icon: 'wallet',
+              header: 'Wallet address is not valid',
+              text: 'The wallet address is not valid. It must be a "Token name" wallet address',
+            },
+          }),
+        );
+        return;
+      }
+    }
+
     try {
       setIsExecuting(true);
 
       const action = transfer({
         source: fromTokenAccount.address,
-        destination: new PublicKey(toTokenPublicKey),
+        destination,
         amount,
       });
 
@@ -168,7 +223,12 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
       </ToSendWrapper>
       <BottomWrapper>
         <ButtonWrapper>
-          <Button primary={!isDisabled} disabled={isDisabled} big full onClick={handleSubmit}>
+          <Button
+            primary={!isDisabled}
+            disabled={isDisabled || isValidAmount(fromAmount) || !isValidAddress(toTokenPublicKey)}
+            big
+            full
+            onClick={handleSubmit}>
             Send
           </Button>
           <Hint>All deposits are stored 100% non-custodiallity with keys held on this device</Hint>

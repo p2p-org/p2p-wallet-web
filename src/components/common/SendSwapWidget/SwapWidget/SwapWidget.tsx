@@ -401,7 +401,11 @@ export const SwapWidget: FunctionComponent = () => {
       ? selectedPool.impliedRate(isReverseRate ? firstToken : secondToken, 1).toNumber()
       : undefined;
 
-  const isDisabled = isExecuting || !selectedPool;
+  const hasBalance = firstTokenAccount
+    ? firstTokenAccount.balance.toNumber() >= Number(firstAmount)
+    : false;
+
+  const isDisabled = isExecuting || !selectedPool || !hasBalance;
   const isShowFee = firstToken && fee && feeProperties;
   const isNeedCreateWallet = isNil(secondTokenAccount);
 
