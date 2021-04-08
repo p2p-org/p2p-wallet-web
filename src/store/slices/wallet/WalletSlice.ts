@@ -84,6 +84,17 @@ const getSolToken = async () => {
   return new TokenAccount(mint, SYSTEM_PROGRAM_ID, SYSTEM_PROGRAM_ID, publicKey, balance);
 };
 
+export const getTokenAccount = createAsyncThunk<TokenAccount | null, PublicKey>(
+  `${WALLET_SLICE_NAME}/getTokenAccount`,
+  async (account, thunkAPI) => {
+    const state: RootState = thunkAPI.getState() as RootState;
+    const walletState = state.wallet;
+    const TokenAPI = TokenAPIFactory(walletState.cluster);
+
+    return TokenAPI.tokenAccountInfo(account);
+  },
+);
+
 export const getTokenAccounts = createAsyncThunk<Array<SerializableTokenAccount>>(
   `${WALLET_SLICE_NAME}/getTokenAccounts`,
   async (_, thunkAPI) => {
