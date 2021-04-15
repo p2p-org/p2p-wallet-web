@@ -3,11 +3,13 @@ import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 
 import dayjs from 'dayjs';
 import localizedFormat from 'dayjs/plugin/localizedFormat';
+import { useFeature } from 'flagged';
 
 import { FeaturesToggle } from 'components/common/FeaturesToggle';
 import { ModalManager } from 'components/common/ModalManager';
 import { NotifyToast } from 'components/common/NotifyToast';
 import { ToastManager } from 'components/common/ToastManager';
+import { FEATURE_LANDING } from 'config/featureFlags';
 import { Access } from 'pages/Access';
 import { Create } from 'pages/Create';
 import { Home } from 'pages/Home';
@@ -25,11 +27,17 @@ import { AuthRequiredRoute } from 'utils/routes/UserRequiredRoute';
 dayjs.extend(localizedFormat);
 
 const App: React.FC = () => {
+  const isFeatureLanding = useFeature(FEATURE_LANDING);
+
   return (
     <>
       <Router basename={process.env.REACT_APP_BASENAME}>
         <Switch>
-          <Route path="/" component={Landing} exact />
+          {isFeatureLanding ? (
+            <Route path="/" component={Landing} exact />
+          ) : (
+            <Route path="/" component={Home} exact />
+          )}
           <Route path="/enter" component={Home} exact />
           <Route path="/create" component={Create} />
           <Route path="/access" component={Access} />
