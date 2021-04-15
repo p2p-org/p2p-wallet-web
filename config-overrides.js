@@ -1,3 +1,4 @@
+const path = require('path');
 const {
   useBabelRc,
   override,
@@ -6,6 +7,7 @@ const {
   setWebpackPublicPath,
 } = require('customize-cra');
 const SpritePlugin = require('svg-sprite-loader/plugin');
+const PrerenderSPAPlugin = require('prerender-spa-plugin');
 
 const isDev = process.env.NODE_ENV === 'development';
 
@@ -13,6 +15,12 @@ module.exports = override(
   useBabelRc(),
   setWebpackPublicPath(process.env.REACT_APP_BASENAME || '/'),
   addWebpackPlugin(new SpritePlugin()),
+  addWebpackPlugin(
+    new PrerenderSPAPlugin({
+      routes: ['/'],
+      staticDir: path.join(__dirname, 'build'),
+    }),
+  ),
   addWebpackModuleRule({
     test: /\.tsx?$/,
     exclude: /node_modules/,

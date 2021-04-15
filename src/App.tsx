@@ -11,6 +11,7 @@ import { ToastManager } from 'components/common/ToastManager';
 import { Access } from 'pages/Access';
 import { Create } from 'pages/Create';
 import { Home } from 'pages/Home';
+import { Landing } from 'pages/Landing';
 import { Receive } from 'pages/Receive';
 import { Send } from 'pages/Send';
 import { Settings } from 'pages/Settings';
@@ -28,7 +29,8 @@ const App: React.FC = () => {
     <>
       <Router basename={process.env.REACT_APP_BASENAME}>
         <Switch>
-          <Route path="/" component={Home} exact />
+          <Route path="/" component={Landing} exact />
+          <Route path="/enter" component={Home} exact />
           <Route path="/create" component={Create} />
           <Route path="/access" component={Access} />
           <AuthRequiredRoute path="/wallets" component={Wallets} />
