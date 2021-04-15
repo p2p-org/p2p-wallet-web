@@ -49,7 +49,7 @@ const Wrapper = styled.div`
       top: -710px;
       left: 0;
 
-      width: 10%;
+      width: 100%;
       height: 1412px;
 
       background: url('./curves-desktop.png') no-repeat 50%;
