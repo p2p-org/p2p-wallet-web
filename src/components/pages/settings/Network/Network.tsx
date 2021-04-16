@@ -8,10 +8,10 @@ import { mergeDeepRight } from 'ramda';
 
 import { WidgetPage } from 'components/common/WidgetPage';
 import { Button, Input, RadioButton } from 'components/ui';
+import { clusters } from 'config/constants';
 import { RootState } from 'store/rootReducer';
 import { wipeAction } from 'store/slices/GlobalSlice';
 import { autoConnect, selectCluster, updateSettings } from 'store/slices/wallet/WalletSlice';
-import { clusters } from 'utils/settings';
 
 const URL_REGEX = new RegExp(
   /https?:\/\/(?:w{1,3}\.)?[^\s.]+(?:\.[a-z]+)*(?::\d+)?((?:\/\w+)|(?:-\w+))*\/?(?![^<]*(?:<\/\w+>|\/?>))/,

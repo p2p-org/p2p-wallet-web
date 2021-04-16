@@ -1,4 +1,4 @@
-import React, { FC, HTMLAttributes } from 'react';
+import React, { FC } from 'react';
 
 import { styled } from '@linaria/react';
 import classNames from 'classnames';
@@ -76,7 +76,7 @@ type ButtonProps = {
   glow?: boolean;
 };
 
-export const ButtonWeb: FC<ButtonProps & HTMLAttributes<any>> = ({ glow, className }) => {
+export const ButtonWeb: FC<ButtonProps & HTMLElement> = ({ glow, className }) => {
   return (
     <Button className={classNames(className, { glow })}>
       <Text className="web">Go to web wallet</Text>
@@ -84,7 +84,7 @@ export const ButtonWeb: FC<ButtonProps & HTMLAttributes<any>> = ({ glow, classNa
   );
 };
 
-export const ButtonIOS: FC<ButtonProps & HTMLAttributes<any>> = ({ glow, className }) => {
+export const ButtonIOS: FC<ButtonProps & HTMLElement> = ({ glow, className }) => {
   return (
     <Button className={classNames(className, { glow, green: true })}>
       <Text className="ios">Download for iOS</Text>

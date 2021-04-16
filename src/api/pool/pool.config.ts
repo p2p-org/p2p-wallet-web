@@ -22,4 +22,7 @@ export default {
   'mainnet-beta': {
     swapProgramId: new PublicKey('SwaPpA9LAaLfeLi3a68M4DjnLqgtticKg6CnyNwgAC8'),
   },
+  p2p: {
+    swapProgramId: new PublicKey('SwaPpA9LAaLfeLi3a68M4DjnLqgtticKg6CnyNwgAC8'),
+  },
 } as PoolsByEntrypointType;

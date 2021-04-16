@@ -1,7 +1,7 @@
 import { clusterApiUrl, Commitment, Connection, SignatureResult } from '@solana/web3.js';
 import { identity, memoizeWith } from 'ramda';
 
-import { defaultCommitment } from 'config/constants';
+import { clusters, defaultCommitment } from 'config/constants';
 import { ExtendedCluster } from 'utils/types';
 
 import { retryableProxy } from './utils/retryableProxy';
@@ -45,11 +45,7 @@ export const getNetwork = (cluster: ExtendedCluster): string => {
     return LOCALNET_URL;
   }
 
-  if (cluster === 'mainnet-beta') {
-    return 'https://solana-api.projectserum.com/';
-  }
-
-  return clusterApiUrl(cluster);
+  return clusters[cluster] || clusterApiUrl(cluster);
 };
 
 export const getConnection = (cluster?: ExtendedCluster): Connection => {

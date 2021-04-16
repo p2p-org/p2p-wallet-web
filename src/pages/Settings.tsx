@@ -11,10 +11,11 @@ import { Layout } from 'components/common/Layout';
 import { WidgetPage } from 'components/common/WidgetPage';
 import { Icon, Select, Switch } from 'components/ui';
 import { MenuItem } from 'components/ui/Select/MenuItem';
+import { clusters } from 'config/constants';
 import { FEATURE_SETTINGS_LIST } from 'config/featureFlags';
 import { RootState } from 'store/rootReducer';
 import { disconnect, STORAGE_KEY_SEED, updateSettings } from 'store/slices/wallet/WalletSlice';
-import { appearance, clusters, currencies } from 'utils/settings';
+import { appearance, currencies } from 'utils/settings';
 import { WalletSettings } from 'utils/types';
 
 const Wrapper = styled.div`

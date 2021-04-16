@@ -22,16 +22,6 @@ export const currencies = [
   },
 ];
 
-type ClusterEntrypoint = {
-  [cluster: string]: string;
-};
-
-export const clusters = {
-  'mainnet-beta': 'https://solana-api.projectserum.com/',
-  devnet: 'https://devnet.solana.com',
-  testnet: 'https://testnet.solana.com',
-} as ClusterEntrypoint;
-
 export const appearance = ['system', 'light', 'dark'];
 
 export const defaultSettings = {
