@@ -34,8 +34,9 @@ export const airdropKey = (cluster: ExtendedCluster): string | undefined =>
 export const clusters: {
   [cluster: string]: string;
 } = {
-  p2p: 'https://node-1.solana.p2p.org/',
-  'mainnet-beta': 'https://solana-api.projectserum.com/',
+  'p2p-mainnet': 'https://node-1.solana.p2p.org',
+  'serum-mainnet': 'https://solana-api.projectserum.com',
+  'mainnet-beta': 'https://api.mainnet-beta.solana.com',
   devnet: 'https://devnet.solana.com',
   testnet: 'https://testnet.solana.com',
 };

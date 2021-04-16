@@ -8,21 +8,26 @@ type PoolsByEntrypointType = {
   [cluster: string]: PoolConfig;
 };
 
+const swapProgramId = new PublicKey('SwaPpA9LAaLfeLi3a68M4DjnLqgtticKg6CnyNwgAC8');
+
 // eslint-disable-next-line import/no-default-export
 export default {
-  localnet: {
-    swapProgramId: null,
+  'p2p-mainnet': {
+    swapProgramId,
   },
-  devnet: {
-    swapProgramId: new PublicKey('SwaPpA9LAaLfeLi3a68M4DjnLqgtticKg6CnyNwgAC8'),
-  },
-  testnet: {
-    swapProgramId: new PublicKey('SwaPpA9LAaLfeLi3a68M4DjnLqgtticKg6CnyNwgAC8'),
+  'serum-mainnet': {
+    swapProgramId,
   },
   'mainnet-beta': {
-    swapProgramId: new PublicKey('SwaPpA9LAaLfeLi3a68M4DjnLqgtticKg6CnyNwgAC8'),
+    swapProgramId,
   },
-  p2p: {
-    swapProgramId: new PublicKey('SwaPpA9LAaLfeLi3a68M4DjnLqgtticKg6CnyNwgAC8'),
+  devnet: {
+    swapProgramId,
+  },
+  testnet: {
+    swapProgramId,
+  },
+  localnet: {
+    swapProgramId: null,
   },
 } as PoolsByEntrypointType;
