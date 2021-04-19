@@ -20,6 +20,7 @@ import {
   getTokenAccount,
   transfer,
 } from 'store/slices/wallet/WalletSlice';
+import { minorAmountToMajor } from 'utils/amount';
 
 import {
   BottomWrapper,
@@ -130,14 +131,17 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
         return;
       }
 
-      if (!account.mint.address.equals(fromTokenAccount?.mint.address)) {
+      if (
+        account.mint.symbol !== 'SOL' &&
+        !account.mint.address.equals(fromTokenAccount.mint.address)
+      ) {
         void dispatch(
           openModal({
             modalType: SHOW_MODAL_ERROR,
             props: {
               icon: 'wallet',
               header: 'Wallet address is not valid',
-              text: 'The wallet address is not valid. It must be a "Token name" wallet address',
+              text: `The wallet address is not valid. It must be a ${fromTokenAccount.mint.symbol} wallet address`,
             },
           }),
         );
@@ -193,6 +197,11 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
     setToTokenPublicKey(nextPublicKey);
   };
 
+  const hasBalance = fromTokenAccount
+    ? minorAmountToMajor(fromTokenAccount.balance, fromTokenAccount.mint).toNumber() >=
+      Number(fromAmount)
+    : false;
+
   const isDisabled = isExecuting;
 
   return (
@@ -225,7 +234,12 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
         <ButtonWrapper>
           <Button
             primary={!isDisabled}
-            disabled={isDisabled || isValidAmount(fromAmount) || !isValidAddress(toTokenPublicKey)}
+            disabled={
+              isDisabled ||
+              isValidAmount(fromAmount) ||
+              !isValidAddress(toTokenPublicKey) ||
+              !hasBalance
+            }
             big
             full
             onClick={handleSubmit}>
