@@ -398,7 +398,7 @@ export const SwapWidget: FunctionComponent = () => {
 
   const rate =
     selectedPool && firstToken && secondToken
-      ? selectedPool.impliedRate(isReverseRate ? firstToken : secondToken, 1).toNumber()
+      ? selectedPool.impliedRate(isReverseRate ? firstToken : secondToken, firstAmount).toNumber()
       : undefined;
 
   const hasBalance = firstTokenAccount
@@ -451,7 +451,7 @@ export const SwapWidget: FunctionComponent = () => {
             <FeeLeft>Price:</FeeLeft>
             <FeeRight>
               <Rate>
-                {rate} {(isReverseRate ? secondToken : firstToken)?.symbol} per{' '}
+                {rate.toFixed(6)} {(isReverseRate ? secondToken : firstToken)?.symbol} per{' '}
                 {(isReverseRate ? firstToken : secondToken)?.symbol}
                 <ChangeRateWrapper onClick={handleChangeRateClick}>
                   <ChangeRateIcon name="swap" />
@@ -467,7 +467,8 @@ export const SwapWidget: FunctionComponent = () => {
             <PropertyLine>
               Minimum Received:
               <PropertyValue>
-                {minimumToAmountWithSlippage.toNumber()} {secondToken?.symbol}
+                {minimumToAmountWithSlippage.toNumber().toFixed(secondToken?.decimals)}{' '}
+                {secondToken?.symbol}
               </PropertyValue>
             </PropertyLine>
           ) : undefined}
