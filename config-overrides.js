@@ -36,10 +36,13 @@ module.exports = override(
     ],
   }),
   addWebpackModuleRule({
-    test: /\.svg$/,
+    test: /-icon\.svg$/,
     use: [
       {
         loader: 'svg-sprite-loader',
+      },
+      {
+        loader: 'svgo-loader',
       },
     ],
   }),
