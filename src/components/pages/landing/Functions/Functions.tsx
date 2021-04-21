@@ -1,6 +1,7 @@
 import React, { FC, useState } from 'react';
 
 import { styled } from '@linaria/react';
+import classNames from 'classnames';
 
 import { down, up, useBreakpoint } from '../styles/breakpoints';
 
@@ -401,48 +402,48 @@ const SelectorName = styled.div`
 
 const SlideImage = styled.div`
   position: absolute;
-
-  width: 263px;
-  height: 527px;
+  top: 0;
+  right: 0;
 
   background-repeat: no-repeat;
   background-position: center;
 
-  &.send {
+  transition: top 0.2s, bottom 0.2s, right 0.2s, left 0.2s;
+
+  &:first-child {
     top: 0;
     right: 0;
     z-index: 1;
 
-    background-image: url('./screen-1-desktop.png');
-    background-size: 263px 527px;
+    width: 263px;
+    height: 527px;
 
+    background-size: 263px 527px;
     filter: drop-shadow(0 32px 56px rgba(0, 0, 0, 0.5));
   }
 
-  &.store {
+  &:nth-child(2) {
+    top: initial;
     bottom: 0;
     left: 0;
 
     width: 208px;
     height: 452px;
 
-    background-image: url('./screen-1-desktop.png');
     background-size: 208px 452px;
-
     transform: rotate(-10deg);
   }
 
-  &.swap {
-    bottom: 0;
-    left: 0;
-
-    width: 208px;
-    height: 452px;
-
+  &.send {
     background-image: url('./screen-1-desktop.png');
-    background-size: 208px 452px;
+  }
 
-    transform: rotate(-10deg);
+  &.store {
+    background-image: url('./screen-1-desktop.png');
+  }
+
+  &.swap {
+    background-image: url('./screen-1-desktop.png');
   }
 `;
 
@@ -503,13 +504,16 @@ const Description = styled.div`
   }
 `;
 
-const handleClick = (selector: string) => () => {
-  console.log(selector);
-};
-
 export const Functions: FC = () => {
   const isTablet = useBreakpoint(up.tablet);
-  const [slides] = useState(['send', 'store', 'swap']);
+  const [activeSlide, setActiveSlide] = useState('send');
+  const [slides, setSlides] = useState(['send', 'store', 'swap']);
+
+  const handleClick = (nextSlide: string) => () => {
+    const newSlides = slides.filter((slide) => slide !== nextSlide);
+    setActiveSlide(nextSlide);
+    setSlides([nextSlide, ...newSlides]);
+  };
 
   return (
     <Wrapper>
@@ -523,33 +527,64 @@ export const Functions: FC = () => {
             ))}
           </Carousel>
           <Selectors>
-            <Selector className="active" onClick={handleClick('send')}>
+            <Selector
+              className={classNames({ active: activeSlide === 'send' })}
+              onClick={handleClick('send')}>
               <Icon className="send" />
               <SelectorName>Send</SelectorName>
             </Selector>
-            <Selector>
-              <Icon className="store" onClick={handleClick('store')} />
+            <Selector
+              className={classNames({ active: activeSlide === 'store' })}
+              onClick={handleClick('store')}>
+              <Icon className="store" />
               <SelectorName>Store</SelectorName>
             </Selector>
-            <Selector>
-              <Icon className="swap" onClick={handleClick('swap')} />
+            <Selector
+              className={classNames({ active: activeSlide === 'swap' })}
+              onClick={handleClick('swap')}>
+              <Icon className="swap" />
               <SelectorName>Swap</SelectorName>
             </Selector>
           </Selectors>
         </CarouselWrapper>
         <TextWrapper>
-          <TextContent>
-            <Title>
-              Send <TitleBold>USDC</TitleBold>, <TitleBold>BTC</TitleBold>,{' '}
-              <TitleBold>ETH</TitleBold>, and other tokens <TitleBold>in a seconds</TitleBold> with{' '}
-              <TitleBold>no fees</TitleBold>. By QR code, address or username right in your app or
-              web wallet.
-            </Title>
-            <Description>
-              Solana has 400ms blocks and extremely low fees by design. Every transaction takes less
-              than a minute. We took all fees on us.
-            </Description>
-          </TextContent>
+          {activeSlide === 'send' ? (
+            <TextContent>
+              <Title>
+                Send <TitleBold>USDC</TitleBold>, <TitleBold>BTC</TitleBold>,{' '}
+                <TitleBold>ETH</TitleBold>, and other tokens <TitleBold>in a seconds</TitleBold>{' '}
+                with <TitleBold>no fees</TitleBold>. By QR code, address or username right in your
+                app or web wallet.
+              </Title>
+              <Description>
+                Solana has 400ms blocks and extremely low fees by design. Every transaction takes
+                less than a minute. We took all fees on us.
+              </Description>
+            </TextContent>
+          ) : undefined}
+          {activeSlide === 'store' ? (
+            <TextContent>
+              <Title>
+                Full control of your cryptos and your keys.{' '}
+                <TitleBold>Only you can access you assets.</TitleBold> <br /> Not government. Not
+                us. Not anyone else. Easily manage 30+ coins.
+              </Title>
+              <Description>
+                Easily import your existing wallet with a 12/18/24-word recovery phrase.
+              </Description>
+            </TextContent>
+          ) : undefined}
+          {activeSlide === 'swap' ? (
+            <TextContent>
+              <Title>
+                Exchange crypto using advantages of DeFi Solutions with a{' '}
+                <TitleBold>high speed</TitleBold> of centralized exchanges.{' '}
+                <TitleBold>No signup required.</TitleBold> Exchange in a few seconds. Sophisticated
+                UI/UX.
+              </Title>
+              <Description>powered by Project Serum.</Description>
+            </TextContent>
+          ) : undefined}
         </TextWrapper>
       </Container>
     </Wrapper>
