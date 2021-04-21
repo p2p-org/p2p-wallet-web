@@ -13,13 +13,29 @@ export const Button = styled.a`
   height: 61px;
   padding: 0 24px;
 
+  color: #000;
+  font-weight: 500;
+  font-size: 18px;
+  font-family: 'Aktiv Grotesk Corp', sans-serif;
+  line-height: 140%;
   text-decoration: none;
 
-  background: #fff;
+  background-color: #fff;
   border-radius: 32px;
+  cursor: pointer;
+
+  transition: background-color 0.1s;
+
+  &:hover {
+    background-color: #71e6ff;
+  }
 
   &.green {
-    background-image: linear-gradient(90deg, #bcff4e 0%, #bcff4e 100%);
+    background-color: #bcff4e;
+
+    &:hover {
+      background-color: #e3ff74;
+    }
   }
 
   &.glow {
@@ -48,12 +64,6 @@ export const Button = styled.a`
 `;
 
 const Text = styled.div`
-  color: #000;
-  font-weight: 500;
-  font-size: 18px;
-  font-family: 'Aktiv Grotesk Corp', sans-serif;
-  line-height: 140%;
-
   &.web,
   &.ios {
     padding-left: 33px;

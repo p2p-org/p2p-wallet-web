@@ -7,6 +7,7 @@ import { ButtonIOS } from 'components/pages/landing/common/Button/Button';
 import { up } from '../styles/breakpoints';
 
 const Wrapper = styled.div`
+  position: relative;
   z-index: 1;
 
   margin: 80px 0 100px;

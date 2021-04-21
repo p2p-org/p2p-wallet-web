@@ -8,7 +8,7 @@ import LogoImg from '../common/images/logo.png';
 import { up } from '../styles/breakpoints';
 
 const Wrapper = styled.div`
-  z-index: 1;
+  z-index: 2;
 
   display: flex;
   flex-direction: column;

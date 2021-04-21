@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FC, useState } from 'react';
 
 import { styled } from '@linaria/react';
 
@@ -336,17 +336,17 @@ const Icon = styled.div`
   border-radius: 18px;
 
   &.send {
-    background-image: url('./selector-send.png');
+    background-image: url('./selector-send.svg');
     background-size: 16px 13px;
   }
 
-  &.receive {
-    background-image: url('./selector-receive.png');
-    background-size: 16px 13px;
+  &.store {
+    background-image: url('./selector-store.svg');
+    background-size: 16px 16px;
   }
 
   &.swap {
-    background-image: url('./selector-swap.png');
+    background-image: url('./selector-swap.svg');
     background-size: 28px 28px;
   }
 `;
@@ -361,7 +361,7 @@ const Selector = styled.div`
 
   &.active,
   &:hover {
-    background: url('./selector-bg.png') no-repeat 50% 50%;
+    background: url('./selector-bg.svg') no-repeat 50% 50%;
     background-size: contain;
 
     ${Icon} {
@@ -381,14 +381,8 @@ const Selector = styled.div`
 
   ${up.tablet} {
     &:not(:last-child) {
-      margin-top: 50px;
       margin-right: 0;
-    }
-  }
-
-  ${up.desktop} {
-    &:not(:last-child) {
-      margin-top: 40px;
+      margin-bottom: 20px;
     }
   }
 `;
@@ -414,16 +408,31 @@ const SlideImage = styled.div`
   background-repeat: no-repeat;
   background-position: center;
 
-  &.one {
+  &.send {
     top: 0;
     right: 0;
     z-index: 1;
 
     background-image: url('./screen-1-desktop.png');
     background-size: 263px 527px;
+
+    filter: drop-shadow(0 32px 56px rgba(0, 0, 0, 0.5));
   }
 
-  &.two {
+  &.store {
+    bottom: 0;
+    left: 0;
+
+    width: 208px;
+    height: 452px;
+
+    background-image: url('./screen-1-desktop.png');
+    background-size: 208px 452px;
+
+    transform: rotate(-10deg);
+  }
+
+  &.swap {
     bottom: 0;
     left: 0;
 
@@ -494,8 +503,13 @@ const Description = styled.div`
   }
 `;
 
+const handleClick = (selector: string) => () => {
+  console.log(selector);
+};
+
 export const Functions: FC = () => {
   const isTablet = useBreakpoint(up.tablet);
+  const [slides] = useState(['send', 'store', 'swap']);
 
   return (
     <Wrapper>
@@ -504,20 +518,21 @@ export const Functions: FC = () => {
         {isTablet ? <HackathonWrapper /> : undefined}
         <CarouselWrapper>
           <Carousel>
-            <SlideImage className="one" />
-            <SlideImage className="two" />
+            {slides.map((slide) => (
+              <SlideImage className={slide} />
+            ))}
           </Carousel>
           <Selectors>
-            <Selector className="active">
+            <Selector className="active" onClick={handleClick('send')}>
               <Icon className="send" />
               <SelectorName>Send</SelectorName>
             </Selector>
             <Selector>
-              <Icon className="receive" />
-              <SelectorName>Receive</SelectorName>
+              <Icon className="store" onClick={handleClick('store')} />
+              <SelectorName>Store</SelectorName>
             </Selector>
             <Selector>
-              <Icon className="swap" />
+              <Icon className="swap" onClick={handleClick('swap')} />
               <SelectorName>Swap</SelectorName>
             </Selector>
           </Selectors>
