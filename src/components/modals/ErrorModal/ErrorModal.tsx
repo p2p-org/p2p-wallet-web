@@ -1,6 +1,7 @@
 import React, { FunctionComponent } from 'react';
 
 import { styled } from '@linaria/react';
+import { rgba } from 'polished';
 
 import { Button, Icon } from 'components/ui';
 
@@ -14,7 +15,7 @@ const Wrapper = styled.div`
 
   overflow: hidden;
 
-  background: #f6f6f8;
+  background: #fff;
 
   border-radius: 15px;
 `;
@@ -58,7 +59,7 @@ const Description = styled.div`
   font-weight: 600;
   font-size: 16px;
 
-  border-bottom: 1px solid #fbfbfd;
+  border-bottom: 1px solid ${rgba('#000', 0.05)};
 `;
 
 const Buttons = styled.div`
