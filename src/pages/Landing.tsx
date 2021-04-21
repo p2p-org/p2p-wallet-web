@@ -1,8 +1,10 @@
 import React, { FC } from 'react';
+import { Helmet } from 'react-helmet';
 
+import { css } from '@linaria/core';
 import { styled } from '@linaria/react';
 
-import { Features } from 'components/pages/landing/Features/Features';
+import { Features } from 'components/pages/landing/Features';
 import { Footer } from 'components/pages/landing/Footer';
 import { Functions } from 'components/pages/landing/Functions';
 import { Header } from 'components/pages/landing/Header';
@@ -15,24 +17,36 @@ import { YouCan } from 'components/pages/landing/YouCan/YouCan';
 const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
+  overflow-x: hidden;
+`;
 
-  background: #161616;
+export const global = css`
+  :global() {
+    body.landing {
+      background: #161616;
 
-  ${fonts}
+      ${fonts}
+    }
+  }
 `;
 
 export const Landing: FC = () => {
   return (
-    <Wrapper>
-      <Header />
-      <Top />
-      <Functions />
-      <Features />
-      <YouCan>
-        <Under />
-        <Updates />
-        <Footer />
-      </YouCan>
-    </Wrapper>
+    <>
+      <Helmet>
+        <body className="landing" />
+      </Helmet>
+      <Wrapper>
+        <Header />
+        <Top />
+        <Functions />
+        <Features />
+        <YouCan>
+          <Under />
+          <Updates />
+          <Footer />
+        </YouCan>
+      </Wrapper>
+    </>
   );
 };

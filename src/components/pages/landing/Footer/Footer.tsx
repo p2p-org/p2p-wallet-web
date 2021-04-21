@@ -9,47 +9,25 @@ import { up, useBreakpoint } from '../styles/breakpoints';
 import LogoP2PImg from './logo.png';
 
 const Wrapper = styled.div`
+  position: relative;
+
   display: flex;
   justify-content: center;
+
+  background-image: url('./ellipse.svg');
+  background-repeat: no-repeat;
+  background-position: 50% 0;
+  background-size: 101% 100%;
 `;
 
 const FooterWrapper = styled.div`
+  position: relative;
+  z-index: 1;
+
   display: flex;
   flex: 1;
   flex-direction: column;
   align-items: center;
-
-  /* max-width: 391px; */
-
-  background-image: url('./ellipse-mobile.png');
-  background-repeat: no-repeat;
-  background-position: 50% 0;
-  background-size: 102% 100%;
-
-  ${up.mobileLandscape} {
-    /* max-width: 568px; */
-
-    background-image: url('./ellipse-mobile-landscape.png');
-
-    /* background-size: 568px 1384px; */
-  }
-
-  ${up.tablet} {
-    /* max-width: 1024px; */
-
-    background-image: url('./ellipse-tablet.png');
-
-    /* background-size: 1024px 931px; */
-  }
-
-  ${up.desktop} {
-    /* max-width: 1442px; */
-
-    background-image: url('./ellipse-desktop.png');
-    background-size: 100%;
-
-    /* background-size: 1442px 875px; */
-  }
 `;
 
 const Top = styled.div`
@@ -143,6 +121,13 @@ const ButtonWrapper = styled.div`
   }
 `;
 
+const BackgroundBlack = styled.div`
+  width: 100%;
+
+  /* TODO: need to be here */
+  background: #161616;
+`;
+
 const DelimiterSection = styled.div`
   width: 100%;
   height: 1px;
@@ -152,13 +137,15 @@ const DelimiterSection = styled.div`
 
 const Middle = styled.div`
   display: flex;
+  justify-content: center;
+  width: 100%;
+`;
+
+const MiddleContainer = styled.div`
+  display: flex;
   flex-direction: column;
   align-items: center;
-  width: 100%;
   padding: 32px 50px 80px;
-
-  /* TODO: need to be here */
-  background: #161616;
 
   ${up.mobileLandscape} {
     padding: 56px 103px 78px;
@@ -173,8 +160,6 @@ const Middle = styled.div`
   ${up.desktop} {
     max-width: 1442px;
     padding: 68px 47px;
-
-    background: transparent;
   }
 `;
 
@@ -264,9 +249,6 @@ const AdditionalColumn = styled.div`
   width: 100%;
   padding: 39px 0;
 
-  /* TODO: need to be here */
-  background: #161616;
-
   & > :not(:last-child) {
     margin-bottom: 30px;
   }
@@ -334,9 +316,6 @@ const Bottom = styled.div`
   font-weight: 500;
   font-family: 'Aktiv Grotesk Corp', sans-serif;
 
-  /* TODO: need to be here */
-  background: #161616;
-
   ${up.mobileLandscape} {
     padding: 25px 40px;
 
@@ -372,83 +351,87 @@ export const Footer: FC = () => {
             <ButtonIOS glow />
           </ButtonWrapper>
         </Top>
-        <DelimiterSection />
-        <Middle>
-          <LogoWrapper>
-            <LogoP2P />
-            <DelimiterLogo />
-            <Wallet>Wallet</Wallet>
-          </LogoWrapper>
-          <ColumnsWrapper>
-            <Column>
-              <ColumnLink href="#">Explore</ColumnLink>
-              <ColumnLink href="#">About</ColumnLink>
-              <ColumnLink href="#">Recent Updates</ColumnLink>
-              <ColumnLink href="#">FAQ</ColumnLink>
-            </Column>
-            {isDesktop ? (
-              <Column>
-                <ColumnLink href="#" className="gray">
-                  wallet@p2p.org
-                </ColumnLink>
-                <ColumnLink href="#" className="gray">
-                  t.me/p2p.org
-                </ColumnLink>
-              </Column>
-            ) : undefined}
-            {isMobileLandscape ? (
-              <Column>
-                <ColumnLink href="#" className="gray twitter">
-                  @p2pwallet
-                </ColumnLink>
-                <ColumnLink href="#" className="gray github">
-                  @p2pwallet
-                </ColumnLink>
-                {!isDesktop && isTablet ? (
-                  <>
+        <BackgroundBlack>
+          <DelimiterSection />
+          <Middle>
+            <MiddleContainer>
+              <LogoWrapper>
+                <LogoP2P />
+                <DelimiterLogo />
+                <Wallet>Wallet</Wallet>
+              </LogoWrapper>
+              <ColumnsWrapper>
+                <Column>
+                  <ColumnLink href="#">Explore</ColumnLink>
+                  <ColumnLink href="#">About</ColumnLink>
+                  <ColumnLink href="#">Recent Updates</ColumnLink>
+                  <ColumnLink href="#">FAQ</ColumnLink>
+                </Column>
+                {isDesktop ? (
+                  <Column>
                     <ColumnLink href="#" className="gray">
                       wallet@p2p.org
                     </ColumnLink>
                     <ColumnLink href="#" className="gray">
                       t.me/p2p.org
                     </ColumnLink>
-                  </>
+                  </Column>
                 ) : undefined}
-              </Column>
-            ) : undefined}
-          </ColumnsWrapper>
-        </Middle>
-        {!isMobileLandscape ? (
-          <>
-            <DelimiterSection />
-            <AdditionalColumn>
-              <ColumnLink href="#" className="gray twitter">
-                @p2pwallet
-              </ColumnLink>
-              <ColumnLink href="#" className="gray github">
-                @p2pwallet
-              </ColumnLink>
-            </AdditionalColumn>
-          </>
-        ) : undefined}
-        {!isTablet ? (
-          <>
-            <DelimiterSection />
-            <AdditionalColumn>
-              <ColumnLink href="#" className="gray">
-                wallet@p2p.org
-              </ColumnLink>
-              <ColumnLink href="#" className="gray">
-                t.me/p2p.org
-              </ColumnLink>
-            </AdditionalColumn>
-          </>
-        ) : undefined}
-        <DelimiterSection />
-        <Bottom>
-          There shoud be something about privacy policy and terms of services, but you can use it
-          anonymously
-        </Bottom>
+                {isMobileLandscape ? (
+                  <Column>
+                    <ColumnLink href="#" className="gray twitter">
+                      @p2pwallet
+                    </ColumnLink>
+                    <ColumnLink href="#" className="gray github">
+                      @p2pwallet
+                    </ColumnLink>
+                    {!isDesktop && isTablet ? (
+                      <>
+                        <ColumnLink href="#" className="gray">
+                          wallet@p2p.org
+                        </ColumnLink>
+                        <ColumnLink href="#" className="gray">
+                          t.me/p2p.org
+                        </ColumnLink>
+                      </>
+                    ) : undefined}
+                  </Column>
+                ) : undefined}
+              </ColumnsWrapper>
+            </MiddleContainer>
+          </Middle>
+          {!isMobileLandscape ? (
+            <>
+              <DelimiterSection />
+              <AdditionalColumn>
+                <ColumnLink href="#" className="gray twitter">
+                  @p2pwallet
+                </ColumnLink>
+                <ColumnLink href="#" className="gray github">
+                  @p2pwallet
+                </ColumnLink>
+              </AdditionalColumn>
+            </>
+          ) : undefined}
+          {!isTablet ? (
+            <>
+              <DelimiterSection />
+              <AdditionalColumn>
+                <ColumnLink href="#" className="gray">
+                  wallet@p2p.org
+                </ColumnLink>
+                <ColumnLink href="#" className="gray">
+                  t.me/p2p.org
+                </ColumnLink>
+              </AdditionalColumn>
+            </>
+          ) : undefined}
+          <DelimiterSection />
+          <Bottom>
+            There shoud be something about privacy policy and terms of services, but you can use it
+            anonymously
+          </Bottom>
+        </BackgroundBlack>
       </FooterWrapper>
     </Wrapper>
   );

@@ -8,41 +8,9 @@ const Wrapper = styled.div`
   position: relative;
 
   display: flex;
-  flex-direction: column;
-  width: 100%;
-  height: 922px;
-  margin-bottom: 153px;
-
-  /* margin-bottom: 367px; */
-
-  background-image: url('./ellipse-mobile.png');
-  background-repeat: no-repeat;
-  background-position: 50% 100%;
-  background-size: 100% 856px;
-
-  ${up.mobileLandscape} {
-    height: 910px;
-    margin-bottom: 153px;
-
-    background-image: url('./ellipse-mobile-landscape.png');
-  }
-
-  ${up.tablet} {
-    height: 873px;
-    margin-bottom: 104px;
-
-    background-image: url('./ellipse-tablet.png');
-    background-size: 100% 873px;
-  }
+  justify-content: center;
 
   ${up.desktop} {
-    height: 873px;
-    margin-bottom: 148px;
-
-    background-image: url('./ellipse-desktop.png');
-    background-position: 0 100%;
-    background-size: 80% 873px;
-
     &::after {
       position: absolute;
 
@@ -52,10 +20,70 @@ const Wrapper = styled.div`
       width: 100%;
       height: 1412px;
 
-      background: url('./curves-desktop.png') no-repeat 50%;
+      background: url('./curves.svg') no-repeat 50%;
       background-size: 100% 1412px;
 
       content: '';
+    }
+  }
+`;
+
+const Container = styled.div`
+  position: relative;
+
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 1335px;
+  height: 922px;
+  margin-bottom: 153px;
+
+  &::before {
+    position: absolute;
+
+    display: flex;
+    align-self: center;
+
+    width: 967px;
+    height: 856px;
+
+    background-image: url('./ellipse-updates.svg');
+    background-repeat: no-repeat;
+    background-position: 50% 100%;
+    background-size: 967px 856px;
+
+    content: '';
+  }
+
+  ${up.mobileLandscape} {
+    height: 910px;
+    margin-bottom: 153px;
+  }
+
+  ${up.tablet} {
+    height: 873px;
+    margin-bottom: 104px;
+
+    &::before {
+      width: 1426px;
+      height: 873px;
+
+      background-size: 1426px 873px;
+    }
+  }
+
+  ${up.desktop} {
+    height: 873px;
+    margin-bottom: 148px;
+
+    &::before {
+      right: 80px;
+
+      width: 1474px;
+      height: 873px;
+
+      background-position: 0 100%;
+      background-size: 1474px 873px;
     }
   }
 `;
@@ -74,7 +102,7 @@ const TopWrapper = styled.div`
   }
 
   ${up.desktop} {
-    margin: 45px 168px 112px;
+    margin: 45px 0 112px;
   }
 `;
 
@@ -133,14 +161,18 @@ const CardWrapper = styled.div`
   }
 
   ${up.desktop} {
-    padding: 0 0 0 168px;
+    padding: 0;
   }
 `;
 
-const Container = styled.div`
+const CardContainer = styled.div`
   display: flex;
   align-items: center;
   padding-right: 50px;
+
+  ${up.desktop} {
+    padding-right: 0;
+  }
 `;
 
 const Card = styled.div`
@@ -150,7 +182,7 @@ const Card = styled.div`
   min-width: 295px;
   height: 490px;
 
-  background-image: url('./card-ellipse-mobile.png');
+  background-image: url('./card.svg');
   background-repeat: no-repeat;
   background-position: 50%;
   background-size: 295px 490px;
@@ -168,7 +200,6 @@ const Card = styled.div`
     min-width: 468px;
     height: 450px;
 
-    background-image: url('./card-ellipse-mobile-landscape.png');
     background-size: 468px 450px;
 
     &:not(:last-child) {
@@ -181,7 +212,6 @@ const Card = styled.div`
     min-width: 366px;
     height: 450px;
 
-    background-image: url('./card-ellipse-tablet.png');
     background-size: 366px 450px;
   }
 
@@ -190,12 +220,7 @@ const Card = styled.div`
     min-width: 416px;
     height: 416px;
 
-    background-image: url('./card-ellipse-desktop.png');
     background-size: 416px 416px;
-
-    &:not(:last-child) {
-      margin-right: 50px;
-    }
   }
 `;
 
@@ -307,6 +332,10 @@ const ReleasesLink = styled.a`
   line-height: 32px;
   text-decoration-line: underline;
 
+  &.top {
+    margin-right: 70px;
+  }
+
   ${up.mobileLandscape} {
     font-size: 24px;
     line-height: 48px;
@@ -318,61 +347,65 @@ export const Updates: FC = () => {
 
   return (
     <Wrapper>
-      <TopWrapper>
-        <Title>We are working now with some cool features, check it!</Title>
-        {isDesktop ? <ReleasesLink>Our short timeline and releases</ReleasesLink> : undefined}
-      </TopWrapper>
-      <CardWrapper>
-        <Container>
-          <Card>
-            <CardContent>
-              <Status>
-                <Dot /> Working now
-              </Status>
-              <CardTitle>Issue name here may be in 2 lines</CardTitle>
-              <Line />
-              <Text>
-                Amet minim mollit non deserunt ullamco est sit aliqua dolor do amet sint. Velit
-                officia consequat duis enim velit mollit. Exercitation veniam consequat sunt nostrud
-                amet.
-              </Text>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent>
-              <Status>
-                <Dot className="latest" /> Latest release
-              </Status>
-              <CardTitle>Issue name here may be in 2 lines</CardTitle>
-              <Line />
-              <Text>
-                Amet minim mollit non deserunt ullamco est sit aliqua dolor do amet sint. Velit
-                officia consequat duis enim velit mollit. Exercitation veniam consequat sunt nostrud
-                amet.
-              </Text>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent>
-              <Status>
-                <Dot className="next" /> Next
-              </Status>
-              <CardTitle>Issue name here may be in 2 lines</CardTitle>
-              <Line />
-              <Text>
-                Amet minim mollit non deserunt ullamco est sit aliqua dolor do amet sint. Velit
-                officia consequat duis enim velit mollit. Exercitation veniam consequat sunt nostrud
-                amet.
-              </Text>
-            </CardContent>
-          </Card>
-        </Container>
-      </CardWrapper>
-      {!isDesktop ? (
-        <ReleasesLinkWrapper>
-          <ReleasesLink>Our short timeline and releases</ReleasesLink>
-        </ReleasesLinkWrapper>
-      ) : undefined}
+      <Container>
+        <TopWrapper>
+          <Title>We are working now with some cool features, check it!</Title>
+          {isDesktop ? (
+            <ReleasesLink className="top">Our short timeline and releases</ReleasesLink>
+          ) : undefined}
+        </TopWrapper>
+        <CardWrapper>
+          <CardContainer>
+            <Card>
+              <CardContent>
+                <Status>
+                  <Dot /> Working now
+                </Status>
+                <CardTitle>Issue name here may be in 2 lines</CardTitle>
+                <Line />
+                <Text>
+                  Amet minim mollit non deserunt ullamco est sit aliqua dolor do amet sint. Velit
+                  officia consequat duis enim velit mollit. Exercitation veniam consequat sunt
+                  nostrud amet.
+                </Text>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent>
+                <Status>
+                  <Dot className="latest" /> Latest release
+                </Status>
+                <CardTitle>Issue name here may be in 2 lines</CardTitle>
+                <Line />
+                <Text>
+                  Amet minim mollit non deserunt ullamco est sit aliqua dolor do amet sint. Velit
+                  officia consequat duis enim velit mollit. Exercitation veniam consequat sunt
+                  nostrud amet.
+                </Text>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent>
+                <Status>
+                  <Dot className="next" /> Next
+                </Status>
+                <CardTitle>Issue name here may be in 2 lines</CardTitle>
+                <Line />
+                <Text>
+                  Amet minim mollit non deserunt ullamco est sit aliqua dolor do amet sint. Velit
+                  officia consequat duis enim velit mollit. Exercitation veniam consequat sunt
+                  nostrud amet.
+                </Text>
+              </CardContent>
+            </Card>
+          </CardContainer>
+        </CardWrapper>
+        {!isDesktop ? (
+          <ReleasesLinkWrapper>
+            <ReleasesLink>Our short timeline and releases</ReleasesLink>
+          </ReleasesLinkWrapper>
+        ) : undefined}
+      </Container>
     </Wrapper>
   );
 };

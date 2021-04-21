@@ -8,30 +8,16 @@ const Wrapper = styled.div`
   position: relative;
 
   display: flex;
-  align-items: center;
   justify-content: center;
 
-  height: 1600px;
-
-  &::before {
-    position: absolute;
-    top: -30px;
-    left: 0;
-
-    width: 100%;
-    height: 1923px;
-
-    background: url('./bg-mobile.png') no-repeat 50% 50%;
-    background-size: 100% 2027px;
-
-    content: '';
-  }
+  height: 1389px;
+  margin-top: 187px;
 
   ${down.mobileLandscape} {
     &::after {
       position: absolute;
 
-      top: 60px;
+      top: -100px;
       left: 50%;
 
       width: 30px;
@@ -46,50 +32,28 @@ const Wrapper = styled.div`
   }
 
   ${up.mobileLandscape} {
-    height: 1488px;
-
-    &::before {
-      top: -150px;
-
-      width: 100%;
-      height: 1923px;
-
-      background: url('./bg-mobile-landscape.png') no-repeat 50% 50%;
-      background-size: 100% 1923px;
-    }
+    height: 1348px;
+    margin-top: 130px;
   }
 
   ${up.tablet} {
-    height: 1284px;
-
-    &::before {
-      width: 100%;
-      height: 1791px;
-
-      background: url('./bg-tablet.png') no-repeat 50% 50%;
-      background-size: 100% 1791px;
-    }
+    height: 1177px;
+    margin-top: 119px;
   }
 
   ${up.desktop} {
-    height: 960px;
-
-    &::before {
-      width: 100%;
-      height: 1474px;
-
-      background: url('./bg-desktop.png') no-repeat 50% 50%;
-      background-size: 100% 1474px;
-    }
+    height: 854px;
+    margin-top: 110px;
   }
 `;
 
 const HackathonWrapper = styled.div`
   position: absolute;
+  z-index: 1;
 
   ${up.tablet} {
-    top: 85px;
-    right: 33px;
+    top: -40px;
+    right: -161px;
 
     width: 305px;
     height: 159px;
@@ -103,8 +67,7 @@ const HackathonWrapper = styled.div`
       width: 128px;
       height: 128px;
 
-      background: url('./hackathon-second.png') no-repeat 50% 50%;
-      background-size: 128px;
+      background: url('./hackathon-second.svg') no-repeat 50% 50%;
 
       content: '';
     }
@@ -118,21 +81,21 @@ const HackathonWrapper = styled.div`
       width: 128px;
       height: 128px;
 
-      background: url('./hackathon-third.png') no-repeat 50% 50%;
-      background-size: 128px;
+      background: url('./hackathon-third.svg') no-repeat 50% 50%;
 
       content: '';
     }
   }
 
   ${up.desktop} {
-    top: 0;
-    right: 70px;
+    top: -110px;
+    right: -48px;
 
     width: 300px;
     height: 150px;
 
     &::before {
+      top: initial;
       bottom: 0;
       left: 0;
     }
@@ -140,52 +103,214 @@ const HackathonWrapper = styled.div`
     &::after {
       top: 0;
       right: 0;
+      bottom: initial;
     }
   }
 `;
 
 const Container = styled.div`
+  position: relative;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  max-width: 1178px;
+
+  &::before {
+    position: absolute;
+    top: -291px;
+
+    width: 1896px;
+    height: 2027px;
+
+    background: url('./gradient.png') no-repeat 50%;
+    background-size: 1896px 2027px;
+
+    content: '';
+  }
+
+  &::after {
+    position: absolute;
+    top: 0;
+
+    width: 926px;
+    height: 1389px;
+
+    background: url('./ellipse-functions.svg') no-repeat 50%;
+    background-size: 926px 1389px;
+
+    content: '';
+  }
+
+  ${up.mobileLandscape} {
+    &::before {
+      width: 1798px;
+      height: 1923px;
+
+      background-size: 1798px 1923px;
+    }
+
+    &::after {
+      width: 1250px;
+      height: 1348px;
+
+      background-size: 1250px 1348px;
+    }
+  }
+
+  ${up.tablet} {
+    &::before {
+      top: -259px;
+
+      width: 1674px;
+      height: 1791px;
+
+      background-size: 1674px 1791px;
+    }
+
+    &::after {
+      width: 1250px;
+      height: 1177px;
+
+      background-size: 1250px 1177px;
+    }
+  }
+
+  ${up.desktop} {
+    flex-direction: row;
+
+    &::before {
+      top: -257px;
+
+      display: none;
+
+      width: 1506px;
+      height: 1311px;
+
+      background-size: 1506px 1311px;
+    }
+
+    &::after {
+      display: none;
+
+      width: 1458px;
+      height: 854px;
+
+      background-size: 1458px 854px;
+    }
+  }
+`;
+
+const Curves = styled.div`
+  position: absolute;
+  bottom: -151px;
+  left: -1021px;
+
+  width: 3204px;
+  height: 1647px;
+
+  background: url('./curves-functions.svg') no-repeat 50%;
+  background-size: 3204px 1647px;
+
+  content: '';
+
+  ${up.mobileLandscape} {
+    bottom: -78px;
+    left: -685px;
+
+    width: 2959px;
+    height: 1521px;
+
+    background-size: 2959px 1521px;
+  }
+
+  ${up.tablet} {
+    bottom: 18px;
+    left: -295px;
+
+    width: 2759px;
+    height: 1418px;
+
+    background-size: 2759px 1418px;
+  }
+
+  ${up.desktop} {
+    bottom: -363px;
+    left: -144px;
+
+    width: 2759px;
+    height: 1418px;
+
+    background-size: 2759px 1418px;
+  }
+`;
+
+const CarouselWrapper = styled.div`
+  position: relative;
   z-index: 1;
 
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-top: 130px;
-
-  ${up.mobileLandscape} {
-    margin-top: 140px;
-  }
+  justify-content: flex-end;
+  height: 854px;
 
   ${up.tablet} {
-    margin-top: 180px;
+    flex-direction: row;
+    height: 545px;
   }
 
   ${up.desktop} {
-    flex-direction: row;
-    margin-top: 50px;
+    padding-right: 94px;
+
+    &::before {
+      position: absolute;
+      right: -298px;
+
+      width: 1506px;
+      height: 1311px;
+
+      background: url('./gradient.png') no-repeat 50%;
+      background-size: 1506px 1311px;
+
+      content: '';
+    }
+
+    &::after {
+      position: absolute;
+
+      right: 0;
+
+      width: 1458px;
+      height: 854px;
+
+      background: url('./ellipse-functions.svg') no-repeat 50%;
+      background-size: 1458px 854px;
+
+      content: '';
+    }
   }
-`;
 
-const CarouselWrapper = styled.div`
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-end;
-
-  ${up.tablet} {
-    flex-direction: row;
+  ${up.widedesktop} {
+    &::after {
+      background-position: 100% 50%;
+      background-size: 854px 854px;
+    }
   }
 `;
 
 const Carousel = styled.div`
   position: relative;
+  z-index: 1;
 
   width: 351px;
   height: 545px;
 `;
 
 const Selectors = styled.div`
+  z-index: 1;
+
   display: flex;
 
   margin-top: 71px;
@@ -315,8 +440,6 @@ const SlideImage = styled.div`
 const TextWrapper = styled.div`
   z-index: 1;
 
-  flex: 1;
-
   margin-top: 71px;
   padding: 0 40px;
 
@@ -329,7 +452,8 @@ const TextWrapper = styled.div`
   }
 
   ${up.desktop} {
-    margin-left: 288px;
+    margin-left: 88px;
+    padding: 0;
   }
 `;
 
@@ -375,8 +499,9 @@ export const Functions: FC = () => {
 
   return (
     <Wrapper>
-      {isTablet ? <HackathonWrapper /> : undefined}
       <Container>
+        <Curves />
+        {isTablet ? <HackathonWrapper /> : undefined}
         <CarouselWrapper>
           <Carousel>
             <SlideImage className="one" />

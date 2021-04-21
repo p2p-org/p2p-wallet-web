@@ -66,7 +66,7 @@ const GradientWrapper = styled.div`
   margin: 56px 20px 0;
   padding: 2px;
 
-  background: linear-gradient(120deg, #fff738 0%, #36f3ff 50%, #1f50ff 100%);
+  background: linear-gradient(125deg, #fff738 0%, #36f3ff 50%, #1f50ff 100%);
   border-radius: 16px;
 
   ${up.mobileLandscape} {

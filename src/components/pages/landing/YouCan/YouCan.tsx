@@ -8,23 +8,10 @@ const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
 
-  background-image: url('./bg-mobile.png');
+  background-image: url('./bg-youcan.svg');
   background-repeat: no-repeat;
-  background-size: contain;
-
-  ${up.mobileLandscape} {
-    background-image: url('./bg-mobile-landscape.png');
-    background-size: cover;
-  }
-
-  ${up.tablet} {
-    background-image: url('./bg-tablet.png');
-    background-size: contain;
-  }
-
-  ${up.desktop} {
-    background-image: url('./bg-desktop.png');
-  }
+  background-position: 50% 0;
+  background-size: 101% 25%;
 `;
 
 const Top = styled.div`
@@ -99,7 +86,7 @@ const Hint = styled.div`
     width: 352px;
     height: 170px;
 
-    background: url('./circle.png') no-repeat 50%;
+    background: url('./circle.svg') no-repeat 50%;
     background-size: 352px 170px;
 
     content: '';
@@ -161,12 +148,30 @@ const TitleBold = styled.span`
 
 const Middle = styled.div`
   display: flex;
-  flex-direction: column;
+  justify-content: center;
 
   background: #f9f9f9;
+`;
+
+const MiddleContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  padding: 0 40px;
+
+  ${up.mobileLandscape} {
+    padding: 0 56px;
+  }
 
   ${up.tablet} {
     flex-direction: row;
+    max-width: 864px;
+    padding: 0;
+  }
+
+  ${up.desktop} {
+    max-width: 1204px;
   }
 `;
 
@@ -174,21 +179,11 @@ const TextWrapper = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding: 0 40px;
+  width: 100%;
+  max-width: 456px;
 
   ${up.mobileLandscape} {
     align-items: center;
-    padding: 0 56px;
-  }
-
-  ${up.tablet} {
-    padding: 0 0 0 80px;
-  }
-
-  ${up.desktop} {
-    flex: 1;
-
-    padding-left: 118px;
   }
 `;
 
@@ -287,42 +282,93 @@ const Arrow = styled.div`
   height: 16px;
   margin-left: 23px;
 
-  background: url('./arrow.png') no-repeat 50%;
+  background: url('./arrow.svg') no-repeat 50%;
   background-size: 13px 16px;
 `;
 
 const Window = styled.div`
+  position: relative;
+
   width: 100%;
   height: 453px;
   margin-top: 121px;
 
-  background-image: url('./window-mobile.png');
-  background-repeat: no-repeat;
-  background-position: 100% 50%;
-  background-size: 345px 453px;
+  &::before {
+    position: absolute;
+
+    width: 802px;
+    height: 453px;
+
+    background-image: url('./ellipse-youcan.svg');
+    background-repeat: no-repeat;
+    background-position: 100% 50%;
+    background-size: 802px 453px;
+
+    content: '';
+  }
+
+  &::after {
+    position: absolute;
+    left: 65px;
+
+    width: 552px;
+    height: 431px;
+
+    background-image: url('./window-youcan.svg');
+    background-repeat: no-repeat;
+    background-position: 100% 50%;
+    background-size: 552px 431px;
+
+    content: '';
+  }
 
   ${up.mobileLandscape} {
     height: 668px;
 
-    background-image: url('./window-mobile-landscape.png');
-    background-size: 508px 668px;
+    &::before {
+      width: 1183px;
+      height: 668px;
+
+      background-size: 1183px 668px;
+    }
+
+    &::after {
+      left: 95px;
+
+      width: 829px;
+      height: 647px;
+
+      background-size: 829px 647px;
+    }
   }
 
   ${up.tablet} {
     flex: 1;
-    height: 668px;
-
-    background-image: url('./window-tablet.png');
-    background-size: 454px 668px;
+    margin-top: 0;
+    margin-left: 34px;
   }
 
   ${up.desktop} {
     flex: initial;
     width: 846px;
     height: 873px;
+    margin-left: 20px;
 
-    background-image: url('./window-desktop.png');
-    background-size: 846px 873px;
+    &::before {
+      width: 1426px;
+      height: 873px;
+
+      background-size: 1426px 873px;
+    }
+
+    &::after {
+      left: 90px;
+
+      width: 1114px;
+      height: 868px;
+
+      background-size: 1114px 868px;
+    }
   }
 `;
 
@@ -348,26 +394,28 @@ export const YouCan: FC<Props> = ({ children }) => {
         </Hint>
       </Top>
       <Middle>
-        <TextWrapper>
-          <TextContent>
-            <TextTitle>
-              You can send fast and with no fees a <TextTitleBold>lot of tokens</TextTitleBold>
-            </TextTitle>
-            <Text>
-              Doesn’t matter what token you want to send. {!isDesktop ? <br /> : undefined}
-              <TextBold>The speed is stable for all of them!</TextBold>
-              <br />
-              <br />
-              Solana blokchain contains many tokens. Its native and wrapped by different
-              technologies. Such as FTX, Sollet etc. It’s allows us to keep the speed and no-fees in
-              front of all.
-            </Text>
-            <LearnMoreLink>
-              Learn more about Wrapped Tokens {isMobileLandscape ? <Arrow /> : undefined}
-            </LearnMoreLink>
-          </TextContent>
-        </TextWrapper>
-        <Window />
+        <MiddleContainer>
+          <TextWrapper>
+            <TextContent>
+              <TextTitle>
+                You can send fast and with no fees a <TextTitleBold>lot of tokens</TextTitleBold>
+              </TextTitle>
+              <Text>
+                Doesn’t matter what token you want to send. {!isDesktop ? <br /> : undefined}
+                <TextBold>The speed is stable for all of them!</TextBold>
+                <br />
+                <br />
+                Solana blokchain contains many tokens. Its native and wrapped by different
+                technologies. Such as FTX, Sollet etc. It’s allows us to keep the speed and no-fees
+                in front of all.
+              </Text>
+              <LearnMoreLink>
+                Learn more about Wrapped Tokens {isMobileLandscape ? <Arrow /> : undefined}
+              </LearnMoreLink>
+            </TextContent>
+          </TextWrapper>
+          <Window />
+        </MiddleContainer>
       </Middle>
       <Bottom>{children}</Bottom>
     </Wrapper>

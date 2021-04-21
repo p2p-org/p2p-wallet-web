@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 
 const breakpoints: { [type: string]: number } = {
+  widedesktop: 1440,
   desktop: 1440,
   tablet: 1024,
   mobileLandscape: 568,
@@ -16,6 +17,7 @@ export const down = {
 };
 
 export const up = {
+  widedesktop: `@media (min-width: ${breakpoints.widedesktop}px)`,
   desktop: `@media (min-width: ${breakpoints.desktop}px)`,
   tablet: `@media (min-width: ${breakpoints.tablet}px)`,
   mobileLandscape: `@media (min-width: ${breakpoints.mobileLandscape}px)`,
