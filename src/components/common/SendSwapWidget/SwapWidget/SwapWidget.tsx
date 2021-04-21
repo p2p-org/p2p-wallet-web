@@ -17,12 +17,14 @@ import { TokenAvatar } from 'components/common/TokenAvatar';
 import { Button, Icon, Tooltip } from 'components/ui';
 import { openModal } from 'store/actions/modals';
 import { SHOW_MODAL_TRANSACTION_STATUS } from 'store/constants/modalTypes';
+import { wipeAction } from 'store/slices/GlobalSlice';
 import { executeSwap } from 'store/slices/swap/SwapSlice';
 import { clearTokenPairState, updateTokenPairState } from 'store/slices/tokenPair/TokenPairSlice';
 import { matchesPool, tokenPairSelector } from 'store/slices/tokenPair/utils/tokenPair';
 import {
   getMinimumBalanceForRentExemption,
   getRecentBlockhash,
+  getTokenAccounts,
 } from 'store/slices/wallet/WalletSlice';
 import { majorAmountToMinor, minorAmountToMajor } from 'utils/amount';
 
@@ -282,6 +284,8 @@ export const SwapWidget: FunctionComponent = () => {
     }
   }, [secondToken, secondAmount, slippage]);
 
+  const isNeedCreateWallet = isNil(secondTokenAccount);
+
   const handleSubmit = async () => {
     try {
       setIsExecuting(true);
@@ -308,6 +312,11 @@ export const SwapWidget: FunctionComponent = () => {
       ToastManager.error((error as Error).message);
     } finally {
       setIsExecuting(false);
+
+      if (isNeedCreateWallet) {
+        dispatch(wipeAction());
+        await dispatch(getTokenAccounts());
+      }
     }
   };
 
@@ -407,7 +416,6 @@ export const SwapWidget: FunctionComponent = () => {
 
   const isDisabled = isExecuting || !selectedPool || !hasBalance;
   const isShowFee = firstToken && fee && feeProperties;
-  const isNeedCreateWallet = isNil(secondTokenAccount);
 
   return (
     <WrapperWidgetPage
