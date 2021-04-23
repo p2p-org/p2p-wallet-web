@@ -523,7 +523,7 @@ export const Functions: FC = () => {
         <CarouselWrapper>
           <Carousel>
             {slides.map((slide) => (
-              <SlideImage className={slide} />
+              <SlideImage key={slide} className={slide} />
             ))}
           </Carousel>
           <Selectors>

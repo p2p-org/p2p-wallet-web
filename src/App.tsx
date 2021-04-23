@@ -10,8 +10,6 @@ import { ModalManager } from 'components/common/ModalManager';
 import { NotifyToast } from 'components/common/NotifyToast';
 import { ToastManager } from 'components/common/ToastManager';
 import { FEATURE_LANDING } from 'config/featureFlags';
-import { Access } from 'pages/Access';
-import { Create } from 'pages/Create';
 import { Home } from 'pages/Home';
 import { Landing } from 'pages/Landing';
 import { Receive } from 'pages/Receive';
@@ -38,9 +36,7 @@ const App: React.FC = () => {
           ) : (
             <Route path="/" component={Home} exact />
           )}
-          <Route path="/enter" component={Home} exact />
-          <Route path="/create" component={Create} />
-          <Route path="/access" component={Access} />
+          <Route path="/:type(signup|login)" component={Home} exact />
           <AuthRequiredRoute path="/wallets" component={Wallets} />
           <AuthRequiredRoute path="/wallet/:publicKey/settings" component={WalletSettings} />
           <AuthRequiredRoute path="/wallet/:publicKey" component={Wallet} />

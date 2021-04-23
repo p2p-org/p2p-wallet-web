@@ -135,10 +135,10 @@ export const Header: FC = () => {
         <NavLink href="#faq">FAQ</NavLink>
       </Center>
       <Right>
-        <Link to="/access" component={Button}>
+        <Link to="/login" component={Button}>
           I have a wallet
         </Link>
-        <Link to="/create" component={Button} className="white">
+        <Link to="/signup" component={Button} className="white">
           Create wallet
         </Link>
       </Right>

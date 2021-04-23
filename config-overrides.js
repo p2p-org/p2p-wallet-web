@@ -15,12 +15,12 @@ module.exports = override(
   useBabelRc(),
   setWebpackPublicPath(process.env.REACT_APP_BASENAME || '/'),
   addWebpackPlugin(new SpritePlugin()),
-  addWebpackPlugin(
-    new PrerenderSPAPlugin({
-      routes: ['/'],
-      staticDir: path.join(__dirname, 'build'),
-    }),
-  ),
+  // addWebpackPlugin(
+  //   new PrerenderSPAPlugin({
+  //     routes: ['/'],
+  //     staticDir: path.join(__dirname, 'build'),
+  //   }),
+  // ),
   addWebpackModuleRule({
     test: /\.tsx?$/,
     exclude: /node_modules/,

@@ -1,176 +1,160 @@
-import React, { FunctionComponent, useEffect, useState } from 'react';
-import { batch, useDispatch } from 'react-redux';
-import { useLocation } from 'react-router';
-import { Link, useHistory } from 'react-router-dom';
+import React, { FunctionComponent, useState } from 'react';
+import { NavLink, Route, Switch } from 'react-router-dom';
 
+import { css } from '@linaria/core';
 import { styled } from '@linaria/react';
-import { unwrapResult } from '@reduxjs/toolkit';
 
-import { WalletType } from 'api/wallet';
-import logo from 'assets/images/logo-blue.png';
-import bgImg from 'assets/images/sun.png';
-import { HEADER_HEIGHT } from 'components/common/Header/constants';
-import { LayoutUnauthed } from 'components/common/LayoutUnauthed';
-import { Loader } from 'components/common/Loader';
-import { ToastManager } from 'components/common/ToastManager';
-import { Button } from 'components/ui';
-import {
-  autoConnect,
-  connect,
-  selectType,
-  STORAGE_KEY_SEED,
-} from 'store/slices/wallet/WalletSlice';
-import { sleep } from 'utils/common';
+import app from 'components/pages/home/app.png';
+import { LoaderWide } from 'components/pages/home/common/LoaderWide';
+import { Login } from 'components/pages/home/Login';
+import logo from 'components/pages/home/logo.svg';
+import { Signup } from 'components/pages/home/Signup';
+import { fonts } from 'components/pages/landing/styles/fonts';
 
-const LoaderPage = styled.div`
+const Wrapper = styled.div`
   display: flex;
-  align-items: center;
-  justify-content: center;
-
-  height: 100%;
+  min-height: 100%;
 `;
 
-const LoaderWrapper = styled.div`
+const Left = styled.div`
+  position: relative;
+
+  flex: 1;
+  padding: 20px 50px 50px;
+  overflow: hidden;
+
+  background: #f5f7fe;
+`;
+
+const Logo = styled.div`
+  width: 32px;
+  height: 24px;
+
+  background: url(${logo}) no-repeat 50%;
+`;
+
+const Title = styled.span`
+  display: inline-block;
+  margin-top: 67px;
+
+  color: #161616;
+  font-size: 32px;
+  font-family: 'GT Super Ds Trial', sans-serif;
+  line-height: 40px;
+`;
+
+const TitleBold = styled.strong`
+  display: block;
+
+  font-weight: 900;
+`;
+
+const AppImage = styled.div`
+  position: absolute;
+  z-index: 0;
+
+  width: 820px;
+  height: 526px;
+  margin-top: 50px;
+
+  background: url(${app}) no-repeat 50%;
+  background-size: 820px 526px;
+`;
+
+const Right = styled.div`
+  position: relative;
+  z-index: 1;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  width: 100%;
+  max-width: 710px;
+  padding-bottom: 20px;
+
+  background: #fff;
+`;
+
+const Navigate = styled.div`
+  display: flex;
+  margin-bottom: 70px;
+
+  border-bottom: 1px solid #16161626;
+`;
+
+const NavLinkStyled = styled(NavLink)`
   position: relative;
 
   display: flex;
   align-items: center;
   justify-content: center;
 
-  margin-top: -${HEADER_HEIGHT}px;
-`;
+  min-width: 180px;
+  height: 50px;
 
-const LoaderStyled = styled(Loader)`
-  width: 64px;
-  height: 64px;
+  color: #1616164c;
+  font-weight: 500;
+  font-size: 16px;
+  font-family: 'Aktiv Grotesk Corp', sans-serif;
+  line-height: 24px;
+  white-space: nowrap;
+  text-align: center;
+  text-decoration: none;
 
-  &::after {
-    width: 88%;
-    height: 88%;
+  cursor: pointer;
+
+  &.active {
+    color: #161616cc;
+
+    &::after {
+      position: absolute;
+      right: 0;
+      bottom: -1px;
+      left: 0;
+
+      height: 1px;
+
+      background: #161616;
+
+      content: '';
+    }
   }
 `;
 
-const LogoImg = styled.img`
-  position: absolute;
-
-  width: 44px;
-  height: 44px;
-`;
-
-const Actions = styled.div`
-  display: flex;
-  flex-flow: column wrap;
-
-  > :not(:last-child) {
-    margin-bottom: 20px;
+export const global = css`
+  :global() {
+    ${fonts}
   }
-`;
-
-const Title = styled.div`
-  color: #000;
-  font-weight: 500;
-  font-size: 27px;
-  line-height: 120%;
-  text-align: center;
-`;
-
-const SubTitle = styled.div`
-  margin-bottom: 28px;
-
-  color: #000;
-  font-weight: 500;
-  font-size: 27px;
-  line-height: 120%;
-  text-align: center;
-`;
-
-const HeaderImage = styled.div`
-  width: 219px;
-  height: 209px;
-  margin: 91px auto 48px;
-
-  background-image: url(${bgImg});
 `;
 
 export const Home: FunctionComponent = () => {
-  const location = useLocation<{ from?: string }>();
-  const history = useHistory();
-  const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(() => {
-    const mount = async () => {
-      if (!localStorage.getItem(STORAGE_KEY_SEED)) {
-        return;
-      }
-
-      try {
-        setIsLoading(true);
-        unwrapResult(await dispatch(autoConnect()));
-
-        await sleep(100);
-
-        history.push(location.state?.from || '/wallets');
-      } catch (error) {
-        ToastManager.error((error as Error).message);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    void mount();
-  }, []);
-
-  const handleConnectByClick = (type: WalletType) => {
-    batch(async () => {
-      try {
-        setIsLoading(true);
-        dispatch(selectType(type));
-        unwrapResult(await dispatch(connect()));
-        await sleep(100);
-        history.push('/wallets');
-      } catch (error) {
-        ToastManager.error((error as Error).message);
-      } finally {
-        setIsLoading(false);
-      }
-    });
-  };
-
   return (
-    <LayoutUnauthed>
-      {isLoading ? (
-        <LoaderPage>
-          <LoaderWrapper>
-            <LoaderStyled />
-            <LogoImg src={logo} />
-          </LoaderWrapper>
-        </LoaderPage>
-      ) : (
-        <>
-          <HeaderImage />
-          <Title>P2P Wallet </Title>
-          <SubTitle> Own Your Money </SubTitle>
-          <Actions>
-            <Link to="/create" className="button">
-              <Button primary big full>
-                Create new wallet
-              </Button>
-            </Link>
-            <Link to="/access" className="button">
-              <Button gray big full>
-                I already have a wallet
-              </Button>
-            </Link>
-            <Button gray big full onClick={() => handleConnectByClick(WalletType.SOLLET)}>
-              Connect by Sollet
-            </Button>
-            <Button gray big full onClick={() => handleConnectByClick(WalletType.BONFIDA)}>
-              Connect by Bonfida
-            </Button>
-          </Actions>
-        </>
-      )}
-    </LayoutUnauthed>
+    <Wrapper>
+      <Left>
+        <Logo />
+        <Title>
+          Your crypto <TitleBold>is starting here</TitleBold>
+        </Title>
+        <AppImage />
+      </Left>
+      <Right>
+        <Navigate>
+          <NavLinkStyled to="/signup">Create new wallet</NavLinkStyled>
+          <NavLinkStyled to="/login">I already have wallet</NavLinkStyled>
+        </Navigate>
+        <Switch>
+          <Route path="/signup">
+            <Signup setIsLoading={setIsLoading} />
+          </Route>
+          <Route path="/login">
+            <Login setIsLoading={setIsLoading} />
+          </Route>
+        </Switch>
+        {isLoading ? <LoaderWide /> : undefined}
+      </Right>
+    </Wrapper>
   );
 };

@@ -1,0 +1,1 @@
+export { LoaderWide } from './LoaderWide';
