@@ -209,7 +209,7 @@ export const Login: FC<Props> = ({ setIsLoading }) => {
         </SocialButton>
         <SocialButton onClick={handleConnectByClick(WalletType.BONFIDA)}>
           <WalletIcon className="bonfida" />
-          Continue wi th Bonfida
+          Continue with Bonfida
         </SocialButton>
       </ButtonsWrapper>
       <Delimiter>
