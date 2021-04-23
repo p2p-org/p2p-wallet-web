@@ -1,6 +1,6 @@
 {
   "files": {
-    "main.css": "/p2p-wallet-web/static/css/main.ac1f1c41.chunk.css",
+    "main.css": "/p2p-wallet-web/static/css/main.54af3b84.chunk.css",
     "main.js": "/p2p-wallet-web/static/js/main.3ed86b42.chunk.js",
     "main.js.map": "/p2p-wallet-web/static/js/main.3ed86b42.chunk.js.map",
     "runtime-main.js": "/p2p-wallet-web/static/js/runtime-main.71044a5e.js",
@@ -30,7 +30,7 @@
     "static/css/5.5a0dc4f9.chunk.css.map": "/p2p-wallet-web/static/css/5.5a0dc4f9.chunk.css.map",
     "static/css/6.1e88bb1c.chunk.css.map": "/p2p-wallet-web/static/css/6.1e88bb1c.chunk.css.map",
     "static/css/7.4b063de3.chunk.css.map": "/p2p-wallet-web/static/css/7.4b063de3.chunk.css.map",
-    "static/css/main.ac1f1c41.chunk.css.map": "/p2p-wallet-web/static/css/main.ac1f1c41.chunk.css.map",
+    "static/css/main.54af3b84.chunk.css.map": "/p2p-wallet-web/static/css/main.54af3b84.chunk.css.map",
     "static/js/2.0010c983.chunk.js.LICENSE.txt": "/p2p-wallet-web/static/js/2.0010c983.chunk.js.LICENSE.txt",
     "static/media/Landing.linaria.css": "/p2p-wallet-web/static/media/GT-Super-Text-Bold.24a70721.woff2",
     "static/media/Home.linaria.css": "/p2p-wallet-web/static/media/logo.83fb5ddd.svg",
@@ -52,7 +52,7 @@
     "static/js/runtime-main.71044a5e.js",
     "static/css/2.8f976517.chunk.css",
     "static/js/2.0010c983.chunk.js",
-    "static/css/main.ac1f1c41.chunk.css",
+    "static/css/main.54af3b84.chunk.css",
     "static/js/main.3ed86b42.chunk.js"
   ]
 }
