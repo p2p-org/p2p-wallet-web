@@ -1,5 +1,5 @@
 import React, { FunctionComponent, useState } from 'react';
-import { NavLink, Route, Switch } from 'react-router-dom';
+import { NavLink, Route, Switch, useLocation } from 'react-router-dom';
 
 import { css } from '@linaria/core';
 import { styled } from '@linaria/react';
@@ -66,11 +66,10 @@ const Right = styled.div`
   z-index: 1;
 
   display: flex;
+  flex: 1;
   flex-direction: column;
   align-items: center;
 
-  width: 100%;
-  max-width: 710px;
   padding-bottom: 20px;
 
   background: #fff;
@@ -129,6 +128,7 @@ export const global = css`
 `;
 
 export const Home: FunctionComponent = () => {
+  const { pathname } = useLocation();
   const [isLoading, setIsLoading] = useState(false);
 
   return (
@@ -143,10 +143,12 @@ export const Home: FunctionComponent = () => {
       <Right>
         <Navigate>
           <NavLinkStyled to="/signup">Create new wallet</NavLinkStyled>
-          <NavLinkStyled to="/login">I already have wallet</NavLinkStyled>
+          <NavLinkStyled to="/login" isActive={() => ['/login', '/'].includes(pathname)}>
+            I already have wallet
+          </NavLinkStyled>
         </Navigate>
         <Switch>
-          <Route path="/">
+          <Route path="/" exact>
             <Login setIsLoading={setIsLoading} />
           </Route>
           <Route path="/login">
