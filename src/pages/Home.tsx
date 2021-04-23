@@ -146,11 +146,14 @@ export const Home: FunctionComponent = () => {
           <NavLinkStyled to="/login">I already have wallet</NavLinkStyled>
         </Navigate>
         <Switch>
-          <Route path="/signup">
-            <Signup setIsLoading={setIsLoading} />
+          <Route path="/">
+            <Login setIsLoading={setIsLoading} />
           </Route>
           <Route path="/login">
             <Login setIsLoading={setIsLoading} />
+          </Route>
+          <Route path="/signup">
+            <Signup setIsLoading={setIsLoading} />
           </Route>
         </Switch>
         {isLoading ? <LoaderWide /> : undefined}
