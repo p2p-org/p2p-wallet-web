@@ -9,6 +9,7 @@ import * as bip39 from 'bip39';
 import { WalletType } from 'api/wallet';
 import { ToastManager } from 'components/common/ToastManager';
 import { Button } from 'components/pages/home/common/Button';
+import { localMnemonic } from 'config/constants';
 import { connect, selectType } from 'store/slices/wallet/WalletSlice';
 import { sleep } from 'utils/common';
 
@@ -146,7 +147,7 @@ type Props = {
 export const Login: FC<Props> = ({ setIsLoading }) => {
   const history = useHistory();
   const dispatch = useDispatch();
-  const [mnemonic, setMnemonic] = useState('');
+  const [mnemonic, setMnemonic] = useState(localMnemonic || '');
   const [error, setError] = useState(false);
 
   // TODO: password process

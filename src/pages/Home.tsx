@@ -1,15 +1,21 @@
-import React, { FunctionComponent, useState } from 'react';
+import React, { FunctionComponent, useEffect, useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { useHistory } from 'react-router';
 import { NavLink, Route, Switch, useLocation } from 'react-router-dom';
 
 import { css } from '@linaria/core';
 import { styled } from '@linaria/react';
+import { unwrapResult } from '@reduxjs/toolkit';
 
+import { ToastManager } from 'components/common/ToastManager';
 import app from 'components/pages/home/app.png';
 import { LoaderWide } from 'components/pages/home/common/LoaderWide';
 import { Login } from 'components/pages/home/Login';
 import logo from 'components/pages/home/logo.svg';
 import { Signup } from 'components/pages/home/Signup';
 import { fonts } from 'components/pages/landing/styles/fonts';
+import { autoConnect, STORAGE_KEY_SEED } from 'store/slices/wallet/WalletSlice';
+import { sleep } from 'utils/common';
 
 const Wrapper = styled.div`
   display: flex;
@@ -128,8 +134,33 @@ export const global = css`
 `;
 
 export const Home: FunctionComponent = () => {
-  const { pathname } = useLocation();
+  const location = useLocation<{ from?: string }>();
+  const history = useHistory();
+  const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    const mount = async () => {
+      if (!localStorage.getItem(STORAGE_KEY_SEED)) {
+        return;
+      }
+
+      try {
+        setIsLoading(true);
+        unwrapResult(await dispatch(autoConnect()));
+
+        await sleep(100);
+
+        history.push(location.state?.from || '/wallets');
+      } catch (error) {
+        ToastManager.error((error as Error).message);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    void mount();
+  }, []);
 
   return (
     <Wrapper>
@@ -143,7 +174,7 @@ export const Home: FunctionComponent = () => {
       <Right>
         <Navigate>
           <NavLinkStyled to="/signup">Create new wallet</NavLinkStyled>
-          <NavLinkStyled to="/login" isActive={() => ['/login', '/'].includes(pathname)}>
+          <NavLinkStyled to="/login" isActive={() => ['/login', '/'].includes(location.pathname)}>
             I already have wallet
           </NavLinkStyled>
         </Navigate>
