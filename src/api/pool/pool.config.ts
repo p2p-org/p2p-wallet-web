@@ -15,6 +15,9 @@ export default {
   'p2p-mainnet': {
     swapProgramId,
   },
+  'p2p-2-mainnet': {
+    swapProgramId,
+  },
   'serum-mainnet': {
     swapProgramId,
   },

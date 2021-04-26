@@ -237,6 +237,7 @@ const mainnet = [
 // eslint-disable-next-line import/no-default-export
 export default {
   'p2p-mainnet': mainnet,
+  'p2p-2-mainnet': mainnet,
   'serum-mainnet': mainnet,
   'mainnet-beta': mainnet,
   devnet: [

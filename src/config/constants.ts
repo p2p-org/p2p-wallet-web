@@ -35,6 +35,7 @@ export const clusters: {
   [cluster: string]: string;
 } = {
   'p2p-mainnet': 'https://node-1.solana.p2p.org',
+  'p2p-2-mainnet': 'https://node-2.solana.p2p.org',
   'serum-mainnet': 'https://solana-api.projectserum.com',
   'mainnet-beta': 'https://api.mainnet-beta.solana.com',
   devnet: 'https://devnet.solana.com',
