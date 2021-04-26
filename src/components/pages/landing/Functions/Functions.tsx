@@ -450,6 +450,7 @@ const SlideImage = styled.div`
 const TextWrapper = styled.div`
   z-index: 1;
 
+  min-height: 419px;
   margin-top: 71px;
   padding: 0 40px;
 
@@ -462,6 +463,7 @@ const TextWrapper = styled.div`
   }
 
   ${up.desktop} {
+    margin-top: 0;
     margin-left: 88px;
     padding: 0;
   }
