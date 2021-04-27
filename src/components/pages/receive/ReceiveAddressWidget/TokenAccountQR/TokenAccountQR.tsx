@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useEffect, useState } from 'react';
+import React, { FunctionComponent, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { styled } from '@linaria/react';
@@ -14,6 +14,7 @@ import { LoaderBlock } from 'components/common/LoaderBlock';
 import { ToastManager } from 'components/common/ToastManager';
 import { Button, Icon } from 'components/ui';
 import { createAccountForToken } from 'store/slices/wallet/WalletSlice';
+import { setToClipboard } from 'utils/clipboard';
 import { getExplorerUrl } from 'utils/connection';
 
 const Wrapper = styled.div`
@@ -223,43 +224,6 @@ const LoaderBlockStyled = styled(LoaderBlock)`
   margin-right: 8px;
 `;
 
-// @return Promise<boolean>
-async function askClipboardWritePermission() {
-  try {
-    // The clipboard-write permission is granted automatically to pages
-    // when they are the active tab. So it's not required, but it's more safe.
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    const { state } = await navigator.permissions.query({ name: 'clipboard-write' });
-    return state === 'granted';
-  } catch {
-    // Browser compatibility / Security error (ONLY HTTPS) ...
-    return false;
-  }
-}
-
-// @params blob - The ClipboardItem takes an object with the MIME type as key, and the actual blob as the value.
-// @return Promise<void>
-const setToClipboard = async (blob: Blob | null) => {
-  if (!blob) {
-    ToastManager.error(`Can't copy to clipboard`);
-    return;
-  }
-
-  try {
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-assignment
-    const data = [new ClipboardItem({ [blob.type]: blob })];
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-    await navigator.clipboard.write(data);
-  } catch (error) {
-    ToastManager.error((error as Error).message);
-  }
-};
-
 const copy = (value: string, cb: (state: boolean) => void) => {
   try {
     void navigator.clipboard.writeText(value);
@@ -303,14 +267,14 @@ export const TokenAccountQR: FunctionComponent<Props> = ({
   const [isAddressCopied, setIsAddressCopied] = useState(false);
   const [isNew, setIsNew] = useState(false);
   const [isImageCopied, setIsImageCopied] = useState(false);
-  const [isImageCopyAvailable, setIsImageCopyAvailable] = useState(false);
+  const [isImageCopyAvailable] = useState(false);
   const cluster = useSelector((state) => state.wallet.cluster);
 
-  useEffect(() => {
-    askClipboardWritePermission()
-      .then((state) => setIsImageCopyAvailable(state))
-      .catch(() => setIsImageCopyAvailable(false));
-  }, []);
+  // useEffect(() => {
+  //   askClipboardWritePermission()
+  //     .then((state) => setIsImageCopyAvailable(state))
+  //     .catch(() => setIsImageCopyAvailable(false));
+  // }, []);
 
   const handleImageCopyClick = () => {
     const qrElement = document.querySelector<HTMLCanvasElement>('#qrcode');
