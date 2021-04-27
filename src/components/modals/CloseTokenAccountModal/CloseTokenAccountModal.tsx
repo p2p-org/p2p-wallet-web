@@ -130,8 +130,8 @@ export const CloseTokenAccountModal: FunctionComponent<Props> = ({
       </IconWrapper>
       <Header>{`Close ${tokenName} account?`}</Header>
       <Description>
-        {`Your balance will be converted and transferred to your main SOL wallet and all your ${tokenName}
-        addresses will be disabled. This action can not be undone.`}
+        Are you sure you want to delete token account? This will permanently disable token transfers
+        to this address and remove it from your wallet.
       </Description>
       <Buttons>
         <ButtonStyled disabled={isExecuting} onClick={handleCloseTokenAButtonClick}>
