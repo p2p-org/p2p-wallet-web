@@ -41,3 +41,5 @@ export const clusters: {
   devnet: 'https://devnet.solana.com',
   testnet: 'https://testnet.solana.com',
 };
+
+export const feeRelayerUrl = process.env.REACT_APP_FEE_RELAYER_URL;

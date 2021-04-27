@@ -251,6 +251,18 @@ export const Settings: FunctionComponent = () => {
                     </Select>
                   }
                 />
+                <Row
+                  icon="card"
+                  title="Use free transactions"
+                  secondary={
+                    <Switch
+                      checked={settings.useFreeTransactions}
+                      onChange={onItemClickHandler({
+                        useFreeTransactions: !settings.useFreeTransactions,
+                      })}
+                    />
+                  }
+                />
               </Feature>
               <Row
                 icon="branch"

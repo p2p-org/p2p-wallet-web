@@ -9,6 +9,7 @@ import { Account, Blockhash, Cluster, FeeCalculator, PublicKey } from '@solana/w
 import Decimal from 'decimal.js';
 import { mergeDeepRight } from 'ramda';
 
+import { APIFactory as FeeRelayerAPIFactory } from 'api/feeRelayer';
 import { APIFactory as TokenAPIFactory, TransferParameters } from 'api/token';
 import { AccountListener } from 'api/token/AccountListener';
 import { Token } from 'api/token/Token';
@@ -199,6 +200,16 @@ export const transfer = createAsyncThunk<string, TransferParameters>(
   async (parameters, thunkAPI) => {
     const state: RootState = thunkAPI.getState() as RootState;
     const walletState = state.wallet;
+
+    if (walletState.settings.useFreeTransactions) {
+      const tokenAccounts = state.wallet.tokenAccounts.map((account) => TokenAccount.from(account));
+      const tokenAccount = tokenAccounts.find((account) =>
+        account.address.equals(parameters.source),
+      );
+      const FeeRelayerAPI = FeeRelayerAPIFactory(walletState.cluster);
+      return FeeRelayerAPI.transfer(parameters, tokenAccount);
+    }
+
     const TokenAPI = TokenAPIFactory(walletState.cluster);
 
     return TokenAPI.transfer(parameters);
