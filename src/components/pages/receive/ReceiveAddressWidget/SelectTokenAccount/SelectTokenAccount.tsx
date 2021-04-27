@@ -8,7 +8,6 @@ import { Token } from 'api/token/Token';
 import { TokenAccount } from 'api/token/TokenAccount';
 import { Empty } from 'components/common/Empty';
 import { SlideContainer } from 'components/common/SlideContainer';
-import { ToastManager } from 'components/common/ToastManager';
 import { TokenAccountRow } from 'components/common/TokenAccountRow';
 import { TokenAvatar } from 'components/common/TokenAvatar';
 import { TokenRow } from 'components/common/TokenRow';
@@ -74,13 +73,6 @@ const InfoWrapper = styled.div`
   margin-left: 16px;
 `;
 
-const CopiedText = styled.div`
-  color: #2db533;
-  font-weight: 600;
-  font-size: 16px;
-  line-height: 140%;
-`;
-
 const TokenName = styled.div`
   overflow: hidden;
 
@@ -103,10 +95,6 @@ const TokenAccountAddress = styled.div`
 
   white-space: nowrap;
   text-overflow: ellipsis;
-
-  &:hover {
-    color: #5887ff;
-  }
 `;
 
 const EmptyName = styled.div`
@@ -213,13 +201,11 @@ export const SelectTokenAccount: FunctionComponent<Props> = ({
   className,
 }) => {
   const selectorRef = useRef<HTMLDivElement>(null);
-  const tokenAddressRef = useRef<HTMLDivElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
   const [filter, setFilter] = useState('');
   const [isOpen, setIsOpen] = useState(false);
   const [scrollTop, setScrollTop] = useState(0);
-  const [copied, setCopied] = useState(false);
 
   const handleScroll = throttle(() => {
     if (!listRef.current) {
@@ -248,25 +234,6 @@ export const SelectTokenAccount: FunctionComponent<Props> = ({
     }
   };
 
-  const handleCopyClick = () => {
-    if (!tokenAccount) {
-      return;
-    }
-
-    try {
-      void navigator.clipboard.writeText(tokenAccount.address.toBase58());
-      setCopied(true);
-      ToastManager.info(`Wallet Address Copied!`);
-
-      // fade copied after some seconds
-      setTimeout(() => {
-        setCopied(false);
-      }, 2000);
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
   useEffect(() => {
     window.addEventListener('click', handleAwayClick);
 
@@ -291,14 +258,12 @@ export const SelectTokenAccount: FunctionComponent<Props> = ({
     };
   }, [isOpen, listRef.current]);
 
-  const handleSelectorClick = (e: React.MouseEvent<HTMLDivElement>) => {
+  const handleSelectorClick = () => {
     if (!tokenAccounts) {
       return;
     }
 
-    if (!tokenAddressRef.current?.contains(e.target as HTMLDivElement)) {
-      setIsOpen(!isOpen);
-    }
+    setIsOpen(!isOpen);
   };
 
   const handleTokenAccountClick = (nextTokenAccount: TokenAccount) => {
@@ -366,17 +331,13 @@ export const SelectTokenAccount: FunctionComponent<Props> = ({
           {token ? <TokenAvatar symbol={token.symbol} size={40} /> : <WalletIcon name="wallet" />}
         </TokenAvatarWrapper>
         <InfoWrapper>
-          {copied ? (
-            <CopiedText>Copied!</CopiedText>
-          ) : (
-            <TokenName title={token?.address.toBase58()}>
-              {token?.symbol || (tokenAccount && shortAddress(tokenAccount.address.toBase58())) || (
-                <EmptyName>—</EmptyName>
-              )}
-            </TokenName>
-          )}
+          <TokenName title={token?.address.toBase58()}>
+            {token?.symbol || (tokenAccount && shortAddress(tokenAccount.address.toBase58())) || (
+              <EmptyName>—</EmptyName>
+            )}
+          </TokenName>
           {tokenAccount ? (
-            <TokenAccountAddress ref={tokenAddressRef} onClick={handleCopyClick}>
+            <TokenAccountAddress>
               {shortAddress(tokenAccount.address.toBase58())}
             </TokenAccountAddress>
           ) : (
