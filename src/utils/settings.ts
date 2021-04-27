@@ -31,6 +31,7 @@ export const defaultSettings = {
     current: 'mainnet-beta',
   },
   isZeroBalancesHidden: true,
+  useFreeTransactions: false,
 } as WalletSettings;
 
 export function loadSettings(): WalletSettings {

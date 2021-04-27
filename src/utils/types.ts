@@ -39,4 +39,5 @@ export type WalletSettings = {
   appearance: string;
   network: Network;
   isZeroBalancesHidden: boolean;
+  useFreeTransactions: boolean;
 };

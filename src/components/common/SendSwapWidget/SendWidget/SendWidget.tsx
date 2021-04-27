@@ -81,11 +81,16 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
     [tokenAccounts, publicKey],
   );
 
+  const useFreeTransactions = useSelector(
+    (state: RootState) => state.wallet.settings.useFreeTransactions,
+  );
+
   useEffect(() => {
     const mount = async () => {
       try {
-        // TODO: not 0
-        const resultFee = unwrapResult(await dispatch(getMinimumBalanceForRentExemption(0)));
+        const resultFee = useFreeTransactions
+          ? 0
+          : unwrapResult(await dispatch(getMinimumBalanceForRentExemption(0)));
         setFee(
           new Decimal(resultFee)
             .div(10 ** 9)
@@ -223,7 +228,7 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
               <RateUSD symbol={fromTokenAccount?.mint.symbol} />
             </FeeLeft>
           ) : undefined}
-          {fee ? <FeeRight>Fee: {fee} SOL</FeeRight> : undefined}
+          <FeeRight>Fee: {fee} SOL</FeeRight>
         </FeeLine>
       </FromWrapper>
       <ToSendWrapper>
