@@ -206,6 +206,8 @@ export const TransactionRow: FunctionComponent<Props> = ({ transaction, source }
         return `${symbol} Closed`;
       }
     }
+
+    return <div title={transaction.signature}>{shortAddress(transaction.signature)}</div>;
   };
 
   return (
@@ -237,7 +239,14 @@ export const TransactionRow: FunctionComponent<Props> = ({ transaction, source }
           <Bottom>
             <div>{renderBottomLeft()}</div>
             <div>
-              {details.isReceiver ? '+' : '-'} {details.amount.toNumber()} {details.token?.symbol}
+              {details.typeOriginal ? (
+                <>
+                  {details.isReceiver ? '+' : '-'} {details.amount.toNumber()}{' '}
+                  {details.token?.symbol}
+                </>
+              ) : (
+                <>#{transaction.slot}</>
+              )}
             </div>
           </Bottom>
         </Content>

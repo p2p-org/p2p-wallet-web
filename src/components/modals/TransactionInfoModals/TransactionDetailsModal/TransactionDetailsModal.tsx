@@ -210,6 +210,51 @@ export const TransactionDetailsModal: FC<Props> = ({ signature, source, close })
     );
   };
 
+  const renderAmountBlock = () => {
+    if (details.type === 'swap') {
+      return (
+        <SwapWrapper>
+          <SwapColumn>
+            <SwapInfo>
+              <TokenAvatar size={44} symbol={details.sourceToken?.symbol} />
+              <SwapAmount>
+                - {details.sourceAmount.toNumber()} {details.sourceToken?.symbol}
+              </SwapAmount>
+            </SwapInfo>
+          </SwapColumn>
+          <SwapBlock>
+            <SwapIcon name="swap" />
+          </SwapBlock>
+          <SwapColumn>
+            <SwapInfo>
+              <TokenAvatar size={44} symbol={details.destinationToken?.symbol} />
+              <SwapAmount>
+                + {details.destinationAmount.toNumber()} {details.destinationToken?.symbol}
+              </SwapAmount>
+            </SwapInfo>
+          </SwapColumn>
+        </SwapWrapper>
+      );
+    }
+
+    if (details.typeOriginal) {
+      return (
+        <SendWrapper>
+          <ValueCurrency>
+            {details.isReceiver ? '+' : '-'} {details.amount.toNumber()} {details.token?.symbol}
+          </ValueCurrency>
+          <ValueOriginal>
+            <AmountUSD
+              prefix={details.isReceiver ? '+' : '-'}
+              symbol={details.token?.symbol}
+              value={details.amount}
+            />
+          </ValueOriginal>
+        </SendWrapper>
+      );
+    }
+  };
+
   const date = transaction.timestamp
     ? dayjs.unix(transaction.timestamp).format('LLL')
     : `${transaction.slot} SLOT`;
@@ -241,42 +286,7 @@ export const TransactionDetailsModal: FC<Props> = ({ signature, source, close })
         {/*    </ValueOriginal> */}
         {/*  </SendWrapper> */}
         {/* ) : undefined} */}
-        {details.type === 'swap' ? (
-          <SwapWrapper>
-            <SwapColumn>
-              <SwapInfo>
-                <TokenAvatar size={44} symbol={details.sourceToken?.symbol} />
-                <SwapAmount>
-                  - {details.sourceAmount.toNumber()} {details.sourceToken?.symbol}
-                </SwapAmount>
-              </SwapInfo>
-            </SwapColumn>
-            <SwapBlock>
-              <SwapIcon name="swap" />
-            </SwapBlock>
-            <SwapColumn>
-              <SwapInfo>
-                <TokenAvatar size={44} symbol={details.destinationToken?.symbol} />
-                <SwapAmount>
-                  + {details.destinationAmount.toNumber()} {details.destinationToken?.symbol}
-                </SwapAmount>
-              </SwapInfo>
-            </SwapColumn>
-          </SwapWrapper>
-        ) : (
-          <SendWrapper>
-            <ValueCurrency>
-              {details.isReceiver ? '+' : '-'} {details.amount.toNumber()} {details.token?.symbol}
-            </ValueCurrency>
-            <ValueOriginal>
-              <AmountUSD
-                prefix={details.isReceiver ? '+' : '-'}
-                symbol={details.token?.symbol}
-                value={details.amount}
-              />
-            </ValueOriginal>
-          </SendWrapper>
-        )}
+        {renderAmountBlock()}
         <StatusWrapper>
           <Status>
             <StatusIndicator /> Completed

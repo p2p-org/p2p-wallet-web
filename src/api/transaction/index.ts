@@ -191,11 +191,11 @@ export const APIFactory = memoizeWith(
         const instruction = instructions[0] as ConfirmedTransaction;
         const info = instruction?.parsed?.info;
 
-        type = instruction?.parsed?.type || null;
         source = info?.source ? new PublicKey(info?.source) : null;
         sourceTokenAccount = source ? await tokenAPI.tokenAccountInfo(source) : null;
 
-        if (type === 'createAccount') {
+        if (instruction?.parsed?.type === 'createAccount') {
+          type = instruction.parsed.type;
           const initializeAccountInstruction = instructions[1] as ConfirmedTransaction;
           const initializeAccountInfo = initializeAccountInstruction.parsed?.info;
 
@@ -215,7 +215,8 @@ export const APIFactory = memoizeWith(
             );
           }
           destinationAmount = new Decimal(info?.lamports || 0).div(LAMPORTS_PER_SOL);
-        } else if (type === 'closeAccount' && preTokenBalances) {
+        } else if (instruction?.parsed?.type === 'closeAccount' && preTokenBalances) {
+          type = instruction.parsed.type;
           const preToken = preTokenBalances[0];
           const preBalance = preBalances?.[1];
 
@@ -235,7 +236,8 @@ export const APIFactory = memoizeWith(
             ? await tokenAPI.tokenAccountInfo(destination)
             : null;
           destinationAmount = new Decimal(preBalance || 0).div(LAMPORTS_PER_SOL);
-        } else {
+        } else if (instruction?.parsed?.type === 'transfer') {
+          type = instruction.parsed.type;
           source = info?.source ? new PublicKey(info?.source) : null;
           destination = info?.destination ? new PublicKey(info?.destination) : null;
           sourceTokenAccount = source ? await tokenAPI.tokenAccountInfo(source) : null;

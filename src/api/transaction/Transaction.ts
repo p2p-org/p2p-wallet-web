@@ -191,6 +191,9 @@ export class Transaction implements Serializable<SerializableTransaction> {
       icon = 'wallet';
     } else if (type === 'closeAccount') {
       icon = 'bucket';
+    } else if (!type) {
+      type = 'transaction';
+      icon = 'db';
     }
 
     if (isReceiver) {

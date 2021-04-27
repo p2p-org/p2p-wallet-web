@@ -18,6 +18,7 @@ import clock from './assets/clock-icon.svg';
 import close from './assets/close-icon.svg';
 import copy from './assets/copy-icon.svg';
 import currency from './assets/currency-icon.svg';
+import db from './assets/db-icon.svg';
 import error from './assets/error-icon.svg';
 import eye from './assets/eye-icon.svg';
 import gear from './assets/gear-icon.svg';
@@ -54,6 +55,7 @@ const iconsMap = new Map<string, string>([
   ['close', close],
   ['copy', copy],
   ['currency', currency],
+  ['db', db],
   ['bucket', bucket],
   ['gear', gear],
   ['more', more],
