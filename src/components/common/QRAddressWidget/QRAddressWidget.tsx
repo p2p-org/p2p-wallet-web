@@ -6,7 +6,7 @@ import * as web3 from '@solana/web3.js';
 import { rgba } from 'polished';
 import QRCode from 'qrcode.react';
 
-import tokenConfig, { SOL_AVATAR_URL } from 'api/token/token.config';
+import tokenList from 'api/token/token.config';
 import { TokenAccount } from 'api/token/TokenAccount';
 import { Card } from 'components/common/Card';
 import { ToastManager } from 'components/common/ToastManager';
@@ -148,16 +148,13 @@ export const QRAddressWidget: FunctionComponent<Props> = ({ publicKey, className
     width: 28,
   };
 
-  if (tokenAccount.mint.symbol === 'SOL') {
-    qrImageSettings.src = `${process.env.PUBLIC_URL}${SOL_AVATAR_URL}`;
-  } else {
-    const iconSrc = tokenConfig[cluster]?.find(
-      (token) => token.tokenSymbol === tokenAccount.mint.symbol,
-    )?.icon;
+  const iconSrc = tokenList
+    .filterByClusterSlug(cluster)
+    .getList()
+    .find((token) => token.symbol === tokenAccount.mint.symbol)?.logoURI;
 
-    if (iconSrc) {
-      qrImageSettings.src = `${process.env.PUBLIC_URL}${iconSrc}`;
-    }
+  if (iconSrc) {
+    qrImageSettings.src = iconSrc;
   }
 
   return (

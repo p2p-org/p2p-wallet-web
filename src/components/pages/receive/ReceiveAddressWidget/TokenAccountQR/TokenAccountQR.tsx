@@ -8,7 +8,7 @@ import { rgba } from 'polished';
 import QRCode from 'qrcode.react';
 
 import { Token } from 'api/token/Token';
-import tokenConfig, { SOL_AVATAR_URL } from 'api/token/token.config';
+import tokenList from 'api/token/token.config';
 import { TokenAccount } from 'api/token/TokenAccount';
 import { LoaderBlock } from 'components/common/LoaderBlock';
 import { ToastManager } from 'components/common/ToastManager';
@@ -352,16 +352,13 @@ export const TokenAccountQR: FunctionComponent<Props> = ({
     width: 28,
   };
 
-  if (token.symbol === 'SOL') {
-    qrImageSettings.src = `${process.env.PUBLIC_URL}${SOL_AVATAR_URL}`;
-  } else {
-    const iconSrc = tokenConfig[cluster]?.find(
-      (tokenItem) => tokenItem.tokenSymbol === token.symbol,
-    )?.icon;
+  const iconSrc = tokenList
+    .filterByClusterSlug(cluster)
+    .getList()
+    .find((tokenItem) => tokenItem.symbol === token.symbol)?.logoURI;
 
-    if (iconSrc) {
-      qrImageSettings.src = `${process.env.PUBLIC_URL}${iconSrc}`;
-    }
+  if (iconSrc) {
+    qrImageSettings.src = iconSrc;
   }
 
   return (

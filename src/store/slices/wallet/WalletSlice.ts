@@ -10,10 +10,9 @@ import Decimal from 'decimal.js';
 import { mergeDeepRight } from 'ramda';
 
 import { APIFactory as FeeRelayerAPIFactory } from 'api/feeRelayer';
-import { APIFactory as TokenAPIFactory, TransferParameters } from 'api/token';
+import { API, APIFactory as TokenAPIFactory, TransferParameters } from 'api/token';
 import { AccountListener } from 'api/token/AccountListener';
 import { Token } from 'api/token/Token';
-import { SOL_AVATAR_URL, SOL_COLOR } from 'api/token/token.config';
 import { SerializableTokenAccount, TokenAccount } from 'api/token/TokenAccount';
 import * as WalletAPI from 'api/wallet';
 import { getBalance, getWallet, WalletDataType, WalletType } from 'api/wallet';
@@ -21,7 +20,7 @@ import { ManualSeedData } from 'api/wallet/ManualWallet';
 import { WalletEvent } from 'api/wallet/Wallet';
 import { ToastManager } from 'components/common/ToastManager';
 import { swapHostFeeAddress } from 'config/constants';
-import { SYSTEM_PROGRAM_ID } from 'constants/solana/bufferLayouts';
+import { SYSTEM_PROGRAM_ID, WRAPPED_SOL_MINT } from 'constants/solana/bufferLayouts';
 import { RootState } from 'store/rootReducer';
 import { getAvailableTokens, wipeAction } from 'store/slices/GlobalSlice';
 import { getPools } from 'store/slices/pool/PoolSlice';
@@ -67,9 +66,10 @@ export const disconnect = createAsyncThunk(`${WALLET_SLICE_NAME}/disconnect`, (_
 });
 
 // Simulate SOL token account
-const getSolToken = async () => {
+const getSolToken = async (TokenAPI: API) => {
   const publicKey = getWallet().pubkey;
   const balance = await getBalance(publicKey);
+  const tokenInfo = TokenAPI.getConfigForToken(WRAPPED_SOL_MINT);
 
   // Fake token to simulate SOL as Token
   const mint = new Token(
@@ -79,8 +79,8 @@ const getSolToken = async () => {
     undefined,
     'Solana',
     'SOL',
-    SOL_COLOR,
-    SOL_AVATAR_URL,
+    undefined, // ,
+    tokenInfo?.logoURI,
   );
   return new TokenAccount(mint, SYSTEM_PROGRAM_ID, SYSTEM_PROGRAM_ID, publicKey, balance);
 };
@@ -104,7 +104,7 @@ export const getTokenAccounts = createAsyncThunk<Array<SerializableTokenAccount>
     const TokenAPI = TokenAPIFactory(walletState.cluster);
 
     // Simulated SOL token
-    const solToken = await getSolToken();
+    const solToken = await getSolToken(TokenAPI);
     // Get all Tokens
     const accountsForWallet = await TokenAPI.getAccountsForWallet();
 

@@ -1,7 +1,7 @@
-import { complement, identity, isNil, memoizeWith } from 'ramda';
+import { complement, identity, isNil, memoizeWith, mergeAll, splitEvery } from 'ramda';
 import assert from 'ts-invariant';
 
-import tokenConfig from 'api/token/token.config';
+import tokenList from 'api/token/token.config';
 import { cryptoCompareApiKey } from 'config/constants';
 import { ExtendedCluster } from 'utils/types';
 
@@ -82,22 +82,38 @@ export const APIFactory = memoizeWith(
   (cluster: ExtendedCluster): API => {
     assert(cryptoCompareApiKey, 'Define crypto compare api key in .env');
 
-    const tokenSymbols = tokenConfig[cluster]?.map((token) => token.tokenSymbol) || [];
-    tokenSymbols.push('SOL');
+    const tokenSymbols =
+      tokenList
+        .filterByClusterSlug(cluster)
+        .excludeByTag('lp-token')
+        .excludeByTag('nft')
+        .excludeByTag('leveraged')
+        .excludeByTag('bull')
+        .excludeByTag('wormhole')
+        .getList()
+        .map((token) => token.symbol) || [];
 
     const getRatesMarkets = async (): Promise<Array<MarketRate>> => {
       try {
-        const res = await fetch(
-          `${CRYPTO_COMPARE_API_URL}/pricemulti?api_key=${cryptoCompareApiKey}&fsyms=${tokenSymbols.join(
-            ',',
-          )}&tsyms=${CURRENCY}`,
+        const chunks = splitEvery(50, tokenSymbols);
+
+        const results = await Promise.all(
+          chunks.map(async (chunk) => {
+            const res = await fetch(
+              `${CRYPTO_COMPARE_API_URL}/pricemulti?api_key=${cryptoCompareApiKey}&fsyms=${chunk.join(
+                ',',
+              )}&tsyms=${CURRENCY}`,
+            );
+
+            if (!res.ok) {
+              throw new Error('getRatesMarkets something wrong');
+            }
+
+            return (await res.json()) as OrderbooksResponse;
+          }),
         );
 
-        if (!res.ok) {
-          throw new Error('getRatesMarkets something wrong');
-        }
-
-        const result = (await res.json()) as OrderbooksResponse;
+        const result = mergeAll(results);
 
         const rates = tokenSymbols.map((symbol) =>
           result[symbol] ? new MarketRate(symbol, result[symbol][CURRENCY]) : null,

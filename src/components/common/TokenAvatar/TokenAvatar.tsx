@@ -1,14 +1,14 @@
-import React, { FunctionComponent, HTMLAttributes } from 'react';
+import React, { FunctionComponent, HTMLAttributes, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 
 import { styled } from '@linaria/react';
 import classNames from 'classnames';
 
-import tokenConfig, { SOL_AVATAR_URL } from 'api/token/token.config';
+import tokenList from 'api/token/token.config';
 import { Avatar } from 'components/ui';
 import { RootState } from 'store/rootReducer';
 
-import ftxImage from './images/ftx.png';
+import wrappedImage from './images/wrapped.svg';
 
 const Wrapper = styled.div`
   position: relative;
@@ -35,11 +35,11 @@ const WrappedBy = styled.div`
   border-radius: 4px;
   filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.25));
 
-  &.isSollet {
-    background-image: url(${ftxImage});
+  &.isWrapped {
+    background-image: url(${wrappedImage});
     background-repeat: no-repeat;
     background-position: center;
-    background-size: 13px 13px;
+    background-size: 16px 16px;
   }
 `;
 
@@ -56,27 +56,24 @@ export const TokenAvatar: FunctionComponent<Props & HTMLAttributes<HTMLDivElemen
   ...props
 }) => {
   const cluster = useSelector((state: RootState) => state.wallet.cluster);
+  const tokenInfo = tokenList
+    .filterByClusterSlug(cluster)
+    .getList()
+    .find((token) => token.symbol === symbol);
 
-  let newSrc: string | undefined = src;
-  let wrappedBy: string | undefined;
-
-  if (!src) {
-    if (symbol === 'SOL') {
-      newSrc = SOL_AVATAR_URL;
-    } else {
-      const tokenInfo = tokenConfig[cluster]?.find((token) => token.tokenSymbol === symbol);
-      if (tokenInfo) {
-        newSrc = tokenInfo?.icon;
-        wrappedBy = tokenInfo?.wrappedBy;
-      }
-    }
-  }
+  const isWrapped = useMemo(() => tokenInfo?.tags?.find((tag) => tag.includes('wrapped')), [
+    tokenInfo,
+  ]);
 
   return (
-    <Wrapper className={classNames(className, { isNotExists: !newSrc })}>
-      <AvatarStyled src={newSrc ? `${process.env.PUBLIC_URL}${newSrc}` : undefined} {...props} />
-      {wrappedBy ? (
-        <WrappedBy className={classNames({ isSollet: wrappedBy === 'sollet' })} />
+    <Wrapper className={classNames(className, { isNotExists: !tokenInfo?.logoURI })}>
+      <AvatarStyled src={tokenInfo?.logoURI} {...props} />
+      {isWrapped ? (
+        <WrappedBy
+          className={classNames({
+            isWrapped,
+          })}
+        />
       ) : undefined}
     </Wrapper>
   );

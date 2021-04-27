@@ -1,4 +1,5 @@
 import { AccountLayout, MintLayout, Token as SPLToken } from '@solana/spl-token';
+import { TokenInfo } from '@solana/spl-token-registry';
 import {
   Account,
   AccountInfo,
@@ -22,7 +23,7 @@ import {
   sendTransactionFromAccount,
 } from 'api/wallet';
 import { airdropKey } from 'config/constants';
-import { SYSTEM_PROGRAM_ID } from 'constants/solana/bufferLayouts';
+import { SYSTEM_PROGRAM_ID, WRAPPED_SOL_MINT } from 'constants/solana/bufferLayouts';
 import { CacheTTL } from 'lib/cachettl';
 import { toDecimal } from 'utils/amount';
 import { makeNewAccountInstruction } from 'utils/transaction';
@@ -30,7 +31,7 @@ import { ExtendedCluster } from 'utils/types';
 
 import { ACCOUNT_UPDATED_EVENT, AccountListener, AccountUpdateEvent } from './AccountListener';
 import { Token } from './Token';
-import tokenConfig, { SOL_AVATAR_URL, SOL_COLOR, TokenConfig } from './token.config';
+import tokenList from './token.config';
 import { TokenAccount } from './TokenAccount';
 
 export const TOKEN_PROGRAM_ID = new PublicKey('TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA');
@@ -62,6 +63,7 @@ export interface API {
   updateTokenAccountInfo: (tokenAccount: TokenAccount) => Promise<TokenAccount | null>;
   getAccountsForToken: (token: Token) => Promise<TokenAccount[]>;
   getAccountsForWallet: (owner?: PublicKey) => Promise<TokenAccount[]>;
+  getConfigForToken: (address: PublicKey) => TokenInfo | null;
   precacheTokenAccounts: (owner: PublicKey) => Promise<void>;
   createToken: (decimals?: number, mintAuthority?: PublicKey) => Promise<Token>;
   createAccountForToken: (token: Token, owner?: PublicKey) => Promise<TokenAccount>;
@@ -128,14 +130,14 @@ export const APIFactory = memoizeWith(
      * Given a token address, check the config to see if the name and symbol are known for this token
      * @param address
      */
-    const getConfigForToken = (address: PublicKey): TokenConfig | null => {
-      const clusterConfig = tokenConfig[cluster];
+    const getConfigForToken = (address: PublicKey): TokenInfo | null => {
+      const clusterConfig = tokenList.filterByClusterSlug(cluster).getList();
 
       if (!clusterConfig) {
         return null;
       }
 
-      const configForToken = find(propEq('mintAddress', address.toBase58()), clusterConfig);
+      const configForToken = find(propEq('address', address.toBase58()), clusterConfig);
 
       if (!configForToken) {
         return null;
@@ -176,10 +178,10 @@ export const APIFactory = memoizeWith(
         mintInfo.decimals,
         mintInfo.supply,
         mintInfo.mintAuthority || undefined, // maps a null mintAuthority to undefined
-        configForToken?.tokenName,
-        configForToken?.tokenSymbol,
-        configForToken?.color,
-        configForToken?.icon,
+        configForToken?.name,
+        configForToken?.symbol,
+        undefined, // configForToken?.color,
+        configForToken?.logoURI,
       );
     };
 
@@ -239,10 +241,10 @@ export const APIFactory = memoizeWith(
           mintInfo.decimals,
           mintInfo.supply,
           mintInfo.mintAuthority ? new PublicKey(mintInfo.mintAuthority) : undefined, // maps a null mintAuthority to undefined
-          configForToken?.tokenName,
-          configForToken?.tokenSymbol,
-          configForToken?.color,
-          configForToken?.icon,
+          configForToken?.name,
+          configForToken?.symbol,
+          undefined, // configForToken?.color,
+          configForToken?.logoURI,
         );
 
         // set cache
@@ -255,14 +257,14 @@ export const APIFactory = memoizeWith(
     });
 
     const getTokens = async (): Promise<Token[]> => {
-      const clusterConfig = tokenConfig[cluster];
+      const clusterConfig = tokenList.filterByClusterSlug(cluster).getList();
 
       if (!clusterConfig) {
         return [];
       }
 
       const tokensAddresses = clusterConfig.map(
-        (config: TokenConfig) => new PublicKey(config.mintAddress),
+        (config: TokenInfo) => new PublicKey(config.address),
       );
 
       return tokensInfo(tokensAddresses);
@@ -304,6 +306,8 @@ export const APIFactory = memoizeWith(
         );
       }
 
+      const mintTokenInfo = getConfigForToken(WRAPPED_SOL_MINT);
+
       // For SOL simulated token
       if (account.equals(getWallet().pubkey)) {
         const balance = await connection.getBalance(account);
@@ -314,8 +318,8 @@ export const APIFactory = memoizeWith(
           undefined,
           'Solana',
           'SOL',
-          SOL_COLOR,
-          SOL_AVATAR_URL,
+          undefined, // SOL_COLOR,
+          mintTokenInfo?.logoURI,
         );
 
         return new TokenAccount(mint, SYSTEM_PROGRAM_ID, SYSTEM_PROGRAM_ID, account, balance);
@@ -330,8 +334,8 @@ export const APIFactory = memoizeWith(
           undefined,
           'Solana',
           'SOL',
-          SOL_COLOR,
-          SOL_AVATAR_URL,
+          undefined, // SOL_COLOR,
+          mintTokenInfo?.logoURI,
         );
 
         return new TokenAccount(
@@ -894,6 +898,7 @@ export const APIFactory = memoizeWith(
       approve,
       getAccountsForToken,
       getAccountsForWallet,
+      getConfigForToken,
       precacheTokenAccounts,
       listenToTokenAccountChanges,
       closeAccount,

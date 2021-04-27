@@ -6,7 +6,6 @@ import { styled } from '@linaria/react';
 import { TokenAccount } from 'api/token/TokenAccount';
 import { LoaderBlock } from 'components/common/LoaderBlock';
 import { Widget } from 'components/common/Widget';
-import { RootState } from 'store/rootReducer';
 import { rateSelector } from 'store/selectors/rates';
 
 import { DonutChart, DonutChartData } from '../DonutChart';
@@ -59,10 +58,10 @@ type Props = {
 };
 
 export const TotalBalanceWidget: FunctionComponent<Props> = ({ onSymbolChange }) => {
-  const tokenAccounts = useSelector((state: RootState) =>
+  const tokenAccounts = useSelector((state) =>
     state.wallet.tokenAccounts.map((account) => TokenAccount.from(account)),
   );
-  const state = useSelector((currentState: RootState) => currentState);
+  const state = useSelector((currentState) => currentState);
 
   const totalBalance = useMemo(
     () =>
@@ -117,7 +116,6 @@ export const TotalBalanceWidget: FunctionComponent<Props> = ({ onSymbolChange })
       }
 
       const rate = rateSelector(tokenAccount.mint.symbol)(state);
-
       if (!rate) {
         return;
       }
