@@ -101,7 +101,7 @@ export const APIFactory = memoizeWith(
         (inst) =>
           inst.programId.equals(swapProgramId) ||
           inst.programId.toBase58() === '9qvG1zUp8xF1Bi4m6UdRNby1BAAuaDrUxSpv4CmRRMjL' || // main old swap
-          inst.programId.toBase58() === 'DjVE6JNiYqPL2QXyCUUh8rNjHrbz9hXHNYt99MQ59qw1', // main ocra
+          inst.programId.toBase58() === 'DjVE6JNiYqPL2QXyCUUh8rNjHrbz9hXHNYt99MQ59qw1', // main orca
       );
       if (swapInstructionIndex && instructions[swapInstructionIndex]) {
         const swapInstruction = instructions[swapInstructionIndex] as PartiallyDecodedInstruction;

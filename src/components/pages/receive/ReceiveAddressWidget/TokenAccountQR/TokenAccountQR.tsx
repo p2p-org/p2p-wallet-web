@@ -101,6 +101,25 @@ const QRCodeBg = styled.div`
   opacity: 0.05;
 `;
 
+const Address = styled.div`
+  margin-top: 12px;
+
+  color: #202020;
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 140%;
+
+  cursor: pointer;
+
+  &:hover {
+    color: #458aff;
+  }
+
+  &.isAddressCopied {
+    color: #2db533;
+  }
+`;
+
 const AddWrapper = styled.div`
   position: absolute;
 
@@ -281,6 +300,7 @@ export const TokenAccountQR: FunctionComponent<Props> = ({
   const [isExecuting, setIsExecuting] = useState(false);
   const [isError, setError] = useState(false);
   const [isMintCopied, setIsMintCopied] = useState(false);
+  const [isAddressCopied, setIsAddressCopied] = useState(false);
   const [isNew, setIsNew] = useState(false);
   const [isImageCopied, setIsImageCopied] = useState(false);
   const [isImageCopyAvailable, setIsImageCopyAvailable] = useState(false);
@@ -370,6 +390,11 @@ export const TokenAccountQR: FunctionComponent<Props> = ({
                 />
               </QRCodeWrapper>
             </QRContent>
+            <Address
+              className={classNames({ isAddressCopied })}
+              onClick={handleCopyClick(tokenAccount.address.toBase58(), setIsAddressCopied)}>
+              {isAddressCopied ? 'Address Copied!' : tokenAccount.address.toBase58()}
+            </Address>
           </QRWrapper>
         ) : (
           <QRWrapper>

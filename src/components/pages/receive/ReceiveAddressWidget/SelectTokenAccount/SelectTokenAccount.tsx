@@ -377,7 +377,7 @@ export const SelectTokenAccount: FunctionComponent<Props> = ({
           )}
           {tokenAccount ? (
             <TokenAccountAddress ref={tokenAddressRef} onClick={handleCopyClick}>
-              {tokenAccount.address.toBase58()}
+              {shortAddress(tokenAccount.address.toBase58())}
             </TokenAccountAddress>
           ) : (
             <TokenAccountAddress>Add token to your list to see token address</TokenAccountAddress>
