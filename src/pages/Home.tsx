@@ -55,16 +55,17 @@ const TitleBold = styled.strong`
   font-weight: 900;
 `;
 
-const AppImage = styled.div`
+const AppImg = styled.img`
   position: absolute;
   z-index: 0;
 
-  width: 820px;
-  height: 526px;
+  display: block;
+
+  width: 110%;
+  min-width: 820px;
   margin-top: 50px;
 
-  background: url(${app}) no-repeat 50%;
-  background-size: 820px 526px;
+  filter: drop-shadow(-34px 42px 100px rgba(0, 0, 0, 0.05));
 `;
 
 const Right = styled.div`
@@ -169,7 +170,7 @@ export const Home: FunctionComponent = () => {
         <Title>
           Your crypto <TitleBold>is starting here</TitleBold>
         </Title>
-        <AppImage />
+        <AppImg src={app} />
       </Left>
       <Right>
         <Navigate>
