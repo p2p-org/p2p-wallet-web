@@ -11,7 +11,7 @@ import {
 } from '@solana/web3.js';
 import BN from 'bn.js';
 import BufferLayout, { blob } from 'buffer-layout';
-import { complement, find, identity, isNil, memoizeWith, path, propEq } from 'ramda';
+import { complement, find, identity, isNil, memoizeWith, path, propEq, splitEvery } from 'ramda';
 import assert from 'ts-invariant';
 
 import { getConnection } from 'api/connection';
@@ -30,6 +30,7 @@ import { makeNewAccountInstruction } from 'utils/transaction';
 import { ExtendedCluster } from 'utils/types';
 
 import { ACCOUNT_UPDATED_EVENT, AccountListener, AccountUpdateEvent } from './AccountListener';
+import colors from './colors.config';
 import { Token } from './Token';
 import tokenList from './token.config';
 import { TokenAccount } from './TokenAccount';
@@ -180,7 +181,7 @@ export const APIFactory = memoizeWith(
         mintInfo.mintAuthority || undefined, // maps a null mintAuthority to undefined
         configForToken?.name,
         configForToken?.symbol,
-        undefined, // configForToken?.color,
+        configForToken?.symbol && colors[configForToken.symbol],
         configForToken?.logoURI,
       );
     };
@@ -210,16 +211,35 @@ export const APIFactory = memoizeWith(
 
     const tokensInfo = retryableProxy<PublicKey[], Token[]>(async (mints: PublicKey[]) => {
       const publicKeys = mints.map((publicKey) => publicKey.toBase58());
+      const chunks = splitEvery(100, publicKeys);
 
-      const getMultipleAccountsResult = <GetMultipleAccountsResultType>(
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-call,no-underscore-dangle
-        await connection._rpcRequest('getMultipleAccounts', [
-          publicKeys,
-          { commitment: connection.commitment, encoding: 'jsonParsed' },
-        ])
+      const results = await Promise.all(
+        chunks.map(async (chunk) => {
+          const getMultipleAccountsResult = <GetMultipleAccountsResultType>(
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-call,no-underscore-dangle
+            await connection._rpcRequest('getMultipleAccounts', [
+              chunk,
+              { commitment: connection.commitment, encoding: 'jsonParsed' },
+            ])
+          );
+
+          return path<AccountInfo<Buffer | ParsedAccountData>[] | null>(
+            ['result', 'value'],
+            getMultipleAccountsResult,
+          );
+        }),
       );
+
+      // eslint-disable-next-line unicorn/no-reduce
+      const result = results.reduce((prev, cur) => {
+        if (cur) {
+          return prev?.concat(cur);
+        }
+
+        return prev;
+      }, []);
 
       const tokens: Token[] = [];
 
@@ -228,7 +248,7 @@ export const APIFactory = memoizeWith(
           decimals: number;
           supply: number;
           mintAuthority: string;
-        }>(['result', 'value', index, 'data', 'parsed', 'info'], getMultipleAccountsResult);
+        }>([index, 'data', 'parsed', 'info'], result);
 
         if (!mintInfo) {
           return;
@@ -243,7 +263,7 @@ export const APIFactory = memoizeWith(
           mintInfo.mintAuthority ? new PublicKey(mintInfo.mintAuthority) : undefined, // maps a null mintAuthority to undefined
           configForToken?.name,
           configForToken?.symbol,
-          undefined, // configForToken?.color,
+          configForToken?.symbol && colors[configForToken.symbol],
           configForToken?.logoURI,
         );
 
@@ -318,7 +338,7 @@ export const APIFactory = memoizeWith(
           undefined,
           'Solana',
           'SOL',
-          undefined, // SOL_COLOR,
+          colors.SOL,
           mintTokenInfo?.logoURI,
         );
 
@@ -334,7 +354,7 @@ export const APIFactory = memoizeWith(
           undefined,
           'Solana',
           'SOL',
-          undefined, // SOL_COLOR,
+          colors.SOL,
           mintTokenInfo?.logoURI,
         );
 

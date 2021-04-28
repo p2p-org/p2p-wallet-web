@@ -67,7 +67,7 @@ export const TokenAvatar: FunctionComponent<Props & HTMLAttributes<HTMLDivElemen
 
   return (
     <Wrapper className={classNames(className, { isNotExists: !tokenInfo?.logoURI })}>
-      <AvatarStyled src={tokenInfo?.logoURI} {...props} />
+      <AvatarStyled src={tokenInfo?.logoURI || undefined} {...props} />
       {isWrapped ? (
         <WrappedBy
           className={classNames({

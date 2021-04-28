@@ -12,6 +12,7 @@ import { mergeDeepRight } from 'ramda';
 import { APIFactory as FeeRelayerAPIFactory } from 'api/feeRelayer';
 import { API, APIFactory as TokenAPIFactory, TransferParameters } from 'api/token';
 import { AccountListener } from 'api/token/AccountListener';
+import colors from 'api/token/colors.config';
 import { Token } from 'api/token/Token';
 import { SerializableTokenAccount, TokenAccount } from 'api/token/TokenAccount';
 import * as WalletAPI from 'api/wallet';
@@ -79,7 +80,7 @@ const getSolToken = async (TokenAPI: API) => {
     undefined,
     'Solana',
     'SOL',
-    undefined, // ,
+    colors.SOL,
     tokenInfo?.logoURI,
   );
   return new TokenAccount(mint, SYSTEM_PROGRAM_ID, SYSTEM_PROGRAM_ID, publicKey, balance);
