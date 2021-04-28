@@ -1928,10 +1928,10 @@
     json-to-pretty-yaml "^1.2.2"
     mkdirp "1.0.4"
 
-"@solana/spl-token@^0.1.2":
-  version "0.1.2"
-  resolved "https://registry.yarnpkg.com/@solana/spl-token/-/spl-token-0.1.2.tgz#6292629dddc8d4cb7da03c89e2446bf1d0c7006c"
-  integrity sha512-Z6WBrOqybwuU2sGPxMxF6Y0UjU/DI575RpQaSYMtLjENOVqgENN0Vj2lyp4bqLwP5htDa126tJElcVEPKntyLg==
+"@solana/spl-token@^0.1.3":
+  version "0.1.3"
+  resolved "https://registry.yarnpkg.com/@solana/spl-token/-/spl-token-0.1.3.tgz#6bf7c1a74cd95dabe8b8164e4c13b987db5be3bd"
+  integrity sha512-M251on5RDz8VQXoKoQPeLANEyI4qhThKLZBeUiLbFZ93KRgouGfmV5D/bUZXkLF75PlLcARIzU9ptoHOlZ6SbQ==
   dependencies:
     "@babel/runtime" "^7.10.5"
     "@solana/web3.js" "^1.2.2"

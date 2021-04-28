@@ -1,10 +1,10 @@
 import { Token as SPLToken } from '@solana/spl-token';
 import {
   PublicKey,
+  SignaturePubkeyPair,
   SystemProgram,
   Transaction,
   TransactionInstruction,
-  TransactionInstructionCtorFields,
 } from '@solana/web3.js';
 import bs58 from 'bs58';
 import { identity, memoizeWith } from 'ramda';
@@ -15,11 +15,6 @@ import { TokenAccount } from 'api/token/TokenAccount';
 import { getWallet } from 'api/wallet';
 import { feeRelayerUrl } from 'config/constants';
 import { ExtendedCluster } from 'utils/types';
-
-type SignaturePubkeyPair = {
-  signature: Buffer | null;
-  publicKey: PublicKey;
-};
 
 type TransferSolParams = {
   sender_pubkey: string;
@@ -41,7 +36,7 @@ type TransferSPLTokenParams = {
 };
 
 export interface API {
-  transfer: (parameters: TransferParameters, tokenAccount?: TokenAccount) => Promise<string>;
+  transfer: (parameters: TransferParameters, tokenAccount: TokenAccount) => Promise<string>;
 }
 
 const getFeePayerPubkey = async (): Promise<string> => {
@@ -92,10 +87,7 @@ export const APIFactory = memoizeWith(
   (cluster: ExtendedCluster): API => {
     const connection = getConnection(cluster);
 
-    const makeTransaction = async (
-      feePayer: PublicKey,
-      instructions: (TransactionInstruction | TransactionInstructionCtorFields)[],
-    ) => {
+    const makeTransaction = async (feePayer: PublicKey, instructions: TransactionInstruction[]) => {
       const { blockhash: recentBlockhash } = await connection.getRecentBlockhash();
 
       const transaction = new Transaction({
@@ -106,39 +98,45 @@ export const APIFactory = memoizeWith(
 
       const signedTransacton = await getWallet().sign(transaction);
 
-      const { signature } = signedTransacton.signatures.find((sign: SignaturePubkeyPair) =>
+      const signaturePubkeyPair = signedTransacton.signatures.find((sign: SignaturePubkeyPair) =>
         sign.publicKey.equals(getWallet().pubkey),
       );
 
       return {
         blockhash: recentBlockhash,
-        signature: bs58.encode(signature),
+        signature: bs58.encode(signaturePubkeyPair?.signature),
       };
     };
 
     const transfer = async (
       parameters: TransferParameters,
-      tokenAccount?: TokenAccount,
+      tokenAccount: TokenAccount,
     ): Promise<string> => {
       if (!feeRelayerUrl) {
         throw new Error('feeRelayerUrl must be set');
       }
 
-      const isTransferSol = parameters.source.equals(getWallet().pubkey);
+      const { source, destination, amount } = parameters;
 
+      const isTransferSol = source.equals(getWallet().pubkey);
+
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       const transferInstruction = isTransferSol
         ? SystemProgram.transfer({
-            fromPubkey: parameters.source,
-            toPubkey: parameters.destination,
-            lamports: parameters.amount,
+            fromPubkey: source,
+            toPubkey: destination,
+            lamports: amount,
           })
-        : SPLToken.createTransferInstruction(
+        : // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+          SPLToken.createTransferCheckedInstruction(
             TOKEN_PROGRAM_ID,
-            parameters.source,
-            parameters.destination,
-            getWallet().pubkey,
+            source,
+            tokenAccount.mint.address,
+            destination,
+            tokenAccount.owner,
             [],
-            parameters.amount,
+            amount,
+            tokenAccount.mint.decimals,
           );
 
       const feePayer = await getFeePayerPubkey();
@@ -151,17 +149,17 @@ export const APIFactory = memoizeWith(
         ? {
             blockhash,
             signature,
-            sender_pubkey: parameters.source.toBase58(),
-            lamports: parameters.amount,
-            recipient_pubkey: parameters.destination.toBase58(),
+            sender_pubkey: source.toBase58(),
+            lamports: amount,
+            recipient_pubkey: destination.toBase58(),
           }
         : {
-            sender_token_account_pubkey: parameters.source.toBase58(),
-            recipient_pubkey: parameters.destination.toBase58(),
-            token_mint_pubkey: tokenAccount?.mint.address.toBase58(),
-            authority_pubkey: tokenAccount?.owner.toBase58(),
-            amount: parameters.amount,
-            decimals: tokenAccount?.mint.decimals || 6,
+            sender_token_account_pubkey: source.toBase58(),
+            recipient_pubkey: destination.toBase58(),
+            token_mint_pubkey: tokenAccount.mint.address.toBase58(),
+            authority_pubkey: tokenAccount.owner.toBase58(),
+            amount,
+            decimals: tokenAccount.mint.decimals,
             signature,
             blockhash,
           };
