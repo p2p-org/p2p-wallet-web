@@ -3,14 +3,13 @@ import { Link } from 'react-router-dom';
 
 import { styled } from '@linaria/react';
 
-import { up } from '../styles/breakpoints';
-import LogoImg from './logo.png';
+import { up, useBreakpoint } from '../styles/breakpoints';
 
 const Wrapper = styled.div`
   display: flex;
   align-items: center;
   height: 64px;
-  padding: 0 50px;
+  padding: 0 20px 0 10px;
 `;
 
 const Left = styled.div`
@@ -20,11 +19,27 @@ const Left = styled.div`
   justify-content: flex-start;
 `;
 
+const HamburgerIcon = styled.div`
+  width: 44px;
+  height: 44px;
+  margin-right: 10px;
+
+  background: url('./hamburger.svg') no-repeat 50% 50%;
+  background-size: 24px 24px;
+  cursor: pointer;
+`;
+
+const LogoWrapper = styled.div`
+  display: flex;
+  align-items: center;
+`;
+
 const Logo = styled.div`
   width: 80px;
   height: 18px;
+  margin-left: 10px;
 
-  background: url('${LogoImg}') no-repeat 50% 50%;
+  background: url('./logo.svg') no-repeat 50% 50%;
   background-size: 80px 18px;
 `;
 
@@ -45,14 +60,10 @@ const Wallet = styled.div`
 `;
 
 const Center = styled.div`
-  display: none;
-
-  ${up.desktop} {
-    display: flex;
-    flex: 1;
-    align-items: center;
-    justify-content: center;
-  }
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
 `;
 
 const NavLink = styled.a`
@@ -69,14 +80,10 @@ const NavLink = styled.a`
 `;
 
 const Right = styled.div`
-  display: none;
-
-  ${up.tablet} {
-    display: flex;
-    flex: 1;
-    align-items: center;
-    justify-content: flex-end;
-  }
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: flex-end;
 `;
 
 const Button = styled.a`
@@ -120,28 +127,46 @@ const Button = styled.a`
   }
 `;
 
-export const Header: FC = () => {
+type Props = {
+  onDrawerToggle: () => void;
+};
+
+export const Header: FC<Props> = ({ onDrawerToggle }) => {
+  const isTablet = useBreakpoint(up.tablet);
+  const isDesktop = useBreakpoint(up.desktop);
+
+  const handleHamburgerClick = () => {
+    onDrawerToggle();
+  };
+
   return (
     <Wrapper>
       <Left>
-        <Logo />
-        <Delimiter />
-        <Wallet>Wallet</Wallet>
+        {!isDesktop ? <HamburgerIcon onClick={handleHamburgerClick} /> : undefined}
+        <LogoWrapper>
+          <Logo />
+          <Delimiter />
+          <Wallet>Wallet</Wallet>
+        </LogoWrapper>
       </Left>
-      <Center>
-        <NavLink href="#explore">Explore</NavLink>
-        <NavLink href="#about">About</NavLink>
-        <NavLink href="#recent">Recent updates</NavLink>
-        <NavLink href="#faq">FAQ</NavLink>
-      </Center>
-      <Right>
-        <Link to="/login" component={Button}>
-          I have a wallet
-        </Link>
-        <Link to="/signup" component={Button} className="white">
-          Create wallet
-        </Link>
-      </Right>
+      {isDesktop ? (
+        <Center>
+          <NavLink href="#explore">Explore</NavLink>
+          <NavLink href="#about">About</NavLink>
+          <NavLink href="#recent">Recent updates</NavLink>
+          <NavLink href="#faq">FAQ</NavLink>
+        </Center>
+      ) : undefined}
+      {isTablet ? (
+        <Right>
+          <Link to="/login" component={Button}>
+            I have a wallet
+          </Link>
+          <Link to="/signup" component={Button} className="white">
+            Create wallet
+          </Link>
+        </Right>
+      ) : undefined}
     </Wrapper>
   );
 };

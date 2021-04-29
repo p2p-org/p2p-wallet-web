@@ -1,9 +1,10 @@
-import React, { FC } from 'react';
+import React, { FC, useState } from 'react';
 import { Helmet } from 'react-helmet';
 
 import { css } from '@linaria/core';
 import { styled } from '@linaria/react';
 
+import { Drawer } from 'components/pages/landing/common/Drawer';
 import { Features } from 'components/pages/landing/Features';
 import { Footer } from 'components/pages/landing/Footer';
 import { Functions } from 'components/pages/landing/Functions';
@@ -31,13 +32,20 @@ export const global = css`
 `;
 
 export const Landing: FC = () => {
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+
+  const handleDrawerToggle = () => {
+    setIsDrawerOpen(!isDrawerOpen);
+  };
+
   return (
     <>
       <Helmet>
         <body className="landing" />
       </Helmet>
       <Wrapper>
-        <Header />
+        <Drawer isOpen={isDrawerOpen} onDrawerClose={handleDrawerToggle} />
+        <Header onDrawerToggle={handleDrawerToggle} />
         <Top />
         <Functions />
         <Features />
