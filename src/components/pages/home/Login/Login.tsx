@@ -5,10 +5,12 @@ import { useHistory } from 'react-router-dom';
 import { styled } from '@linaria/react';
 import { unwrapResult } from '@reduxjs/toolkit';
 import * as bip39 from 'bip39';
+import classNames from 'classnames';
 
 import { WalletType } from 'api/wallet';
 import { ToastManager } from 'components/common/ToastManager';
 import { Button } from 'components/pages/home/common/Button';
+import { Icon } from 'components/ui';
 import { localMnemonic } from 'config/constants';
 import { connect, selectType } from 'store/slices/wallet/WalletSlice';
 import { sleep } from 'utils/common';
@@ -110,8 +112,15 @@ const DelimiterText = styled.div`
   background: #fff;
 `;
 
+const SecurityWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+
+  margin-bottom: 32px;
+`;
+
 const SecurityKey = styled.span`
-  margin-bottom: 12px;
+  margin-bottom: 8px;
 
   color: #161616;
   font-weight: 500;
@@ -122,22 +131,44 @@ const SecurityKey = styled.span`
 
 const SeedTextarea = styled.textarea`
   min-height: 92px;
-  margin-bottom: 24px;
   padding: 15px;
 
   color: #161616;
-  font-weight: 500;
   font-size: 16px;
   font-family: 'Aktiv Grotesk Corp', sans-serif;
   line-height: 22px;
 
   background: #f6f6f8;
-  border: none;
+  border: 1px solid transparent;
   border-radius: 12px;
+
+  &.hasError {
+    border-color: #f43d3d;
+  }
 
   &::placeholder {
     color: #1616164c;
   }
+`;
+
+const Error = styled.div`
+  display: flex;
+  align-items: center;
+
+  margin-top: 8px;
+
+  color: #f43d3d;
+  font-size: 16px;
+  font-family: 'Aktiv Grotesk Corp', sans-serif;
+  line-height: 24px;
+`;
+
+const WarningIcon = styled(Icon)`
+  width: 16px;
+  height: 16px;
+  margin-right: 12px;
+
+  color: #f43d3d;
 `;
 
 type Props = {
@@ -148,7 +179,7 @@ export const Login: FC<Props> = ({ setIsLoading }) => {
   const history = useHistory();
   const dispatch = useDispatch();
   const [mnemonic, setMnemonic] = useState(localMnemonic || '');
-  const [error, setError] = useState(false);
+  const [hasError, setHasError] = useState(false);
 
   // TODO: password process
   const password = '';
@@ -156,12 +187,6 @@ export const Login: FC<Props> = ({ setIsLoading }) => {
   const handleSeedChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const { value } = e.target;
     setMnemonic(value);
-
-    if (bip39.validateMnemonic(value)) {
-      setError(false);
-    } else if (!error) {
-      setError(true);
-    }
   };
 
   const handleConnectByClick = (type: WalletType) => () => {
@@ -181,6 +206,14 @@ export const Login: FC<Props> = ({ setIsLoading }) => {
     });
   };
 
+  const handleSeedBlur = () => {
+    if (bip39.validateMnemonic(mnemonic)) {
+      setHasError(false);
+    } else if (!hasError) {
+      setHasError(true);
+    }
+  };
+
   const handleContinueClick = () => {
     batch(async () => {
       try {
@@ -198,7 +231,7 @@ export const Login: FC<Props> = ({ setIsLoading }) => {
     });
   };
 
-  const isDisabled = !mnemonic || error;
+  const isDisabled = !mnemonic || hasError;
 
   return (
     <Wrapper>
@@ -216,8 +249,22 @@ export const Login: FC<Props> = ({ setIsLoading }) => {
       <Delimiter>
         <DelimiterText>Or use your seed...</DelimiterText>
       </Delimiter>
-      <SecurityKey>Enter security key</SecurityKey>
-      <SeedTextarea placeholder="Seed phrase" value={mnemonic} onChange={handleSeedChange} />
+      <SecurityWrapper>
+        <SecurityKey>Enter security key</SecurityKey>
+        <SeedTextarea
+          placeholder="Seed phrase"
+          value={mnemonic}
+          onChange={handleSeedChange}
+          onBlur={handleSeedBlur}
+          className={classNames({ hasError })}
+        />
+        {hasError ? (
+          <Error>
+            <WarningIcon name="warning" />
+            Incorrect seed phrase
+          </Error>
+        ) : undefined}
+      </SecurityWrapper>
       <Button disabled={isDisabled} onClick={handleContinueClick}>
         Continue
       </Button>
