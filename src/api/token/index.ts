@@ -277,7 +277,13 @@ export const APIFactory = memoizeWith(
     });
 
     const getTokens = async (): Promise<Token[]> => {
-      const clusterConfig = tokenList.filterByClusterSlug(cluster).getList();
+      const clusterConfig = tokenList
+        .filterByClusterSlug(cluster)
+        .excludeByTag('nft')
+        .excludeByTag('leveraged')
+        .excludeByTag('bull')
+        .excludeByTag('lp-token')
+        .getList();
 
       if (!clusterConfig) {
         return [];
