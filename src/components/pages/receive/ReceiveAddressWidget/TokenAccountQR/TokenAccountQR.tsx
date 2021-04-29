@@ -332,7 +332,9 @@ export const TokenAccountQR: FunctionComponent<Props> = ({
           <QRWrapper>
             <QRContent>
               <QRText>
-                {isNew ? 'Now you can receive tokens on your wallet' : 'Scan or copy QR code'}
+                {isNew
+                  ? 'Now you can receive tokens on your wallet'
+                  : 'Scan QR code or copy wallet address'}
               </QRText>
               <QRCodeWrapper
                 className={classNames({ isImageCopyAvailable })}
