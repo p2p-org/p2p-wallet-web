@@ -21,7 +21,7 @@ export interface TokenPairState {
 }
 
 // Web3 does not recognise "localnet" as a cluster
-export type ExtendedCluster = Cluster | 'localnet';
+export type ExtendedCluster = Cluster | 'p2p-mainnet' | 'p2p-2-mainnet' | 'serum-mainnet';
 
 export interface Serializable<T> {
   serialize(): T;

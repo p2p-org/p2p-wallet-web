@@ -1,4 +1,4 @@
-import { clusterApiUrl, Commitment, Connection, SignatureResult } from '@solana/web3.js';
+import { Cluster, clusterApiUrl, Commitment, Connection, SignatureResult } from '@solana/web3.js';
 import { identity, memoizeWith } from 'ramda';
 
 import { clusters, defaultCommitment } from 'config/constants';
@@ -6,7 +6,7 @@ import { ExtendedCluster } from 'utils/types';
 
 import { retryableProxy } from './utils/retryableProxy';
 
-const LOCALNET_URL = 'http://localhost:8899';
+// const LOCALNET_URL = 'http://localhost:8899';
 // const TICK = 5000;
 
 // The default time to wait when confirming a transaction.
@@ -41,11 +41,11 @@ const createConnection = memoizeWith<(network: string) => Connection>(identity, 
 });
 
 export const getNetwork = (cluster: ExtendedCluster): string => {
-  if (cluster === 'localnet') {
-    return LOCALNET_URL;
-  }
+  // if (cluster === 'localnet') {
+  //   return LOCALNET_URL;
+  // }
 
-  return clusters[cluster] || clusterApiUrl(cluster);
+  return clusters[cluster] || clusterApiUrl(cluster as Cluster);
 };
 
 export const getConnection = (cluster?: ExtendedCluster): Connection => {

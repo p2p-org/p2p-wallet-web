@@ -32,7 +32,7 @@ export const airdropKey = (cluster: ExtendedCluster): string | undefined =>
   process.env[`REACT_APP_${cluster.toUpperCase()}_AIRDROP_PRIVATE_KEY`];
 
 export const clusters: {
-  [cluster: string]: string;
+  [cluster in ExtendedCluster]: string;
 } = {
   'p2p-mainnet': 'https://node-1.solana.p2p.org',
   'p2p-2-mainnet': 'https://node-2.solana.p2p.org',
