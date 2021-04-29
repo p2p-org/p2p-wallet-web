@@ -62,6 +62,12 @@ const Wrapper = styled.button`
     background: #f6f6f8;
   }
 
+  &.lightBlue {
+    color: #5887ff;
+
+    background: #f6f6f8;
+  }
+
   &.hollow {
     color: #5887ff;
 
@@ -112,6 +118,7 @@ type Props = {
   light?: boolean;
   gray?: boolean;
   lightGray?: boolean;
+  lightBlue?: boolean;
   hollow?: boolean;
   link?: boolean;
   small?: boolean;
@@ -127,6 +134,7 @@ export const Button: FunctionComponent<Props & React.ButtonHTMLAttributes<HTMLBu
   light,
   gray,
   lightGray,
+  lightBlue,
   link,
   hollow,
   small,
@@ -149,6 +157,7 @@ export const Button: FunctionComponent<Props & React.ButtonHTMLAttributes<HTMLBu
         light,
         gray,
         lightGray,
+        lightBlue,
         link,
         hollow,
         small,

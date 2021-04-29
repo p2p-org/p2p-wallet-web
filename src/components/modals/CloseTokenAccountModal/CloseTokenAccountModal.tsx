@@ -15,11 +15,11 @@ const Wrapper = styled.div`
   display: flex;
   flex-basis: 504px;
   flex-direction: column;
-  padding: 32px 0 24px;
+  padding: 32px 0 0;
 
   overflow: hidden;
 
-  background: #f6f6f8;
+  background: #fff;
 
   border-radius: 15px;
 `;
@@ -28,19 +28,19 @@ const IconWrapper = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
+  width: 44px;
+  height: 44px;
 
   margin: 0 20px;
   padding: 8px;
 
-  background: #f77;
+  background: #ff7777;
   border-radius: 12px;
 `;
 
 const CloseAccountIcon = styled(Icon)`
-  width: 20px;
-  height: 20px;
+  width: 25px;
+  height: 25px;
 
   color: #fff;
 `;
@@ -55,33 +55,36 @@ const Header = styled.div`
 
 const Description = styled.div`
   margin-top: 12px;
-  padding: 0 20px;
-  padding-bottom: 32px;
+  padding: 0 20px 32px;
 
   color: #a3a5ba;
 
   font-weight: 600;
   font-size: 16px;
 
-  border-bottom: 1px solid #fbfbfd;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 `;
 
 const Buttons = styled.div`
-  padding: 24px 20px 0;
+  padding: 24px 20px;
 `;
 
-const ButtonStyled = styled(Button)`
+const ButtonClose = styled(Button)`
   margin-right: 16px;
 
-  color: #f77;
+  color: #f43d3d;
 
-  border: 1px solid #f77;
+  border: 1px solid #f43d3d;
 
   &:disabled {
     background: #f77;
     border: none;
     opacity: 0.5;
   }
+`;
+
+const ButtonCancel = styled(Button)`
+  min-width: 93px;
 `;
 
 type Props = {
@@ -134,12 +137,12 @@ export const CloseTokenAccountModal: FunctionComponent<Props> = ({
         to this address and remove it from your wallet.
       </Description>
       <Buttons>
-        <ButtonStyled disabled={isExecuting} onClick={handleCloseTokenAButtonClick}>
+        <ButtonClose disabled={isExecuting} onClick={handleCloseTokenAButtonClick}>
           Close token account
-        </ButtonStyled>
-        <Button light disabled={isExecuting} onClick={handleCloseButtonClick}>
+        </ButtonClose>
+        <ButtonCancel lightBlue disabled={isExecuting} onClick={handleCloseButtonClick}>
           Cancel
-        </Button>
+        </ButtonCancel>
       </Buttons>
     </Wrapper>
   );
