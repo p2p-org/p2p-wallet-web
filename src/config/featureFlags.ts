@@ -9,5 +9,5 @@ export const featureFlags = {
   [FEATURE_LEFT_NAV_MENU_POFILE]: false,
   [FEATURE_SETTINGS_LIST]: false,
   [FEATURE_ADD_TOKEN_BUTTON]: false,
-  [FEATURE_LANDING]: false,
+  [FEATURE_LANDING]: true,
 };

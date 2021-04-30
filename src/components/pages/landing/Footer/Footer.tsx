@@ -5,7 +5,7 @@ import { styled } from '@linaria/react';
 import { ButtonIOS, ButtonWeb } from 'components/pages/landing/common/Button/Button';
 
 import LogoImg from '../common/images/logo.png';
-import { up, useBreakpoint } from '../styles/breakpoints';
+import { up } from '../styles/breakpoints';
 import LogoP2PImg from './logo.png';
 
 const Wrapper = styled.div`
@@ -244,25 +244,25 @@ const Column = styled.div`
   }
 `;
 
-const AdditionalColumn = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 100%;
-  padding: 39px 0;
-
-  & > :not(:last-child) {
-    margin-bottom: 30px;
-  }
-
-  ${up.mobileLandscape} {
-    padding: 61px 0;
-
-    & > :not(:last-child) {
-      margin-bottom: 43px;
-    }
-  }
-`;
+// const AdditionalColumn = styled.div`
+//   display: flex;
+//   flex-direction: column;
+//   align-items: center;
+//   width: 100%;
+//   padding: 39px 0;
+//
+//   & > :not(:last-child) {
+//     margin-bottom: 30px;
+//   }
+//
+//   ${up.mobileLandscape} {
+//     padding: 61px 0;
+//
+//     & > :not(:last-child) {
+//       margin-bottom: 43px;
+//     }
+//   }
+// `;
 
 const ColumnLink = styled.a`
   display: flex;
@@ -338,9 +338,9 @@ const Bottom = styled.div`
 `;
 
 export const Footer: FC = () => {
-  const isDesktop = useBreakpoint(up.desktop);
-  const isTablet = useBreakpoint(up.tablet);
-  const isMobileLandscape = useBreakpoint(up.mobileLandscape);
+  // const isDesktop = useBreakpoint(up.desktop);
+  // const isTablet = useBreakpoint(up.tablet);
+  // const isMobileLandscape = useBreakpoint(up.mobileLandscape);
 
   return (
     <Wrapper>
@@ -369,65 +369,65 @@ export const Footer: FC = () => {
                   <ColumnLink href="#">Recent Updates</ColumnLink>
                   <ColumnLink href="#">FAQ</ColumnLink>
                 </Column>
-                {isDesktop ? (
-                  <Column>
-                    <ColumnLink href="#" className="gray">
-                      wallet@p2p.org
-                    </ColumnLink>
-                    <ColumnLink href="#" className="gray">
-                      t.me/p2p.org
-                    </ColumnLink>
-                  </Column>
-                ) : undefined}
-                {isMobileLandscape ? (
-                  <Column>
-                    <ColumnLink href="#" className="gray twitter">
-                      @p2pwallet
-                    </ColumnLink>
-                    <ColumnLink href="#" className="gray github">
-                      @p2pwallet
-                    </ColumnLink>
-                    {!isDesktop && isTablet ? (
-                      <>
-                        <ColumnLink href="#" className="gray">
-                          wallet@p2p.org
-                        </ColumnLink>
-                        <ColumnLink href="#" className="gray">
-                          t.me/p2p.org
-                        </ColumnLink>
-                      </>
-                    ) : undefined}
-                  </Column>
-                ) : undefined}
+                {/* {isDesktop ? ( */}
+                {/*  <Column> */}
+                {/*    <ColumnLink href="#" className="gray"> */}
+                {/*      wallet@p2p.org */}
+                {/*    </ColumnLink> */}
+                {/*    <ColumnLink href="#" className="gray"> */}
+                {/*      t.me/p2p.org */}
+                {/*    </ColumnLink> */}
+                {/*  </Column> */}
+                {/* ) : undefined} */}
+                {/* {isMobileLandscape ? ( */}
+                {/*  <Column> */}
+                {/*    <ColumnLink href="#" className="gray twitter"> */}
+                {/*      @p2pwallet */}
+                {/*    </ColumnLink> */}
+                {/*    <ColumnLink href="#" className="gray github"> */}
+                {/*      @p2pwallet */}
+                {/*    </ColumnLink> */}
+                {/*    {!isDesktop && isTablet ? ( */}
+                {/*      <> */}
+                {/*        <ColumnLink href="#" className="gray"> */}
+                {/*          wallet@p2p.org */}
+                {/*        </ColumnLink> */}
+                {/*        <ColumnLink href="#" className="gray"> */}
+                {/*          t.me/p2p.org */}
+                {/*        </ColumnLink> */}
+                {/*      </> */}
+                {/*    ) : undefined} */}
+                {/*  </Column> */}
+                {/* ) : undefined} */}
               </ColumnsWrapper>
             </MiddleContainer>
           </Middle>
-          {!isMobileLandscape ? (
-            <>
-              <DelimiterSection />
-              <AdditionalColumn>
-                <ColumnLink href="#" className="gray twitter">
-                  @p2pwallet
-                </ColumnLink>
-                <ColumnLink href="#" className="gray github">
-                  @p2pwallet
-                </ColumnLink>
-              </AdditionalColumn>
-            </>
-          ) : undefined}
-          {!isTablet ? (
-            <>
-              <DelimiterSection />
-              <AdditionalColumn>
-                <ColumnLink href="#" className="gray">
-                  wallet@p2p.org
-                </ColumnLink>
-                <ColumnLink href="#" className="gray">
-                  t.me/p2p.org
-                </ColumnLink>
-              </AdditionalColumn>
-            </>
-          ) : undefined}
+          {/* {!isMobileLandscape ? ( */}
+          {/*  <> */}
+          {/*    <DelimiterSection /> */}
+          {/*    <AdditionalColumn> */}
+          {/*      <ColumnLink href="#" className="gray twitter"> */}
+          {/*        @p2pwallet */}
+          {/*      </ColumnLink> */}
+          {/*      <ColumnLink href="#" className="gray github"> */}
+          {/*        @p2pwallet */}
+          {/*      </ColumnLink> */}
+          {/*    </AdditionalColumn> */}
+          {/*  </> */}
+          {/* ) : undefined} */}
+          {/* {!isTablet ? ( */}
+          {/*  <> */}
+          {/*    <DelimiterSection /> */}
+          {/*    <AdditionalColumn> */}
+          {/*      <ColumnLink href="#" className="gray"> */}
+          {/*        wallet@p2p.org */}
+          {/*      </ColumnLink> */}
+          {/*      <ColumnLink href="#" className="gray"> */}
+          {/*        t.me/p2p.org */}
+          {/*      </ColumnLink> */}
+          {/*    </AdditionalColumn> */}
+          {/*  </> */}
+          {/* ) : undefined} */}
           <DelimiterSection />
           <Bottom>
             There shoud be something about privacy policy and terms of services, but you can use it

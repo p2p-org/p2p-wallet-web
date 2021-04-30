@@ -1,9 +1,10 @@
 import React, { FC, HTMLAttributes } from 'react';
+import { Link } from 'react-router-dom';
 
 import { styled } from '@linaria/react';
 import classNames from 'classnames';
 
-export const Button = styled.a`
+export const ButtonLink = styled(Link)`
   position: relative;
 
   display: flex;
@@ -88,16 +89,16 @@ type ButtonProps = {
 
 export const ButtonWeb: FC<ButtonProps & HTMLAttributes<HTMLElement>> = ({ glow, className }) => {
   return (
-    <Button className={classNames(className, { glow })}>
+    <ButtonLink to="/login" className={classNames(className, { glow })}>
       <Text className="web">Go to web wallet</Text>
-    </Button>
+    </ButtonLink>
   );
 };
 
 export const ButtonIOS: FC<ButtonProps & HTMLAttributes<HTMLElement>> = ({ glow, className }) => {
   return (
-    <Button className={classNames(className, { glow, green: true })}>
+    <ButtonLink to="#" className={classNames(className, { glow, green: true })}>
       <Text className="ios">Download for iOS</Text>
-    </Button>
+    </ButtonLink>
   );
 };
