@@ -21,6 +21,7 @@ import currency from './assets/currency-icon.svg';
 import db from './assets/db-icon.svg';
 import error from './assets/error-icon.svg';
 import eye from './assets/eye-icon.svg';
+import freeTx from './assets/free-tx-icon.svg';
 import gear from './assets/gear-icon.svg';
 import hide from './assets/hide-icon.svg';
 import home from './assets/home-icon.svg';
@@ -81,6 +82,7 @@ const iconsMap = new Map<string, string>([
   ['error', error],
   ['attention', attention],
   ['clock', clock],
+  ['free-tx', freeTx],
 ]);
 
 export type Props = {

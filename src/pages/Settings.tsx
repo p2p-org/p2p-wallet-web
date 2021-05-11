@@ -251,18 +251,6 @@ export const Settings: FunctionComponent = () => {
                     </Select>
                   }
                 />
-                <Row
-                  icon="card"
-                  title="Use free transactions"
-                  secondary={
-                    <Switch
-                      checked={settings.useFreeTransactions}
-                      onChange={onItemClickHandler({
-                        useFreeTransactions: !settings.useFreeTransactions,
-                      })}
-                    />
-                  }
-                />
               </Feature>
               <Row
                 icon="branch"
@@ -287,6 +275,18 @@ export const Settings: FunctionComponent = () => {
                     checked={settings.isZeroBalancesHidden}
                     onChange={onItemClickHandler({
                       isZeroBalancesHidden: !settings.isZeroBalancesHidden,
+                    })}
+                  />
+                }
+              />
+              <Row
+                icon="free-tx"
+                title="Use free transactions"
+                secondary={
+                  <Switch
+                    checked={settings.useFreeTransactions}
+                    onChange={onItemClickHandler({
+                      useFreeTransactions: !settings.useFreeTransactions,
                     })}
                   />
                 }

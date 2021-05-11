@@ -28,7 +28,7 @@ export interface Serializable<T> {
 }
 
 export type Network = {
-  current: string;
+  current: ExtendedCluster;
   custom?: {
     [property: string]: string;
   };
