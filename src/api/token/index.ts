@@ -10,7 +10,6 @@ import {
   TransactionInstruction,
 } from '@solana/web3.js';
 import BN from 'bn.js';
-import BufferLayout, { blob } from 'buffer-layout';
 import { complement, find, identity, isNil, memoizeWith, path, propEq, splitEvery } from 'ramda';
 import assert from 'ts-invariant';
 

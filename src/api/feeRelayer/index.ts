@@ -121,6 +121,10 @@ const makeTransferTokenInstructionAndParams = (
 
   return {
     instructions: [
+      // TODO: wait for d.ts for SPLToken and remove after that
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
       SPLToken.createTransferCheckedInstruction(
         TOKEN_PROGRAM_ID,
         source,
