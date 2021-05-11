@@ -36,6 +36,9 @@ import tokenList from './token.config';
 import { TokenAccount } from './TokenAccount';
 
 export const TOKEN_PROGRAM_ID = new PublicKey('TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA');
+export const ASSOCIATED_TOKEN_ACCOUNT_PROGRAM_ID: PublicKey = new PublicKey(
+  'ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL',
+);
 
 // Check that was pass same owner
 // https://github.com/project-serum/serum-dex/tree/master/assert-owner
@@ -774,67 +777,38 @@ export const APIFactory = memoizeWith(
       return sendTransaction(transaction);
     };
 
-    const createAndTransferToAccount = async (
+    const createAndTransferToAssociatedTokenAccount = async (
       source: PublicKey,
-      destination: PublicKey,
+      associatedTokenAddress: PublicKey,
+      associatedTokenOwner: PublicKey,
       amount: number,
       mint: PublicKey,
     ): Promise<string> => {
-      const newAccount = new Account();
-
       const instructions = [];
 
-      // AssertOwnerInstruction
-      const dataLayout = BufferLayout.struct([blob(32, 'account')]);
-      const data = Buffer.alloc(dataLayout.span);
-      dataLayout.encode(
-        {
-          account: SystemProgram.programId.toBuffer(),
-        },
-        data,
-      );
-      instructions.push({
-        keys: [{ pubkey: destination, isSigner: false, isWritable: false }],
-        programId: OWNER_VALIDATION_PROGRAM_ID,
-        data,
-      });
-
-      const balanceNeededAccount = await connection.getMinimumBalanceForRentExemption(
-        AccountLayout.span,
-      );
-
       instructions.push(
-        SystemProgram.createAccount({
-          fromPubkey: getWallet().pubkey,
-          newAccountPubkey: newAccount.publicKey,
-          lamports: balanceNeededAccount,
-          space: AccountLayout.span,
-          programId: TOKEN_PROGRAM_ID,
-        }),
-      );
-
-      instructions.push(
-        SPLToken.createInitAccountInstruction(
+        SPLToken.createAssociatedTokenAccountInstruction(
+          ASSOCIATED_TOKEN_ACCOUNT_PROGRAM_ID,
           TOKEN_PROGRAM_ID,
           mint,
-          newAccount.publicKey,
-          destination,
+          associatedTokenAddress,
+          associatedTokenOwner,
+          getWallet().pubkey,
         ),
       );
 
-      // transferBetweenAccountsTxn
       instructions.push(
         SPLToken.createTransferInstruction(
           TOKEN_PROGRAM_ID,
           source,
-          newAccount.publicKey,
+          associatedTokenAddress,
           getWallet().pubkey,
           [],
           amount,
         ),
       );
 
-      const transaction = await makeTransaction(instructions, [newAccount]);
+      const transaction = await makeTransaction(instructions);
 
       return sendTransaction(transaction);
     };
@@ -865,21 +839,26 @@ export const APIFactory = memoizeWith(
         throw new Error('Cannot send to address with zero SOL balances');
       }
 
-      // Try to find Token account by SOL address with highest balance
-      const destinationSplTokenAccount = (
-        await getAccountsForToken(sourceTokenAccountInfo.mint, parameters.destination)
-      ).sort((a, b) => b.balance.cmp(a.balance))[0];
+      const associatedTokenAddress = await SPLToken.getAssociatedTokenAddress(
+        ASSOCIATED_TOKEN_ACCOUNT_PROGRAM_ID,
+        TOKEN_PROGRAM_ID,
+        sourceTokenAccountInfo.mint.address,
+        parameters.destination,
+      );
 
-      if (destinationSplTokenAccount) {
+      const associatedTokenAccountInfo = await connection.getAccountInfo(associatedTokenAddress);
+
+      if (associatedTokenAccountInfo && associatedTokenAccountInfo.owner.equals(TOKEN_PROGRAM_ID)) {
         return transferBetweenSplTokenAccounts(
           parameters.source,
-          destinationSplTokenAccount.address,
+          associatedTokenAddress,
           parameters.amount,
         );
       }
 
-      return createAndTransferToAccount(
+      return createAndTransferToAssociatedTokenAccount(
         parameters.source,
+        associatedTokenAddress,
         parameters.destination,
         parameters.amount,
         sourceTokenAccountInfo.mint.address,

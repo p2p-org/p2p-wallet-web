@@ -10,7 +10,11 @@ import bs58 from 'bs58';
 import { identity, memoizeWith } from 'ramda';
 
 import { getConnection } from 'api/connection';
-import { TOKEN_PROGRAM_ID, TransferParameters } from 'api/token';
+import {
+  ASSOCIATED_TOKEN_ACCOUNT_PROGRAM_ID,
+  TOKEN_PROGRAM_ID,
+  TransferParameters,
+} from 'api/token';
 import { TokenAccount } from 'api/token/TokenAccount';
 import { getWallet } from 'api/wallet';
 import { feeRelayerUrl } from 'config/constants';
@@ -20,8 +24,6 @@ type TransferSolParams = {
   sender_pubkey: string;
   recipient_pubkey: string;
   lamports: number;
-  signature: string;
-  blockhash: string;
 };
 
 type TransferSPLTokenParams = {
@@ -31,15 +33,19 @@ type TransferSPLTokenParams = {
   authority_pubkey: string;
   amount: number;
   decimals: number;
-  signature: string;
-  blockhash: string;
+};
+
+type InstructionsAndParams = {
+  instructions: TransactionInstruction[];
+  transferParams: TransferSolParams | TransferSPLTokenParams;
+  path: string;
 };
 
 export interface API {
   transfer: (parameters: TransferParameters, tokenAccount: TokenAccount) => Promise<string>;
 }
 
-const getFeePayerPubkey = async (): Promise<string> => {
+const getFeePayerPubkey = async (): Promise<PublicKey> => {
   try {
     const res = await fetch(`${feeRelayerUrl}/fee_payer/pubkey`);
 
@@ -49,7 +55,7 @@ const getFeePayerPubkey = async (): Promise<string> => {
 
     const result = await res.text();
 
-    return result;
+    return new PublicKey(result);
   } catch (error) {
     throw new Error(`Can't get fee payer pubkey: ${error}`);
   }
@@ -57,7 +63,10 @@ const getFeePayerPubkey = async (): Promise<string> => {
 
 const sendTransaction = async (
   path: string,
-  params: TransferSolParams | TransferSPLTokenParams,
+  params: (TransferSolParams | TransferSPLTokenParams) & {
+    signature: string;
+    blockhash: string;
+  },
 ): Promise<string> => {
   const options = {
     method: 'POST',
@@ -82,6 +91,59 @@ const sendTransaction = async (
   }
 };
 
+const makeTransferSolInstructionAndParams = (
+  parameters: TransferParameters,
+): InstructionsAndParams => {
+  const { source, destination, amount } = parameters;
+
+  return {
+    instructions: [
+      SystemProgram.transfer({
+        fromPubkey: source,
+        toPubkey: destination,
+        lamports: amount,
+      }),
+    ],
+    transferParams: {
+      sender_pubkey: source.toBase58(),
+      lamports: amount,
+      recipient_pubkey: destination.toBase58(),
+    },
+    path: '/transfer_sol',
+  };
+};
+
+const makeTransferTokenInstructionAndParams = (
+  parameters: TransferParameters,
+  tokenAccount: TokenAccount,
+): InstructionsAndParams => {
+  const { source, destination, amount } = parameters;
+
+  return {
+    instructions: [
+      SPLToken.createTransferCheckedInstruction(
+        TOKEN_PROGRAM_ID,
+        source,
+        tokenAccount.mint.address,
+        destination,
+        tokenAccount.owner,
+        [],
+        amount,
+        tokenAccount.mint.decimals,
+      ) as TransactionInstruction,
+    ],
+    transferParams: {
+      sender_token_account_pubkey: source.toBase58(),
+      recipient_pubkey: destination.toBase58(),
+      token_mint_pubkey: tokenAccount.mint.address.toBase58(),
+      authority_pubkey: tokenAccount.owner.toBase58(),
+      amount,
+      decimals: tokenAccount.mint.decimals,
+    },
+    path: '/transfer_spl_token',
+  };
+};
+
 export const APIFactory = memoizeWith(
   identity,
   (cluster: ExtendedCluster): API => {
@@ -104,8 +166,63 @@ export const APIFactory = memoizeWith(
 
       return {
         blockhash: recentBlockhash,
-        signature: bs58.encode(signaturePubkeyPair?.signature),
+        signature: bs58.encode(signaturePubkeyPair?.signature || []),
       };
+    };
+
+    const getTransferTokenInstructionAndParams = async (
+      parameters: TransferParameters,
+      tokenAccount: TokenAccount,
+      feePayer: PublicKey,
+    ): Promise<InstructionsAndParams> => {
+      const destinationAccountInfo = await connection.getAccountInfo(parameters.destination);
+
+      if (destinationAccountInfo && destinationAccountInfo.owner.equals(TOKEN_PROGRAM_ID)) {
+        return makeTransferTokenInstructionAndParams(parameters, tokenAccount);
+      }
+
+      if (!destinationAccountInfo || destinationAccountInfo.lamports === 0) {
+        throw new Error('Cannot send to address with zero SOL balances');
+      }
+
+      const associatedTokenAddress = await SPLToken.getAssociatedTokenAddress(
+        ASSOCIATED_TOKEN_ACCOUNT_PROGRAM_ID,
+        TOKEN_PROGRAM_ID,
+        tokenAccount.mint.address,
+        parameters.destination,
+      );
+
+      const associatedTokenAccountInfo = await connection.getAccountInfo(associatedTokenAddress);
+
+      const instructionsAndParams = makeTransferTokenInstructionAndParams(
+        {
+          source: parameters.source,
+          destination: associatedTokenAddress,
+          amount: parameters.amount,
+        },
+        tokenAccount,
+      );
+
+      if (associatedTokenAccountInfo && associatedTokenAccountInfo.owner.equals(TOKEN_PROGRAM_ID)) {
+        return instructionsAndParams;
+      }
+
+      const { instructions, transferParams, path } = instructionsAndParams;
+
+      instructions.unshift(
+        SPLToken.createAssociatedTokenAccountInstruction(
+          ASSOCIATED_TOKEN_ACCOUNT_PROGRAM_ID,
+          TOKEN_PROGRAM_ID,
+          tokenAccount.mint.address,
+          associatedTokenAddress,
+          parameters.destination,
+          feePayer,
+        ),
+      );
+
+      transferParams.recipient_pubkey = parameters.destination.toBase58();
+
+      return { instructions, transferParams, path };
     };
 
     const transfer = async (
@@ -116,58 +233,21 @@ export const APIFactory = memoizeWith(
         throw new Error('feeRelayerUrl must be set');
       }
 
-      const { source, destination, amount } = parameters;
-
-      const isTransferSol = source.equals(getWallet().pubkey);
-
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      const transferInstruction = isTransferSol
-        ? SystemProgram.transfer({
-            fromPubkey: source,
-            toPubkey: destination,
-            lamports: amount,
-          })
-        : // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-          SPLToken.createTransferCheckedInstruction(
-            TOKEN_PROGRAM_ID,
-            source,
-            tokenAccount.mint.address,
-            destination,
-            tokenAccount.owner,
-            [],
-            amount,
-            tokenAccount.mint.decimals,
-          );
+      const isTransferSol = parameters.source.equals(getWallet().pubkey);
 
       const feePayer = await getFeePayerPubkey();
 
-      const { signature, blockhash } = await makeTransaction(new PublicKey(feePayer), [
-        transferInstruction,
-      ]);
+      const { instructions, transferParams, path } = isTransferSol
+        ? makeTransferSolInstructionAndParams(parameters)
+        : await getTransferTokenInstructionAndParams(parameters, tokenAccount, feePayer);
 
-      const transferParams = isTransferSol
-        ? {
-            blockhash,
-            signature,
-            sender_pubkey: source.toBase58(),
-            lamports: amount,
-            recipient_pubkey: destination.toBase58(),
-          }
-        : {
-            sender_token_account_pubkey: source.toBase58(),
-            recipient_pubkey: destination.toBase58(),
-            token_mint_pubkey: tokenAccount.mint.address.toBase58(),
-            authority_pubkey: tokenAccount.owner.toBase58(),
-            amount,
-            decimals: tokenAccount.mint.decimals,
-            signature,
-            blockhash,
-          };
+      const { signature, blockhash } = await makeTransaction(feePayer, instructions);
 
-      return sendTransaction(
-        isTransferSol ? '/transfer_sol' : '/transfer_spl_token',
-        transferParams,
-      );
+      return sendTransaction(path, {
+        blockhash,
+        signature,
+        ...transferParams,
+      });
     };
 
     return {
