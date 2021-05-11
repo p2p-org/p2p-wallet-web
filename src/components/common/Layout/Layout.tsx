@@ -1,4 +1,5 @@
 import React, { FunctionComponent, useEffect } from 'react';
+import { Helmet } from 'react-helmet';
 import { useSelector } from 'react-redux';
 import Sticky from 'react-stickynode';
 
@@ -95,38 +96,43 @@ export const Layout: FunctionComponent<Props> = ({
   }, [Boolean(loading)]);
 
   return (
-    <Wrapper>
-      <Header breadcrumb={breadcrumb} />
-      <MainScrollFix id="container">
-        <Container>
-          {connected ? (
-            <Content>
-              {rightColumn ? (
-                <ColumnsWrapper>
-                  <ColumnLeftSticky top={HEADER_HEIGHT + CONTAINER_PADDING_TOP}>
-                    <ColumnLeft>
-                      {leftColumn || (
-                        <>
-                          <ProfileWidget />
-                          <LeftNavMenu />
-                        </>
-                      )}
-                    </ColumnLeft>
-                  </ColumnLeftSticky>
-                  <ColumnRightWrapper>
-                    <ColumnRight>{rightColumn}</ColumnRight>
-                  </ColumnRightWrapper>
-                </ColumnsWrapper>
-              ) : // eslint-disable-next-line unicorn/no-nested-ternary
-              centered ? (
-                <CenteredWrapper>{centered}</CenteredWrapper>
-              ) : (
-                children
-              )}
-            </Content>
-          ) : undefined}
-        </Container>
-      </MainScrollFix>
-    </Wrapper>
+    <>
+      <Helmet>
+        <body className="" />
+      </Helmet>
+      <Wrapper>
+        <Header breadcrumb={breadcrumb} />
+        <MainScrollFix id="container">
+          <Container>
+            {connected ? (
+              <Content>
+                {rightColumn ? (
+                  <ColumnsWrapper>
+                    <ColumnLeftSticky top={HEADER_HEIGHT + CONTAINER_PADDING_TOP}>
+                      <ColumnLeft>
+                        {leftColumn || (
+                          <>
+                            <ProfileWidget />
+                            <LeftNavMenu />
+                          </>
+                        )}
+                      </ColumnLeft>
+                    </ColumnLeftSticky>
+                    <ColumnRightWrapper>
+                      <ColumnRight>{rightColumn}</ColumnRight>
+                    </ColumnRightWrapper>
+                  </ColumnsWrapper>
+                ) : // eslint-disable-next-line unicorn/no-nested-ternary
+                centered ? (
+                  <CenteredWrapper>{centered}</CenteredWrapper>
+                ) : (
+                  children
+                )}
+              </Content>
+            ) : undefined}
+          </Container>
+        </MainScrollFix>
+      </Wrapper>
+    </>
   );
 };

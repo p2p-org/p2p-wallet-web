@@ -1,0 +1,12 @@
+name = "p2p-wallet-web"
+type = 'webpack'
+account_id = 'df14f0bdad0ec81a491bcfb3c64e809e'
+route = ''
+zone_id = ''
+usage_model = ''
+workers_dev = true
+target_type = "webpack"
+
+[site]
+bucket = "./build"
+entry-point = "workers-site"

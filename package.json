@@ -2,7 +2,6 @@
   "name": "p2p-wallet-web",
   "version": "1.0.0",
   "main": "index.js",
-  "homepage": "https://p2p-org.github.io/p2p-wallet-web",
   "license": "MIT",
   "scripts": {
     "predeploy": "npm run build",
