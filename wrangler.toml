@@ -1,12 +1,19 @@
-name = "p2p-wallet-web"
+# https://developers.cloudflare.com/workers/cli-wrangler/configuration#keys
+
+name = "p2p-wallet-dev"
 type = 'webpack'
-account_id = 'df14f0bdad0ec81a491bcfb3c64e809e'
-route = ''
-zone_id = ''
-usage_model = ''
-workers_dev = true
 target_type = "webpack"
+account_id = 'e8861c88f3aeb07236ccc26b6c21c560'
+zone_id = "54ed3a4176c8757eda8e95af8b2192ad"
+#route = "dev.wallet.p2p.org/*"
+# this field specifies that the worker should be deployed to workers.dev
+workers_dev = true
 
 [site]
 bucket = "./build"
 entry-point = "workers-site"
+
+[env.production]
+name = "p2p-wallet"
+vars = { ENVIRONMENT = "production" }
+route = "wallet.p2p.org/*"
