@@ -13,7 +13,6 @@ import { Token } from 'api/token/Token';
 import { TokenAccount } from 'api/token/TokenAccount';
 import { SettingsAction } from 'components/common/SendSwapWidget/SwapWidget/SettingsAction';
 import { ToastManager } from 'components/common/ToastManager';
-import { TokenAvatar } from 'components/common/TokenAvatar';
 import { Button, Icon, Tooltip } from 'components/ui';
 import { openModal } from 'store/actions/modals';
 import { SHOW_MODAL_TRANSACTION_STATUS } from 'store/constants/modalTypes';
@@ -39,6 +38,7 @@ import {
   Hint,
   WrapperWidgetPage,
 } from '../common/styled';
+import orcaLogo from './orca_logo.svg';
 
 const ActionsWrapper = styled.div`
   display: flex;
@@ -522,8 +522,10 @@ export const SwapWidget: FunctionComponent = () => {
         </ButtonWrapper>
       </BottomWrapper>
       <PoweredByBannerWrapper>
-        <PoweredBy>Powered by Project Serum</PoweredBy>
-        <TokenAvatar symbol="SRM" size={24} />
+        <PoweredBy>Powered by </PoweredBy>
+        <a href="https://www.orca.so/pools" target="_blank" rel="noopener noreferrer noindex">
+          <img src={orcaLogo} alt="Orca" />
+        </a>
       </PoweredByBannerWrapper>
     </WrapperWidgetPage>
   );
