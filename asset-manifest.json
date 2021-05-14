@@ -1,13 +1,13 @@
 {
   "files": {
-    "main.css": "/static/css/main.525c29bc.chunk.css",
-    "main.js": "/static/js/main.de7c2f01.chunk.js",
-    "main.js.map": "/static/js/main.de7c2f01.chunk.js.map",
-    "runtime-main.js": "/static/js/runtime-main.2da0e29f.js",
-    "runtime-main.js.map": "/static/js/runtime-main.2da0e29f.js.map",
+    "main.css": "/static/css/main.57876479.chunk.css",
+    "main.js": "/static/js/main.3546a9e0.chunk.js",
+    "main.js.map": "/static/js/main.3546a9e0.chunk.js.map",
+    "runtime-main.js": "/static/js/runtime-main.4283bb35.js",
+    "runtime-main.js.map": "/static/js/runtime-main.4283bb35.js.map",
     "static/css/2.8f976517.chunk.css": "/static/css/2.8f976517.chunk.css",
-    "static/js/2.4aea8bf4.chunk.js": "/static/js/2.4aea8bf4.chunk.js",
-    "static/js/2.4aea8bf4.chunk.js.map": "/static/js/2.4aea8bf4.chunk.js.map",
+    "static/js/2.0f8fe505.chunk.js": "/static/js/2.0f8fe505.chunk.js",
+    "static/js/2.0f8fe505.chunk.js.map": "/static/js/2.0f8fe505.chunk.js.map",
     "static/css/3.0291bb76.chunk.css": "/static/css/3.0291bb76.chunk.css",
     "static/js/3.c6219309.chunk.js": "/static/js/3.c6219309.chunk.js",
     "static/js/3.c6219309.chunk.js.map": "/static/js/3.c6219309.chunk.js.map",
@@ -30,8 +30,8 @@
     "static/css/5.5a0dc4f9.chunk.css.map": "/static/css/5.5a0dc4f9.chunk.css.map",
     "static/css/6.b441e6a9.chunk.css.map": "/static/css/6.b441e6a9.chunk.css.map",
     "static/css/7.4b063de3.chunk.css.map": "/static/css/7.4b063de3.chunk.css.map",
-    "static/css/main.525c29bc.chunk.css.map": "/static/css/main.525c29bc.chunk.css.map",
-    "static/js/2.4aea8bf4.chunk.js.LICENSE.txt": "/static/js/2.4aea8bf4.chunk.js.LICENSE.txt",
+    "static/css/main.57876479.chunk.css.map": "/static/css/main.57876479.chunk.css.map",
+    "static/js/2.0f8fe505.chunk.js.LICENSE.txt": "/static/js/2.0f8fe505.chunk.js.LICENSE.txt",
     "static/media/Landing.linaria.css": "/static/media/GT-Super-Text-Bold.24a70721.woff2",
     "static/media/app.8c1aae4b.png": "/static/media/app.8c1aae4b.png",
     "static/media/YouCan.linaria.css": "/static/media/window-youcan.f6cb7d44.svg",
@@ -54,10 +54,10 @@
     "static/media/TokenAvatar.linaria.css": "/static/media/wrapped.3372a516.svg"
   },
   "entrypoints": [
-    "static/js/runtime-main.2da0e29f.js",
+    "static/js/runtime-main.4283bb35.js",
     "static/css/2.8f976517.chunk.css",
-    "static/js/2.4aea8bf4.chunk.js",
-    "static/css/main.525c29bc.chunk.css",
-    "static/js/main.de7c2f01.chunk.js"
+    "static/js/2.0f8fe505.chunk.js",
+    "static/css/main.57876479.chunk.css",
+    "static/js/main.3546a9e0.chunk.js"
   ]
 }
