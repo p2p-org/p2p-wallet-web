@@ -22,7 +22,21 @@
       // https://username.github.io/repo-name/one/two?a=b&c=d#qwe becomes
       // https://username.github.io/repo-name/?/one/two&a=b~and~c=d#qwe
       // Otherwise, leave pathSegmentsToKeep as 0.
-      var pathSegmentsToKeep = 0;
+
+      var basename = '%REACT_APP_BASENAME%';
+      // Remove first /
+      if (basename.indexOf('/') === 0) {
+        basename = basename.slice(1)
+      }
+
+      var pathSegmentsToKeep;
+      // If empty so segments 0
+      if (!basename.length) {
+        pathSegmentsToKeep = 0
+      } else {
+        // count of segments if split by /
+        pathSegmentsToKeep = basename.split('/').length
+      }
 
       var l = window.location;
       l.replace(
