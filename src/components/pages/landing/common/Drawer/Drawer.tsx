@@ -106,10 +106,10 @@ export const Drawer: FC<Props> = ({ isOpen, onDrawerClose }) => {
         </DrawerBg>
         <DrawerMenu>
           <Logo>Wallet</Logo>
-          <MenuA href="/#">Explore</MenuA>
-          <MenuA href="//#">About</MenuA>
-          <MenuA href="/#">Recent Updates</MenuA>
-          <MenuA href="/#">FAQ</MenuA>
+          {/* <MenuA href="/#">Explore</MenuA> */}
+          {/* <MenuA href="/#">About</MenuA> */}
+          {/* <MenuA href="/#">Recent Updates</MenuA> */}
+          {/* <MenuA href="/#">FAQ</MenuA> */}
           <Link to="/login" component={MenuA}>
             I have a wallet
           </Link>

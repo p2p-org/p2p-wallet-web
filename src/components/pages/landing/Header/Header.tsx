@@ -59,25 +59,25 @@ const Wallet = styled.div`
   line-height: 140%;
 `;
 
-const Center = styled.div`
-  display: flex;
-  flex: 1;
-  align-items: center;
-  justify-content: center;
-`;
-
-const NavLink = styled.a`
-  color: #fff;
-  font-weight: 500;
-  font-size: 16px;
-  font-family: 'Aktiv Grotesk Corp', sans-serif;
-  line-height: 140%;
-  text-decoration: none;
-
-  &:not(:last-child) {
-    margin-right: 44px;
-  }
-`;
+// const Center = styled.div`
+//   display: flex;
+//   flex: 1;
+//   align-items: center;
+//   justify-content: center;
+// `;
+//
+// const NavLink = styled.a`
+//   color: #fff;
+//   font-weight: 500;
+//   font-size: 16px;
+//   font-family: 'Aktiv Grotesk Corp', sans-serif;
+//   line-height: 140%;
+//   text-decoration: none;
+//
+//   &:not(:last-child) {
+//     margin-right: 44px;
+//   }
+// `;
 
 const Right = styled.div`
   display: flex;
@@ -149,14 +149,14 @@ export const Header: FC<Props> = ({ onDrawerToggle }) => {
           <Wallet>Wallet</Wallet>
         </LogoWrapper>
       </Left>
-      {isDesktop ? (
-        <Center>
-          <NavLink href="#explore">Explore</NavLink>
-          <NavLink href="#about">About</NavLink>
-          <NavLink href="#recent">Recent updates</NavLink>
-          <NavLink href="#faq">FAQ</NavLink>
-        </Center>
-      ) : undefined}
+      {/* {isDesktop ? ( */}
+      {/*  <Center> */}
+      {/*    <NavLink href="#explore">Explore</NavLink> */}
+      {/*    <NavLink href="#about">About</NavLink> */}
+      {/*    <NavLink href="#recent">Recent updates</NavLink> */}
+      {/*    <NavLink href="#faq">FAQ</NavLink> */}
+      {/*  </Center> */}
+      {/* ) : undefined} */}
       {isTablet ? (
         <Right>
           <Link to="/login" component={Button}>
