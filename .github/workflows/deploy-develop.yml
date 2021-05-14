@@ -15,6 +15,11 @@ jobs:
       - name: Install dependecies
         run: 'npm install'
       - name: Build site
+        env:
+          REACT_APP_BASENAME: ${{ secrets.REACT_APP_BASENAME }}
+          REACT_APP_CRYPTO_COMPARE_API_KEY: ${{ secrets.REACT_APP_CRYPTO_COMPARE_API_KEY }}
+          REACT_APP_FEE_RELAYER_URL: ${{ secrets.REACT_APP_FEE_RELAYER_URL }}
+          REACT_APP_SWAP_HOST_FEE_ADDRESS: ${{ secrets.REACT_APP_SWAP_HOST_FEE_ADDRESS }}
         run: 'npm run build'
       - name: Publish
         uses: peaceiris/actions-gh-pages@v3
