@@ -251,7 +251,7 @@ export const QRAddressWidget: FunctionComponent<Props> = ({ publicKey, className
       {isExpand ? (
         <>
           <Content>
-            <Text>Send to your {tokenAccount.mint.symbol} wallet</Text>
+            <Text>Scan QR code or copy wallet address</Text>
             <QRCodeWrapper
               className={classNames({ isImageCopyAvailable })}
               onClick={isImageCopyAvailable ? handleImageCopyClick : undefined}>
