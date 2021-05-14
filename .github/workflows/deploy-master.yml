@@ -13,7 +13,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Install dependecies
-        run: npm install
+        run: 'npm install'
       - name: Build site
         run: 'npm run build'
       - name: Publish
