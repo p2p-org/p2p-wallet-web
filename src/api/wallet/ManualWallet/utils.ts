@@ -126,7 +126,7 @@ export async function storeMnemonicAndSeed(
     localStorage.removeItem(STORAGE_KEY_LOCKED);
   }
 
-  sessionStorage.removeItem('unlocked');
+  sessionStorage.removeItem(STORAGE_KEY_UNLOCKED);
 }
 
 const EMPTY_UNLOCKED: EncryptedType = {
