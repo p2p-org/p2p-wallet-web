@@ -1,19 +1,20 @@
-import React, { FC, useState } from 'react';
+import React, { FC, useEffect, useState } from 'react';
 import { batch, useDispatch } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 
 import { styled } from '@linaria/react';
 import { unwrapResult } from '@reduxjs/toolkit';
-import * as bip39 from 'bip39';
-import classNames from 'classnames';
 
 import { WalletType } from 'api/wallet';
+import { loadMnemonicAndSeed, mnemonicToSeed, STORAGE_KEY_LOCKED } from 'api/wallet/ManualWallet';
 import { ToastManager } from 'components/common/ToastManager';
-import { Button } from 'components/pages/home/common/Button';
-import { Icon } from 'components/ui';
-import { localMnemonic } from 'config/constants';
-import { connect, selectType } from 'store/slices/wallet/WalletSlice';
+import { Back } from 'components/pages/home/common/Back';
+import { DerivableAccounts } from 'components/pages/home/Login/DerivableAccounts';
+import { Password } from 'components/pages/home/Login/Password';
+import { connectWallet, selectType } from 'store/slices/wallet/WalletSlice';
 import { sleep } from 'utils/common';
+
+import { Main } from './Main';
 
 const Wrapper = styled.div`
   position: relative;
@@ -25,6 +26,8 @@ const Wrapper = styled.div`
 `;
 
 const Title = styled.span`
+  position: relative;
+
   margin-bottom: 32px;
 
   color: #161616;
@@ -35,239 +38,106 @@ const Title = styled.span`
   text-align: center;
 `;
 
-const ButtonsWrapper = styled.div``;
-
-const SocialButton = styled.button`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  width: 100%;
-  height: 54px;
-
-  color: #161616;
-  font-weight: 500;
-  font-size: 16px;
-  font-family: 'Aktiv Grotesk Corp', sans-serif;
-  line-height: 18px;
-
-  background: #fff;
-  border: 1px solid rgba(22, 22, 22, 0.15);
-  border-radius: 32px;
-  outline: none;
-  cursor: pointer;
-
-  appearance: none;
-
-  &:not(:last-child) {
-    margin-bottom: 12px;
-  }
+const BackStyled = styled(Back)`
+  position: absolute;
+  left: 0;
 `;
 
-const WalletIcon = styled.div`
-  width: 30px;
-  height: 30px;
-  margin-right: 12px;
+type PageTypes = 'main' | 'password' | 'derivableAccounts';
 
-  &.sollet {
-    background: url('./sollet.svg') no-repeat 50%;
-  }
-
-  &.bonfida {
-    background: url('./bonfida.svg') no-repeat 50%;
-  }
-`;
-
-const Delimiter = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 22px;
-  margin: 32px 0;
-
-  &::before {
-    position: absolute;
-
-    width: 100%;
-    height: 1px;
-
-    background: #161616;
-    opacity: 0.15;
-
-    content: '';
-  }
-`;
-
-const DelimiterText = styled.div`
-  z-index: 1;
-
-  padding: 0 10px;
-
-  color: #161616;
-  font-weight: 500;
-  font-size: 14px;
-  font-family: 'Aktiv Grotesk Corp', sans-serif;
-  line-height: 20px;
-
-  background: #fff;
-`;
-
-const SecurityWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-
-  margin-bottom: 32px;
-`;
-
-const SecurityKey = styled.span`
-  margin-bottom: 8px;
-
-  color: #161616;
-  font-weight: 500;
-  font-size: 16px;
-  font-family: 'Aktiv Grotesk Corp', sans-serif;
-  line-height: 24px;
-`;
-
-const SeedTextarea = styled.textarea`
-  min-height: 92px;
-  padding: 15px;
-
-  color: #161616;
-  font-size: 16px;
-  font-family: 'Aktiv Grotesk Corp', sans-serif;
-  line-height: 22px;
-
-  background: #f6f6f8;
-  border: 1px solid transparent;
-  border-radius: 12px;
-
-  &.hasError {
-    border-color: #f43d3d;
-  }
-
-  &::placeholder {
-    color: #1616164c;
-  }
-`;
-
-const Error = styled.div`
-  display: flex;
-  align-items: center;
-
-  margin-top: 8px;
-
-  color: #f43d3d;
-  font-size: 16px;
-  font-family: 'Aktiv Grotesk Corp', sans-serif;
-  line-height: 24px;
-`;
-
-const WarningIcon = styled(Icon)`
-  width: 16px;
-  height: 16px;
-  margin-right: 12px;
-
-  color: #f43d3d;
-`;
+const backToPage: {
+  [page in PageTypes]: PageTypes;
+} = {
+  main: 'main',
+  password: 'main',
+  derivableAccounts: 'password',
+};
 
 type Props = {
   setIsLoading: (isLoading: boolean) => void;
 };
 
 export const Login: FC<Props> = ({ setIsLoading }) => {
-  const history = useHistory();
   const dispatch = useDispatch();
-  const [mnemonic, setMnemonic] = useState(localMnemonic || '');
-  const [hasError, setHasError] = useState(false);
+  const history = useHistory();
+  const [mnemonic, setMnemonic] = useState('');
+  const [seed, setSeed] = useState('');
+  const [password, setPassword] = useState('');
+  const [page, setPage] = useState<PageTypes>('main');
 
-  // TODO: password process
-  const password = '';
+  useEffect(() => {
+    if (localStorage.getItem(STORAGE_KEY_LOCKED)) {
+      setPage('password');
+    }
+  }, []);
 
-  const handleSeedChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const { value } = e.target;
-    setMnemonic(value);
+  const handleContinueMnemonicClick = async (nextMnemonic: string) => {
+    const nextSeed = await mnemonicToSeed(nextMnemonic);
+
+    setMnemonic(nextMnemonic);
+    setSeed(nextSeed);
+    setPage('password');
   };
 
-  const handleConnectByClick = (type: WalletType) => () => {
-    batch(async () => {
-      try {
-        setIsLoading(true);
-        dispatch(selectType(type));
-        unwrapResult(await dispatch(connect()));
-        await sleep(100);
-        history.push('/wallets');
-        // eslint-disable-next-line @typescript-eslint/no-shadow
-      } catch (error) {
-        ToastManager.error((error as Error).message);
-      } finally {
-        setIsLoading(false);
+  const handleContinuePasswordClick = async (nextPassword: string) => {
+    // If has locked and has not mnemonic from prev step
+    if (mnemonic || !localStorage.getItem(STORAGE_KEY_LOCKED)) {
+      setPassword(nextPassword);
+      setPage('derivableAccounts');
+
+      return;
+    }
+
+    // If has not locked
+    try {
+      const { seed: loadedSeed, derivationPath } = await loadMnemonicAndSeed(nextPassword);
+      if (loadedSeed && derivationPath) {
+        batch(async () => {
+          try {
+            setIsLoading(true);
+            dispatch(selectType(WalletType.MANUAL));
+            unwrapResult(
+              await dispatch(
+                connectWallet({ seed: loadedSeed, password: nextPassword, derivationPath }),
+              ),
+            );
+            await sleep(100);
+            history.push('/wallets');
+            // eslint-disable-next-line @typescript-eslint/no-shadow
+          } catch (error) {
+            ToastManager.error((error as Error).message);
+          } finally {
+            setIsLoading(false);
+          }
+        });
       }
-    });
-  };
-
-  const handleSeedBlur = () => {
-    if (bip39.validateMnemonic(mnemonic)) {
-      setHasError(false);
-    } else if (!hasError) {
-      setHasError(true);
+    } catch (error) {
+      ToastManager.error((error as Error).message);
     }
   };
 
-  const handleContinueClick = () => {
-    batch(async () => {
-      try {
-        setIsLoading(true);
-        dispatch(selectType(WalletType.MANUAL));
-        unwrapResult(await dispatch(connect({ mnemonic, password })));
-        await sleep(100);
-        history.push('/wallets');
-        // eslint-disable-next-line @typescript-eslint/no-shadow
-      } catch (error) {
-        ToastManager.error((error as Error).message);
-      } finally {
-        setIsLoading(false);
-      }
-    });
+  const handleBackClick = () => {
+    setPage((state) => backToPage[state]);
   };
-
-  const isDisabled = !mnemonic || hasError;
 
   return (
     <Wrapper>
-      <Title>Log in to your wallet</Title>
-      <ButtonsWrapper>
-        <SocialButton onClick={handleConnectByClick(WalletType.SOLLET)}>
-          <WalletIcon className="sollet" />
-          Continue with Sollet
-        </SocialButton>
-        <SocialButton onClick={handleConnectByClick(WalletType.BONFIDA)}>
-          <WalletIcon className="bonfida" />
-          Continue with Bonfida
-        </SocialButton>
-      </ButtonsWrapper>
-      <Delimiter>
-        <DelimiterText>Or use your seed...</DelimiterText>
-      </Delimiter>
-      <SecurityWrapper>
-        <SecurityKey>Enter security key</SecurityKey>
-        <SeedTextarea
-          placeholder="Seed phrase"
-          value={mnemonic}
-          onChange={handleSeedChange}
-          onBlur={handleSeedBlur}
-          className={classNames({ hasError })}
+      <Title>
+        {page !== 'main' ? <BackStyled onClick={handleBackClick} /> : undefined}
+        Log in to your wallet
+      </Title>
+      {page === 'main' ? (
+        <Main setIsLoading={setIsLoading} next={handleContinueMnemonicClick} />
+      ) : undefined}
+      {page === 'password' ? <Password next={handleContinuePasswordClick} /> : undefined}
+      {page === 'derivableAccounts' ? (
+        <DerivableAccounts
+          mnemonic={mnemonic}
+          seed={seed}
+          password={password}
+          setIsLoading={setIsLoading}
         />
-        {hasError ? (
-          <Error>
-            <WarningIcon name="warning" />
-            Incorrect seed phrase
-          </Error>
-        ) : undefined}
-      </SecurityWrapper>
-      <Button disabled={isDisabled} onClick={handleContinueClick}>
-        Continue
-      </Button>
+      ) : undefined}
     </Wrapper>
   );
 };

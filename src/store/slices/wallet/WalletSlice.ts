@@ -16,8 +16,12 @@ import colors from 'api/token/colors.config';
 import { Token } from 'api/token/Token';
 import { SerializableTokenAccount, TokenAccount } from 'api/token/TokenAccount';
 import * as WalletAPI from 'api/wallet';
-import { getBalance, getWallet, WalletDataType, WalletType } from 'api/wallet';
-import { ManualSeedData } from 'api/wallet/ManualWallet';
+import { getBalance, getWallet, getWalletUnsafe, WalletDataType, WalletType } from 'api/wallet';
+import {
+  getDerivableAccounts,
+  loadMnemonicAndSeed,
+  ManualWalletData,
+} from 'api/wallet/ManualWallet';
 import { WalletEvent } from 'api/wallet/Wallet';
 import { ToastManager } from 'components/common/ToastManager';
 import { swapHostFeeAddress } from 'config/constants';
@@ -39,7 +43,6 @@ import { transferNotification } from 'utils/transactionNotifications';
 import { WalletSettings } from 'utils/types';
 
 const STORAGE_KEY_TYPE = 'type';
-export const STORAGE_KEY_SEED = 'seed';
 
 export const DEFAULT_CLUSTER: Cluster = 'devnet';
 export const WALLET_SLICE_NAME = 'wallet';
@@ -52,6 +55,7 @@ export interface WalletsState {
   publicKey: string | null;
   type: WalletType;
   tokenAccounts: Array<SerializableTokenAccount>;
+  derivableTokenAccounts: Array<SerializableTokenAccount>;
   hiddenTokens: Array<string> | null;
   settings: WalletSettings;
   zeroBalanceTokens: Array<string>;
@@ -67,8 +71,7 @@ export const disconnect = createAsyncThunk(`${WALLET_SLICE_NAME}/disconnect`, (_
 });
 
 // Simulate SOL token account
-const getSolToken = async (TokenAPI: API) => {
-  const publicKey = getWallet().pubkey;
+const getSolToken = async (TokenAPI: API, publicKey: PublicKey, isDerivable?: boolean) => {
   const balance = await getBalance(publicKey);
   const tokenInfo = TokenAPI.getConfigForToken(WRAPPED_SOL_MINT);
 
@@ -83,8 +86,37 @@ const getSolToken = async (TokenAPI: API) => {
     colors.SOL,
     tokenInfo?.logoURI,
   );
-  return new TokenAccount(mint, SYSTEM_PROGRAM_ID, SYSTEM_PROGRAM_ID, publicKey, balance);
+  return new TokenAccount(
+    mint,
+    SYSTEM_PROGRAM_ID,
+    SYSTEM_PROGRAM_ID,
+    publicKey,
+    balance,
+    isDerivable,
+  );
 };
+
+export const getDerivableTokenAccounts = createAsyncThunk<
+  SerializableTokenAccount[],
+  { seed: string; derivationPath: string }
+>(`${WALLET_SLICE_NAME}/getDerivableTokenAccounts`, async (data, thunkAPI) => {
+  const state: RootState = thunkAPI.getState() as RootState;
+  const walletState = state.wallet;
+  const TokenAPI = TokenAPIFactory(walletState.cluster);
+  // if didn't connected(need for DerivableAccount component/page)
+  const walletPublicKey = getWalletUnsafe()?.pubkey || null;
+
+  const accounts = getDerivableAccounts(data.seed, data.derivationPath);
+  const publicKeys = accounts.map((account) => account.publicKey);
+
+  const promises = publicKeys.map((publicKey) => {
+    const isDerivable = walletPublicKey ? !walletPublicKey?.equals(publicKey) : false;
+    return getSolToken(TokenAPI, publicKey, isDerivable);
+  });
+  const derivableTokenAccounts = await Promise.all(promises);
+
+  return derivableTokenAccounts.map((tokenAccount) => tokenAccount.serialize()) || [];
+});
 
 export const getTokenAccount = createAsyncThunk<TokenAccount | null, PublicKey>(
   `${WALLET_SLICE_NAME}/getTokenAccount`,
@@ -97,20 +129,29 @@ export const getTokenAccount = createAsyncThunk<TokenAccount | null, PublicKey>(
   },
 );
 
-export const getTokenAccounts = createAsyncThunk<Array<SerializableTokenAccount>>(
-  `${WALLET_SLICE_NAME}/getTokenAccounts`,
+export const getTokenAccountsForWallet = createAsyncThunk<SerializableTokenAccount[]>(
+  `${WALLET_SLICE_NAME}/getTokenAccountsForWallet`,
   async (_, thunkAPI) => {
     const state: RootState = thunkAPI.getState() as RootState;
-    const walletState = state.wallet;
-    const TokenAPI = TokenAPIFactory(walletState.cluster);
+    const { cluster, type, derivableTokenAccounts } = state.wallet;
+    const TokenAPI = TokenAPIFactory(cluster);
 
-    // Simulated SOL token
-    const solToken = await getSolToken(TokenAPI);
+    const solTokens = [];
+
+    // If manual
+    if (type === WalletType.MANUAL) {
+      derivableTokenAccounts.forEach((account) => solTokens.push(TokenAccount.from(account)));
+    } else {
+      // Simulated SOL token for sollet and other wallet types
+      const publicKey = getWallet().pubkey;
+      solTokens.push(await getSolToken(TokenAPI, publicKey));
+    }
+
     // Get all Tokens
     const accountsForWallet = await TokenAPI.getAccountsForWallet();
 
     // Merge SOL and Tokens as token accounts
-    const tokenAccounts = [solToken, ...accountsForWallet];
+    const tokenAccounts = [...solTokens, ...accountsForWallet];
 
     const listener = TokenAPI.listenToTokenAccountChanges(tokenAccounts, (updatedTokenAccount) => {
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
@@ -141,16 +182,24 @@ export const autoConnect = createAsyncThunk<string | undefined>(
       wallet: { type },
     }: RootState = thunkAPI.getState() as RootState;
 
-    const seed = localStorage.getItem(STORAGE_KEY_SEED)
-      ? (JSON.parse(localStorage.getItem(STORAGE_KEY_SEED) as string) as string)
-      : null;
+    let processedData;
 
-    const processedData = type === WalletType.MANUAL ? <ManualSeedData>{ seed } : undefined;
+    if (type === WalletType.MANUAL) {
+      processedData = (await loadMnemonicAndSeed()) as ManualWalletData;
+    }
 
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
-    return unwrapResult(await thunkAPI.dispatch(connect(processedData)));
+    return unwrapResult(await thunkAPI.dispatch(connectWallet(processedData)));
   },
 );
+
+export const connect = createAsyncThunk(`${WALLET_SLICE_NAME}/connect`, (_, thunkAPI) => {
+  const {
+    wallet: { cluster },
+  }: RootState = thunkAPI.getState() as RootState;
+
+  WalletAPI.connect(cluster);
+});
 
 /**
  * Async action to connect to a wallet. Creates a new wallet instance,
@@ -160,14 +209,14 @@ export const autoConnect = createAsyncThunk<string | undefined>(
  * The output of the action is the user's public key in Base58 form,
  * so that the user can verify it.
  */
-export const connect = createAsyncThunk<string, WalletDataType | undefined>(
-  `${WALLET_SLICE_NAME}/connect`,
+export const connectWallet = createAsyncThunk<string, WalletDataType | undefined>(
+  `${WALLET_SLICE_NAME}/connectWallet`,
   async (data, thunkAPI) => {
     const {
       wallet: { cluster, type },
     }: RootState = thunkAPI.getState() as RootState;
 
-    const wallet = await WalletAPI.connect(cluster, type, data);
+    const wallet = await WalletAPI.connectWallet(cluster, type, data);
 
     wallet.on(WalletEvent.DISCONNECT, () => {
       void thunkAPI.dispatch(disconnect());
@@ -180,10 +229,17 @@ export const connect = createAsyncThunk<string, WalletDataType | undefined>(
 
     ToastManager.info('Wallet connected');
 
+    // Make and store derivable before getAvailableTokens
+    if (type === WalletType.MANUAL && data?.seed && data?.derivationPath) {
+      await thunkAPI.dispatch(
+        getDerivableTokenAccounts({ seed: data.seed, derivationPath: data.derivationPath }),
+      );
+    }
+
     // Get tokens first before getting accounts and pools,
     // to avail of the token caching feature
     await thunkAPI.dispatch(getAvailableTokens());
-    void thunkAPI.dispatch(getTokenAccounts());
+    void thunkAPI.dispatch(getTokenAccountsForWallet());
     void thunkAPI.dispatch(getPools());
     void thunkAPI.dispatch(getRatesMarkets());
     void thunkAPI.dispatch(getRatesCandle({ symbol: 'SOL', type: 'month' }));
@@ -318,6 +374,7 @@ const makeInitialState = (): WalletsState => ({
     ? Number(localStorage.getItem(STORAGE_KEY_TYPE))
     : WalletType.MANUAL,
   tokenAccounts: [],
+  derivableTokenAccounts: [],
   // eslint-disable-next-line unicorn/prefer-spread
   hiddenTokens: Array.from(loadHiddenTokens()),
   settings: loadSettings(),
@@ -365,10 +422,11 @@ const walletSlice = createSlice({
   },
   extraReducers: (builder) => {
     // Triggered when the connect async action is completed
-    builder.addCase(connect.fulfilled, (state, action) => ({
+    builder.addCase(connectWallet.fulfilled, (state, action) => ({
       ...makeInitialState(),
       publicKey: action.payload,
       connected: true,
+      derivableTokenAccounts: state.derivableTokenAccounts,
     }));
     // Triggered when the disconnect async action is completed
     builder.addCase(disconnect.fulfilled, () => ({
@@ -376,7 +434,11 @@ const walletSlice = createSlice({
       publicKey: null,
       connected: false,
     }));
-    builder.addCase(getTokenAccounts.fulfilled, (state, action) => ({
+    builder.addCase(getDerivableTokenAccounts.fulfilled, (state, action) => ({
+      ...state,
+      derivableTokenAccounts: action.payload,
+    }));
+    builder.addCase(getTokenAccountsForWallet.fulfilled, (state, action) => ({
       ...state,
       tokenAccounts: state.tokenAccounts.concat(action.payload),
     }));

@@ -6,6 +6,7 @@ import { styled } from '@linaria/react';
 import { Feature } from 'flagged';
 import { rgba } from 'polished';
 
+import { forgetWallet } from 'api/wallet/ManualWallet';
 import { Card } from 'components/common/Card';
 import { Layout } from 'components/common/Layout';
 import { WidgetPage } from 'components/common/WidgetPage';
@@ -14,7 +15,7 @@ import { MenuItem } from 'components/ui/Select/MenuItem';
 import { clusters } from 'config/constants';
 import { FEATURE_SETTINGS_LIST } from 'config/featureFlags';
 import { RootState } from 'store/rootReducer';
-import { disconnect, STORAGE_KEY_SEED, updateSettings } from 'store/slices/wallet/WalletSlice';
+import { disconnect, updateSettings } from 'store/slices/wallet/WalletSlice';
 import { appearance, currencies } from 'utils/settings';
 import { WalletSettings } from 'utils/types';
 
@@ -189,7 +190,7 @@ export const Settings: FunctionComponent = () => {
   const settings = useSelector((state: RootState) => state.wallet.settings);
 
   const handleLogoutClick = () => {
-    localStorage.removeItem(STORAGE_KEY_SEED);
+    forgetWallet();
     void dispatch(disconnect());
   };
 
@@ -268,7 +269,7 @@ export const Settings: FunctionComponent = () => {
                 }}
               />
               <Row
-                icon="hide"
+                icon="eye-hide"
                 title="Hide zero balances"
                 secondary={
                   <Switch

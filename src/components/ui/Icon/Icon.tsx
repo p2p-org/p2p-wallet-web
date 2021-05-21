@@ -3,6 +3,7 @@ import React, { FC } from 'react';
 import isPropValid from '@emotion/is-prop-valid';
 import { CSSProperties } from '@linaria/core';
 
+import arrow from './assets/arrow-icon.svg';
 import arrowTriangle from './assets/arrow-triangle-icon.svg';
 import attention from './assets/attention-icon.svg';
 import bottom from './assets/bottom-icon.svg';
@@ -20,10 +21,10 @@ import copy from './assets/copy-icon.svg';
 import currency from './assets/currency-icon.svg';
 import db from './assets/db-icon.svg';
 import error from './assets/error-icon.svg';
+import eyeHide from './assets/eye-hide-icon.svg';
 import eye from './assets/eye-icon.svg';
 import freeTx from './assets/free-tx-icon.svg';
 import gear from './assets/gear-icon.svg';
-import hide from './assets/hide-icon.svg';
 import home from './assets/home-icon.svg';
 import lock from './assets/lock-icon.svg';
 import logout from './assets/logout-icon.svg';
@@ -44,6 +45,7 @@ import wallet from './assets/wallet-icon.svg';
 import warning from './assets/warning-icon.svg';
 
 const iconsMap = new Map<string, string>([
+  ['arrow', arrow],
   ['arrow-triangle', arrowTriangle],
   ['bottom', bottom],
   ['branch', branch],
@@ -60,6 +62,7 @@ const iconsMap = new Map<string, string>([
   ['bucket', bucket],
   ['gear', gear],
   ['more', more],
+  ['eye-hide', eyeHide],
   ['eye', eye],
   ['search', search],
   ['settings', settings],
@@ -68,7 +71,6 @@ const iconsMap = new Map<string, string>([
   ['swap', swap],
   ['timer', timer],
   ['home', home],
-  ['hide', hide],
   ['lock', lock],
   ['logout', logout],
   ['pen', pen],

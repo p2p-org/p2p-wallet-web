@@ -34,33 +34,6 @@ export const getPools = createAsyncThunk(
   },
 );
 
-// Airdrop tokens to the wallet, if an airdrop key is available.
-// This is useful in order to demo token swaps on "dummy tokens" in non-mainnet environments
-// export const airdrop = createAsyncThunk<void, Pool>(
-//   `${POOL_SLICE_NAME}/airdrop`,
-//   async (pool, thunkAPI): Promise<void> => {
-//     const state: RootState = thunkAPI.getState() as RootState;
-//
-//     const TokenAPI = TokenAPIFactory(state.wallet.cluster);
-//     const IdentityAPI = IdentityAPIFactory(state.wallet.cluster);
-//
-//     // airdrop 10 of both tokens (calculated using the following formula: 10 * (10 ^ decimals))
-//     const amountA = 10 ** (pool.tokenA.mint.decimals + 1);
-//     const amountB = 10 ** (pool.tokenB.mint.decimals + 1);
-//
-//     // airdrop to the wallet and IDV to ensure both (especially the IDV) stay funded. (DEMO MODE ONLY)
-//     // do the wallet airdrop first to ensure it has SOL to create token accounts
-//     await WalletAPI.airdrop();
-//
-//     const airdropSolIDVPromise = WalletAPI.airdropTo(IdentityAPI.dummyIDV.publicKey);
-//     const airdropAPromise = TokenAPI.airdropToWallet(pool.tokenA.mint, amountA);
-//     const airdropBPromise = TokenAPI.airdropToWallet(pool.tokenB.mint, amountB);
-//
-//     await Promise.all([airdropSolIDVPromise, airdropAPromise, airdropBPromise]);
-//     void thunkAPI.dispatch(getTokenAccounts());
-//   },
-// );
-
 const updatePoolReducer = (state: Draft<PoolsState>, action: PayloadAction<SerializablePool>) => {
   // find and replace the pool in the list with the pool in the action
   const updatedPools = updateEntityArray(

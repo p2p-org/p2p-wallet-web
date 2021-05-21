@@ -15,6 +15,7 @@ export type SerializableTokenAccount = {
   ownerProgram: string;
   address: string;
   balance: string;
+  isDerivable: boolean;
   lastUpdatedSlot?: number;
   previous?: SerializableTokenAccount;
 };
@@ -33,12 +34,15 @@ export class TokenAccount
 
   readonly balance: Decimal;
 
+  readonly isDerivable: boolean;
+
   constructor(
     mint: Token,
     owner: PublicKey,
     ownerProgram: PublicKey,
     address: PublicKey,
     balance: number | BN | Decimal,
+    isDerivable = false,
     currentSlot?: number,
     previous?: TokenAccount,
   ) {
@@ -49,6 +53,7 @@ export class TokenAccount
     this.ownerProgram = ownerProgram;
     this.address = address;
     this.balance = toDecimal(balance);
+    this.isDerivable = isDerivable;
   }
 
   matchToken(token: Token): boolean {
@@ -95,6 +100,7 @@ export class TokenAccount
       ownerProgram: this.ownerProgram.toBase58(),
       address: this.address.toBase58(),
       balance: this.balance.toString(),
+      isDerivable: this.isDerivable,
       lastUpdatedSlot: this.lastUpdatedSlot,
       previous: this.previous?.serialize(),
     };
@@ -111,6 +117,7 @@ export class TokenAccount
       new PublicKey(serializableTokenAccount.ownerProgram),
       new PublicKey(serializableTokenAccount.address),
       new Decimal(serializableTokenAccount.balance),
+      serializableTokenAccount.isDerivable,
       serializableTokenAccount.lastUpdatedSlot,
       serializableTokenAccount.previous && TokenAccount.from(serializableTokenAccount.previous),
     );

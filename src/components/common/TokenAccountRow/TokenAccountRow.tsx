@@ -56,16 +56,19 @@ const Bottom = styled.div`
 
 type Props = {
   tokenAccount: TokenAccount;
-  onClick: (tokenAccount: TokenAccount) => void;
+  onClick?: (tokenAccount: TokenAccount) => void;
+  className?: string;
 };
 
-export const TokenAccountRow: FunctionComponent<Props> = ({ tokenAccount, onClick }) => {
+export const TokenAccountRow: FunctionComponent<Props> = ({ tokenAccount, onClick, className }) => {
   const handleClick = () => {
-    onClick(tokenAccount);
+    if (onClick) {
+      onClick(tokenAccount);
+    }
   };
 
   return (
-    <Wrapper onClick={handleClick}>
+    <Wrapper onClick={handleClick} className={className}>
       <ItemWrapper>
         <TokenAvatar symbol={tokenAccount.mint.symbol} size={44} />
         <Info>

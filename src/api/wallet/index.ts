@@ -16,7 +16,7 @@ import { ExtendedCluster } from 'utils/types';
 
 import { confirmTransaction, DEFAULT_COMMITMENT, getConnection, getNetwork } from '../connection';
 import { LocalWallet } from './LocalWallet';
-import { ManualWallet, ManualWalletData } from './ManualWallet';
+import { ManualWallet, ManualWalletData } from './ManualWallet/ManualWallet';
 import { SolletWallet } from './SolletWallet';
 import { Wallet, WalletEvent } from './Wallet';
 
@@ -60,7 +60,11 @@ const createWallet = (
   }
 };
 
-export const connect = async (
+export const connect = (cluster: ExtendedCluster) => {
+  connection = getConnection(cluster);
+};
+
+export const connectWallet = async (
   cluster: ExtendedCluster,
   type: WalletType,
   data?: WalletDataType,
@@ -172,9 +176,13 @@ export const sendTransactionFromAccount = async (
 
 export const getWallet = (): Wallet => {
   if (!wallet || !connection) {
-    throw new Error('notification.error.noWallet');
+    throw new Error('Did not have wallet');
   }
 
+  return wallet;
+};
+
+export const getWalletUnsafe = (): Wallet | null => {
   return wallet;
 };
 
@@ -187,7 +195,7 @@ export const airdropTo = (publicKey: PublicKey): Promise<string> => {
 };
 
 export const getBalance = (publicKey: PublicKey): Promise<number> => {
-  if (!wallet || !connection) {
+  if (!connection) {
     throw new Error('Connect first');
   }
 

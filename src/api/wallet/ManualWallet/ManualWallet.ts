@@ -1,20 +1,21 @@
 import { Account, PublicKey, Transaction } from '@solana/web3.js';
-import * as bip32 from 'bip32';
-import * as bip39 from 'bip39';
 import nacl from 'tweetnacl';
 
-import { Wallet, WalletEvent } from './Wallet';
+import { Wallet, WalletEvent } from '../Wallet';
+import { getAccountFromSeed } from './utils';
 
-export type ManualCredentialsData = {
-  mnemonic: string;
-  password?: string;
-};
-
-export type ManualSeedData = {
+export type ManualUserData = {
   seed: string;
+  password?: string;
+  derivationPath: string;
 };
 
-export type ManualWalletData = ManualCredentialsData | ManualSeedData;
+export type ManualStoredData = {
+  seed: string;
+  derivationPath: string;
+};
+
+export type ManualWalletData = ManualUserData | ManualStoredData;
 
 /**
  * Manual wallet implementation that uses a private key
@@ -24,27 +25,25 @@ export class ManualWallet extends Wallet {
   // @ts-ignore
   private account: Account;
 
-  constructor(network: string, data?: ManualWalletData) {
+  constructor(network: string, data: ManualWalletData) {
     super(network);
 
     void this.init(data);
   }
 
-  init(data?: ManualWalletData): void {
-    if (!(<ManualCredentialsData>data).mnemonic && !(<ManualSeedData>data).seed) {
-      throw new Error('Wallet data must have credentials');
+  init(data: ManualWalletData): void {
+    if (!data.seed) {
+      throw new Error('Wallet data must have seed');
+    }
+
+    if (!data.derivationPath) {
+      throw new Error('Wallet data must have derivationPath');
     }
 
     try {
-      const seed = (<ManualSeedData>data).seed
-        ? Buffer.from((<ManualSeedData>data).seed)
-        : bip39.mnemonicToSeedSync((<ManualCredentialsData>data).mnemonic);
-      localStorage.setItem('seed', JSON.stringify(seed));
+      const seed = Buffer.from(data.seed, 'hex');
 
-      const derivedSeed = bip32.fromSeed(seed).derivePath(`m/501'/0'/0/0`).privateKey as Uint8Array;
-      const keyPair = nacl.sign.keyPair.fromSeed(derivedSeed);
-
-      this.account = new Account(keyPair.secretKey);
+      this.account = getAccountFromSeed(seed, 0, data.derivationPath);
 
       // can be too fast and handler will not be set
       setTimeout(() => {
@@ -52,6 +51,7 @@ export class ManualWallet extends Wallet {
       }, 0);
     } catch (error) {
       this.emit(WalletEvent.DISCONNECT, error);
+      throw error;
     }
   }
 

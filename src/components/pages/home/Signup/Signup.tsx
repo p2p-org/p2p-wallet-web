@@ -6,11 +6,13 @@ import { styled } from '@linaria/react';
 import * as bip39 from 'bip39';
 
 import { WalletType } from 'api/wallet';
+import { DERIVATION_PATH, mnemonicToSeed, storeMnemonicAndSeed } from 'api/wallet/ManualWallet';
 import { ToastManager } from 'components/common/ToastManager';
 import { Password } from 'components/pages/home/Signup/Password';
-import { connect, selectType } from 'store/slices/wallet/WalletSlice';
+import { connectWallet, selectType } from 'store/slices/wallet/WalletSlice';
 import { sleep } from 'utils/common';
 
+import { Back } from '../common/Back';
 import { Seed } from './Seed';
 
 const Wrapper = styled.div`
@@ -23,6 +25,8 @@ const Wrapper = styled.div`
 `;
 
 const Title = styled.span`
+  position: relative;
+
   color: #161616;
   font-weight: 700;
   font-size: 26px;
@@ -31,6 +35,20 @@ const Title = styled.span`
   text-align: center;
 `;
 
+const BackStyled = styled(Back)`
+  position: absolute;
+  left: 0;
+`;
+
+type PageTypes = 'seed' | 'password';
+
+const backToPage: {
+  [page in PageTypes]: PageTypes;
+} = {
+  seed: 'seed',
+  password: 'seed',
+};
+
 type Props = {
   setIsLoading: (isLoading: boolean) => void;
 };
@@ -38,22 +56,28 @@ type Props = {
 export const Signup: FC<Props> = ({ setIsLoading }) => {
   const dispatch = useDispatch();
   const history = useHistory();
-  const [page, setPage] = useState('password');
-  const [password, setPassword] = useState('');
+  const [page, setPage] = useState<PageTypes>('seed');
 
-  const mnemonic = useMemo(() => bip39.generateMnemonic(), []);
+  const mnemonic = useMemo(() => bip39.generateMnemonic(256), []);
 
-  const handleContinueClick = (currentPassword: string) => {
-    setPassword(currentPassword);
-    setPage('seed');
+  const handleBackClick = () => {
+    setPage((state) => backToPage[state]);
   };
 
-  const handleFinishClick = () => {
+  const handleContinueSeedClick = () => {
+    setPage('password');
+  };
+
+  const handleFinishPasswordClick = (password: string) => {
     batch(async () => {
       try {
         setIsLoading(true);
         dispatch(selectType(WalletType.MANUAL));
-        await dispatch(connect({ mnemonic, password }));
+        const seed = await mnemonicToSeed(mnemonic);
+        await dispatch(
+          connectWallet({ seed, password, derivationPath: DERIVATION_PATH.bip44Change }),
+        );
+        await storeMnemonicAndSeed(mnemonic, seed, DERIVATION_PATH.bip44Change, password);
         await sleep(100);
         history.push('/wallets');
         // eslint-disable-next-line @typescript-eslint/no-shadow
@@ -67,9 +91,12 @@ export const Signup: FC<Props> = ({ setIsLoading }) => {
 
   return (
     <Wrapper>
-      <Title>New wallet</Title>
-      {page === 'password' ? <Password next={handleContinueClick} /> : undefined}
-      {page === 'seed' ? <Seed seed={mnemonic} finish={handleFinishClick} /> : undefined}
+      <Title>
+        {page !== 'seed' ? <BackStyled onClick={handleBackClick} /> : undefined}
+        New wallet
+      </Title>
+      {page === 'seed' ? <Seed seed={mnemonic} next={handleContinueSeedClick} /> : undefined}
+      {page === 'password' ? <Password finish={handleFinishPasswordClick} /> : undefined}
     </Wrapper>
   );
 };

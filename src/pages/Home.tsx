@@ -7,6 +7,7 @@ import { css } from '@linaria/core';
 import { styled } from '@linaria/react';
 import { unwrapResult } from '@reduxjs/toolkit';
 
+import { loadMnemonicAndSeed } from 'api/wallet/ManualWallet';
 import { ToastManager } from 'components/common/ToastManager';
 import app from 'components/pages/home/app.png';
 import { LoaderWide } from 'components/pages/home/common/LoaderWide';
@@ -14,7 +15,7 @@ import { Login } from 'components/pages/home/Login';
 import logo from 'components/pages/home/logo.svg';
 import { Signup } from 'components/pages/home/Signup';
 import { fonts } from 'components/pages/landing/styles/fonts';
-import { autoConnect, STORAGE_KEY_SEED } from 'store/slices/wallet/WalletSlice';
+import { autoConnect } from 'store/slices/wallet/WalletSlice';
 import { sleep } from 'utils/common';
 
 const Wrapper = styled.div`
@@ -142,7 +143,9 @@ export const Home: FunctionComponent = () => {
 
   useEffect(() => {
     const mount = async () => {
-      if (!localStorage.getItem(STORAGE_KEY_SEED)) {
+      const { seed } = await loadMnemonicAndSeed();
+
+      if (!seed) {
         return;
       }
 

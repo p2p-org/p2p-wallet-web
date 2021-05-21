@@ -39,6 +39,7 @@
     "classnames": "^2.2.6",
     "dayjs": "^1.9.5",
     "decimal.js": "^10.2.1",
+    "ed25519-hd-key": "^1.2.0",
     "eventemitter3": "^4.0.7",
     "flagged": "^2.0.1",
     "highcharts": "^8.2.2",

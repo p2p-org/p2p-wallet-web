@@ -23,7 +23,7 @@ import { matchesPool, tokenPairSelector } from 'store/slices/tokenPair/utils/tok
 import {
   getMinimumBalanceForRentExemption,
   getRecentBlockhash,
-  getTokenAccounts,
+  getTokenAccountsForWallet,
 } from 'store/slices/wallet/WalletSlice';
 import { majorAmountToMinor, minorAmountToMajor } from 'utils/amount';
 
@@ -315,7 +315,7 @@ export const SwapWidget: FunctionComponent = () => {
 
       if (isNeedCreateWallet) {
         dispatch(wipeAction());
-        await dispatch(getTokenAccounts());
+        await dispatch(getTokenAccountsForWallet());
       }
     }
   };

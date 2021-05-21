@@ -84,7 +84,7 @@ const SeedTextarea = styled.textarea`
 
   width: 100%;
   height: 100%;
-  min-height: 100px;
+  min-height: 125px;
   padding: 15px;
 
   color: #161616;
@@ -127,10 +127,10 @@ const CheckboxWrapper = styled.div`
 
 type Props = {
   seed: string;
-  finish: () => void;
+  next: () => void;
 };
 
-export const Seed: FC<Props> = ({ seed, finish }) => {
+export const Seed: FC<Props> = ({ seed, next }) => {
   const [checked, setChecked] = useState(false);
 
   const handleCheckChange = (nextChecked: boolean) => {
@@ -158,8 +158,8 @@ export const Seed: FC<Props> = ({ seed, finish }) => {
           onChange={handleCheckChange}
         />
       </CheckboxWrapper>
-      <Button disabled={!checked} onClick={finish}>
-        Finish
+      <Button disabled={!checked} onClick={next}>
+        Continue
       </Button>
     </Wrapper>
   );

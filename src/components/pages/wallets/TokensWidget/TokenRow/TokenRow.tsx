@@ -190,7 +190,7 @@ export const TokenRow: FunctionComponent<Props> = ({
       {isNotSOL ? (
         <MenuWrapper>
           <Menu vertical>
-            <MenuItem onItemClick={handleMenuItemClick} icon={isHidden ? 'eye' : 'hide'}>
+            <MenuItem onItemClick={handleMenuItemClick} icon={isHidden ? 'eye' : 'eye-hide'}>
               {isHidden ? 'Show' : 'Hide'}
             </MenuItem>
           </Menu>

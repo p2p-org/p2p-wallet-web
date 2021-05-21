@@ -167,7 +167,7 @@ export const TokenSettingsWidget: FunctionComponent<Props> = ({
       <>
         <SettingItem>
           <IconWrapper>
-            <StyledIcon name="hide" />
+            <StyledIcon name="eye-hide" />
           </IconWrapper>
           <Text>Hide in token list</Text>
           <Switch checked={isHidden} onChange={handleHideTokenClick(publicKey)} />

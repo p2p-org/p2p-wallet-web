@@ -240,7 +240,7 @@ export const TokenRow: FunctionComponent<Props> = ({
     } finally {
       setIsExecuting(false);
     }
-    // dispatch(getTokenAccounts());
+    // dispatch(getTokenAccountsForWallet());
     closeModal();
   };
 

@@ -140,7 +140,7 @@ export const TokensWidget: FunctionComponent<Props> = ({ selectedSymbol }) => {
         (isZeroBalancesHidden &&
           token.balance.lte(0) &&
           !zeroBalanceTokens.includes(token.address.toBase58()) &&
-          token.mint.symbol !== 'SOL')
+          (token.mint.symbol !== 'SOL' || token.isDerivable))
       ) {
         newHiddenTokensList.push(token);
       } else {
@@ -177,7 +177,7 @@ export const TokensWidget: FunctionComponent<Props> = ({ selectedSymbol }) => {
       {hiddenTokensList.length > 0 ? (
         <HiddenTokens onClick={handleChevronClick} className={classNames({ isOpen })}>
           <HideIconWrapper>
-            <IconHide name={isOpen ? 'hide' : 'eye'} className={classNames({ isOpen })} />
+            <IconHide name={isOpen ? 'eye-hide' : 'eye'} className={classNames({ isOpen })} />
           </HideIconWrapper>
           <Text>{`${hiddenTokensList.length} hidden wallet${
             hiddenTokensList.length !== 1 ? 's' : ''
