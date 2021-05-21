@@ -273,7 +273,7 @@ export const SwapWidget: FunctionComponent = () => {
     if (selectedPool && firstToken && firstAmount) {
       return {
         amount: selectedPool.impliedFee(firstToken, firstAmount),
-        token: firstToken,
+        token: secondToken,
       };
     }
   }, [selectedPool, firstToken, firstAmount]);

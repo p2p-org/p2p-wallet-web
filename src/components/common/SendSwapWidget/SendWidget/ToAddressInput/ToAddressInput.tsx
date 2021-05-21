@@ -87,7 +87,7 @@ export const ToAddressInput: FunctionComponent<Props> = ({ value, onChange }) =>
         <WalletIcon name="wallet" />
       </IconWrapper>
       <ToInput
-        placeholder="Enter 0x address"
+        placeholder="Enter address"
         value={value}
         onChange={handleChange}
         onFocus={() => setIsFocused(true)}
