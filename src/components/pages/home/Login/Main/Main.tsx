@@ -23,10 +23,10 @@ const ButtonsWrapper = styled.div``;
 const SocialButton = styled.button`
   display: flex;
   align-items: center;
-  justify-content: center;
 
   width: 100%;
   height: 54px;
+  padding: 0 16px 0 24px;
 
   color: #161616;
   font-weight: 500;
@@ -50,11 +50,24 @@ const SocialButton = styled.button`
 const WalletIcon = styled.div`
   width: 30px;
   height: 30px;
-  margin-right: 12px;
+  margin-right: 16px;
 
   &.sollet {
     background: url('./sollet.svg') no-repeat 50%;
   }
+
+  &.phantom {
+    background: url('./phantom.png') no-repeat 50%;
+  }
+`;
+
+const ArrowIcon = styled.div`
+  flex: 1;
+  width: 20px;
+  height: 20px;
+
+  background: url('./arrow-right.svg') no-repeat 100% 50%;
+  opacity: 0.15;
 `;
 
 const Delimiter = styled.div`
@@ -206,7 +219,18 @@ export const Main: FC<Props> = ({ setIsLoading, next }) => {
       <ButtonsWrapper>
         <SocialButton onClick={handleConnectByClick(WalletType.SOLLET)}>
           <WalletIcon className="sollet" />
-          Continue with Sollet
+          Sollet.io
+          <ArrowIcon />
+        </SocialButton>
+        <SocialButton onClick={handleConnectByClick(WalletType.SOLLET_EXTENSION)}>
+          <WalletIcon className="sollet" />
+          Sollet Extension
+          <ArrowIcon />
+        </SocialButton>
+        <SocialButton onClick={handleConnectByClick(WalletType.PHANTOM)}>
+          <WalletIcon className="phantom" />
+          Phantom
+          <ArrowIcon />
         </SocialButton>
       </ButtonsWrapper>
       <Delimiter>

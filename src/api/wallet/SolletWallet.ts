@@ -11,28 +11,28 @@ const DEFAULT_PROVIDER = 'https://www.sollet.io';
  * to create and connect a simple web wallet.
  */
 export class SolletWallet extends Wallet {
-  private solletWallet: SolletWalletAdapter;
+  private provider: SolletWalletAdapter;
 
-  constructor(network: string, provider: string = DEFAULT_PROVIDER) {
+  constructor(network: string, provider: string | unknown = DEFAULT_PROVIDER) {
     super(network);
-    this.solletWallet = new SolletWalletAdapter(provider, network);
+    this.provider = new SolletWalletAdapter(provider, network);
 
     // once the sollet wallet emits a connect or disconnect event, pass it on
-    this.solletWallet.on(WalletEvent.CONNECT, () => this.emit(WalletEvent.CONNECT));
-    this.solletWallet.on(WalletEvent.DISCONNECT, () => this.emit(WalletEvent.DISCONNECT));
+    this.provider.on(WalletEvent.CONNECT, () => this.emit(WalletEvent.CONNECT));
+    this.provider.on(WalletEvent.DISCONNECT, () => this.emit(WalletEvent.DISCONNECT));
 
-    void this.solletWallet.connect();
+    void this.provider.connect();
   }
 
   get pubkey(): PublicKey {
-    return this.solletWallet.publicKey;
+    return this.provider.publicKey;
   }
 
   disconnect(): void {
-    this.solletWallet.disconnect();
+    this.provider.disconnect();
   }
 
   signTransaction(transaction: Transaction): Promise<Transaction> {
-    return this.solletWallet.signTransaction(transaction);
+    return this.provider.signTransaction(transaction);
   }
 }

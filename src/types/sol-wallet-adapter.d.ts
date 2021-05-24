@@ -4,7 +4,7 @@ declare module '@project-serum/sol-wallet-adapter' {
   import EventEmitter from 'eventemitter3';
 
   class Wallet extends EventEmitter {
-    constructor(providerUrl: string, network: string);
+    constructor(provider: string | unknown, network: string);
     connect(): Promise<void>;
     disconnect(): void;
     signTransaction(transaction: Transaction): Promise<Transaction>;

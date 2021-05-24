@@ -9,7 +9,9 @@ import {
   TransactionInstruction,
   TransactionInstructionCtorFields,
 } from '@solana/web3.js';
+import assert from 'assert';
 
+import { PhantomtWallet } from 'api/wallet/PhantomWallet';
 import { postTransactionSleepMS } from 'config/constants';
 import { sleep } from 'utils/common';
 import { ExtendedCluster } from 'utils/types';
@@ -33,9 +35,11 @@ let connection: Connection | null;
 
 // eslint-disable-next-line no-shadow
 export enum WalletType {
+  LOCAL,
   MANUAL,
   SOLLET,
-  LOCAL,
+  SOLLET_EXTENSION,
+  PHANTOM,
 }
 
 export type WalletDataType = ManualWalletData;
@@ -49,10 +53,16 @@ const createWallet = (
   switch (type) {
     case WalletType.LOCAL:
       return new LocalWallet(network);
+    case WalletType.SOLLET_EXTENSION:
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      return new SolletWallet(network, (window as any).sollet);
     case WalletType.SOLLET:
       return new SolletWallet(network);
+    case WalletType.PHANTOM:
+      return new PhantomtWallet(network);
     case WalletType.MANUAL:
     default:
+      assert(data, 'Wallet data must be exists');
       return new ManualWallet(network, data);
   }
 };
