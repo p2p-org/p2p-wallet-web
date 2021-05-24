@@ -35,7 +35,6 @@ let connection: Connection | null;
 export enum WalletType {
   MANUAL,
   SOLLET,
-  BONFIDA,
   LOCAL,
 }
 
@@ -52,8 +51,6 @@ const createWallet = (
       return new LocalWallet(network);
     case WalletType.SOLLET:
       return new SolletWallet(network);
-    case WalletType.BONFIDA:
-      return new SolletWallet(network, 'https://bonfida.com/wallet');
     case WalletType.MANUAL:
     default:
       return new ManualWallet(network, data);

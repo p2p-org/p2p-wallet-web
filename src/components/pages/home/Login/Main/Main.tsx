@@ -55,10 +55,6 @@ const WalletIcon = styled.div`
   &.sollet {
     background: url('./sollet.svg') no-repeat 50%;
   }
-
-  &.bonfida {
-    background: url('./bonfida.svg') no-repeat 50%;
-  }
 `;
 
 const Delimiter = styled.div`
@@ -211,10 +207,6 @@ export const Main: FC<Props> = ({ setIsLoading, next }) => {
         <SocialButton onClick={handleConnectByClick(WalletType.SOLLET)}>
           <WalletIcon className="sollet" />
           Continue with Sollet
-        </SocialButton>
-        <SocialButton onClick={handleConnectByClick(WalletType.BONFIDA)}>
-          <WalletIcon className="bonfida" />
-          Continue with Bonfida
         </SocialButton>
       </ButtonsWrapper>
       <Delimiter>
