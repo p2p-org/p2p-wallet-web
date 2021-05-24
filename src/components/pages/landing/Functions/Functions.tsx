@@ -555,8 +555,8 @@ export const Functions: FC = () => {
               <Title>
                 Send <TitleBold>USDC</TitleBold>, <TitleBold>BTC</TitleBold>,{' '}
                 <TitleBold>ETH</TitleBold>, and other tokens <TitleBold>in a seconds</TitleBold>{' '}
-                with <TitleBold>no fees</TitleBold>. By QR code, address or username right in your
-                app or web wallet.
+                with <TitleBold>no fees</TitleBold>. By QR code or address right in your app or web
+                wallet.
               </Title>
               <Description>
                 Solana has 400ms blocks and extremely low fees by design. Every transaction takes
@@ -572,7 +572,7 @@ export const Functions: FC = () => {
                 us. Not anyone else. Easily manage 30+ coins.
               </Title>
               <Description>
-                Easily import your existing wallet with a 12/18/24-word recovery phrase.
+                Easily import your existing wallet with a 12/24-word recovery phrase.
               </Description>
             </TextContent>
           ) : undefined}
@@ -584,7 +584,6 @@ export const Functions: FC = () => {
                 <TitleBold>No signup required.</TitleBold> Exchange in a few seconds. Sophisticated
                 UI/UX.
               </Title>
-              <Description>powered by Project Serum.</Description>
             </TextContent>
           ) : undefined}
         </TextWrapper>
