@@ -113,7 +113,8 @@ export const APIFactory = memoizeWith(
         if (instructionIndex === 1 && swapInner) {
           type = 'swap';
           const transfersInstructions = swapInner.instructions.filter(
-            (inst: ConfirmedTransaction) => inst?.parsed?.type === 'transfer',
+            (inst: ConfirmedTransaction) =>
+              inst?.parsed?.type === 'transfer' || inst?.parsed?.type === 'transferChecked',
           );
           const sourceInstruction = transfersInstructions[0] as ConfirmedTransaction;
           const destinationInstruction = transfersInstructions[1] as ConfirmedTransaction;
@@ -236,7 +237,10 @@ export const APIFactory = memoizeWith(
             ? await tokenAPI.tokenAccountInfo(destination)
             : null;
           destinationAmount = new Decimal(preBalance || 0).div(LAMPORTS_PER_SOL);
-        } else if (instruction?.parsed?.type === 'transfer') {
+        } else if (
+          instruction?.parsed?.type === 'transfer' ||
+          instruction?.parsed?.type === 'transferChecked'
+        ) {
           type = instruction.parsed.type;
           source = info?.source ? new PublicKey(info?.source) : null;
           destination = info?.destination ? new PublicKey(info?.destination) : null;

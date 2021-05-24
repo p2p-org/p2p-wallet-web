@@ -179,7 +179,7 @@ export const TransactionRow: FunctionComponent<Props> = ({ transaction, source }
       );
     }
 
-    if (details.type === 'transfer') {
+    if (details.type === 'transfer' || details.type === 'transferChecked') {
       const address = details.destinationTokenAccount?.address.toBase58();
       if (address) {
         return `To ${shortAddress(address)}`;

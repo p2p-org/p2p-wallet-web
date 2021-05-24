@@ -197,7 +197,7 @@ export class Transaction implements Serializable<SerializableTransaction> {
     }
 
     if (isReceiver) {
-      if (type === 'transfer') {
+      if (type === 'transfer' || type === 'transferChecked') {
         type = 'receive';
         icon = 'bottom';
       } else if (type !== 'createAccount') {
@@ -207,7 +207,7 @@ export class Transaction implements Serializable<SerializableTransaction> {
       } else if (type === 'createAccount') {
         isReceiver = false;
       }
-    } else if (type === 'transfer') {
+    } else if (type === 'transfer' || type === 'transferChecked') {
       icon = 'top';
     }
 

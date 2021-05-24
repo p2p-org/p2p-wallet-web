@@ -140,6 +140,7 @@ export const NotifyToast: FunctionComponent<Props> = ({
       icon = <ToastIcon name="error" style={{ color: '#ff5959' }} />;
       break;
     case 'transfer':
+    case 'transferChecked':
       icon = <TokenAvatar symbol={symbol} size={44} />;
       break;
     case 'swap':
