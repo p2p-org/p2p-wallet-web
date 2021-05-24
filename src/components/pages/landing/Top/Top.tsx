@@ -5,7 +5,7 @@ import { styled } from '@linaria/react';
 import { ButtonIOS, ButtonWeb } from 'components/pages/landing/common/Button/Button';
 
 import LogoImg from '../common/images/logo.png';
-import { up } from '../styles/breakpoints';
+import { up, useBreakpoint } from '../styles/breakpoints';
 
 const Wrapper = styled.div`
   z-index: 2;
@@ -141,6 +141,8 @@ const ButtonsWrapper = styled.div`
 `;
 
 export const Top: FC = () => {
+  const isTablet = useBreakpoint(up.tablet);
+
   return (
     <Wrapper>
       <Logo />
@@ -152,7 +154,7 @@ export const Top: FC = () => {
         send money with free transactions and without hidden fees.{' '}
       </Description>
       <ButtonsWrapper>
-        <ButtonWeb glow />
+        {isTablet ? <ButtonWeb glow /> : undefined}
         <ButtonIOS glow />
       </ButtonsWrapper>
     </Wrapper>

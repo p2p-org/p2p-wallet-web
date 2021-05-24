@@ -4,7 +4,7 @@ import { styled } from '@linaria/react';
 
 import { ButtonIOS, ButtonWeb } from 'components/pages/landing/common/Button/Button';
 
-import { up } from '../styles/breakpoints';
+import { up, useBreakpoint } from '../styles/breakpoints';
 
 const Wrapper = styled.div`
   display: flex;
@@ -179,6 +179,8 @@ const ButtonWrapper = styled.div`
 `;
 
 export const Features: FC = () => {
+  const isTablet = useBreakpoint(up.tablet);
+
   return (
     <Wrapper>
       <Title>Store, receive, transfer your money with all those great features</Title>
@@ -223,7 +225,7 @@ export const Features: FC = () => {
               </FeatureDescription>
             </Feature>
             <ButtonWrapper>
-              <ButtonWeb glow />
+              {isTablet ? <ButtonWeb glow /> : undefined}
               <ButtonIOS glow />
             </ButtonWrapper>
           </FeaturesColumn>

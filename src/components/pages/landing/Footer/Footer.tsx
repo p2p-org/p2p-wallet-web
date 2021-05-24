@@ -5,7 +5,7 @@ import { styled } from '@linaria/react';
 import { ButtonIOS, ButtonWeb } from 'components/pages/landing/common/Button/Button';
 
 import LogoImg from '../common/images/logo.png';
-import { up } from '../styles/breakpoints';
+import { up, useBreakpoint } from '../styles/breakpoints';
 import LogoP2PImg from './logo.png';
 
 const Wrapper = styled.div`
@@ -339,7 +339,7 @@ const Bottom = styled.div`
 
 export const Footer: FC = () => {
   // const isDesktop = useBreakpoint(up.desktop);
-  // const isTablet = useBreakpoint(up.tablet);
+  const isTablet = useBreakpoint(up.tablet);
   // const isMobileLandscape = useBreakpoint(up.mobileLandscape);
 
   return (
@@ -349,7 +349,7 @@ export const Footer: FC = () => {
           <Logo />
           <Title>Carefully crafted for people from people in- and around the world</Title>
           <ButtonWrapper>
-            <ButtonWeb glow />
+            {isTablet ? <ButtonWeb glow /> : undefined}
             <ButtonIOS glow />
           </ButtonWrapper>
         </Top>

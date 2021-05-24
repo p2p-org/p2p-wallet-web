@@ -133,7 +133,7 @@ type Props = {
 
 export const Header: FC<Props> = ({ onDrawerToggle }) => {
   const isTablet = useBreakpoint(up.tablet);
-  const isDesktop = useBreakpoint(up.desktop);
+  // const isDesktop = useBreakpoint(up.desktop);
 
   const handleHamburgerClick = () => {
     onDrawerToggle();
@@ -142,7 +142,8 @@ export const Header: FC<Props> = ({ onDrawerToggle }) => {
   return (
     <Wrapper>
       <Left>
-        {!isDesktop ? <HamburgerIcon onClick={handleHamburgerClick} /> : undefined}
+        {/* // isDesktop */}
+        {isTablet ? <HamburgerIcon onClick={handleHamburgerClick} /> : undefined}
         <LogoWrapper>
           <Logo />
           <Delimiter />
