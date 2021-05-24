@@ -54,7 +54,7 @@ const createWallet = (
     case WalletType.LOCAL:
       return new LocalWallet(network);
     case WalletType.SOLLET_EXTENSION:
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-explicit-any
       return new SolletWallet(network, (window as any).sollet);
     case WalletType.SOLLET:
       return new SolletWallet(network);
