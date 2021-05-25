@@ -13,7 +13,9 @@ interface PhantomProvider {
   signAllTransactions: (transactions: Transaction[]) => Promise<Transaction[]>;
   connect: () => Promise<void>;
   disconnect: () => Promise<void>;
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-explicit-any
   on: (event: PhantomEvent, handler: (args: any) => void) => void;
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-explicit-any
   request: (method: PhantomRequestMethod, params: any) => Promise<any>;
 }
 
