@@ -208,6 +208,7 @@ export class Transaction implements Serializable<SerializableTransaction> {
         isReceiver = false;
       }
     } else if (type === 'transfer' || type === 'transferChecked') {
+      type = 'transfer';
       icon = 'top';
     }
 
