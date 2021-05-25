@@ -195,6 +195,11 @@ export const APIFactory = memoizeWith(
         source = info?.source ? new PublicKey(info?.source) : null;
         sourceTokenAccount = source ? await tokenAPI.tokenAccountInfo(source) : null;
 
+        const transferInstruction = instructions.find(
+          (inst: ConfirmedTransaction) =>
+            inst?.parsed?.type === 'transfer' || inst?.parsed?.type === 'transferChecked',
+        ) as ConfirmedTransaction | undefined;
+
         if (instruction?.parsed?.type === 'createAccount') {
           type = instruction.parsed.type;
           const initializeAccountInstruction = instructions[1] as ConfirmedTransaction;
@@ -237,11 +242,8 @@ export const APIFactory = memoizeWith(
             ? await tokenAPI.tokenAccountInfo(destination)
             : null;
           destinationAmount = new Decimal(preBalance || 0).div(LAMPORTS_PER_SOL);
-        } else if (
-          instruction?.parsed?.type === 'transfer' ||
-          instruction?.parsed?.type === 'transferChecked'
-        ) {
-          type = instruction.parsed.type;
+        } else if (transferInstruction && transferInstruction.parsed?.type) {
+          type = transferInstruction.parsed.type;
           source = info?.source ? new PublicKey(info?.source) : null;
           destination = info?.destination ? new PublicKey(info?.destination) : null;
           sourceTokenAccount = source ? await tokenAPI.tokenAccountInfo(source) : null;
