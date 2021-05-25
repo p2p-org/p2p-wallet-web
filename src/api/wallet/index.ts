@@ -19,7 +19,7 @@ import { ExtendedCluster } from 'utils/types';
 import { confirmTransaction, DEFAULT_COMMITMENT, getConnection, getNetwork } from '../connection';
 import { LocalWallet } from './LocalWallet';
 import { ManualWallet, ManualWalletData } from './ManualWallet/ManualWallet';
-import { SolletWallet } from './SolletWallet';
+import { DEFAULT_SOLLET_PROVIDER, SolletWallet } from './SolletWallet';
 import { Wallet, WalletEvent } from './Wallet';
 
 const POST_TRANSACTION_SLEEP_MS = postTransactionSleepMS || 500;
@@ -57,7 +57,7 @@ const createWallet = (
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-explicit-any
       return new SolletWallet(network, (window as any).sollet);
     case WalletType.SOLLET:
-      return new SolletWallet(network);
+      return new SolletWallet(network, DEFAULT_SOLLET_PROVIDER);
     case WalletType.PHANTOM:
       return new PhantomtWallet(network);
     case WalletType.MANUAL:

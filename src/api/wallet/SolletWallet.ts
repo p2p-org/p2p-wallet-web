@@ -3,7 +3,7 @@ import { PublicKey, Transaction } from '@solana/web3.js';
 
 import { Wallet, WalletEvent } from './Wallet';
 
-const DEFAULT_PROVIDER = 'https://www.sollet.io';
+export const DEFAULT_SOLLET_PROVIDER = 'https://www.sollet.io';
 
 /**
  * Wallet implementation for the sollet.io wallet.
@@ -13,8 +13,13 @@ const DEFAULT_PROVIDER = 'https://www.sollet.io';
 export class SolletWallet extends Wallet {
   private provider: SolletWalletAdapter;
 
-  constructor(network: string, provider: string | unknown = DEFAULT_PROVIDER) {
+  constructor(network: string, provider: string | unknown) {
     super(network);
+
+    if (typeof provider !== 'string' && !provider) {
+      throw new Error('Please install and initialize Sollet wallet extension first');
+    }
+
     this.provider = new SolletWalletAdapter(provider, network);
 
     // once the sollet wallet emits a connect or disconnect event, pass it on
