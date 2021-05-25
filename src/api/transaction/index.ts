@@ -68,6 +68,11 @@ export const APIFactory = memoizeWith(
           // close account
           account: string;
           mint: string;
+
+          // transfer checked
+          tokenAmount?: {
+            amount: string;
+          };
         };
         type: string;
       };
@@ -79,6 +84,7 @@ export const APIFactory = memoizeWith(
     // Swap // from
     // Create Account
     // Close Account
+    // TODO: decompose
     const makeTransactionShortInfo = async (transactionInfo: ParsedConfirmedTransaction) => {
       let type: string | null = null;
       let source: PublicKey | null = null;
@@ -189,8 +195,8 @@ export const APIFactory = memoizeWith(
           }
         }
       } else {
-        const instruction = instructions[0] as ConfirmedTransaction;
-        const info = instruction?.parsed?.info;
+        let instruction = instructions[0] as ConfirmedTransaction;
+        let info = instruction?.parsed?.info;
 
         source = info?.source ? new PublicKey(info?.source) : null;
         sourceTokenAccount = source ? await tokenAPI.tokenAccountInfo(source) : null;
@@ -243,6 +249,10 @@ export const APIFactory = memoizeWith(
             : null;
           destinationAmount = new Decimal(preBalance || 0).div(LAMPORTS_PER_SOL);
         } else if (transferInstruction && transferInstruction.parsed?.type) {
+          // rewrite info and instruction with transfer instruction info
+          instruction = transferInstruction;
+          info = transferInstruction?.parsed?.info;
+
           type = transferInstruction.parsed.type;
           source = info?.source ? new PublicKey(info?.source) : null;
           destination = info?.destination ? new PublicKey(info?.destination) : null;
@@ -294,8 +304,8 @@ export const APIFactory = memoizeWith(
           }
 
           if (instruction?.programId.equals(TOKEN_PROGRAM_ID)) {
-            sourceAmount = new Decimal(info?.amount || 0);
-            destinationAmount = new Decimal(info?.amount || 0);
+            sourceAmount = new Decimal(info?.amount || info?.tokenAmount?.amount || 0);
+            destinationAmount = new Decimal(info?.amount || info?.tokenAmount?.amount || 0);
 
             if (sourceTokenAccount?.mint.decimals) {
               sourceAmount = sourceAmount.div(10 ** sourceTokenAccount?.mint.decimals);
