@@ -16,6 +16,7 @@ jobs:
         run: 'npm install'
       - name: Build site
         env:
+          PUBLIC_URL: ${{ secrets.PUBLIC_URL }}
           REACT_APP_BASENAME: ${{ secrets.REACT_APP_BASENAME }}
           REACT_APP_CRYPTO_COMPARE_API_KEY: ${{ secrets.REACT_APP_CRYPTO_COMPARE_API_KEY }}
           REACT_APP_FEE_RELAYER_URL: ${{ secrets.REACT_APP_FEE_RELAYER_URL }}
