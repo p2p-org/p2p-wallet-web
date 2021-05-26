@@ -1,16 +1,10 @@
 import React, { FC, useMemo, useState } from 'react';
-import { batch, useDispatch } from 'react-redux';
-import { useHistory } from 'react-router-dom';
 
 import { styled } from '@linaria/react';
 import * as bip39 from 'bip39';
 
-import { WalletType } from 'api/wallet';
-import { DERIVATION_PATH, mnemonicToSeed, storeMnemonicAndSeed } from 'api/wallet/ManualWallet';
-import { ToastManager } from 'components/common/ToastManager';
+import { DERIVATION_PATH, mnemonicToSeed } from 'api/wallet/ManualWallet';
 import { Password } from 'components/pages/home/Auth/Signup/Password';
-import { connectWallet, selectType } from 'store/slices/wallet/WalletSlice';
-import { sleep } from 'utils/common';
 
 import { Back } from '../common/Back';
 import { DataType } from '../types';
@@ -51,13 +45,10 @@ const backToPage: {
 };
 
 type Props = {
-  setIsLoading: (isLoading: boolean) => void;
   next: (data: DataType) => void;
 };
 
-export const Signup: FC<Props> = ({ setIsLoading }) => {
-  const dispatch = useDispatch();
-  const history = useHistory();
+export const Signup: FC<Props> = ({ next }) => {
   const [page, setPage] = useState<PageTypes>('seed');
 
   const mnemonic = useMemo(() => bip39.generateMnemonic(256), []);
@@ -70,24 +61,14 @@ export const Signup: FC<Props> = ({ setIsLoading }) => {
     setPage('password');
   };
 
-  const handleFinishPasswordClick = (password: string) => {
-    batch(async () => {
-      try {
-        setIsLoading(true);
-        dispatch(selectType(WalletType.MANUAL));
-        const seed = await mnemonicToSeed(mnemonic);
-        await dispatch(
-          connectWallet({ seed, password, derivationPath: DERIVATION_PATH.bip44Change }),
-        );
-        await storeMnemonicAndSeed(mnemonic, seed, DERIVATION_PATH.bip44Change, password);
-        await sleep(100);
-        history.push('/wallets');
-        // eslint-disable-next-line @typescript-eslint/no-shadow
-      } catch (error) {
-        ToastManager.error((error as Error).message);
-      } finally {
-        setIsLoading(false);
-      }
+  const handleContinuePasswordClick = async (password: string) => {
+    const seed = await mnemonicToSeed(mnemonic);
+    next({
+      type: 'signup',
+      mnemonic,
+      seed,
+      password,
+      derivationPath: DERIVATION_PATH.bip44Change,
     });
   };
 
@@ -98,7 +79,7 @@ export const Signup: FC<Props> = ({ setIsLoading }) => {
         New wallet
       </Title>
       {page === 'seed' ? <Seed seed={mnemonic} next={handleContinueSeedClick} /> : undefined}
-      {page === 'password' ? <Password finish={handleFinishPasswordClick} /> : undefined}
+      {page === 'password' ? <Password finish={handleContinuePasswordClick} /> : undefined}
     </Wrapper>
   );
 };

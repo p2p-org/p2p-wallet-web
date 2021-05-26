@@ -74,10 +74,11 @@ const SwitcherText = styled.span`
 `;
 
 interface Props {
+  type?: 'login' | 'signup';
   finish: (isSave: boolean) => void;
 }
 
-export const Ready: FC<Props> = ({ finish }) => {
+export const Ready: FC<Props> = ({ type, finish }) => {
   const [isSave, setIsSave] = useState(true);
 
   const handleIsSaveChange = (nextIsSave: boolean) => {
@@ -92,7 +93,7 @@ export const Ready: FC<Props> = ({ finish }) => {
     <Wrapper>
       <TopWrapper>
         <Logo />
-        <Title>Welcome back!</Title>
+        <Title>{type === 'login' ? 'Welcome back!' : 'Your wallet is ready!'}</Title>
         <Desc>
           You can turn on a quick enter via password. Only you have access to your keys, not
           governmenе, not us, not anyone else. it’s 100% stored on your devices.{' '}

@@ -85,6 +85,7 @@ export const Login: FC<Props> = ({ setIsLoading, next }) => {
 
   const handleContinueDerivableAccountsClick = (nextDerivationPath: string) => {
     next({
+      type: 'login',
       mnemonic,
       seed,
       password,

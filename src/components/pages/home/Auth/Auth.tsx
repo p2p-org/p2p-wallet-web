@@ -84,6 +84,7 @@ export const Auth: FC = () => {
   const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(false);
   const [data, setData] = useState<DataType>({
+    type: undefined,
     mnemonic: '',
     seed: '',
     derivationPath: '',
@@ -132,7 +133,7 @@ export const Auth: FC = () => {
 
   const render = () => {
     if (data.seed) {
-      return <Ready finish={finish(data)} />;
+      return <Ready type={data.type} finish={finish(data)} />;
     }
 
     return (
@@ -148,7 +149,7 @@ export const Auth: FC = () => {
             <Login setIsLoading={setIsLoading} next={next} />
           </Route>
           <Route path="/signup">
-            <Signup setIsLoading={setIsLoading} next={next} />
+            <Signup next={next} />
           </Route>
         </Switch>
       </>
