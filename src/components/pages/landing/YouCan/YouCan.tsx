@@ -248,43 +248,43 @@ const TextBold = styled.span`
   font-weight: 900;
 `;
 
-const LearnMoreLink = styled.a`
-  display: flex;
-  align-items: center;
-  margin-top: 48px;
-
-  color: #161616;
-  font-weight: 500;
-  font-size: 18px;
-  font-family: 'Aktiv Grotesk Corp', sans-serif;
-  line-height: 34px;
-
-  ${up.mobileLandscape} {
-    font-size: 24px;
-    text-decoration: none;
-  }
-
-  ${up.tablet} {
-    margin-top: 40px;
-
-    font-size: 20px;
-  }
-
-  ${up.desktop} {
-    margin-top: 56px;
-
-    font-size: 24px;
-  }
-`;
-
-const Arrow = styled.div`
-  width: 13px;
-  height: 16px;
-  margin-left: 23px;
-
-  background: url('./arrow.svg') no-repeat 50%;
-  background-size: 13px 16px;
-`;
+// const LearnMoreLink = styled.a`
+//   display: flex;
+//   align-items: center;
+//   margin-top: 48px;
+//
+//   color: #161616;
+//   font-weight: 500;
+//   font-size: 18px;
+//   font-family: 'Aktiv Grotesk Corp', sans-serif;
+//   line-height: 34px;
+//
+//   ${up.mobileLandscape} {
+//     font-size: 24px;
+//     text-decoration: none;
+//   }
+//
+//   ${up.tablet} {
+//     margin-top: 40px;
+//
+//     font-size: 20px;
+//   }
+//
+//   ${up.desktop} {
+//     margin-top: 56px;
+//
+//     font-size: 24px;
+//   }
+// `;
+//
+// const Arrow = styled.div`
+//   width: 13px;
+//   height: 16px;
+//   margin-left: 23px;
+//
+//   background: url('./arrow.svg') no-repeat 50%;
+//   background-size: 13px 16px;
+// `;
 
 const Window = styled.div`
   position: relative;
@@ -382,7 +382,7 @@ type Props = {
 
 export const YouCan: FC<Props> = ({ children }) => {
   const isDesktop = useBreakpoint(up.desktop);
-  const isMobileLandscape = useBreakpoint(up.mobileLandscape);
+  // const isMobileLandscape = useBreakpoint(up.mobileLandscape);
 
   return (
     <Wrapper>
@@ -409,9 +409,9 @@ export const YouCan: FC<Props> = ({ children }) => {
                 technologies. Such as FTX, Sollet etc. It’s allows us to keep the speed and no-fees
                 in front of all.
               </Text>
-              <LearnMoreLink>
-                Learn more about Wrapped Tokens {isMobileLandscape ? <Arrow /> : undefined}
-              </LearnMoreLink>
+              {/* <LearnMoreLink> */}
+              {/*  Learn more about Wrapped Tokens {isMobileLandscape ? <Arrow /> : undefined} */}
+              {/* </LearnMoreLink> */}
             </TextContent>
           </TextWrapper>
           <Window />
