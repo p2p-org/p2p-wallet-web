@@ -10,7 +10,10 @@ const Wrapper = styled.div`
   border-bottom: 1px dashed #a3a5ba;
 `;
 
-const Title = styled.div``;
+const Title = styled.div`
+  display: flex;
+  align-items: center;
+`;
 
 const Popover = styled.div`
   position: absolute;
@@ -30,10 +33,11 @@ const Popover = styled.div`
 `;
 
 type Props = {
-  title: string;
+  title: string | React.ReactNode;
+  className?: string;
 };
 
-export const Tooltip: FunctionComponent<Props> = ({ title, children }) => {
+export const Tooltip: FunctionComponent<Props> = ({ title, children, className }) => {
   const tooltipRef = useRef<HTMLDivElement>(null);
   const [isOpen, setIsOpen] = useState(false);
 
@@ -56,7 +60,7 @@ export const Tooltip: FunctionComponent<Props> = ({ title, children }) => {
   };
 
   return (
-    <Wrapper ref={tooltipRef}>
+    <Wrapper ref={tooltipRef} className={className}>
       <Title onClick={handleTooltipClick}>{title}</Title>
       {isOpen ? <Popover>{children}</Popover> : undefined}
     </Wrapper>

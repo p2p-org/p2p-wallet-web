@@ -185,10 +185,6 @@ export const APIFactory = memoizeWith(
         return makeTransferTokenInstructionAndParams(parameters, tokenAccount);
       }
 
-      if (!destinationAccountInfo || destinationAccountInfo.lamports === 0) {
-        throw new Error('Cannot send to address with zero SOL balances');
-      }
-
       const associatedTokenAddress = await SPLToken.getAssociatedTokenAddress(
         ASSOCIATED_TOKEN_ACCOUNT_PROGRAM_ID,
         TOKEN_PROGRAM_ID,

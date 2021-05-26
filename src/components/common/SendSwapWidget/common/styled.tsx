@@ -41,12 +41,12 @@ export const FeeLine = styled.div`
 
 export const FeeLeft = styled.div`
   display: flex;
+  flex-grow: 1;
 `;
 
 export const FeeRight = styled.div`
-  flex: 1;
-
-  text-align: right;
+  display: flex;
+  align-items: center;
 `;
 
 export const BottomWrapper = styled.div`
@@ -66,4 +66,21 @@ export const Hint = styled.div`
   font-size: 14px;
   line-height: 21px;
   text-align: center;
+`;
+
+export const TooltipRow = styled.div`
+  display: flex;
+  font-size: 14px;
+`;
+
+export const TxName = styled.div`
+  flex-grow: 1;
+
+  margin-right: 5px;
+
+  font-weight: normal;
+`;
+
+export const TxValue = styled.div`
+  font-weight: 600;
 `;

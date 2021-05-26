@@ -26,6 +26,7 @@ import eye from './assets/eye-icon.svg';
 import freeTx from './assets/free-tx-icon.svg';
 import gear from './assets/gear-icon.svg';
 import home from './assets/home-icon.svg';
+import info from './assets/info-icon.svg';
 import lock from './assets/lock-icon.svg';
 import logout from './assets/logout-icon.svg';
 import more from './assets/more-icon.svg';
@@ -85,6 +86,7 @@ const iconsMap = new Map<string, string>([
   ['attention', attention],
   ['clock', clock],
   ['free-tx', freeTx],
+  ['info', info],
 ]);
 
 export type Props = {
