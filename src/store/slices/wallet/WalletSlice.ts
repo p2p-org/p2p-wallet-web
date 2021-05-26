@@ -140,7 +140,9 @@ export const getTokenAccountsForWallet = createAsyncThunk<SerializableTokenAccou
 
     // If manual
     if (type === WalletType.MANUAL) {
-      derivableTokenAccounts.forEach((account) => solTokens.push(TokenAccount.from(account)));
+      // TODO: temp for future feature
+      solTokens.push(TokenAccount.from(derivableTokenAccounts[0]));
+      // derivableTokenAccounts.forEach((account) => solTokens.push(TokenAccount.from(account)));
     } else {
       // Simulated SOL token for sollet and other wallet types
       const publicKey = getWallet().pubkey;
