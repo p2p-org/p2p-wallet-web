@@ -1,4 +1,5 @@
 import { styled } from '@linaria/react';
+import { rgba } from 'polished';
 
 export const Button = styled.button`
   display: flex;
@@ -15,14 +16,21 @@ export const Button = styled.button`
   line-height: 18px;
 
   background: #161616;
-  border: none;
+  border: 1px solid transparent;
   border-radius: 12px;
   outline: none;
   cursor: pointer;
 
   appearance: none;
 
+  &.hollow {
+    color: #161616;
+
+    background: #fff;
+    border: 1px solid ${rgba('#161616', 0.15)};
+  }
+
   &:disabled {
-    background: #1616164c;
+    background: #c0c1cb;
   }
 `;

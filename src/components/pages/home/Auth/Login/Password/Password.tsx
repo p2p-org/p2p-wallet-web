@@ -4,10 +4,10 @@ import { styled } from '@linaria/react';
 import classNames from 'classnames';
 import throttle from 'lodash.throttle';
 
-import { PasswordInput } from 'components/pages/home/Signup/Password/PasswordInput';
 import { Icon } from 'components/ui';
 
 import { Button } from '../../common/Button';
+import { PasswordInput } from '../../common/PasswordInput';
 
 const Wrapper = styled.div`
   display: flex;

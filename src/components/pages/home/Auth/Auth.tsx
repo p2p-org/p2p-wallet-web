@@ -1,18 +1,22 @@
-import React, { FC, useEffect, useState } from 'react';
-import { useDispatch } from 'react-redux';
+import React, { FC, useState } from 'react';
+import { batch, useDispatch } from 'react-redux';
 import { useHistory } from 'react-router';
 import { NavLink, Route, Switch, useLocation } from 'react-router-dom';
 
 import { styled } from '@linaria/react';
 import { unwrapResult } from '@reduxjs/toolkit';
 
-import { loadMnemonicAndSeed } from 'api/wallet/ManualWallet';
+import { WalletType } from 'api/wallet';
+import { storeMnemonicAndSeed } from 'api/wallet/ManualWallet';
 import { ToastManager } from 'components/common/ToastManager';
-import { LoaderWide } from 'components/pages/home/common/LoaderWide';
-import { Login } from 'components/pages/home/Login';
-import { Signup } from 'components/pages/home/Signup';
-import { autoConnect } from 'store/slices/wallet/WalletSlice';
+import { connectWallet, selectType } from 'store/slices/wallet/WalletSlice';
 import { sleep } from 'utils/common';
+
+import { LoaderWide } from './common/LoaderWide';
+import { Login } from './Login';
+import { Ready } from './Ready';
+import { Signup } from './Signup';
+import { DataType } from './types';
 
 const Wrapper = styled.div`
   position: relative;
@@ -79,51 +83,81 @@ export const Auth: FC = () => {
   const history = useHistory();
   const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(false);
+  const [data, setData] = useState<DataType>({
+    mnemonic: '',
+    seed: '',
+    derivationPath: '',
+    password: '',
+  });
 
-  useEffect(() => {
-    const mount = async () => {
-      const { seed } = await loadMnemonicAndSeed();
-
-      if (!seed) {
-        return;
-      }
-
+  const finish = (currentData: DataType) => (isSave?: boolean) => {
+    batch(async () => {
       try {
         setIsLoading(true);
-        unwrapResult(await dispatch(autoConnect()));
-
+        dispatch(selectType(WalletType.MANUAL));
+        unwrapResult(
+          await dispatch(
+            connectWallet({
+              seed: currentData.seed,
+              password: currentData.password,
+              derivationPath: currentData.derivationPath,
+            }),
+          ),
+        );
+        await storeMnemonicAndSeed(
+          currentData.mnemonic,
+          currentData.seed,
+          currentData.derivationPath,
+          currentData.password,
+          isSave,
+        );
         await sleep(100);
-
-        history.push(location.state?.from || '/wallets');
+        history.push('/wallets');
+        // eslint-disable-next-line @typescript-eslint/no-shadow
       } catch (error) {
         ToastManager.error((error as Error).message);
       } finally {
         setIsLoading(false);
       }
-    };
+    });
+  };
 
-    void mount();
-  }, []);
+  const next = (nextData: DataType) => {
+    if (nextData.password) {
+      setData(nextData);
+    } else {
+      finish(nextData)();
+    }
+  };
+
+  const render = () => {
+    if (data.seed) {
+      return <Ready finish={finish(data)} />;
+    }
+
+    return (
+      <>
+        <Navigate>
+          <NavLinkStyled to="/signup">Create new wallet</NavLinkStyled>
+          <NavLinkStyled to="/login" isActive={() => ['/login', '/'].includes(location.pathname)}>
+            I already have wallet
+          </NavLinkStyled>
+        </Navigate>
+        <Switch>
+          <Route path={['/', '/login']} exact>
+            <Login setIsLoading={setIsLoading} next={next} />
+          </Route>
+          <Route path="/signup">
+            <Signup setIsLoading={setIsLoading} next={next} />
+          </Route>
+        </Switch>
+      </>
+    );
+  };
 
   return (
     <Wrapper>
-      <Navigate>
-        <NavLinkStyled to="/signup">Create new wallet</NavLinkStyled>
-        <NavLinkStyled to="/login" isActive={() => ['/login', '/'].includes(location.pathname)}>
-          I already have wallet
-        </NavLinkStyled>
-      </Navigate>
-      <Switch>
-        <Route path="/" exact>
-          <Login setIsLoading={setIsLoading} />
-        </Route>
-        <Route path="/login">
-          <Login setIsLoading={setIsLoading} />
-        </Route>
-        <Route path="/signup">
-          <Signup setIsLoading={setIsLoading} />
-        </Route>
-      </Switch>
+      {render()}
       {isLoading ? <LoaderWide /> : undefined}
     </Wrapper>
   );

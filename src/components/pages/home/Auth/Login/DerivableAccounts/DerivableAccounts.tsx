@@ -1,27 +1,17 @@
 import React, { FC, useEffect, useState } from 'react';
-import { batch, useDispatch, useSelector } from 'react-redux';
-import { useHistory } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 
 import { styled } from '@linaria/react';
-import { unwrapResult } from '@reduxjs/toolkit';
 
 import { TokenAccount } from 'api/token/TokenAccount';
-import { WalletType } from 'api/wallet';
-import { DERIVATION_PATH, storeMnemonicAndSeed } from 'api/wallet/ManualWallet';
-import { ToastManager } from 'components/common/ToastManager';
+import { DERIVATION_PATH } from 'api/wallet/ManualWallet';
 import { TokenAccountRow } from 'components/common/TokenAccountRow';
-import { Button } from 'components/pages/home/common/Button';
+import { Button } from 'components/pages/home/Auth/common/Button';
 import { getRatesMarkets } from 'store/slices/rate/RateSlice';
-import {
-  connect,
-  connectWallet,
-  getDerivableTokenAccounts,
-  selectType,
-} from 'store/slices/wallet/WalletSlice';
-import { sleep } from 'utils/common';
+import { connect, getDerivableTokenAccounts } from 'store/slices/wallet/WalletSlice';
 
-import { Selector } from './Selector';
-import { SelectorItemType } from './Selector/Selector';
+import { Selector } from '../../common/Selector';
+import { SelectorItemType } from '../../common/Selector/Selector';
 
 const Wrapper = styled.div``;
 
@@ -50,7 +40,7 @@ const TokenAccountRowStyled = styled(TokenAccountRow)`
   padding-left: 0;
 `;
 
-const DERIVATION_PATHS_WITH_LABELS = [
+const DERIVATION_PATHS_WITH_LABELS: SelectorItemType[] = [
   {
     label: `m/44'/501'/0'`,
     value: DERIVATION_PATH.bip44,
@@ -66,15 +56,12 @@ const DERIVATION_PATHS_WITH_LABELS = [
 ];
 
 type Props = {
-  mnemonic: string;
   seed: string;
-  password: string;
-  setIsLoading: (isLoading: boolean) => void;
+  next: (derivationPath: string) => void;
 };
 
-export const DerivableAccounts: FC<Props> = ({ mnemonic, seed, password, setIsLoading }) => {
+export const DerivableAccounts: FC<Props> = ({ seed, next }) => {
   const dispatch = useDispatch();
-  const history = useHistory();
   const [derivationPathItem, setDerivationPathItem] = useState(DERIVATION_PATHS_WITH_LABELS[1]);
   const derivableTokenAccounts = useSelector((state) =>
     state.wallet.derivableTokenAccounts.map((account) => TokenAccount.from(account)),
@@ -95,25 +82,7 @@ export const DerivableAccounts: FC<Props> = ({ mnemonic, seed, password, setIsLo
   };
 
   const handleContinueClick = () => {
-    batch(async () => {
-      try {
-        setIsLoading(true);
-        dispatch(selectType(WalletType.MANUAL));
-        unwrapResult(
-          await dispatch(
-            connectWallet({ seed, password, derivationPath: derivationPathItem.value }),
-          ),
-        );
-        await storeMnemonicAndSeed(mnemonic, seed, derivationPathItem.value, password);
-        await sleep(100);
-        history.push('/wallets');
-        // eslint-disable-next-line @typescript-eslint/no-shadow
-      } catch (error) {
-        ToastManager.error((error as Error).message);
-      } finally {
-        setIsLoading(false);
-      }
-    });
+    next(derivationPathItem.value);
   };
 
   return (

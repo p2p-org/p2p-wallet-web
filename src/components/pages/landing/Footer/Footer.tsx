@@ -2,9 +2,9 @@ import React, { FC } from 'react';
 
 import { styled } from '@linaria/react';
 
+import LogoImg from 'assets/images/big-logo.png';
 import { ButtonIOS, ButtonWeb } from 'components/pages/landing/common/Button/Button';
 
-import LogoImg from '../common/images/logo.png';
 import { up, useBreakpoint } from '../styles/breakpoints';
 import LogoP2PImg from './logo.png';
 

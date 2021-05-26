@@ -2,8 +2,8 @@ import React, { FC, useState } from 'react';
 
 import { styled } from '@linaria/react';
 
-import { Button } from 'components/pages/home/common/Button';
-import { Checkbox } from 'components/pages/home/common/Checkbox';
+import { Button } from 'components/pages/home/Auth/common/Button';
+import { Checkbox } from 'components/pages/home/Auth/common/Checkbox';
 
 const Wrapper = styled.div`
   display: flex;

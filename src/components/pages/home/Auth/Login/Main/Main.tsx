@@ -10,7 +10,7 @@ import throttle from 'lodash.throttle';
 
 import { WalletType } from 'api/wallet';
 import { ToastManager } from 'components/common/ToastManager';
-import { Button } from 'components/pages/home/common/Button';
+import { Button } from 'components/pages/home/Auth/common/Button';
 import { Icon } from 'components/ui';
 import { localMnemonic } from 'config/constants';
 import { connectWallet, selectType } from 'store/slices/wallet/WalletSlice';

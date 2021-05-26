@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useRef, useState } from 'react';
+import React, { FC, ReactNode, useEffect, useRef, useState } from 'react';
 
 import { styled } from '@linaria/react';
 import classNames from 'classnames';
@@ -9,8 +9,9 @@ const Wrapper = styled.div``;
 
 const MainWrapper = styled.div`
   display: flex;
-
-  padding: 16px;
+  align-items: center;
+  height: 54px;
+  padding-right: 16px;
 
   background: #fff;
   border: 1px solid rgba(22, 22, 22, 0.15);
@@ -26,6 +27,10 @@ const MainWrapper = styled.div`
 
 const Value = styled.div`
   flex: 1;
+`;
+
+const Text = styled.div`
+  padding: 16px;
 
   color: #161616;
   font-weight: 500;
@@ -76,26 +81,19 @@ const DropDownList = styled.div`
 `;
 
 const DropDownListItem = styled.div`
-  padding: 18px 16px;
-
-  color: #161616;
-  font-weight: 500;
-  font-size: 16px;
-  font-family: 'Aktiv Grotesk Corp', sans-serif;
-  line-height: 18px;
-
   cursor: pointer;
 `;
 
-export type SelectorItemType = { value: string; label: string };
+export type SelectorItemType = { value: string; label: string | ReactNode };
 
 type Props = {
   value: SelectorItemType;
   items: SelectorItemType[];
   onChange: (item: SelectorItemType) => void;
+  className?: string;
 };
 
-export const Selector: FC<Props> = ({ value, items, onChange }) => {
+export const Selector: FC<Props> = ({ value, items, onChange, className }) => {
   const selectorRef = useRef<HTMLDivElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
@@ -122,15 +120,38 @@ export const Selector: FC<Props> = ({ value, items, onChange }) => {
     setIsOpen(!isOpen);
   };
 
-  const handleItemClick = (nextValue: SelectorItemType) => {
+  const handleItemClick = (nextValue: SelectorItemType) => () => {
     setIsOpen(false);
     onChange(nextValue);
   };
 
+  const renderValue = () => {
+    if (!value) {
+      return null;
+    }
+
+    if (typeof value.label === 'string') {
+      return <Text>{value.label}</Text>;
+    }
+
+    return value.label;
+  };
+
+  const renderItem = (item: SelectorItemType) => {
+    if (typeof item.label === 'string') {
+      return <Text>{item.label}</Text>;
+    }
+
+    return item.label;
+  };
+
   return (
-    <Wrapper>
-      <MainWrapper ref={selectorRef} onClick={handleSelectorClick}>
-        <Value>{value.label}</Value>
+    <Wrapper className={className}>
+      <MainWrapper
+        ref={selectorRef}
+        onClick={handleSelectorClick}
+        className={classNames({ isOpen })}>
+        <Value>{renderValue()}</Value>
         <ChevronWrapper className={classNames({ isOpen })}>
           <ChevronIcon name="arrow-triangle" />
         </ChevronWrapper>
@@ -139,8 +160,8 @@ export const Selector: FC<Props> = ({ value, items, onChange }) => {
         <DropDownListContainer ref={dropdownRef}>
           <DropDownList ref={listRef}>
             {items.map((item) => (
-              <DropDownListItem key={item.value} onClick={() => handleItemClick(item)}>
-                {item.label}
+              <DropDownListItem key={item.value} onClick={handleItemClick(item)}>
+                {renderItem(item)}
               </DropDownListItem>
             ))}
           </DropDownList>

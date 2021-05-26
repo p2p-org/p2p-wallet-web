@@ -67,7 +67,7 @@ const CheckboxHidden = styled.input`
 
 type Props = {
   checked: boolean;
-  onChange: (valaue: boolean) => void;
+  onChange: (value: boolean) => void;
 };
 
 export const Switch: FunctionComponent<Props> = ({ checked, onChange }) => {

@@ -7,7 +7,8 @@ import { pbkdf2 } from 'crypto';
 import * as ed25519 from 'ed25519-hd-key';
 import nacl from 'tweetnacl';
 
-type LockedType = {
+export type LockedType = {
+  account: string;
   encrypted: string;
   nonce: string;
   kdf: string;
@@ -16,7 +17,7 @@ type LockedType = {
   digest: string;
 };
 
-type EncryptedType = {
+type UnlockedType = {
   mnemonic: string | null;
   seed: string | null;
   derivationPath: string | null;
@@ -30,6 +31,14 @@ export const DERIVATION_PATH = {
 
 const STORAGE_KEY_UNLOCKED = 'unlocked';
 export const STORAGE_KEY_LOCKED = 'locked';
+
+const EMPTY_UNLOCKED: UnlockedType = {
+  mnemonic: null,
+  seed: null,
+  derivationPath: null,
+};
+
+let unlockedMnemonicAndSeed: UnlockedType = EMPTY_UNLOCKED;
 
 export async function mnemonicToSeed(mnemonic: string) {
   const bip39 = await import('bip39');
@@ -99,6 +108,7 @@ export async function storeMnemonicAndSeed(
   seed: string,
   derivationPath: string,
   password?: string,
+  isSave?: boolean,
 ) {
   const plaintext = JSON.stringify({ mnemonic, seed, derivationPath });
 
@@ -111,7 +121,9 @@ export async function storeMnemonicAndSeed(
     const nonce = nacl.randomBytes(nacl.secretbox.nonceLength);
     const encrypted = nacl.secretbox(Buffer.from(plaintext), nonce, key);
 
+    const account = getAccountFromSeed(Buffer.from(seed, 'hex'), 0, derivationPath);
     const locked = JSON.stringify({
+      account: account.publicKey.toBase58(),
       encrypted: bs58.encode(encrypted),
       nonce: bs58.encode(nonce),
       kdf,
@@ -119,36 +131,19 @@ export async function storeMnemonicAndSeed(
       iterations,
       digest,
     });
-    localStorage.setItem(STORAGE_KEY_LOCKED, locked);
-    localStorage.removeItem(STORAGE_KEY_UNLOCKED);
-  } else {
-    localStorage.setItem(STORAGE_KEY_UNLOCKED, plaintext);
-    localStorage.removeItem(STORAGE_KEY_LOCKED);
-  }
 
-  sessionStorage.removeItem(STORAGE_KEY_UNLOCKED);
+    if (isSave) {
+      localStorage.setItem(STORAGE_KEY_LOCKED, locked);
+    }
+  } else {
+    unlockedMnemonicAndSeed = { mnemonic, seed, derivationPath };
+  }
 }
 
-const EMPTY_UNLOCKED: EncryptedType = {
-  mnemonic: null,
-  seed: null,
-  derivationPath: null,
-};
-
-export async function loadMnemonicAndSeed(
-  password?: string,
-  stayLoggedIn?: boolean,
-): Promise<EncryptedType> {
+export async function loadMnemonicAndSeed(password?: string): Promise<UnlockedType> {
   if (!password) {
     return new Promise((resolve) => {
-      if (localStorage.getItem(STORAGE_KEY_UNLOCKED)) {
-        const unlocked = JSON.parse(
-          localStorage.getItem(STORAGE_KEY_UNLOCKED) || '',
-        ) as EncryptedType;
-        resolve(unlocked);
-      }
-
-      return resolve(EMPTY_UNLOCKED);
+      return resolve(unlockedMnemonicAndSeed);
     });
   }
 
@@ -171,15 +166,10 @@ export async function loadMnemonicAndSeed(
   }
 
   const decodedPlaintext = Buffer.from(plaintext).toString();
-  const { mnemonic, seed, derivationPath } = JSON.parse(decodedPlaintext) as EncryptedType;
-
-  if (stayLoggedIn) {
-    sessionStorage.setItem(STORAGE_KEY_UNLOCKED, decodedPlaintext);
-  }
-
-  return { mnemonic, seed, derivationPath };
+  const decoded = JSON.parse(decodedPlaintext) as UnlockedType;
+  return decoded;
 }
 
 export function forgetWallet() {
-  localStorage.removeItem(STORAGE_KEY_UNLOCKED);
+  sessionStorage.removeItem(STORAGE_KEY_UNLOCKED);
 }

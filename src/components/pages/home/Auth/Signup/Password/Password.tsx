@@ -5,10 +5,10 @@ import React, { FC, useMemo, useState } from 'react';
 import { styled } from '@linaria/react';
 import classNames from 'classnames';
 
-import { PasswordInput } from 'components/pages/home/Signup/Password/PasswordInput';
 import { Icon } from 'components/ui';
 
 import { Button } from '../../common/Button';
+import { PasswordInput } from '../../common/PasswordInput';
 import { validatePassword } from './utils';
 
 const Wrapper = styled.div`

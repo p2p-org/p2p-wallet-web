@@ -17,6 +17,7 @@ const WrapperLabel = styled.label`
   cursor: text;
 
   &.isFocused {
+    background: #fff;
     border-color: #5887ff;
   }
 

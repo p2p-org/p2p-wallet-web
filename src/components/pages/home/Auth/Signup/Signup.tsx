@@ -8,11 +8,12 @@ import * as bip39 from 'bip39';
 import { WalletType } from 'api/wallet';
 import { DERIVATION_PATH, mnemonicToSeed, storeMnemonicAndSeed } from 'api/wallet/ManualWallet';
 import { ToastManager } from 'components/common/ToastManager';
-import { Password } from 'components/pages/home/Signup/Password';
+import { Password } from 'components/pages/home/Auth/Signup/Password';
 import { connectWallet, selectType } from 'store/slices/wallet/WalletSlice';
 import { sleep } from 'utils/common';
 
 import { Back } from '../common/Back';
+import { DataType } from '../types';
 import { Seed } from './Seed';
 
 const Wrapper = styled.div`
@@ -51,6 +52,7 @@ const backToPage: {
 
 type Props = {
   setIsLoading: (isLoading: boolean) => void;
+  next: (data: DataType) => void;
 };
 
 export const Signup: FC<Props> = ({ setIsLoading }) => {
