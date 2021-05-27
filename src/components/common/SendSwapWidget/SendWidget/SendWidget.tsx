@@ -4,6 +4,7 @@ import { useHistory } from 'react-router';
 
 import { styled } from '@linaria/react';
 import { unwrapResult } from '@reduxjs/toolkit';
+import { AccountLayout } from '@solana/spl-token';
 import { PublicKey } from '@solana/web3.js';
 import Decimal from 'decimal.js';
 
@@ -11,12 +12,13 @@ import { Token } from 'api/token/Token';
 import { TokenAccount } from 'api/token/TokenAccount';
 import { RateUSD } from 'components/common/RateUSD';
 import { ToastManager } from 'components/common/ToastManager';
-import { Button } from 'components/ui';
+import { Button, Icon, Tooltip } from 'components/ui';
 import { openModal } from 'store/actions/modals';
 import { SHOW_MODAL_ERROR, SHOW_MODAL_TRANSACTION_STATUS } from 'store/constants/modalTypes';
 import { RootState } from 'store/rootReducer';
 import {
   getMinimumBalanceForRentExemption,
+  getRecentBlockhash,
   getTokenAccount,
   transfer,
 } from 'store/slices/wallet/WalletSlice';
@@ -31,6 +33,9 @@ import {
   FromToSelectInputStyled,
   FromWrapper,
   Hint,
+  TooltipRow,
+  TxName,
+  TxValue,
   WrapperWidgetPage,
 } from '../common/styled';
 import { ToAddressInput } from './ToAddressInput';
@@ -44,6 +49,29 @@ const FromTitle = styled.div`
   font-weight: 600;
   font-size: 16px;
   line-height: 24px;
+`;
+
+const InfoIcon = styled(Icon)`
+  width: 20px;
+  height: 20px;
+
+  margin-left: 10px;
+
+  color: #a3a5ba;
+`;
+
+const FeeRightStyled = styled(FeeRight)`
+  &:hover {
+    color: #5887ff;
+
+    ${InfoIcon} {
+      color: #5887ff;
+    }
+  }
+`;
+
+const TooltipStyled = styled(Tooltip)`
+  border-bottom: none;
 `;
 
 type Props = {
@@ -66,12 +94,19 @@ const isValidAddress = (address: string): boolean => {
   }
 };
 
+const formatFee = (amount: number): number =>
+  new Decimal(amount)
+    .div(10 ** 9)
+    .toDecimalPlaces(9)
+    .toNumber();
+
 export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
   const dispatch = useDispatch();
   const history = useHistory();
   const [fromAmount, setFromAmount] = useState('');
   const [toTokenPublicKey, setToTokenPublicKey] = useState('');
-  const [fee, setFee] = useState(0);
+  const [txFee, setTxFee] = useState(0);
+  const [rentFee, setRentFee] = useState(0);
   const [isExecuting, setIsExecuting] = useState(false);
   const tokenAccounts = useSelector((state: RootState) =>
     state.wallet.tokenAccounts.map((account) => TokenAccount.from(account)),
@@ -85,25 +120,26 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
     (state: RootState) => state.wallet.settings.useFreeTransactions,
   );
 
-  useEffect(() => {
-    const mount = async () => {
-      try {
-        const resultFee = useFreeTransactions
-          ? 0
-          : unwrapResult(await dispatch(getMinimumBalanceForRentExemption(0)));
-        setFee(
-          new Decimal(resultFee)
-            .div(10 ** 9)
-            .toDecimalPlaces(9)
-            .toNumber(),
-        );
-      } catch (error) {
-        ToastManager.error((error as Error).message);
-      }
-    };
+  if (!useFreeTransactions) {
+    useEffect(() => {
+      const mount = async () => {
+        try {
+          const resultRentFee = unwrapResult(
+            await dispatch(getMinimumBalanceForRentExemption(AccountLayout.span)),
+          );
 
-    void mount();
-  }, []);
+          const resultRecentBlockhash = unwrapResult(await dispatch(getRecentBlockhash()));
+
+          setRentFee(formatFee(resultRentFee));
+          setTxFee(formatFee(resultRecentBlockhash.feeCalculator.lamportsPerSignature));
+        } catch (error) {
+          console.log(error);
+        }
+      };
+
+      void mount();
+    }, []);
+  }
 
   const handleSubmit = async () => {
     if (!fromTokenAccount) {
@@ -121,22 +157,8 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
     if (fromTokenAccount?.mint.symbol !== 'SOL') {
       const account = unwrapResult(await dispatch(getTokenAccount(destination)));
 
-      if (!account) {
-        void dispatch(
-          openModal({
-            modalType: SHOW_MODAL_ERROR,
-            props: {
-              icon: 'branch',
-              header: 'Current SOL Address are not in blockchain network',
-              text:
-                'If you are sending tokens to a new SOL wallet make sure that recepient’s balance is’n empty.',
-            },
-          }),
-        );
-        return;
-      }
-
       if (
+        account &&
         account.mint.symbol !== 'SOL' &&
         !account.mint.address.equals(fromTokenAccount.mint.address)
       ) {
@@ -209,6 +231,33 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
 
   const isDisabled = isExecuting;
 
+  // TODO
+  const isNeedCreateWallet = false;
+
+  const toolTipItems = [];
+  if (useFreeTransactions) {
+    toolTipItems.push(
+      <TooltipRow>Paid by p2p.org.</TooltipRow>,
+      <TooltipRow>We take care of all transfers costs ✌.</TooltipRow>,
+    );
+  } else {
+    toolTipItems.push(
+      <TooltipRow>
+        <TxName>Transaction:</TxName>
+        <TxValue>{`${txFee} SOL`}</TxValue>
+      </TooltipRow>,
+    );
+
+    if (isNeedCreateWallet) {
+      toolTipItems.push(
+        <TooltipRow>
+          <TxName>Wallet creation:</TxName>
+          <TxValue>{`${rentFee} SOL`}</TxValue>
+        </TooltipRow>,
+      );
+    }
+  }
+
   return (
     <WrapperWidgetPage title="Send" icon="top">
       <FromWrapper>
@@ -228,7 +277,17 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
               <RateUSD symbol={fromTokenAccount?.mint.symbol} />
             </FeeLeft>
           ) : undefined}
-          <FeeRight>Fee: {fee} SOL</FeeRight>
+          <FeeRightStyled>
+            <TooltipStyled
+              title={
+                <>
+                  <div>Fee: {isNeedCreateWallet ? txFee + rentFee : txFee} SOL</div>
+                  <InfoIcon name="info" />
+                </>
+              }>
+              {toolTipItems}
+            </TooltipStyled>
+          </FeeRightStyled>
         </FeeLine>
       </FromWrapper>
       <ToSendWrapper>

@@ -36,6 +36,9 @@ import {
   FromToSelectInputStyled,
   FromWrapper,
   Hint,
+  TooltipRow,
+  TxName,
+  TxValue,
   WrapperWidgetPage,
 } from '../common/styled';
 import orcaLogo from './orca_logo.svg';
@@ -120,24 +123,6 @@ const PropertyLine = styled.div`
 
 const PropertyValue = styled.div`
   color: #000;
-`;
-
-const TooltipRow = styled.div`
-  display: flex;
-`;
-
-const TxName = styled.div`
-  flex-grow: 1;
-
-  margin-right: 5px;
-
-  font-weight: normal;
-  font-size: 14px;
-`;
-
-const TxValue = styled.div`
-  font-weight: 600;
-  font-size: 14px;
 `;
 
 const PoweredByBannerWrapper = styled.div`
