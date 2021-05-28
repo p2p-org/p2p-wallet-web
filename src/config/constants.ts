@@ -55,9 +55,9 @@ export const networks: NetworksByNameType = {
   figment: {
     name: 'figment',
     cluster: 'mainnet-beta',
-    endpoint: `https://solana--mainnet--rpc.datahub.figment.io/apikey/${process.env.REACT_APP_FIGMENT_DATAHUB}`,
+    endpoint: `https://solana--mainnet--rpc.datahub.figment.io/apikey/${process.env.REACT_APP_FIGMENT_DATAHUB_API_KEY}`,
     endpointLabel: 'https://solana--mainnet--rpc.datahub.figment.io',
-    wsEndpoint: `wss://solana--mainnet--ws.datahub.figment.io/apikey/${process.env.REACT_APP_FIGMENT_DATAHUB}`,
+    wsEndpoint: `wss://solana--mainnet--ws.datahub.figment.io/apikey/${process.env.REACT_APP_FIGMENT_DATAHUB_API_KEY}`,
     wsEndpointLabel: 'wss://solana--mainnet--ws.datahub.figment.io',
   },
   'serum-mainnet': {
