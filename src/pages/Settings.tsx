@@ -143,6 +143,14 @@ const Title = styled.div`
   color: #a3a5ba;
   font-weight: 600;
   font-size: 16px;
+
+  &.overflow-ellipsis {
+    width: 250px;
+    overflow: hidden;
+
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
 `;
 
 const ChevronIcon = styled(Icon)`
@@ -248,7 +256,7 @@ export const Settings: FunctionComponent = () => {
                 title="Network"
                 secondary={
                   <>
-                    <Title>{network.endpoint}</Title>
+                    <Title className="overflow-ellipsis">{network.endpoint}</Title>
                     <ChevronWrapper>
                       <ChevronIcon name="chevron" />
                     </ChevronWrapper>

@@ -16,6 +16,7 @@ const createConnection = memoizeWith(
   (network: NetworkType): Connection => {
     const connection = new Connection(network.endpoint, {
       wsEndpoint: network.wsEndpoint,
+      httpHeaders: network.httpHeaders,
       commitment: DEFAULT_COMMITMENT,
     });
 

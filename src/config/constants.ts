@@ -1,4 +1,4 @@
-import { Commitment, PublicKey } from '@solana/web3.js';
+import { Commitment, HttpHeaders, PublicKey } from '@solana/web3.js';
 
 import { ExtendedCluster } from 'utils/types';
 
@@ -38,10 +38,11 @@ export type NetworkType = {
   endpointLabel?: string;
   wsEndpoint?: string;
   wsEndpointLabel?: string;
+  httpHeaders?: HttpHeaders;
 };
 
 export type NetworkNameType =
-  | 'figment'
+  | 'figment-mainnet'
   | 'serum-mainnet'
   | 'solana-mainnet'
   | 'solana-devnet'
@@ -52,13 +53,16 @@ type NetworksByNameType = {
 };
 
 export const networks: NetworksByNameType = {
-  figment: {
-    name: 'figment',
+  'figment-mainnet': {
+    name: 'figment-mainnet',
     cluster: 'mainnet-beta',
-    endpoint: `https://solana--mainnet--rpc.datahub.figment.io/apikey/${process.env.REACT_APP_FIGMENT_DATAHUB_API_KEY}`,
-    endpointLabel: 'https://solana--mainnet--rpc.datahub.figment.io',
+    endpoint: `https://solana--mainnet--rpc.datahub.figment.io`,
     wsEndpoint: `wss://solana--mainnet--ws.datahub.figment.io/apikey/${process.env.REACT_APP_FIGMENT_DATAHUB_API_KEY}`,
-    wsEndpointLabel: 'wss://solana--mainnet--ws.datahub.figment.io',
+    httpHeaders: process.env.REACT_APP_FIGMENT_DATAHUB_API_KEY
+      ? {
+          Authorization: process.env.REACT_APP_FIGMENT_DATAHUB_API_KEY,
+        }
+      : undefined,
   },
   'serum-mainnet': {
     name: 'serum-mainnet',
@@ -82,6 +86,6 @@ export const networks: NetworksByNameType = {
   },
 };
 
-export const DEFAULT_NETWORK: NetworkType = networks.figment;
+export const DEFAULT_NETWORK: NetworkType = networks['figment-mainnet'];
 
 export const feeRelayerUrl = process.env.REACT_APP_FEE_RELAYER_URL;
