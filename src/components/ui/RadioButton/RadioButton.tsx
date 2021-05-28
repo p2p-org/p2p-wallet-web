@@ -75,8 +75,10 @@ const Radio = styled.input`
 type Props = {
   label: string;
   checked: boolean;
-  value: string;
-  onChange: (valaue: string) => void;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  value: any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  onChange: (value: any) => void;
   className?: string;
 };
 
@@ -87,19 +89,13 @@ export const RadioButton: FunctionComponent<Props> = ({
   onChange,
   className,
 }) => {
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    onChange(e.target.value);
+  const handleChange = () => {
+    onChange(value);
   };
 
   return (
     <Wrapper className={className}>
-      <Radio
-        value={value}
-        checked={checked}
-        name="radio-button"
-        type="radio"
-        onChange={handleChange}
-      />
+      <Radio checked={checked} name="radio-button" type="radio" onChange={handleChange} />
       <Label>{label}</Label>
     </Wrapper>
   );

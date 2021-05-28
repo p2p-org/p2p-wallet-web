@@ -101,7 +101,7 @@ export const TransactionStatusModal: FunctionComponent<Props> = ({
         Transaction.from(state.transaction.items[signature])) ||
       null,
   );
-  const cluster = useSelector((state) => state.wallet.cluster);
+  const cluster = useSelector((state) => state.wallet.network.cluster);
   const tokenAccounts = useSelector((state) => state.wallet.tokenAccounts);
 
   useEffect(() => {

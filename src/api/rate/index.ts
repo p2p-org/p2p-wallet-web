@@ -1,9 +1,8 @@
-import { complement, identity, isNil, memoizeWith, mergeAll, splitEvery } from 'ramda';
+import { complement, isNil, memoizeWith, mergeAll, splitEvery, toString } from 'ramda';
 import assert from 'ts-invariant';
 
 import tokenList from 'api/token/token.config';
-import { cryptoCompareApiKey } from 'config/constants';
-import { ExtendedCluster } from 'utils/types';
+import { cryptoCompareApiKey, NetworkType } from 'config/constants';
 
 import { CandleLimitType, CandleRate } from './CandleRate';
 import { MarketRate } from './MarketRate';
@@ -78,13 +77,13 @@ export interface API {
 
 // The API is a singleton per cluster. This ensures requests can be cached
 export const APIFactory = memoizeWith(
-  identity,
-  (cluster: ExtendedCluster): API => {
+  toString,
+  (network: NetworkType): API => {
     assert(cryptoCompareApiKey, 'Define crypto compare api key in .env');
 
     const tokenSymbols =
       tokenList
-        .filterByClusterSlug(cluster)
+        .filterByClusterSlug(network.cluster)
         .excludeByTag('lp-token')
         .excludeByTag('nft')
         .excludeByTag('leveraged')

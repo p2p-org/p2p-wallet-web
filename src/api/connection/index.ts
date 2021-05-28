@@ -1,62 +1,61 @@
-import { Cluster, clusterApiUrl, Commitment, Connection, SignatureResult } from '@solana/web3.js';
-import { identity, memoizeWith } from 'ramda';
+import { Commitment, Connection, SignatureResult } from '@solana/web3.js';
+import { memoizeWith, toString } from 'ramda';
 
-import { clusters, defaultCommitment } from 'config/constants';
-import { ExtendedCluster } from 'utils/types';
+import { defaultCommitment, NetworkType } from 'config/constants';
 
 import { retryableProxy } from './utils/retryableProxy';
-
-// const LOCALNET_URL = 'http://localhost:8899';
-// const TICK = 5000;
 
 // The default time to wait when confirming a transaction.
 export const DEFAULT_COMMITMENT: Commitment = defaultCommitment;
 
-let currentCluster: ExtendedCluster;
+let currentNetwork: NetworkType;
 
 // Since connection objects include state, we memoise them here per network
-const createConnection = memoizeWith<(network: string) => Connection>(identity, (network) => {
-  const connection = new Connection(network, DEFAULT_COMMITMENT);
+const createConnection = memoizeWith(
+  toString,
+  (network: NetworkType): Connection => {
+    const connection = new Connection(network.endpoint, {
+      wsEndpoint: network.wsEndpoint,
+      commitment: DEFAULT_COMMITMENT,
+    });
 
-  // Due to an issue with the solana back-end relating to CORS headers on 429 responses
-  // Rate-limiting responses are not retried correctly. Adding this proxy fixes this.
-  const proxiedFunctions = [
-    'getBalance',
-    'getAccountInfo',
-    'getParsedAccountInfo',
-    'getParsedProgramAccounts',
-    'getParsedTokenAccountsByOwner',
-    'getRecentBlockhash',
-    'sendTransaction',
-    'sendRawTransaction',
-    'requestAirdrop',
-  ];
-  proxiedFunctions.forEach((fnName) => {
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    connection[fnName] = retryableProxy(connection[fnName]);
-  });
+    // Due to an issue with the solana back-end relating to CORS headers on 429 responses
+    // Rate-limiting responses are not retried correctly. Adding this proxy fixes this.
+    const proxiedFunctions = [
+      'getBalance',
+      'getAccountInfo',
+      'getParsedAccountInfo',
+      'getParsedProgramAccounts',
+      'getParsedTokenAccountsByOwner',
+      'getRecentBlockhash',
+      'sendTransaction',
+      'sendRawTransaction',
+      'requestAirdrop',
+    ];
+    proxiedFunctions.forEach((fnName) => {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      connection[fnName] = retryableProxy(connection[fnName]);
+    });
 
-  return connection;
-});
+    return connection;
+  },
+);
 
-export const getNetwork = (cluster: ExtendedCluster): string => {
-  // if (cluster === 'localnet') {
-  //   return LOCALNET_URL;
-  // }
-
-  return clusters[cluster] || clusterApiUrl(cluster as Cluster);
+export const getEndpoint = (network: NetworkType): string => {
+  return network.endpoint;
+};
+export const getWsEndpoint = (network: NetworkType): string | undefined => {
+  return network.wsEndpoint;
 };
 
-export const getConnection = (cluster?: ExtendedCluster): Connection => {
-  if (cluster) {
-    currentCluster = cluster;
+export const getConnection = (network?: NetworkType): Connection => {
+  if (network) {
+    currentNetwork = network;
   }
 
-  const selectedCluster = cluster || currentCluster;
-
-  const network = getNetwork(selectedCluster);
-  return createConnection(network);
+  const selectedNetwork = network || currentNetwork;
+  return createConnection(selectedNetwork);
 };
 
 export const confirmTransaction = (
@@ -80,12 +79,3 @@ export const confirmTransaction = (
 
   return Promise.race([confirmViaHttp, confirmViaSocket]);
 };
-
-// type EpochCallback = (epochInfo: EpochInfo) => void;
-// export const listenToEpoch = (cluster: ExtendedCluster, callback: EpochCallback): void => {
-//   const connection = getConnection();
-//
-//   setInterval(() => {
-//     connection.getEpochInfo(DEFAULT_COMMITMENT).then(callback);
-//   }, TICK);
-// };

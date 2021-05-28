@@ -7,7 +7,7 @@ import {
   TransactionInstruction,
 } from '@solana/web3.js';
 import bs58 from 'bs58';
-import { identity, memoizeWith } from 'ramda';
+import { memoizeWith, toString } from 'ramda';
 
 import { getConnection } from 'api/connection';
 import {
@@ -17,8 +17,7 @@ import {
 } from 'api/token';
 import { TokenAccount } from 'api/token/TokenAccount';
 import { getWallet } from 'api/wallet';
-import { feeRelayerUrl } from 'config/constants';
-import { ExtendedCluster } from 'utils/types';
+import { feeRelayerUrl, NetworkType } from 'config/constants';
 
 type TransferSolParams = {
   sender_pubkey: string;
@@ -149,9 +148,9 @@ const makeTransferTokenInstructionAndParams = (
 };
 
 export const APIFactory = memoizeWith(
-  identity,
-  (cluster: ExtendedCluster): API => {
-    const connection = getConnection(cluster);
+  toString,
+  (network: NetworkType): API => {
+    const connection = getConnection(network);
 
     const makeTransaction = async (feePayer: PublicKey, instructions: TransactionInstruction[]) => {
       const { blockhash: recentBlockhash } = await connection.getRecentBlockhash();

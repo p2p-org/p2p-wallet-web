@@ -3,6 +3,7 @@ import { Cluster } from '@solana/web3.js';
 import { SerializablePool } from 'api/pool/Pool';
 import { SerializableToken } from 'api/token/Token';
 import { SerializableTokenAccount } from 'api/token/TokenAccount';
+import { NetworkType } from 'config/constants';
 
 export type HasEqual<T> = { equals: (other: T) => boolean };
 
@@ -21,23 +22,16 @@ export interface TokenPairState {
 }
 
 // Web3 does not recognise "localnet" as a cluster
-export type ExtendedCluster = Cluster | 'p2p-mainnet' | 'p2p-2-mainnet' | 'serum-mainnet';
+export type ExtendedCluster = Cluster;
 
 export interface Serializable<T> {
   serialize(): T;
 }
 
-export type Network = {
-  current: ExtendedCluster;
-  custom?: {
-    [property: string]: string;
-  };
-};
-
 export type WalletSettings = {
   currency: string;
   appearance: string;
-  network: Network;
+  network: NetworkType;
   isZeroBalancesHidden: boolean;
   useFreeTransactions: boolean;
 };

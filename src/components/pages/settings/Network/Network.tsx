@@ -2,16 +2,14 @@ import React, { FunctionComponent, useState } from 'react';
 import { batch, useDispatch, useSelector } from 'react-redux';
 
 import { styled } from '@linaria/react';
-import { Cluster } from '@solana/web3.js';
 import { rgba } from 'polished';
 import { mergeDeepRight } from 'ramda';
 
 import { WidgetPage } from 'components/common/WidgetPage';
 import { Button, Input, RadioButton } from 'components/ui';
-import { clusters } from 'config/constants';
-import { RootState } from 'store/rootReducer';
+import { networks, NetworkType } from 'config/constants';
 import { wipeAction } from 'store/slices/GlobalSlice';
-import { autoConnect, selectCluster, updateSettings } from 'store/slices/wallet/WalletSlice';
+import { autoConnect, selectNetwork, updateSettings } from 'store/slices/wallet/WalletSlice';
 
 const URL_REGEX = new RegExp(
   /https?:\/\/(?:w{1,3}\.)?[^\s.]+(?:\.[a-z]+)*(?::\d+)?((?:\/\w+)|(?:-\w+))*\/?(?![^<]*(?:<\/\w+>|\/?>))/,
@@ -76,54 +74,53 @@ export const Network: FunctionComponent = () => {
   const [isOpenAddUrl, setIsOpenAddUrl] = useState(false);
   const [customUrl, setCustomUrl] = useState('');
 
-  const { network } = useSelector((state: RootState) => state.wallet.settings);
+  const { network } = useSelector((state) => state.wallet.settings);
 
-  const handleChange = (value: string) => {
-    dispatch(updateSettings({ network: { current: value } }));
+  const handleChange = (value: NetworkType) => {
+    dispatch(updateSettings({ network: value }));
 
     batch(async () => {
-      dispatch(selectCluster(value as Cluster));
+      dispatch(selectNetwork(value));
       dispatch(wipeAction());
       await dispatch(autoConnect());
     });
   };
 
   const renderClustersRadioButtons = () =>
-    Object.entries(clusters).map((entry) => {
-      const [key, url] = entry;
+    Object.values(networks).map((networkItem) => {
       return (
-        <RadioButtonItem key={key}>
+        <RadioButtonItem key={networkItem.name}>
           <RadioButton
-            label={url}
-            value={key}
-            checked={key === network.current}
+            label={networkItem.endpointLabel || networkItem.endpoint}
+            value={networkItem}
+            checked={networkItem.name === network.name}
             onChange={handleChange}
           />
         </RadioButtonItem>
       );
     });
 
-  const renderCustomClustersRadioButtons = () => {
-    const { custom } = network;
-
-    if (!custom) {
-      return null;
-    }
-
-    return Object.entries(custom).map((entry) => {
-      const [key, url] = entry;
-      return (
-        <RadioButtonItem key={key}>
-          <RadioButton
-            label={url}
-            value={key}
-            checked={key === network.current}
-            onChange={handleChange}
-          />
-        </RadioButtonItem>
-      );
-    });
-  };
+  // const renderCustomClustersRadioButtons = () => {
+  //   const { custom } = network;
+  //
+  //   if (!custom) {
+  //     return null;
+  //   }
+  //
+  //   return Object.entries(custom).map((entry) => {
+  //     const [key, url] = entry;
+  //     return (
+  //       <RadioButtonItem key={key}>
+  //         <RadioButton
+  //           label={url}
+  //           value={key}
+  //           checked={key === network.current}
+  //           onChange={handleChange}
+  //         />
+  //       </RadioButtonItem>
+  //     );
+  //   });
+  // };
 
   const handleOpenAddUrl = () => {
     setIsOpenAddUrl(!isOpenAddUrl);
@@ -153,7 +150,7 @@ export const Network: FunctionComponent = () => {
       <RadioButtonsWrapper>
         <>
           {renderClustersRadioButtons()}
-          {renderCustomClustersRadioButtons()}
+          {/* {renderCustomClustersRadioButtons()} */}
         </>
       </RadioButtonsWrapper>
       <AddCustomUrlWrapper>

@@ -19,7 +19,7 @@ export const getTransactions = createAsyncThunk<
 >(`${TRANSACTION_SLICE_NAME}/getTransactions`, async ({ publicKey, options }, thunkAPI) => {
   const state: RootState = thunkAPI.getState() as RootState;
 
-  const TransactionAPI = APIFactory(state.wallet.cluster);
+  const TransactionAPI = APIFactory(state.wallet.network);
   const transactions = await TransactionAPI.getTransactionsForAddress(publicKey, options);
 
   return transactions.map((transaction) => transaction.serialize());
@@ -31,7 +31,7 @@ export const getTransaction = createAsyncThunk<
 >(`${TRANSACTION_SLICE_NAME}/getTransaction`, async (signature, thunkAPI) => {
   const state: RootState = thunkAPI.getState() as RootState;
 
-  const TransactionAPI = APIFactory(state.wallet.cluster);
+  const TransactionAPI = APIFactory(state.wallet.network);
   const transaction = await TransactionAPI.transactionInfo(signature);
 
   if (!transaction) {

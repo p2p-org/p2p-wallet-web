@@ -15,7 +15,7 @@ export const getRatesMarkets = createAsyncThunk<SerializableMarketRate[]>(
   async (_, thunkAPI) => {
     const state: RootState = thunkAPI.getState() as RootState;
 
-    const RateAPI = APIFactory(state.wallet.cluster);
+    const RateAPI = APIFactory(state.wallet.network);
     const rates = await RateAPI.getRatesMarkets();
 
     return rates.map((rate) => rate.serialize());
@@ -28,7 +28,7 @@ export const getRatesCandle = createAsyncThunk<
 >(`${RATES_SLICE_NAME}/getRatesCandle`, async (args, thunkAPI) => {
   const state: RootState = thunkAPI.getState() as RootState;
 
-  const PoolAPI = APIFactory(state.wallet.cluster);
+  const PoolAPI = APIFactory(state.wallet.network);
   const rates = await PoolAPI.getRatesCandle(args.symbol, args.type);
 
   return rates.map((rate) => rate.serialize());

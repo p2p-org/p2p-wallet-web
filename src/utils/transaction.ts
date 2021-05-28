@@ -3,17 +3,16 @@ import { Layout } from 'buffer-layout';
 
 import { getConnection } from 'api/connection';
 import { getWallet } from 'api/wallet';
-
-import { ExtendedCluster } from './types';
+import { NetworkType } from 'config/constants';
 
 export const makeNewAccountInstruction = async (
-  cluster: ExtendedCluster,
+  network: NetworkType,
   newAccountKey: PublicKey,
   layout: Layout,
   programId: PublicKey,
 ): Promise<TransactionInstruction> => {
   const wallet = getWallet();
-  const connection = getConnection(cluster);
+  const connection = getConnection(network);
   const balanceNeeded = await connection.getMinimumBalanceForRentExemption(layout.span);
 
   return SystemProgram.createAccount({

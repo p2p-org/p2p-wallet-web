@@ -268,7 +268,7 @@ export const TokenAccountQR: FunctionComponent<Props> = ({
   const [isNew, setIsNew] = useState(false);
   const [isImageCopied, setIsImageCopied] = useState(false);
   const [isImageCopyAvailable] = useState(false);
-  const cluster = useSelector((state) => state.wallet.cluster);
+  const cluster = useSelector((state) => state.wallet.network.cluster);
 
   // useEffect(() => {
   //   askClipboardWritePermission()

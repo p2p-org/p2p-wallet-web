@@ -13,14 +13,14 @@ export const DEFAULT_SOLLET_PROVIDER = 'https://www.sollet.io';
 export class SolletWallet extends Wallet {
   private provider: SolletWalletAdapter;
 
-  constructor(network: string, provider: string | unknown) {
-    super(network);
+  constructor(endpoint: string, provider: string | unknown) {
+    super(endpoint);
 
     if (typeof provider !== 'string' && !provider) {
       throw new Error('Please install and initialize Sollet wallet extension first');
     }
 
-    this.provider = new SolletWalletAdapter(provider, network);
+    this.provider = new SolletWalletAdapter(provider, endpoint);
 
     // once the sollet wallet emits a connect or disconnect event, pass it on
     this.provider.on(WalletEvent.CONNECT, () => this.emit(WalletEvent.CONNECT));

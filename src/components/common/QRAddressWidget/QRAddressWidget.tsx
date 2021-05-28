@@ -162,7 +162,7 @@ export const QRAddressWidget: FunctionComponent<Props> = ({ publicKey, className
   const [isExpand, setIsExpand] = useState(false);
   const [isImageCopyAvailable] = useState(false);
   const [isImageCopied, setIsImageCopied] = useState(false);
-  const cluster = useSelector((state) => state.wallet.cluster);
+  const cluster = useSelector((state) => state.wallet.network.cluster);
   const tokenAccounts = useSelector((state) => state.wallet.tokenAccounts);
   const tokenAccount = useMemo(() => {
     const foundToken = tokenAccounts.find((account) => account.address === publicKey.toBase58());

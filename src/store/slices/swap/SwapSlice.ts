@@ -51,7 +51,7 @@ export const executeSwap = createAsyncThunk(
         ...notificationParams,
       });
 
-      const PoolAPI = APIFactory(walletState.cluster);
+      const PoolAPI = APIFactory(walletState.network);
       const result = await PoolAPI.swap(swapParameters);
 
       swapNotification({

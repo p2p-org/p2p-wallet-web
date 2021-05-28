@@ -176,7 +176,7 @@ export const TopWidget: FunctionComponent<Props> = ({ publicKey }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isShowFixed, setIsShowFixed] = useState(false);
   const type = useSelector((state) => state.rate.candlesType);
-  const cluster = useSelector((state) => state.wallet.cluster);
+  const cluster = useSelector((state) => state.wallet.network.cluster);
   const tokenAccounts = useSelector((state) =>
     state.wallet.tokenAccounts.map((account) => TokenAccount.from(account)),
   );

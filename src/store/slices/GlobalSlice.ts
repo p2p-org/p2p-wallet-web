@@ -31,10 +31,10 @@ export const getAvailableTokens = createAsyncThunk(
   `${GLOBAL_SLICE_NAME}/getAvailableTokens`,
   async (arg, thunkAPI): Promise<Array<SerializableToken>> => {
     const {
-      wallet: { cluster },
+      wallet: { network },
     } = thunkAPI.getState() as RootState;
 
-    const tokenAPI = APIFactory(cluster);
+    const tokenAPI = APIFactory(network);
     const tokens = await tokenAPI.getTokens();
     return tokens.map((token) => token.serialize());
   },

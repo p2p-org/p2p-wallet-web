@@ -224,7 +224,7 @@ export const TokenRow: FunctionComponent<Props> = ({
   const [isExecuting, setIsExecuting] = useState(false);
   const [isError, setError] = useState(false);
   const [isMintCopied, setIsMintCopied] = useState(false);
-  const cluster = useSelector((state) => state.wallet.cluster);
+  const cluster = useSelector((state) => state.wallet.network.cluster);
 
   const handleChevronClick = () => {
     setIsOpen(!isOpen);

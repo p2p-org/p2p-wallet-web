@@ -31,15 +31,57 @@ export const postTransactionSleepMS = Number(process.env.REACT_APP_POST_TRANSACT
 export const airdropKey = (cluster: ExtendedCluster): string | undefined =>
   process.env[`REACT_APP_${cluster.toUpperCase()}_AIRDROP_PRIVATE_KEY`];
 
-export const clusters: {
-  [cluster in ExtendedCluster]: string;
-} = {
-  'p2p-mainnet': 'https://node-1.solana.p2p.org',
-  'p2p-2-mainnet': 'https://node-2.solana.p2p.org',
-  'serum-mainnet': 'https://solana-api.projectserum.com',
-  'mainnet-beta': 'https://api.mainnet-beta.solana.com',
-  devnet: 'https://devnet.solana.com',
-  testnet: 'https://testnet.solana.com',
+export type NetworkType = {
+  name: string;
+  cluster: ExtendedCluster;
+  endpoint: string;
+  endpointLabel?: string;
+  wsEndpoint?: string;
+  wsEndpointLabel?: string;
 };
+
+export type NetworkNameType =
+  | 'figment'
+  | 'serum-mainnet'
+  | 'solana-mainnet'
+  | 'solana-devnet'
+  | 'solana-testnet';
+
+type NetworksByNameType = {
+  [name in NetworkNameType]: NetworkType;
+};
+
+export const networks: NetworksByNameType = {
+  figment: {
+    name: 'figment',
+    cluster: 'mainnet-beta',
+    endpoint: `https://solana--mainnet--rpc.datahub.figment.io/apikey/${process.env.REACT_APP_FIGMENT_DATAHUB}`,
+    endpointLabel: 'https://solana--mainnet--rpc.datahub.figment.io',
+    wsEndpoint: `wss://solana--mainnet--ws.datahub.figment.io/apikey/${process.env.REACT_APP_FIGMENT_DATAHUB}`,
+    wsEndpointLabel: 'wss://solana--mainnet--ws.datahub.figment.io',
+  },
+  'serum-mainnet': {
+    name: 'serum-mainnet',
+    cluster: 'mainnet-beta',
+    endpoint: 'https://solana-api.projectserum.com',
+  },
+  'solana-mainnet': {
+    name: 'solana-mainnet',
+    cluster: 'mainnet-beta',
+    endpoint: 'https://api.mainnet-beta.solana.com',
+  },
+  'solana-devnet': {
+    name: 'solana-devnet',
+    cluster: 'devnet',
+    endpoint: 'https://devnet.solana.com',
+  },
+  'solana-testnet': {
+    name: 'solana-testnet',
+    cluster: 'testnet',
+    endpoint: 'https://testnet.solana.com',
+  },
+};
+
+export const DEFAULT_NETWORK: NetworkType = networks.figment;
 
 export const feeRelayerUrl = process.env.REACT_APP_FEE_RELAYER_URL;

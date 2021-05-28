@@ -119,7 +119,7 @@ type Props = {
 export const TransactionDetailsModal: FC<Props> = ({ signature, source, close }) => {
   const dispatch = useDispatch();
   const [isShowDetails, setShowDetails] = useState(false);
-  const cluster = useSelector((state) => state.wallet.cluster);
+  const cluster = useSelector((state) => state.wallet.network.cluster);
   const transaction = useSelector(
     (state) =>
       state.transaction.items[signature] && Transaction.from(state.transaction.items[signature]),

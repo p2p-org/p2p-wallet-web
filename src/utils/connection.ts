@@ -1,8 +1,8 @@
-import { Cluster } from '@solana/web3.js';
+import { ExtendedCluster } from './types';
 
 const SOLANA_BASE_URL = 'https://explorer.solana.com/';
 
-export const getExplorerUrl = (type = 'tx', address: string, cluster: Cluster): string => {
+export const getExplorerUrl = (type = 'tx', address: string, cluster: ExtendedCluster): string => {
   const baseUrlWithAddress = `${SOLANA_BASE_URL}${type}/${address}`;
   switch (cluster) {
     case 'devnet':

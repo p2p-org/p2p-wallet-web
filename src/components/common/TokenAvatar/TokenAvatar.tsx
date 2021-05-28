@@ -6,7 +6,6 @@ import classNames from 'classnames';
 
 import tokenList from 'api/token/token.config';
 import { Avatar } from 'components/ui';
-import { RootState } from 'store/rootReducer';
 
 import wrappedImage from './images/wrapped.svg';
 
@@ -55,7 +54,7 @@ export const TokenAvatar: FunctionComponent<Props & HTMLAttributes<HTMLDivElemen
   className,
   ...props
 }) => {
-  const cluster = useSelector((state: RootState) => state.wallet.cluster);
+  const cluster = useSelector((state) => state.wallet.network.cluster);
   const tokenInfo = tokenList
     .filterByClusterSlug(cluster)
     .getList()

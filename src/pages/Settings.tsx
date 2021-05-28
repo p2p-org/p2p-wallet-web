@@ -12,9 +12,7 @@ import { Layout } from 'components/common/Layout';
 import { WidgetPage } from 'components/common/WidgetPage';
 import { Icon, Select, Switch } from 'components/ui';
 import { MenuItem } from 'components/ui/Select/MenuItem';
-import { clusters } from 'config/constants';
 import { FEATURE_SETTINGS_LIST } from 'config/featureFlags';
-import { RootState } from 'store/rootReducer';
 import { disconnect, updateSettings } from 'store/slices/wallet/WalletSlice';
 import { appearance, currencies } from 'utils/settings';
 import { WalletSettings } from 'utils/types';
@@ -186,8 +184,7 @@ const Row: FunctionComponent<RowProps> = ({ icon, title, secondary, onClick }) =
 export const Settings: FunctionComponent = () => {
   const history = useHistory();
   const dispatch = useDispatch();
-
-  const settings = useSelector((state: RootState) => state.wallet.settings);
+  const settings = useSelector((state) => state.wallet.settings);
 
   const handleLogoutClick = () => {
     forgetWallet();
@@ -198,14 +195,7 @@ export const Settings: FunctionComponent = () => {
     dispatch(updateSettings(option));
   };
 
-  const currentCluster = settings.network.current;
-
-  let clusterUrl;
-  if (Object.keys(clusters).includes(currentCluster)) {
-    clusterUrl = clusters[currentCluster];
-  } else {
-    clusterUrl = settings.network.custom ? settings.network.custom[currentCluster] : '';
-  }
+  const { network } = settings;
 
   return (
     <Layout
@@ -258,7 +248,7 @@ export const Settings: FunctionComponent = () => {
                 title="Network"
                 secondary={
                   <>
-                    <Title>{clusterUrl}</Title>
+                    <Title>{network.endpoint}</Title>
                     <ChevronWrapper>
                       <ChevronIcon name="chevron" />
                     </ChevronWrapper>

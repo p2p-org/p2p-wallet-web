@@ -1,3 +1,4 @@
+import { DEFAULT_NETWORK } from 'config/constants';
 import { WalletSettings } from 'utils/types';
 
 const WALLET_SETTINGS_KEY = 'walletSettings';
@@ -24,15 +25,13 @@ export const currencies = [
 
 export const appearance = ['system', 'light', 'dark'];
 
-export const defaultSettings = {
+export const defaultSettings: WalletSettings = {
   currency: 'USD',
   appearance: 'system',
-  network: {
-    current: 'mainnet-beta',
-  },
+  network: DEFAULT_NETWORK,
   isZeroBalancesHidden: true,
   useFreeTransactions: true,
-} as WalletSettings;
+};
 
 export function loadSettings(): WalletSettings {
   const localSettings = localStorage.getItem(WALLET_SETTINGS_KEY) as string;

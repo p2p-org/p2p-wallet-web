@@ -20,7 +20,7 @@ export const getPools = createAsyncThunk(
   async (_, thunkAPI): Promise<Array<SerializablePool>> => {
     const state: RootState = thunkAPI.getState() as RootState;
 
-    const PoolAPI = APIFactory(state.wallet.cluster);
+    const PoolAPI = APIFactory(state.wallet.network);
     const pools = await PoolAPI.getPools();
 
     const listener = PoolAPI.listenToPoolChanges(pools, (pool) => {

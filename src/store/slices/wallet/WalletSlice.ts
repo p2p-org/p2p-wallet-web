@@ -5,7 +5,7 @@ import {
   PayloadAction,
   unwrapResult,
 } from '@reduxjs/toolkit';
-import { Account, Blockhash, Cluster, FeeCalculator, PublicKey } from '@solana/web3.js';
+import { Account, Blockhash, FeeCalculator, PublicKey } from '@solana/web3.js';
 import Decimal from 'decimal.js';
 import { mergeDeepRight } from 'ramda';
 
@@ -24,7 +24,7 @@ import {
 } from 'api/wallet/ManualWallet';
 import { WalletEvent } from 'api/wallet/Wallet';
 import { ToastManager } from 'components/common/ToastManager';
-import { swapHostFeeAddress } from 'config/constants';
+import { DEFAULT_NETWORK, NetworkType, swapHostFeeAddress } from 'config/constants';
 import { SYSTEM_PROGRAM_ID, WRAPPED_SOL_MINT } from 'constants/solana/bufferLayouts';
 import { RootState } from 'store/rootReducer';
 import { getAvailableTokens, wipeAction } from 'store/slices/GlobalSlice';
@@ -44,13 +44,12 @@ import { WalletSettings } from 'utils/types';
 
 const STORAGE_KEY_TYPE = 'type';
 
-export const DEFAULT_CLUSTER: Cluster = 'devnet';
 export const WALLET_SLICE_NAME = 'wallet';
 
 const accountsListeners: AccountListener[] = [];
 
 export interface WalletsState {
-  cluster: Cluster;
+  network: NetworkType;
   connected: boolean;
   publicKey: string | null;
   type: WalletType;
@@ -102,7 +101,7 @@ export const getDerivableTokenAccounts = createAsyncThunk<
 >(`${WALLET_SLICE_NAME}/getDerivableTokenAccounts`, async (data, thunkAPI) => {
   const state: RootState = thunkAPI.getState() as RootState;
   const walletState = state.wallet;
-  const TokenAPI = TokenAPIFactory(walletState.cluster);
+  const TokenAPI = TokenAPIFactory(walletState.network);
   // if didn't connected(need for DerivableAccount component/page)
   const walletPublicKey = getWalletUnsafe()?.pubkey || null;
 
@@ -123,7 +122,7 @@ export const getTokenAccount = createAsyncThunk<TokenAccount | null, PublicKey>(
   async (account, thunkAPI) => {
     const state: RootState = thunkAPI.getState() as RootState;
     const walletState = state.wallet;
-    const TokenAPI = TokenAPIFactory(walletState.cluster);
+    const TokenAPI = TokenAPIFactory(walletState.network);
 
     return TokenAPI.tokenAccountInfo(account);
   },
@@ -133,8 +132,8 @@ export const getTokenAccountsForWallet = createAsyncThunk<SerializableTokenAccou
   `${WALLET_SLICE_NAME}/getTokenAccountsForWallet`,
   async (_, thunkAPI) => {
     const state: RootState = thunkAPI.getState() as RootState;
-    const { cluster, type, derivableTokenAccounts } = state.wallet;
-    const TokenAPI = TokenAPIFactory(cluster);
+    const { network, type, derivableTokenAccounts } = state.wallet;
+    const TokenAPI = TokenAPIFactory(network);
 
     const solTokens = [];
 
@@ -171,7 +170,7 @@ export const precacheTokenAccounts = createAsyncThunk<void, PublicKey>(
   async (publicKey, thunkAPI) => {
     const state: RootState = thunkAPI.getState() as RootState;
     const walletState = state.wallet;
-    const TokenAPI = TokenAPIFactory(walletState.cluster);
+    const TokenAPI = TokenAPIFactory(walletState.network);
 
     await TokenAPI.precacheTokenAccounts(publicKey);
   },
@@ -197,10 +196,10 @@ export const autoConnect = createAsyncThunk<string | undefined>(
 
 export const connect = createAsyncThunk(`${WALLET_SLICE_NAME}/connect`, (_, thunkAPI) => {
   const {
-    wallet: { cluster },
+    wallet: { network },
   }: RootState = thunkAPI.getState() as RootState;
 
-  WalletAPI.connect(cluster);
+  WalletAPI.connect(network);
 });
 
 /**
@@ -215,10 +214,10 @@ export const connectWallet = createAsyncThunk<string, WalletDataType | undefined
   `${WALLET_SLICE_NAME}/connectWallet`,
   async (data, thunkAPI) => {
     const {
-      wallet: { cluster, type },
+      wallet: { network, type },
     }: RootState = thunkAPI.getState() as RootState;
 
-    const wallet = await WalletAPI.connectWallet(cluster, type, data);
+    const wallet = await WalletAPI.connectWallet(network, type, data);
 
     wallet.on(WalletEvent.DISCONNECT, () => {
       void thunkAPI.dispatch(disconnect());
@@ -265,11 +264,11 @@ export const transfer = createAsyncThunk<string, TransferParameters>(
       const tokenAccount = tokenAccounts.find((account) =>
         account.address.equals(parameters.source),
       );
-      const FeeRelayerAPI = FeeRelayerAPIFactory(walletState.cluster);
+      const FeeRelayerAPI = FeeRelayerAPIFactory(walletState.network);
       return FeeRelayerAPI.transfer(parameters, tokenAccount);
     }
 
-    const TokenAPI = TokenAPIFactory(walletState.cluster);
+    const TokenAPI = TokenAPIFactory(walletState.network);
 
     return TokenAPI.transfer(parameters);
   },
@@ -281,7 +280,7 @@ export const createMint = createAsyncThunk<
 >(`${WALLET_SLICE_NAME}/createMint`, async (parameters, thunkAPI) => {
   const state: RootState = thunkAPI.getState() as RootState;
   const walletState = state.wallet;
-  const TokenAPI = TokenAPIFactory(walletState.cluster);
+  const TokenAPI = TokenAPIFactory(walletState.network);
 
   return TokenAPI.createMint(parameters.amount, parameters.decimals, parameters.initialAccount);
 });
@@ -291,7 +290,7 @@ export const createAccountForToken = createAsyncThunk<TokenAccount, { token: Tok
   async (parameters, thunkAPI) => {
     const state: RootState = thunkAPI.getState() as RootState;
     const walletState = state.wallet;
-    const TokenAPI = TokenAPIFactory(walletState.cluster);
+    const TokenAPI = TokenAPIFactory(walletState.network);
 
     return TokenAPI.createAccountForToken(parameters.token);
   },
@@ -302,7 +301,7 @@ export const closeTokenAccount = createAsyncThunk<string, { publicKey: PublicKey
   async (parameters, thunkAPI) => {
     const state: RootState = thunkAPI.getState() as RootState;
     const walletState = state.wallet;
-    const TokenAPI = TokenAPIFactory(walletState.cluster);
+    const TokenAPI = TokenAPIFactory(walletState.network);
 
     return TokenAPI.closeAccount(parameters.publicKey);
   },
@@ -369,7 +368,7 @@ export const updateAccountReducer = (
 
 // The initial wallet state. No wallet is connected yet.
 const makeInitialState = (): WalletsState => ({
-  cluster: (loadSettings().network.current as Cluster) || DEFAULT_CLUSTER,
+  network: loadSettings().network || DEFAULT_NETWORK,
   connected: false,
   publicKey: null,
   type: localStorage.getItem(STORAGE_KEY_TYPE)
@@ -392,9 +391,9 @@ const walletSlice = createSlice({
   initialState: makeInitialState(),
   reducers: {
     updateAccount: updateAccountReducer,
-    selectCluster: (state, action: PayloadAction<Cluster>) => ({
+    selectNetwork: (state, action: PayloadAction<NetworkType>) => ({
       ...state,
-      cluster: action.payload,
+      network: action.payload,
     }),
     selectType: (state, action: PayloadAction<WalletType>) => {
       localStorage.setItem(STORAGE_KEY_TYPE, String(action.payload));
@@ -469,7 +468,7 @@ const walletSlice = createSlice({
 });
 
 export const {
-  selectCluster,
+  selectNetwork,
   selectType,
   updateAccount,
   updateHiddenTokens,

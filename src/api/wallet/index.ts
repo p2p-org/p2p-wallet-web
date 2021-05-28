@@ -12,11 +12,10 @@ import {
 import assert from 'assert';
 
 import { PhantomtWallet } from 'api/wallet/PhantomWallet';
-import { postTransactionSleepMS } from 'config/constants';
+import { NetworkType, postTransactionSleepMS } from 'config/constants';
 import { sleep } from 'utils/common';
-import { ExtendedCluster } from 'utils/types';
 
-import { confirmTransaction, DEFAULT_COMMITMENT, getConnection, getNetwork } from '../connection';
+import { confirmTransaction, DEFAULT_COMMITMENT, getConnection, getEndpoint } from '../connection';
 import { LocalWallet } from './LocalWallet';
 import { ManualWallet, ManualWalletData } from './ManualWallet/ManualWallet';
 import { DEFAULT_SOLLET_PROVIDER, SolletWallet } from './SolletWallet';
@@ -44,44 +43,40 @@ export enum WalletType {
 
 export type WalletDataType = ManualWalletData;
 
-const createWallet = (
-  type: WalletType,
-  cluster: ExtendedCluster,
-  data?: WalletDataType,
-): Wallet => {
-  const network = getNetwork(cluster);
+const createWallet = (type: WalletType, network: NetworkType, data?: WalletDataType): Wallet => {
+  const endpoint = getEndpoint(network);
   switch (type) {
     case WalletType.LOCAL:
-      return new LocalWallet(network);
+      return new LocalWallet(endpoint);
     case WalletType.SOLLET_EXTENSION:
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-explicit-any
-      return new SolletWallet(network, (window as any).sollet);
+      return new SolletWallet(endpoint, (window as any).sollet);
     case WalletType.SOLLET:
-      return new SolletWallet(network, DEFAULT_SOLLET_PROVIDER);
+      return new SolletWallet(endpoint, DEFAULT_SOLLET_PROVIDER);
     case WalletType.PHANTOM:
-      return new PhantomtWallet(network);
+      return new PhantomtWallet(endpoint);
     case WalletType.MANUAL:
     default:
       assert(data, 'Wallet data must be exists');
-      return new ManualWallet(network, data);
+      return new ManualWallet(endpoint, data);
   }
 };
 
-export const connect = (cluster: ExtendedCluster) => {
-  connection = getConnection(cluster);
+export const connect = (network: NetworkType) => {
+  connection = getConnection(network);
 };
 
 export const connectWallet = async (
-  cluster: ExtendedCluster,
+  network: NetworkType,
   type: WalletType,
   data?: WalletDataType,
 ): Promise<Wallet> => {
-  const newWallet = createWallet(type, cluster, data);
+  const newWallet = createWallet(type, network, data);
 
   // assign the singleton wallet.
   // Using a separate variable to simplify the type definitions
   wallet = newWallet;
-  connection = getConnection(cluster);
+  connection = getConnection(network);
 
   // connect is done once the wallet reports that it is connected.
   return new Promise((resolve) => {

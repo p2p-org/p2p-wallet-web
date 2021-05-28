@@ -15,11 +15,11 @@ export enum WalletEvent {
  * is a separate implementation of this.
  */
 export abstract class Wallet extends EventEmitter {
-  private network: string;
+  private endpoint: string;
 
   protected constructor(network: string) {
     super();
-    this.network = network;
+    this.endpoint = network;
   }
 
   abstract get pubkey(): PublicKey;

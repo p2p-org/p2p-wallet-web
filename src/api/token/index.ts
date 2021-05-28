@@ -10,7 +10,7 @@ import {
   TransactionInstruction,
 } from '@solana/web3.js';
 import BN from 'bn.js';
-import { complement, find, identity, isNil, memoizeWith, path, propEq, splitEvery } from 'ramda';
+import { complement, find, isNil, memoizeWith, path, propEq, splitEvery, toString } from 'ramda';
 import assert from 'ts-invariant';
 
 import { getConnection } from 'api/connection';
@@ -21,12 +21,11 @@ import {
   sendTransaction,
   sendTransactionFromAccount,
 } from 'api/wallet';
-import { airdropKey } from 'config/constants';
+import { airdropKey, NetworkType } from 'config/constants';
 import { SYSTEM_PROGRAM_ID, WRAPPED_SOL_MINT } from 'constants/solana/bufferLayouts';
 import { CacheTTL } from 'lib/cachettl';
 import { toDecimal } from 'utils/amount';
 import { makeNewAccountInstruction } from 'utils/transaction';
-import { ExtendedCluster } from 'utils/types';
 
 import { ACCOUNT_UPDATED_EVENT, AccountListener, AccountUpdateEvent } from './AccountListener';
 import colors from './colors.config';
@@ -124,9 +123,9 @@ const transferSol = async (parameters: TransferParameters): Promise<string> => {
 
 // The API is a singleton per cluster. This ensures requests can be cached
 export const APIFactory = memoizeWith(
-  identity,
-  (cluster: ExtendedCluster): API => {
-    const connection = getConnection(cluster);
+  toString,
+  (network: NetworkType): API => {
+    const connection = getConnection(network);
     const payer = new Account();
 
     /**
@@ -134,7 +133,7 @@ export const APIFactory = memoizeWith(
      * @param address
      */
     const getConfigForToken = (address: PublicKey): TokenInfo | null => {
-      const clusterConfig = tokenList.filterByClusterSlug(cluster).getList();
+      const clusterConfig = tokenList.filterByClusterSlug(network.cluster).getList();
 
       if (!clusterConfig) {
         return null;
@@ -280,7 +279,7 @@ export const APIFactory = memoizeWith(
 
     const getTokens = async (): Promise<Token[]> => {
       const clusterConfig = tokenList
-        .filterByClusterSlug(cluster)
+        .filterByClusterSlug(network.cluster)
         .excludeByTag('nft')
         .excludeByTag('leveraged')
         .excludeByTag('bull')
@@ -330,6 +329,7 @@ export const APIFactory = memoizeWith(
           getParsedAccountInfoResult.value?.owner,
           account,
           toDecimal(new BN(parsedInfo.tokenAmount.amount)),
+          false,
           getParsedAccountInfoResult.context.slot,
         );
       }
@@ -518,7 +518,7 @@ export const APIFactory = memoizeWith(
     const createToken = async (decimals?: number, mintAuthority?: PublicKey) => {
       const mintAccount = new Account();
       const createAccountInstruction = await makeNewAccountInstruction(
-        cluster,
+        network,
         mintAccount.publicKey,
         MintLayout,
         TOKEN_PROGRAM_ID,
@@ -580,7 +580,7 @@ export const APIFactory = memoizeWith(
 
       // Instruction to create a new Solana account
       const createAccountInstruction = await makeNewAccountInstruction(
-        cluster,
+        network,
         newAccount.publicKey,
         AccountLayout,
         TOKEN_PROGRAM_ID,
@@ -712,9 +712,9 @@ export const APIFactory = memoizeWith(
      * @param tokenAmount The amount of tokens to mint
      */
     const airdropToWallet = async (token: Token, tokenAmount: number): Promise<string> => {
-      const airdropPrivateKey = airdropKey(cluster);
+      const airdropPrivateKey = airdropKey(network.cluster);
       if (!airdropPrivateKey) {
-        throw new Error(`No airdrop key available for ${cluster}`);
+        throw new Error(`No airdrop key available for ${network.cluster}`);
       }
       const airdropAccount: Account = new Account(JSON.parse(airdropPrivateKey));
 

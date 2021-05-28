@@ -8,17 +8,16 @@ import {
 } from '@solana/web3.js';
 import bs58 from 'bs58';
 import { Decimal } from 'decimal.js';
-import { complement, identity, isNil, memoizeWith } from 'ramda';
+import { complement, isNil, memoizeWith, toString } from 'ramda';
 
 import { getConnection } from 'api/connection';
 import poolConfig from 'api/pool/pool.config';
 import { APIFactory as TokenAPIFactory } from 'api/token';
 import { Token } from 'api/token/Token';
 import { TokenAccount } from 'api/token/TokenAccount';
-import { localSwapProgramId } from 'config/constants';
+import { localSwapProgramId, NetworkType } from 'config/constants';
 import { SYSTEM_PROGRAM_ID, TOKEN_PROGRAM_ID } from 'constants/solana/bufferLayouts';
 import { CacheTTL } from 'lib/cachettl';
-import { ExtendedCluster } from 'utils/types';
 
 import { Transaction } from './Transaction';
 
@@ -37,11 +36,11 @@ export interface API {
 
 // The API is a singleton per cluster. This ensures requests can be cached
 export const APIFactory = memoizeWith(
-  identity,
-  (cluster: ExtendedCluster): API => {
-    const connection = getConnection(cluster);
-    const tokenAPI = TokenAPIFactory(cluster);
-    const poolConfigForCluster = poolConfig[cluster];
+  toString,
+  (network: NetworkType): API => {
+    const connection = getConnection(network);
+    const tokenAPI = TokenAPIFactory(network);
+    const poolConfigForCluster = poolConfig[network.cluster];
 
     const swapProgramId = poolConfigForCluster.swapProgramId || localSwapProgramId;
     if (!swapProgramId) {

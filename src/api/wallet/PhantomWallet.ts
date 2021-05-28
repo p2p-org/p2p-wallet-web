@@ -22,8 +22,8 @@ interface PhantomProvider {
 export class PhantomtWallet extends Wallet {
   private provider: PhantomProvider;
 
-  constructor(network: string) {
-    super(network);
+  constructor(endpoint: string) {
+    super(endpoint);
 
     let provider: PhantomProvider;
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-explicit-any

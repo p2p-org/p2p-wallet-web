@@ -11,8 +11,8 @@ import { Wallet, WalletEvent } from './Wallet';
 export class LocalWallet extends Wallet {
   private account: Account;
 
-  constructor(network: string) {
-    super(network);
+  constructor(endpoint: string) {
+    super(endpoint);
     if (!isDev) {
       throw new Error('LocalWallet can not be used in production');
     }
