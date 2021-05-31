@@ -63,6 +63,8 @@ export interface API {
   tokenInfoUncached: (mint: PublicKey) => Promise<Token>;
   tokenAccountInfo: (account: PublicKey) => Promise<TokenAccount | null>;
   updateTokenAccountInfo: (tokenAccount: TokenAccount) => Promise<TokenAccount | null>;
+  tokensInfo: (mints: PublicKey[]) => Promise<Token[]>;
+  tokensAccountsInfo: (mints: PublicKey[]) => Promise<TokenAccount[]>;
   getAccountsForToken: (token: Token) => Promise<TokenAccount[]>;
   getAccountsForWallet: (owner?: PublicKey) => Promise<TokenAccount[]>;
   getConfigForToken: (address: PublicKey) => TokenInfo | null;
@@ -210,7 +212,7 @@ export const APIFactory = memoizeWith(
       Buffer | ParsedAccountData
     > | null>;
 
-    const tokensInfo = retryableProxy<PublicKey[], Token[]>(async (mints: PublicKey[]) => {
+    const getMultipleAccounts = async (mints: PublicKey[]) => {
       const publicKeys = mints.map((publicKey) => publicKey.toBase58());
       const chunks = splitEvery(100, publicKeys);
 
@@ -234,13 +236,17 @@ export const APIFactory = memoizeWith(
       );
 
       // eslint-disable-next-line unicorn/no-reduce
-      const result = results.reduce((prev, cur) => {
+      return results.reduce((prev, cur) => {
         if (cur) {
           return prev?.concat(cur);
         }
 
         return prev;
       }, []);
+    };
+
+    const tokensInfo = retryableProxy<PublicKey[], Token[]>(async (mints: PublicKey[]) => {
+      const result = await getMultipleAccounts(mints);
 
       const tokens: Token[] = [];
 
@@ -276,6 +282,46 @@ export const APIFactory = memoizeWith(
 
       return tokens;
     });
+
+    const tokensAccountsInfo = retryableProxy<PublicKey[], TokenAccount[]>(
+      async (mints: PublicKey[]) => {
+        const result = await getMultipleAccounts(mints);
+
+        const tokens: TokenAccount[] = [];
+
+        mints.forEach(async (mint, index) => {
+          const ownerProgram =
+            path<string>([index, 'owner'], result) || TOKEN_PROGRAM_ID.toBase58();
+          const accountInfo = path<{
+            isNative: boolean;
+            mint: string;
+            owner: string;
+            state: string;
+            tokenAmount: {
+              amount: string;
+              decimals: number;
+            };
+          }>([index, 'data', 'parsed', 'info'], result);
+          if (!accountInfo) {
+            return;
+          }
+
+          const mintTokenInfo = await tokenInfo(new PublicKey(accountInfo.mint));
+
+          const tokenAccount = new TokenAccount(
+            mintTokenInfo,
+            new PublicKey(accountInfo.owner),
+            new PublicKey(ownerProgram),
+            mint,
+            toDecimal(new BN(accountInfo.tokenAmount.amount)),
+          );
+
+          tokens.push(tokenAccount);
+        });
+
+        return tokens;
+      },
+    );
 
     const getTokens = async (): Promise<Token[]> => {
       const clusterConfig = tokenList
@@ -885,7 +931,9 @@ export const APIFactory = memoizeWith(
       getTokens,
       tokenInfo,
       tokenInfoUncached,
+      tokensInfo,
       tokenAccountInfo,
+      tokensAccountsInfo,
       updateTokenAccountInfo,
       createAccountForToken,
       createToken,
