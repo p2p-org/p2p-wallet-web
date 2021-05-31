@@ -4,11 +4,12 @@ import { styled } from '@linaria/react';
 import * as bip39 from 'bip39';
 
 import { DERIVATION_PATH, mnemonicToSeed } from 'api/wallet/ManualWallet';
-import { Password } from 'components/pages/home/Auth/Signup/Password';
+import { Password } from 'components/pages/home/Auth/common/Password';
+import { Paste } from 'components/pages/home/Auth/Signup/Paste';
 
 import { Back } from '../common/Back';
 import { DataType } from '../types';
-import { Seed } from './Seed';
+import { Mnemonic } from './Mnemonic';
 
 const Wrapper = styled.div`
   position: relative;
@@ -35,13 +36,14 @@ const BackStyled = styled(Back)`
   left: 0;
 `;
 
-type PageTypes = 'seed' | 'password';
+type PageTypes = 'mnemonic' | 'paste' | 'password';
 
 const backToPage: {
   [page in PageTypes]: PageTypes;
 } = {
-  seed: 'seed',
-  password: 'seed',
+  mnemonic: 'mnemonic',
+  paste: 'mnemonic',
+  password: 'paste',
 };
 
 type Props = {
@@ -49,7 +51,7 @@ type Props = {
 };
 
 export const Signup: FC<Props> = ({ next }) => {
-  const [page, setPage] = useState<PageTypes>('seed');
+  const [page, setPage] = useState<PageTypes>('mnemonic');
 
   const mnemonic = useMemo(() => bip39.generateMnemonic(256), []);
 
@@ -57,7 +59,11 @@ export const Signup: FC<Props> = ({ next }) => {
     setPage((state) => backToPage[state]);
   };
 
-  const handleContinueSeedClick = () => {
+  const handleContinueMnemonicClick = () => {
+    setPage('paste');
+  };
+
+  const handleContinuePasteClick = () => {
     setPage('password');
   };
 
@@ -75,11 +81,14 @@ export const Signup: FC<Props> = ({ next }) => {
   return (
     <Wrapper>
       <Title>
-        {page !== 'seed' ? <BackStyled onClick={handleBackClick} /> : undefined}
+        {page !== 'mnemonic' ? <BackStyled onClick={handleBackClick} /> : undefined}
         New wallet
       </Title>
-      {page === 'seed' ? <Seed seed={mnemonic} next={handleContinueSeedClick} /> : undefined}
-      {page === 'password' ? <Password finish={handleContinuePasswordClick} /> : undefined}
+      {page === 'mnemonic' ? (
+        <Mnemonic mnemonic={mnemonic} next={handleContinueMnemonicClick} />
+      ) : undefined}
+      {page === 'paste' ? <Paste mnemonic={mnemonic} next={handleContinuePasteClick} /> : undefined}
+      {page === 'password' ? <Password next={handleContinuePasswordClick} /> : undefined}
     </Wrapper>
   );
 };

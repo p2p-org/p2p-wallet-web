@@ -11,10 +11,11 @@ import throttle from 'lodash.throttle';
 import { WalletType } from 'api/wallet';
 import { ToastManager } from 'components/common/ToastManager';
 import { Button } from 'components/pages/home/Auth/common/Button';
-import { Icon } from 'components/ui';
 import { localMnemonic } from 'config/constants';
 import { connectWallet, selectType } from 'store/slices/wallet/WalletSlice';
 import { sleep } from 'utils/common';
+
+import { ErrorHint } from '../../common/ErrorHint';
 
 const Wrapper = styled.div``;
 
@@ -121,7 +122,7 @@ const SecurityKey = styled.span`
   line-height: 24px;
 `;
 
-const SeedTextarea = styled.textarea`
+const MnemonicTextarea = styled.textarea`
   min-height: 92px;
   padding: 15px;
 
@@ -141,25 +142,6 @@ const SeedTextarea = styled.textarea`
   &::placeholder {
     color: #1616164c;
   }
-`;
-
-const Error = styled.div`
-  display: flex;
-  align-items: center;
-  margin-top: 8px;
-
-  color: #f43d3d;
-  font-size: 16px;
-  font-family: 'Aktiv Grotesk Corp', sans-serif;
-  line-height: 24px;
-`;
-
-const WarningIcon = styled(Icon)`
-  width: 16px;
-  height: 16px;
-  margin-right: 12px;
-
-  color: #f43d3d;
 `;
 
 type Props = {
@@ -238,18 +220,13 @@ export const Main: FC<Props> = ({ setIsLoading, next }) => {
       </Delimiter>
       <SecurityWrapper>
         <SecurityKey>Enter security key</SecurityKey>
-        <SeedTextarea
+        <MnemonicTextarea
           placeholder="Seed phrase"
           value={mnemonic}
           onChange={handleSeedChange}
           className={classNames({ hasError })}
         />
-        {hasError ? (
-          <Error>
-            <WarningIcon name="warning" />
-            Incorrect seed phrase
-          </Error>
-        ) : undefined}
+        {hasError ? <ErrorHint error="Incorrect seed phrase" /> : undefined}
       </SecurityWrapper>
       <Button disabled={isDisabled} onClick={handleContinueClick}>
         Continue

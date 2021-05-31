@@ -5,10 +5,9 @@ import React, { FC, useMemo, useState } from 'react';
 import { styled } from '@linaria/react';
 import classNames from 'classnames';
 
-import { Icon } from 'components/ui';
-
-import { Button } from '../../common/Button';
-import { PasswordInput } from '../../common/PasswordInput';
+import { Button } from '../Button';
+import { ErrorHint } from '../ErrorHint';
+import { PasswordInput } from '../PasswordInput';
 import { validatePassword } from './utils';
 
 const Wrapper = styled.div`
@@ -103,34 +102,15 @@ const RepeatPassword = styled(SubTitle)`
   margin: 20px 0 12px;
 `;
 
-const Error = styled.div`
-  display: flex;
-  align-items: center;
-  margin-top: 8px;
-
-  color: #f43d3d;
-  font-size: 16px;
-  font-family: 'Aktiv Grotesk Corp', sans-serif;
-  line-height: 24px;
-`;
-
-const WarningIcon = styled(Icon)`
-  width: 16px;
-  height: 16px;
-  margin-right: 12px;
-
-  color: #f43d3d;
-`;
-
 const ButtonStyled = styled(Button)`
   margin-top: 32px;
 `;
 
 type Props = {
-  finish: (password: string) => void;
+  next: (password: string) => void;
 };
 
-export const Password: FC<Props> = ({ finish }) => {
+export const Password: FC<Props> = ({ next }) => {
   const [password, setPassword] = useState('');
   const [passwordRepeat, setPasswordRepeat] = useState('');
   const [hasPasswordRepeatError, setHasPasswordRepeatError] = useState(false);
@@ -144,8 +124,7 @@ export const Password: FC<Props> = ({ finish }) => {
     setPassword(value);
   };
 
-  const handlePasswordRepeatChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { value } = e.target;
+  const handlePasswordRepeatChange = (value: string) => {
     setPasswordRepeat(value);
 
     if (hasPasswordRepeatError) {
@@ -158,10 +137,14 @@ export const Password: FC<Props> = ({ finish }) => {
   };
 
   const handleContinueClick = () => {
-    finish(password);
+    next(password);
   };
 
   const renderRules = () => {
+    if (!password) {
+      return;
+    }
+
     // eslint-disable-next-line unicorn/no-reduce
     const counter = [isLowerCase, isUpperCase, isNumber, isMinLength].reduce(
       (prev, curr) => (curr ? prev + 1 : prev),
@@ -227,11 +210,7 @@ export const Password: FC<Props> = ({ finish }) => {
         onBlur={handlePasswordRepeatBlur}
         className={classNames({ error: hasPasswordRepeatError })}
       />
-      {hasPasswordRepeatError ? (
-        <Error>
-          <WarningIcon name="warning" /> Passwords doesn’t match
-        </Error>
-      ) : undefined}
+      {hasPasswordRepeatError ? <ErrorHint error="Passwords doesn’t match" /> : undefined}
       <ButtonStyled disabled={disabled} onClick={handleContinueClick}>
         Continue
       </ButtonStyled>

@@ -7,8 +7,10 @@ import { unwrapResult } from '@reduxjs/toolkit';
 
 import { WalletType } from 'api/wallet';
 import { loadMnemonicAndSeed, LockedType, STORAGE_KEY_LOCKED } from 'api/wallet/ManualWallet';
+import { ERROR_WRONG_PASSWORD } from 'api/wallet/ManualWallet/errors';
 import LogoImg from 'assets/images/big-logo.png';
 import { ToastManager } from 'components/common/ToastManager';
+import { ErrorHint } from 'components/pages/home/Auth/common/ErrorHint';
 import { PasswordInput } from 'components/pages/home/Auth/common/PasswordInput';
 import { SelectorAccountItem } from 'components/pages/home/Auth/Login/Restore/SelectorAccountItem';
 import { connectWallet, selectType } from 'store/slices/wallet/WalletSlice';
@@ -76,6 +78,7 @@ export const Restore: FC<Props> = ({ setIsLoading, back }) => {
   const dispatch = useDispatch();
   const [password, setPassword] = useState('');
   const [accounts, setAccounts] = useState<SelectorItemType[]>([]);
+  const [hasError, setHasError] = useState(false);
 
   useEffect(() => {
     if (localStorage.getItem(STORAGE_KEY_LOCKED)) {
@@ -90,8 +93,23 @@ export const Restore: FC<Props> = ({ setIsLoading, back }) => {
     }
   }, []);
 
+  const validatePassword = async (value: string) => {
+    try {
+      await loadMnemonicAndSeed(value);
+      setHasError(false);
+    } catch (error) {
+      if ((error as Error).message === ERROR_WRONG_PASSWORD) {
+        setHasError(true);
+      }
+    }
+  };
+
   const handlePasswordChange = (value: string) => {
     setPassword(value);
+
+    if (value) {
+      void validatePassword(value);
+    }
   };
 
   const handleAccessClick = () => {
@@ -125,7 +143,7 @@ export const Restore: FC<Props> = ({ setIsLoading, back }) => {
     });
   };
 
-  const isDisabled = !password;
+  const isDisabled = !password || hasError;
 
   return (
     <Wrapper>
@@ -137,6 +155,7 @@ export const Restore: FC<Props> = ({ setIsLoading, back }) => {
         <Selector value={accounts[0]} items={accounts} onChange={() => console.log(1)} />
         <EnterPassword>Enter password</EnterPassword>
         <PasswordInput placeholder="Password" value={password} onChange={handlePasswordChange} />
+        {hasError ? <ErrorHint error="Wrong password" /> : undefined}
       </AccountWrapper>
       <ButtonsWrapper>
         <Button disabled={isDisabled} onClick={handleAccessClick}>

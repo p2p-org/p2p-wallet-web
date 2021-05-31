@@ -1,0 +1,1 @@
+export { Paste } from './Paste';

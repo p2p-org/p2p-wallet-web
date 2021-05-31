@@ -1,16 +1,7 @@
 import React, { FC, useState } from 'react';
-import { batch, useDispatch } from 'react-redux';
-import { useHistory } from 'react-router';
 import { NavLink, Route, Switch, useLocation } from 'react-router-dom';
 
 import { styled } from '@linaria/react';
-import { unwrapResult } from '@reduxjs/toolkit';
-
-import { WalletType } from 'api/wallet';
-import { storeMnemonicAndSeed } from 'api/wallet/ManualWallet';
-import { ToastManager } from 'components/common/ToastManager';
-import { connectWallet, selectType } from 'store/slices/wallet/WalletSlice';
-import { sleep } from 'utils/common';
 
 import { LoaderWide } from './common/LoaderWide';
 import { Login } from './Login';
@@ -80,8 +71,7 @@ const NavLinkStyled = styled(NavLink)`
 
 export const Auth: FC = () => {
   const location = useLocation<{ from?: string }>();
-  const history = useHistory();
-  const dispatch = useDispatch();
+
   const [isLoading, setIsLoading] = useState(false);
   const [data, setData] = useState<DataType>({
     type: undefined,
@@ -91,49 +81,13 @@ export const Auth: FC = () => {
     password: '',
   });
 
-  const finish = (currentData: DataType) => (isSave?: boolean) => {
-    batch(async () => {
-      try {
-        setIsLoading(true);
-        dispatch(selectType(WalletType.MANUAL));
-        unwrapResult(
-          await dispatch(
-            connectWallet({
-              seed: currentData.seed,
-              password: currentData.password,
-              derivationPath: currentData.derivationPath,
-            }),
-          ),
-        );
-        await storeMnemonicAndSeed(
-          currentData.mnemonic,
-          currentData.seed,
-          currentData.derivationPath,
-          currentData.password,
-          isSave,
-        );
-        await sleep(100);
-        history.push('/wallets');
-        // eslint-disable-next-line @typescript-eslint/no-shadow
-      } catch (error) {
-        ToastManager.error((error as Error).message);
-      } finally {
-        setIsLoading(false);
-      }
-    });
-  };
-
   const next = (nextData: DataType) => {
-    if (nextData.password) {
-      setData(nextData);
-    } else {
-      finish(nextData)();
-    }
+    setData(nextData);
   };
 
   const render = () => {
     if (data.seed) {
-      return <Ready type={data.type} finish={finish(data)} />;
+      return <Ready setIsLoading={setIsLoading} data={data} />;
     }
 
     return (

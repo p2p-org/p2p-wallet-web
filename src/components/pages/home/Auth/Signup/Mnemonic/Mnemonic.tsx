@@ -62,7 +62,7 @@ const SecurityKeyHint = styled.span`
   line-height: 18px;
 `;
 
-const SeedWrapper = styled.div`
+const MnemonicWrapper = styled.div`
   position: relative;
 
   &::before {
@@ -79,9 +79,10 @@ const SeedWrapper = styled.div`
   }
 `;
 
-const SeedTextarea = styled.textarea`
+const MnemonicTextarea = styled.textarea`
   position: relative;
 
+  flex-shrink: 0;
   width: 100%;
   height: 100%;
   min-height: 125px;
@@ -126,11 +127,11 @@ const CheckboxWrapper = styled.div`
 `;
 
 type Props = {
-  seed: string;
+  mnemonic: string;
   next: () => void;
 };
 
-export const Seed: FC<Props> = ({ seed, next }) => {
+export const Mnemonic: FC<Props> = ({ mnemonic, next }) => {
   const [checked, setChecked] = useState(false);
 
   const handleCheckChange = (nextChecked: boolean) => {
@@ -148,13 +149,13 @@ export const Seed: FC<Props> = ({ seed, next }) => {
         words to restore your wallet if your browser’s storage is cleared or your device is damaged
         or lost.
       </SecurityKeyHint>
-      <SeedWrapper>
-        <SeedTextarea placeholder="Seed phrase" value={seed} readOnly />
-      </SeedWrapper>
+      <MnemonicWrapper>
+        <MnemonicTextarea placeholder="Seed phrase" value={mnemonic} readOnly />
+      </MnemonicWrapper>
       <CheckboxWrapper>
         <Checkbox
           checked={checked}
-          label=" I have saved these words in a safe place."
+          label="I have saved these words in a safe place."
           onChange={handleCheckChange}
         />
       </CheckboxWrapper>

@@ -5,8 +5,8 @@ import { styled } from '@linaria/react';
 import { mnemonicToSeed, STORAGE_KEY_LOCKED } from 'api/wallet/ManualWallet';
 import { Back } from 'components/pages/home/Auth/common/Back';
 import { DerivableAccounts } from 'components/pages/home/Auth/Login/DerivableAccounts';
-import { Password } from 'components/pages/home/Auth/Login/Password';
 
+import { Password } from '../common/Password';
 import { DataType } from '../types';
 import { Main } from './Main';
 import { Restore } from './Restore';

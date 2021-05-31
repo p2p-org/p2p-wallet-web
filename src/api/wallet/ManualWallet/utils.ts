@@ -7,6 +7,8 @@ import { pbkdf2 } from 'crypto';
 import * as ed25519 from 'ed25519-hd-key';
 import nacl from 'tweetnacl';
 
+import { ERROR_WRONG_PASSWORD } from 'api/wallet/ManualWallet/errors';
+
 export type LockedType = {
   account: string;
   encrypted: string;
@@ -162,7 +164,7 @@ export async function loadMnemonicAndSeed(password?: string): Promise<UnlockedTy
 
   const plaintext = nacl.secretbox.open(encrypted, nonce, key);
   if (!plaintext) {
-    throw new Error('Incorrect password');
+    throw new Error(ERROR_WRONG_PASSWORD);
   }
 
   const decodedPlaintext = Buffer.from(plaintext).toString();

@@ -1,9 +1,18 @@
 import React, { FC, useState } from 'react';
+import { batch, useDispatch } from 'react-redux';
+import { useHistory } from 'react-router';
 
 import { styled } from '@linaria/react';
+import { unwrapResult } from '@reduxjs/toolkit';
 
+import { WalletType } from 'api/wallet';
+import { storeMnemonicAndSeed } from 'api/wallet/ManualWallet';
 import LogoImg from 'assets/images/big-logo.png';
+import { ToastManager } from 'components/common/ToastManager';
+import { DataType } from 'components/pages/home/Auth/types';
 import { Switch } from 'components/ui';
+import { connectWallet, selectType } from 'store/slices/wallet/WalletSlice';
+import { sleep } from 'utils/common';
 
 import { Button } from '../common/Button';
 
@@ -74,11 +83,13 @@ const SwitcherText = styled.span`
 `;
 
 interface Props {
-  type?: 'login' | 'signup';
-  finish: (isSave: boolean) => void;
+  setIsLoading: (isLoading: boolean) => void;
+  data: DataType;
 }
 
-export const Ready: FC<Props> = ({ type, finish }) => {
+export const Ready: FC<Props> = ({ setIsLoading, data }) => {
+  const history = useHistory();
+  const dispatch = useDispatch();
   const [isSave, setIsSave] = useState(true);
 
   const handleIsSaveChange = (nextIsSave: boolean) => {
@@ -86,14 +97,42 @@ export const Ready: FC<Props> = ({ type, finish }) => {
   };
 
   const handleFinishClick = () => {
-    finish(isSave);
+    batch(async () => {
+      try {
+        setIsLoading(true);
+        dispatch(selectType(WalletType.MANUAL));
+        unwrapResult(
+          await dispatch(
+            connectWallet({
+              seed: data.seed,
+              password: data.password,
+              derivationPath: data.derivationPath,
+            }),
+          ),
+        );
+        await storeMnemonicAndSeed(
+          data.mnemonic,
+          data.seed,
+          data.derivationPath,
+          data.password,
+          isSave,
+        );
+        await sleep(100);
+        history.push('/wallets');
+        // eslint-disable-next-line @typescript-eslint/no-shadow
+      } catch (error) {
+        ToastManager.error((error as Error).message);
+      } finally {
+        setIsLoading(false);
+      }
+    });
   };
 
   return (
     <Wrapper>
       <TopWrapper>
         <Logo />
-        <Title>{type === 'login' ? 'Welcome back!' : 'Your wallet is ready!'}</Title>
+        <Title>{data.type === 'login' ? 'Welcome back!' : 'Your wallet is ready!'}</Title>
         <Desc>
           You can turn on a quick enter via password. Only you have access to your keys, not
           governmenе, not us, not anyone else. it’s 100% stored on your devices.{' '}
