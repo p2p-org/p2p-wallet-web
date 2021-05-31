@@ -5,6 +5,7 @@ import { styled } from '@linaria/react';
 import classNames from 'classnames';
 
 import tokenList from 'api/token/token.config';
+import { Jazzicon } from 'components/common/TokenAvatar/Jazzicon';
 import { Avatar } from 'components/ui';
 
 import wrappedImage from './images/wrapped.svg';
@@ -18,8 +19,6 @@ const Wrapper = styled.div`
     background: #f6f6f8;
   }
 `;
-
-const AvatarStyled = styled(Avatar)``;
 
 const WrappedBy = styled.div`
   position: absolute;
@@ -65,8 +64,12 @@ export const TokenAvatar: FunctionComponent<Props & HTMLAttributes<HTMLDivElemen
   ]);
 
   return (
-    <Wrapper className={classNames(className, { isNotExists: !tokenInfo?.logoURI })}>
-      <AvatarStyled src={tokenInfo?.logoURI || undefined} {...props} />
+    <Wrapper className={classNames(className, { isNotExists: !tokenInfo })}>
+      {tokenInfo && !tokenInfo.logoURI ? (
+        <Jazzicon address={tokenInfo.address} {...props} />
+      ) : (
+        <Avatar src={tokenInfo?.logoURI || undefined} {...props} />
+      )}
       {isWrapped ? (
         <WrappedBy
           className={classNames({

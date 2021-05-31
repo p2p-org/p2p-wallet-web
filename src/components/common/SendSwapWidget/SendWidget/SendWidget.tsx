@@ -237,12 +237,12 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
   const toolTipItems = [];
   if (useFreeTransactions) {
     toolTipItems.push(
-      <TooltipRow>Paid by p2p.org.</TooltipRow>,
-      <TooltipRow>We take care of all transfers costs ✌.</TooltipRow>,
+      <TooltipRow key="tooltip-row-1">Paid by p2p.org.</TooltipRow>,
+      <TooltipRow key="tooltip-row-2">We take care of all transfers costs ✌.</TooltipRow>,
     );
   } else {
     toolTipItems.push(
-      <TooltipRow>
+      <TooltipRow key="tooltip-row-3">
         <TxName>Transaction:</TxName>
         <TxValue>{`${txFee} SOL`}</TxValue>
       </TooltipRow>,
@@ -250,7 +250,7 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
 
     if (isNeedCreateWallet) {
       toolTipItems.push(
-        <TooltipRow>
+        <TooltipRow key="tooltip-row-4">
           <TxName>Wallet creation:</TxName>
           <TxValue>{`${rentFee} SOL`}</TxValue>
         </TooltipRow>,
