@@ -16,6 +16,28 @@ import { adjustForSlippage, Pool } from './Pool';
 import poolConfig from './pool.config';
 import { POOL_UPDATED_EVENT, PoolListener, PoolUpdatedEvent } from './PoolListener';
 
+export type PoolInfo = {
+  account: PublicKey;
+  authority: PublicKey;
+  nonce: number;
+  poolTokenMint: PublicKey;
+  tokenAccountA: PublicKey;
+  tokenAccountB: PublicKey;
+  mintA: PublicKey;
+  mintB: PublicKey;
+  feeAccount: PublicKey;
+  feeNumerator: Numberu64;
+  feeDenominator: Numberu64;
+  ownerTradeFeeNumerator: Numberu64;
+  ownerTradeFeeDenominator: Numberu64;
+  ownerWithdrawFeeNumerator: Numberu64;
+  ownerWithdrawFeeDenominator: Numberu64;
+  hostFeeNumerator: Numberu64;
+  hostFeeDenominator: Numberu64;
+  curveType: number;
+  tokenProgramId: PublicKey;
+};
+
 type PoolUpdateCallback = (pool: Pool) => void;
 
 type PoolOperationParameters = {
@@ -67,6 +89,88 @@ const validateSwapParameters = (parameters: SwapParameters): void => {
 
 const isReverseSwap = ({ pool, fromAccount }: Pick<SwapParameters, 'pool' | 'fromAccount'>) =>
   pool.tokenB.sameToken(fromAccount);
+
+const makeTokenAccount = (address: PublicKey, mint: PublicKey, decimals: number): TokenAccount => {
+  const pubkey = new Account().publicKey;
+
+  const mintToken = new Token(mint, decimals || 0, 0);
+
+  return new TokenAccount(mintToken, pubkey, TOKEN_PROGRAM_ID, address, 0);
+};
+
+const parseTokenSwapData = async (
+  address: PublicKey,
+  programId: PublicKey,
+  data: Buffer,
+): Promise<PoolInfo> => {
+  const tokenSwapData = TokenSwapLayout.decode(data) as {
+    isInitialized: boolean;
+    tokenPool: string;
+    feeAccount: string;
+    tokenAccountA: string;
+    tokenAccountB: string;
+    mintA: string;
+    mintB: string;
+    tokenProgramId: string;
+    tradeFeeNumerator: Buffer;
+    tradeFeeDenominator: Buffer;
+    ownerTradeFeeNumerator: Buffer;
+    ownerTradeFeeDenominator: Buffer;
+    ownerWithdrawFeeNumerator: Buffer;
+    ownerWithdrawFeeDenominator: Buffer;
+    hostFeeNumerator: Buffer;
+    hostFeeDenominator: Buffer;
+    curveType: number;
+  };
+
+  if (!tokenSwapData.isInitialized) {
+    throw new Error(`Invalid token swap state`);
+  }
+
+  const [authority, nonce] = await PublicKey.findProgramAddress([address.toBuffer()], programId);
+
+  const poolTokenMint = new PublicKey(tokenSwapData.tokenPool);
+  const feeAccount = new PublicKey(tokenSwapData.feeAccount);
+  const tokenAccountA = new PublicKey(tokenSwapData.tokenAccountA);
+  const tokenAccountB = new PublicKey(tokenSwapData.tokenAccountB);
+  const mintA = new PublicKey(tokenSwapData.mintA);
+  const mintB = new PublicKey(tokenSwapData.mintB);
+  const tokenProgramId = new PublicKey(tokenSwapData.tokenProgramId);
+
+  const feeNumerator = Numberu64.fromBuffer(tokenSwapData.tradeFeeNumerator);
+  const feeDenominator = Numberu64.fromBuffer(tokenSwapData.tradeFeeDenominator);
+  const ownerTradeFeeNumerator = Numberu64.fromBuffer(tokenSwapData.ownerTradeFeeNumerator);
+  const ownerTradeFeeDenominator = Numberu64.fromBuffer(tokenSwapData.ownerTradeFeeDenominator);
+  const ownerWithdrawFeeNumerator = Numberu64.fromBuffer(tokenSwapData.ownerWithdrawFeeNumerator);
+  const ownerWithdrawFeeDenominator = Numberu64.fromBuffer(
+    tokenSwapData.ownerWithdrawFeeDenominator,
+  );
+  const hostFeeNumerator = Numberu64.fromBuffer(tokenSwapData.hostFeeNumerator);
+  const hostFeeDenominator = Numberu64.fromBuffer(tokenSwapData.hostFeeDenominator);
+  const { curveType } = tokenSwapData;
+
+  return {
+    account: address,
+    authority,
+    nonce,
+    poolTokenMint,
+    tokenAccountA,
+    tokenAccountB,
+    mintA,
+    mintB,
+    feeAccount,
+    feeNumerator,
+    feeDenominator,
+    ownerTradeFeeNumerator,
+    ownerTradeFeeDenominator,
+    ownerWithdrawFeeNumerator,
+    ownerWithdrawFeeDenominator,
+    hostFeeNumerator,
+    hostFeeDenominator,
+    curveType,
+    tokenProgramId,
+  };
+};
 
 export const APIFactory = memoizeWith(
   toString,
@@ -175,7 +279,9 @@ export const APIFactory = memoizeWith(
       // load the token account and mint info for tokens A and B
       const tokenAccountAInfo = await tokenAPI.tokenAccountInfo(swapInfo.tokenAccountA);
       const tokenAccountBInfo = await tokenAPI.tokenAccountInfo(swapInfo.tokenAccountB);
-      const feeAccountInfo = await tokenAPI.tokenAccountInfo(swapInfo.feeAccount);
+      const feeAccountInfo =
+        (await tokenAPI.tokenAccountInfo(swapInfo.feeAccount)) ||
+        makeTokenAccount(swapInfo.feeAccount, swapInfo.poolToken, 0);
 
       // load the mint info for the pool token
       const poolTokenInfo = await tokenAPI.tokenInfoUncached(swapInfo.poolToken);
@@ -229,22 +335,70 @@ export const APIFactory = memoizeWith(
         return [];
       }
 
-      console.log('Loading pools for cluster', network.cluster);
-
-      const poolInfos = (
+      const poolsData = (
         await connection.getProgramAccounts(poolConfigForCluster.swapProgramId)
       ).filter((item) => item.account.data.length === TokenSwapLayout.span);
 
-      const poolPromises = poolInfos.map((poolInfo) =>
-        getPool(poolInfo.pubkey, Buffer.from(poolInfo.account.data)).catch((error: Error) => {
-          console.error(error.message);
-          return null;
-        }),
+      const poolInfos: PoolInfo[] = await Promise.all(
+        poolsData.map((poolData) =>
+          parseTokenSwapData(poolData.pubkey, swapProgramId, Buffer.from(poolData.account.data)),
+        ),
       );
 
-      const pools = await Promise.all(poolPromises);
+      // eslint-disable-next-line unicorn/no-reduce
+      const tokenAccountsKeys: Array<PublicKey> = poolInfos.reduce(
+        (acc: Array<PublicKey>, cur: PoolInfo) => {
+          acc.push(cur.tokenAccountA, cur.tokenAccountB);
+          return acc;
+        },
+        [],
+      );
 
-      return pools.filter(complement(isNil)) as Pool[];
+      // eslint-disable-next-line unicorn/no-reduce
+      const poolTokensKeys: Array<PublicKey> = poolInfos.reduce(
+        (acc: Array<PublicKey>, cur: PoolInfo) => {
+          acc.push(cur.poolTokenMint);
+          return acc;
+        },
+        [],
+      );
+
+      const poolTokensInfo: Token[] = await tokenAPI.tokensInfo(poolTokensKeys);
+
+      const tokenAccountsInfo: TokenAccount[] = await tokenAPI.tokensAccountsInfo(
+        tokenAccountsKeys,
+      );
+
+      const pools: Pool[] = [];
+      for (const poolInfo of poolInfos) {
+        const tokenAccountAInfo = tokenAccountsInfo.find((account) =>
+          account.address.equals(poolInfo.tokenAccountA),
+        );
+
+        const tokenAccountBInfo = tokenAccountsInfo.find((account) =>
+          account.address.equals(poolInfo.tokenAccountB),
+        );
+
+        const poolTokenInfo = poolTokensInfo.find((account) =>
+          account.address.equals(poolInfo.poolTokenMint),
+        );
+
+        if (tokenAccountAInfo && tokenAccountBInfo && poolTokenInfo) {
+          pools.push(
+            new Pool(
+              poolInfo.account,
+              tokenAccountAInfo,
+              tokenAccountBInfo,
+              poolTokenInfo,
+              makeTokenAccount(poolInfo.feeAccount, poolInfo.poolTokenMint, 0),
+              swapProgramId,
+              poolInfo.feeNumerator.toNumber() / poolInfo.feeDenominator.toNumber(),
+            ),
+          );
+        }
+      }
+
+      return pools.filter(complement(isNil));
     };
 
     const listenToPoolChanges = (pools: Array<Pool>, callback: PoolUpdateCallback) => {
