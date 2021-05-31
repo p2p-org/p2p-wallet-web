@@ -58,14 +58,22 @@ const EyeIcon = styled(Icon)`
   color: #c0c1cb;
 `;
 
-export const PasswordInput: FC<Omit<React.InputHTMLAttributes<HTMLInputElement>, 'type'>> = ({
-  onFocus,
-  onBlur,
-  className,
-  ...props
-}) => {
+const REGEX_PASSWORD = /[^\w!"#$%&'()*+,./:;<=>?@[\\\]^`{|}~-]+/g;
+
+type Props = {
+  onChange: (password: string) => void;
+};
+
+export const PasswordInput: FC<
+  Props & Omit<React.InputHTMLAttributes<HTMLInputElement>, 'type' | 'onChange'>
+> = ({ onChange, onFocus, onBlur, className, ...props }) => {
   const [isShowPassword, setIsShowPassword] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value.replace(REGEX_PASSWORD, '');
+    onChange(value);
+  };
 
   const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
     setIsFocused(true);
@@ -92,6 +100,7 @@ export const PasswordInput: FC<Omit<React.InputHTMLAttributes<HTMLInputElement>,
       <Input
         type={isShowPassword ? 'input' : 'password'}
         {...props}
+        onChange={handleChange}
         onFocus={handleFocus}
         onBlur={handleBlur}
       />

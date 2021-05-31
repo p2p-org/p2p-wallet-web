@@ -81,14 +81,12 @@ export const Password: FC<Props> = ({ next }) => {
     { leading: false, trailing: true },
   );
 
-  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { value } = e.target;
+  const handlePasswordChange = (value: string) => {
     setPassword(value);
     validatePasswordRepeat(passwordRepeat, value);
   };
 
-  const handlePasswordRepeatChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { value } = e.target;
+  const handlePasswordRepeatChange = (value: string) => {
     setPasswordRepeat(value);
     validatePasswordRepeat(password, value);
   };

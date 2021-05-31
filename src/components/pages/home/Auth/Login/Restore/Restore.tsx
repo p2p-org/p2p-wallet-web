@@ -90,8 +90,7 @@ export const Restore: FC<Props> = ({ setIsLoading, back }) => {
     }
   }, []);
 
-  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { value } = e.target;
+  const handlePasswordChange = (value: string) => {
     setPassword(value);
   };
 

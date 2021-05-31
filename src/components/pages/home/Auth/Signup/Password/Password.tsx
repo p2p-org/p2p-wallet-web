@@ -140,8 +140,7 @@ export const Password: FC<Props> = ({ finish }) => {
     [password],
   );
 
-  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { value } = e.target;
+  const handlePasswordChange = (value: string) => {
     setPassword(value);
   };
 
