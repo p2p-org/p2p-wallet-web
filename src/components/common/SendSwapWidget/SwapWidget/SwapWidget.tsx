@@ -17,6 +17,7 @@ import { Button, Icon, Tooltip } from 'components/ui';
 import { openModal } from 'store/actions/modals';
 import { SHOW_MODAL_TRANSACTION_STATUS } from 'store/constants/modalTypes';
 import { wipeAction } from 'store/slices/GlobalSlice';
+import { updatePools } from 'store/slices/pool/PoolSlice';
 import { executeSwap } from 'store/slices/swap/SwapSlice';
 import { clearTokenPairState, updateTokenPairState } from 'store/slices/tokenPair/TokenPairSlice';
 import { matchesPool, tokenPairSelector } from 'store/slices/tokenPair/utils/tokenPair';
@@ -26,6 +27,7 @@ import {
   getTokenAccountsForWallet,
 } from 'store/slices/wallet/WalletSlice';
 import { majorAmountToMinor, minorAmountToMajor } from 'utils/amount';
+import { useIntervalHook } from 'utils/hooks/useIntervalHook';
 
 import {
   BottomWrapper,
@@ -142,6 +144,8 @@ const PoweredBy = styled.div`
   font-size: 14px;
 `;
 
+const UPDATE_POOLS_INTERVAL = 5000;
+
 const formatFee = (amount: number): number =>
   new Decimal(amount)
     .div(10 ** 9)
@@ -205,6 +209,10 @@ export const SwapWidget: FunctionComponent = () => {
     tokenAccounts,
     updateAction: updateTokenPairState,
   });
+
+  useIntervalHook(() => {
+    void dispatch(updatePools());
+  }, UPDATE_POOLS_INTERVAL);
 
   useEffect(() => {
     return () => {

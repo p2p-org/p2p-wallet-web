@@ -1,7 +1,7 @@
 import { AccountLayout, Token as SPLToken } from '@solana/spl-token';
 import { Numberu64, TokenSwap, TokenSwapLayout } from '@solana/spl-token-swap';
 import { Account, PublicKey, SystemProgram, TransactionInstruction } from '@solana/web3.js';
-import { complement, isNil, memoizeWith, toString } from 'ramda';
+import { complement, isNil, memoizeWith, mergeRight, toString } from 'ramda';
 import assert from 'ts-invariant';
 
 import { getConnection } from 'api/connection';
@@ -65,6 +65,7 @@ export interface API {
   getPools: () => Promise<Array<Pool>>;
   getPool: (address: PublicKey) => Promise<Pool>;
   updatePool: (pool: Pool) => Promise<Pool>;
+  updatePools: (pools: Array<Pool>) => Promise<Array<Pool>>;
   swap: (parameters: SwapParameters) => Promise<string>;
   listenToPoolChanges: (pools: Array<Pool>, callback: PoolUpdateCallback) => PoolListener;
 }
@@ -327,6 +328,59 @@ export const APIFactory = memoizeWith(
       pool.addToHistory(updatedPool.clone());
 
       return updatedPool;
+    };
+
+    const updatePools = async (pools: Array<Pool>): Promise<Array<Pool>> => {
+      // eslint-disable-next-line unicorn/no-reduce
+      const poolTokenAccountsKeys: Array<PublicKey> = pools.reduce(
+        (acc: Array<PublicKey>, cur: Pool) => {
+          acc.push(cur.tokenA.address, cur.tokenB.address);
+          return acc;
+        },
+        [],
+      );
+
+      // eslint-disable-next-line unicorn/no-reduce
+      const poolTokensKeys: Array<PublicKey> = pools.reduce((acc: Array<PublicKey>, cur: Pool) => {
+        acc.push(cur.poolToken.address);
+        return acc;
+      }, []);
+
+      const poolTokenAccounts: TokenAccount[] = await tokenAPI.tokensAccountsInfo(
+        poolTokenAccountsKeys,
+      );
+
+      const poolTokensInfo: Token[] = await tokenAPI.tokensInfo(poolTokensKeys);
+
+      const updatedPools: Pool[] = [];
+      for (const pool of pools) {
+        const oldPool = pool.serialize();
+        const tokenAccountAInfo = poolTokenAccounts.find((account) =>
+          account.address.equals(pool.tokenA.address),
+        );
+
+        const tokenAccountBInfo = poolTokenAccounts.find((account) =>
+          account.address.equals(pool.tokenB.address),
+        );
+
+        const poolTokenInfo = poolTokensInfo.find((account) =>
+          account.address.equals(pool.poolToken.address),
+        );
+
+        if (tokenAccountAInfo && tokenAccountBInfo && poolTokenInfo) {
+          updatedPools.push(
+            Pool.from(
+              mergeRight(oldPool, {
+                tokenA: tokenAccountAInfo.serialize(),
+                tokenB: tokenAccountBInfo.serialize(),
+                poolToken: poolTokenInfo.serialize(),
+              }),
+            ),
+          );
+        }
+      }
+
+      return updatedPools;
     };
 
     const getPools = async (): Promise<Array<Pool>> => {
@@ -677,6 +731,7 @@ export const APIFactory = memoizeWith(
       getPools,
       getPool,
       updatePool,
+      updatePools,
       swap,
       listenToPoolChanges,
     };
