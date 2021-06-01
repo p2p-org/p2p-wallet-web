@@ -22,13 +22,26 @@ export const getPools = createAsyncThunk(
 
     const PoolAPI = APIFactory(state.wallet.network);
     const pools = await PoolAPI.getPools();
-
+    /*
     const listener = PoolAPI.listenToPoolChanges(pools, (pool) => {
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
       thunkAPI.dispatch(poolSlice.actions.updatePool(pool.serialize()));
     });
 
     poolsListeners.push(listener);
+    */
+    return pools.map((pool) => pool.serialize());
+  },
+);
+
+export const updatePools = createAsyncThunk(
+  `${POOL_SLICE_NAME}/updatePools`,
+  async (_, thunkAPI): Promise<Array<SerializablePool>> => {
+    const state: RootState = thunkAPI.getState() as RootState;
+
+    const PoolAPI = APIFactory(state.wallet.network);
+    const oldPools = state.pool.availablePools.map((pool) => Pool.from(pool));
+    const pools = await PoolAPI.updatePools(oldPools);
 
     return pools.map((pool) => pool.serialize());
   },
@@ -59,6 +72,10 @@ const poolSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder.addCase(getPools.fulfilled, (state, action) => ({
+      ...state,
+      availablePools: action.payload,
+    }));
+    builder.addCase(updatePools.fulfilled, (state, action) => ({
       ...state,
       availablePools: action.payload,
     }));

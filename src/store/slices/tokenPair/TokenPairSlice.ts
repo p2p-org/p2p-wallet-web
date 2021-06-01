@@ -8,7 +8,7 @@ import { SYSTEM_PROGRAM_ID, WRAPPED_SOL_MINT } from 'constants/solana/bufferLayo
 import { wipeAction } from 'store/slices/GlobalSlice';
 import { TokenPairState } from 'utils/types';
 
-import { getPools, updatePool } from '../pool/PoolSlice';
+import { getPools, updatePool, updatePools } from '../pool/PoolSlice';
 import { getTokenAccountsForWallet, updateAccount } from '../wallet/WalletSlice';
 import {
   getToAmount,
@@ -144,6 +144,12 @@ const tokenPairSlice = createSlice({
     builder.addCase(getPools.fulfilled, (state, action) => syncPools(state, action.payload));
 
     builder.addCase(updatePool, updatePoolReducer);
+    builder.addCase(updatePools.fulfilled, (state, action) => {
+      return {
+        ...state,
+        availablePools: action.payload,
+      };
+    });
     builder.addCase(updateAccount, updateAccountReducer);
     builder.addCase(wipeAction, () => initialState);
   },

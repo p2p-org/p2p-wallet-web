@@ -44,7 +44,7 @@ export const OWNER_VALIDATION_PROGRAM_ID = new PublicKey(
   '4MNPdKu9wFMvEeZBMt3Eipfs5ovVWTJb31pEXDJAAxX5',
 );
 
-const tokensCache = new CacheTTL<Token>({ ttl: 5000 });
+const tokensCache = new Map<string, Token>();
 
 // uses for precache SWAP_HOST_FEE_ADDRESS token accounts
 export const tokenAccountsPrecache = new CacheTTL<TokenAccount>();
