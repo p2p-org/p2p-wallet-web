@@ -137,9 +137,9 @@ export async function storeMnemonicAndSeed(
     if (isSave) {
       localStorage.setItem(STORAGE_KEY_LOCKED, locked);
     }
-  } else {
-    unlockedMnemonicAndSeed = { mnemonic, seed, derivationPath };
   }
+
+  unlockedMnemonicAndSeed = { mnemonic, seed, derivationPath };
 }
 
 export async function loadMnemonicAndSeed(password?: string): Promise<UnlockedType> {
@@ -169,6 +169,9 @@ export async function loadMnemonicAndSeed(password?: string): Promise<UnlockedTy
 
   const decodedPlaintext = Buffer.from(plaintext).toString();
   const decoded = JSON.parse(decodedPlaintext) as UnlockedType;
+
+  unlockedMnemonicAndSeed = decoded;
+
   return decoded;
 }
 
