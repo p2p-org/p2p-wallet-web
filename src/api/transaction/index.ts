@@ -10,7 +10,7 @@ import bs58 from 'bs58';
 import { Decimal } from 'decimal.js';
 import { complement, isNil, memoizeWith, toString } from 'ramda';
 
-import { getConnection } from 'api/connection';
+import { getConnection, getConnectionTransactions } from 'api/connection';
 import poolConfig from 'api/pool/pool.config';
 import { APIFactory as TokenAPIFactory } from 'api/token';
 import { Token } from 'api/token/Token';
@@ -39,6 +39,7 @@ export const APIFactory = memoizeWith(
   toString,
   (network: NetworkType): API => {
     const connection = getConnection(network);
+    const connectionTransactions = getConnectionTransactions(network);
     const tokenAPI = TokenAPIFactory(network);
     const poolConfigForCluster = poolConfig[network.cluster];
 
@@ -427,7 +428,7 @@ export const APIFactory = memoizeWith(
         account: account.toBase58(),
       });
 
-      const confirmedSignaturesInfos = await connection
+      const confirmedSignaturesInfos = await connectionTransactions
         .getConfirmedSignaturesForAddress2(account, options)
         .catch((error: Error) => {
           console.error(`Error getting transaction signatures for ${account.toBase58()}`, error);
@@ -442,7 +443,7 @@ export const APIFactory = memoizeWith(
         return [];
       }
 
-      const parsedTransactions = await connection
+      const parsedTransactions = await connectionTransactions
         .getParsedConfirmedTransactions(confirmedSignatures)
         .catch((error: Error) => {
           console.error(`Error getting transaction signatures for ${account.toBase58()}`, error);

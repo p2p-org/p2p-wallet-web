@@ -1,5 +1,5 @@
 import { Commitment, Connection, SignatureResult } from '@solana/web3.js';
-import { memoizeWith, toString } from 'ramda';
+import { clone, memoizeWith, toString } from 'ramda';
 
 import { defaultCommitment, NetworkType } from 'config/constants';
 
@@ -9,6 +9,7 @@ import { retryableProxy } from './utils/retryableProxy';
 export const DEFAULT_COMMITMENT: Commitment = defaultCommitment;
 
 let currentNetwork: NetworkType;
+let currentNetworkTransactions: NetworkType;
 
 // Since connection objects include state, we memoise them here per network
 const createConnection = memoizeWith(
@@ -56,6 +57,20 @@ export const getConnection = (network?: NetworkType): Connection => {
   }
 
   const selectedNetwork = network || currentNetwork;
+  return createConnection(selectedNetwork);
+};
+
+export const getConnectionTransactions = (network?: NetworkType): Connection => {
+  if (network) {
+    currentNetworkTransactions = clone(network);
+
+    // HACK: take transactions history from the official node
+    if (network.cluster === 'mainnet-beta') {
+      currentNetworkTransactions.endpoint = 'https://api.mainnet-beta.solana.com';
+    }
+  }
+
+  const selectedNetwork = network || currentNetworkTransactions;
   return createConnection(selectedNetwork);
 };
 
