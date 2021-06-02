@@ -56,13 +56,8 @@ export const networks: NetworksByNameType = {
   'figment-mainnet': {
     name: 'figment-mainnet',
     cluster: 'mainnet-beta',
-    endpoint: `https://solana--mainnet--rpc.datahub.figment.io`,
+    endpoint: `https://datahub-proxy.p2p.org`,
     wsEndpoint: `wss://solana--mainnet--ws.datahub.figment.io/apikey/${process.env.REACT_APP_FIGMENT_DATAHUB_API_KEY}`,
-    httpHeaders: process.env.REACT_APP_FIGMENT_DATAHUB_API_KEY
-      ? {
-          Authorization: process.env.REACT_APP_FIGMENT_DATAHUB_API_KEY,
-        }
-      : undefined,
   },
   'serum-mainnet': {
     name: 'serum-mainnet',

@@ -165,6 +165,10 @@ export const TransactionStatusModal: FunctionComponent<Props> = ({
           setTimeout(mount, 3000);
           return;
         }
+
+        if (isError) {
+          setIsError(false);
+        }
       } catch (error) {
         setIsError(true);
         setIsExecuting(false);
