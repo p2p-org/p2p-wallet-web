@@ -1,5 +1,5 @@
 import { Commitment, Connection, SignatureResult } from '@solana/web3.js';
-import { clone, memoizeWith, toString } from 'ramda';
+import { memoizeWith, toString } from 'ramda';
 
 import { defaultCommitment, NetworkType } from 'config/constants';
 
@@ -56,13 +56,12 @@ export const getConnection = (network?: NetworkType): Connection => {
     currentNetwork = network;
   }
 
-  const selectedNetwork = network || currentNetwork;
-  return createConnection(selectedNetwork);
+  return createConnection(currentNetwork);
 };
 
 export const getConnectionTransactions = (network?: NetworkType): Connection => {
   if (network) {
-    currentNetworkTransactions = clone(network);
+    currentNetworkTransactions = { ...network };
 
     // HACK: take transactions history from the official node
     if (network.cluster === 'mainnet-beta') {
@@ -70,8 +69,7 @@ export const getConnectionTransactions = (network?: NetworkType): Connection => 
     }
   }
 
-  const selectedNetwork = network || currentNetworkTransactions;
-  return createConnection(selectedNetwork);
+  return createConnection(currentNetworkTransactions);
 };
 
 export const confirmTransaction = (
