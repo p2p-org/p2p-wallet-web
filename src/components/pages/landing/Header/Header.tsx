@@ -86,7 +86,7 @@ const Right = styled.div`
   justify-content: flex-end;
 `;
 
-const Button = styled.a`
+const Button = styled(Link)`
   display: flex;
   align-items: center;
   height: 40px;
@@ -160,12 +160,10 @@ export const Header: FC<Props> = ({ onDrawerToggle }) => {
       {/* ) : undefined} */}
       {isTablet ? (
         <Right>
-          <Link to="/login" component={Button}>
-            I have a wallet
-          </Link>
-          <Link to="/signup" component={Button} className="white">
+          <Button to="/login">I have a wallet</Button>
+          <Button to="/signup" className="white">
             Create wallet
-          </Link>
+          </Button>
         </Right>
       ) : undefined}
     </Wrapper>

@@ -63,7 +63,7 @@ const Logo = styled.div`
   line-height: 140%;
 `;
 
-const MenuA = styled.a`
+const MenuLink = styled(Link)`
   min-width: 250px;
   padding: 24px 18px;
 
@@ -106,16 +106,14 @@ export const Drawer: FC<Props> = ({ isOpen, onDrawerClose }) => {
         </DrawerBg>
         <DrawerMenu>
           <Logo>Wallet</Logo>
-          {/* <MenuA href="/#">Explore</MenuA> */}
-          {/* <MenuA href="/#">About</MenuA> */}
-          {/* <MenuA href="/#">Recent Updates</MenuA> */}
-          {/* <MenuA href="/#">FAQ</MenuA> */}
-          <Link to="/login" component={MenuA}>
-            I have a wallet
-          </Link>
-          <Link to="/signup" component={MenuA} className="green">
+          {/* <MenuLink href="/#">Explore</MenuLink> */}
+          {/* <MenuLink href="/#">About</MenuLink> */}
+          {/* <MenuLink href="/#">Recent Updates</MenuLink> */}
+          {/* <MenuLink href="/#">FAQ</MenuLink> */}
+          <MenuLink to="/login">I have a wallet</MenuLink>
+          <MenuLink to="/signup" className="green">
             Create new wallet
-          </Link>
+          </MenuLink>
         </DrawerMenu>
       </Wrapper>
     </>
