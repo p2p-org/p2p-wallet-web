@@ -33,7 +33,6 @@
     "@solana/spl-token-swap": "^0.1.0",
     "@solana/web3.js": "^1.15.0",
     "@ukstv/jazzicon-react": "^1.0.0",
-    "add": "^2.0.6",
     "bip32": "^2.0.6",
     "bip39": "^3.0.2",
     "bn.js": "^5.1.3",

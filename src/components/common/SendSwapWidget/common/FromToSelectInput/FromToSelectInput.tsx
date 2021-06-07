@@ -417,7 +417,10 @@ export const FromToSelectInput: FunctionComponent<Props> = ({
   };
 
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    let nextAmount = e.target.value.replace(/[^\d.]/g, '').replace(/^(\d*\.?)|(\d*)\.?/g, '$1$2');
+    let nextAmount = e.target.value
+      .replace(',', '.')
+      .replace(/[^\d.]/g, '')
+      .replace(/^(\d*\.?)|(\d*)\.?/g, '$1$2');
 
     if (nextAmount === '.') {
       nextAmount = '0.';
