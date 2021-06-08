@@ -1,4 +1,4 @@
-import React, { FunctionComponent } from 'react';
+import React, { FunctionComponent, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 
 import { styled } from '@linaria/react';
@@ -16,8 +16,15 @@ const sortByUSDBalance = (rates: { [pair: string]: number }) => (
   a: TokenAccount,
   b: TokenAccount,
 ) => {
-  const aUSDBalance = a.balance.toNumber() * (a.mint.symbol ? rates[a.mint.symbol] : 1);
-  const bUSDBalance = b.balance.toNumber() * (b.mint.symbol ? rates[b.mint.symbol] : 1);
+  if (a.mint.symbol && !rates[a.mint.symbol]) {
+    return 1;
+  }
+  if (b.mint.symbol && !rates[b.mint.symbol]) {
+    return -1;
+  }
+
+  const aUSDBalance = a.balance.toNumber() * rates[a.mint.symbol!];
+  const bUSDBalance = b.balance.toNumber() * rates[b.mint.symbol!];
 
   if (aUSDBalance < bUSDBalance) {
     return 1;
@@ -27,6 +34,8 @@ const sortByUSDBalance = (rates: { [pair: string]: number }) => (
     if (a.balance.lt(b.balance)) {
       return 1;
     }
+
+    return 0;
   }
 
   return -1;
@@ -47,7 +56,7 @@ export const TokenList: FunctionComponent<Props> = ({
 }) => {
   const rates = useSelector((state) => state.rate.markets);
 
-  const tokens = items.sort(sortByUSDBalance(rates));
+  const tokens = useMemo(() => items.sort(sortByUSDBalance(rates)), [items, rates]);
 
   if (tokens.length === 0 && !isHidden) {
     return <LoaderBlock />;
