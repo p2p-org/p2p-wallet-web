@@ -81,6 +81,6 @@ export const networks: NetworksByNameType = {
   },
 };
 
-export const DEFAULT_NETWORK: NetworkType = networks['solana-mainnet'];
+export const DEFAULT_NETWORK: NetworkType = networks['serum-mainnet'];
 
 export const feeRelayerUrl = process.env.REACT_APP_FEE_RELAYER_URL;
