@@ -1,4 +1,4 @@
-import { Commitment, HttpHeaders, PublicKey } from '@solana/web3.js';
+import { clusterApiUrl, Commitment, HttpHeaders, PublicKey } from '@solana/web3.js';
 
 import { ExtendedCluster } from 'utils/types';
 
@@ -67,17 +67,17 @@ export const networks: NetworksByNameType = {
   'solana-mainnet': {
     name: 'solana-mainnet',
     cluster: 'mainnet-beta',
-    endpoint: 'https://api.mainnet-beta.solana.com',
+    endpoint: clusterApiUrl('mainnet-beta'),
   },
   'solana-devnet': {
     name: 'solana-devnet',
     cluster: 'devnet',
-    endpoint: 'https://devnet.solana.com',
+    endpoint: clusterApiUrl('devnet'),
   },
   'solana-testnet': {
     name: 'solana-testnet',
     cluster: 'testnet',
-    endpoint: 'https://testnet.solana.com',
+    endpoint: clusterApiUrl('testnet'),
   },
 };
 
