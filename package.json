@@ -29,7 +29,7 @@
     "@project-serum/sol-wallet-adapter": "^0.2.0",
     "@reduxjs/toolkit": "^1.5.0",
     "@solana/spl-token": "^0.1.4",
-    "@solana/spl-token-registry": "^0.2.118",
+    "@solana/spl-token-registry": "^0.2.123",
     "@solana/spl-token-swap": "^0.1.0",
     "@solana/web3.js": "^1.17.0",
     "@ukstv/jazzicon-react": "^1.0.0",
