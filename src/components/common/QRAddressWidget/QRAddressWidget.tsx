@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useMemo, useState } from 'react';
+import React, { FunctionComponent, useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 
 import { styled } from '@linaria/react';
@@ -7,12 +7,12 @@ import classNames from 'classnames';
 import { rgba } from 'polished';
 import QRCode from 'qrcode.react';
 
-import tokenList from 'api/token/token.config';
 import { TokenAccount } from 'api/token/TokenAccount';
 import { Card } from 'components/common/Card';
 import { ToastManager } from 'components/common/ToastManager';
-import { Icon } from 'components/ui';
-import { setToClipboard } from 'utils/clipboard';
+import { Button, Icon } from 'components/ui';
+import { askClipboardWritePermission, setToClipboard } from 'utils/clipboard';
+import { getExplorerUrl } from 'utils/connection';
 
 const WrapperCard = styled(Card)`
   flex: 1;
@@ -101,7 +101,7 @@ const QRCodeWrapper = styled.div`
   align-items: center;
   justify-content: center;
 
-  margin: 3px 0 15px;
+  margin: 20px 0;
   padding: 17px;
 
   border-radius: 12px;
@@ -141,8 +141,77 @@ const QRCopied = styled.div`
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
 `;
 
+const Details = styled.div`
+  border-top: 1px solid ${rgba('#000', 0.05)};
+`;
+
+const DetailRow = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 20px;
+
+  &:not(:last-child) {
+    border-bottom: 1px solid ${rgba('#000', 0.05)};
+  }
+`;
+
+const FieldGroup = styled.div``;
+
+const FieldTitle = styled.div`
+  color: #000;
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 16px;
+`;
+
+const FieldValue = styled.div`
+  margin-top: 4px;
+
+  color: #a3a5ba;
+  font-weight: 600;
+  font-size: 13px;
+  line-height: 16px;
+
+  cursor: pointer;
+
+  &:hover {
+    color: #5887ff;
+  }
+`;
+
+export const ShareIcon = styled(Icon)`
+  width: 24px;
+  height: 24px;
+
+  color: #a3a5ba;
+`;
+
+export const ShareWrapper = styled.div`
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  margin-left: 20px;
+
+  background: rgba(163, 165, 186, 0.1);
+  border-radius: 8px;
+  cursor: pointer;
+
+  &:hover {
+    background: #eff3ff;
+
+    ${ShareIcon} {
+      color: #5887ff;
+    }
+  }
+`;
+
 const Footer = styled.div`
-  padding: 12px 20px 14px;
+  padding: 20px;
 
   color: #a3a5ba;
   font-size: 14px;
@@ -160,20 +229,27 @@ type Props = {
 export const QRAddressWidget: FunctionComponent<Props> = ({ publicKey, className }) => {
   const [copied, setCopied] = useState(false);
   const [isExpand, setIsExpand] = useState(false);
-  const [isImageCopyAvailable] = useState(false);
+  const [isShowDetails, setIsShowDetails] = useState(false);
+  const [isImageCopyAvailable, setIsImageCopyAvailable] = useState(false);
   const [isImageCopied, setIsImageCopied] = useState(false);
   const cluster = useSelector((state) => state.wallet.network.cluster);
+  const solPublicKey = useSelector((state) => state.wallet.publicKey);
+
   const tokenAccounts = useSelector((state) => state.wallet.tokenAccounts);
   const tokenAccount = useMemo(() => {
     const foundToken = tokenAccounts.find((account) => account.address === publicKey.toBase58());
     return foundToken && TokenAccount.from(foundToken);
   }, [tokenAccounts, publicKey]);
+  const solAccount = useMemo(() => {
+    const foundToken = tokenAccounts.find((account) => account.address === solPublicKey);
+    return foundToken && TokenAccount.from(foundToken);
+  }, [tokenAccounts, solPublicKey]);
 
-  // useEffect(() => {
-  //   askClipboardWritePermission()
-  //     .then((state) => setIsImageCopyAvailable(state))
-  //     .catch(() => setIsImageCopyAvailable(false));
-  // }, []);
+  useEffect(() => {
+    askClipboardWritePermission()
+      .then((state) => setIsImageCopyAvailable(state))
+      .catch(() => setIsImageCopyAvailable(false));
+  }, []);
 
   if (!tokenAccount) {
     return null;
@@ -183,11 +259,11 @@ export const QRAddressWidget: FunctionComponent<Props> = ({ publicKey, className
     setIsExpand(!isExpand);
   };
 
-  const handleCopyClick = () => {
+  const handleCopyClick = (address: string) => () => {
     try {
-      void navigator.clipboard.writeText(tokenAccount.address.toBase58());
+      void navigator.clipboard.writeText(address);
       setCopied(true);
-      ToastManager.info(`Wallet Address Copied!`);
+      ToastManager.info(`Address Copied!`);
 
       // fade copied after some seconds
       setTimeout(() => {
@@ -217,20 +293,12 @@ export const QRAddressWidget: FunctionComponent<Props> = ({ publicKey, className
     }
   };
 
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  const qrImageSettings: QRCode.ImageSettings = {
-    height: 28,
-    width: 28,
+  const handleToggleAddressDetailsClick = () => {
+    setIsShowDetails((state) => !state);
   };
 
-  const iconSrc = tokenList
-    .filterByClusterSlug(cluster)
-    .getList()
-    .find((token) => token.symbol === tokenAccount.mint.symbol)?.logoURI;
-
-  if (iconSrc) {
-    qrImageSettings.src = iconSrc;
+  if (!solAccount) {
+    return null;
   }
 
   return (
@@ -242,7 +310,9 @@ export const QRAddressWidget: FunctionComponent<Props> = ({ publicKey, className
           ) : (
             <TokenName>Wallet Address</TokenName>
           )}
-          <TokenAddress onClick={handleCopyClick}>{tokenAccount.address.toBase58()}</TokenAddress>
+          <TokenAddress onClick={handleCopyClick(solAccount.address.toBase58())}>
+            {solAccount.address.toBase58()}
+          </TokenAddress>
         </TokenWrapper>
         <ExpandWrapper onClick={handleExpandClick}>
           <ExpandIcon name="qr" />
@@ -251,7 +321,7 @@ export const QRAddressWidget: FunctionComponent<Props> = ({ publicKey, className
       {isExpand ? (
         <>
           <Content>
-            <Text>Scan QR code or copy wallet address</Text>
+            <Text>Scan or copy QR code</Text>
             <QRCodeWrapper
               className={classNames({ isImageCopyAvailable })}
               onClick={isImageCopyAvailable ? handleImageCopyClick : undefined}>
@@ -260,17 +330,51 @@ export const QRAddressWidget: FunctionComponent<Props> = ({ publicKey, className
                   <QRCopied>Copied</QRCopied>
                 </QRCopiedWrapper>
               ) : undefined}
-              <QRCode
-                id="qrcode"
-                value={tokenAccount.address.toBase58()}
-                imageSettings={qrImageSettings}
-                size={140}
-                renderAs="canvas"
-              />
+              <QRCode id="qrcode" value={tokenAccount.address.toBase58()} size={150} />
             </QRCodeWrapper>
           </Content>
+          {isShowDetails ? (
+            <Details>
+              <DetailRow>
+                <FieldGroup>
+                  <FieldTitle>Direct {tokenAccount.mint.symbol} Address</FieldTitle>
+                  <FieldValue onClick={handleCopyClick(tokenAccount.address.toBase58())}>
+                    {tokenAccount.address.toBase58()}
+                  </FieldValue>
+                </FieldGroup>
+                <a
+                  href={getExplorerUrl('address', tokenAccount.address.toBase58(), cluster)}
+                  target="_blank"
+                  rel="noopener noreferrer noindex"
+                  className="button">
+                  <ShareWrapper>
+                    <ShareIcon name="chain" />
+                  </ShareWrapper>
+                </a>
+              </DetailRow>
+              <DetailRow>
+                <FieldGroup>
+                  <FieldTitle>{tokenAccount.mint.symbol} Mint Address</FieldTitle>
+                  <FieldValue onClick={handleCopyClick(tokenAccount.address.toBase58())}>
+                    {tokenAccount.mint.address.toBase58()}
+                  </FieldValue>
+                </FieldGroup>
+                <a
+                  href={getExplorerUrl('address', tokenAccount.mint.address.toBase58(), cluster)}
+                  target="_blank"
+                  rel="noopener noreferrer noindex"
+                  className="button">
+                  <ShareWrapper>
+                    <ShareIcon name="chain" />
+                  </ShareWrapper>
+                </a>
+              </DetailRow>
+            </Details>
+          ) : undefined}
           <Footer>
-            All deposits are stored 100% non-custodiallity with keys held on this device
+            <Button lightGray onClick={handleToggleAddressDetailsClick}>
+              {isShowDetails ? 'Hide address details' : 'Show address details'}
+            </Button>
           </Footer>
         </>
       ) : undefined}
