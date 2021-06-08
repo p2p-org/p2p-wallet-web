@@ -12,7 +12,7 @@ import { Token } from 'api/token/Token';
 import { TokenAccount } from 'api/token/TokenAccount';
 import { RateUSD } from 'components/common/RateUSD';
 import { ToastManager } from 'components/common/ToastManager';
-import { Button, Icon, Tooltip } from 'components/ui';
+import { Button, Icon, Switch, Tooltip } from 'components/ui';
 import { openModal } from 'store/actions/modals';
 import { SHOW_MODAL_ERROR, SHOW_MODAL_TRANSACTION_STATUS } from 'store/constants/modalTypes';
 import { RootState } from 'store/rootReducer';
@@ -74,6 +74,32 @@ const TooltipStyled = styled(Tooltip)`
   border-bottom: none;
 `;
 
+const ConfirmWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  margin-top: 20px;
+  padding: 10px 20px;
+
+  background: #f6f6f8;
+  border-radius: 12px;
+`;
+
+const ConfirmTextWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  margin-left: 20px;
+`;
+
+const ConfirmTextPrimary = styled.div`
+  font-weight: 600;
+  font-size: 14px;
+  color: #a3a5ba;
+`;
+const ConfirmTextSecondary = styled.div`
+  font-weight: 600;
+  font-size: 16px;
+`;
+
 type Props = {
   publicKey: string | null;
 };
@@ -108,6 +134,8 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
   const [txFee, setTxFee] = useState(0);
   const [rentFee, setRentFee] = useState(0);
   const [isExecuting, setIsExecuting] = useState(false);
+  const [isShowConfirmAddressSwitch, setIsShowConfirmAddressSwitch] = useState(false);
+  const [isConfirmCorrectAddress, setIsConfirmCorrectAddress] = useState(false);
   const tokenAccounts = useSelector((state: RootState) =>
     state.wallet.tokenAccounts.map((account) => TokenAccount.from(account)),
   );
@@ -140,6 +168,24 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
       void mount();
     }, []);
   }
+
+  useEffect(() => {
+    const checkDestinationAddress = async () => {
+      const account = unwrapResult(
+        await dispatch(getTokenAccount(new PublicKey(toTokenPublicKey))),
+      );
+
+      if (!account) {
+        setIsShowConfirmAddressSwitch(true);
+      }
+    };
+
+    if (isValidAddress(toTokenPublicKey)) {
+      void checkDestinationAddress();
+    } else {
+      setIsShowConfirmAddressSwitch(false);
+    }
+  }, [toTokenPublicKey]);
 
   const handleSubmit = async () => {
     if (!fromTokenAccount) {
@@ -293,6 +339,20 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
       <ToSendWrapper>
         <FromTitle>Send to</FromTitle>
         <ToAddressInput value={toTokenPublicKey || ''} onChange={handleToPublicKeyChange} />
+        {isShowConfirmAddressSwitch ? (
+          <ConfirmWrapper>
+            <Switch
+              checked={isConfirmCorrectAddress}
+              onChange={() => setIsConfirmCorrectAddress(!isConfirmCorrectAddress)}
+            />
+            <ConfirmTextWrapper>
+              <ConfirmTextPrimary>
+                This address has no funds, are you sure its correct?
+              </ConfirmTextPrimary>
+              <ConfirmTextSecondary>I’m sure, It’s correct</ConfirmTextSecondary>
+            </ConfirmTextWrapper>
+          </ConfirmWrapper>
+        ) : undefined}
       </ToSendWrapper>
       <BottomWrapper>
         <ButtonWrapper>
@@ -302,7 +362,8 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
               isDisabled ||
               isValidAmount(fromAmount) ||
               !isValidAddress(toTokenPublicKey) ||
-              !hasBalance
+              !hasBalance ||
+              (isShowConfirmAddressSwitch && !isConfirmCorrectAddress)
             }
             big
             full
