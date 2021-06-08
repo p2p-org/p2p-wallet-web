@@ -28,6 +28,15 @@ export const globalCss = css`
       text-decoration: none;
     }
 
+    button {
+      white-space: nowrap;
+
+      border: none;
+      cursor: pointer;
+
+      appearance: none;
+    }
+
     & ::-webkit-scrollbar {
       width: 6px;
       height: 6px;
