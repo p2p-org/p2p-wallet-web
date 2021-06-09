@@ -165,6 +165,49 @@ export const getTokenAccountsForWallet = createAsyncThunk<SerializableTokenAccou
   },
 );
 
+export const updateTokenAccountsForWallet = createAsyncThunk<SerializableTokenAccount[]>(
+  `${WALLET_SLICE_NAME}/updateTokenAccountsForWallet`,
+  async (_, thunkAPI) => {
+    const state: RootState = thunkAPI.getState() as RootState;
+    const { network, tokenAccounts } = state.wallet;
+    const TokenAPI = TokenAPIFactory(network);
+
+    const accountsForWallet = await TokenAPI.getAccountsForWallet();
+
+    const tokenAccountsAddresses = new Set(tokenAccounts.map((token) => token.address));
+
+    const newTokenAccounts = [];
+
+    for (const account of accountsForWallet) {
+      if (!tokenAccountsAddresses.has(account.address.toBase58())) {
+        newTokenAccounts.push(account);
+
+        const listener = TokenAPI.listenToTokenAccountChanges(
+          newTokenAccounts,
+          (updatedTokenAccount) => {
+            // eslint-disable-next-line @typescript-eslint/no-use-before-define
+            thunkAPI.dispatch(updateAccount(updatedTokenAccount.serialize()));
+          },
+        );
+
+        accountsListeners.push(listener);
+
+        ToastManager.info('Wallet successfully created!');
+
+        const { symbol } = account.mint;
+
+        transferNotification({
+          header: 'Received',
+          text: `+ ${minorAmountToMajor(account.balance, account.mint).toString()} ${symbol}`,
+          symbol,
+        });
+      }
+    }
+
+    return newTokenAccounts.map((tokenAccount) => tokenAccount.serialize());
+  },
+);
+
 export const precacheTokenAccounts = createAsyncThunk<void, PublicKey>(
   `${WALLET_SLICE_NAME}/precacheTokenAccounts`,
   async (publicKey, thunkAPI) => {
@@ -440,6 +483,10 @@ const walletSlice = createSlice({
       derivableTokenAccounts: action.payload,
     }));
     builder.addCase(getTokenAccountsForWallet.fulfilled, (state, action) => ({
+      ...state,
+      tokenAccounts: state.tokenAccounts.concat(action.payload),
+    }));
+    builder.addCase(updateTokenAccountsForWallet.fulfilled, (state, action) => ({
       ...state,
       tokenAccounts: state.tokenAccounts.concat(action.payload),
     }));

@@ -9,7 +9,11 @@ import { wipeAction } from 'store/slices/GlobalSlice';
 import { TokenPairState } from 'utils/types';
 
 import { getPools, updatePool, updatePools } from '../pool/PoolSlice';
-import { getTokenAccountsForWallet, updateAccount } from '../wallet/WalletSlice';
+import {
+  getTokenAccountsForWallet,
+  updateAccount,
+  updateTokenAccountsForWallet,
+} from '../wallet/WalletSlice';
 import {
   getToAmount,
   selectPoolForTokenPair,
@@ -139,6 +143,9 @@ const tokenPairSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder.addCase(getTokenAccountsForWallet.fulfilled, (state, action) =>
+      syncTokenAccounts(state, action.payload),
+    );
+    builder.addCase(updateTokenAccountsForWallet.fulfilled, (state, action) =>
       syncTokenAccounts(state, action.payload),
     );
     builder.addCase(getPools.fulfilled, (state, action) => syncPools(state, action.payload));
