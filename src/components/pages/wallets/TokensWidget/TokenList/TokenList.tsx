@@ -16,31 +16,42 @@ const sortByUSDBalance = (rates: { [pair: string]: number }) => (
   a: TokenAccount,
   b: TokenAccount,
 ) => {
-  if (a.mint.symbol && !rates[a.mint.symbol]) {
-    return 1;
-  }
-  if (b.mint.symbol && !rates[b.mint.symbol]) {
-    return -1;
+  if (a.mint.symbol === 'SOL' || b.mint.symbol === 'SOL') {
+    return a.mint.symbol === 'SOL' ? -1 : 1;
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  const aUSDBalance = a.balance.toNumber() * rates[a.mint.symbol!];
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  const bUSDBalance = b.balance.toNumber() * rates[b.mint.symbol!];
+  if (a.mint.symbol && b.mint.symbol) {
+    if (rates[a.mint.symbol] && rates[b.mint.symbol]) {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      const aUSDBalance = a.balance.toNumber() * rates[a.mint.symbol];
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      const bUSDBalance = b.balance.toNumber() * rates[b.mint.symbol];
 
-  if (aUSDBalance < bUSDBalance) {
-    return 1;
-  }
-
-  if (aUSDBalance === bUSDBalance) {
-    if (a.balance.lt(b.balance)) {
-      return 1;
+      if (aUSDBalance !== bUSDBalance) {
+        return aUSDBalance > bUSDBalance ? -1 : 1;
+      }
     }
 
-    return 0;
+    if (rates[a.mint.symbol] && !rates[b.mint.symbol]) {
+      return -1;
+    }
+
+    if (!rates[a.mint.symbol] && rates[b.mint.symbol]) {
+      return 1;
+    }
   }
 
-  return -1;
+  const aBalance = a.mint.toMajorDenomination(a.balance);
+  const bBalance = b.mint.toMajorDenomination(b.balance);
+  if (!aBalance.eq(bBalance)) {
+    return aBalance.gt(bBalance) ? -1 : 1;
+  }
+
+  if (a.mint.symbol && b.mint.symbol && a.mint.symbol !== b.mint.symbol) {
+    return a.mint.symbol < b.mint.symbol ? -1 : 1;
+  }
+
+  return a.mint.address < b.mint.address ? -1 : 1;
 };
 
 type Props = {
@@ -59,13 +70,7 @@ export const TokenList: FunctionComponent<Props> = ({
   const rates = useSelector((state) => state.rate.markets);
 
   const tokens = useMemo(() => {
-    if (items.length <= 1) {
-      return [];
-    }
-
-    const [solToken, ...allTokens] = items;
-    const sortedTokens = allTokens.sort(sortByUSDBalance(rates));
-    return [solToken, ...sortedTokens];
+    return items.sort(sortByUSDBalance(rates));
   }, [items, rates]);
 
   if (tokens.length === 0 && !isHidden) {
