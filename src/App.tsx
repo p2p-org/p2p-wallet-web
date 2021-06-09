@@ -6,6 +6,7 @@ import localizedFormat from 'dayjs/plugin/localizedFormat';
 import { useFeature } from 'flagged';
 
 import { FeaturesToggle } from 'components/common/FeaturesToggle';
+import { Intercom } from 'components/common/Intercom';
 import { ModalManager } from 'components/common/ModalManager';
 import { NotifyToast } from 'components/common/NotifyToast';
 import { ToastManager } from 'components/common/ToastManager';
@@ -47,6 +48,7 @@ const App: React.FC = () => {
           <AuthRequiredRoute path="/settings/network" component={SettingsNetwork} />
           <AuthRequiredRoute path="/settings" component={Settings} />
         </Switch>
+        <Intercom />
       </Router>
       <ModalManager />
       <ToastManager anchor="right" renderToast={(props) => <NotifyToast {...props} />} />

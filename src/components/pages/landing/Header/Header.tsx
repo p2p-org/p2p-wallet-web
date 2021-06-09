@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom';
 
 import { styled } from '@linaria/react';
 
+import { trackEvent } from 'utils/analytics';
+
 import { up, useBreakpoint } from '../styles/breakpoints';
 
 const Wrapper = styled.div`
@@ -160,7 +162,9 @@ export const Header: FC<Props> = ({ onDrawerToggle }) => {
       {/* ) : undefined} */}
       {isTablet ? (
         <Right>
-          <Button to="/login">I have a wallet</Button>
+          <Button to="/login" onClick={() => trackEvent('i_have_wallet_click')}>
+            I have a wallet
+          </Button>
           <Button to="/signup" className="white">
             Create wallet
           </Button>

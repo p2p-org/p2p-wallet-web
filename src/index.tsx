@@ -4,11 +4,17 @@ import 'styles/css/nprogress.css';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
+import { IntercomProvider } from 'react-use-intercom';
+
+import assert from 'ts-invariant';
 
 import { FeatureProvider } from 'components/common/FeatureProvider';
 import { isDev } from 'config/constants';
 import { store } from 'store';
 import { globalCss } from 'styles/global';
+import { initAmplitude } from 'utils/analytics';
+
+initAmplitude();
 
 export const global = globalCss;
 
@@ -17,12 +23,19 @@ const render = () => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-var-requires,global-require
   const App = require('./App').default as React.FC;
 
+  assert(
+    process.env.REACT_APP_INTERCOM_APP_ID,
+    "REACT_APP_INTERCOM_APP_ID doesn't set in environment",
+  );
+
   ReactDOM.render(
     <React.StrictMode>
       <Provider store={store}>
-        <FeatureProvider>
-          <App />
-        </FeatureProvider>
+        <IntercomProvider appId={process.env.REACT_APP_INTERCOM_APP_ID} autoBoot>
+          <FeatureProvider>
+            <App />
+          </FeatureProvider>
+        </IntercomProvider>
       </Provider>
     </React.StrictMode>,
     document.querySelector('#root'),
