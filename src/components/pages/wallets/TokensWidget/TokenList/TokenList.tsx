@@ -23,7 +23,9 @@ const sortByUSDBalance = (rates: { [pair: string]: number }) => (
     return -1;
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const aUSDBalance = a.balance.toNumber() * rates[a.mint.symbol!];
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const bUSDBalance = b.balance.toNumber() * rates[b.mint.symbol!];
 
   if (aUSDBalance < bUSDBalance) {
