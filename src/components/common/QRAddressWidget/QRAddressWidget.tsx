@@ -330,7 +330,7 @@ export const QRAddressWidget: FunctionComponent<Props> = ({ publicKey, className
                   <QRCopied>Copied</QRCopied>
                 </QRCopiedWrapper>
               ) : undefined}
-              <QRCode id="qrcode" value={tokenAccount.address.toBase58()} size={150} />
+              <QRCode id="qrcode" value={solAccount.address.toBase58()} size={150} />
             </QRCodeWrapper>
           </Content>
           {isShowDetails ? (
