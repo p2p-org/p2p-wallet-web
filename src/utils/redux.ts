@@ -20,6 +20,8 @@ const ignoredActions = [
   'swap/executeSwap',
   'transaction/getTransaction',
   'openModal',
+  'pool/updatePools',
+  'wallet/updateTokenAccountsForWallet',
 ];
 
 const isIgnored = (action: AnyAction) =>

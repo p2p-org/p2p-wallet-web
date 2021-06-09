@@ -1,12 +1,14 @@
 import React, { FunctionComponent, useEffect } from 'react';
 import { Helmet } from 'react-helmet';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import Sticky from 'react-stickynode';
 
 import { styled } from '@linaria/react';
 import NProgress from 'nprogress';
 
 import { RootState } from 'store/rootReducer';
+import { updateTokenAccountsForWallet } from 'store/slices/wallet/WalletSlice';
+import { useIntervalHook } from 'utils/hooks/useIntervalHook';
 
 import { BreadcrumbType, Header, HEADER_HEIGHT } from '../Header';
 import { ScrollFix } from '../ScollFix';
@@ -85,6 +87,7 @@ export const Layout: FunctionComponent<Props> = ({
   centered,
   children,
 }) => {
+  const dispatch = useDispatch();
   const connected = useSelector((state: RootState) => state.wallet.connected);
   const loading = useSelector((state: RootState) => state.global.loading);
 
@@ -95,6 +98,10 @@ export const Layout: FunctionComponent<Props> = ({
       NProgress.done();
     }
   }, [Boolean(loading)]);
+
+  useIntervalHook(() => {
+    void dispatch(updateTokenAccountsForWallet());
+  }, 5000);
 
   return (
     <>
