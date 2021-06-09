@@ -58,7 +58,15 @@ export const TokenList: FunctionComponent<Props> = ({
 }) => {
   const rates = useSelector((state) => state.rate.markets);
 
-  const tokens = useMemo(() => items.sort(sortByUSDBalance(rates)), [items, rates]);
+  const tokens = useMemo(() => {
+    if (items.length <= 1) {
+      return [];
+    }
+
+    const [solToken, ...allTokens] = items;
+    const sortedTokens = allTokens.sort(sortByUSDBalance(rates));
+    return [solToken, ...sortedTokens];
+  }, [items, rates]);
 
   if (tokens.length === 0 && !isHidden) {
     return <LoaderBlock />;
