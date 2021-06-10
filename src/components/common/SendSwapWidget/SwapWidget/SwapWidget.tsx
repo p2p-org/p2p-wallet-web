@@ -16,7 +16,6 @@ import { ToastManager } from 'components/common/ToastManager';
 import { Button, Icon, Tooltip } from 'components/ui';
 import { openModal } from 'store/actions/modals';
 import { SHOW_MODAL_TRANSACTION_STATUS } from 'store/constants/modalTypes';
-import { wipeAction } from 'store/slices/GlobalSlice';
 import { updatePools } from 'store/slices/pool/PoolSlice';
 import { executeSwap } from 'store/slices/swap/SwapSlice';
 import { clearTokenPairState, updateTokenPairState } from 'store/slices/tokenPair/TokenPairSlice';
@@ -24,7 +23,6 @@ import { matchesPool, tokenPairSelector } from 'store/slices/tokenPair/utils/tok
 import {
   getMinimumBalanceForRentExemption,
   getRecentBlockhash,
-  getTokenAccountsForWallet,
 } from 'store/slices/wallet/WalletSlice';
 import { majorAmountToMinor, minorAmountToMajor } from 'utils/amount';
 import { useIntervalHook } from 'utils/hooks/useIntervalHook';
@@ -305,11 +303,6 @@ export const SwapWidget: FunctionComponent = () => {
       ToastManager.error((error as Error).message);
     } finally {
       setIsExecuting(false);
-
-      if (isNeedCreateWallet) {
-        dispatch(wipeAction());
-        await dispatch(getTokenAccountsForWallet());
-      }
     }
   };
 
