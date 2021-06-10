@@ -20,6 +20,10 @@ const sortByUSDBalance = (rates: { [pair: string]: number }) => (
     return a.mint.symbol === 'SOL' ? -1 : 1;
   }
 
+  if (!a.mint.symbol || !b.mint.symbol) {
+    return !a.mint.symbol ? 1 : -1;
+  }
+
   if (a.mint.symbol && b.mint.symbol) {
     if (rates[a.mint.symbol] && rates[b.mint.symbol]) {
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
