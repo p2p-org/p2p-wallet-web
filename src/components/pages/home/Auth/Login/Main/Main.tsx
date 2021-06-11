@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react';
+import React, { FC, useEffect, useState } from 'react';
 import { batch, useDispatch } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 
@@ -13,7 +13,9 @@ import { ToastManager } from 'components/common/ToastManager';
 import { Button } from 'components/pages/home/Auth/common/Button';
 import { localMnemonic } from 'config/constants';
 import { connectWallet, selectType } from 'store/slices/wallet/WalletSlice';
+import { trackEvent } from 'utils/analytics';
 import { sleep } from 'utils/common';
+import { useTrackEventOnce } from 'utils/hooks/useTrackEventOnce';
 
 import { ErrorHint } from '../../common/ErrorHint';
 
@@ -152,8 +154,13 @@ type Props = {
 export const Main: FC<Props> = ({ setIsLoading, next }) => {
   const history = useHistory();
   const dispatch = useDispatch();
+  const trackEventOnce = useTrackEventOnce();
   const [mnemonic, setMnemonic] = useState(localMnemonic || '');
   const [hasError, setHasError] = useState(false);
+
+  useEffect(() => {
+    trackEvent('login_open');
+  }, []);
 
   const handleConnectByClick = (type: WalletType) => () => {
     batch(async () => {
@@ -161,6 +168,15 @@ export const Main: FC<Props> = ({ setIsLoading, next }) => {
         setIsLoading(true);
         dispatch(selectType(type));
         unwrapResult(await dispatch(connectWallet()));
+
+        if (type === WalletType.SOLLET) {
+          trackEventOnce('login_solletio_click');
+        } else if (type === WalletType.SOLLET_EXTENSION) {
+          trackEventOnce('login_sollet_extension_click');
+        } else if (type === WalletType.PHANTOM) {
+          trackEventOnce('login_phantom_click');
+        }
+
         await sleep(100);
         history.push('/wallets');
         // eslint-disable-next-line @typescript-eslint/no-shadow
@@ -188,6 +204,8 @@ export const Main: FC<Props> = ({ setIsLoading, next }) => {
     const { value } = e.target;
     setMnemonic(value);
     validateMnemonic(value);
+
+    trackEventOnce('login_seed_keydown');
   };
 
   const handleContinueClick = () => {
