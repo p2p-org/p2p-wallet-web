@@ -9,6 +9,7 @@ import { TokenAccountRow } from 'components/common/TokenAccountRow';
 import { Button } from 'components/pages/home/Auth/common/Button';
 import { getRatesMarkets } from 'store/slices/rate/RateSlice';
 import { connect, getDerivableTokenAccounts } from 'store/slices/wallet/WalletSlice';
+import { trackEvent } from 'utils/analytics';
 
 import { Selector } from '../../common/Selector';
 import { SelectorItemType } from '../../common/Selector/Selector';
@@ -78,10 +79,14 @@ export const DerivableAccounts: FC<Props> = ({ seed, next }) => {
   }, [seed, derivationPathItem]);
 
   const handleDerivationPathChange = (item: SelectorItemType) => {
+    trackEvent('login_select_derivation_path_click', { derivationPath: item.value });
     setDerivationPathItem(item);
   };
 
   const handleContinueClick = () => {
+    trackEvent('login_continue_derivation_path_click', {
+      derivationPath: derivationPathItem.value,
+    });
     next(derivationPathItem.value);
   };
 

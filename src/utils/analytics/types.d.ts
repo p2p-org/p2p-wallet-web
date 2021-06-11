@@ -75,6 +75,10 @@ export type TrackEventType = {
   (event: 'login_password_confirm_keydown'): void;
   // Пользователь нажал "Continue"
   (event: 'login_continue_create_password_click'): void;
+  // Пользователь выбирает Derivation path
+  (event: 'login_select_derivation_path_click', { derivationPath: string }): void;
+  // Пользователь нажал "Continue"
+  (event: 'login_continue_derivation_path_click', { derivationPath: string }): void;
   // Пользователь попадает на страницу "Your wallet is ready!"
   (event: 'login_wallet_ready_open'): void;
   // Пользователь нажал "Finish setup"

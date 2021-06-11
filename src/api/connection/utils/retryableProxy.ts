@@ -54,9 +54,13 @@ export const retryableProxy = <U, R>(
 
     //  if it has been called, and failed, catch the error, wait and retry
     return previousValue.catch((error: Error) => {
-      if (error.toString().includes('Transaction simulation failed')) {
+      if (!error.message.includes('429 Too Many Requests')) {
         throw error;
       }
+
+      // if (error.message.includes('Transaction simulation failed')) {
+      //   throw error;
+      // }
 
       const sleepMs = options.intervalMS * options.backoutMultiplier ** currentIndex;
       console.error(error);
