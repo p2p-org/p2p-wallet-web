@@ -15,6 +15,7 @@ import { ToastManager } from 'components/common/ToastManager';
 import { TokenAvatar } from 'components/common/TokenAvatar';
 import { Button } from 'components/ui';
 import { getTransaction } from 'store/slices/transaction/TransactionSlice';
+import { trackEvent } from 'utils/analytics';
 import { getExplorerUrl } from 'utils/connection';
 import { transferNotification } from 'utils/transactionNotifications';
 
@@ -92,7 +93,7 @@ export const TransactionStatusModal: FunctionComponent<Props> = ({
   const dispatch = useDispatch();
   const [progress, setProgress] = useState(5);
   const [isExecuting, setIsExecuting] = useState(false);
-  const [isError, setIsError] = useState(false);
+  const [transactionError, setTransactionError] = useState('');
   const [signature, setSignature] = useState<string | null>(null);
   const transaction = useSelector(
     (state) =>
@@ -142,7 +143,7 @@ export const TransactionStatusModal: FunctionComponent<Props> = ({
         });
       }
     } catch (error) {
-      setIsError(true);
+      setTransactionError((error as Error).message);
       setIsExecuting(false);
       ToastManager.error((error as Error).message);
     }
@@ -166,11 +167,11 @@ export const TransactionStatusModal: FunctionComponent<Props> = ({
           return;
         }
 
-        if (isError) {
-          setIsError(false);
+        if (transactionError) {
+          setTransactionError('');
         }
       } catch (error) {
-        setIsError(true);
+        setTransactionError((error as Error).message);
         setIsExecuting(false);
         ToastManager.error((error as Error).message);
       }
@@ -191,11 +192,43 @@ export const TransactionStatusModal: FunctionComponent<Props> = ({
     );
   }, [transaction?.short.destination, tokenAccounts]);
 
+  const handleCloseClick = () => {
+    if (type === 'send') {
+      trackEvent('send_close_click', { transactionConfirmed: !isExecuting });
+    } else if (type === 'swap') {
+      trackEvent('swap_close_click', { transactionConfirmed: !isExecuting });
+    }
+
+    close(signature);
+  };
+
+  const handleDoneClick = () => {
+    if (type === 'send') {
+      trackEvent('send_done_click', { transactionConfirmed: !isExecuting });
+    } else if (type === 'swap') {
+      trackEvent('swap_done_click', { transactionConfirmed: !isExecuting });
+    }
+
+    close(signature);
+  };
+
   const handleRetryClick = () => {
+    if (type === 'send') {
+      trackEvent('send_try_again_click', { error: transactionError });
+    } else if (type === 'swap') {
+      trackEvent('swap_try_again_click', { error: transactionError });
+    }
+
     void executeAction();
   };
 
-  const handleCloseClick = () => {
+  const handleCancelClick = () => {
+    if (type === 'send') {
+      trackEvent('send_cancel_click', { error: transactionError });
+    } else if (type === 'swap') {
+      trackEvent('swap_cancel_click', { error: transactionError });
+    }
+
     close(signature);
   };
 
@@ -207,7 +240,7 @@ export const TransactionStatusModal: FunctionComponent<Props> = ({
       return 'Success';
     }
 
-    if (isError) {
+    if (transactionError) {
       return 'Something went wrong';
     }
 
@@ -221,7 +254,7 @@ export const TransactionStatusModal: FunctionComponent<Props> = ({
         : 'You’ve successfully swapped tokens';
     }
 
-    if (isError) {
+    if (transactionError) {
       return type === 'send' ? 'Tokens have not been debited' : 'Tokens have not been swapped';
     }
 
@@ -240,12 +273,12 @@ export const TransactionStatusModal: FunctionComponent<Props> = ({
           className={classNames({
             isProcessing,
             isSuccess,
-            isError,
+            isError: Boolean(transactionError),
           })}>
           {isSuccess ? (
             <CheckmarkIcon name="checkmark" />
           ) : (
-            <OtherIcon name={isError ? 'warning' : 'timer'} />
+            <OtherIcon name={transactionError ? 'warning' : 'timer'} />
           )}
         </BlockWrapper>
       </Header>
@@ -317,18 +350,18 @@ export const TransactionStatusModal: FunctionComponent<Props> = ({
         ) : undefined}
       </Content>
       <Footer>
-        {isError ? (
+        {transactionError ? (
           <>
             <Button primary disabled={isExecuting} onClick={handleRetryClick}>
               Try again
             </Button>
-            <Button lightGray disabled={isExecuting} onClick={handleCloseClick}>
+            <Button lightGray disabled={isExecuting} onClick={handleCancelClick}>
               Cancel
             </Button>
           </>
         ) : (
           <>
-            <Button primary onClick={handleCloseClick}>
+            <Button primary onClick={handleDoneClick}>
               Done
             </Button>
             {signature ? (
@@ -336,6 +369,13 @@ export const TransactionStatusModal: FunctionComponent<Props> = ({
                 href={getExplorerUrl('tx', signature, cluster)}
                 target="_blank"
                 rel="noopener noreferrer noindex"
+                onClick={() => {
+                  if (type === 'send') {
+                    trackEvent('send_explorer_click', { transactionConfirmed: !isExecuting });
+                  } else if (type === 'swap') {
+                    trackEvent('swap_explorer_click', { transactionConfirmed: !isExecuting });
+                  }
+                }}
                 className="button">
                 <ButtonExplorer lightGray>View in blockchain explorer</ButtonExplorer>
               </a>

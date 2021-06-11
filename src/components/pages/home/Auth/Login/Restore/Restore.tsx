@@ -14,7 +14,9 @@ import { ErrorHint } from 'components/pages/home/Auth/common/ErrorHint';
 import { PasswordInput } from 'components/pages/home/Auth/common/PasswordInput';
 import { SelectorAccountItem } from 'components/pages/home/Auth/Login/Restore/SelectorAccountItem';
 import { connectWallet, selectType } from 'store/slices/wallet/WalletSlice';
+import { trackEvent } from 'utils/analytics';
 import { sleep } from 'utils/common';
+import { useTrackEventOnce } from 'utils/hooks/useTrackEventOnce';
 
 import { Button } from '../../common/Button';
 import { Selector } from '../../common/Selector';
@@ -76,11 +78,14 @@ interface Props {
 export const Restore: FC<Props> = ({ setIsLoading, back }) => {
   const history = useHistory();
   const dispatch = useDispatch();
+  const trackEventOnce = useTrackEventOnce();
   const [password, setPassword] = useState('');
   const [accounts, setAccounts] = useState<SelectorItemType[]>([]);
   const [hasError, setHasError] = useState(false);
 
   useEffect(() => {
+    trackEvent('restore_welcome_back_open');
+
     if (localStorage.getItem(STORAGE_KEY_LOCKED)) {
       const locked = JSON.parse(localStorage.getItem(STORAGE_KEY_LOCKED) || '') as LockedType;
 
@@ -108,6 +113,7 @@ export const Restore: FC<Props> = ({ setIsLoading, back }) => {
     setPassword(value);
 
     if (value) {
+      trackEventOnce('restore_password_keydown');
       void validatePassword(value);
     }
   };
@@ -129,6 +135,9 @@ export const Restore: FC<Props> = ({ setIsLoading, back }) => {
               }),
             ),
           );
+
+          trackEvent('restore_access_wallet_click');
+
           await sleep(100);
           history.push('/wallets');
         } else {
@@ -141,6 +150,11 @@ export const Restore: FC<Props> = ({ setIsLoading, back }) => {
         setIsLoading(false);
       }
     });
+  };
+
+  const handleSeedPhraseClick = () => {
+    trackEvent('restore_access_via_seed_click');
+    back();
   };
 
   const isDisabled = !password || hasError;
@@ -161,7 +175,7 @@ export const Restore: FC<Props> = ({ setIsLoading, back }) => {
         <Button disabled={isDisabled} onClick={handleAccessClick}>
           Access my wallet
         </Button>
-        <Button className="hollow" onClick={back}>
+        <Button className="hollow" onClick={handleSeedPhraseClick}>
           Access via seed phrase
         </Button>
       </ButtonsWrapper>

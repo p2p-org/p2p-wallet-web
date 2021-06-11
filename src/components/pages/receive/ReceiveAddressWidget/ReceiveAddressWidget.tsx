@@ -9,6 +9,7 @@ import QRCode from 'qrcode.react';
 import { TokenAccount } from 'api/token/TokenAccount';
 import { ToastManager } from 'components/common/ToastManager';
 import { WidgetPage } from 'components/common/WidgetPage';
+import { trackEvent } from 'utils/analytics';
 import { askClipboardWritePermission, setToClipboard } from 'utils/clipboard';
 import { getExplorerUrl } from 'utils/connection';
 
@@ -142,6 +143,7 @@ const copy = (value: string, cb: (state: boolean) => void) => {
 };
 
 const handleCopyClick = (value: string, cb: (state: boolean) => void) => () => {
+  trackEvent('receive_address_copy');
   return copy(value, cb);
 };
 

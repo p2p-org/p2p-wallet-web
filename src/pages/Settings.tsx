@@ -1,6 +1,7 @@
-import React, { FunctionComponent } from 'react';
+import React, { FunctionComponent, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router';
+import { useLocation } from 'react-router-dom';
 
 import { styled } from '@linaria/react';
 import { Feature } from 'flagged';
@@ -14,6 +15,7 @@ import { Icon, Select, Switch } from 'components/ui';
 import { MenuItem } from 'components/ui/Select/MenuItem';
 import { FEATURE_SETTINGS_LIST } from 'config/featureFlags';
 import { disconnect, updateSettings } from 'store/slices/wallet/WalletSlice';
+import { trackEvent } from 'utils/analytics';
 import { appearance, currencies } from 'utils/settings';
 import { WalletSettings } from 'utils/types';
 
@@ -190,11 +192,17 @@ const Row: FunctionComponent<RowProps> = ({ icon, title, secondary, onClick }) =
 };
 
 export const Settings: FunctionComponent = () => {
+  const location = useLocation<{ fromPage: string }>();
   const history = useHistory();
   const dispatch = useDispatch();
   const settings = useSelector((state) => state.wallet.settings);
 
+  useEffect(() => {
+    trackEvent('settings_open', { fromPage: location.state.fromPage });
+  }, []);
+
   const handleLogoutClick = () => {
+    trackEvent('settings_logout_click');
     forgetWallet();
     void dispatch(disconnect());
   };
@@ -272,9 +280,14 @@ export const Settings: FunctionComponent = () => {
                 secondary={
                   <Switch
                     checked={settings.isZeroBalancesHidden}
-                    onChange={onItemClickHandler({
-                      isZeroBalancesHidden: !settings.isZeroBalancesHidden,
-                    })}
+                    onChange={() => {
+                      trackEvent('settings_hide_zero_balances_click', {
+                        hide: !settings.isZeroBalancesHidden,
+                      });
+                      onItemClickHandler({
+                        isZeroBalancesHidden: !settings.isZeroBalancesHidden,
+                      });
+                    }}
                   />
                 }
               />

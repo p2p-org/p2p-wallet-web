@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useMemo } from 'react';
+import React, { FunctionComponent, useEffect, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 
@@ -9,6 +9,7 @@ import { Layout } from 'components/common/Layout';
 import { QRAddressWidget } from 'components/common/QRAddressWidget';
 import { ActivityWidget, TopWidget } from 'components/pages/wallet';
 import { RootState } from 'store/rootReducer';
+import { trackEvent } from 'utils/analytics';
 import { shortAddress } from 'utils/tokens';
 
 export const Wallet: FunctionComponent = () => {
@@ -22,6 +23,12 @@ export const Wallet: FunctionComponent = () => {
     () => tokenAccounts.find((account) => account.address.equals(tokenPublicKey)),
     [tokenAccounts, publicKey],
   );
+
+  useEffect(() => {
+    if (tokenAccount?.mint.symbol) {
+      trackEvent('wallet_open', { tokenTicker: tokenAccount.mint.symbol });
+    }
+  }, [tokenAccount?.mint.symbol]);
 
   return (
     <Layout

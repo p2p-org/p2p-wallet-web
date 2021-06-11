@@ -1,9 +1,11 @@
-import React, { FC, useState } from 'react';
+import React, { FC, useEffect, useState } from 'react';
 
 import { styled } from '@linaria/react';
 import classNames from 'classnames';
 
 import { Button } from 'components/pages/home/Auth/common/Button';
+import { trackEvent } from 'utils/analytics';
+import { useTrackEventOnce } from 'utils/hooks/useTrackEventOnce';
 
 import { ErrorHint } from '../../common/ErrorHint';
 
@@ -73,19 +75,25 @@ interface Props {
 }
 
 export const Paste: FC<Props> = ({ mnemonic, next }) => {
+  const trackEventOnce = useTrackEventOnce();
   const [userMnemonic, setUserMnemonic] = useState('');
   const [hasError, setHasError] = useState(false);
+
+  useEffect(() => {
+    trackEvent('signup_paste_seed_open');
+  }, []);
 
   const validateMnemonic = (value: string) => {
     setHasError(value !== mnemonic);
   };
 
-  const handleMnemonicChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+  const handleMnemonicInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const { value } = e.target;
     setUserMnemonic(value);
 
     if (userMnemonic) {
       validateMnemonic(value);
+      trackEventOnce('signup_seed_pasted');
     }
   };
 
@@ -93,6 +101,11 @@ export const Paste: FC<Props> = ({ mnemonic, next }) => {
     const value = e.target.value.trim();
     setUserMnemonic(value);
     validateMnemonic(value);
+  };
+
+  const handleContinueClick = () => {
+    trackEvent('signup_continue_paste_click');
+    next();
   };
 
   const isDisabled = userMnemonic !== mnemonic || hasError;
@@ -108,13 +121,13 @@ export const Paste: FC<Props> = ({ mnemonic, next }) => {
         <MnemonicTextarea
           placeholder="Seed phrase"
           value={userMnemonic}
-          onInput={handleMnemonicChange}
+          onInput={handleMnemonicInput}
           onBlur={handleMnemonicBlur}
           className={classNames({ hasError })}
         />
         {hasError ? <ErrorHint error="Incorrect seed phrase" /> : undefined}
       </MnemonicWrapper>
-      <Button disabled={isDisabled} onClick={next}>
+      <Button disabled={isDisabled} onClick={handleContinueClick}>
         Continue
       </Button>
     </Wrapper>

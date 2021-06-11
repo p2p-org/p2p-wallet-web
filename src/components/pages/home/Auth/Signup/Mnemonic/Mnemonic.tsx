@@ -4,6 +4,8 @@ import { styled } from '@linaria/react';
 
 import { Button } from 'components/pages/home/Auth/common/Button';
 import { Checkbox } from 'components/pages/home/Auth/common/Checkbox';
+import { trackEvent } from 'utils/analytics';
+import { useTrackEventOnce } from 'utils/hooks/useTrackEventOnce';
 
 const Wrapper = styled.div`
   display: flex;
@@ -132,10 +134,20 @@ type Props = {
 };
 
 export const Mnemonic: FC<Props> = ({ mnemonic, next }) => {
+  const trackEventOnce = useTrackEventOnce();
   const [checked, setChecked] = useState(false);
 
   const handleCheckChange = (nextChecked: boolean) => {
     setChecked(nextChecked);
+
+    if (nextChecked) {
+      trackEventOnce('signup_i_have_saved_words_click');
+    }
+  };
+
+  const handleContinueClick = () => {
+    trackEvent('signup_continue_mnemonic_click');
+    next();
   };
 
   return (
@@ -159,7 +171,7 @@ export const Mnemonic: FC<Props> = ({ mnemonic, next }) => {
           onChange={handleCheckChange}
         />
       </CheckboxWrapper>
-      <Button disabled={!checked} onClick={next}>
+      <Button disabled={!checked} onClick={handleContinueClick}>
         Continue
       </Button>
     </Wrapper>

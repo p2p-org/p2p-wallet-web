@@ -12,9 +12,10 @@ import { TokenAvatar } from 'components/common/TokenAvatar';
 import { Icon } from 'components/ui';
 import { openModal } from 'store/actions/modals';
 import { SHOW_MODAL_TRANSACTION_DETAILS } from 'store/constants/modalTypes';
+import { trackEvent } from 'utils/analytics';
 import { shortAddress } from 'utils/tokens';
 
-import { AmountUSD } from '../AmountUSD';
+import { AmountUSD } from '../../../../common/AmountUSD';
 
 const Wrapper = styled.div`
   position: relative;
@@ -147,6 +148,8 @@ export const TransactionRow: FunctionComponent<Props> = ({ transaction, source }
     if (['A', 'IMG'].includes((e.target as HTMLElement).tagName)) {
       return;
     }
+
+    trackEvent('wallet_transaction_details_open');
 
     void dispatch(
       openModal({

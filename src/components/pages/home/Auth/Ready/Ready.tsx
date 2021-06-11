@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react';
+import React, { FC, useEffect, useState } from 'react';
 import { batch, useDispatch } from 'react-redux';
 import { useHistory } from 'react-router';
 
@@ -12,9 +12,12 @@ import { ToastManager } from 'components/common/ToastManager';
 import { DataType } from 'components/pages/home/Auth/types';
 import { Switch } from 'components/ui';
 import { connectWallet, selectType } from 'store/slices/wallet/WalletSlice';
+import { trackEvent } from 'utils/analytics';
 import { sleep } from 'utils/common';
 
+// import { useUpdateEffect } from 'utils/hooks/useUpdateEffect';
 import { Button } from '../common/Button';
+// import { OffPasswordModal } from './OffPasswordModal';
 
 const Wrapper = styled.div`
   display: flex;
@@ -91,6 +94,21 @@ export const Ready: FC<Props> = ({ setIsLoading, data }) => {
   const history = useHistory();
   const dispatch = useDispatch();
   const [isSave, setIsSave] = useState(true);
+  // const [isShowModal, setIsShowModal] = useState(false);
+
+  useEffect(() => {
+    if (data.type === 'login') {
+      trackEvent('login_wallet_ready_open');
+    } else if (data.type === 'signup') {
+      trackEvent('signup_wallet_ready_open');
+    }
+  }, []);
+
+  // useUpdateEffect(() => {
+  //   if (!isSave) {
+  //     setIsShowModal(true);
+  //   }
+  // }, [isSave]);
 
   const handleIsSaveChange = (nextIsSave: boolean) => {
     setIsSave(nextIsSave);
@@ -117,6 +135,13 @@ export const Ready: FC<Props> = ({ setIsLoading, data }) => {
           data.password,
           isSave,
         );
+
+        if (data.type === 'login') {
+          trackEvent('login_finish_setup_click', { fastEnter: isSave });
+        } else if (data.type === 'signup') {
+          trackEvent('signup_finish_setup_click', { fastEnter: isSave });
+        }
+
         await sleep(100);
         history.push('/wallets');
         // eslint-disable-next-line @typescript-eslint/no-shadow
@@ -130,12 +155,14 @@ export const Ready: FC<Props> = ({ setIsLoading, data }) => {
 
   return (
     <Wrapper>
+      {/* {isShowModal ? <OffPasswordModal close={() => setIsShowModal(false)} /> : undefined} */}
+
       <TopWrapper>
         <Logo />
         <Title>{data.type === 'login' ? 'Welcome back!' : 'Your wallet is ready!'}</Title>
         <Desc>
           You can turn on a quick enter via password. Only you have access to your keys, not
-          governmenе, not us, not anyone else. it’s 100% stored on your devices.{' '}
+          government, not us, not anyone else. it’s 100% stored on your devices.
         </Desc>
       </TopWrapper>
       <SwitcherLabel>

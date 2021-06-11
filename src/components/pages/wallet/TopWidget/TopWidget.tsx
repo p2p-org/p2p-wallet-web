@@ -1,5 +1,6 @@
 import React, { FunctionComponent, useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useLocation } from 'react-router';
 import { Link } from 'react-router-dom';
 
 import { styled } from '@linaria/react';
@@ -16,6 +17,7 @@ import { Button, Icon } from 'components/ui';
 import { rateSelector } from 'store/selectors/rates';
 import { getRatesCandle } from 'store/slices/rate/RateSlice';
 import { airdrop } from 'store/slices/wallet/WalletSlice';
+import { trackEvent } from 'utils/analytics';
 import { shortAddress } from 'utils/tokens';
 
 import { Chart } from './Chart';
@@ -172,6 +174,7 @@ type Props = {
 
 export const TopWidget: FunctionComponent<Props> = ({ publicKey }) => {
   const dispatch = useDispatch();
+  const location = useLocation();
   const widgetRef = useRef<HTMLDivElement>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isShowFixed, setIsShowFixed] = useState(false);
@@ -250,12 +253,20 @@ export const TopWidget: FunctionComponent<Props> = ({ publicKey }) => {
         {/*    <PlusIcon name="plus" /> */}
         {/*  </ButtonStyled> */}
         {/* </Link> */}
-        <Link to={`/send/${publicKey.toBase58()}`} title="Send" className="button">
+        <Link
+          to={{ pathname: `/send/${publicKey.toBase58()}`, state: { fromPage: location.pathname } }}
+          title="Send"
+          onClick={() => trackEvent('wallet_send_click')}
+          className="button">
           <ButtonStyled primary small>
             <PlusIcon name="top" />
           </ButtonStyled>
         </Link>
-        <Link to={`/swap/${publicKey.toBase58()}`} title="Swap" className="button">
+        <Link
+          to={{ pathname: `/swap/${publicKey.toBase58()}`, state: { fromPage: location.pathname } }}
+          title="Swap"
+          onClick={() => trackEvent('wallet_swap_click')}
+          className="button">
           <ButtonStyled primary small>
             <PlusIcon name="swap" />
           </ButtonStyled>
@@ -341,7 +352,10 @@ export const TopWidget: FunctionComponent<Props> = ({ publicKey }) => {
               {tokenAccount?.mint.address.equals(SystemProgram.programId) ? undefined : (
                 <TokenSettings>
                   <Link
-                    to={`/wallet/${publicKey.toBase58()}/settings`}
+                    to={{
+                      pathname: `/wallet/${publicKey.toBase58()}/settings`,
+                      state: { fromPage: location.pathname },
+                    }}
                     title="Settings"
                     className="button">
                     <TokenSettingsButton small>

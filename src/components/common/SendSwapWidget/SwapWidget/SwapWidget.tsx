@@ -25,6 +25,7 @@ import {
   getRecentBlockhash,
 } from 'store/slices/wallet/WalletSlice';
 import { majorAmountToMinor, minorAmountToMajor } from 'utils/amount';
+import { trackEvent } from 'utils/analytics';
 import { useIntervalHook } from 'utils/hooks/useIntervalHook';
 
 import {
@@ -282,6 +283,13 @@ export const SwapWidget: FunctionComponent = () => {
       setIsExecuting(true);
       const action = executeSwap();
 
+      trackEvent('swap_swap_click', {
+        tokenTickerA: firstToken?.symbol || '',
+        tokenTickerB: secondToken?.symbol || '',
+        sumA: firstAmount,
+        sumB: secondAmount,
+      });
+
       unwrapResult(
         // eslint-disable-next-line @typescript-eslint/await-thenable
         await dispatch(
@@ -326,6 +334,12 @@ export const SwapWidget: FunctionComponent = () => {
     //   });
     // }
 
+    if (key === 'firstToken') {
+      trackEvent('swap_token_a_select_click', { tokenTicker: selectedToken.symbol || '' });
+    } else if (key === 'secondToken') {
+      trackEvent('swap_token_b_select_click', { tokenTicker: selectedToken.symbol || '' });
+    }
+
     dispatch(
       updateTokenPairState({
         [key]: selectedToken.serialize(),
@@ -337,11 +351,22 @@ export const SwapWidget: FunctionComponent = () => {
   const selectFirstTokenHandleChange = handleTokenSelectionChange('firstToken');
   const selectSecondTokenHandleChange = handleTokenSelectionChange('secondToken');
 
-  const handleAmountChange = (key: 'firstAmount' | 'secondAmount') => (minorAmount: string) => {
+  const handleAmountChange = (key: 'firstAmount' | 'secondAmount') => (
+    minorAmount: string,
+    type?: 'available',
+  ) => {
     const token = key === 'firstAmount' ? firstToken : secondToken;
 
     if (!token) {
       return;
+    }
+
+    if (type === 'available') {
+      trackEvent('swap_available_click', { sum: Number(minorAmount) });
+    } else if (key === 'firstAmount') {
+      trackEvent('swap_token_a_amount_keydown', { sum: Number(minorAmount) });
+    } else if (key === 'secondAmount') {
+      trackEvent('swap_token_b_amount_keydown', { sum: Number(minorAmount) });
     }
 
     dispatch(
@@ -355,6 +380,8 @@ export const SwapWidget: FunctionComponent = () => {
   const updateSecondAmount = handleAmountChange('secondAmount');
 
   const handleReverseClick = () => {
+    trackEvent('swap_reverse_click');
+
     dispatch(
       updateTokenPairState({
         firstAmount: secondAmount,

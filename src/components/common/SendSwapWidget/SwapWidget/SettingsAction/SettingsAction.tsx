@@ -9,6 +9,7 @@ import { DEFAULT_SLIPPAGE } from 'api/pool/Pool';
 import { Button, Icon, Input } from 'components/ui';
 import { updateTokenPairState } from 'store/slices/tokenPair/TokenPairSlice';
 import { tokenPairSelector } from 'store/slices/tokenPair/utils/tokenPair';
+import { trackEvent } from 'utils/analytics';
 
 const Wrapper = styled.div`
   position: relative;
@@ -150,6 +151,8 @@ export const SettingsAction: FunctionComponent = () => {
 
   const handleToggleShow = () => {
     setIsShow((state) => !state);
+
+    trackEvent('swap_slippage_click');
   };
 
   const handleToggleCustomShow = () => {
@@ -157,6 +160,10 @@ export const SettingsAction: FunctionComponent = () => {
   };
 
   const handleDoneClick = () => {
+    trackEvent('swap_slippage_done_click', {
+      slippage: Number(nextSlippage),
+    });
+
     dispatch(
       updateTokenPairState({
         slippage: Number(nextSlippage),

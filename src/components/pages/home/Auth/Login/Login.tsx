@@ -107,7 +107,9 @@ export const Login: FC<Props> = ({ setIsLoading, next }) => {
         {page === 'main' ? (
           <Main setIsLoading={setIsLoading} next={handleContinueMnemonicClick} />
         ) : undefined}
-        {page === 'password' ? <Password next={handleContinuePasswordClick} /> : undefined}
+        {page === 'password' ? (
+          <Password type="login" next={handleContinuePasswordClick} />
+        ) : undefined}
         {page === 'derivableAccounts' ? (
           <DerivableAccounts seed={seed} next={handleContinueDerivableAccountsClick} />
         ) : undefined}

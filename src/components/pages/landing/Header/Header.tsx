@@ -162,10 +162,13 @@ export const Header: FC<Props> = ({ onDrawerToggle }) => {
       {/* ) : undefined} */}
       {isTablet ? (
         <Right>
-          <Button to="/login" onClick={() => trackEvent('i_have_wallet_click')}>
+          <Button to="/login" onClick={() => trackEvent('landing_i_have_wallet_click')}>
             I have a wallet
           </Button>
-          <Button to="/signup" className="white">
+          <Button
+            to="/signup"
+            onClick={() => trackEvent('landing_create_wallet_click')}
+            className="white">
             Create wallet
           </Button>
         </Right>

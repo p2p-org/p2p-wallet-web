@@ -87,17 +87,25 @@ type ButtonProps = {
   glow?: boolean;
 };
 
-export const ButtonWeb: FC<ButtonProps & HTMLAttributes<HTMLElement>> = ({ glow, className }) => {
+export const ButtonWeb: FC<ButtonProps & HTMLAttributes<HTMLElement>> = ({
+  glow,
+  className,
+  ...props
+}) => {
   return (
-    <ButtonLink to="/login" className={classNames(className, { glow })}>
+    <ButtonLink to="/login" className={classNames(className, { glow })} {...props}>
       <Text className="web">Go to web wallet</Text>
     </ButtonLink>
   );
 };
 
-export const ButtonIOS: FC<ButtonProps & HTMLAttributes<HTMLElement>> = ({ glow, className }) => {
+export const ButtonIOS: FC<ButtonProps & HTMLAttributes<HTMLElement>> = ({
+  glow,
+  className,
+  ...props
+}) => {
   return (
-    <ButtonLink to="#" className={classNames(className, { glow, green: true })}>
+    <ButtonLink to="#" className={classNames(className, { glow, green: true })} {...props}>
       <Text className="ios">Download for iOS</Text>
     </ButtonLink>
   );

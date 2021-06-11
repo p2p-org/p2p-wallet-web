@@ -11,6 +11,7 @@ import { TokenAccount } from 'api/token/TokenAccount';
 import { Card } from 'components/common/Card';
 import { ToastManager } from 'components/common/ToastManager';
 import { Button, Icon } from 'components/ui';
+import { trackEvent } from 'utils/analytics';
 import { askClipboardWritePermission, setToClipboard } from 'utils/clipboard';
 import { getExplorerUrl } from 'utils/connection';
 
@@ -257,13 +258,25 @@ export const QRAddressWidget: FunctionComponent<Props> = ({ publicKey, className
 
   const handleExpandClick = () => {
     setIsExpand(!isExpand);
+
+    if (!isExpand) {
+      trackEvent('wallet_qr_click');
+    }
   };
 
-  const handleCopyClick = (address: string) => () => {
+  const handleCopyClick = (type: 'sol' | 'token' | 'mint', address: string) => () => {
     try {
       void navigator.clipboard.writeText(address);
       setCopied(true);
       ToastManager.info(`Address Copied!`);
+
+      if (type === 'sol') {
+        trackEvent('wallet_sol_address_copy');
+      } else if (type === 'token') {
+        trackEvent('wallet_token_address_copy');
+      } else if (type === 'mint') {
+        trackEvent('wallet_mint_address_copy');
+      }
 
       // fade copied after some seconds
       setTimeout(() => {
@@ -310,7 +323,7 @@ export const QRAddressWidget: FunctionComponent<Props> = ({ publicKey, className
           ) : (
             <TokenName>Wallet Address</TokenName>
           )}
-          <TokenAddress onClick={handleCopyClick(solAccount.address.toBase58())}>
+          <TokenAddress onClick={handleCopyClick('sol', solAccount.address.toBase58())}>
             {solAccount.address.toBase58()}
           </TokenAddress>
         </TokenWrapper>
@@ -338,7 +351,7 @@ export const QRAddressWidget: FunctionComponent<Props> = ({ publicKey, className
               <DetailRow>
                 <FieldGroup>
                   <FieldTitle>Direct {tokenAccount.mint.symbol} Address</FieldTitle>
-                  <FieldValue onClick={handleCopyClick(tokenAccount.address.toBase58())}>
+                  <FieldValue onClick={handleCopyClick('token', tokenAccount.address.toBase58())}>
                     {tokenAccount.address.toBase58()}
                   </FieldValue>
                 </FieldGroup>
@@ -355,7 +368,7 @@ export const QRAddressWidget: FunctionComponent<Props> = ({ publicKey, className
               <DetailRow>
                 <FieldGroup>
                   <FieldTitle>{tokenAccount.mint.symbol} Mint Address</FieldTitle>
-                  <FieldValue onClick={handleCopyClick(tokenAccount.address.toBase58())}>
+                  <FieldValue onClick={handleCopyClick('mint', tokenAccount.address.toBase58())}>
                     {tokenAccount.mint.address.toBase58()}
                   </FieldValue>
                 </FieldGroup>

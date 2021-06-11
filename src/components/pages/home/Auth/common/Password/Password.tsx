@@ -1,9 +1,12 @@
 // eslint-disable-next-line eslint-comments/disable-enable-pair
 /* eslint-disable react/no-array-index-key */
-import React, { FC, useMemo, useState } from 'react';
+import React, { FC, useEffect, useMemo, useState } from 'react';
 
 import { styled } from '@linaria/react';
 import classNames from 'classnames';
+
+import { trackEvent } from 'utils/analytics';
+import { useTrackEventOnce } from 'utils/hooks/useTrackEventOnce';
 
 import { Button } from '../Button';
 import { ErrorHint } from '../ErrorHint';
@@ -107,10 +110,12 @@ const ButtonStyled = styled(Button)`
 `;
 
 type Props = {
+  type: 'signup' | 'login';
   next: (password: string) => void;
 };
 
-export const Password: FC<Props> = ({ next }) => {
+export const Password: FC<Props> = ({ type, next }) => {
+  const trackEventOnce = useTrackEventOnce();
   const [password, setPassword] = useState('');
   const [passwordRepeat, setPasswordRepeat] = useState('');
   const [hasPasswordRepeatError, setHasPasswordRepeatError] = useState(false);
@@ -120,12 +125,32 @@ export const Password: FC<Props> = ({ next }) => {
     [password],
   );
 
+  useEffect(() => {
+    if (type === 'login') {
+      trackEvent('login_create_password_open');
+    } else if (type === 'signup') {
+      trackEvent('signup_create_password_open');
+    }
+  }, []);
+
   const handlePasswordChange = (value: string) => {
     setPassword(value);
+
+    if (type === 'login') {
+      trackEventOnce('login_password_keydown');
+    } else if (type === 'signup') {
+      trackEventOnce('signup_password_keydown');
+    }
   };
 
   const handlePasswordRepeatChange = (value: string) => {
     setPasswordRepeat(value);
+
+    if (type === 'login') {
+      trackEventOnce('login_password_confirm_keydown');
+    } else if (type === 'signup') {
+      trackEventOnce('signup_password_confirm_keydown');
+    }
 
     if (hasPasswordRepeatError) {
       setHasPasswordRepeatError(password !== value);
@@ -137,6 +162,12 @@ export const Password: FC<Props> = ({ next }) => {
   };
 
   const handleContinueClick = () => {
+    if (type === 'login') {
+      trackEventOnce('login_continue_create_password_click');
+    } else if (type === 'signup') {
+      trackEventOnce('signup_continue_create_password_click');
+    }
+
     next(password);
   };
 

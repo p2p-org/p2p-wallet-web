@@ -23,6 +23,8 @@ import {
   transfer,
 } from 'store/slices/wallet/WalletSlice';
 import { minorAmountToMajor } from 'utils/amount';
+import { trackEvent } from 'utils/analytics';
+import { useTrackEventOnce } from 'utils/hooks/useTrackEventOnce';
 
 import {
   BottomWrapper,
@@ -91,9 +93,9 @@ const ConfirmTextWrapper = styled.div`
 `;
 
 const ConfirmTextPrimary = styled.div`
+  color: #a3a5ba;
   font-weight: 600;
   font-size: 14px;
-  color: #a3a5ba;
 `;
 const ConfirmTextSecondary = styled.div`
   font-weight: 600;
@@ -129,6 +131,7 @@ const formatFee = (amount: number): number =>
 export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
   const dispatch = useDispatch();
   const history = useHistory();
+  const trackEventOnce = useTrackEventOnce();
   const [fromAmount, setFromAmount] = useState('');
   const [toTokenPublicKey, setToTokenPublicKey] = useState('');
   const [txFee, setTxFee] = useState(0);
@@ -231,6 +234,11 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
         amount,
       });
 
+      trackEvent('send_send_click', {
+        tokenTicker: fromTokenAccount.mint.symbol || '',
+        sum: amount,
+      });
+
       unwrapResult(
         await dispatch(
           openModal({
@@ -259,15 +267,25 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
       return;
     }
 
+    trackEvent('send_select_token_click', { tokenTicker: nextTokenAccount.mint.symbol || '' });
+
     history.replace(`/send/${nextTokenAccount.address.toBase58()}`);
   };
 
-  const handleFromAmountChange = (minorAmount: string) => {
+  const handleFromAmountChange = (minorAmount: string, type?: string) => {
     setFromAmount(minorAmount);
+
+    if (type === 'available') {
+      trackEvent('send_available_click', { sum: Number(minorAmount) });
+    } else {
+      trackEvent('send_amount_keydown', { sum: Number(minorAmount) });
+    }
   };
 
   const handleToPublicKeyChange = (nextPublicKey: string) => {
     setToTokenPublicKey(nextPublicKey);
+
+    trackEventOnce('send_address_keydown');
   };
 
   const hasBalance = fromTokenAccount

@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useState } from 'react';
+import React, { FunctionComponent, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { styled } from '@linaria/react';
@@ -11,12 +11,15 @@ import { Empty } from 'components/common/Empty';
 import { InfinityScrollHelper } from 'components/common/InfinityScrollHelper';
 import { LoaderBlock } from 'components/common/LoaderBlock';
 import { ToastManager } from 'components/common/ToastManager';
-import { TransactionList } from 'components/common/TransactionList';
 import { Widget } from 'components/common/Widget';
+import { TransactionList } from 'components/pages/wallet/ActivityWidget/TransactionList';
 import { RootState } from 'store/rootReducer';
 import { getTransactions } from 'store/slices/transaction/TransactionSlice';
+import { trackEvent } from 'utils/analytics';
 
 const WrapperWidget = styled(Widget)``;
+
+const LIMIT = 10;
 
 type Props = {
   publicKey: web3.PublicKey;
@@ -28,9 +31,13 @@ export const ActivityWidget: FunctionComponent<Props> = ({ publicKey }) => {
   const [isEnd, setIsEnd] = useState(false);
   const order = useSelector((state: RootState) => state.transaction.order[publicKey.toBase58()]);
 
+  useEffect(() => {
+    trackEvent('wallet_activity_scroll', { pageNum: Math.floor(order.length / LIMIT) });
+  }, [order]);
+
   const fetchData = async (isPaging?: boolean) => {
     const options: ConfirmedSignaturesForAddress2Options = {
-      limit: 10,
+      limit: LIMIT,
     };
 
     if (isPaging) {

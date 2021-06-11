@@ -304,7 +304,7 @@ type Props = {
   tokenAccount?: TokenAccount;
   amount?: string;
   onTokenAccountChange: (token: Token, tokenAccount: TokenAccount | null) => void;
-  onAmountChange: (minorAmount: string) => void;
+  onAmountChange: (minorAmount: string, type?: 'available') => void;
   disabled?: boolean;
   disabledInput?: boolean;
   className?: string;
@@ -413,7 +413,10 @@ export const FromToSelectInput: FunctionComponent<Props> = ({
       return;
     }
 
-    onAmountChange(minorAmountToMajor(tokenAccount.balance, tokenAccount.mint).toString());
+    onAmountChange(
+      minorAmountToMajor(tokenAccount.balance, tokenAccount.mint).toString(),
+      'available',
+    );
   };
 
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {

@@ -1,10 +1,11 @@
-import React, { FunctionComponent, useState } from 'react';
+import React, { FunctionComponent, useEffect, useState } from 'react';
 
 import { styled } from '@linaria/react';
 
 import { Layout } from 'components/common/Layout';
 import { TokensWidget } from 'components/pages/wallets';
 import { TotalBalanceWidget } from 'components/pages/wallets/TotalBalanceWidget';
+import { trackEvent } from 'utils/analytics';
 
 const WrapperTemp = styled.div`
   display: grid;
@@ -18,6 +19,10 @@ const WrapperTemp = styled.div`
 
 export const Wallets: FunctionComponent = () => {
   const [selectedSymbol, setSelectedSymbol] = useState('');
+
+  useEffect(() => {
+    trackEvent('wallets_open');
+  }, []);
 
   const handleSymbolChange = (symbol: string) => {
     setSelectedSymbol(symbol);

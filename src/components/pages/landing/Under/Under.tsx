@@ -3,6 +3,7 @@ import React, { FC } from 'react';
 import { styled } from '@linaria/react';
 
 import { ButtonIOS } from 'components/pages/landing/common/Button/Button';
+import { trackEvent } from 'utils/analytics';
 
 import { up } from '../styles/breakpoints';
 
@@ -231,7 +232,7 @@ export const Under: FC = () => {
         </Container>
       </Middle>
       <Bottom>
-        <ButtonIOS />
+        <ButtonIOS onClick={() => trackEvent('landing_download_for_ios_3_click')} />
         <Hint>Will take less than a 2 min.</Hint>
       </Bottom>
     </Wrapper>

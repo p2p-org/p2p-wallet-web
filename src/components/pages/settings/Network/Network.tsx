@@ -10,6 +10,7 @@ import { Button, Input, RadioButton } from 'components/ui';
 import { networks, NetworkType } from 'config/constants';
 import { wipeAction } from 'store/slices/GlobalSlice';
 import { autoConnect, selectNetwork, updateSettings } from 'store/slices/wallet/WalletSlice';
+import { trackEvent } from 'utils/analytics';
 
 const URL_REGEX = new RegExp(
   /https?:\/\/(?:w{1,3}\.)?[^\s.]+(?:\.[a-z]+)*(?::\d+)?((?:\/\w+)|(?:-\w+))*\/?(?![^<]*(?:<\/\w+>|\/?>))/,
@@ -77,6 +78,8 @@ export const Network: FunctionComponent = () => {
   const { network } = useSelector((state) => state.wallet.settings);
 
   const handleChange = (value: NetworkType) => {
+    trackEvent('settings_network_click', { endpoint: value.endpoint });
+
     dispatch(updateSettings({ network: value }));
 
     batch(async () => {

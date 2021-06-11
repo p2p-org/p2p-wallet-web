@@ -1,4 +1,4 @@
-import React, { FC, useMemo, useState } from 'react';
+import React, { FC, useEffect, useMemo, useState } from 'react';
 
 import { styled } from '@linaria/react';
 import * as bip39 from 'bip39';
@@ -6,6 +6,7 @@ import * as bip39 from 'bip39';
 import { DERIVATION_PATH, mnemonicToSeed } from 'api/wallet/ManualWallet';
 import { Password } from 'components/pages/home/Auth/common/Password';
 import { Paste } from 'components/pages/home/Auth/Signup/Paste';
+import { trackEvent } from 'utils/analytics';
 
 import { Back } from '../common/Back';
 import { DataType } from '../types';
@@ -55,6 +56,10 @@ export const Signup: FC<Props> = ({ next }) => {
 
   const mnemonic = useMemo(() => bip39.generateMnemonic(256), []);
 
+  useEffect(() => {
+    trackEvent('signup_open');
+  }, []);
+
   const handleBackClick = () => {
     setPage((state) => backToPage[state]);
   };
@@ -88,7 +93,9 @@ export const Signup: FC<Props> = ({ next }) => {
         <Mnemonic mnemonic={mnemonic} next={handleContinueMnemonicClick} />
       ) : undefined}
       {page === 'paste' ? <Paste mnemonic={mnemonic} next={handleContinuePasteClick} /> : undefined}
-      {page === 'password' ? <Password next={handleContinuePasswordClick} /> : undefined}
+      {page === 'password' ? (
+        <Password type="signup" next={handleContinuePasswordClick} />
+      ) : undefined}
     </Wrapper>
   );
 };

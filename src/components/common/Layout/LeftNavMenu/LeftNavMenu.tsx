@@ -1,4 +1,5 @@
 import React, { FunctionComponent } from 'react';
+import { useLocation } from 'react-router';
 import { NavLink } from 'react-router-dom';
 
 import { styled } from '@linaria/react';
@@ -86,9 +87,13 @@ const NavLinkMenu = styled(NavLink)`
 `;
 
 export const LeftNavMenu: FunctionComponent = () => {
+  const location = useLocation();
+
   return (
     <Wrapper>
-      <NavLinkMenu to="/wallets" className="button">
+      <NavLinkMenu
+        to={{ pathname: '/wallets', state: { fromPage: location.pathname } }}
+        className="button">
         <NavButton>
           <IconBlock>
             <NavIcon name="home" />
@@ -96,7 +101,9 @@ export const LeftNavMenu: FunctionComponent = () => {
           Wallets
         </NavButton>
       </NavLinkMenu>
-      <NavLinkMenu to="/receive" className="button">
+      <NavLinkMenu
+        to={{ pathname: '/receive', state: { fromPage: location.pathname } }}
+        className="button">
         <NavButton>
           <IconBlock>
             <NavIcon name="bottom" />
@@ -104,7 +111,9 @@ export const LeftNavMenu: FunctionComponent = () => {
           Receive
         </NavButton>
       </NavLinkMenu>
-      <NavLinkMenu to="/send" className="button">
+      <NavLinkMenu
+        to={{ pathname: '/send', state: { fromPage: location.pathname } }}
+        className="button">
         <NavButton>
           <IconBlock>
             <NavIcon name="top" />
@@ -112,7 +121,9 @@ export const LeftNavMenu: FunctionComponent = () => {
           Send
         </NavButton>
       </NavLinkMenu>
-      <NavLinkMenu to="/swap" className="button">
+      <NavLinkMenu
+        to={{ pathname: '/swap', state: { fromPage: location.pathname } }}
+        className="button">
         <NavButton>
           <IconBlock>
             <NavIcon name="swap" />
@@ -120,7 +131,9 @@ export const LeftNavMenu: FunctionComponent = () => {
           Swap
         </NavButton>
       </NavLinkMenu>
-      <NavLinkMenu to="/settings" className="button">
+      <NavLinkMenu
+        to={{ pathname: '/settings', state: { fromPage: location.pathname } }}
+        className="button">
         <NavButton>
           <IconBlock>
             <NavIcon name="gear" />
