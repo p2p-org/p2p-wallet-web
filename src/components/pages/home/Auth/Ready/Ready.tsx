@@ -15,9 +15,8 @@ import { connectWallet, selectType } from 'store/slices/wallet/WalletSlice';
 import { trackEvent } from 'utils/analytics';
 import { sleep } from 'utils/common';
 
-// import { useUpdateEffect } from 'utils/hooks/useUpdateEffect';
 import { Button } from '../common/Button';
-// import { OffPasswordModal } from './OffPasswordModal';
+import { OffPasswordModal } from './OffPasswordModal';
 
 const Wrapper = styled.div`
   display: flex;
@@ -94,7 +93,7 @@ export const Ready: FC<Props> = ({ setIsLoading, data }) => {
   const history = useHistory();
   const dispatch = useDispatch();
   const [isSave, setIsSave] = useState(true);
-  // const [isShowModal, setIsShowModal] = useState(false);
+  const [isShowModal, setIsShowModal] = useState(false);
 
   useEffect(() => {
     if (data.type === 'login') {
@@ -104,14 +103,18 @@ export const Ready: FC<Props> = ({ setIsLoading, data }) => {
     }
   }, []);
 
-  // useUpdateEffect(() => {
-  //   if (!isSave) {
-  //     setIsShowModal(true);
-  //   }
-  // }, [isSave]);
+  const handleCloseModal = (nextIsSave: boolean) => {
+    setIsShowModal(false);
+    setIsSave(nextIsSave);
+  };
 
   const handleIsSaveChange = (nextIsSave: boolean) => {
-    setIsSave(nextIsSave);
+    if (nextIsSave) {
+      setIsSave(nextIsSave);
+      return;
+    }
+
+    setIsShowModal(true);
   };
 
   const handleFinishClick = () => {
@@ -155,7 +158,7 @@ export const Ready: FC<Props> = ({ setIsLoading, data }) => {
 
   return (
     <Wrapper>
-      {/* {isShowModal ? <OffPasswordModal close={() => setIsShowModal(false)} /> : undefined} */}
+      {isShowModal ? <OffPasswordModal close={handleCloseModal} /> : undefined}
 
       <TopWrapper>
         <Logo />

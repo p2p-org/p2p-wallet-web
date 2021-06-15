@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useState } from 'react';
+import React, { FunctionComponent } from 'react';
 
 import { styled } from '@linaria/react';
 import classNames from 'classnames';
@@ -71,17 +71,14 @@ type Props = {
 };
 
 export const Switch: FunctionComponent<Props> = ({ checked, onChange }) => {
-  const [isChecked, setIsChecked] = useState(Boolean(checked));
-
   const handleTogglerClick = () => {
-    setIsChecked(!isChecked);
-    onChange(!isChecked);
+    onChange(!checked);
   };
 
   return (
-    <Wrapper className={classNames({ checked: isChecked })}>
-      <Toggler className={classNames({ checked: isChecked })} />
-      <CheckboxHidden type="checkbox" checked={isChecked} onChange={handleTogglerClick} />
+    <Wrapper className={classNames({ checked })}>
+      <Toggler className={classNames({ checked })} />
+      <CheckboxHidden type="checkbox" checked={checked} onChange={handleTogglerClick} />
     </Wrapper>
   );
 };

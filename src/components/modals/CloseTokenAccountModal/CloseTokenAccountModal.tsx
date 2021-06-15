@@ -20,7 +20,6 @@ const Wrapper = styled.div`
   overflow: hidden;
 
   background: #fff;
-
   border-radius: 15px;
 `;
 

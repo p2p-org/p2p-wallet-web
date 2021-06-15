@@ -44,6 +44,12 @@ const Wrapper = styled.button`
     background: #a3a5ba;
   }
 
+  &.dark {
+    color: #fff;
+
+    background: #000;
+  }
+
   &.light {
     color: #5887ff;
 
@@ -115,6 +121,7 @@ const Wrapper = styled.button`
 type Props = {
   primary?: boolean;
   secondary?: boolean;
+  dark?: boolean;
   light?: boolean;
   gray?: boolean;
   lightGray?: boolean;
@@ -131,6 +138,7 @@ export const Button: FunctionComponent<Props & React.ButtonHTMLAttributes<HTMLBu
   type = 'button',
   primary,
   secondary,
+  dark,
   light,
   gray,
   lightGray,
@@ -155,6 +163,7 @@ export const Button: FunctionComponent<Props & React.ButtonHTMLAttributes<HTMLBu
         primary,
         secondary,
         light,
+        dark,
         gray,
         lightGray,
         lightBlue,
