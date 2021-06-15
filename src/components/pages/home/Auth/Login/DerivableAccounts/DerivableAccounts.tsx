@@ -7,6 +7,8 @@ import { TokenAccount } from 'api/token/TokenAccount';
 import { DERIVATION_PATH } from 'api/wallet/ManualWallet';
 import { TokenAccountRow } from 'components/common/TokenAccountRow';
 import { Button } from 'components/pages/home/Auth/common/Button';
+import { Icon } from 'components/ui';
+import { Popover } from 'components/ui/Popover';
 import { getRatesMarkets } from 'store/slices/rate/RateSlice';
 import { connect, getDerivableTokenAccounts } from 'store/slices/wallet/WalletSlice';
 import { trackEvent } from 'utils/analytics';
@@ -14,7 +16,9 @@ import { trackEvent } from 'utils/analytics';
 import { Selector } from '../../common/Selector';
 import { SelectorItemType } from '../../common/Selector/Selector';
 
-const Wrapper = styled.div``;
+const Wrapper = styled.div`
+  position: relative;
+`;
 
 const SubTitle = styled.div`
   color: #161616;
@@ -25,7 +29,39 @@ const SubTitle = styled.div`
 `;
 
 const SelectDerivationPath = styled(SubTitle)`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   margin-bottom: 8px;
+`;
+
+const CloseWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+
+  background: #f6f6f8;
+  border-radius: 4px;
+`;
+
+const CloseIcon = styled(Icon)`
+  width: 12px;
+  height: 12px;
+
+  color: #161616;
+`;
+
+const QuestionIcon = styled(Icon)`
+  width: 20px;
+  height: 20px;
+
+  color: #a3a5ba;
+`;
+
+const PopoverContent = styled.div`
+  width: 328px;
 `;
 
 const Derivable = styled(SubTitle)`
@@ -92,12 +128,30 @@ export const DerivableAccounts: FC<Props> = ({ seed, next }) => {
 
   return (
     <Wrapper>
-      <SelectDerivationPath>Select Derivation Path</SelectDerivationPath>
+      <SelectDerivationPath>
+        Select Derivation Path{' '}
+        <Popover
+          button={(isShow) =>
+            isShow ? (
+              <CloseWrapper>
+                <CloseIcon name="close" />
+              </CloseWrapper>
+            ) : (
+              <QuestionIcon name="question-circle" />
+            )
+          }>
+          <PopoverContent>
+            By default, P2P wallet will use m/44&apos;/501&apos;/0&apos;/0&apos; as the derivation
+            path for the main wallet. To use an alternative path, try restoring an existing wallet.
+          </PopoverContent>
+        </Popover>
+      </SelectDerivationPath>
       <Selector
         value={derivationPathItem}
         items={DERIVATION_PATHS_WITH_LABELS}
         onChange={handleDerivationPathChange}
       />
+
       <Derivable>Derivable Accounts</Derivable>
       <AccountsWrapper>
         {derivableTokenAccounts?.map((tokenAccount) => (

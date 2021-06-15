@@ -34,6 +34,7 @@ import pen from './assets/pen-icon.svg';
 import plug from './assets/plug-icon.svg';
 import plus from './assets/plus-icon.svg';
 import qr from './assets/qr-icon.svg';
+import questionCircle from './assets/question-circle-icon.svg';
 import reload from './assets/reload-icon.svg';
 import search from './assets/search-icon.svg';
 import settings from './assets/settings-icon.svg';
@@ -78,6 +79,7 @@ const iconsMap = new Map<string, string>([
   ['plug', plug],
   ['plus', plus],
   ['qr', qr],
+  ['question-circle', questionCircle],
   ['reload', reload],
   ['top', top],
   ['wallet', wallet],
@@ -119,7 +121,12 @@ export const Icon: FC<Props> = ({ name, size, height, width, ...props }) => {
   }
 
   return (
-    <svg {...validProps} viewBox={icon.viewBox} height={size || height} width={size || width}>
+    <svg
+      {...validProps}
+      viewBox={icon.viewBox}
+      height={size || height}
+      width={size || width}
+      {...props}>
       <use xlinkHref={`#${icon.id}`} />
     </svg>
   );
