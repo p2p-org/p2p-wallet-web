@@ -32,7 +32,9 @@ export const ActivityWidget: FunctionComponent<Props> = ({ publicKey }) => {
   const order = useSelector((state: RootState) => state.transaction.order[publicKey.toBase58()]);
 
   useEffect(() => {
-    trackEvent('wallet_activity_scroll', { pageNum: Math.floor(order.length / LIMIT) });
+    if (order) {
+      trackEvent('wallet_activity_scroll', { pageNum: Math.floor(order.length / LIMIT) });
+    }
   }, [order]);
 
   const fetchData = async (isPaging?: boolean) => {
