@@ -2,6 +2,8 @@ export type TrackEventType = {
   /*
    * landing
    */
+  // Пользователь попадает на страницу
+  (event: 'landing_open'): void;
   // Пользователь нажал "I have wallet"
   (event: 'landing_i_have_wallet_click'): void;
   // Пользователь нажал "Create Wallet"

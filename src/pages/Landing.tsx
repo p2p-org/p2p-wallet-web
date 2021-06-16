@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react';
+import React, { FC, useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet';
 
 import { css } from '@linaria/core';
@@ -14,6 +14,7 @@ import { Top } from 'components/pages/landing/Top';
 import { Under } from 'components/pages/landing/Under';
 // import { Updates } from 'components/pages/landing/Updates';
 import { YouCan } from 'components/pages/landing/YouCan/YouCan';
+import { trackEvent } from 'utils/analytics';
 
 const Wrapper = styled.div`
   display: flex;
@@ -33,6 +34,10 @@ export const global = css`
 
 export const Landing: FC = () => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+
+  useEffect(() => {
+    trackEvent('landing_open');
+  }, []);
 
   const handleDrawerToggle = () => {
     setIsDrawerOpen(!isDrawerOpen);
