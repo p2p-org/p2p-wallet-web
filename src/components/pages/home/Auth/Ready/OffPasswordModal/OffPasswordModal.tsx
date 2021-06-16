@@ -1,6 +1,7 @@
 import React, { FunctionComponent } from 'react';
 
 import { styled } from '@linaria/react';
+import { rgba } from 'polished';
 
 import { Button } from 'components/ui';
 
@@ -32,21 +33,23 @@ const Wrapper = styled.div`
 `;
 
 const Header = styled.div`
-  margin-top: 20px;
-  padding: 0 20px;
+  margin: 30px 20px 0;
 
-  font-weight: 600;
-  font-size: 20px;
+  color: #161616;
+  font-weight: 500;
+  font-size: 16px;
+  font-family: 'Aktiv Grotesk Corp', sans-serif;
+  line-height: 24px;
 `;
 
 const Description = styled.div`
   margin-top: 12px;
-  padding: 0 20px 32px;
+  padding: 0 20px 24px;
 
-  color: #a3a5ba;
-
-  font-weight: 600;
-  font-size: 16px;
+  color: ${rgba('#161616', 0.8)};
+  font-size: 14px;
+  font-family: 'Aktiv Grotesk Corp', sans-serif;
+  line-height: 20px;
 
   border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 `;
