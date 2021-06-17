@@ -159,7 +159,7 @@ export const APIFactory = memoizeWith(
               sourceToken = tokenAccount.mint;
               sourceTokenAccount = new TokenAccount(
                 sourceToken,
-                new PublicKey(sourceInfo?.owner),
+                sourceInfo.owner ? new PublicKey(sourceInfo.owner) : TOKEN_PROGRAM_ID, // TODO: fake
                 TOKEN_PROGRAM_ID,
                 source,
                 0,
@@ -170,13 +170,13 @@ export const APIFactory = memoizeWith(
             destinationToken = destinationTokenAccount.mint;
           } else if (destination && destinationInfo?.source) {
             const tokenAccount = await tokenAPI.tokenAccountInfo(
-              new PublicKey(destinationInfo?.source),
+              new PublicKey(destinationInfo.source),
             );
             if (tokenAccount) {
               destinationToken = tokenAccount.mint;
               destinationTokenAccount = new TokenAccount(
                 destinationToken,
-                new PublicKey(destinationInfo?.owner),
+                destinationInfo.owner ? new PublicKey(destinationInfo.owner) : TOKEN_PROGRAM_ID, // TODO: fake
                 TOKEN_PROGRAM_ID,
                 destination,
                 0,
@@ -198,7 +198,7 @@ export const APIFactory = memoizeWith(
         let instruction = instructions[0] as ConfirmedTransaction;
         let info = instruction?.parsed?.info;
 
-        source = info?.source ? new PublicKey(info?.source) : null;
+        source = info?.source ? new PublicKey(info.source) : null;
         sourceTokenAccount = source ? await tokenAPI.tokenAccountInfo(source) : null;
 
         const transferInstruction = instructions.find(
@@ -211,16 +211,16 @@ export const APIFactory = memoizeWith(
           const initializeAccountInstruction = instructions[1] as ConfirmedTransaction;
           const initializeAccountInfo = initializeAccountInstruction.parsed?.info;
 
-          source = info?.source ? new PublicKey(info?.source) : null;
+          source = info?.source ? new PublicKey(info.source) : null;
           sourceTokenAccount = source ? await tokenAPI.tokenAccountInfo(source) : null;
           sourceAmount = new Decimal(info?.lamports || 0).div(LAMPORTS_PER_SOL);
 
-          destination = info?.newAccount ? new PublicKey(info?.newAccount) : null;
+          destination = info?.newAccount ? new PublicKey(info.newAccount) : null;
           if (initializeAccountInfo?.mint && destination) {
-            const mint = await tokenAPI.tokenInfo(new PublicKey(initializeAccountInfo?.mint));
+            const mint = await tokenAPI.tokenInfo(new PublicKey(initializeAccountInfo.mint));
             destinationTokenAccount = new TokenAccount(
               mint,
-              new PublicKey(initializeAccountInfo?.owner),
+              new PublicKey(initializeAccountInfo.owner),
               TOKEN_PROGRAM_ID,
               destination,
               0,
@@ -232,18 +232,18 @@ export const APIFactory = memoizeWith(
           const preToken = preTokenBalances[0];
           const preBalance = preBalances?.[1];
 
-          source = info?.account ? new PublicKey(info?.account) : null;
+          source = info?.account ? new PublicKey(info.account) : null;
           if (info?.owner && source && preToken) {
             const mint = await tokenAPI.tokenInfo(new PublicKey(preToken.mint));
             sourceTokenAccount = new TokenAccount(
               mint,
-              new PublicKey(info?.owner),
+              new PublicKey(info.owner),
               TOKEN_PROGRAM_ID,
               source,
               0,
             );
           }
-          destination = info?.destination ? new PublicKey(info?.destination) : null;
+          destination = info?.destination ? new PublicKey(info.destination) : null;
           destinationTokenAccount = destination
             ? await tokenAPI.tokenAccountInfo(destination)
             : null;
@@ -254,8 +254,8 @@ export const APIFactory = memoizeWith(
           info = transferInstruction?.parsed?.info;
 
           type = transferInstruction.parsed.type;
-          source = info?.source ? new PublicKey(info?.source) : null;
-          destination = info?.destination ? new PublicKey(info?.destination) : null;
+          source = info?.source ? new PublicKey(info.source) : null;
+          destination = info?.destination ? new PublicKey(info.destination) : null;
           sourceTokenAccount = source ? await tokenAPI.tokenAccountInfo(source) : null;
           destinationTokenAccount = destination
             ? await tokenAPI.tokenAccountInfo(destination)
@@ -271,7 +271,7 @@ export const APIFactory = memoizeWith(
               );
 
               if (accountMint?.mint && destination) {
-                const mint = await tokenAPI.tokenInfo(new PublicKey(accountMint?.mint));
+                const mint = await tokenAPI.tokenInfo(new PublicKey(accountMint.mint));
                 destinationTokenAccount = new TokenAccount(
                   mint,
                   new PublicKey(info.authority),
@@ -291,7 +291,7 @@ export const APIFactory = memoizeWith(
               );
 
               if (accountMint?.mint && source) {
-                const mint = await tokenAPI.tokenInfo(new PublicKey(accountMint?.mint));
+                const mint = await tokenAPI.tokenInfo(new PublicKey(accountMint.mint));
                 destinationTokenAccount = new TokenAccount(
                   mint,
                   new PublicKey(info.authority),
