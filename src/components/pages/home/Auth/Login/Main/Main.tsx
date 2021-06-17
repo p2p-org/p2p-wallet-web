@@ -17,7 +17,7 @@ import { trackEvent } from 'utils/analytics';
 import { sleep } from 'utils/common';
 import { useTrackEventOnce } from 'utils/hooks/useTrackEventOnce';
 
-import { ErrorHint } from '../../common/ErrorHint';
+import { ErrorHint } from '../../../../../common/ErrorHint';
 
 const Wrapper = styled.div``;
 

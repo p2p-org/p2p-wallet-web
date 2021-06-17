@@ -7,7 +7,7 @@ import { Button } from 'components/pages/home/Auth/common/Button';
 import { trackEvent } from 'utils/analytics';
 import { useTrackEventOnce } from 'utils/hooks/useTrackEventOnce';
 
-import { ErrorHint } from '../../common/ErrorHint';
+import { ErrorHint } from '../../../../../common/ErrorHint';
 
 const Wrapper = styled.div`
   display: flex;

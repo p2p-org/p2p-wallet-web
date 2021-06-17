@@ -5,12 +5,12 @@ import React, { FC, useEffect, useMemo, useState } from 'react';
 import { styled } from '@linaria/react';
 import classNames from 'classnames';
 
+import { ErrorHint } from 'components/common/ErrorHint';
+import { PasswordInput } from 'components/common/PasswordInput';
 import { trackEvent } from 'utils/analytics';
 import { useTrackEventOnce } from 'utils/hooks/useTrackEventOnce';
 
 import { Button } from '../Button';
-import { ErrorHint } from '../ErrorHint';
-import { PasswordInput } from '../PasswordInput';
 import { validatePassword } from './utils';
 
 const Wrapper = styled.div`

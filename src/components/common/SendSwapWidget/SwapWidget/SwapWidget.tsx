@@ -15,7 +15,10 @@ import { SettingsAction } from 'components/common/SendSwapWidget/SwapWidget/Sett
 import { ToastManager } from 'components/common/ToastManager';
 import { Button, Icon, Tooltip } from 'components/ui';
 import { openModal } from 'store/actions/modals';
-import { SHOW_MODAL_TRANSACTION_STATUS } from 'store/constants/modalTypes';
+import {
+  SHOW_MODAL_TRANSACTION_CONFIRM,
+  SHOW_MODAL_TRANSACTION_STATUS,
+} from 'store/constants/modalTypes';
 import { updatePools } from 'store/slices/pool/PoolSlice';
 import { executeSwap } from 'store/slices/swap/SwapSlice';
 import { clearTokenPairState, updateTokenPairState } from 'store/slices/tokenPair/TokenPairSlice';
@@ -279,6 +282,28 @@ export const SwapWidget: FunctionComponent = () => {
   const isNeedCreateWallet = isNil(secondTokenAccount);
 
   const handleSubmit = async () => {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    const result = unwrapResult(
+      await dispatch(
+        openModal({
+          modalType: SHOW_MODAL_TRANSACTION_CONFIRM,
+          props: {
+            type: 'swap',
+            params: {
+              firstTokenAccount,
+              secondTokenAccount,
+              firstAmount,
+              secondAmount,
+            },
+          },
+        }),
+      ),
+    );
+
+    if (!result) {
+      return false;
+    }
+
     try {
       setIsExecuting(true);
       const action = executeSwap();

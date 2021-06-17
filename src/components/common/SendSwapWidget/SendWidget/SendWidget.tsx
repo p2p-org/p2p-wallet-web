@@ -14,7 +14,11 @@ import { RateUSD } from 'components/common/RateUSD';
 import { ToastManager } from 'components/common/ToastManager';
 import { Button, Icon, Switch, Tooltip } from 'components/ui';
 import { openModal } from 'store/actions/modals';
-import { SHOW_MODAL_ERROR, SHOW_MODAL_TRANSACTION_STATUS } from 'store/constants/modalTypes';
+import {
+  SHOW_MODAL_ERROR,
+  SHOW_MODAL_TRANSACTION_CONFIRM,
+  SHOW_MODAL_TRANSACTION_STATUS,
+} from 'store/constants/modalTypes';
 import { RootState } from 'store/rootReducer';
 import {
   getMinimumBalanceForRentExemption,
@@ -223,6 +227,27 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
         );
         return;
       }
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    const result = unwrapResult(
+      await dispatch(
+        openModal({
+          modalType: SHOW_MODAL_TRANSACTION_CONFIRM,
+          props: {
+            type: 'send',
+            params: {
+              source: fromTokenAccount,
+              destination,
+              amount: fromAmount,
+            },
+          },
+        }),
+      ),
+    );
+
+    if (!result) {
+      return false;
     }
 
     try {

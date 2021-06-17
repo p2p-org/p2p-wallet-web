@@ -18,24 +18,27 @@ const Wrapper = styled.div`
 const Header = styled.div`
   position: relative;
 
-  padding: 20px 30px;
+  padding: 24px 20px;
+
+  text-align: center;
 
   border-bottom: 1px solid ${rgba('#000', 0.05)};
 `;
 
 const Title = styled.div`
+  margin-bottom: 10px;
+
   color: #000;
-  font-weight: 600;
-  font-size: 18px;
+  font-weight: bold;
+  font-size: 20px;
   line-height: 100%;
 `;
 
 const Description = styled.div`
-  margin-top: 10px;
-
-  color: ${rgba('#000', 0.5)};
-  font-size: 14px;
-  line-height: 17px;
+  color: #a3a5ba;
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 100%;
 `;
 
 const CloseWrapper = styled.div`
@@ -64,9 +67,22 @@ const CloseIcon = styled(Icon)`
 
 const Content = styled.div``;
 
+const Footer = styled.div`
+  display: flex;
+  align-items: center;
+  padding: 20px;
+
+  border-top: 1px solid ${rgba('#000', 0.05)};
+
+  & > :not(:last-child) {
+    margin-right: 16px;
+  }
+`;
+
 type Props = {
   title?: React.ReactNode;
   description?: React.ReactNode;
+  footer?: React.ReactNode;
   close?: () => void;
   className?: string;
 };
@@ -74,6 +90,7 @@ type Props = {
 export const Modal: FunctionComponent<Props> = ({
   title,
   description,
+  footer,
   close,
   children,
   className,
@@ -90,6 +107,7 @@ export const Modal: FunctionComponent<Props> = ({
         ) : undefined}
       </Header>
       {children ? <Content>{children}</Content> : undefined}
+      {footer ? <Footer>{footer}</Footer> : undefined}
     </Wrapper>
   );
 };
