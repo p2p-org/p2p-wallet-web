@@ -280,13 +280,13 @@ export const Settings: FunctionComponent = () => {
                 secondary={
                   <Switch
                     checked={settings.isZeroBalancesHidden}
-                    onChange={() => {
+                    onChange={(checked) => {
                       trackEvent('settings_hide_zero_balances_click', {
-                        hide: !settings.isZeroBalancesHidden,
+                        hide: checked,
                       });
                       onItemClickHandler({
-                        isZeroBalancesHidden: !settings.isZeroBalancesHidden,
-                      });
+                        isZeroBalancesHidden: checked,
+                      })();
                     }}
                   />
                 }
@@ -297,9 +297,11 @@ export const Settings: FunctionComponent = () => {
                 secondary={
                   <Switch
                     checked={settings.useFreeTransactions}
-                    onChange={onItemClickHandler({
-                      useFreeTransactions: !settings.useFreeTransactions,
-                    })}
+                    onChange={(checked) =>
+                      onItemClickHandler({
+                        useFreeTransactions: checked,
+                      })()
+                    }
                   />
                 }
               />
