@@ -20,7 +20,13 @@ export const Send: FunctionComponent = () => {
     <Layout
       breadcrumb={
         status === 'result'
-          ? { currentName: 'Result', backTo: `/send/${publicKey || publicKeySol}` }
+          ? {
+              currentName: 'Result',
+              backTo: {
+                pathname: `/send/${publicKey || publicKeySol}`,
+                state: { fromPage: location.pathname },
+              },
+            }
           : undefined
       }
       rightColumn={

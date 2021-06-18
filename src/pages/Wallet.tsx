@@ -1,5 +1,6 @@
 import React, { FunctionComponent, useEffect, useMemo } from 'react';
 import { useSelector } from 'react-redux';
+import { useLocation } from 'react-router';
 import { useParams } from 'react-router-dom';
 
 import * as web3 from '@solana/web3.js';
@@ -13,6 +14,7 @@ import { trackEvent } from 'utils/analytics';
 import { shortAddress } from 'utils/tokens';
 
 export const Wallet: FunctionComponent = () => {
+  const location = useLocation();
   const { publicKey } = useParams<{ publicKey: string }>();
   const tokenPublicKey = new web3.PublicKey(publicKey);
 
@@ -36,7 +38,10 @@ export const Wallet: FunctionComponent = () => {
         currentName: tokenAccount?.mint.symbol
           ? `${tokenAccount.mint.symbol} Wallet`
           : `${shortAddress(publicKey)} Wallet`,
-        backTo: '/wallets',
+        backTo: {
+          pathname: `/wallets`,
+          state: { fromPage: location.pathname },
+        },
       }}
       rightColumn={
         <>

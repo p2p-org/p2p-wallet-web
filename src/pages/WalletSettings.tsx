@@ -1,5 +1,6 @@
 import React, { FunctionComponent, useMemo } from 'react';
 import { useSelector } from 'react-redux';
+import { useLocation } from 'react-router';
 import { useParams } from 'react-router-dom';
 
 import * as web3 from '@solana/web3.js';
@@ -11,6 +12,7 @@ import { RootState } from 'store/rootReducer';
 import { shortAddress } from 'utils/tokens';
 
 export const WalletSettings: FunctionComponent = () => {
+  const location = useLocation();
   const { publicKey } = useParams<{ publicKey: string }>();
   const tokenPublicKey = new web3.PublicKey(publicKey);
 
@@ -29,7 +31,10 @@ export const WalletSettings: FunctionComponent = () => {
     <Layout
       breadcrumb={{
         currentName: `${tokenName} Wallet`,
-        backTo: `/wallet/${publicKey}`,
+        backTo: {
+          pathname: `/wallet/${publicKey}`,
+          state: { fromPage: location.pathname },
+        },
       }}
       rightColumn={
         <TokenSettingsWidget
