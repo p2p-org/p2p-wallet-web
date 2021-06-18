@@ -1,3 +1,5 @@
+// eslint-disable-next-line eslint-comments/disable-enable-pair
+/* eslint-disable no-param-reassign */
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import {
   ConfirmedSignaturesForAddress2Options,
@@ -73,15 +75,17 @@ const transactionSlice = createSlice({
         newPubkeys.push(transaction.signature);
       }
 
-      // eslint-disable-next-line no-param-reassign
       state.items = mergeRight(state.items, newItems);
 
-      // eslint-disable-next-line no-param-reassign
-      state.order[action.meta.arg.publicKey.toBase58()] = uniq(
-        pathOr<string[]>([], ['order', action.meta.arg.publicKey.toBase58()], state).concat(
-          newPubkeys,
-        ),
-      );
+      if (action.meta.arg.options?.before) {
+        state.order[action.meta.arg.publicKey.toBase58()] = uniq(
+          pathOr<string[]>([], ['order', action.meta.arg.publicKey.toBase58()], state).concat(
+            newPubkeys,
+          ),
+        );
+      } else {
+        state.order[action.meta.arg.publicKey.toBase58()] = newPubkeys;
+      }
     });
     builder.addCase(getTransaction.fulfilled, (state, action) => {
       if (!action.payload) {
@@ -93,10 +97,8 @@ const transactionSlice = createSlice({
       };
       const newPubkeys: string[] = [action.payload.signature];
 
-      // eslint-disable-next-line no-param-reassign
       state.items = mergeRight(state.items, newItems);
 
-      // eslint-disable-next-line no-param-reassign
       state.order[action.payload.signature] = uniq(
         pathOr<string[]>([], ['order', action.payload.signature], state).concat(newPubkeys),
       );

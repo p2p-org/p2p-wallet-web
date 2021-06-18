@@ -32,7 +32,7 @@ export const ActivityWidget: FunctionComponent<Props> = ({ publicKey }) => {
   const order = useSelector((state: RootState) => state.transaction.order[publicKey.toBase58()]);
 
   useEffect(() => {
-    if (order) {
+    if (order?.length) {
       trackEvent('wallet_activity_scroll', { pageNum: Math.floor(order.length / LIMIT) });
     }
   }, [order]);
@@ -59,6 +59,10 @@ export const ActivityWidget: FunctionComponent<Props> = ({ publicKey }) => {
       setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    void fetchData();
+  }, []);
 
   const handleNeedLoadMore = () => {
     void fetchData(true);
