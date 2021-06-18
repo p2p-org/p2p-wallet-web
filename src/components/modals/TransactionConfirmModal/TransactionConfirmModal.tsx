@@ -189,7 +189,7 @@ export const TransactionConfirmModal: FunctionComponent<Props> = ({ type, params
     <WrapperModal
       title="Double check and confirm"
       description="Swap transaction"
-      close={close}
+      close={handleCloseClick}
       footer={renderButtons()}>
       {type === 'send' ? (
         <Section className="send">
