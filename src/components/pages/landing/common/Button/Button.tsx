@@ -93,7 +93,7 @@ export const ButtonWeb: FC<ButtonProps & HTMLAttributes<HTMLElement>> = ({
   ...props
 }) => {
   return (
-    <ButtonLink to="/login" className={classNames(className, { glow })} {...props}>
+    <ButtonLink to="/signup" className={classNames(className, { glow })} {...props}>
       <Text className="web">Go to web wallet</Text>
     </ButtonLink>
   );
