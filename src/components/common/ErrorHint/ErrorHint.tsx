@@ -10,8 +10,8 @@ const Wrapper = styled.div`
   margin-top: 8px;
 
   color: #f43d3d;
+  font-weight: 600;
   font-size: 16px;
-  font-family: 'Aktiv Grotesk Corp', sans-serif;
   line-height: 24px;
 `;
 
@@ -25,12 +25,13 @@ const WarningIcon = styled(Icon)`
 
 interface Props {
   error: string;
+  noIcon?: boolean;
 }
 
-export const ErrorHint: FC<Props> = ({ error }) => {
+export const ErrorHint: FC<Props> = ({ error, noIcon }) => {
   return (
     <Wrapper>
-      <WarningIcon name="warning" />
+      {!noIcon ? <WarningIcon name="warning" /> : undefined}
       {error}
     </Wrapper>
   );

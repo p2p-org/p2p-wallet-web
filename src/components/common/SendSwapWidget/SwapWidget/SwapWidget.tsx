@@ -290,7 +290,9 @@ export const SwapWidget: FunctionComponent = () => {
           props: {
             type: 'swap',
             params: {
+              firstToken,
               firstTokenAccount,
+              secondToken,
               secondTokenAccount,
               firstAmount,
               secondAmount,

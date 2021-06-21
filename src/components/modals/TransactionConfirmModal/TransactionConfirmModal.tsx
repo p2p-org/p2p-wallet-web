@@ -4,6 +4,7 @@ import { useSelector } from 'react-redux';
 import { styled } from '@linaria/react';
 import { PublicKey } from '@solana/web3.js';
 
+import { Token } from 'api/token/Token';
 import { TokenAccount } from 'api/token/TokenAccount';
 import { WalletType } from 'api/wallet';
 import { loadMnemonicAndSeed } from 'api/wallet/ManualWallet';
@@ -114,7 +115,9 @@ type TransferParams = {
 };
 
 type SwapParams = {
+  firstToken: Token;
   firstTokenAccount: TokenAccount;
+  secondToken: Token;
   secondTokenAccount: TokenAccount;
   firstAmount: number;
   secondAmount: number;
@@ -228,17 +231,14 @@ export const TransactionConfirmModal: FunctionComponent<Props> = ({ type, params
               </InfoWrapper>
             </FieldInfo>
             <FieldInfo>
-              <TokenAvatar
-                symbol={(params as SwapParams).firstTokenAccount.mint.symbol}
-                size={44}
-              />
+              <TokenAvatar symbol={(params as SwapParams).firstToken.symbol} size={44} />
               <InfoWrapper>
                 <InfoTitle>Check the amount</InfoTitle>
                 <InfoValue>
-                  {(params as SwapParams).firstTokenAccount.mint
+                  {(params as SwapParams).firstToken
                     .toMajorDenomination((params as SwapParams).firstAmount)
                     .toNumber()}{' '}
-                  {(params as SwapParams).firstTokenAccount.mint.symbol}
+                  {(params as SwapParams).firstToken.symbol}
                 </InfoValue>
               </InfoWrapper>
             </FieldInfo>
@@ -252,22 +252,21 @@ export const TransactionConfirmModal: FunctionComponent<Props> = ({ type, params
               <InfoWrapper>
                 <InfoTitle>Destination wallet</InfoTitle>
                 <InfoValue>
-                  {(params as SwapParams).secondTokenAccount.address.toBase58()}
+                  {(params as SwapParams).secondTokenAccount
+                    ? (params as SwapParams).secondTokenAccount.address.toBase58()
+                    : 'Will be created'}
                 </InfoValue>
               </InfoWrapper>
             </FieldInfo>
             <FieldInfo>
-              <TokenAvatar
-                symbol={(params as SwapParams).secondTokenAccount.mint.symbol}
-                size={44}
-              />
+              <TokenAvatar symbol={(params as SwapParams).secondToken.symbol} size={44} />
               <InfoWrapper>
                 <InfoTitle>Check the amount</InfoTitle>
                 <InfoValue>
-                  {(params as SwapParams).secondTokenAccount.mint
+                  {(params as SwapParams).secondToken
                     .toMajorDenomination((params as SwapParams).secondAmount)
                     .toNumber()}{' '}
-                  {(params as SwapParams).secondTokenAccount.mint.symbol}
+                  {(params as SwapParams).secondToken.symbol}
                 </InfoValue>
               </InfoWrapper>
             </FieldInfo>
@@ -278,7 +277,7 @@ export const TransactionConfirmModal: FunctionComponent<Props> = ({ type, params
         <Section>
           <SubTitle>Enter password to confirm</SubTitle>
           <PasswordInputStyled value={password} onChange={handlePasswordChange} />
-          {hasError ? <ErrorHint error="Wrong password" /> : undefined}
+          {hasError ? <ErrorHint error="Incorrect password, try again" noIcon /> : undefined}
         </Section>
       ) : undefined}
     </WrapperModal>
