@@ -7,6 +7,7 @@ import { unwrapResult } from '@reduxjs/toolkit';
 import { AccountLayout } from '@solana/spl-token';
 import { PublicKey } from '@solana/web3.js';
 import Decimal from 'decimal.js';
+import { rgba } from 'polished';
 
 import { Token } from 'api/token/Token';
 import { TokenAccount } from 'api/token/TokenAccount';
@@ -30,6 +31,7 @@ import { minorAmountToMajor } from 'utils/amount';
 import { trackEvent } from 'utils/analytics';
 import { useTrackEventOnce } from 'utils/hooks/useTrackEventOnce';
 
+import { Hint } from '../common/Hint';
 import {
   BottomWrapper,
   ButtonWrapper,
@@ -38,7 +40,6 @@ import {
   FeeRight,
   FromToSelectInputStyled,
   FromWrapper,
-  Hint,
   TooltipRow,
   TxName,
   TxValue,
@@ -104,6 +105,17 @@ const ConfirmTextPrimary = styled.div`
 const ConfirmTextSecondary = styled.div`
   font-weight: 600;
   font-size: 16px;
+`;
+
+const HintWrapper = styled.div`
+  padding: 12px 0;
+
+  color: #a3a5ba;
+  font-size: 14px;
+  line-height: 21px;
+  text-align: center;
+
+  border-top: 1px solid ${rgba('#000', 0.05)};
 `;
 
 type Props = {
@@ -348,74 +360,77 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
   }
 
   return (
-    <WrapperWidgetPage title="Send" icon="top">
-      <FromWrapper>
-        <FromToSelectInputStyled
-          tokenAccounts={tokenAccounts}
-          token={fromTokenAccount?.mint}
-          tokenAccount={fromTokenAccount}
-          amount={fromAmount}
-          onTokenAccountChange={handleFromTokenAccountChange}
-          onAmountChange={handleFromAmountChange}
-          disabled={isDisabled}
-        />
-        <FeeLine>
-          {fromTokenAccount?.mint ? (
-            <FeeLeft>
-              1 {fromTokenAccount?.mint.symbol} =&nbsp;
-              <RateUSD symbol={fromTokenAccount?.mint.symbol} />
-            </FeeLeft>
+    <div>
+      <WrapperWidgetPage title="Send" icon="top">
+        <FromWrapper>
+          <FromToSelectInputStyled
+            tokenAccounts={tokenAccounts}
+            token={fromTokenAccount?.mint}
+            tokenAccount={fromTokenAccount}
+            amount={fromAmount}
+            onTokenAccountChange={handleFromTokenAccountChange}
+            onAmountChange={handleFromAmountChange}
+            disabled={isDisabled}
+          />
+          <FeeLine>
+            {fromTokenAccount?.mint ? (
+              <FeeLeft>
+                1 {fromTokenAccount?.mint.symbol} =&nbsp;
+                <RateUSD symbol={fromTokenAccount?.mint.symbol} />
+              </FeeLeft>
+            ) : undefined}
+            <FeeRightStyled>
+              <TooltipStyled
+                title={
+                  <>
+                    <div>Fee: {isNeedCreateWallet ? txFee + rentFee : txFee} SOL</div>
+                    <InfoIcon name="info" />
+                  </>
+                }>
+                {toolTipItems}
+              </TooltipStyled>
+            </FeeRightStyled>
+          </FeeLine>
+        </FromWrapper>
+        <ToSendWrapper>
+          <FromTitle>Send to</FromTitle>
+          <ToAddressInput value={toTokenPublicKey || ''} onChange={handleToPublicKeyChange} />
+          {isShowConfirmAddressSwitch ? (
+            <ConfirmWrapper>
+              <Switch
+                checked={isConfirmCorrectAddress}
+                onChange={() => setIsConfirmCorrectAddress(!isConfirmCorrectAddress)}
+              />
+              <ConfirmTextWrapper>
+                <ConfirmTextPrimary>
+                  This address has no funds, are you sure its correct?
+                </ConfirmTextPrimary>
+                <ConfirmTextSecondary>I’m sure, It’s correct</ConfirmTextSecondary>
+              </ConfirmTextWrapper>
+            </ConfirmWrapper>
           ) : undefined}
-          <FeeRightStyled>
-            <TooltipStyled
-              title={
-                <>
-                  <div>Fee: {isNeedCreateWallet ? txFee + rentFee : txFee} SOL</div>
-                  <InfoIcon name="info" />
-                </>
-              }>
-              {toolTipItems}
-            </TooltipStyled>
-          </FeeRightStyled>
-        </FeeLine>
-      </FromWrapper>
-      <ToSendWrapper>
-        <FromTitle>Send to</FromTitle>
-        <ToAddressInput value={toTokenPublicKey || ''} onChange={handleToPublicKeyChange} />
-        {isShowConfirmAddressSwitch ? (
-          <ConfirmWrapper>
-            <Switch
-              checked={isConfirmCorrectAddress}
-              onChange={() => setIsConfirmCorrectAddress(!isConfirmCorrectAddress)}
-            />
-            <ConfirmTextWrapper>
-              <ConfirmTextPrimary>
-                This address has no funds, are you sure its correct?
-              </ConfirmTextPrimary>
-              <ConfirmTextSecondary>I’m sure, It’s correct</ConfirmTextSecondary>
-            </ConfirmTextWrapper>
-          </ConfirmWrapper>
-        ) : undefined}
-      </ToSendWrapper>
-      <BottomWrapper>
-        <ButtonWrapper>
-          <Button
-            primary={!isDisabled}
-            disabled={
-              isDisabled ||
-              isValidAmount(fromAmount) ||
-              !isValidAddress(toTokenPublicKey) ||
-              !hasBalance ||
-              (isShowConfirmAddressSwitch && !isConfirmCorrectAddress)
-            }
-            big
-            full
-            onClick={handleSubmit}>
-            Send
-          </Button>
-          <Hint>All deposits are stored 100% non-custodiallity with keys held on this device</Hint>
-        </ButtonWrapper>
-      </BottomWrapper>
-    </WrapperWidgetPage>
+        </ToSendWrapper>
+        <BottomWrapper>
+          <ButtonWrapper>
+            <Button
+              primary={!isDisabled}
+              disabled={
+                isDisabled ||
+                isValidAmount(fromAmount) ||
+                !isValidAddress(toTokenPublicKey) ||
+                !hasBalance ||
+                (isShowConfirmAddressSwitch && !isConfirmCorrectAddress)
+              }
+              big
+              full
+              onClick={handleSubmit}>
+              Send
+            </Button>
+          </ButtonWrapper>
+        </BottomWrapper>
+        <HintWrapper>Send SOL or any SPL Tokens on one address</HintWrapper>
+      </WrapperWidgetPage>
+      <Hint />
+    </div>
   );
 };

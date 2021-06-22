@@ -50,7 +50,7 @@ export const FeeRight = styled.div`
 `;
 
 export const BottomWrapper = styled.div`
-  padding: 20px 20px 24px;
+  padding: 24px 20px;
 
   &:not(:has(div:only-child)) {
     padding: 20px;
@@ -59,17 +59,9 @@ export const BottomWrapper = styled.div`
 
 export const ButtonWrapper = styled.div``;
 
-export const Hint = styled.div`
-  margin-top: 20px;
-
-  color: #a3a5ba;
-  font-size: 14px;
-  line-height: 21px;
-  text-align: center;
-`;
-
 export const TooltipRow = styled.div`
   display: flex;
+
   font-size: 14px;
 `;
 

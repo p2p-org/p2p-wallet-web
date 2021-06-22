@@ -5,6 +5,7 @@ import { styled } from '@linaria/react';
 import { unwrapResult } from '@reduxjs/toolkit';
 import { AccountLayout } from '@solana/spl-token';
 import { Decimal } from 'decimal.js';
+import { rgba } from 'polished';
 import { any, complement, isNil, or, pathEq } from 'ramda';
 
 import { adjustForSlippage, Pool } from 'api/pool/Pool';
@@ -31,6 +32,7 @@ import { majorAmountToMinor, minorAmountToMajor } from 'utils/amount';
 import { trackEvent } from 'utils/analytics';
 import { useIntervalHook } from 'utils/hooks/useIntervalHook';
 
+import { Hint } from '../common/Hint';
 import {
   BottomWrapper,
   ButtonWrapper,
@@ -39,7 +41,6 @@ import {
   FeeRight,
   FromToSelectInputStyled,
   FromWrapper,
-  Hint,
   TooltipRow,
   TxName,
   TxValue,
@@ -107,7 +108,9 @@ const ChangeRateIcon = styled(Icon)`
 `;
 
 const PropertiesWrapper = styled.div`
-  padding-bottom: 20px;
+  &:not(:empty) {
+    padding-bottom: 20px;
+  }
 
   > :not(:last-child) {
     margin-bottom: 8px;
@@ -133,8 +136,9 @@ const PoweredByBannerWrapper = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 10px;
 
-  padding-bottom: 22px;
+  border-top: 1px solid ${rgba('#000', 0.05)};
 `;
 
 const PoweredBy = styled.div`
@@ -463,115 +467,117 @@ export const SwapWidget: FunctionComponent = () => {
   const isShowFee = firstToken && fee && feeProperties;
 
   return (
-    <WrapperWidgetPage
-      title="Swap"
-      icon="swap"
-      action={
-        <ActionsWrapper>
-          <SettingsAction />
-        </ActionsWrapper>
-      }>
-      <FromWrapper>
-        <FromToSelectInputStyled
-          tokenAccounts={firstTokenAccounts}
-          token={firstToken}
-          tokenAccount={firstTokenAccount}
-          amount={firstToken ? minorAmountToMajor(firstAmount, firstToken).toString() : ''}
-          onTokenAccountChange={selectFirstTokenHandleChange}
-          onAmountChange={updateFirstAmount}
-          disabled={isExecuting}
-          disabledInput={!firstToken}
-        />
-      </FromWrapper>
-      <ToSwapWrapper>
-        <ReverseWrapper onClick={handleReverseClick}>
-          <ReverseIcon name="swap" />
-        </ReverseWrapper>
-        <FromToSelectInputStyled
-          direction="to"
-          tokens={secondTokens}
-          tokenAccounts={secondTokenAccounts}
-          token={secondToken}
-          tokenAccount={secondTokenAccount}
-          amount={secondToken ? minorAmountToMajor(secondAmount, secondToken).toString() : ''}
-          onTokenAccountChange={selectSecondTokenHandleChange}
-          onAmountChange={updateSecondAmount}
-          disabled={isExecuting}
-          disabledInput={!secondToken}
-        />
-        {rate ? (
-          <FeeLine>
-            <FeeLeft>Price:</FeeLeft>
-            <FeeRight>
-              <Rate>
-                {rate.toFixed(6)} {(isReverseRate ? secondToken : firstToken)?.symbol} per{' '}
-                {(isReverseRate ? firstToken : secondToken)?.symbol}
-                <ChangeRateWrapper onClick={handleChangeRateClick}>
-                  <ChangeRateIcon name="swap" />
-                </ChangeRateWrapper>
-              </Rate>
-            </FeeRight>
-          </FeeLine>
-        ) : undefined}
-      </ToSwapWrapper>
-      <BottomWrapper>
-        <PropertiesWrapper>
-          {minimumToAmountWithSlippage ? (
-            <PropertyLine>
-              Minimum Received:
-              <PropertyValue>
-                {minimumToAmountWithSlippage.toNumber().toFixed(secondToken?.decimals)}{' '}
-                {secondToken?.symbol}
-              </PropertyValue>
-            </PropertyLine>
+    <div>
+      <WrapperWidgetPage
+        title="Swap"
+        icon="swap"
+        action={
+          <ActionsWrapper>
+            <SettingsAction />
+          </ActionsWrapper>
+        }>
+        <FromWrapper>
+          <FromToSelectInputStyled
+            tokenAccounts={firstTokenAccounts}
+            token={firstToken}
+            tokenAccount={firstTokenAccount}
+            amount={firstToken ? minorAmountToMajor(firstAmount, firstToken).toString() : ''}
+            onTokenAccountChange={selectFirstTokenHandleChange}
+            onAmountChange={updateFirstAmount}
+            disabled={isExecuting}
+            disabledInput={!firstToken}
+          />
+        </FromWrapper>
+        <ToSwapWrapper>
+          <ReverseWrapper onClick={handleReverseClick}>
+            <ReverseIcon name="swap" />
+          </ReverseWrapper>
+          <FromToSelectInputStyled
+            direction="to"
+            tokens={secondTokens}
+            tokenAccounts={secondTokenAccounts}
+            token={secondToken}
+            tokenAccount={secondTokenAccount}
+            amount={secondToken ? minorAmountToMajor(secondAmount, secondToken).toString() : ''}
+            onTokenAccountChange={selectSecondTokenHandleChange}
+            onAmountChange={updateSecondAmount}
+            disabled={isExecuting}
+            disabledInput={!secondToken}
+          />
+          {rate ? (
+            <FeeLine>
+              <FeeLeft>Price:</FeeLeft>
+              <FeeRight>
+                <Rate>
+                  {rate.toFixed(6)} {(isReverseRate ? secondToken : firstToken)?.symbol} per{' '}
+                  {(isReverseRate ? firstToken : secondToken)?.symbol}
+                  <ChangeRateWrapper onClick={handleChangeRateClick}>
+                    <ChangeRateIcon name="swap" />
+                  </ChangeRateWrapper>
+                </Rate>
+              </FeeRight>
+            </FeeLine>
           ) : undefined}
-          {isShowFee ? (
-            <>
+        </ToSwapWrapper>
+        <BottomWrapper>
+          <PropertiesWrapper>
+            {minimumToAmountWithSlippage ? (
               <PropertyLine>
-                Liquidity Provider Fee:
+                Minimum Received:
                 <PropertyValue>
-                  {fee} {feeProperties?.token.symbol}
+                  {minimumToAmountWithSlippage.toNumber().toFixed(secondToken?.decimals)}{' '}
+                  {secondToken?.symbol}
                 </PropertyValue>
               </PropertyLine>
-              <PropertyLine>
-                Fee:
-                <PropertyValue>
-                  <Tooltip title={`${isNeedCreateWallet ? txFee + rentFee : txFee} SOL`}>
-                    <TooltipRow>
-                      <TxName>Transaction:</TxName>
-                      <TxValue>{`${txFee} SOL`}</TxValue>
-                    </TooltipRow>
-                    {isNeedCreateWallet ? (
+            ) : undefined}
+            {isShowFee ? (
+              <>
+                <PropertyLine>
+                  Liquidity Provider Fee:
+                  <PropertyValue>
+                    {fee} {feeProperties?.token.symbol}
+                  </PropertyValue>
+                </PropertyLine>
+                <PropertyLine>
+                  Fee:
+                  <PropertyValue>
+                    <Tooltip title={`${isNeedCreateWallet ? txFee + rentFee : txFee} SOL`}>
                       <TooltipRow>
-                        <TxName>Wallet creation:</TxName>
-                        <TxValue>{`${rentFee} SOL`}</TxValue>
+                        <TxName>Transaction:</TxName>
+                        <TxValue>{`${txFee} SOL`}</TxValue>
                       </TooltipRow>
-                    ) : undefined}
-                  </Tooltip>
-                </PropertyValue>
+                      {isNeedCreateWallet ? (
+                        <TooltipRow>
+                          <TxName>Wallet creation:</TxName>
+                          <TxValue>{`${rentFee} SOL`}</TxValue>
+                        </TooltipRow>
+                      ) : undefined}
+                    </Tooltip>
+                  </PropertyValue>
+                </PropertyLine>
+              </>
+            ) : undefined}
+            {selectedPool && firstToken && secondToken && !isNil(slippage) ? (
+              <PropertyLine>
+                Slippage:
+                <PropertyValue>{slippage} %</PropertyValue>
               </PropertyLine>
-            </>
-          ) : undefined}
-          {selectedPool && firstToken && secondToken && !isNil(slippage) ? (
-            <PropertyLine>
-              Slippage:
-              <PropertyValue>{slippage} %</PropertyValue>
-            </PropertyLine>
-          ) : undefined}
-        </PropertiesWrapper>
-        <ButtonWrapper>
-          <Button primary={!isDisabled} disabled={isDisabled} big full onClick={handleSubmit}>
-            {renderActionText()}
-          </Button>
-          <Hint>All deposits are stored 100% non-custodiallity with keys held on this device</Hint>
-        </ButtonWrapper>
-      </BottomWrapper>
-      <PoweredByBannerWrapper>
-        <PoweredBy>Powered by </PoweredBy>
-        <a href="https://www.orca.so/pools" target="_blank" rel="noopener noreferrer noindex">
-          <img src={orcaLogo} alt="Orca" />
-        </a>
-      </PoweredByBannerWrapper>
-    </WrapperWidgetPage>
+            ) : undefined}
+          </PropertiesWrapper>
+          <ButtonWrapper>
+            <Button primary={!isDisabled} disabled={isDisabled} big full onClick={handleSubmit}>
+              {renderActionText()}
+            </Button>
+          </ButtonWrapper>
+        </BottomWrapper>
+        <PoweredByBannerWrapper>
+          <PoweredBy>Powered by </PoweredBy>
+          <a href="https://www.orca.so/pools" target="_blank" rel="noopener noreferrer noindex">
+            <img src={orcaLogo} alt="Orca" />
+          </a>
+        </PoweredByBannerWrapper>
+      </WrapperWidgetPage>
+      <Hint />
+    </div>
   );
 };
