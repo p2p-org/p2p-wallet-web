@@ -1,18 +1,19 @@
-import React, { FunctionComponent, useEffect, useRef, useState } from 'react';
+import React, { FunctionComponent, useState } from 'react';
 
 import { styled } from '@linaria/react';
+import classNames from 'classnames';
 
 const Wrapper = styled.div`
   position: relative;
 
   display: inline-flex;
-
-  border-bottom: 1px dashed #a3a5ba;
 `;
 
 const Title = styled.div`
   display: flex;
   align-items: center;
+
+  cursor: pointer;
 `;
 
 const Popover = styled.div`
@@ -30,39 +31,34 @@ const Popover = styled.div`
   background: rgba(0, 0, 0, 0.75);
   border-radius: 12px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+
+  &.noOpacity {
+    background: #202020;
+  }
 `;
 
 type Props = {
   title: string | React.ReactNode;
+  noOpacity?: boolean;
   className?: string;
 };
 
-export const Tooltip: FunctionComponent<Props> = ({ title, children, className }) => {
-  const tooltipRef = useRef<HTMLDivElement>(null);
+export const Tooltip: FunctionComponent<Props> = ({ title, noOpacity, children, className }) => {
   const [isOpen, setIsOpen] = useState(false);
 
-  const handleAwayClick = (e: MouseEvent) => {
-    if (!tooltipRef.current?.contains(e.target as HTMLDivElement)) {
-      setIsOpen(false);
-    }
+  const handleMouseEnter = () => {
+    setIsOpen(true);
   };
-
-  useEffect(() => {
-    window.addEventListener('click', handleAwayClick);
-
-    return () => {
-      window.removeEventListener('click', handleAwayClick);
-    };
-  }, []);
-
-  const handleTooltipClick = () => {
-    setIsOpen(!isOpen);
+  const handleMouseLeave = () => {
+    setIsOpen(false);
   };
 
   return (
-    <Wrapper ref={tooltipRef} className={className}>
-      <Title onClick={handleTooltipClick}>{title}</Title>
-      {isOpen ? <Popover>{children}</Popover> : undefined}
+    <Wrapper className={className}>
+      <Title onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
+        {title}
+      </Title>
+      {isOpen ? <Popover className={classNames({ noOpacity })}>{children}</Popover> : undefined}
     </Wrapper>
   );
 };

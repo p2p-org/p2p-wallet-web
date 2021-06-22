@@ -32,7 +32,7 @@ import { majorAmountToMinor, minorAmountToMajor } from 'utils/amount';
 import { trackEvent } from 'utils/analytics';
 import { useIntervalHook } from 'utils/hooks/useIntervalHook';
 
-import { Hint } from '../common/Hint';
+import { Hint } from '../../Hint';
 import {
   BottomWrapper,
   ButtonWrapper,
@@ -130,6 +130,10 @@ const PropertyLine = styled.div`
 
 const PropertyValue = styled.div`
   color: #000;
+`;
+
+const TooltipStyled = styled(Tooltip)`
+  border-bottom: 1px dashed #a3a5ba;
 `;
 
 const PoweredByBannerWrapper = styled.div`
@@ -541,7 +545,7 @@ export const SwapWidget: FunctionComponent = () => {
                 <PropertyLine>
                   Fee:
                   <PropertyValue>
-                    <Tooltip title={`${isNeedCreateWallet ? txFee + rentFee : txFee} SOL`}>
+                    <TooltipStyled title={`${isNeedCreateWallet ? txFee + rentFee : txFee} SOL`}>
                       <TooltipRow>
                         <TxName>Transaction:</TxName>
                         <TxValue>{`${txFee} SOL`}</TxValue>
@@ -552,7 +556,7 @@ export const SwapWidget: FunctionComponent = () => {
                           <TxValue>{`${rentFee} SOL`}</TxValue>
                         </TooltipRow>
                       ) : undefined}
-                    </Tooltip>
+                    </TooltipStyled>
                   </PropertyValue>
                 </PropertyLine>
               </>

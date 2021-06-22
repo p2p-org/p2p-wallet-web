@@ -7,8 +7,10 @@ import { rgba } from 'polished';
 import QRCode from 'qrcode.react';
 
 import { TokenAccount } from 'api/token/TokenAccount';
+import { Hint } from 'components/common/Hint';
 import { ToastManager } from 'components/common/ToastManager';
 import { WidgetPage } from 'components/common/WidgetPage';
+import { Icon, Tooltip } from 'components/ui';
 import { trackEvent } from 'utils/analytics';
 import { askClipboardWritePermission, setToClipboard } from 'utils/clipboard';
 import { getExplorerUrl } from 'utils/connection';
@@ -30,10 +32,44 @@ const QRContent = styled.div`
 `;
 
 const QRText = styled.div`
+  display: flex;
+  align-items: center;
+
   color: #202020;
   font-weight: 600;
-  font-size: 20px;
+  font-size: 18px;
   line-height: 120%;
+`;
+
+const QuestionCircleIcon = styled(Icon)`
+  width: 16px;
+  height: 16px;
+  margin-left: 6px;
+
+  color: #a3a5ba;
+`;
+
+const TooltipContent = styled.div`
+  max-width: 318px;
+`;
+
+const TooltipTitle = styled.span`
+  display: block;
+  margin-bottom: 10px;
+
+  color: #fff;
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 140%;
+`;
+
+const TooltipText = styled.span`
+  display: block;
+
+  color: #fff;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 140%;
 `;
 
 const QRCodeWrapper = styled.div`
@@ -83,24 +119,36 @@ const QRCopied = styled.div`
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
 `;
 
+const CopyIcon = styled(Icon)`
+  width: 24px;
+  height: 24px;
+
+  color: #a3a5ba;
+`;
+
 const Address = styled.div`
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
   height: 56px;
   margin-top: 32px;
+  padding: 0 16px;
 
   color: #202020;
   font-weight: 600;
   font-size: 16px;
   line-height: 24px;
 
-  background: #fbfbfd;
+  background: #f6f6f8;
   border-radius: 12px;
   cursor: pointer;
 
   &:hover {
     color: #458aff;
+
+    ${CopyIcon} {
+      color: #458aff;
+    }
   }
 
   &.isAddressCopied {
@@ -192,36 +240,58 @@ export const ReceiveAddressWidget: FC = () => {
   }
 
   return (
-    <WrapperWidgetPage title="Receive" icon="bottom">
-      <QRWrapper>
-        <QRContent>
-          <QRText>Scan or copy QR code.</QRText>
-          <QRCodeWrapper
-            className={classNames({ isImageCopyAvailable })}
-            onClick={isImageCopyAvailable ? handleImageCopyClick : undefined}>
-            {isImageCopied ? (
-              <QRCopiedWrapper>
-                <QRCopied>Copied</QRCopied>
-              </QRCopiedWrapper>
-            ) : undefined}
-            <QRCode id="qrcode" value={solAccount.address.toBase58()} size={150} />
-          </QRCodeWrapper>
-        </QRContent>
-        <Address
-          className={classNames({ isAddressCopied })}
-          onClick={handleCopyClick(solAccount.address.toBase58(), setIsAddressCopied)}>
-          {isAddressCopied ? 'Address Copied!' : solAccount.address.toBase58()}
-        </Address>
-      </QRWrapper>
-      <BottomInfo>
-        <ExplorerA
-          href={getExplorerUrl('address', solAccount.address.toBase58(), cluster)}
-          target="_blank"
-          rel="noopener noreferrer noindex"
-          className="button">
-          View in Solana explorer
-        </ExplorerA>
-      </BottomInfo>
-    </WrapperWidgetPage>
+    <div>
+      <WrapperWidgetPage title="Receive" icon="bottom">
+        <QRWrapper>
+          <QRContent>
+            <QRText>
+              One unified address to receive SOL or SPL Tokens{' '}
+              <Tooltip title={<QuestionCircleIcon name="question-circle" />} noOpacity>
+                <TooltipContent>
+                  <TooltipTitle>SPL Token Program</TooltipTitle>
+                  <TooltipText>
+                    The Solana Program Library (SPL) is a collection of on-chain programs maintained
+                    by the Solana team. The SPL Token program is the token standard of the Solana
+                    blockchain.
+                    <br />
+                    <br />
+                    Similar to ERC20 tokens on the Ethereum network, SPL Tokens are designed for
+                    DeFi applications. SPL Tokens can be traded on Serum, a Solana based
+                    decentralized exchange and FTX.
+                  </TooltipText>
+                </TooltipContent>
+              </Tooltip>
+            </QRText>
+            <QRCodeWrapper
+              className={classNames({ isImageCopyAvailable })}
+              onClick={isImageCopyAvailable ? handleImageCopyClick : undefined}>
+              {isImageCopied ? (
+                <QRCopiedWrapper>
+                  <QRCopied>Copied</QRCopied>
+                </QRCopiedWrapper>
+              ) : undefined}
+              <QRCode id="qrcode" value={solAccount.address.toBase58()} size={150} />
+            </QRCodeWrapper>
+          </QRContent>
+          <Address
+            className={classNames({ isAddressCopied })}
+            onClick={handleCopyClick(solAccount.address.toBase58(), setIsAddressCopied)}>
+            {isAddressCopied ? 'Address Copied!' : solAccount.address.toBase58()}
+
+            <CopyIcon name="copy" />
+          </Address>
+        </QRWrapper>
+        <BottomInfo>
+          <ExplorerA
+            href={getExplorerUrl('address', solAccount.address.toBase58(), cluster)}
+            target="_blank"
+            rel="noopener noreferrer noindex"
+            className="button">
+            View in Solana explorer
+          </ExplorerA>
+        </BottomInfo>
+      </WrapperWidgetPage>
+      <Hint />
+    </div>
   );
 };

@@ -31,7 +31,7 @@ import { minorAmountToMajor } from 'utils/amount';
 import { trackEvent } from 'utils/analytics';
 import { useTrackEventOnce } from 'utils/hooks/useTrackEventOnce';
 
-import { Hint } from '../common/Hint';
+import { Hint } from '../../Hint';
 import {
   BottomWrapper,
   ButtonWrapper,
@@ -75,10 +75,6 @@ const FeeRightStyled = styled(FeeRight)`
       color: #5887ff;
     }
   }
-`;
-
-const TooltipStyled = styled(Tooltip)`
-  border-bottom: none;
 `;
 
 const ConfirmWrapper = styled.div`
@@ -380,7 +376,7 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
               </FeeLeft>
             ) : undefined}
             <FeeRightStyled>
-              <TooltipStyled
+              <Tooltip
                 title={
                   <>
                     <div>Fee: {isNeedCreateWallet ? txFee + rentFee : txFee} SOL</div>
@@ -388,7 +384,7 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
                   </>
                 }>
                 {toolTipItems}
-              </TooltipStyled>
+              </Tooltip>
             </FeeRightStyled>
           </FeeLine>
         </FromWrapper>
