@@ -163,6 +163,17 @@ export const TransactionConfirmModal: FunctionComponent<Props> = ({ type, params
 
   const isDisabled = walletType === WalletType.MANUAL && (!password || hasError);
 
+  const renderDescription = () => {
+    switch (type) {
+      case 'swap':
+        return 'Swap transaction';
+      case 'send':
+        return 'Send transaction';
+      default:
+        return 'Transaction';
+    }
+  };
+
   const renderButtons = () => {
     let action;
 
@@ -191,7 +202,7 @@ export const TransactionConfirmModal: FunctionComponent<Props> = ({ type, params
   return (
     <WrapperModal
       title="Double check and confirm"
-      description="Swap transaction"
+      description={renderDescription()}
       close={handleCloseClick}
       footer={renderButtons()}>
       {type === 'send' ? (
