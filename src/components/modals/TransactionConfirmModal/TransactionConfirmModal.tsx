@@ -7,7 +7,7 @@ import { PublicKey } from '@solana/web3.js';
 import { Token } from 'api/token/Token';
 import { TokenAccount } from 'api/token/TokenAccount';
 import { WalletType } from 'api/wallet';
-import { loadMnemonicAndSeed } from 'api/wallet/ManualWallet';
+import { loadMnemonicAndSeed, STORAGE_KEY_LOCKED } from 'api/wallet/ManualWallet';
 import { ERROR_WRONG_PASSWORD } from 'api/wallet/ManualWallet/errors';
 import { ErrorHint } from 'components/common/ErrorHint';
 import { Modal } from 'components/common/Modal';
@@ -161,7 +161,10 @@ export const TransactionConfirmModal: FunctionComponent<Props> = ({ type, params
     close(false);
   };
 
-  const isDisabled = walletType === WalletType.MANUAL && (!password || hasError);
+  const isDisabled =
+    walletType === WalletType.MANUAL &&
+    localStorage.getItem(STORAGE_KEY_LOCKED) &&
+    (!password || hasError);
 
   const renderDescription = () => {
     switch (type) {
@@ -284,7 +287,7 @@ export const TransactionConfirmModal: FunctionComponent<Props> = ({ type, params
           </Section>
         </>
       ) : undefined}
-      {walletType === WalletType.MANUAL ? (
+      {walletType === WalletType.MANUAL && localStorage.getItem(STORAGE_KEY_LOCKED) ? (
         <Section>
           <SubTitle>Enter password to confirm</SubTitle>
           <PasswordInputStyled value={password} onChange={handlePasswordChange} />

@@ -136,6 +136,8 @@ export async function storeMnemonicAndSeed(
 
     if (isSave) {
       localStorage.setItem(STORAGE_KEY_LOCKED, locked);
+    } else {
+      localStorage.removeItem(STORAGE_KEY_LOCKED);
     }
   }
 
