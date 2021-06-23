@@ -2,7 +2,6 @@ import React, { FC, useState } from 'react';
 import { Link } from 'react-router-dom';
 
 import { styled } from '@linaria/react';
-import classNames from 'classnames';
 import { rgba } from 'polished';
 
 import logoImg from 'assets/images/big-logo.png';
@@ -33,22 +32,6 @@ const Title = styled.span`
   font-weight: 600;
   font-size: 14px;
   line-height: 140%;
-
-  &.isWasntOpened {
-    &::before {
-      position: absolute;
-      top: -1px;
-      right: -8px;
-
-      width: 6px;
-      height: 6px;
-
-      background: #f43d3d;
-      border-radius: 12px;
-
-      content: '';
-    }
-  }
 `;
 
 const ChevronIcon = styled(Icon)`
@@ -117,25 +100,29 @@ const AndroidImg = styled.div`
   background-size: 20px 20px;
 `;
 
-const STORAGE_KEY = 'isWasDownloadOpened';
+const STORAGE_KEY = 'isDownloadOpen';
 
 export const Download: FC = () => {
-  const [isWasntOpened, setIsWasntOpened] = useState(!localStorage.getItem(STORAGE_KEY));
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(
+    localStorage.getItem(STORAGE_KEY)
+      ? Boolean(JSON.parse(localStorage.getItem(STORAGE_KEY) || 'false'))
+      : true,
+  );
 
   const handleToggleClick = () => {
     setIsOpen((state) => !state);
 
-    if (isWasntOpened) {
-      setIsWasntOpened(false);
+    if (!isOpen) {
       localStorage.setItem(STORAGE_KEY, 'true');
+    } else {
+      localStorage.setItem(STORAGE_KEY, 'false');
     }
   };
 
   return (
     <Wrapper>
       <Header onClick={handleToggleClick}>
-        <Title className={classNames({ isWasntOpened })}>Download app</Title>
+        <Title>Download app</Title>
         <ChevronIcon name="chevron" />
       </Header>
       {isOpen ? (
