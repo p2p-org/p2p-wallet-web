@@ -1,3 +1,4 @@
+import './wdyr';
 import 'sanitize.css';
 import 'styles/css/nprogress.css';
 
