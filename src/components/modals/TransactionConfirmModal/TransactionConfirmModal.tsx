@@ -163,7 +163,7 @@ export const TransactionConfirmModal: FunctionComponent<Props> = ({ type, params
 
   const isDisabled =
     walletType === WalletType.MANUAL &&
-    localStorage.getItem(STORAGE_KEY_LOCKED) &&
+    Boolean(localStorage.getItem(STORAGE_KEY_LOCKED)) &&
     (!password || hasError);
 
   const renderDescription = () => {
@@ -275,7 +275,7 @@ export const TransactionConfirmModal: FunctionComponent<Props> = ({ type, params
             <FieldInfo>
               <TokenAvatar symbol={(params as SwapParams).secondToken.symbol} size={44} />
               <InfoWrapper>
-                <InfoTitle>Check the amount</InfoTitle>
+                <InfoTitle>Minimum receive</InfoTitle>
                 <InfoValue>
                   {(params as SwapParams).secondToken
                     .toMajorDenomination((params as SwapParams).secondAmount)
@@ -287,7 +287,7 @@ export const TransactionConfirmModal: FunctionComponent<Props> = ({ type, params
           </Section>
         </>
       ) : undefined}
-      {walletType === WalletType.MANUAL && localStorage.getItem(STORAGE_KEY_LOCKED) ? (
+      {walletType === WalletType.MANUAL && Boolean(localStorage.getItem(STORAGE_KEY_LOCKED)) ? (
         <Section>
           <SubTitle>Enter password to confirm</SubTitle>
           <PasswordInputStyled value={password} onChange={handlePasswordChange} />
