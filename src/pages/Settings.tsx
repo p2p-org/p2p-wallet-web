@@ -13,7 +13,7 @@ import { Layout } from 'components/common/Layout';
 import { WidgetPage } from 'components/common/WidgetPage';
 import { Icon, Select, Switch } from 'components/ui';
 import { MenuItem } from 'components/ui/Select/MenuItem';
-import { FEATURE_SETTINGS_LIST } from 'config/featureFlags';
+import { FEATURE_SETTINGS_FREE_TRANSACTIONS, FEATURE_SETTINGS_LIST } from 'config/featureFlags';
 import { disconnect, updateSettings } from 'store/slices/wallet/WalletSlice';
 import { trackEvent } from 'utils/analytics';
 import { appearance, currencies } from 'utils/settings';
@@ -291,20 +291,23 @@ export const Settings: FunctionComponent = () => {
                   />
                 }
               />
-              <Row
-                icon="free-tx"
-                title="Use free transactions"
-                secondary={
-                  <Switch
-                    checked={settings.useFreeTransactions}
-                    onChange={(checked) =>
-                      onItemClickHandler({
-                        useFreeTransactions: checked,
-                      })()
-                    }
-                  />
-                }
-              />
+
+              <Feature name={FEATURE_SETTINGS_FREE_TRANSACTIONS}>
+                <Row
+                  icon="free-tx"
+                  title="Use free transactions"
+                  secondary={
+                    <Switch
+                      checked={settings.useFreeTransactions}
+                      onChange={(checked) =>
+                        onItemClickHandler({
+                          useFreeTransactions: checked,
+                        })()
+                      }
+                    />
+                  }
+                />
+              </Feature>
             </RowsWrapper>
           </WidgetPage>
           <LogoutCard withShadow>

@@ -4,10 +4,12 @@ import { useHistory } from 'react-router';
 
 import { styled } from '@linaria/react';
 import * as web3 from '@solana/web3.js';
+import { Feature } from 'flagged';
 import { rgba } from 'polished';
 
 import { Widget } from 'components/common/Widget';
 import { Button, Icon, Switch } from 'components/ui';
+import { FEATURE_SETTINGS_CLOSE_ACCOUNT } from 'config/featureFlags';
 import { openModal } from 'store/actions/modals';
 import { SHOW_MODAL_CLOSE_TOKEN_ACCOUNT } from 'store/constants/modalTypes';
 import { RootState } from 'store/rootReducer';
@@ -172,24 +174,26 @@ export const TokenSettingsWidget: FunctionComponent<Props> = ({
           <Text>Hide in token list</Text>
           <Switch checked={isHidden} onChange={handleHideTokenClick(publicKey)} />
         </SettingItem>
-        <SettingItem>
-          <ButtonStyled
-            disabled={!isZeroBalance}
-            small
-            title="Close token account"
-            onClick={handleCloseTokenAccountClick}>
-            <IconWrapper>
-              <StyledIcon name="bucket" />
-            </IconWrapper>
-            Close token account
-          </ButtonStyled>
-          {!isZeroBalance ? (
-            <Warning>
-              <Text>Token account should be zero</Text>
-              <WarningIcon name="warning" />
-            </Warning>
-          ) : undefined}
-        </SettingItem>
+        <Feature name={FEATURE_SETTINGS_CLOSE_ACCOUNT}>
+          <SettingItem>
+            <ButtonStyled
+              disabled={!isZeroBalance}
+              small
+              title="Close token account"
+              onClick={handleCloseTokenAccountClick}>
+              <IconWrapper>
+                <StyledIcon name="bucket" />
+              </IconWrapper>
+              Close token account
+            </ButtonStyled>
+            {!isZeroBalance ? (
+              <Warning>
+                <Text>Token account should be zero</Text>
+                <WarningIcon name="warning" />
+              </Warning>
+            ) : undefined}
+          </SettingItem>
+        </Feature>
       </>
     );
   };
