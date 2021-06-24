@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import { styled } from '@linaria/react';
 import { unwrapResult } from '@reduxjs/toolkit';
-import { PublicKey, TransactionSignature } from '@solana/web3.js';
+import { TransactionSignature } from '@solana/web3.js';
 import classNames from 'classnames';
 import dayjs from 'dayjs';
 
@@ -112,7 +112,7 @@ const AddressValue = styled.div`
 
 type Props = {
   signature: TransactionSignature;
-  source: PublicKey;
+  source: string;
   close: () => void;
 };
 
@@ -145,7 +145,7 @@ export const TransactionDetailsModal: FC<Props> = ({ signature, source, close })
       return null;
     }
 
-    return transaction.details(transaction.short.destination?.equals(source));
+    return transaction.details(transaction.short.destination?.toBase58() === source);
   }, [transaction?.short.destination, tokenAccounts]);
 
   if (!details || !transaction) {

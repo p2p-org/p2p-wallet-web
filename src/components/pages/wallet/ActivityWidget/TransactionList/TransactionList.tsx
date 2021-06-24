@@ -2,7 +2,7 @@ import React, { FunctionComponent, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 
 import { styled } from '@linaria/react';
-import { PublicKey, TransactionSignature } from '@solana/web3.js';
+import { TransactionSignature } from '@solana/web3.js';
 import dayjs from 'dayjs';
 
 import { Transaction } from 'api/transaction/Transaction';
@@ -57,7 +57,7 @@ const renderDate = (currentDate: string | null, dates: Dates) => {
 
 type Props = {
   order?: TransactionSignature[];
-  source: PublicKey;
+  source: string;
 };
 
 export const TransactionList: FunctionComponent<Props> = ({ order, source }) => {

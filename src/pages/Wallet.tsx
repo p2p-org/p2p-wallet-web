@@ -3,22 +3,21 @@ import { useSelector } from 'react-redux';
 import { useLocation } from 'react-router';
 import { useParams } from 'react-router-dom';
 
-import * as web3 from '@solana/web3.js';
+import { PublicKey } from '@solana/web3.js';
 
 import { TokenAccount } from 'api/token/TokenAccount';
 import { Layout } from 'components/common/Layout';
 import { QRAddressWidget } from 'components/common/QRAddressWidget';
 import { ActivityWidget, TopWidget } from 'components/pages/wallet';
-import { RootState } from 'store/rootReducer';
 import { trackEvent } from 'utils/analytics';
 import { shortAddress } from 'utils/tokens';
 
-export const Wallet: FunctionComponent = () => {
+export const WalletOrigin: FunctionComponent = () => {
   const location = useLocation();
   const { publicKey } = useParams<{ publicKey: string }>();
-  const tokenPublicKey = new web3.PublicKey(publicKey);
+  const tokenPublicKey = new PublicKey(publicKey);
 
-  const tokenAccounts = useSelector((state: RootState) =>
+  const tokenAccounts = useSelector((state) =>
     state.wallet.tokenAccounts.map((account) => TokenAccount.from(account)),
   );
   const tokenAccount = useMemo(
@@ -45,11 +44,13 @@ export const Wallet: FunctionComponent = () => {
       }}
       rightColumn={
         <>
-          <TopWidget publicKey={tokenPublicKey} />
-          <QRAddressWidget publicKey={tokenPublicKey} />
-          <ActivityWidget publicKey={tokenPublicKey} />
+          <TopWidget publicKey={publicKey} />
+          <QRAddressWidget publicKey={publicKey} />
+          <ActivityWidget publicKey={publicKey} />
         </>
       }
     />
   );
 };
+
+export const Wallet = React.memo(WalletOrigin);

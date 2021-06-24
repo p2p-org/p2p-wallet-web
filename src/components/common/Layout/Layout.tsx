@@ -80,7 +80,7 @@ type Props = {
   centered?: React.ReactNode;
 };
 
-export const Layout: FunctionComponent<Props> = ({
+export const LayoutOrigin: FunctionComponent<Props> = ({
   breadcrumb,
   leftColumn,
   rightColumn,
@@ -145,3 +145,5 @@ export const Layout: FunctionComponent<Props> = ({
     </>
   );
 };
+
+export const Layout = React.memo(LayoutOrigin);

@@ -3,19 +3,17 @@ import { useDispatch } from 'react-redux';
 import { Link } from 'react-router-dom';
 
 import { styled } from '@linaria/react';
-import { PublicKey } from '@solana/web3.js';
 import classNames from 'classnames';
 import { rgba } from 'polished';
 
 import { Transaction } from 'api/transaction/Transaction';
+import { AmountUSD } from 'components/common/AmountUSD';
 import { TokenAvatar } from 'components/common/TokenAvatar';
 import { Icon } from 'components/ui';
 import { openModal } from 'store/actions/modals';
 import { SHOW_MODAL_TRANSACTION_DETAILS } from 'store/constants/modalTypes';
 import { trackEvent } from 'utils/analytics';
 import { shortAddress } from 'utils/tokens';
-
-import { AmountUSD } from '../../../../common/AmountUSD';
 
 const Wrapper = styled.div`
   position: relative;
@@ -137,12 +135,12 @@ const LinkStyled = styled(Link)`
 
 type Props = {
   transaction: Transaction;
-  source: PublicKey;
+  source: string;
 };
 
 export const TransactionRow: FunctionComponent<Props> = ({ transaction, source }) => {
   const dispatch = useDispatch();
-  const details = transaction.details(transaction.short.destination?.equals(source));
+  const details = transaction.details(transaction.short.destination?.toBase58() === source);
 
   const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (['A', 'IMG'].includes((e.target as HTMLElement).tagName)) {

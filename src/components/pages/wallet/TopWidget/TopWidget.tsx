@@ -4,7 +4,7 @@ import { useLocation } from 'react-router';
 import { Link } from 'react-router-dom';
 
 import { styled } from '@linaria/react';
-import { PublicKey, SystemProgram } from '@solana/web3.js';
+import { SystemProgram } from '@solana/web3.js';
 import classNames from 'classnames';
 import throttle from 'lodash.throttle';
 
@@ -169,10 +169,10 @@ const TokenSettingsIcon = styled(Icon)`
 `;
 
 type Props = {
-  publicKey: PublicKey;
+  publicKey: string;
 };
 
-export const TopWidget: FunctionComponent<Props> = ({ publicKey }) => {
+export const TopWidgetOrigin: FunctionComponent<Props> = ({ publicKey }) => {
   const dispatch = useDispatch();
   const location = useLocation();
   const widgetRef = useRef<HTMLDivElement>(null);
@@ -184,7 +184,7 @@ export const TopWidget: FunctionComponent<Props> = ({ publicKey }) => {
     state.wallet.tokenAccounts.map((account) => TokenAccount.from(account)),
   );
   const tokenAccount = useMemo(
-    () => tokenAccounts.find((account) => account.address.equals(publicKey)),
+    () => tokenAccounts.find((account) => account.address.toBase58() === publicKey),
     [tokenAccounts, publicKey],
   );
   const rate = useSelector(rateSelector(tokenAccount?.mint.symbol));
@@ -254,7 +254,7 @@ export const TopWidget: FunctionComponent<Props> = ({ publicKey }) => {
         {/*  </ButtonStyled> */}
         {/* </Link> */}
         <Link
-          to={{ pathname: `/send/${publicKey.toBase58()}`, state: { fromPage: location.pathname } }}
+          to={{ pathname: `/send/${publicKey}`, state: { fromPage: location.pathname } }}
           title="Send"
           onClick={() => trackEvent('wallet_send_click')}
           className="button">
@@ -263,7 +263,7 @@ export const TopWidget: FunctionComponent<Props> = ({ publicKey }) => {
           </ButtonStyled>
         </Link>
         <Link
-          to={{ pathname: `/swap/${publicKey.toBase58()}`, state: { fromPage: location.pathname } }}
+          to={{ pathname: `/swap/${publicKey}`, state: { fromPage: location.pathname } }}
           title="Swap"
           onClick={() => trackEvent('wallet_swap_click')}
           className="button">
@@ -353,7 +353,7 @@ export const TopWidget: FunctionComponent<Props> = ({ publicKey }) => {
                 <TokenSettings>
                   <Link
                     to={{
-                      pathname: `/wallet/${publicKey.toBase58()}/settings`,
+                      pathname: `/wallet/${publicKey}/settings`,
                       state: { fromPage: location.pathname },
                     }}
                     title="Settings"
@@ -383,3 +383,5 @@ export const TopWidget: FunctionComponent<Props> = ({ publicKey }) => {
     </>
   );
 };
+
+export const TopWidget = React.memo(TopWidgetOrigin);

@@ -2,7 +2,6 @@ import React, { FunctionComponent, useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 
 import { styled } from '@linaria/react';
-import * as web3 from '@solana/web3.js';
 import classNames from 'classnames';
 import { rgba } from 'polished';
 import QRCode from 'qrcode.react';
@@ -223,11 +222,11 @@ const Footer = styled.div`
 `;
 
 type Props = {
-  publicKey: web3.PublicKey;
+  publicKey: string;
   className?: string;
 };
 
-export const QRAddressWidget: FunctionComponent<Props> = ({ publicKey, className }) => {
+export const QRAddressWidgetOrigin: FunctionComponent<Props> = ({ publicKey, className }) => {
   const [copied, setCopied] = useState(false);
   const [isExpand, setIsExpand] = useState(false);
   const [isShowDetails, setIsShowDetails] = useState(false);
@@ -238,7 +237,7 @@ export const QRAddressWidget: FunctionComponent<Props> = ({ publicKey, className
 
   const tokenAccounts = useSelector((state) => state.wallet.tokenAccounts);
   const tokenAccount = useMemo(() => {
-    const foundToken = tokenAccounts.find((account) => account.address === publicKey.toBase58());
+    const foundToken = tokenAccounts.find((account) => account.address === publicKey);
     return foundToken && TokenAccount.from(foundToken);
   }, [tokenAccounts, publicKey]);
   const solAccount = useMemo(() => {
@@ -394,3 +393,5 @@ export const QRAddressWidget: FunctionComponent<Props> = ({ publicKey, className
     </WrapperCard>
   );
 };
+
+export const QRAddressWidget = React.memo(QRAddressWidgetOrigin);

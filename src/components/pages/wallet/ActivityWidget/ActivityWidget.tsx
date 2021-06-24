@@ -3,8 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import { styled } from '@linaria/react';
 import { unwrapResult } from '@reduxjs/toolkit';
-import * as web3 from '@solana/web3.js';
-import { ConfirmedSignaturesForAddress2Options } from '@solana/web3.js';
+import { ConfirmedSignaturesForAddress2Options, PublicKey } from '@solana/web3.js';
 import { last } from 'ramda';
 
 import { Empty } from 'components/common/Empty';
@@ -13,7 +12,6 @@ import { LoaderBlock } from 'components/common/LoaderBlock';
 import { ToastManager } from 'components/common/ToastManager';
 import { Widget } from 'components/common/Widget';
 import { TransactionList } from 'components/pages/wallet/ActivityWidget/TransactionList';
-import { RootState } from 'store/rootReducer';
 import { getTransactions } from 'store/slices/transaction/TransactionSlice';
 import { trackEvent } from 'utils/analytics';
 
@@ -22,14 +20,14 @@ const WrapperWidget = styled(Widget)``;
 const LIMIT = 10;
 
 type Props = {
-  publicKey: web3.PublicKey;
+  publicKey: string;
 };
 
 export const ActivityWidget: FunctionComponent<Props> = ({ publicKey }) => {
   const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(false);
   const [isEnd, setIsEnd] = useState(false);
-  const order = useSelector((state: RootState) => state.transaction.order[publicKey.toBase58()]);
+  const order = useSelector((state) => state.transaction.order[publicKey]);
 
   useEffect(() => {
     if (order?.length) {
@@ -38,17 +36,19 @@ export const ActivityWidget: FunctionComponent<Props> = ({ publicKey }) => {
   }, [order]);
 
   const fetchData = async (isPaging?: boolean) => {
-    const options: ConfirmedSignaturesForAddress2Options = {
-      limit: LIMIT,
-    };
-
-    if (isPaging) {
-      options.before = order ? last(order) : undefined;
-    }
-
     setIsLoading(true);
     try {
-      const result = unwrapResult(await dispatch(getTransactions({ publicKey, options })));
+      const options: ConfirmedSignaturesForAddress2Options = {
+        limit: LIMIT,
+      };
+
+      if (isPaging) {
+        options.before = order ? last(order) : undefined;
+      }
+
+      const result = unwrapResult(
+        await dispatch(getTransactions({ publicKey: new PublicKey(publicKey), options })),
+      );
 
       if (result.length === 0) {
         setIsEnd(true);
