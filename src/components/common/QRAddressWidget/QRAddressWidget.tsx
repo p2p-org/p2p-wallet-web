@@ -367,7 +367,8 @@ export const QRAddressWidgetOrigin: FunctionComponent<Props> = ({ publicKey, cla
               <DetailRow>
                 <FieldGroup>
                   <FieldTitle>{tokenAccount.mint.symbol} Mint Address</FieldTitle>
-                  <FieldValue onClick={handleCopyClick('mint', tokenAccount.address.toBase58())}>
+                  <FieldValue
+                    onClick={handleCopyClick('mint', tokenAccount.mint.address.toBase58())}>
                     {tokenAccount.mint.address.toBase58()}
                   </FieldValue>
                 </FieldGroup>
