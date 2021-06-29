@@ -319,8 +319,8 @@ export const SwapWidget: FunctionComponent = () => {
       const action = executeSwap();
 
       trackEvent('swap_swap_click', {
-        tokenTickerA: firstToken?.symbol || '',
-        tokenTickerB: secondToken?.symbol || '',
+        tokenA: firstToken?.symbol || '',
+        tokenB: secondToken?.symbol || '',
         sumA: firstAmount,
         sumB: secondAmount,
       });

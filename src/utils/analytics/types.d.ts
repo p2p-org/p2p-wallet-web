@@ -189,7 +189,7 @@ export type TrackEventType = {
   // Пользователь нажимает "Swap Now"
   (
     event: 'swap_swap_click',
-    data: { tokenTickerA: string; tokenTickerB: string; sumA: number; sumB: number },
+    data: { tokenA: string; tokenB: string; sumA: number; sumB: number },
   ): void;
   // Пользователь нажимает "Close"
   (event: 'swap_close_click', data: { transactionConfirmed: boolean }): void;
