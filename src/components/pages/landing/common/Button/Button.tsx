@@ -85,15 +85,17 @@ const Text = styled.div`
 
 type ButtonProps = {
   glow?: boolean;
+  green?: boolean;
 };
 
 export const ButtonWeb: FC<ButtonProps & HTMLAttributes<HTMLElement>> = ({
   glow,
+  green,
   className,
   ...props
 }) => {
   return (
-    <ButtonLink to="/signup" className={classNames(className, { glow })} {...props}>
+    <ButtonLink to="/signup" className={classNames(className, { glow, green })} {...props}>
       <Text className="web">Go to web wallet</Text>
     </ButtonLink>
   );

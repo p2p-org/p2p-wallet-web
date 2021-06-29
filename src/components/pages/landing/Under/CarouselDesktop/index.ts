@@ -1,0 +1,1 @@
+export { CarouselDesktop } from './CarouselDesktop';

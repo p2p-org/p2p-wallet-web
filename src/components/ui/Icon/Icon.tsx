@@ -15,6 +15,7 @@ import change from './assets/change-icon.svg';
 import checkmark from './assets/checkmark-icon.svg';
 import chevron1 from './assets/chevron-1-icon.svg';
 import chevron from './assets/chevron-icon.svg';
+import chevronRounded from './assets/chevron-rounded-icon.svg';
 import clock from './assets/clock-icon.svg';
 import close from './assets/close-icon.svg';
 import copy from './assets/copy-icon.svg';
@@ -57,6 +58,7 @@ const iconsMap = new Map<string, string>([
   ['checkmark', checkmark],
   ['chevron-1', chevron1],
   ['chevron', chevron],
+  ['chevron-rounded', chevronRounded],
   ['close', close],
   ['copy', copy],
   ['currency', currency],

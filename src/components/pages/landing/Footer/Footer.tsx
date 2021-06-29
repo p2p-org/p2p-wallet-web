@@ -146,7 +146,7 @@ const MiddleContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 32px 50px 80px;
+  padding: 32px 50px;
 
   ${up.mobileLandscape} {
     padding: 56px 103px 78px;
@@ -169,13 +169,13 @@ const LogoWrapper = styled.div`
   align-items: center;
   height: 34px;
 
-  ${up.tablet} {
-    margin-right: 146px;
-  }
-
-  ${up.desktop} {
-    margin-right: 264px;
-  }
+  // ${up.tablet} {
+  //   margin-right: 146px;
+  // }
+  //
+  // ${up.desktop} {
+  //   margin-right: 264px;
+  // }
 `;
 
 const LogoP2P = styled.div`
@@ -202,48 +202,48 @@ const Wallet = styled.div`
   line-height: 140%;
 `;
 
-const ColumnsWrapper = styled.div`
-  display: flex;
-  margin-top: 56px;
-
-  ${up.mobileLandscape} {
-    flex-direction: column;
-    align-items: center;
-
-    margin-top: 20px;
-  }
-
-  ${up.tablet} {
-    flex-direction: row;
-    align-items: initial;
-
-    margin-top: 0;
-  }
-`;
-
-const Column = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-
-  & > :not(:last-child) {
-    margin-bottom: 30px;
-  }
-
-  ${up.mobileLandscape} {
-    margin-top: 100px;
-  }
-
-  ${up.tablet} {
-    align-items: initial;
-
-    margin-top: 0;
-
-    &:not(:last-child) {
-      margin-right: 143px;
-    }
-  }
-`;
+// const ColumnsWrapper = styled.div`
+//   display: flex;
+//   margin-top: 56px;
+//
+//   ${up.mobileLandscape} {
+//     flex-direction: column;
+//     align-items: center;
+//
+//     margin-top: 20px;
+//   }
+//
+//   ${up.tablet} {
+//     flex-direction: row;
+//     align-items: initial;
+//
+//     margin-top: 0;
+//   }
+// `;
+//
+// const Column = styled.div`
+//   display: flex;
+//   flex-direction: column;
+//   align-items: center;
+//
+//   & > :not(:last-child) {
+//     margin-bottom: 30px;
+//   }
+//
+//   ${up.mobileLandscape} {
+//     margin-top: 100px;
+//   }
+//
+//   ${up.tablet} {
+//     align-items: initial;
+//
+//     margin-top: 0;
+//
+//     &:not(:last-child) {
+//       margin-right: 143px;
+//     }
+//   }
+// `;
 
 // const AdditionalColumn = styled.div`
 //   display: flex;
@@ -265,48 +265,48 @@ const Column = styled.div`
 //   }
 // `;
 
-const ColumnLink = styled.a`
-  display: flex;
-  align-items: center;
-  height: 22px;
-
-  color: #fff;
-  font-weight: 500;
-  font-size: 20px;
-  font-family: 'Aktiv Grotesk Corp', sans-serif;
-  line-height: 140%;
-  text-decoration: none;
-
-  ${up.mobileLandscape} {
-    font-size: 24px;
-    line-height: 140%;
-  }
-
-  ${up.tablet} {
-    font-size: 16px;
-    line-height: 140%;
-  }
-
-  &.gray {
-    color: rgba(255, 255, 255, 0.3);
-  }
-
-  &.twitter {
-    height: 34px;
-    padding-left: 40px;
-
-    background: url('./twitter.png') no-repeat 0 50%;
-    background-size: 24px;
-  }
-
-  &.github {
-    height: 34px;
-    padding-left: 40px;
-
-    background: url('./github.png') no-repeat 0 50%;
-    background-size: 24px;
-  }
-`;
+// const ColumnLink = styled.a`
+//   display: flex;
+//   align-items: center;
+//   height: 22px;
+//
+//   color: #fff;
+//   font-weight: 500;
+//   font-size: 20px;
+//   font-family: 'Aktiv Grotesk Corp', sans-serif;
+//   line-height: 140%;
+//   text-decoration: none;
+//
+//   ${up.mobileLandscape} {
+//     font-size: 24px;
+//     line-height: 140%;
+//   }
+//
+//   ${up.tablet} {
+//     font-size: 16px;
+//     line-height: 140%;
+//   }
+//
+//   &.gray {
+//     color: rgba(255, 255, 255, 0.3);
+//   }
+//
+//   &.twitter {
+//     height: 34px;
+//     padding-left: 40px;
+//
+//     background: url('./twitter.png') no-repeat 0 50%;
+//     background-size: 24px;
+//   }
+//
+//   &.github {
+//     height: 34px;
+//     padding-left: 40px;
+//
+//     background: url('./github.png') no-repeat 0 50%;
+//     background-size: 24px;
+//   }
+// `;
 
 const Bottom = styled.div`
   display: flex;
@@ -365,44 +365,44 @@ export const Footer: FC = () => {
                 <DelimiterLogo />
                 <Wallet>Wallet</Wallet>
               </LogoWrapper>
-              <ColumnsWrapper>
-                <Column>
-                  <ColumnLink href="#">Explore</ColumnLink>
-                  <ColumnLink href="#">About</ColumnLink>
-                  <ColumnLink href="#">Recent Updates</ColumnLink>
-                  <ColumnLink href="#">FAQ</ColumnLink>
-                </Column>
-                {/* {isDesktop ? ( */}
-                {/*  <Column> */}
-                {/*    <ColumnLink href="#" className="gray"> */}
-                {/*      wallet@p2p.org */}
-                {/*    </ColumnLink> */}
-                {/*    <ColumnLink href="#" className="gray"> */}
-                {/*      t.me/p2p.org */}
-                {/*    </ColumnLink> */}
-                {/*  </Column> */}
-                {/* ) : undefined} */}
-                {/* {isMobileLandscape ? ( */}
-                {/*  <Column> */}
-                {/*    <ColumnLink href="#" className="gray twitter"> */}
-                {/*      @p2pwallet */}
-                {/*    </ColumnLink> */}
-                {/*    <ColumnLink href="#" className="gray github"> */}
-                {/*      @p2pwallet */}
-                {/*    </ColumnLink> */}
-                {/*    {!isDesktop && isTablet ? ( */}
-                {/*      <> */}
-                {/*        <ColumnLink href="#" className="gray"> */}
-                {/*          wallet@p2p.org */}
-                {/*        </ColumnLink> */}
-                {/*        <ColumnLink href="#" className="gray"> */}
-                {/*          t.me/p2p.org */}
-                {/*        </ColumnLink> */}
-                {/*      </> */}
-                {/*    ) : undefined} */}
-                {/*  </Column> */}
-                {/* ) : undefined} */}
-              </ColumnsWrapper>
+              {/* <ColumnsWrapper> */}
+              {/* <Column> */}
+              {/*  <ColumnLink href="#">Explore</ColumnLink> */}
+              {/*  <ColumnLink href="#">About</ColumnLink> */}
+              {/*  <ColumnLink href="#">Recent Updates</ColumnLink> */}
+              {/*  <ColumnLink href="#">FAQ</ColumnLink> */}
+              {/* </Column> */}
+              {/* {isDesktop ? ( */}
+              {/*  <Column> */}
+              {/*    <ColumnLink href="#" className="gray"> */}
+              {/*      wallet@p2p.org */}
+              {/*    </ColumnLink> */}
+              {/*    <ColumnLink href="#" className="gray"> */}
+              {/*      t.me/p2p.org */}
+              {/*    </ColumnLink> */}
+              {/*  </Column> */}
+              {/* ) : undefined} */}
+              {/* {isMobileLandscape ? ( */}
+              {/*  <Column> */}
+              {/*    <ColumnLink href="#" className="gray twitter"> */}
+              {/*      @p2pwallet */}
+              {/*    </ColumnLink> */}
+              {/*    <ColumnLink href="#" className="gray github"> */}
+              {/*      @p2pwallet */}
+              {/*    </ColumnLink> */}
+              {/*    {!isDesktop && isTablet ? ( */}
+              {/*      <> */}
+              {/*        <ColumnLink href="#" className="gray"> */}
+              {/*          wallet@p2p.org */}
+              {/*        </ColumnLink> */}
+              {/*        <ColumnLink href="#" className="gray"> */}
+              {/*          t.me/p2p.org */}
+              {/*        </ColumnLink> */}
+              {/*      </> */}
+              {/*    ) : undefined} */}
+              {/*  </Column> */}
+              {/* ) : undefined} */}
+              {/* </ColumnsWrapper> */}
             </MiddleContainer>
           </Middle>
           {/* {!isMobileLandscape ? ( */}

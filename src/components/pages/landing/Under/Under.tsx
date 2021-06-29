@@ -2,10 +2,12 @@ import React, { FC } from 'react';
 
 import { styled } from '@linaria/react';
 
-import { ButtonIOS } from 'components/pages/landing/common/Button/Button';
+import { ButtonIOS, ButtonWeb } from 'components/pages/landing/common/Button/Button';
+import { CarouselMobile } from 'components/pages/landing/Under/CarouselMobile';
 import { trackEvent } from 'utils/analytics';
 
-import { up } from '../styles/breakpoints';
+import { up, useBreakpoint } from '../styles/breakpoints';
+import { CarouselDesktop } from './CarouselDesktop';
 
 const Wrapper = styled.div`
   position: relative;
@@ -87,108 +89,21 @@ const Bold = styled.span`
   }
 `;
 
-const Middle = styled.div`
-  position: relative;
-  z-index: 1;
-
-  display: flex;
-  padding: 64px 40px;
-
-  overflow-x: auto;
-
-  filter: drop-shadow(0 40px 100px rgba(0, 0, 0, 0.15));
-
-  &::-webkit-scrollbar {
-    display: none;
-  }
-
-  &::-webkit-scrollbar-track {
-    background: none;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background: none;
-  }
+const CarouselWrapper = styled.div`
+  padding: 64px 0;
 
   ${up.mobileLandscape} {
-    padding: 80px 40px 53px;
+    padding: 80px 0 53px;
   }
 
   ${up.tablet} {
-    padding: 77px 80px 53px;
+    display: flex;
+    justify-content: center;
+    padding: 77px 0 80px;
   }
 
   ${up.desktop} {
-    padding: 77px 80px 100px;
-  }
-`;
-
-const Container = styled.div`
-  display: flex;
-  padding-right: 50px;
-`;
-
-const SlideImage = styled.div`
-  width: 295px;
-  height: 188px;
-
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: 295px 188px;
-
-  &.one {
-    background-image: url('./screen-1-mobile.png');
-
-    ${up.mobileLandscape} {
-      width: 488px;
-      height: 312px;
-
-      background-image: url('./screen-1-mobile-landscape.png');
-    }
-
-    ${up.tablet} {
-      width: 865px;
-      height: 556px;
-
-      background-image: url('./screen-1-tablet.png');
-      background-size: 865px 556px;
-    }
-
-    ${up.desktop} {
-      width: 1136px;
-      height: 730px;
-
-      background-image: url('./screen-1-desktop.png');
-      background-size: 1136px 730px;
-    }
-  }
-
-  &:not(:last-child) {
-    margin-right: 16px;
-  }
-
-  ${up.mobileLandscape} {
-    width: 488px;
-    height: 312px;
-
-    background-size: 488px 312px;
-
-    &:not(:last-child) {
-      margin-right: 20px;
-    }
-  }
-
-  ${up.tablet} {
-    width: 865px;
-    height: 556px;
-
-    background-size: 865px 556px;
-
-    /*
-    &:not(:last-child) {
-      margin-right: 0;
-    }
-     */
+    padding: 77px 0 100px;
   }
 `;
 
@@ -217,6 +132,8 @@ const Hint = styled.div`
 `;
 
 export const Under: FC = () => {
+  const isTablet = useBreakpoint(up.tablet);
+
   return (
     <Wrapper>
       <Top>
@@ -224,15 +141,13 @@ export const Under: FC = () => {
           A sneak peek of what we have <Bold>under the hood</Bold>
         </Title>
       </Top>
-      <Middle>
-        <Container>
-          <SlideImage className="one" />
-          <SlideImage className="one" />
-          <SlideImage className="one" />
-        </Container>
-      </Middle>
+      <CarouselWrapper>{isTablet ? <CarouselDesktop /> : <CarouselMobile />}</CarouselWrapper>
       <Bottom>
-        <ButtonIOS onClick={() => trackEvent('landing_download_for_ios_3_click')} />
+        {isTablet ? (
+          <ButtonWeb green />
+        ) : (
+          <ButtonIOS onClick={() => trackEvent('landing_download_for_ios_3_click')} />
+        )}
         <Hint>Will take less than a 2 min.</Hint>
       </Bottom>
     </Wrapper>
