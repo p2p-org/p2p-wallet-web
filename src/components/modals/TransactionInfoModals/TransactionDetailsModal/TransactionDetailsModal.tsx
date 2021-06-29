@@ -7,6 +7,7 @@ import { TransactionSignature } from '@solana/web3.js';
 import classNames from 'classnames';
 import dayjs from 'dayjs';
 
+import { KNOWN_FEE_PAYER_PUBKEYS } from 'api/feeRelayer';
 import { Transaction } from 'api/transaction/Transaction';
 import { AmountUSD } from 'components/common/AmountUSD';
 import { TokenAvatar } from 'components/common/TokenAvatar';
@@ -110,6 +111,21 @@ const AddressValue = styled.div`
   line-height: 16px;
 `;
 
+const FieldTitleWrapper = styled.div`
+  display: flex;
+  justify-content: space-between;
+`;
+
+const PaidByBadge = styled.div`
+  padding: 1px 8px;
+  color: #5887ff;
+  font-weight: 600;
+  font-size: 12px;
+
+  background: #eff3ff;
+  border-radius: 4px;
+`;
+
 type Props = {
   signature: TransactionSignature;
   source: string;
@@ -151,6 +167,10 @@ export const TransactionDetailsModal: FC<Props> = ({ signature, source, close })
   if (!details || !transaction) {
     return null;
   }
+
+  const isShowFeeBadge =
+    details.type === 'transfer' &&
+    KNOWN_FEE_PAYER_PUBKEYS.has(transaction.message.accountKeys[0].pubkey.toBase58());
 
   const handleToggleShowDetailsClick = () => {
     setShowDetails((state) => !state);
@@ -320,7 +340,10 @@ export const TransactionDetailsModal: FC<Props> = ({ signature, source, close })
               </FieldWrapper>
               {transaction.meta ? (
                 <FieldWrapper>
-                  <FieldTitle>Transaction fee</FieldTitle>
+                  <FieldTitleWrapper>
+                    <FieldTitle>Transaction fee</FieldTitle>
+                    {isShowFeeBadge ? <PaidByBadge>Paid by p2p.org</PaidByBadge> : undefined}
+                  </FieldTitleWrapper>
                   <FieldValue>{transaction.meta.fee} lamports</FieldValue>
                 </FieldWrapper>
               ) : null}
