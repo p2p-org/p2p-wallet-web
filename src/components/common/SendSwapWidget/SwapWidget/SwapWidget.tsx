@@ -155,6 +155,8 @@ const PoweredBy = styled.div`
 `;
 
 const UPDATE_POOLS_INTERVAL = 5000;
+// fee payer, authority, wSol account
+const SIGNATURES_COUNT = 3;
 
 const formatFee = (amount: number): number =>
   new Decimal(amount)
@@ -197,6 +199,7 @@ export const SwapWidget: FunctionComponent = () => {
   const [isExecuting, setIsExecuting] = useState(false);
   const [isReverseRate, setIsReverseRate] = useState(false);
   const [rentFee, setRentFee] = useState(0);
+  const [lamportsPerSignature, setLamportsPerSignature] = useState(0);
   const [txFee, setTxFee] = useState(0);
   const availableTokens = useSelector((state) =>
     state.global.availableTokens.map((token) => Token.from(token)),
@@ -240,7 +243,9 @@ export const SwapWidget: FunctionComponent = () => {
         const resultRecentBlockhash = unwrapResult(await dispatch(getRecentBlockhash()));
 
         setRentFee(formatFee(resultRentFee));
-        setTxFee(formatFee(resultRecentBlockhash.feeCalculator.lamportsPerSignature));
+        setLamportsPerSignature(
+          formatFee(resultRecentBlockhash.feeCalculator.lamportsPerSignature),
+        );
       } catch (error) {
         console.log(error);
       }
@@ -248,6 +253,15 @@ export const SwapWidget: FunctionComponent = () => {
 
     void mount();
   }, []);
+
+  useEffect(() => {
+    setTxFee(
+      new Decimal(lamportsPerSignature)
+        .mul(isNil(secondTokenAccount) ? SIGNATURES_COUNT + 1 /* new account */ : SIGNATURES_COUNT)
+        .toDecimalPlaces(6)
+        .toNumber(),
+    );
+  }, [lamportsPerSignature, secondTokenAccount]);
 
   const firstTokenAccounts = useMemo(() => {
     return tokenAccounts.filter(isInPoolsTokenAccounts(availablePools));
