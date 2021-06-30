@@ -387,7 +387,7 @@ export const YouCan: FC<Props> = ({ children }) => {
   return (
     <Wrapper>
       <Top>
-        <Title>Imagine if you can send USD, BTC or ETH without fees in few seconds?</Title>
+        <Title>Imagine if you can send USD, BTC or ETH without fees in just a few seconds?</Title>
         <Hint>
           We have it! <TitleBold>BTC</TitleBold>, <TitleBold>ETH</TitleBold> and{' '}
           <TitleBold>30+</TitleBold> another tokens*
@@ -398,16 +398,16 @@ export const YouCan: FC<Props> = ({ children }) => {
           <TextWrapper>
             <TextContent>
               <TextTitle>
-                You can send fast and with no fees a <TextTitleBold>lot of tokens</TextTitleBold>
+                You can send a <TextTitleBold>lot of tokens</TextTitleBold> fast and with no fees
               </TextTitle>
               <Text>
                 Doesn’t matter what token you want to send. {!isDesktop ? <br /> : undefined}
                 <TextBold>The speed is stable for all of them!</TextBold>
                 <br />
                 <br />
-                Solana blokchain contains many tokens. Its native and wrapped by different
-                technologies. Such as FTX, Sollet etc. It’s allows us to keep the speed and no-fees
-                in front of all.
+                Solana blockchain contains many tokens. It’s native and wrapped by different
+                technologies such as FTX, Sollet etc. It allows us to keep the speed and no-fees in
+                front of others .
               </Text>
               {/* <LearnMoreLink> */}
               {/*  Learn more about Wrapped Tokens {isMobileLandscape ? <Arrow /> : undefined} */}

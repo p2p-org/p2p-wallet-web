@@ -192,7 +192,7 @@ export const Features: FC = () => {
               <FeatureTitle>It’s cross-platform</FeatureTitle>
               <FeatureDescription>
                 You can use your P2P Wallet everywhere. iOs, Web, Android (soon). Yes, yes., we
-                know, it shouldn’t be a feature, but market shows different...
+                know, it shouldn’t be a feature, but the market shows different...
               </FeatureDescription>
             </Feature>
             <Feature>
@@ -215,13 +215,13 @@ export const Features: FC = () => {
             <Feature>
               <FeatureTitle>It’s designed for people</FeatureTitle>
               <FeatureDescription>
-                It’s simple and intuitive interface inside. Everything under your fingertips.
+                It’s simple with an intuitive interface inside. Everything under your fingertips.
               </FeatureDescription>
             </Feature>
             <Feature>
               <FeatureTitle>No registration or account setup...</FeatureTitle>
               <FeatureDescription>
-                ...actually, it’s up to you. There can be some cool experience with that
+                ...actually, it’s up to you. There can be some cool experiences with that
                 functionality.
               </FeatureDescription>
             </Feature>

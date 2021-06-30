@@ -148,11 +148,11 @@ export const Top: FC = () => {
     <Wrapper>
       <Logo />
       <Title>
-        Wallet with super-speed and <TitleGreen>free transactions</TitleGreen>
+        A wallet with super-speed and <TitleGreen>free transactions</TitleGreen>
       </Title>
       <Description>
-        <Description className="line-through">One more</Description> First ever wallet where you can
-        send money with free transactions and without hidden fees.{' '}
+        <Description className="line-through">One more</Description> The first ever wallet where you
+        can send money with free transactions and without hidden fees.{' '}
       </Description>
       <ButtonsWrapper>
         {isTablet ? (

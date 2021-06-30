@@ -348,7 +348,7 @@ export const Footer: FC = () => {
       <FooterWrapper>
         <Top>
           <Logo />
-          <Title>Carefully crafted for people from people in- and around the world</Title>
+          <Title>Carefully crafted for people from people in and around the world</Title>
           <ButtonWrapper>
             {isTablet ? (
               <ButtonWeb glow onClick={() => trackEvent('landing_go_to_web_wallet_3_click')} />

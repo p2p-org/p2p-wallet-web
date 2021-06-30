@@ -555,12 +555,12 @@ export const Functions: FC = () => {
               <Title>
                 Send <TitleBold>USDC</TitleBold>, <TitleBold>BTC</TitleBold>,{' '}
                 <TitleBold>ETH</TitleBold>, and other tokens <TitleBold>in a seconds</TitleBold>{' '}
-                with <TitleBold>no fees</TitleBold>. By QR code or address right in your app or web
+                with <TitleBold>no fees</TitleBold>. Use QR code or address right in your app or web
                 wallet.
               </Title>
               <Description>
                 Solana has 400ms blocks and extremely low fees by design. Every transaction takes
-                less than a minute. We took all fees on us.
+                less than a minute. All the fees are on us.
               </Description>
             </TextContent>
           ) : undefined}
@@ -579,7 +579,7 @@ export const Functions: FC = () => {
           {activeSlide === 'swap' ? (
             <TextContent>
               <Title>
-                Exchange crypto using advantages of DeFi Solutions with a{' '}
+                Exchange crypto using the advantages of DeFi Solutions with a{' '}
                 <TitleBold>high speed</TitleBold> of centralized exchanges.{' '}
                 <TitleBold>No signup required.</TitleBold> Exchange in a few seconds. Sophisticated
                 UI/UX.

@@ -138,7 +138,7 @@ export const Under: FC = () => {
     <Wrapper>
       <Top>
         <Title>
-          A sneak peek of what we have <Bold>under the hood</Bold>
+          Here’s a sneak peek of what we have <Bold>under the hood</Bold>
         </Title>
       </Top>
       <CarouselWrapper>{isTablet ? <CarouselDesktop /> : <CarouselMobile />}</CarouselWrapper>
