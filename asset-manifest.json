@@ -1,8 +1,8 @@
 {
   "files": {
-    "main.css": "https://p2p-org.github.io/p2p-wallet-web/static/css/main.94ed25b1.chunk.css",
-    "main.js": "https://p2p-org.github.io/p2p-wallet-web/static/js/main.711a960d.chunk.js",
-    "main.js.map": "https://p2p-org.github.io/p2p-wallet-web/static/js/main.711a960d.chunk.js.map",
+    "main.css": "https://p2p-org.github.io/p2p-wallet-web/static/css/main.1138c80c.chunk.css",
+    "main.js": "https://p2p-org.github.io/p2p-wallet-web/static/js/main.7ca294af.chunk.js",
+    "main.js.map": "https://p2p-org.github.io/p2p-wallet-web/static/js/main.7ca294af.chunk.js.map",
     "runtime-main.js": "https://p2p-org.github.io/p2p-wallet-web/static/js/runtime-main.5613bc1f.js",
     "runtime-main.js.map": "https://p2p-org.github.io/p2p-wallet-web/static/js/runtime-main.5613bc1f.js.map",
     "static/css/2.8f976517.chunk.css": "https://p2p-org.github.io/p2p-wallet-web/static/css/2.8f976517.chunk.css",
@@ -34,7 +34,7 @@
     "static/css/6.5a0dc4f9.chunk.css.map": "https://p2p-org.github.io/p2p-wallet-web/static/css/6.5a0dc4f9.chunk.css.map",
     "static/css/7.b441e6a9.chunk.css.map": "https://p2p-org.github.io/p2p-wallet-web/static/css/7.b441e6a9.chunk.css.map",
     "static/css/8.4b063de3.chunk.css.map": "https://p2p-org.github.io/p2p-wallet-web/static/css/8.4b063de3.chunk.css.map",
-    "static/css/main.94ed25b1.chunk.css.map": "https://p2p-org.github.io/p2p-wallet-web/static/css/main.94ed25b1.chunk.css.map",
+    "static/css/main.1138c80c.chunk.css.map": "https://p2p-org.github.io/p2p-wallet-web/static/css/main.1138c80c.chunk.css.map",
     "static/js/2.e0bfa720.chunk.js.LICENSE.txt": "https://p2p-org.github.io/p2p-wallet-web/static/js/2.e0bfa720.chunk.js.LICENSE.txt",
     "static/media/Landing.linaria.css": "https://p2p-org.github.io/p2p-wallet-web/static/media/GT-Super-Text-Bold.24a70721.woff2",
     "static/media/Download.linaria.css": "https://p2p-org.github.io/p2p-wallet-web/static/media/big-logo.979c6ba7.png",
@@ -51,11 +51,11 @@
     "static/media/LoaderWide.linaria.css": "https://p2p-org.github.io/p2p-wallet-web/static/media/logo-loader.0831711f.svg",
     "static/media/Home.linaria.css": "https://p2p-org.github.io/p2p-wallet-web/static/media/logo.83fb5ddd.svg",
     "static/media/orca_logo.e3efb858.svg": "https://p2p-org.github.io/p2p-wallet-web/static/media/orca_logo.e3efb858.svg",
-    "static/media/screen-1-desktop.346e40a0.png": "https://p2p-org.github.io/p2p-wallet-web/static/media/screen-1-desktop.346e40a0.png",
-    "static/media/CarouselMobile.linaria.css": "https://p2p-org.github.io/p2p-wallet-web/static/media/screen-3-mobile.d02da983.png",
-    "static/media/screen-2-desktop.0c3e2580.png": "https://p2p-org.github.io/p2p-wallet-web/static/media/screen-2-desktop.0c3e2580.png",
+    "static/media/screen-1-desktop.dae88933.png": "https://p2p-org.github.io/p2p-wallet-web/static/media/screen-1-desktop.dae88933.png",
+    "static/media/CarouselMobile.linaria.css": "https://p2p-org.github.io/p2p-wallet-web/static/media/screen-3-mobile.7ae7114f.png",
+    "static/media/screen-2-desktop.3b07712a.png": "https://p2p-org.github.io/p2p-wallet-web/static/media/screen-2-desktop.3b07712a.png",
     "static/media/screen-3-desktop.04406f28.png": "https://p2p-org.github.io/p2p-wallet-web/static/media/screen-3-desktop.04406f28.png",
-    "static/media/screen-4-desktop.394c1f5f.png": "https://p2p-org.github.io/p2p-wallet-web/static/media/screen-4-desktop.394c1f5f.png",
+    "static/media/screen-4-desktop.23670a9c.png": "https://p2p-org.github.io/p2p-wallet-web/static/media/screen-4-desktop.23670a9c.png",
     "static/media/ResultWidget.linaria.css": "https://p2p-org.github.io/p2p-wallet-web/static/media/sun.4090a322.png",
     "static/media/TokenAvatar.linaria.css": "https://p2p-org.github.io/p2p-wallet-web/static/media/wrapped.3372a516.svg"
   },
@@ -63,7 +63,7 @@
     "static/js/runtime-main.5613bc1f.js",
     "static/css/2.8f976517.chunk.css",
     "static/js/2.e0bfa720.chunk.js",
-    "static/css/main.94ed25b1.chunk.css",
-    "static/js/main.711a960d.chunk.js"
+    "static/css/main.1138c80c.chunk.css",
+    "static/js/main.7ca294af.chunk.js"
   ]
 }
