@@ -60,12 +60,12 @@ const Title = styled.span`
   }
 
   ${up.tablet} {
-    max-width: 697px;
+    max-width: 818px;
     margin-top: 56px;
   }
 
   ${up.desktop} {
-    max-width: 915px;
+    max-width: 999px;
     margin-top: 72px;
 
     font-size: 84px;
