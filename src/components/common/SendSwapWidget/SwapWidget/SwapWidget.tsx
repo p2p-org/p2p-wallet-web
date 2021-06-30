@@ -197,6 +197,7 @@ export const SwapWidget: FunctionComponent = () => {
   const [isExecuting, setIsExecuting] = useState(false);
   const [isReverseRate, setIsReverseRate] = useState(false);
   const [rentFee, setRentFee] = useState(0);
+  const [lamportsPerSignature, setLamportsPerSignature] = useState(0);
   const [txFee, setTxFee] = useState(0);
   const availableTokens = useSelector((state) =>
     state.global.availableTokens.map((token) => Token.from(token)),
@@ -240,7 +241,9 @@ export const SwapWidget: FunctionComponent = () => {
         const resultRecentBlockhash = unwrapResult(await dispatch(getRecentBlockhash()));
 
         setRentFee(formatFee(resultRentFee));
-        setTxFee(formatFee(resultRecentBlockhash.feeCalculator.lamportsPerSignature));
+        setLamportsPerSignature(
+          formatFee(resultRecentBlockhash.feeCalculator.lamportsPerSignature),
+        );
       } catch (error) {
         console.log(error);
       }
@@ -248,6 +251,20 @@ export const SwapWidget: FunctionComponent = () => {
 
     void mount();
   }, []);
+
+  useEffect(() => {
+    let signatures = 2; // fee payer, authority
+
+    if ([firstTokenAccount?.mint.symbol, secondTokenAccount?.mint.symbol].includes('SOL')) {
+      signatures += 1; // wSol account
+    }
+
+    if (isNil(secondTokenAccount)) {
+      signatures += 1; // new account
+    }
+
+    setTxFee(new Decimal(lamportsPerSignature).mul(signatures).toDecimalPlaces(6).toNumber());
+  }, [lamportsPerSignature, firstTokenAccount, secondTokenAccount]);
 
   const firstTokenAccounts = useMemo(() => {
     return tokenAccounts.filter(isInPoolsTokenAccounts(availablePools));
@@ -469,6 +486,7 @@ export const SwapWidget: FunctionComponent = () => {
 
   const isDisabled = isExecuting || !selectedPool || !hasBalance;
   const isShowFee = firstToken && fee && feeProperties;
+  const minimumFee = txFee + rentFee; // trx fee + wSol rent
 
   return (
     <div>
@@ -486,6 +504,7 @@ export const SwapWidget: FunctionComponent = () => {
             token={firstToken}
             tokenAccount={firstTokenAccount}
             amount={firstToken ? minorAmountToMajor(firstAmount, firstToken).toString() : ''}
+            feeAmount={isNeedCreateWallet ? minimumFee + rentFee : minimumFee}
             onTokenAccountChange={selectFirstTokenHandleChange}
             onAmountChange={updateFirstAmount}
             disabled={isExecuting}
@@ -503,6 +522,7 @@ export const SwapWidget: FunctionComponent = () => {
             token={secondToken}
             tokenAccount={secondTokenAccount}
             amount={secondToken ? minorAmountToMajor(secondAmount, secondToken).toString() : ''}
+            feeAmount={minimumFee}
             onTokenAccountChange={selectSecondTokenHandleChange}
             onAmountChange={updateSecondAmount}
             disabled={isExecuting}

@@ -13,7 +13,7 @@ import { SlideContainer } from 'components/common/SlideContainer';
 import { TokenAvatar } from 'components/common/TokenAvatar';
 import { Icon } from 'components/ui';
 import { SearchInput } from 'components/ui/SearchInput';
-import { minorAmountToMajor } from 'utils/amount';
+import { majorAmountToMinor, minorAmountToMajor } from 'utils/amount';
 import { shortAddress } from 'utils/tokens';
 
 import { Empty } from '../../../Empty';
@@ -303,6 +303,7 @@ type Props = {
   token?: Token;
   tokenAccount?: TokenAccount;
   amount?: string;
+  feeAmount?: Decimal | number;
   onTokenAccountChange: (token: Token, tokenAccount: TokenAccount | null) => void;
   onAmountChange: (minorAmount: string, type?: 'available') => void;
   disabled?: boolean;
@@ -319,6 +320,7 @@ export const FromToSelectInput: FunctionComponent<Props> = ({
   token,
   tokenAccount,
   amount,
+  feeAmount,
   onTokenAccountChange,
   onAmountChange,
   disabled,
@@ -445,6 +447,15 @@ export const FromToSelectInput: FunctionComponent<Props> = ({
   const renderBalance = () => {
     if (!tokenAccount) {
       return null;
+    }
+
+    if (tokenAccount.mint.symbol === 'SOL' && feeAmount) {
+      const fee = majorAmountToMinor(feeAmount, tokenAccount.mint);
+      const balanceWithoutFee = tokenAccount.balance.minus(fee);
+
+      return `${tokenAccount.mint
+        .toMajorDenomination(balanceWithoutFee.gt(0) ? balanceWithoutFee : 0)
+        .toString()} ${tokenAccount?.mint.symbol}`;
     }
 
     return `${tokenAccount?.mint.toMajorDenomination(tokenAccount.balance).toString()} ${

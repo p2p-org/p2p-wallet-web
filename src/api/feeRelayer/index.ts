@@ -19,6 +19,8 @@ import { TokenAccount } from 'api/token/TokenAccount';
 import { getWallet } from 'api/wallet';
 import { feeRelayerUrl, NetworkType } from 'config/constants';
 
+export const KNOWN_FEE_PAYER_PUBKEYS = new Set(['FG4Y3yX4AAchp1HvNZ7LfzFTewF2f6nDoMDCohTFrdpT']);
+
 type TransferSolParams = {
   sender_pubkey: string;
   recipient_pubkey: string;
