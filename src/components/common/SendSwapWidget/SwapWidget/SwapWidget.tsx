@@ -155,8 +155,6 @@ const PoweredBy = styled.div`
 `;
 
 const UPDATE_POOLS_INTERVAL = 5000;
-// fee payer, authority, wSol account
-const SIGNATURES_COUNT = 3;
 
 const formatFee = (amount: number): number =>
   new Decimal(amount)
@@ -255,13 +253,18 @@ export const SwapWidget: FunctionComponent = () => {
   }, []);
 
   useEffect(() => {
-    setTxFee(
-      new Decimal(lamportsPerSignature)
-        .mul(isNil(secondTokenAccount) ? SIGNATURES_COUNT + 1 /* new account */ : SIGNATURES_COUNT)
-        .toDecimalPlaces(6)
-        .toNumber(),
-    );
-  }, [lamportsPerSignature, secondTokenAccount]);
+    let signatures = 2; // fee payer, authority
+
+    if ([firstTokenAccount?.mint.symbol, secondTokenAccount?.mint.symbol].includes('SOL')) {
+      signatures += 1; // wSol account
+    }
+
+    if (isNil(secondTokenAccount)) {
+      signatures += 1; // new account
+    }
+
+    setTxFee(new Decimal(lamportsPerSignature).mul(signatures).toDecimalPlaces(6).toNumber());
+  }, [lamportsPerSignature, firstTokenAccount, secondTokenAccount]);
 
   const firstTokenAccounts = useMemo(() => {
     return tokenAccounts.filter(isInPoolsTokenAccounts(availablePools));
