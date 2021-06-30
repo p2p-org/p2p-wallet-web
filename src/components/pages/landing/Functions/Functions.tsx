@@ -305,8 +305,8 @@ const Carousel = styled.div`
   position: relative;
   z-index: 1;
 
-  width: 351px;
-  height: 545px;
+  width: 286px;
+  height: 504px;
 `;
 
 const Selectors = styled.div`
@@ -415,10 +415,10 @@ const SlideImage = styled.div`
     right: 0;
     z-index: 1;
 
-    width: 263px;
-    height: 527px;
+    width: 232px;
+    height: 502px;
 
-    background-size: 263px 527px;
+    background-size: 232px 502px;
     filter: drop-shadow(0 32px 56px rgba(0, 0, 0, 0.5));
   }
 
@@ -439,11 +439,11 @@ const SlideImage = styled.div`
   }
 
   &.store {
-    background-image: url('./screen-1-desktop.png');
+    background-image: url('./screen-2-desktop.png');
   }
 
   &.swap {
-    background-image: url('./screen-1-desktop.png');
+    background-image: url('./screen-3-desktop.png');
   }
 `;
 
@@ -568,7 +568,7 @@ export const Functions: FC = () => {
             <TextContent>
               <Title>
                 Full control of your cryptos and your keys.{' '}
-                <TitleBold>Only you can access you assets.</TitleBold> <br /> Not government. Not
+                <TitleBold>Only you can access your assets.</TitleBold> <br /> Not government. Not
                 us. Not anyone else. Easily manage 30+ coins.
               </Title>
               <Description>
