@@ -483,6 +483,7 @@ export const SwapWidget: FunctionComponent = () => {
 
   const isDisabled = isExecuting || !selectedPool || !hasBalance;
   const isShowFee = firstToken && fee && feeProperties;
+  const minimumFee = txFee + rentFee; // trx fee + wSol rent
 
   return (
     <div>
@@ -500,6 +501,7 @@ export const SwapWidget: FunctionComponent = () => {
             token={firstToken}
             tokenAccount={firstTokenAccount}
             amount={firstToken ? minorAmountToMajor(firstAmount, firstToken).toString() : ''}
+            feeAmount={isNeedCreateWallet ? minimumFee + rentFee : minimumFee}
             onTokenAccountChange={selectFirstTokenHandleChange}
             onAmountChange={updateFirstAmount}
             disabled={isExecuting}
@@ -517,6 +519,7 @@ export const SwapWidget: FunctionComponent = () => {
             token={secondToken}
             tokenAccount={secondTokenAccount}
             amount={secondToken ? minorAmountToMajor(secondAmount, secondToken).toString() : ''}
+            feeAmount={minimumFee}
             onTokenAccountChange={selectSecondTokenHandleChange}
             onAmountChange={updateSecondAmount}
             disabled={isExecuting}
