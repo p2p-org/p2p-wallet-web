@@ -289,6 +289,8 @@ const TextBold = styled.span`
 const Window = styled.div`
   position: relative;
 
+  display: flex;
+  align-items: center;
   width: 100%;
   height: 453px;
   margin-top: 121px;
@@ -311,13 +313,14 @@ const Window = styled.div`
     position: absolute;
     left: 65px;
 
-    width: 552px;
+    width: 526px;
     height: 431px;
 
     background-image: url('./window-youcan.svg');
     background-repeat: no-repeat;
     background-position: 100% 50%;
     background-size: 552px 431px;
+    filter: drop-shadow(-34px 42px 100px rgba(0, 0, 0, 0.15));
 
     content: '';
   }
@@ -333,12 +336,12 @@ const Window = styled.div`
     }
 
     &::after {
-      left: 95px;
+      left: 30px;
 
-      width: 829px;
-      height: 647px;
+      width: 913px;
+      height: 714px;
 
-      background-size: 829px 647px;
+      background-size: 913px 714px;
     }
   }
 
@@ -364,10 +367,10 @@ const Window = styled.div`
     &::after {
       left: 90px;
 
-      width: 1114px;
-      height: 868px;
+      width: 796px;
+      height: 836px;
 
-      background-size: 1114px 868px;
+      background-size: 796px 836px;
     }
   }
 `;
