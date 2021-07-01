@@ -407,7 +407,7 @@ export const YouCan: FC<Props> = ({ children }) => {
                 <br />
                 Solana blockchain contains many tokens. It’s native and wrapped by different
                 technologies such as FTX, Sollet etc. It allows us to keep the speed and no-fees in
-                front of others .
+                front of others.
               </Text>
               {/* <LearnMoreLink> */}
               {/*  Learn more about Wrapped Tokens {isMobileLandscape ? <Arrow /> : undefined} */}
