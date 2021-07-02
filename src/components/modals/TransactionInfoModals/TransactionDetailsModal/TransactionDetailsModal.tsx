@@ -74,6 +74,10 @@ const StatusIndicator = styled.div`
 
   background: #77db7c;
   border-radius: 2px;
+
+  &.error {
+    background: #f43d3d;
+  }
 `;
 
 const FieldRowWrapper = styled(FieldWrapper)`
@@ -309,7 +313,8 @@ export const TransactionDetailsModal: FC<Props> = ({ signature, source, close })
         {renderAmountBlock()}
         <StatusWrapper>
           <Status>
-            <StatusIndicator /> Completed
+            <StatusIndicator className={classNames({ error: !!transaction.meta?.err })} />{' '}
+            {transaction.meta?.err ? 'Failed' : 'Completed'}
           </Status>
         </StatusWrapper>
         <FieldsWrapper>

@@ -90,10 +90,29 @@ const Type = styled.div`
   text-transform: capitalize;
 `;
 
+const Right = styled.div`
+  display: flex;
+  align-items: center;
+`;
+
 const Amount = styled.div`
   &.isReceiver {
     color: #2db533;
   }
+`;
+
+const WarningWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+const WarningIcon = styled(Icon)`
+  width: 16px;
+  height: 16px;
+  margin-left: 9px;
+
+  color: #f43d3d;
 `;
 
 const Main = styled.div`
@@ -227,15 +246,22 @@ export const TransactionRow: FunctionComponent<Props> = ({ transaction, source }
         <Content>
           <Top>
             <Type>{details.type}</Type>
-            {details.token ? (
-              <Amount className={classNames({ isReceiver: details.isReceiver })}>
-                <AmountUSD
-                  prefix={details.isReceiver ? '+' : '-'}
-                  value={details.amount}
-                  symbol={details.token.symbol}
-                />
-              </Amount>
-            ) : undefined}
+            <Right>
+              {details.token ? (
+                <Amount className={classNames({ isReceiver: details.isReceiver })}>
+                  <AmountUSD
+                    prefix={details.isReceiver ? '+' : '-'}
+                    value={details.amount}
+                    symbol={details.token.symbol}
+                  />
+                </Amount>
+              ) : undefined}
+              {transaction.meta?.err ? (
+                <WarningWrapper title="Transaction failed">
+                  <WarningIcon name="warning" />
+                </WarningWrapper>
+              ) : undefined}
+            </Right>
           </Top>
           <Bottom>
             <div>{renderBottomLeft()}</div>
