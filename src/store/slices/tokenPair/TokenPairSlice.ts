@@ -99,7 +99,7 @@ const updateAccountReducer = (
       ...serializedTokenAccount,
       mint: {
         ...serializedTokenAccount.mint,
-        symbol: 'WSOL',
+        symbol: 'SOL',
         address: WRAPPED_SOL_MINT.toBase58(),
         isSimulated: true,
       },
