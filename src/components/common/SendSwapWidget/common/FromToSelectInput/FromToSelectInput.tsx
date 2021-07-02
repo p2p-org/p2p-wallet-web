@@ -415,8 +415,17 @@ export const FromToSelectInput: FunctionComponent<Props> = ({
       return;
     }
 
+    let tokenAccountBalance = tokenAccount.balance;
+
+    if (tokenAccount.mint.symbol === 'SOL' && feeAmount) {
+      const fee = majorAmountToMinor(feeAmount, tokenAccount.mint);
+      const balanceWithoutFee = tokenAccount.balance.minus(fee);
+
+      tokenAccountBalance = balanceWithoutFee.gt(0) ? balanceWithoutFee : new Decimal(0);
+    }
+
     onAmountChange(
-      minorAmountToMajor(tokenAccount.balance, tokenAccount.mint).toString(),
+      minorAmountToMajor(tokenAccountBalance, tokenAccount.mint).toString(),
       'available',
     );
   };
