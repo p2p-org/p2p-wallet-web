@@ -41,6 +41,8 @@ const EMPTY_UNLOCKED: UnlockedType = {
 };
 
 let unlockedMnemonicAndSeed: UnlockedType = EMPTY_UNLOCKED;
+// for confirmation by password
+let lockedMnemonicAndSeed: string | undefined;
 
 export async function mnemonicToSeed(mnemonic: string) {
   const bip39 = await import('bip39');
@@ -137,6 +139,8 @@ export async function storeMnemonicAndSeed(
     if (isSave) {
       localStorage.setItem(STORAGE_KEY_LOCKED, locked);
     } else {
+      // for confirmation by password
+      lockedMnemonicAndSeed = locked;
       localStorage.removeItem(STORAGE_KEY_LOCKED);
     }
   }
@@ -157,7 +161,9 @@ export async function loadMnemonicAndSeed(password?: string): Promise<UnlockedTy
     salt: encodedSalt,
     iterations,
     digest,
-  } = JSON.parse(localStorage.getItem(STORAGE_KEY_LOCKED) || '') as LockedType;
+  } = JSON.parse(
+    localStorage.getItem(STORAGE_KEY_LOCKED) || lockedMnemonicAndSeed || '',
+  ) as LockedType;
 
   const encrypted = bs58.decode(encodedEncrypted);
   const nonce = bs58.decode(encodedNonce);
@@ -178,5 +184,6 @@ export async function loadMnemonicAndSeed(password?: string): Promise<UnlockedTy
 }
 
 export function forgetWallet() {
+  lockedMnemonicAndSeed = undefined;
   sessionStorage.removeItem(STORAGE_KEY_UNLOCKED);
 }
