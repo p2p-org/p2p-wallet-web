@@ -14299,11 +14299,6 @@ to-regex@^3.0.1, to-regex@^3.0.2:
     regex-not "^1.0.2"
     safe-regex "^1.1.0"
 
-toasts-manager@^0.1.17:
-  version "0.1.17"
-  resolved "https://registry.yarnpkg.com/toasts-manager/-/toasts-manager-0.1.17.tgz#48e2426cf9c2b09e9d64a0c6b6ed4978be249187"
-  integrity sha512-ReV7KckHlKODyq+IrN3K6DFXunCOin7OdimmzAsxyXa2arbloPHfZxkdzqIiT1hx9EluGgivHiM73zByx+dh3w==
-
 toidentifier@1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/toidentifier/-/toidentifier-1.0.0.tgz#7e1be3470f1e77948bc43d94a3c8f4d7752ba553"
