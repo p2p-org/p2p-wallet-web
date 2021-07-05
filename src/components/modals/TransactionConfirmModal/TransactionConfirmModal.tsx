@@ -220,7 +220,11 @@ export const TransactionConfirmModal: FunctionComponent<Props> = ({ type, params
             </InfoWrapper>
           </FieldInfo>
           <FieldInfo>
-            <TokenAvatar symbol={(params as TransferParams).source.mint.symbol} size={44} />
+            <TokenAvatar
+              symbol={(params as TransferParams).source.mint.symbol}
+              address={(params as TransferParams).source.mint.address.toBase58()}
+              size={44}
+            />
             <InfoWrapper>
               <InfoTitle>Check the amount</InfoTitle>
               <InfoValue>
@@ -245,7 +249,11 @@ export const TransactionConfirmModal: FunctionComponent<Props> = ({ type, params
               </InfoWrapper>
             </FieldInfo>
             <FieldInfo>
-              <TokenAvatar symbol={(params as SwapParams).firstToken.symbol} size={44} />
+              <TokenAvatar
+                symbol={(params as SwapParams).firstToken.symbol}
+                address={(params as SwapParams).firstToken.address.toBase58()}
+                size={44}
+              />
               <InfoWrapper>
                 <InfoTitle>Check the amount</InfoTitle>
                 <InfoValue>
@@ -273,7 +281,11 @@ export const TransactionConfirmModal: FunctionComponent<Props> = ({ type, params
               </InfoWrapper>
             </FieldInfo>
             <FieldInfo>
-              <TokenAvatar symbol={(params as SwapParams).secondToken.symbol} size={44} />
+              <TokenAvatar
+                symbol={(params as SwapParams).secondToken.symbol}
+                address={(params as SwapParams).secondToken.address.toBase58()}
+                size={44}
+              />
               <InfoWrapper>
                 <InfoTitle>Minimum receive</InfoTitle>
                 <InfoValue>

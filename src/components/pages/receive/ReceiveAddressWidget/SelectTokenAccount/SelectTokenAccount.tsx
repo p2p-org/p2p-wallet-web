@@ -328,7 +328,11 @@ export const SelectTokenAccount: FunctionComponent<Props> = ({
         onClick={handleSelectorClick}
         className={classNames({ isOpen })}>
         <TokenAvatarWrapper className={classNames({ isOpen: isOpen && !token })}>
-          {token ? <TokenAvatar symbol={token.symbol} size={40} /> : <WalletIcon name="wallet" />}
+          {token ? (
+            <TokenAvatar symbol={token.symbol} address={token.address.toBase58()} size={40} />
+          ) : (
+            <WalletIcon name="wallet" />
+          )}
         </TokenAvatarWrapper>
         <InfoWrapper>
           <TokenName title={token?.address.toBase58()}>

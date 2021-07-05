@@ -517,7 +517,11 @@ export const FromToSelectInput: FunctionComponent<Props> = ({
       </TopWrapper>
       <MainWrapper>
         <TokenAvatarWrapper className={classNames({ isOpen: isOpen && !token })}>
-          {token ? <TokenAvatar symbol={token.symbol} size={44} /> : <WalletIcon name="wallet" />}
+          {token ? (
+            <TokenAvatar symbol={token.symbol} address={token.address.toBase58()} size={44} />
+          ) : (
+            <WalletIcon name="wallet" />
+          )}
         </TokenAvatarWrapper>
         <InfoWrapper>
           <SpecifyTokenWrapper>

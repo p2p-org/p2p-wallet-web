@@ -342,7 +342,11 @@ export const TopWidgetOrigin: FunctionComponent<Props> = ({ publicKey }) => {
         title={
           tokenAccount ? (
             <Header>
-              <TokenAvatar symbol={tokenAccount?.mint.symbol} size="44" />
+              <TokenAvatar
+                symbol={tokenAccount?.mint.symbol}
+                address={tokenAccount?.mint.address.toBase58()}
+                size="44"
+              />
               <TokenInfo>
                 <TokenSymbol>{tokenAccount?.mint.symbol}</TokenSymbol>
                 <TokenName title={tokenAccount.address.toBase58()}>
@@ -374,7 +378,11 @@ export const TopWidgetOrigin: FunctionComponent<Props> = ({ publicKey }) => {
       {isShowFixed ? (
         <WrapperFixed>
           <FixedInfoWrapper>
-            <TokenAvatar symbol={tokenAccount?.mint.symbol} size={36} />
+            <TokenAvatar
+              symbol={tokenAccount?.mint.symbol}
+              address={tokenAccount?.mint.address.toBase58()}
+              size={36}
+            />
             {renderContent(true)}
           </FixedInfoWrapper>
           {renderButtons()}

@@ -114,7 +114,11 @@ export const TokenSelector: FunctionComponent<Props> = ({ value, onChange }) => 
   return (
     <Wrapper ref={selectorRef}>
       <Selector onClick={handleSelectorClick}>
-        <TokenAvatar symbol={tokenAccount?.mint.symbol} size="36" />
+        <TokenAvatar
+          symbol={tokenAccount?.mint.symbol}
+          address={tokenAccount?.mint.address.toBase58()}
+          size="36"
+        />
         <Value title={value}>{tokenAccount?.mint.name || shortAddress(value)}</Value>
         {tokenAccounts ? (
           <ChevronWrapper>

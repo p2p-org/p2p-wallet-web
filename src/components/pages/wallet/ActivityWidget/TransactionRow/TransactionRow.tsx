@@ -235,8 +235,16 @@ export const TransactionRow: FunctionComponent<Props> = ({ transaction, source }
       <Main onClick={handleClick}>
         {details.type === 'swap' ? (
           <SwapAvatarsWrapper>
-            <TokenAvatar symbol={details.sourceToken?.symbol} size={32} />
-            <TokenAvatar symbol={details.destinationToken?.symbol} size={32} />
+            <TokenAvatar
+              symbol={details.sourceToken?.symbol}
+              address={details.sourceToken?.address.toBase58()}
+              size={32}
+            />
+            <TokenAvatar
+              symbol={details.destinationToken?.symbol}
+              address={details.destinationToken?.address.toBase58()}
+              size={32}
+            />
           </SwapAvatarsWrapper>
         ) : (
           <TransactionIconWrapper>

@@ -310,7 +310,11 @@ export const TransactionStatusModal: FunctionComponent<Props> = ({
           <SwapWrapper>
             <SwapColumn>
               <SwapInfo>
-                <TokenAvatar size={44} symbol={fromToken.symbol} />
+                <TokenAvatar
+                  symbol={fromToken.symbol}
+                  address={fromToken?.address.toBase58()}
+                  size={44}
+                />
                 <SwapAmount>
                   - {fromToken.toMajorDenomination(fromAmount).toString()} {fromToken.symbol}
                 </SwapAmount>
@@ -321,7 +325,11 @@ export const TransactionStatusModal: FunctionComponent<Props> = ({
             </SwapBlock>
             <SwapColumn>
               <SwapInfo>
-                <TokenAvatar size={44} symbol={toToken.symbol} />
+                <TokenAvatar
+                  symbol={toToken.symbol}
+                  address={toToken?.address.toBase58()}
+                  size={44}
+                />
                 <SwapAmount>
                   + {toToken.toMajorDenomination(toAmount).toString()} {toToken.symbol}
                 </SwapAmount>

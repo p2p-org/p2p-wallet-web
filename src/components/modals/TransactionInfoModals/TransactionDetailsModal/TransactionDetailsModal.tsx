@@ -206,7 +206,11 @@ export const TransactionDetailsModal: FC<Props> = ({ signature, source, close })
           <ColumnWrapper>
             <FieldTitle>From</FieldTitle>
             <FieldInfo>
-              <TokenAvatar symbol={details.sourceTokenAccount.mint.symbol} size={48} />
+              <TokenAvatar
+                symbol={details.sourceTokenAccount.mint.symbol}
+                address={details.sourceTokenAccount.mint.address.toBase58()}
+                size={48}
+              />
               <AddressWrapper>
                 <AddressTitle>{details.sourceTokenAccount.mint.symbol}</AddressTitle>
                 <AddressValue>
@@ -220,7 +224,11 @@ export const TransactionDetailsModal: FC<Props> = ({ signature, source, close })
           <ColumnWrapper>
             <FieldTitle>To</FieldTitle>
             <FieldInfo>
-              <TokenAvatar symbol={details.destinationTokenAccount.mint.symbol} size={48} />
+              <TokenAvatar
+                symbol={details.destinationTokenAccount.mint.symbol}
+                address={details.destinationTokenAccount.mint.address.toBase58()}
+                size={48}
+              />
               <AddressWrapper>
                 <AddressTitle>{details.destinationTokenAccount.mint.symbol}</AddressTitle>
                 <AddressValue>
@@ -240,7 +248,11 @@ export const TransactionDetailsModal: FC<Props> = ({ signature, source, close })
         <SwapWrapper>
           <SwapColumn>
             <SwapInfo>
-              <TokenAvatar size={44} symbol={details.sourceToken?.symbol} />
+              <TokenAvatar
+                symbol={details.sourceToken?.symbol}
+                address={details.sourceToken?.address.toBase58()}
+                size={44}
+              />
               <SwapAmount>
                 - {details.sourceAmount.toNumber()} {details.sourceToken?.symbol}
               </SwapAmount>
@@ -251,7 +263,11 @@ export const TransactionDetailsModal: FC<Props> = ({ signature, source, close })
           </SwapBlock>
           <SwapColumn>
             <SwapInfo>
-              <TokenAvatar size={44} symbol={details.destinationToken?.symbol} />
+              <TokenAvatar
+                symbol={details.destinationToken?.symbol}
+                address={details.destinationToken?.address.toBase58()}
+                size={44}
+              />
               <SwapAmount>
                 + {details.destinationAmount.toNumber()} {details.destinationToken?.symbol}
               </SwapAmount>

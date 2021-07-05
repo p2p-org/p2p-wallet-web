@@ -66,7 +66,7 @@ export const TokenRow: FunctionComponent<Props> = ({ token, onClick }) => {
   return (
     <Wrapper onClick={handleClick}>
       <ItemWrapper>
-        <TokenAvatar symbol={token.symbol} size={44} />
+        <TokenAvatar symbol={token.symbol} address={token.address.toBase58()} size={44} />
         <Info>
           <Top>
             <TokenName title={token.address.toBase58()}>

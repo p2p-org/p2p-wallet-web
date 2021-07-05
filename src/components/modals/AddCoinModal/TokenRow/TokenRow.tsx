@@ -264,7 +264,7 @@ export const TokenRow: FunctionComponent<Props> = ({
       <Main className={classNames({ isOpen })}>
         <Content className={classNames({ isOpen })}>
           <InfoWrapper onClick={handleChevronClick}>
-            <TokenAvatar symbol={token.symbol} size={45} />
+            <TokenAvatar symbol={token.symbol} address={token.address.toBase58()} size={45} />
             <Info>
               <Top>
                 <div>{token.symbol}</div> <div />

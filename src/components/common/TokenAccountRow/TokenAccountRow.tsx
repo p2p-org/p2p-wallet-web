@@ -70,7 +70,11 @@ export const TokenAccountRow: FunctionComponent<Props> = ({ tokenAccount, onClic
   return (
     <Wrapper onClick={handleClick} className={className}>
       <ItemWrapper>
-        <TokenAvatar symbol={tokenAccount.mint.symbol} size={44} />
+        <TokenAvatar
+          symbol={tokenAccount.mint.symbol}
+          address={tokenAccount.mint.address.toBase58()}
+          size={44}
+        />
         <Info>
           <Top>
             <TokenSymbol title={tokenAccount.mint.address.toBase58()}>

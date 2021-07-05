@@ -168,7 +168,11 @@ export const TokenRow: FunctionComponent<Props> = ({
   return (
     <Wrapper className={classNames({ isHidden, isSelected })}>
       <WrapperLink to={`/wallet/${token.address.toBase58()}`}>
-        <TokenAvatarStyled symbol={token.mint.symbol} size={48} />
+        <TokenAvatarStyled
+          symbol={token.mint.symbol}
+          address={token.mint.address.toBase58()}
+          size={48}
+        />
         <Content>
           <Top>
             <TokenName title={token.mint.address.toBase58()}>

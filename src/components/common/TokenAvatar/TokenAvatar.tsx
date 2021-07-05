@@ -45,10 +45,12 @@ type Props = {
   src?: string;
   size?: string | number;
   symbol?: string;
+  address?: string;
 };
 
 export const TokenAvatar: FunctionComponent<Props & HTMLAttributes<HTMLDivElement>> = ({
   symbol,
+  address,
   src,
   className,
   ...props
@@ -57,7 +59,7 @@ export const TokenAvatar: FunctionComponent<Props & HTMLAttributes<HTMLDivElemen
   const tokenInfo = tokenList
     .filterByClusterSlug(cluster)
     .getList()
-    .find((token) => token.symbol === symbol);
+    .find((token) => token.symbol === symbol || token.address === address);
 
   const isWrapped = useMemo(() => tokenInfo?.tags?.find((tag) => tag.includes('wrapped')), [
     tokenInfo,
@@ -65,8 +67,8 @@ export const TokenAvatar: FunctionComponent<Props & HTMLAttributes<HTMLDivElemen
 
   return (
     <Wrapper className={classNames(className, { isNotExists: !tokenInfo })}>
-      {tokenInfo && !tokenInfo.logoURI ? (
-        <Jazzicon address={tokenInfo.address} {...props} />
+      {(!tokenInfo || !tokenInfo.logoURI) && address ? (
+        <Jazzicon address={address} {...props} />
       ) : (
         <Avatar src={tokenInfo?.logoURI || undefined} {...props} />
       )}
