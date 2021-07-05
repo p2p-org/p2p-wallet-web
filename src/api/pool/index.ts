@@ -438,17 +438,19 @@ export const APIFactory = memoizeWith(
         );
 
         if (tokenAccountAInfo && tokenAccountBInfo && poolTokenInfo) {
-          pools.push(
-            new Pool(
-              poolInfo.account,
-              tokenAccountAInfo,
-              tokenAccountBInfo,
-              poolTokenInfo,
-              makeTokenAccount(poolInfo.feeAccount, poolInfo.poolTokenMint, 0),
-              swapProgramId,
-              poolInfo.feeNumerator.toNumber() / poolInfo.feeDenominator.toNumber(),
-            ),
-          );
+          if (tokenAccountAInfo.balance.gt(0) && tokenAccountBInfo.balance.gt(0)) {
+            pools.push(
+              new Pool(
+                poolInfo.account,
+                tokenAccountAInfo,
+                tokenAccountBInfo,
+                poolTokenInfo,
+                makeTokenAccount(poolInfo.feeAccount, poolInfo.poolTokenMint, 0),
+                swapProgramId,
+                poolInfo.feeNumerator.toNumber() / poolInfo.feeDenominator.toNumber(),
+              ),
+            );
+          }
         }
       }
 

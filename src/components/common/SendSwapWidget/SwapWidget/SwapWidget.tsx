@@ -197,6 +197,7 @@ export const SwapWidget: FunctionComponent = () => {
   const [isExecuting, setIsExecuting] = useState(false);
   const [isReverseRate, setIsReverseRate] = useState(false);
   const [rentFee, setRentFee] = useState(0);
+  const [wSolRentFee, setWSolRentFee] = useState(0);
   const [lamportsPerSignature, setLamportsPerSignature] = useState(0);
   const [txFee, setTxFee] = useState(0);
   const availableTokens = useSelector((state) =>
@@ -257,6 +258,9 @@ export const SwapWidget: FunctionComponent = () => {
 
     if ([firstTokenAccount?.mint.symbol, secondTokenAccount?.mint.symbol].includes('SOL')) {
       signatures += 1; // wSol account
+      setWSolRentFee(rentFee);
+    } else {
+      setWSolRentFee(0);
     }
 
     if (isNil(secondTokenAccount)) {
@@ -565,15 +569,20 @@ export const SwapWidget: FunctionComponent = () => {
                 <PropertyLine>
                   Fee:
                   <PropertyValue>
-                    <TooltipStyled title={`${isNeedCreateWallet ? txFee + rentFee : txFee} SOL`}>
+                    <TooltipStyled
+                      title={`${
+                        isNeedCreateWallet ? txFee + rentFee + wSolRentFee : txFee + wSolRentFee
+                      } SOL`}>
                       <TooltipRow>
                         <TxName>Transaction:</TxName>
                         <TxValue>{`${txFee} SOL`}</TxValue>
                       </TooltipRow>
-                      {isNeedCreateWallet ? (
+                      {isNeedCreateWallet || wSolRentFee ? (
                         <TooltipRow>
                           <TxName>Wallet creation:</TxName>
-                          <TxValue>{`${rentFee} SOL`}</TxValue>
+                          <TxValue>{`${
+                            isNeedCreateWallet ? rentFee + wSolRentFee : wSolRentFee
+                          } SOL`}</TxValue>
                         </TooltipRow>
                       ) : undefined}
                     </TooltipStyled>
