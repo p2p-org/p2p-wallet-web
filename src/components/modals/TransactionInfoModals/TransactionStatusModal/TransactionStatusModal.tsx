@@ -72,9 +72,9 @@ type Props = {
   close: (signature: string | null) => void;
 };
 
-const handleCopyClick = (publicKey: string) => () => {
+const handleCopyClick = (str: string) => () => {
   try {
-    void navigator.clipboard.writeText(publicKey);
+    void navigator.clipboard.writeText(str);
     ToastManager.info('Copied to buffer!');
   } catch (error) {
     console.error(error);
@@ -348,7 +348,7 @@ export const TransactionStatusModal: FunctionComponent<Props> = ({
                   target="_blank"
                   rel="noopener noreferrer noindex"
                   className="button">
-                  <ShareWrapper onClick={handleCopyClick(signature)}>
+                  <ShareWrapper onClick={handleCopyClick(getExplorerUrl('tx', signature, cluster))}>
                     <ShareIcon name="copy" />
                   </ShareWrapper>
                 </a>
