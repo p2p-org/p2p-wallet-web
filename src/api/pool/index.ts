@@ -5,7 +5,12 @@ import { complement, isNil, memoizeWith, mergeRight, toString } from 'ramda';
 import assert from 'ts-invariant';
 
 import { getConnection } from 'api/connection';
-import { APIFactory as TokenAPIFactory, TOKEN_PROGRAM_ID, tokenAccountsPrecache } from 'api/token';
+import {
+  APIFactory as TokenAPIFactory,
+  ASSOCIATED_TOKEN_ACCOUNT_PROGRAM_ID,
+  TOKEN_PROGRAM_ID,
+  tokenAccountsPrecache,
+} from 'api/token';
 import { Token } from 'api/token/Token';
 import { TokenAccount } from 'api/token/TokenAccount';
 import { getWallet, makeTransaction, sendTransaction } from 'api/wallet';
@@ -672,16 +677,36 @@ export const APIFactory = memoizeWith(
         const toToken = isReverse ? parameters.pool.tokenA.mint : parameters.pool.tokenB.mint;
 
         // Token account or Create Token account
-        const toAccount =
-          parameters.toAccount && !parameters.toAccount.mint.address.equals(WRAPPED_SOL_MINT)
-            ? parameters.toAccount
-            : await createAccountByMint(
-                getWallet().pubkey,
-                toToken,
-                instructions,
-                cleanupInstructions,
-                signers,
-              );
+        let toAccount;
+        if (parameters.toAccount && !parameters.toAccount.mint.address.equals(WRAPPED_SOL_MINT)) {
+          toAccount = parameters.toAccount;
+        } else {
+          const associatedTokenAddress = await SPLToken.getAssociatedTokenAddress(
+            ASSOCIATED_TOKEN_ACCOUNT_PROGRAM_ID,
+            TOKEN_PROGRAM_ID,
+            toToken.address,
+            getWallet().pubkey,
+          );
+
+          instructions.push(
+            SPLToken.createAssociatedTokenAccountInstruction(
+              ASSOCIATED_TOKEN_ACCOUNT_PROGRAM_ID,
+              TOKEN_PROGRAM_ID,
+              toToken.address,
+              associatedTokenAddress,
+              getWallet().pubkey,
+              getWallet().pubkey,
+            ),
+          );
+
+          toAccount = new TokenAccount(
+            toToken,
+            getWallet().pubkey,
+            TOKEN_PROGRAM_ID,
+            associatedTokenAddress,
+            0,
+          );
+        }
 
         console.log('Executing swap:', parameters);
 

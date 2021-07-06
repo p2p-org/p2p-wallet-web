@@ -263,10 +263,6 @@ export const SwapWidget: FunctionComponent = () => {
       setWSolRentFee(0);
     }
 
-    if (isNil(secondTokenAccount)) {
-      signatures += 1; // new account
-    }
-
     setTxFee(new Decimal(lamportsPerSignature).mul(signatures).toDecimalPlaces(6).toNumber());
   }, [lamportsPerSignature, firstTokenAccount, secondTokenAccount]);
 
@@ -571,7 +567,7 @@ export const SwapWidget: FunctionComponent = () => {
                   <PropertyValue>
                     <TooltipStyled
                       title={`${
-                        isNeedCreateWallet ? txFee + rentFee + wSolRentFee : txFee + wSolRentFee
+                        isNeedCreateWallet ? txFee + (rentFee + wSolRentFee) : txFee + wSolRentFee
                       } SOL`}>
                       <TooltipRow>
                         <TxName>Transaction:</TxName>
