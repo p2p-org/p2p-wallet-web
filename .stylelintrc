@@ -12,6 +12,7 @@
     "prettier/prettier": true,
     "block-no-empty": null,
     "no-empty-source": null,
+    "function-name-case": null,
     "declaration-empty-line-before": null,
     "indentation": null,
     "max-empty-lines": null,

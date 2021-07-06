@@ -31,6 +31,7 @@ const MainScrollFix = styled.div`
 const Container = styled.div`
   width: 100%;
   max-width: 796px;
+  min-height: calc(100vh - ${String(HEADER_HEIGHT)}px - ${String(CONTAINER_PADDING_TOP)}px);
   margin: 0 auto;
   padding-top: ${CONTAINER_PADDING_TOP}px;
 `;
