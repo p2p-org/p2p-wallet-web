@@ -159,7 +159,7 @@ export const ModalManager: FunctionComponent = () => {
     return (
       <Suspense fallback={null} key={modalId}>
         <ModalContainer>
-          <ModalWrapper onClick={handleWrapperClick}>
+          <ModalWrapper onMouseDown={handleWrapperClick}>
             <ModalComponent
               {...props}
               modalId={modalId}
