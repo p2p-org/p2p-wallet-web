@@ -1,8 +1,8 @@
 {
   "files": {
-    "main.css": "https://p2p-org.github.io/p2p-wallet-web/static/css/main.5cef60df.chunk.css",
-    "main.js": "https://p2p-org.github.io/p2p-wallet-web/static/js/main.821c8068.chunk.js",
-    "main.js.map": "https://p2p-org.github.io/p2p-wallet-web/static/js/main.821c8068.chunk.js.map",
+    "main.css": "https://p2p-org.github.io/p2p-wallet-web/static/css/main.808c0cc4.chunk.css",
+    "main.js": "https://p2p-org.github.io/p2p-wallet-web/static/js/main.ee2c74d5.chunk.js",
+    "main.js.map": "https://p2p-org.github.io/p2p-wallet-web/static/js/main.ee2c74d5.chunk.js.map",
     "runtime-main.js": "https://p2p-org.github.io/p2p-wallet-web/static/js/runtime-main.9ae194e7.js",
     "runtime-main.js.map": "https://p2p-org.github.io/p2p-wallet-web/static/js/runtime-main.9ae194e7.js.map",
     "static/css/2.8f976517.chunk.css": "https://p2p-org.github.io/p2p-wallet-web/static/css/2.8f976517.chunk.css",
@@ -34,7 +34,7 @@
     "static/css/6.655c810d.chunk.css.map": "https://p2p-org.github.io/p2p-wallet-web/static/css/6.655c810d.chunk.css.map",
     "static/css/7.0005edda.chunk.css.map": "https://p2p-org.github.io/p2p-wallet-web/static/css/7.0005edda.chunk.css.map",
     "static/css/8.c4676fbe.chunk.css.map": "https://p2p-org.github.io/p2p-wallet-web/static/css/8.c4676fbe.chunk.css.map",
-    "static/css/main.5cef60df.chunk.css.map": "https://p2p-org.github.io/p2p-wallet-web/static/css/main.5cef60df.chunk.css.map",
+    "static/css/main.808c0cc4.chunk.css.map": "https://p2p-org.github.io/p2p-wallet-web/static/css/main.808c0cc4.chunk.css.map",
     "static/js/2.f23f58bb.chunk.js.LICENSE.txt": "https://p2p-org.github.io/p2p-wallet-web/static/js/2.f23f58bb.chunk.js.LICENSE.txt",
     "static/media/Landing.linaria.css": "https://p2p-org.github.io/p2p-wallet-web/static/media/GT-Super-Text-Bold.24a70721.woff2",
     "static/media/Download.linaria.css": "https://p2p-org.github.io/p2p-wallet-web/static/media/big-logo.979c6ba7.png",
@@ -51,9 +51,9 @@
     "static/media/LoaderWide.linaria.css": "https://p2p-org.github.io/p2p-wallet-web/static/media/logo-loader.0831711f.svg",
     "static/media/Home.linaria.css": "https://p2p-org.github.io/p2p-wallet-web/static/media/logo.83fb5ddd.svg",
     "static/media/orca_logo.e3efb858.svg": "https://p2p-org.github.io/p2p-wallet-web/static/media/orca_logo.e3efb858.svg",
-    "static/media/screen-1-desktop.dae88933.png": "https://p2p-org.github.io/p2p-wallet-web/static/media/screen-1-desktop.dae88933.png",
-    "static/media/CarouselMobile.linaria.css": "https://p2p-org.github.io/p2p-wallet-web/static/media/screen-3-mobile.7ae7114f.png",
-    "static/media/screen-2-desktop.3b07712a.png": "https://p2p-org.github.io/p2p-wallet-web/static/media/screen-2-desktop.3b07712a.png",
+    "static/media/screen-1-desktop.3263f75c.png": "https://p2p-org.github.io/p2p-wallet-web/static/media/screen-1-desktop.3263f75c.png",
+    "static/media/CarouselMobile.linaria.css": "https://p2p-org.github.io/p2p-wallet-web/static/media/screen-3-mobile.d02da983.png",
+    "static/media/screen-2-desktop.3671e256.png": "https://p2p-org.github.io/p2p-wallet-web/static/media/screen-2-desktop.3671e256.png",
     "static/media/screen-3-desktop.04406f28.png": "https://p2p-org.github.io/p2p-wallet-web/static/media/screen-3-desktop.04406f28.png",
     "static/media/screen-4-desktop.23670a9c.png": "https://p2p-org.github.io/p2p-wallet-web/static/media/screen-4-desktop.23670a9c.png",
     "static/media/ResultWidget.linaria.css": "https://p2p-org.github.io/p2p-wallet-web/static/media/sun.4090a322.png",
@@ -63,7 +63,7 @@
     "static/js/runtime-main.9ae194e7.js",
     "static/css/2.8f976517.chunk.css",
     "static/js/2.f23f58bb.chunk.js",
-    "static/css/main.5cef60df.chunk.css",
-    "static/js/main.821c8068.chunk.js"
+    "static/css/main.808c0cc4.chunk.css",
+    "static/js/main.ee2c74d5.chunk.js"
   ]
 }
