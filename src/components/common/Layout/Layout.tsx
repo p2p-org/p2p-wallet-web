@@ -10,7 +10,8 @@ import { RootState } from 'store/rootReducer';
 import { updateTokenAccountsForWallet } from 'store/slices/wallet/WalletSlice';
 import { useIntervalHook } from 'utils/hooks/useIntervalHook';
 
-import { BreadcrumbType, Header, HEADER_HEIGHT } from '../Header';
+import { BreadcrumbType, Header } from '../Header';
+import { HEADER_HEIGHT } from '../Header/constants';
 import { ScrollFix } from '../ScollFix';
 import {
   COLUMN_LEFT_WIDTH,
@@ -31,7 +32,7 @@ const MainScrollFix = styled.div`
 const Container = styled.div`
   width: 100%;
   max-width: 796px;
-  min-height: calc(100vh - ${String(HEADER_HEIGHT)}px - ${String(CONTAINER_PADDING_TOP)}px);
+  min-height: calc(100vh - ${CONTAINER_PADDING_TOP}px - ${HEADER_HEIGHT}px);
   margin: 0 auto;
   padding-top: ${CONTAINER_PADDING_TOP}px;
 `;
