@@ -6,14 +6,18 @@ import classNames from 'classnames';
 import { rgba } from 'polished';
 import QRCode from 'qrcode.react';
 
+import tokenList from 'api/token/token.config';
 import { TokenAccount } from 'api/token/TokenAccount';
 import { Hint } from 'components/common/Hint';
 import { ToastManager } from 'components/common/ToastManager';
 import { WidgetPage } from 'components/common/WidgetPage';
-import { Icon, Tooltip } from 'components/ui';
+import { Avatar, Icon, Tooltip } from 'components/ui';
 import { trackEvent } from 'utils/analytics';
 import { askClipboardWritePermission, setToClipboard } from 'utils/clipboard';
 import { getExplorerUrl } from 'utils/connection';
+
+import ethLogo from './ETH-logo.png';
+import ftxLogo from './FTX-logo.png';
 
 const WrapperWidgetPage = styled(WidgetPage)``;
 
@@ -39,14 +43,6 @@ const QRText = styled.div`
   font-weight: 600;
   font-size: 18px;
   line-height: 120%;
-`;
-
-const QuestionCircleIcon = styled(Icon)`
-  width: 16px;
-  height: 16px;
-  margin-left: 6px;
-
-  color: #a3a5ba;
 `;
 
 const TooltipContent = styled.div`
@@ -175,6 +171,39 @@ const ExplorerA = styled.a`
   }
 `;
 
+const TokensWrapper = styled.div`
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  margin-top: 24px;
+`;
+
+const AvatarStyled = styled(Avatar)`
+  margin-left: -13px;
+  border-radius: 50%;
+`;
+
+const InfoBadge = styled.span`
+  margin-left: -13px;
+  padding: 4px 6px;
+
+  color: #fff;
+  font-weight: 600;
+  font-size: 12px;
+
+  border-radius: 12px;
+  background: #202020;
+  cursor: pointer;
+  opacity: 0.8;
+
+  &:hover {
+    background: #458aff;
+    opacity: 1;
+  }
+`;
+
 const copy = (value: string, cb: (state: boolean) => void) => {
   try {
     void navigator.clipboard.writeText(value);
@@ -244,24 +273,7 @@ export const ReceiveAddressWidget: FC = () => {
       <WrapperWidgetPage title="Receive" icon="bottom">
         <QRWrapper>
           <QRContent>
-            <QRText>
-              One unified address to receive SOL or SPL Tokens{' '}
-              <Tooltip title={<QuestionCircleIcon name="question-circle" />} noOpacity>
-                <TooltipContent>
-                  <TooltipTitle>SPL Token Program</TooltipTitle>
-                  <TooltipText>
-                    The Solana Program Library (SPL) is a collection of on-chain programs maintained
-                    by the Solana team. The SPL Token program is the token standard of the Solana
-                    blockchain.
-                    <br />
-                    <br />
-                    Similar to ERC20 tokens on the Ethereum network, SPL Tokens are designed for
-                    DeFi applications. SPL Tokens can be traded on Serum, a Solana based
-                    decentralized exchange and FTX.
-                  </TooltipText>
-                </TooltipContent>
-              </Tooltip>
-            </QRText>
+            <QRText>One unified address to receive SOL or SPL Tokens</QRText>
             <QRCodeWrapper
               className={classNames({ isImageCopyAvailable })}
               onClick={isImageCopyAvailable ? handleImageCopyClick : undefined}>
@@ -273,6 +285,33 @@ export const ReceiveAddressWidget: FC = () => {
               <QRCode id="qrcode" value={solAccount.address.toBase58()} size={150} />
             </QRCodeWrapper>
           </QRContent>
+          <TokensWrapper>
+            <AvatarStyled
+              src={tokenList.getList().find((token) => token.symbol === 'SOL')?.logoURI}
+              size={32}
+            />
+            <AvatarStyled src={ethLogo} size={32} />
+            <AvatarStyled
+              src={tokenList.getList().find((token) => token.symbol === 'BTC')?.logoURI}
+              size={32}
+            />
+            <AvatarStyled src={ftxLogo} size={32} />
+            <Tooltip title={<InfoBadge>30+</InfoBadge>} noOpacity>
+              <TooltipContent>
+                <TooltipTitle>One address for any SPL Tokens</TooltipTitle>
+                <TooltipText>
+                  The Solana Program Library (SPL) is a collection of on-chain programs maintained
+                  by the Solana team. The SPL Token program is the token standard of the Solana
+                  blockchain.
+                  <br />
+                  <br />
+                  Similar to ERC20 tokens on the Ethereum network, SPL Tokens are designed for DeFi
+                  applications. SPL Tokens can be traded on Serum, a Solana based decentralized
+                  exchange and FTX.
+                </TooltipText>
+              </TooltipContent>
+            </Tooltip>
+          </TokensWrapper>
           <Address
             className={classNames({ isAddressCopied })}
             onClick={handleCopyClick(solAccount.address.toBase58(), setIsAddressCopied)}>
