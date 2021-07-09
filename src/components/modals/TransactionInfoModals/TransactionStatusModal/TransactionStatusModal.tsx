@@ -343,15 +343,9 @@ export const TransactionStatusModal: FunctionComponent<Props> = ({
               <FieldTitle>Transaction ID</FieldTitle>
               <FieldValue>
                 {signature}{' '}
-                <a
-                  href={getExplorerUrl('tx', signature, cluster)}
-                  target="_blank"
-                  rel="noopener noreferrer noindex"
-                  className="button">
-                  <ShareWrapper onClick={handleCopyClick(getExplorerUrl('tx', signature, cluster))}>
-                    <ShareIcon name="copy" />
-                  </ShareWrapper>
-                </a>
+                <ShareWrapper onClick={handleCopyClick(getExplorerUrl('tx', signature, cluster))}>
+                  <ShareIcon name="copy" />
+                </ShareWrapper>
               </FieldValue>
             </FieldWrapper>
           </FieldsWrapper>
