@@ -80,16 +80,16 @@ const InfoWrapper = styled.div`
 const InfoTitle = styled.div`
   margin-bottom: 2px;
 
-  color: #000;
+  color: #a3a5ba;
   font-weight: 600;
-  font-size: 16px;
+  font-size: 14px;
   line-height: 24px;
 `;
 
 const InfoValue = styled.div`
-  color: #a3a5ba;
+  color: #000;
   font-weight: 600;
-  font-size: 14px;
+  font-size: 16px;
   line-height: 16px;
 `;
 
@@ -237,15 +237,6 @@ export const TransactionConfirmModal: FunctionComponent<Props> = ({ type, params
           <Section className="swap">
             <SectionTitle>From</SectionTitle>
             <FieldInfo>
-              <IconWrapper>
-                <WalletIcon name="wallet" />
-              </IconWrapper>
-              <InfoWrapper>
-                <InfoTitle>Source wallet</InfoTitle>
-                <InfoValue>{(params as SwapParams).firstTokenAccount.address.toBase58()}</InfoValue>
-              </InfoWrapper>
-            </FieldInfo>
-            <FieldInfo>
               <TokenAvatar
                 symbol={(params as SwapParams).firstToken.symbol}
                 address={(params as SwapParams).firstToken.address.toBase58()}
@@ -261,22 +252,18 @@ export const TransactionConfirmModal: FunctionComponent<Props> = ({ type, params
                 </InfoValue>
               </InfoWrapper>
             </FieldInfo>
-          </Section>
-          <Section className="top">
-            <SectionTitle>To</SectionTitle>
             <FieldInfo>
               <IconWrapper>
                 <WalletIcon name="wallet" />
               </IconWrapper>
               <InfoWrapper>
-                <InfoTitle>Destination wallet</InfoTitle>
-                <InfoValue>
-                  {(params as SwapParams).secondTokenAccount
-                    ? (params as SwapParams).secondTokenAccount.address.toBase58()
-                    : 'Will be created'}
-                </InfoValue>
+                <InfoTitle>Source wallet</InfoTitle>
+                <InfoValue>{(params as SwapParams).firstTokenAccount.address.toBase58()}</InfoValue>
               </InfoWrapper>
             </FieldInfo>
+          </Section>
+          <Section className="top">
+            <SectionTitle>To</SectionTitle>
             <FieldInfo>
               <TokenAvatar
                 symbol={(params as SwapParams).secondToken.symbol}
@@ -290,6 +277,19 @@ export const TransactionConfirmModal: FunctionComponent<Props> = ({ type, params
                     .toMajorDenomination((params as SwapParams).secondAmount)
                     .toNumber()}{' '}
                   {(params as SwapParams).secondToken.symbol}
+                </InfoValue>
+              </InfoWrapper>
+            </FieldInfo>
+            <FieldInfo>
+              <IconWrapper>
+                <WalletIcon name="wallet" />
+              </IconWrapper>
+              <InfoWrapper>
+                <InfoTitle>Destination wallet</InfoTitle>
+                <InfoValue>
+                  {(params as SwapParams).secondTokenAccount
+                    ? (params as SwapParams).secondTokenAccount.address.toBase58()
+                    : 'Will be created after transaction processing'}
                 </InfoValue>
               </InfoWrapper>
             </FieldInfo>
