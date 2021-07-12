@@ -101,6 +101,7 @@ export const APIFactory = memoizeWith(
       const accountKeys = transactionInfo?.transaction.message.accountKeys;
       const preBalances = transactionInfo?.meta?.preBalances;
       const preTokenBalances = transactionInfo?.meta?.preTokenBalances;
+      const postTokenBalances = transactionInfo?.meta?.postTokenBalances;
 
       // swap contract
       const swapInstructionIndex = instructions.findIndex(
@@ -116,16 +117,23 @@ export const APIFactory = memoizeWith(
 
         const swapInner = innerInstructions?.find((item) => item.index === swapInstructionIndex);
         // swap instruction
-        if (instructionIndex === 1 && swapInner) {
+        if (instructionIndex === 1) {
           type = 'swap';
-          const transfersInstructions = swapInner.instructions.filter(
-            (inst: ConfirmedTransaction) =>
-              inst?.parsed?.type === 'transfer' || inst?.parsed?.type === 'transferChecked',
-          );
-          const sourceInstruction = transfersInstructions[0] as ConfirmedTransaction;
-          const destinationInstruction = transfersInstructions[1] as ConfirmedTransaction;
-          const sourceInfo = sourceInstruction?.parsed?.info;
-          const destinationInfo = destinationInstruction?.parsed?.info;
+
+          let sourceInfo;
+          let destinationInfo;
+
+          if (swapInner) {
+            const transfersInstructions = swapInner.instructions.filter(
+              (inst: ConfirmedTransaction) =>
+                inst?.parsed?.type === 'transfer' || inst?.parsed?.type === 'transferChecked',
+            );
+            const sourceInstruction = transfersInstructions[0] as ConfirmedTransaction;
+            const destinationInstruction = transfersInstructions[1] as ConfirmedTransaction;
+            sourceInfo = sourceInstruction?.parsed?.info;
+            destinationInfo = destinationInstruction?.parsed?.info;
+          }
+
           const closeInstruction = instructions.find(
             (inst: ConfirmedTransaction) => inst.parsed?.type === 'closeAccount',
           ) as ConfirmedTransaction;
@@ -134,6 +142,27 @@ export const APIFactory = memoizeWith(
           destination = destinationInfo?.destination
             ? new PublicKey(destinationInfo.destination)
             : null;
+
+          const approveInstruction = instructions.find(
+            (inst: ConfirmedTransaction) => inst?.parsed?.type === 'approve',
+          ) as ConfirmedTransaction;
+
+          if (approveInstruction?.parsed) {
+            if (!source) {
+              source = new PublicKey(approveInstruction.parsed.info.source);
+            }
+            if (sourceAmount) {
+              sourceAmount = new Decimal(approveInstruction.parsed.info.amount);
+            }
+            if (!destination) {
+              destinationToken =
+                postTokenBalances && postTokenBalances[postTokenBalances.length - 1]
+                  ? await tokenAPI.tokenInfo(
+                      new PublicKey(postTokenBalances[postTokenBalances.length - 1].mint),
+                    )
+                  : null;
+            }
+          }
 
           if (closeInstruction?.parsed) {
             if (closeInstruction.parsed.info.account === source?.toBase58()) {
@@ -184,8 +213,8 @@ export const APIFactory = memoizeWith(
             }
           }
 
-          sourceAmount = new Decimal(sourceInfo?.amount || 0);
-          destinationAmount = new Decimal(destinationInfo?.amount || 0);
+          sourceAmount = new Decimal(sourceInfo?.amount || sourceAmount || 0);
+          destinationAmount = new Decimal(destinationInfo?.amount || destinationAmount || 0);
 
           if (sourceToken?.decimals) {
             sourceAmount = sourceAmount.div(10 ** sourceToken?.decimals);
