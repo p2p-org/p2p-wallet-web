@@ -138,6 +138,7 @@ type Props = {
 
 export const TransactionDetailsModal: FC<Props> = ({ signature, source, close }) => {
   const dispatch = useDispatch();
+  const publicKey = useSelector((state) => state.wallet.publicKey);
   const [isShowDetails, setShowDetails] = useState(false);
   const cluster = useSelector((state) => state.wallet.network.cluster);
   const transaction = useSelector(
@@ -165,8 +166,10 @@ export const TransactionDetailsModal: FC<Props> = ({ signature, source, close })
       return null;
     }
 
-    return transaction.details(transaction.short.destination?.toBase58() === source);
-  }, [transaction?.short.destination, tokenAccounts]);
+    return transaction.details(
+      transaction.short.destinationTokenAccount?.owner.toBase58() === source,
+    );
+  }, [transaction?.short.destination, publicKey, tokenAccounts]);
 
   if (!details || !transaction) {
     return null;

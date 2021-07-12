@@ -1,5 +1,5 @@
 import React, { FunctionComponent } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 
 import { styled } from '@linaria/react';
@@ -159,7 +159,10 @@ type Props = {
 
 export const TransactionRow: FunctionComponent<Props> = ({ transaction, source }) => {
   const dispatch = useDispatch();
-  const details = transaction.details(transaction.short.destination?.toBase58() === source);
+  const publicKey = useSelector((state) => state.wallet.publicKey);
+  const details = transaction.details(
+    transaction.short.destinationTokenAccount?.owner.toBase58() === publicKey,
+  );
 
   const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (['A', 'IMG'].includes((e.target as HTMLElement).tagName)) {
