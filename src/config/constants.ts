@@ -44,6 +44,7 @@ export type NetworkType = {
 export type NetworkNameType =
   | 'figment-mainnet'
   | 'serum-mainnet'
+  | 'free-rpcpool'
   | 'solana-mainnet'
   | 'solana-devnet'
   | 'solana-testnet';
@@ -63,6 +64,11 @@ export const networks: NetworksByNameType = {
     name: 'serum-mainnet',
     cluster: 'mainnet-beta',
     endpoint: 'https://solana-api.projectserum.com',
+  },
+  'free-rpcpool': {
+    name: 'free-rpcpool',
+    cluster: 'mainnet-beta',
+    endpoint: 'https://free.rpcpool.com',
   },
   'solana-mainnet': {
     name: 'solana-mainnet',
