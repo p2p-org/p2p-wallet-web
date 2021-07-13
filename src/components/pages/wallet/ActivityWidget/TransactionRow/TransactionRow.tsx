@@ -161,7 +161,8 @@ export const TransactionRow: FunctionComponent<Props> = ({ transaction, source }
   const dispatch = useDispatch();
   const publicKey = useSelector((state) => state.wallet.publicKey);
   const details = transaction.details(
-    transaction.short.destinationTokenAccount?.owner.toBase58() === publicKey,
+    transaction.short.destinationTokenAccount?.owner.toBase58() === publicKey ||
+      transaction.short.destination?.toBase58() === source,
   );
 
   const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {

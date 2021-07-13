@@ -167,9 +167,10 @@ export const TransactionDetailsModal: FC<Props> = ({ signature, source, close })
     }
 
     return transaction.details(
-      transaction.short.destinationTokenAccount?.owner.toBase58() === source,
+      transaction.short.destinationTokenAccount?.owner.toBase58() === publicKey ||
+        transaction.short.destination?.toBase58() === source,
     );
-  }, [transaction?.short.destination, publicKey, tokenAccounts]);
+  }, [transaction?.short.destination, publicKey, source, tokenAccounts]);
 
   if (!details || !transaction) {
     return null;
