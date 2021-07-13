@@ -680,6 +680,17 @@ export const APIFactory = memoizeWith(
         let toAccount;
         if (parameters.toAccount && !parameters.toAccount.mint.address.equals(WRAPPED_SOL_MINT)) {
           toAccount = parameters.toAccount;
+        } else if (
+          parameters.toAccount &&
+          parameters.toAccount.mint.address.equals(WRAPPED_SOL_MINT)
+        ) {
+          toAccount = await createAccountByMint(
+            getWallet().pubkey,
+            toToken,
+            instructions,
+            cleanupInstructions,
+            signers,
+          );
         } else {
           const associatedTokenAddress = await SPLToken.getAssociatedTokenAddress(
             ASSOCIATED_TOKEN_ACCOUNT_PROGRAM_ID,
