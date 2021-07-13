@@ -208,15 +208,6 @@ export const TransactionConfirmModal: FunctionComponent<Props> = ({ type, params
       {type === 'send' ? (
         <Section className="send">
           <FieldInfo>
-            <IconWrapper>
-              <WalletIcon name="wallet" />
-            </IconWrapper>
-            <InfoWrapper>
-              <InfoTitle>Check recepient’s address</InfoTitle>
-              <InfoValue>{(params as TransferParams).destination.toBase58()}</InfoValue>
-            </InfoWrapper>
-          </FieldInfo>
-          <FieldInfo>
             <TokenAvatar
               symbol={(params as TransferParams).source.mint.symbol}
               address={(params as TransferParams).source.mint.address.toBase58()}
@@ -227,6 +218,15 @@ export const TransactionConfirmModal: FunctionComponent<Props> = ({ type, params
               <InfoValue>
                 {(params as TransferParams).amount} {(params as TransferParams).source.mint.symbol}
               </InfoValue>
+            </InfoWrapper>
+          </FieldInfo>
+          <FieldInfo>
+            <IconWrapper>
+              <WalletIcon name="wallet" />
+            </IconWrapper>
+            <InfoWrapper>
+              <InfoTitle>Check recepient’s address</InfoTitle>
+              <InfoValue>{(params as TransferParams).destination.toBase58()}</InfoValue>
             </InfoWrapper>
           </FieldInfo>
         </Section>
@@ -250,15 +250,6 @@ export const TransactionConfirmModal: FunctionComponent<Props> = ({ type, params
                     .toNumber()}{' '}
                   {(params as SwapParams).firstToken.symbol}
                 </InfoValue>
-              </InfoWrapper>
-            </FieldInfo>
-            <FieldInfo>
-              <IconWrapper>
-                <WalletIcon name="wallet" />
-              </IconWrapper>
-              <InfoWrapper>
-                <InfoTitle>Source wallet</InfoTitle>
-                <InfoValue>{(params as SwapParams).firstTokenAccount.address.toBase58()}</InfoValue>
               </InfoWrapper>
             </FieldInfo>
           </Section>
