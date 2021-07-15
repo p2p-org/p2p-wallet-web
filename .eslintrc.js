@@ -24,6 +24,7 @@ module.exports = {
     'no-unused-vars': 'error',
     'unicorn/no-null': 'off',
     'unicorn/prefer-ternary': 'off',
+    'max-classes-per-file': 'off',
     'prettier/prettier': 'off',
     '@typescript-eslint/restrict-template-expressions': 'off',
     '@typescript-eslint/explicit-module-boundary-types': 'off',

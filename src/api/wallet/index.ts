@@ -14,6 +14,7 @@ import assert from 'assert';
 import { PhantomtWallet } from 'api/wallet/PhantomWallet';
 import { NetworkType, postTransactionSleepMS } from 'config/constants';
 import { sleep } from 'utils/common';
+import { parseSendTransactionError, SendTransactionError } from 'utils/errors';
 
 import { confirmTransaction, DEFAULT_COMMITMENT, getConnection, getEndpoint } from '../connection';
 import { LocalWallet } from './LocalWallet';
@@ -150,11 +151,21 @@ export const sendTransaction = async (
   console.log('Sending signature request to wallet');
   const signed = await wallet.sign(transaction);
   console.log('Got signature, submitting transaction');
-  const signature = await connection.sendRawTransaction(signed.serialize(), {
-    preflightCommitment,
-  });
 
-  return awaitConfirmation(signature, commitment);
+  try {
+    const signature = await connection.sendRawTransaction(signed.serialize(), {
+      preflightCommitment,
+    });
+
+    return await awaitConfirmation(signature, commitment);
+  } catch (error) {
+    if ((error as SendTransactionError).logs) {
+      const errors = parseSendTransactionError(error as SendTransactionError);
+      throw new Error(errors.join(' '));
+    }
+
+    throw error;
+  }
 };
 
 export const getWallet = (): Wallet => {

@@ -31,7 +31,7 @@
     "@solana/spl-token": "^0.1.4",
     "@solana/spl-token-registry": "^0.2.123",
     "@solana/spl-token-swap": "^0.1.0",
-    "@solana/web3.js": "^1.17.0",
+    "@solana/web3.js": "^1.21.0",
     "@ukstv/jazzicon-react": "^1.0.0",
     "amplitude-js": "^8.3.0",
     "bip32": "^2.0.6",
