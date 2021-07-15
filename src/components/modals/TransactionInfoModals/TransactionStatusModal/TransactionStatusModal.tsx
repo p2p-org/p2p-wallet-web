@@ -145,7 +145,7 @@ export const TransactionStatusModal: FunctionComponent<Props> = ({
     } catch (error) {
       setTransactionError((error as Error).message);
       setIsExecuting(false);
-      ToastManager.error((error as Error).message);
+      ToastManager.error(type, (error as Error).message);
     }
   };
 
