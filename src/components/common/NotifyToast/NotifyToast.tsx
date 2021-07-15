@@ -34,12 +34,14 @@ const ToastWrapper = styled.div`
 `;
 
 const ToastHeader = styled.div`
-  display: flex;
-  flex-grow: 1;
-  align-items: center;
+  display: inline-block;
 
   font-weight: 600;
   font-size: 16px;
+
+  &::first-letter {
+    text-transform: uppercase;
+  }
 `;
 
 const ToastText = styled.div`
@@ -47,10 +49,9 @@ const ToastText = styled.div`
   flex-grow: 1;
   align-items: center;
 
+  color: #a3a5ba;
   font-weight: 600;
   font-size: 16px;
-
-  color: #a3a5ba;
 `;
 
 const CloseButton = styled.button`
@@ -85,9 +86,9 @@ const CloseIcon = styled(Icon)`
 
 const StatusIcon = styled(Icon)`
   flex-shrink: 0;
-  margin-right: 8px;
   width: 15px;
   height: 15px;
+  margin-right: 8px;
 `;
 
 const SwapAvatarsWrapper = styled.div`
