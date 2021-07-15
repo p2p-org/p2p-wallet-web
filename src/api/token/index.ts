@@ -15,13 +15,8 @@ import assert from 'ts-invariant';
 
 import { getConnection } from 'api/connection';
 import { retryableProxy } from 'api/connection/utils/retryableProxy';
-import {
-  getWallet,
-  makeTransaction,
-  sendTransaction,
-  sendTransactionFromAccount,
-} from 'api/wallet';
-import { airdropKey, NetworkType } from 'config/constants';
+import { getWallet, makeTransaction, sendTransaction } from 'api/wallet';
+import { NetworkType } from 'config/constants';
 import { SYSTEM_PROGRAM_ID, WRAPPED_SOL_MINT } from 'constants/solana/bufferLayouts';
 import { CacheTTL } from 'lib/cachettl';
 import { toDecimal } from 'utils/amount';
@@ -73,7 +68,6 @@ export interface API {
   createAccountForToken: (token: Token, owner?: PublicKey) => Promise<TokenAccount>;
   mintTo: (recipient: TokenAccount, tokenAmount: number) => Promise<string>;
   createMint: (amount: number, decimals: number, initialAccount: Account) => Promise<string>;
-  airdropToWallet: (token: Token, tokenAmount: number) => Promise<string>;
   transfer: (parameters: TransferParameters) => Promise<string>;
   approveInstruction: (
     sourceAccount: TokenAccount,
@@ -750,47 +744,6 @@ export const APIFactory = memoizeWith(
       );
     }
 
-    /**
-     * If an airdrop key exists, airdrop tokens to the current wallet
-     * This is useful in order to demo token swaps on "dummy tokens" in non-mainnet environments
-     * Note - the airdrop key must be a mint authority for the token.
-     * @param token The token to mint
-     * @param tokenAmount The amount of tokens to mint
-     */
-    const airdropToWallet = async (token: Token, tokenAmount: number): Promise<string> => {
-      const airdropPrivateKey = airdropKey(network.cluster);
-      if (!airdropPrivateKey) {
-        throw new Error(`No airdrop key available for ${network.cluster}`);
-      }
-      const airdropAccount: Account = new Account(JSON.parse(airdropPrivateKey));
-
-      const tokenAccounts = await getAccountsForToken(token);
-
-      // airdrop SOL so that new accounts can be created
-      await connection.requestAirdrop(getWallet().pubkey, 1000000);
-
-      // airdrop SOL to the airdrop key
-      await connection.requestAirdrop(airdropAccount.publicKey, 1000000);
-
-      const recipient =
-        !tokenAccounts || tokenAccounts.length === 0
-          ? await createAccountForToken(token)
-          : tokenAccounts[0];
-
-      const mintToInstruction = SPLToken.createMintToInstruction(
-        TOKEN_PROGRAM_ID,
-        token.address,
-        recipient.address,
-        airdropAccount.publicKey,
-        [],
-        tokenAmount,
-      );
-
-      const transaction = await makeTransaction([mintToInstruction]);
-
-      return sendTransactionFromAccount(transaction, airdropAccount);
-    };
-
     const approve = async (
       sourceAccount: TokenAccount,
       delegate: PublicKey,
@@ -939,7 +892,6 @@ export const APIFactory = memoizeWith(
       createToken,
       mintTo,
       createMint,
-      airdropToWallet,
       transfer,
       approveInstruction,
       approve,

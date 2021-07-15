@@ -28,9 +28,6 @@ export const defaultCommitment: Commitment =
 // in order to work around a known solana web3 bug
 export const postTransactionSleepMS = Number(process.env.REACT_APP_POST_TRANSACTION_SLEEP_MS);
 
-export const airdropKey = (cluster: ExtendedCluster): string | undefined =>
-  process.env[`REACT_APP_${cluster.toUpperCase()}_AIRDROP_PRIVATE_KEY`];
-
 export type NetworkType = {
   name: string;
   cluster: ExtendedCluster;

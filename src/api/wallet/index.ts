@@ -157,25 +157,6 @@ export const sendTransaction = async (
   return awaitConfirmation(signature, commitment);
 };
 
-export const sendTransactionFromAccount = async (
-  transaction: Transaction,
-  signer: Account,
-  {
-    commitment = defaultSendOptions.commitment,
-    preflightCommitment = defaultSendOptions.preflightCommitment,
-  }: Partial<SendOptions> = defaultSendOptions,
-): Promise<string> => {
-  if (!wallet || !connection) {
-    throw new Error('Connect first');
-  }
-
-  const signature = await connection.sendTransaction(transaction, [signer], {
-    preflightCommitment,
-  });
-
-  return awaitConfirmation(signature, commitment);
-};
-
 export const getWallet = (): Wallet => {
   if (!wallet || !connection) {
     throw new Error('Did not have wallet');
