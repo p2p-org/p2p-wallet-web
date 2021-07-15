@@ -45,7 +45,7 @@
     "ed25519-hd-key": "^1.2.0",
     "eventemitter3": "^4.0.7",
     "flagged": "^2.0.1",
-    "highcharts": "^8.2.2",
+    "highcharts": "^9.0.0",
     "history": "^5.0.0",
     "lodash.throttle": "^4.1.1",
     "nprogress": "^0.2.0",
