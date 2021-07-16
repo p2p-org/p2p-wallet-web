@@ -336,7 +336,7 @@ export const FromToSelectInput: FunctionComponent<Props> = ({
   const [scrollTop, setScrollTop] = useState(0);
 
   useEffect(() => {
-    if (amount && amount !== localAmount) {
+    if (!isNil(amount) && amount !== localAmount) {
       setLocalAmount(amount);
     }
   }, [amount]);
@@ -428,6 +428,16 @@ export const FromToSelectInput: FunctionComponent<Props> = ({
       minorAmountToMajor(tokenAccountBalance, tokenAccount.mint).toString(),
       'available',
     );
+  };
+
+  const handleAmountFocus = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let nextAmount = e.target.value;
+
+    if (Number(nextAmount) === 0) {
+      nextAmount = '';
+      setLocalAmount(nextAmount);
+      onAmountChange(nextAmount);
+    }
   };
 
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -551,6 +561,7 @@ export const FromToSelectInput: FunctionComponent<Props> = ({
             <AmountInput
               placeholder={token?.toMajorDenomination(0).toString() || '0'}
               value={localAmount}
+              onFocus={handleAmountFocus}
               onChange={handleAmountChange}
               disabled={disabled || disabledInput}
             />
