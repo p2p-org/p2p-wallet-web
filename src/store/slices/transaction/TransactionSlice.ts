@@ -1,6 +1,6 @@
 // eslint-disable-next-line eslint-comments/disable-enable-pair
 /* eslint-disable no-param-reassign */
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import {
   ConfirmedSignaturesForAddress2Options,
   PublicKey,
@@ -52,18 +52,29 @@ export interface TransactionsState {
   order: {
     [account: string]: string[];
   };
+  isNeedUpdateTransactions: boolean;
+  currentHistoryPubkey: string | null;
 }
 
 const initialState: TransactionsState = {
   items: {},
   order: {},
+  isNeedUpdateTransactions: false,
+  currentHistoryPubkey: null,
 };
 
 const transactionSlice = createSlice({
   name: TRANSACTION_SLICE_NAME,
   initialState,
   reducers: {
-    // updatePool: () => {},
+    updateTransactions: (state, action: PayloadAction<boolean>) => ({
+      ...state,
+      isNeedUpdateTransactions: action.payload,
+    }),
+    setCurrentHistoryPubkey: (state, action: PayloadAction<string | null>) => ({
+      ...state,
+      currentHistoryPubkey: action.payload,
+    }),
   },
   extraReducers: (builder) => {
     builder.addCase(getTransactions.fulfilled, (state, action) => {
@@ -107,6 +118,6 @@ const transactionSlice = createSlice({
   },
 });
 
-// export const { updatePool } = transactionSlice.actions;
+export const { updateTransactions, setCurrentHistoryPubkey } = transactionSlice.actions;
 // eslint-disable-next-line import/no-default-export
 export default transactionSlice.reducer;
