@@ -39,7 +39,6 @@ export type NetworkType = {
 };
 
 export type NetworkNameType =
-  | 'figment-mainnet'
   | 'serum-mainnet'
   | 'free-rpcpool'
   | 'solana-mainnet'
@@ -51,12 +50,6 @@ type NetworksByNameType = {
 };
 
 export const networks: NetworksByNameType = {
-  'figment-mainnet': {
-    name: 'figment-mainnet',
-    cluster: 'mainnet-beta',
-    endpoint: `https://datahub-proxy.p2p.org`,
-    wsEndpoint: `wss://solana--mainnet--ws.datahub.figment.io/apikey/${process.env.REACT_APP_FIGMENT_DATAHUB_API_KEY}`,
-  },
   'serum-mainnet': {
     name: 'serum-mainnet',
     cluster: 'mainnet-beta',
