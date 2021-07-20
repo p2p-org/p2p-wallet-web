@@ -389,7 +389,7 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
           </FeeLine>
         </FromWrapper>
         <ToSendWrapper>
-          <FromTitle>Send to</FromTitle>
+          <FromTitle>Send to SOL or any SPL token address</FromTitle>
           <ToAddressInput value={toTokenPublicKey || ''} onChange={handleToPublicKeyChange} />
           {isShowConfirmAddressSwitch ? (
             <ConfirmWrapper>
