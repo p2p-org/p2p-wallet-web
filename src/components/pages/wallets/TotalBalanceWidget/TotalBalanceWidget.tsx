@@ -144,6 +144,7 @@ export const TotalBalanceWidget: FunctionComponent<Props> = ({ onSymbolChange })
   }, [tokenAccounts]);
 
   const handleTopUpClick = () => {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-assignment
     const transak = new TransakSDK({
       apiKey: process.env.REACT_APP_TRANSAK_API_KEY, // Your API Key
       environment: 'STAGING', // STAGING/PRODUCTION
@@ -158,16 +159,20 @@ export const TotalBalanceWidget: FunctionComponent<Props> = ({ onSymbolChange })
       widgetWidth: '500px',
     });
 
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
     transak.init();
 
     // To get all the events
-    transak.on(transak.ALL_EVENTS, (data) => {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
+    transak.on(transak.ALL_EVENTS, (data: any) => {
       console.log(data);
     });
 
     // This will trigger when the user marks payment is made.
-    transak.on(transak.EVENTS.TRANSAK_ORDER_SUCCESSFUL, (orderData) => {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
+    transak.on(transak.EVENTS.TRANSAK_ORDER_SUCCESSFUL, (orderData: any) => {
       console.log(orderData);
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
       transak.close();
     });
   };
