@@ -39,7 +39,10 @@ import { getAvailableTokens, wipeAction } from 'store/slices/GlobalSlice';
 import { getPools } from 'store/slices/pool/PoolSlice';
 import { getRatesCandle, getRatesMarkets } from 'store/slices/rate/RateSlice';
 import { updateEntityArray } from 'store/slices/tokenPair/utils/tokenPair';
-import { addPendingTransaction } from 'store/slices/transaction/TransactionSlice';
+import {
+  addPendingTransaction,
+  updateTransactions,
+} from 'store/slices/transaction/TransactionSlice';
 import { minorAmountToMajor } from 'utils/amount';
 import {
   loadHiddenTokens,
@@ -137,6 +140,17 @@ export const getTokenAccount = createAsyncThunk<TokenAccount | null, PublicKey>(
   },
 );
 
+const updateHitory = createAsyncThunk<void, TokenAccount>(
+  `${WALLET_SLICE_NAME}/updateHitory`,
+  (account, thunkAPI) => {
+    const state: RootState = thunkAPI.getState() as RootState;
+
+    if (state.transaction.currentHistoryPubkey === account.address.toBase58()) {
+      thunkAPI.dispatch(updateTransactions(true));
+    }
+  },
+);
+
 export const getTokenAccountsForWallet = createAsyncThunk<SerializableTokenAccount[]>(
   `${WALLET_SLICE_NAME}/getTokenAccountsForWallet`,
   async (_, thunkAPI) => {
@@ -166,6 +180,7 @@ export const getTokenAccountsForWallet = createAsyncThunk<SerializableTokenAccou
     const listener = TokenAPI.listenToTokenAccountChanges(tokenAccounts, (updatedTokenAccount) => {
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
       thunkAPI.dispatch(updateAccount(updatedTokenAccount.serialize()));
+      void thunkAPI.dispatch(updateHitory(updatedTokenAccount));
     });
 
     accountsListeners.push(listener);
@@ -324,7 +339,7 @@ export const transfer = createAsyncThunk<string, TransferParameters>(
 
     thunkAPI.dispatch(
       addPendingTransaction(
-        new Transaction(resultSignature, 0, null, null, {
+        new Transaction(resultSignature, 0, null, null, null, {
           type: 'transfer',
           source: parameters.source,
           sourceTokenAccount: tokenAccount || null,

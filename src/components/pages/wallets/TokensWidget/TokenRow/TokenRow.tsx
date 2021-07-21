@@ -1,11 +1,12 @@
 import React, { FunctionComponent } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 
 import { styled } from '@linaria/react';
 import classNames from 'classnames';
 import { rgba } from 'polished';
 
+import tokenList from 'api/token/token.config';
 import { TokenAccount } from 'api/token/TokenAccount';
 import { AmountUSD } from 'components/common/AmountUSD';
 import { TokenAvatar } from 'components/common/TokenAvatar';
@@ -148,6 +149,7 @@ export const TokenRow: FunctionComponent<Props> = ({
   isHidden = false,
 }) => {
   const dispatch = useDispatch();
+  const cluster = useSelector((state) => state.wallet.network.cluster);
   // eslint-disable-next-line unicorn/consistent-function-scoping
   const handleMenuItemClick = () => {
     const tokenAddress = token.address.toBase58();
@@ -164,6 +166,10 @@ export const TokenRow: FunctionComponent<Props> = ({
   };
 
   const isNotSOL = token.mint.symbol !== 'SOL';
+  const tokenInfo = tokenList
+    .filterByClusterSlug(cluster)
+    .getList()
+    .find((t) => t.symbol === token.mint.symbol || t.address === token.mint.address.toBase58());
 
   return (
     <Wrapper className={classNames({ isHidden, isSelected })}>
@@ -184,7 +190,9 @@ export const TokenRow: FunctionComponent<Props> = ({
             />
           </Top>
           <Bottom>
-            <div title={token.address.toBase58()}>{shortAddress(token.address.toBase58())}</div>
+            <div title={token.address.toBase58()}>
+              {isNotSOL ? tokenInfo?.name : shortAddress(token.address.toBase58())}
+            </div>
             <div>
               {token.mint.toMajorDenomination(token.balance).toString()} {token.mint.symbol}
             </div>

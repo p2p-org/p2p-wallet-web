@@ -12,7 +12,11 @@ import { LoaderBlock } from 'components/common/LoaderBlock';
 import { ToastManager } from 'components/common/ToastManager';
 import { Widget } from 'components/common/Widget';
 import { TransactionList } from 'components/pages/wallet/ActivityWidget/TransactionList';
-import { getTransactions } from 'store/slices/transaction/TransactionSlice';
+import {
+  getTransactions,
+  setCurrentHistoryPubkey,
+  updateTransactions,
+} from 'store/slices/transaction/TransactionSlice';
 import { trackEvent } from 'utils/analytics';
 
 const WrapperWidget = styled(Widget)``;
@@ -28,6 +32,9 @@ export const ActivityWidget: FunctionComponent<Props> = ({ publicKey }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isEnd, setIsEnd] = useState(false);
   const order = useSelector((state) => state.transaction.order[publicKey]);
+  const isNeedUpdateTransactions = useSelector(
+    (state) => state.transaction.isNeedUpdateTransactions,
+  );
 
   useEffect(() => {
     if (order?.length) {
@@ -62,7 +69,19 @@ export const ActivityWidget: FunctionComponent<Props> = ({ publicKey }) => {
 
   useEffect(() => {
     void fetchData();
+    dispatch(setCurrentHistoryPubkey(publicKey));
+
+    return function cleanup() {
+      dispatch(setCurrentHistoryPubkey(null));
+    };
   }, []);
+
+  useEffect(() => {
+    if (isNeedUpdateTransactions) {
+      void fetchData();
+      dispatch(updateTransactions(false));
+    }
+  }, [isNeedUpdateTransactions]);
 
   const handleNeedLoadMore = () => {
     void fetchData(true);
