@@ -21,8 +21,8 @@ export type ParsedConfirmedTransactionMeta = {
 type Instruction = ParsedInstruction | PartiallyDecodedInstruction;
 
 type TransactionMessage = {
-  accountKeys: ParsedMessageAccount[];
-  instructions: Instruction[];
+  accountKeys: ParsedMessageAccount[] | undefined;
+  instructions: Instruction[] | undefined;
 };
 
 type ParsedShort = {
@@ -70,8 +70,8 @@ type SerializedAccountKeys = {
 type SerializedInstruction = SerializedParsedInstruction | SerializedPartiallyDecodedInstruction;
 
 type SerializedTransactionMessage = {
-  accountKeys: SerializedAccountKeys[];
-  instructions: SerializedInstruction[];
+  accountKeys: SerializedAccountKeys[] | undefined;
+  instructions: SerializedInstruction[] | undefined;
 };
 
 export type SerializableTransaction = {
@@ -92,7 +92,7 @@ export class Transaction implements Serializable<SerializableTransaction> {
 
   readonly meta: ParsedConfirmedTransactionMeta | null;
 
-  readonly message: TransactionMessage;
+  readonly message: TransactionMessage | null;
 
   readonly short: ParsedShort;
 
@@ -101,7 +101,7 @@ export class Transaction implements Serializable<SerializableTransaction> {
     slot: number,
     timestamp: number | null | undefined,
     meta: ParsedConfirmedTransactionMeta | null,
-    message: TransactionMessage,
+    message: TransactionMessage | null,
     short: ParsedShort,
   ) {
     this.signature = signature;
@@ -117,25 +117,29 @@ export class Transaction implements Serializable<SerializableTransaction> {
   }
 
   serialize(): SerializableTransaction {
-    const accountKeys: SerializedAccountKeys[] = this.message.accountKeys.map((key) => ({
-      ...key,
-      pubkey: key.pubkey.toBase58(),
-    }));
+    const accountKeys: SerializedAccountKeys[] | undefined = this.message?.accountKeys?.map(
+      (key) => ({
+        ...key,
+        pubkey: key.pubkey.toBase58(),
+      }),
+    );
 
-    const instructions: SerializedInstruction[] = this.message.instructions.map((instruction) => {
-      const serializedInstruction = <SerializedInstruction>{
-        ...instruction,
-        programId: instruction.programId.toBase58(),
-      };
+    const instructions: SerializedInstruction[] | undefined = this.message?.instructions?.map(
+      (instruction) => {
+        const serializedInstruction = <SerializedInstruction>{
+          ...instruction,
+          programId: instruction.programId.toBase58(),
+        };
 
-      if ((instruction as PartiallyDecodedInstruction).accounts) {
-        (serializedInstruction as SerializedPartiallyDecodedInstruction).accounts = (instruction as PartiallyDecodedInstruction).accounts.map(
-          (account) => account.toBase58(),
-        );
-      }
+        if ((instruction as PartiallyDecodedInstruction).accounts) {
+          (serializedInstruction as SerializedPartiallyDecodedInstruction).accounts = (instruction as PartiallyDecodedInstruction).accounts.map(
+            (account) => account.toBase58(),
+          );
+        }
 
-      return serializedInstruction;
-    });
+        return serializedInstruction;
+      },
+    );
 
     return {
       signature: this.signature,
@@ -236,29 +240,29 @@ export class Transaction implements Serializable<SerializableTransaction> {
   }
 
   static from(serializableTransaction: SerializableTransaction): Transaction {
-    const accountKeys: ParsedMessageAccount[] = serializableTransaction.message.accountKeys.map(
-      (key) => ({
-        ...key,
-        pubkey: new PublicKey(key.pubkey),
-      }),
-    );
+    const accountKeys:
+      | ParsedMessageAccount[]
+      | undefined = serializableTransaction.message?.accountKeys?.map((key) => ({
+      ...key,
+      pubkey: new PublicKey(key.pubkey),
+    }));
 
-    const instructions: Instruction[] = serializableTransaction.message.instructions.map(
-      (instruction) => {
-        const originalInstruction = <Instruction>{
-          ...instruction,
-          programId: new PublicKey(instruction.programId),
-        };
+    const instructions:
+      | Instruction[]
+      | undefined = serializableTransaction.message?.instructions?.map((instruction) => {
+      const originalInstruction = <Instruction>{
+        ...instruction,
+        programId: new PublicKey(instruction.programId),
+      };
 
-        if ((instruction as SerializedPartiallyDecodedInstruction).accounts) {
-          (originalInstruction as PartiallyDecodedInstruction).accounts = (instruction as SerializedPartiallyDecodedInstruction).accounts.map(
-            (account) => new PublicKey(account),
-          );
-        }
+      if ((instruction as SerializedPartiallyDecodedInstruction).accounts) {
+        (originalInstruction as PartiallyDecodedInstruction).accounts = (instruction as SerializedPartiallyDecodedInstruction).accounts.map(
+          (account) => new PublicKey(account),
+        );
+      }
 
-        return originalInstruction;
-      },
-    );
+      return originalInstruction;
+    });
 
     return new Transaction(
       serializableTransaction.signature,

@@ -1,6 +1,6 @@
 // eslint-disable-next-line eslint-comments/disable-enable-pair
 /* eslint-disable no-param-reassign */
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { createAction, createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import {
   ConfirmedSignaturesForAddress2Options,
   PublicKey,
@@ -14,6 +14,8 @@ import { RootState } from 'store/rootReducer';
 import { wipeAction } from 'store/slices/GlobalSlice';
 
 const TRANSACTION_SLICE_NAME = 'transaction';
+
+export const addPendingTransaction = createAction<SerializableTransaction>('addPendingTransaction');
 
 export const getTransactions = createAsyncThunk<
   Array<SerializableTransaction>,
@@ -70,6 +72,17 @@ const transactionSlice = createSlice({
       const newItems: ItemsType = {};
       const newPubkeys: string[] = [];
 
+      // keep pending transactions
+      if (state.order[action.meta.arg.publicKey.toBase58()]) {
+        for (const signature of state.order[action.meta.arg.publicKey.toBase58()]) {
+          const transaction = state.items[signature];
+
+          if (!transaction.slot) {
+            newPubkeys.push(transaction.signature);
+          }
+        }
+      }
+
       for (const transaction of action.payload) {
         newItems[transaction.signature] = transaction;
         newPubkeys.push(transaction.signature);
@@ -96,12 +109,46 @@ const transactionSlice = createSlice({
         [action.payload.signature]: action.payload,
       };
       const newPubkeys: string[] = [action.payload.signature];
-
       state.items = mergeRight(state.items, newItems);
 
-      state.order[action.payload.signature] = uniq(
-        pathOr<string[]>([], ['order', action.payload.signature], state).concat(newPubkeys),
-      );
+      if (action.payload.short.source) {
+        state.order[action.payload.short.source] = uniq(
+          pathOr<string[]>([], ['order', action.payload.short.source], state).concat(newPubkeys),
+        );
+      }
+
+      if (action.payload.short.destination) {
+        state.order[action.payload.short.destination] = uniq(
+          pathOr<string[]>([], ['order', action.payload.short.destination], state).concat(
+            newPubkeys,
+          ),
+        );
+      }
+    });
+    builder.addCase(addPendingTransaction, (state, action) => {
+      if (!action.payload) {
+        return state;
+      }
+
+      const newItems: ItemsType = {
+        [action.payload.signature]: action.payload,
+      };
+      const newPubkeys: string[] = [action.payload.signature];
+      state.items = mergeRight(state.items, newItems);
+
+      if (action.payload.short.source) {
+        state.order[action.payload.short.source] = uniq(
+          newPubkeys.concat(pathOr<string[]>([], ['order', action.payload.short.source], state)),
+        );
+      }
+
+      if (action.payload.short.destination) {
+        state.order[action.payload.short.destination] = uniq(
+          newPubkeys.concat(
+            pathOr<string[]>([], ['order', action.payload.short.destination], state),
+          ),
+        );
+      }
     });
     builder.addCase(wipeAction, () => initialState);
   },

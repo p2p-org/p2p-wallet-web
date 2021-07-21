@@ -114,7 +114,7 @@ const transferSol = async (parameters: TransferParameters): Promise<string> => {
 
   const transaction = await makeTransaction([transferInstruction]);
 
-  return sendTransaction(transaction);
+  return sendTransaction(transaction, false);
 };
 
 // The API is a singleton per cluster. This ensures requests can be cached
@@ -772,7 +772,7 @@ export const APIFactory = memoizeWith(
 
       const transaction = await makeTransaction([transferInstruction]);
 
-      return sendTransaction(transaction);
+      return sendTransaction(transaction, false);
     };
 
     const createAndTransferToAssociatedTokenAccount = async (
@@ -808,7 +808,7 @@ export const APIFactory = memoizeWith(
 
       const transaction = await makeTransaction(instructions);
 
-      return sendTransaction(transaction);
+      return sendTransaction(transaction, false);
     };
 
     const transferTokens = async (parameters: TransferParameters): Promise<string> => {
@@ -877,7 +877,7 @@ export const APIFactory = memoizeWith(
 
       const transaction = await makeTransaction([closeAccountInstruction]);
 
-      return sendTransaction(transaction);
+      return sendTransaction(transaction, false);
     };
 
     return {

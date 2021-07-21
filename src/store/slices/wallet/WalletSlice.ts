@@ -15,8 +15,16 @@ import { AccountListener } from 'api/token/AccountListener';
 import colors from 'api/token/colors.config';
 import { Token } from 'api/token/Token';
 import { SerializableTokenAccount, TokenAccount } from 'api/token/TokenAccount';
+import { Transaction } from 'api/transaction/Transaction';
 import * as WalletAPI from 'api/wallet';
-import { getBalance, getWallet, getWalletUnsafe, WalletDataType, WalletType } from 'api/wallet';
+import {
+  awaitConfirmation,
+  getBalance,
+  getWallet,
+  getWalletUnsafe,
+  WalletDataType,
+  WalletType,
+} from 'api/wallet';
 import {
   getDerivableAccounts,
   loadMnemonicAndSeed,
@@ -31,6 +39,7 @@ import { getAvailableTokens, wipeAction } from 'store/slices/GlobalSlice';
 import { getPools } from 'store/slices/pool/PoolSlice';
 import { getRatesCandle, getRatesMarkets } from 'store/slices/rate/RateSlice';
 import { updateEntityArray } from 'store/slices/tokenPair/utils/tokenPair';
+import { addPendingTransaction } from 'store/slices/transaction/TransactionSlice';
 import { minorAmountToMajor } from 'utils/amount';
 import {
   loadHiddenTokens,
@@ -301,19 +310,41 @@ export const transfer = createAsyncThunk<string, TransferParameters>(
   async (parameters, thunkAPI) => {
     const state: RootState = thunkAPI.getState() as RootState;
     const walletState = state.wallet;
+    const tokenAccounts = state.wallet.tokenAccounts.map((account) => TokenAccount.from(account));
+    const tokenAccount = tokenAccounts.find((account) => account.address.equals(parameters.source));
 
+    let resultSignature: string;
     if (walletState.settings.useFreeTransactions) {
-      const tokenAccounts = state.wallet.tokenAccounts.map((account) => TokenAccount.from(account));
-      const tokenAccount = tokenAccounts.find((account) =>
-        account.address.equals(parameters.source),
-      );
       const FeeRelayerAPI = FeeRelayerAPIFactory(walletState.network);
-      return FeeRelayerAPI.transfer(parameters, tokenAccount);
+      resultSignature = await FeeRelayerAPI.transfer(parameters, tokenAccount);
+    } else {
+      const TokenAPI = TokenAPIFactory(walletState.network);
+      resultSignature = await TokenAPI.transfer(parameters);
     }
 
-    const TokenAPI = TokenAPIFactory(walletState.network);
+    thunkAPI.dispatch(
+      addPendingTransaction(
+        new Transaction(resultSignature, 0, null, null, {
+          type: 'transfer',
+          source: parameters.source,
+          sourceTokenAccount: tokenAccount || null,
+          sourceToken: tokenAccount?.mint || null,
+          destination: parameters.destination,
+          destinationTokenAccount: null,
+          destinationToken: tokenAccount?.mint || null,
+          sourceAmount: tokenAccount?.mint
+            ? minorAmountToMajor(parameters.amount, tokenAccount?.mint)
+            : new Decimal(0),
+          destinationAmount: tokenAccount?.mint
+            ? minorAmountToMajor(parameters.amount, tokenAccount?.mint)
+            : new Decimal(0),
+        }).serialize(),
+      ),
+    );
 
-    return TokenAPI.transfer(parameters);
+    await awaitConfirmation(resultSignature);
+
+    return resultSignature;
   },
 );
 

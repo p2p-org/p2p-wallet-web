@@ -1,9 +1,14 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
+import { Decimal } from 'decimal.js';
 
 import { APIFactory, SwapParameters } from 'api/pool';
 import { Pool } from 'api/pool/Pool';
 import { TokenAccount } from 'api/token/TokenAccount';
+import { Transaction } from 'api/transaction/Transaction';
+import { awaitConfirmation } from 'api/wallet';
 import { RootState } from 'store/rootReducer';
+import { addPendingTransaction } from 'store/slices/transaction/TransactionSlice';
+import { minorAmountToMajor } from 'utils/amount';
 import { swapNotification } from 'utils/transactionNotifications';
 
 export const SWAP_SLICE_NAME = 'swap';
@@ -17,6 +22,7 @@ export const executeSwap = createAsyncThunk(
       firstTokenAccount: serializedFirstTokenAccount,
       firstAmount,
       secondTokenAccount: serializedSecondTokenAccount,
+      secondAmount,
       selectedPool,
       slippage,
       firstToken,
@@ -52,7 +58,30 @@ export const executeSwap = createAsyncThunk(
       });
 
       const PoolAPI = APIFactory(walletState.network);
-      const result = await PoolAPI.swap(swapParameters);
+      const resultSignature = await PoolAPI.swap(swapParameters);
+
+      thunkAPI.dispatch(
+        addPendingTransaction(
+          new Transaction(resultSignature, 0, null, null, null, {
+            type: 'swap',
+            source: swapParameters.fromAccount.address,
+            sourceTokenAccount: swapParameters.fromAccount,
+            sourceToken: swapParameters.fromAccount.mint,
+            destination: swapParameters.toAccount?.address || null,
+            destinationTokenAccount: swapParameters.toAccount || null,
+            destinationToken: swapParameters.toAccount?.mint || null,
+            sourceAmount: minorAmountToMajor(
+              swapParameters.fromAmount,
+              swapParameters.fromAccount.mint,
+            ),
+            destinationAmount: swapParameters.toAccount?.mint
+              ? minorAmountToMajor(secondAmount, swapParameters.toAccount.mint)
+              : new Decimal(0),
+          }).serialize(),
+        ),
+      );
+
+      await awaitConfirmation(resultSignature);
 
       swapNotification({
         header: 'Swapped successfuly!',
@@ -60,7 +89,7 @@ export const executeSwap = createAsyncThunk(
         ...notificationParams,
       });
 
-      return result;
+      return resultSignature;
     } catch (error) {
       console.error('Something wrong with swap:', error);
 

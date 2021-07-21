@@ -101,7 +101,7 @@ const Amount = styled.div`
   }
 `;
 
-const WarningWrapper = styled.div`
+const StatusWrapper = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
@@ -113,6 +113,14 @@ const WarningIcon = styled(Icon)`
   margin-left: 9px;
 
   color: #f43d3d;
+`;
+
+const ClockIcon = styled(Icon)`
+  width: 15px;
+  height: 15px;
+  margin-left: 9px;
+
+  color: #ffa631;
 `;
 
 const Main = styled.div`
@@ -184,19 +192,11 @@ export const TransactionRow: FunctionComponent<Props> = ({ transaction, source }
     if (details.type === 'swap' && details.sourceToken && details.destinationToken) {
       return (
         <>
-          <LinkStyled
-            to={
-              details.sourceTokenAccount &&
-              `/wallet/${details.sourceTokenAccount.address.toBase58()}`
-            }>
+          <LinkStyled to={details.source && `/wallet/${details.source.toBase58()}`}>
             {details.sourceToken.symbol}
           </LinkStyled>{' '}
           to{' '}
-          <LinkStyled
-            to={
-              details.destinationTokenAccount &&
-              `/wallet/${details.destinationTokenAccount.address.toBase58()}`
-            }>
+          <LinkStyled to={details.destination && `/wallet/${details.destination.toBase58()}`}>
             {details.destinationToken.symbol}
           </LinkStyled>
         </>
@@ -204,28 +204,28 @@ export const TransactionRow: FunctionComponent<Props> = ({ transaction, source }
     }
 
     if (details.type === 'transfer' || details.type === 'transferChecked') {
-      const address = details.destinationTokenAccount?.address.toBase58();
+      const address = details.destination?.toBase58();
       if (address) {
         return `To ${shortAddress(address)}`;
       }
     }
 
     if (details.type === 'receive') {
-      const address = details.sourceTokenAccount?.address.toBase58();
+      const address = details.source?.toBase58();
       if (address) {
         return `From ${shortAddress(address)}`;
       }
     }
 
     if (details.typeOriginal === 'createAccount') {
-      const symbol = details.destinationTokenAccount?.mint.symbol;
+      const symbol = details.destinationToken?.symbol;
       if (symbol) {
         return `${symbol} Created`;
       }
     }
 
     if (details.typeOriginal === 'closeAccount') {
-      const symbol = details.sourceTokenAccount?.mint.symbol;
+      const symbol = details.sourceToken?.symbol;
       if (symbol) {
         return `${symbol} Closed`;
       }
@@ -269,9 +269,14 @@ export const TransactionRow: FunctionComponent<Props> = ({ transaction, source }
                 </Amount>
               ) : undefined}
               {transaction.meta?.err ? (
-                <WarningWrapper title="Transaction failed">
+                <StatusWrapper title="Transaction failed">
                   <WarningIcon name="warning" />
-                </WarningWrapper>
+                </StatusWrapper>
+              ) : undefined}
+              {!transaction.slot ? (
+                <StatusWrapper title="Transaction processing">
+                  <ClockIcon name="clock" />
+                </StatusWrapper>
               ) : undefined}
             </Right>
           </Top>

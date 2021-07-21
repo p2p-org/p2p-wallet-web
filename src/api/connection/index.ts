@@ -74,7 +74,7 @@ export const getConnectionTransactions = (network?: NetworkType): Connection => 
 
 export const confirmTransaction = (
   signature: string,
-  commitment?: Commitment,
+  commitment: Commitment = DEFAULT_COMMITMENT,
 ): Promise<SignatureResult> => {
   const connection = getConnection();
   const confirmViaSocket = new Promise<SignatureResult>((resolve) =>
@@ -85,7 +85,7 @@ export const confirmTransaction = (
   );
 
   const confirmViaHttp = connection
-    .confirmTransaction(signature, commitment || DEFAULT_COMMITMENT)
+    .confirmTransaction(signature, commitment)
     .then((signatureResult) => {
       console.log('Confirmation via http:', signatureResult);
       return signatureResult.value;

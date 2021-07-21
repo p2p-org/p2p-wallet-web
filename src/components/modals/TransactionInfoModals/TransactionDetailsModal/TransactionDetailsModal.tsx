@@ -78,6 +78,10 @@ const StatusIndicator = styled.div`
   &.error {
     background: #f43d3d;
   }
+
+  &.processing {
+    background: #ffa631;
+  }
 `;
 
 const FieldRowWrapper = styled(FieldWrapper)`
@@ -178,7 +182,7 @@ export const TransactionDetailsModal: FC<Props> = ({ signature, source, close })
 
   const isShowFeeBadge =
     details.type === 'transfer' &&
-    KNOWN_FEE_PAYER_PUBKEYS.has(transaction.message.accountKeys[0].pubkey.toBase58());
+    KNOWN_FEE_PAYER_PUBKEYS.has(transaction.message?.accountKeys[0].pubkey.toBase58());
 
   const handleToggleShowDetailsClick = () => {
     setShowDetails((state) => !state);
@@ -333,8 +337,14 @@ export const TransactionDetailsModal: FC<Props> = ({ signature, source, close })
         {renderAmountBlock()}
         <StatusWrapper>
           <Status>
-            <StatusIndicator className={classNames({ error: !!transaction.meta?.err })} />{' '}
-            {transaction.meta?.err ? 'Failed' : 'Completed'}
+            <StatusIndicator
+              className={classNames({
+                error: !!transaction.meta?.err,
+                processing: !transaction.slot,
+              })}
+            />{' '}
+            {/* eslint-disable-next-line unicorn/no-nested-ternary */}
+            {transaction.meta?.err ? 'Failed' : !transaction.slot ? 'Pending' : 'Completed'}
           </Status>
         </StatusWrapper>
         <FieldsWrapper>

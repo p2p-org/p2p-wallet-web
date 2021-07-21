@@ -758,7 +758,7 @@ export const APIFactory = memoizeWith(
           [...instructions, ...cleanupInstructions],
           signers,
         );
-        return await sendTransaction(transaction);
+        return await sendTransaction(transaction, false);
       } catch (error) {
         console.error(error);
         throw error;

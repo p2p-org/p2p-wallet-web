@@ -292,12 +292,12 @@ export const TransactionStatusModal: FunctionComponent<Props> = ({
               {isReceiver ? '+' : '-'}{' '}
               {transaction?.short.destinationAmount.toNumber() ||
                 fromToken.toMajorDenomination(fromAmount).toString()}{' '}
-              {transaction?.short.sourceTokenAccount?.mint.symbol || fromToken.symbol}
+              {transaction?.short.sourceToken?.symbol || fromToken.symbol}
             </ValueCurrency>
             <ValueOriginal>
               <AmountUSD
                 prefix={isReceiver ? '+' : '-'}
-                symbol={transaction?.short.sourceTokenAccount?.mint.symbol || fromToken.symbol}
+                symbol={transaction?.short.sourceToken?.symbol || fromToken.symbol}
                 value={
                   transaction?.short.destinationAmount || fromToken.toMajorDenomination(fromAmount)
                 }

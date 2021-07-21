@@ -122,7 +122,10 @@ const defaultSendOptions = {
   preflightCommitment: DEFAULT_COMMITMENT,
 };
 
-async function awaitConfirmation(signature: string, commitment: Commitment | undefined) {
+export async function awaitConfirmation(
+  signature: string,
+  commitment: Commitment = DEFAULT_COMMITMENT,
+) {
   console.log(`Submitted transaction ${signature}, awaiting confirmation`);
   await confirmTransaction(signature, commitment);
   console.log(`Transaction ${signature} confirmed`);
@@ -139,6 +142,7 @@ async function awaitConfirmation(signature: string, commitment: Commitment | und
 
 export const sendTransaction = async (
   transaction: Transaction,
+  awaitConfirm = true,
   {
     commitment = defaultSendOptions.commitment,
     preflightCommitment = defaultSendOptions.preflightCommitment,
@@ -157,7 +161,11 @@ export const sendTransaction = async (
       preflightCommitment,
     });
 
-    return await awaitConfirmation(signature, commitment);
+    if (awaitConfirm) {
+      return await awaitConfirmation(signature, commitment);
+    }
+
+    return signature;
   } catch (error) {
     if ((error as SendTransactionError).logs) {
       const errors = parseSendTransactionError(error as SendTransactionError);
