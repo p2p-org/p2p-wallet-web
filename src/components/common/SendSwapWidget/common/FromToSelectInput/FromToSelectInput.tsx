@@ -303,7 +303,7 @@ type Props = {
   token?: Token;
   tokenAccount?: TokenAccount;
   amount?: string;
-  feeAmount?: Decimal | number;
+  feeAmount?: string;
   onTokenAccountChange: (token: Token, tokenAccount: TokenAccount | null) => void;
   onAmountChange: (minorAmount: string, type?: 'available') => void;
   disabled?: boolean;
@@ -320,7 +320,7 @@ export const FromToSelectInput: FunctionComponent<Props> = ({
   token,
   tokenAccount,
   amount,
-  feeAmount,
+  feeAmount: feeAmountString,
   onTokenAccountChange,
   onAmountChange,
   disabled,
@@ -417,11 +417,14 @@ export const FromToSelectInput: FunctionComponent<Props> = ({
 
     let tokenAccountBalance = tokenAccount.balance;
 
-    if (tokenAccount.mint.symbol === 'SOL' && feeAmount) {
-      const fee = majorAmountToMinor(feeAmount, tokenAccount.mint);
-      const balanceWithoutFee = tokenAccount.balance.minus(fee);
+    if (feeAmountString) {
+      const [feeAmount, symbol] = feeAmountString.split(' ');
 
-      tokenAccountBalance = balanceWithoutFee.gt(0) ? balanceWithoutFee : new Decimal(0);
+      if (tokenAccount?.mint.symbol === symbol) {
+        const fee = majorAmountToMinor(new Decimal(feeAmount), tokenAccount.mint);
+        const balanceWithoutFee = tokenAccount.balance.minus(fee);
+        tokenAccountBalance = balanceWithoutFee.gt(0) ? balanceWithoutFee : new Decimal(0);
+      }
     }
 
     onAmountChange(
@@ -468,13 +471,17 @@ export const FromToSelectInput: FunctionComponent<Props> = ({
       return null;
     }
 
-    if (tokenAccount.mint.symbol === 'SOL' && feeAmount) {
-      const fee = majorAmountToMinor(feeAmount, tokenAccount.mint);
-      const balanceWithoutFee = tokenAccount.balance.minus(fee);
+    if (feeAmountString) {
+      const [feeAmount, symbol] = feeAmountString.split(' ');
 
-      return `${tokenAccount.mint
-        .toMajorDenomination(balanceWithoutFee.gt(0) ? balanceWithoutFee : 0)
-        .toString()} ${tokenAccount?.mint.symbol}`;
+      if (tokenAccount?.mint.symbol === symbol) {
+        const fee = majorAmountToMinor(new Decimal(feeAmount), tokenAccount.mint);
+        const balanceWithoutFee = tokenAccount.balance.minus(fee);
+
+        return `${tokenAccount.mint
+          .toMajorDenomination(balanceWithoutFee.gt(0) ? balanceWithoutFee : 0)
+          .toString()} ${tokenAccount?.mint.symbol}`;
+      }
     }
 
     return `${tokenAccount?.mint.toMajorDenomination(tokenAccount.balance).toString()} ${

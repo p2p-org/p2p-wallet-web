@@ -15,6 +15,7 @@ import { TokenAccount } from 'api/token/TokenAccount';
 import { SettingsAction } from 'components/common/SendSwapWidget/SwapWidget/SettingsAction';
 import { ToastManager } from 'components/common/ToastManager';
 import { Button, Icon, Tooltip } from 'components/ui';
+import { WRAPPED_SOL_MINT } from 'constants/solana/bufferLayouts';
 import { openModal } from 'store/actions/modals';
 import {
   SHOW_MODAL_TRANSACTION_CONFIRM,
@@ -156,6 +157,8 @@ const PoweredBy = styled.div`
 
 const UPDATE_POOLS_INTERVAL = 5000;
 
+const WSOLToken = new Token(WRAPPED_SOL_MINT, 9, 0);
+
 const formatFee = (amount: number): number =>
   new Decimal(amount)
     .div(10 ** 9)
@@ -242,9 +245,7 @@ export const SwapWidget: FunctionComponent = () => {
         const resultRecentBlockhash = unwrapResult(await dispatch(getRecentBlockhash()));
 
         setRentFee(formatFee(resultRentFee));
-        setLamportsPerSignature(
-          formatFee(resultRecentBlockhash.feeCalculator.lamportsPerSignature),
-        );
+        setLamportsPerSignature(resultRecentBlockhash.feeCalculator.lamportsPerSignature);
       } catch (error) {
         console.log(error);
       }
@@ -263,7 +264,9 @@ export const SwapWidget: FunctionComponent = () => {
       setWSolRentFee(0);
     }
 
-    setTxFee(new Decimal(lamportsPerSignature).mul(signatures).toDecimalPlaces(6).toNumber());
+    setTxFee(
+      new Decimal(formatFee(lamportsPerSignature)).mul(signatures).toDecimalPlaces(6).toNumber(),
+    );
   }, [lamportsPerSignature, firstTokenAccount, secondTokenAccount]);
 
   const firstTokenAccounts = useMemo(() => {
@@ -304,7 +307,42 @@ export const SwapWidget: FunctionComponent = () => {
     }
   }, [secondToken, secondAmount, slippage]);
 
+  const isSwapBetweenSPLTokens =
+    firstToken && secondToken && !firstToken.equals(WSOLToken) && !secondToken.equals(WSOLToken);
+
   const isNeedCreateWallet = isNil(secondTokenAccount);
+
+  const feeCompensationAmount = useMemo(() => {
+    if (firstToken && isSwapBetweenSPLTokens) {
+      const feeAmount =
+        // fee relayer + userTransferAuthority + wsol account
+        lamportsPerSignature * 3 +
+        (isNil(secondTokenAccount)
+          ? new Decimal(rentFee)
+              .mul(10 ** 9)
+              .round()
+              .toNumber()
+          : 0);
+
+      const pool = availablePools.find(matchesPool(firstToken, WSOLToken));
+
+      if (!pool) {
+        return 0;
+      }
+
+      const sourceTokenAccount = pool.tokenA.mint.equals(WSOLToken) ? pool.tokenA : pool.tokenB;
+
+      const minimumFee = pool.calculateAmountInOtherToken(
+        sourceTokenAccount?.mint,
+        feeAmount,
+        true,
+      );
+
+      return adjustForSlippage(minimumFee, 'up', 1).toNumber();
+    }
+
+    return 0;
+  }, [firstToken, secondToken, availablePools, lamportsPerSignature, secondTokenAccount]);
 
   const handleSubmit = async () => {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
@@ -466,9 +504,37 @@ export const SwapWidget: FunctionComponent = () => {
     return 'This pair is unavailable';
   };
 
-  const fee = feeProperties
-    ? minorAmountToMajor(feeProperties.amount, feeProperties.token).toNumber()
-    : undefined;
+  const calculateFee = () => {
+    if (firstToken && isSwapBetweenSPLTokens) {
+      const fee = minorAmountToMajor(feeCompensationAmount, firstToken).toNumber();
+      return {
+        totalFeeString: `${fee} ${firstToken.symbol}`,
+        transactionFee: `${fee} ${firstToken.symbol}`,
+        accountRent: 0,
+        firsTokenFeeAmount: `${fee} ${firstToken.symbol}`,
+        secondTokenFeeAmount: '',
+      };
+    }
+
+    const minimumFee = txFee + rentFee; // trx fee + wSol rent
+    return {
+      totalFeeString: `${
+        isNeedCreateWallet ? txFee + (rentFee + wSolRentFee) : txFee + wSolRentFee
+      } SOL`,
+      transactionFee: `${txFee} SOL`,
+      accountRent:
+        isNeedCreateWallet || wSolRentFee
+          ? `${isNeedCreateWallet ? rentFee + wSolRentFee : wSolRentFee} SOL`
+          : '',
+      firsTokenFeeAmount: `${isNeedCreateWallet ? minimumFee + rentFee : minimumFee} SOL`,
+      secondTokenFeeAmount: `${minimumFee} SOL`,
+    };
+  };
+
+  const liquidityProviderFee =
+    feeProperties && feeProperties.token
+      ? minorAmountToMajor(feeProperties.amount, feeProperties.token).toNumber()
+      : undefined;
 
   const rate =
     selectedPool && firstToken && secondToken
@@ -485,8 +551,14 @@ export const SwapWidget: FunctionComponent = () => {
     : false;
 
   const isDisabled = isExecuting || !selectedPool || !hasBalance;
-  const isShowFee = firstToken && fee && feeProperties;
-  const minimumFee = txFee + rentFee; // trx fee + wSol rent
+  const isShowFee = firstToken && liquidityProviderFee && feeProperties;
+  const {
+    totalFeeString,
+    transactionFee,
+    accountRent,
+    firsTokenFeeAmount,
+    secondTokenFeeAmount,
+  } = calculateFee();
 
   return (
     <div>
@@ -504,7 +576,7 @@ export const SwapWidget: FunctionComponent = () => {
             token={firstToken}
             tokenAccount={firstTokenAccount}
             amount={firstToken ? minorAmountToMajor(firstAmount, firstToken).toString() : ''}
-            feeAmount={isNeedCreateWallet ? minimumFee + rentFee : minimumFee}
+            feeAmount={firsTokenFeeAmount}
             onTokenAccountChange={selectFirstTokenHandleChange}
             onAmountChange={updateFirstAmount}
             disabled={isExecuting}
@@ -522,7 +594,7 @@ export const SwapWidget: FunctionComponent = () => {
             token={secondToken}
             tokenAccount={secondTokenAccount}
             amount={secondToken ? minorAmountToMajor(secondAmount, secondToken).toString() : ''}
-            feeAmount={minimumFee}
+            feeAmount={secondTokenFeeAmount}
             onTokenAccountChange={selectSecondTokenHandleChange}
             onAmountChange={updateSecondAmount}
             disabled={isExecuting}
@@ -559,26 +631,21 @@ export const SwapWidget: FunctionComponent = () => {
                 <PropertyLine>
                   Liquidity Provider Fee:
                   <PropertyValue>
-                    {fee} {feeProperties?.token.symbol}
+                    {liquidityProviderFee} {feeProperties?.token?.symbol}
                   </PropertyValue>
                 </PropertyLine>
                 <PropertyLine>
                   Fee:
                   <PropertyValue>
-                    <TooltipStyled
-                      title={`${
-                        isNeedCreateWallet ? txFee + (rentFee + wSolRentFee) : txFee + wSolRentFee
-                      } SOL`}>
+                    <TooltipStyled title={totalFeeString}>
                       <TooltipRow>
                         <TxName>Transaction:</TxName>
-                        <TxValue>{`${txFee} SOL`}</TxValue>
+                        <TxValue>{transactionFee}</TxValue>
                       </TooltipRow>
-                      {isNeedCreateWallet || wSolRentFee ? (
+                      {accountRent ? (
                         <TooltipRow>
                           <TxName>Wallet creation:</TxName>
-                          <TxValue>{`${
-                            isNeedCreateWallet ? rentFee + wSolRentFee : wSolRentFee
-                          } SOL`}</TxValue>
+                          <TxValue>{accountRent}</TxValue>
                         </TooltipRow>
                       ) : undefined}
                     </TooltipStyled>

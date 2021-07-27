@@ -1,11 +1,13 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { Decimal } from 'decimal.js';
 
+import { APIFactory as FeeRelayerAPIFactory } from 'api/feeRelayer';
 import { APIFactory, SwapParameters } from 'api/pool';
 import { Pool } from 'api/pool/Pool';
 import { TokenAccount } from 'api/token/TokenAccount';
 import { Transaction } from 'api/transaction/Transaction';
 import { awaitConfirmation } from 'api/wallet';
+import { WRAPPED_SOL_MINT } from 'constants/solana/bufferLayouts';
 import { RootState } from 'store/rootReducer';
 import { addPendingTransaction } from 'store/slices/transaction/TransactionSlice';
 import { minorAmountToMajor } from 'utils/amount';
@@ -17,6 +19,7 @@ export const executeSwap = createAsyncThunk(
   `${SWAP_SLICE_NAME}/executeSwap`,
   async (_, thunkAPI): Promise<string> => {
     const state: RootState = thunkAPI.getState() as RootState;
+    const { availablePools } = state.pool;
     const walletState = state.wallet;
     const {
       firstTokenAccount: serializedFirstTokenAccount,
@@ -57,8 +60,34 @@ export const executeSwap = createAsyncThunk(
         ...notificationParams,
       });
 
-      const PoolAPI = APIFactory(walletState.network);
-      const resultSignature = await PoolAPI.swap(swapParameters);
+      let resultSignature;
+      if ([firstToken?.symbol, secondToken?.symbol].includes('SOL')) {
+        const PoolAPI = APIFactory(walletState.network);
+        resultSignature = await PoolAPI.swap(swapParameters);
+      } else {
+        let feeCompensationPool;
+        const wsolMint = WRAPPED_SOL_MINT.toBase58();
+        const fromTokenMint = serializedFirstTokenAccount.mint.address;
+
+        for (const pool of availablePools) {
+          if (
+            (pool.tokenA.mint.address === fromTokenMint && pool.tokenB.mint.address === wsolMint) ||
+            (pool.tokenB.mint.address === fromTokenMint && pool.tokenA.mint.address === wsolMint)
+          ) {
+            feeCompensationPool = pool;
+          }
+        }
+
+        if (!feeCompensationPool) {
+          return '';
+        }
+
+        const FeeRelayerAPI = FeeRelayerAPIFactory(walletState.network);
+        resultSignature = await FeeRelayerAPI.swap({
+          ...swapParameters,
+          feeCompensationPool: Pool.from(feeCompensationPool),
+        });
+      }
 
       thunkAPI.dispatch(
         addPendingTransaction(
@@ -81,6 +110,7 @@ export const executeSwap = createAsyncThunk(
         ),
       );
 
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
       await awaitConfirmation(resultSignature);
 
       swapNotification({

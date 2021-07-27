@@ -51,7 +51,7 @@ export const adjustForSlippage = (
   const slippageFractional = slippage / 100;
   const slippageMultiplier = 1 + (direction === 'up' ? slippageFractional : -slippageFractional);
 
-  return toDecimal(amount).mul(slippageMultiplier); // TODO: check its need or not ".floor()"
+  return toDecimal(amount).mul(slippageMultiplier).floor();
 };
 
 export class Pool extends OnChainEntity<Pool> implements Serializable<SerializablePool> {

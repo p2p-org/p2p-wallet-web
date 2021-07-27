@@ -75,7 +75,7 @@ export interface API {
   listenToPoolChanges: (pools: Array<Pool>, callback: PoolUpdateCallback) => PoolListener;
 }
 
-const validateSwapParameters = (parameters: SwapParameters): void => {
+export const validateSwapParameters = (parameters: SwapParameters): void => {
   // the From amount must be either tokenA or tokenB
   // and, if present, the To amount must be the other one
 
@@ -93,8 +93,10 @@ const validateSwapParameters = (parameters: SwapParameters): void => {
   );
 };
 
-const isReverseSwap = ({ pool, fromAccount }: Pick<SwapParameters, 'pool' | 'fromAccount'>) =>
-  pool.tokenB.sameToken(fromAccount);
+export const isReverseSwap = ({
+  pool,
+  fromAccount,
+}: Pick<SwapParameters, 'pool' | 'fromAccount'>) => pool.tokenB.sameToken(fromAccount);
 
 const makeTokenAccount = (address: PublicKey, mint: PublicKey, decimals: number): TokenAccount => {
   const pubkey = new Account().publicKey;
