@@ -398,7 +398,7 @@ export const APIFactory = memoizeWith(
         return [];
       }
 
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-assignment
       const dataLength = TokenSwapLayout.span;
       const poolsData = (
         await connection.getProgramAccounts(poolConfigForCluster.swapProgramId)
