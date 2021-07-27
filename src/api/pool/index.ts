@@ -111,6 +111,7 @@ const parseTokenSwapData = async (
   programId: PublicKey,
   data: Buffer,
 ): Promise<PoolInfo> => {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-call
   const tokenSwapData = TokenSwapLayout.decode(data) as {
     isInitialized: boolean;
     tokenPool: string;
@@ -200,6 +201,7 @@ export const APIFactory = memoizeWith(
       payer: Account,
       data: Buffer,
     ): Promise<TokenSwap> => {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-call
       const tokenSwapData = TokenSwapLayout.decode(data) as {
         isInitialized: boolean;
         tokenPool: string;
@@ -396,6 +398,7 @@ export const APIFactory = memoizeWith(
         return [];
       }
 
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       const poolsData = (
         await connection.getProgramAccounts(poolConfigForCluster.swapProgramId)
       ).filter((item) => item.account.data.length === TokenSwapLayout.span);
