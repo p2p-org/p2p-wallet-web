@@ -26,8 +26,6 @@ module.exports = {
     'unicorn/prefer-ternary': 'off',
     'max-classes-per-file': 'off',
     'prettier/prettier': 'off',
-    '@typescript-eslint/no-unsafe-member-access': 'off',
-    '@typescript-eslint/no-unsafe-call': 'off',
     '@typescript-eslint/restrict-template-expressions': 'off',
     '@typescript-eslint/explicit-module-boundary-types': 'off',
     '@typescript-eslint/no-misused-promises': [

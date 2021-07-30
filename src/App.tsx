@@ -23,8 +23,6 @@ import { Wallets } from 'pages/Wallets';
 import { WalletSettings } from 'pages/WalletSettings';
 import { AuthRequiredRoute } from 'utils/routes/UserRequiredRoute';
 
-import { Providers } from './Providers';
-
 dayjs.extend(localizedFormat);
 
 const App: React.FC = () => {
@@ -32,31 +30,29 @@ const App: React.FC = () => {
 
   return (
     <>
-      <Providers>
-        <Router basename={process.env.REACT_APP_BASENAME}>
-          <Switch>
-            {isFeatureLanding ? (
-              <Route path="/" component={Landing} exact />
-            ) : (
-              <Route path="/" component={Home} exact />
-            )}
-            <Route path="/:type(signup|login)" component={Home} exact />
-            <AuthRequiredRoute path="/wallets" component={Wallets} />
-            <AuthRequiredRoute path="/wallet/:publicKey/settings" component={WalletSettings} />
-            <AuthRequiredRoute path="/wallet/:publicKey" component={Wallet} />
-            <AuthRequiredRoute path="/receive" component={Receive} />
-            <AuthRequiredRoute path="/send/:publicKey/:status(result)" component={Send} />
-            <AuthRequiredRoute path="/send/:publicKey?" component={Send} />
-            <AuthRequiredRoute path="/swap/:publicKey?" component={Swap} />
-            <AuthRequiredRoute path="/settings/network" component={SettingsNetwork} />
-            <AuthRequiredRoute path="/settings" component={Settings} />
-          </Switch>
-          <Intercom />
-        </Router>
-        <ModalManager />
-        <ToastManager anchor="left" renderToast={(props) => <NotifyToast {...props} />} />
-        <FeaturesToggle />
-      </Providers>
+      <Router basename={process.env.REACT_APP_BASENAME}>
+        <Switch>
+          {isFeatureLanding ? (
+            <Route path="/" component={Landing} exact />
+          ) : (
+            <Route path="/" component={Home} exact />
+          )}
+          <Route path="/:type(signup|login)" component={Home} exact />
+          <AuthRequiredRoute path="/wallets" component={Wallets} />
+          <AuthRequiredRoute path="/wallet/:publicKey/settings" component={WalletSettings} />
+          <AuthRequiredRoute path="/wallet/:publicKey" component={Wallet} />
+          <AuthRequiredRoute path="/receive" component={Receive} />
+          <AuthRequiredRoute path="/send/:publicKey/:status(result)" component={Send} />
+          <AuthRequiredRoute path="/send/:publicKey?" component={Send} />
+          <AuthRequiredRoute path="/swap/:publicKey?" component={Swap} />
+          <AuthRequiredRoute path="/settings/network" component={SettingsNetwork} />
+          <AuthRequiredRoute path="/settings" component={Settings} />
+        </Switch>
+        <Intercom />
+      </Router>
+      <ModalManager />
+      <ToastManager anchor="left" renderToast={(props) => <NotifyToast {...props} />} />
+      <FeaturesToggle />
     </>
   );
 };

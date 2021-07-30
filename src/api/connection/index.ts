@@ -25,7 +25,7 @@ const createConnection = memoizeWith(
     // Rate-limiting responses are not retried correctly. Adding this proxy fixes this.
     const proxiedFunctions = [
       'getBalance',
-      // 'getAccountInfo',
+      'getAccountInfo',
       'getParsedAccountInfo',
       'getParsedProgramAccounts',
       'getParsedTokenAccountsByOwner',
