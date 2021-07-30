@@ -2,6 +2,7 @@ import React, { FunctionComponent, HTMLAttributes, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 
 import { styled } from '@linaria/react';
+import { useTokenMap } from '@project-serum/swap-ui';
 import classNames from 'classnames';
 
 import tokenList from 'api/token/token.config';
@@ -56,10 +57,15 @@ export const TokenAvatar: FunctionComponent<Props & HTMLAttributes<HTMLDivElemen
   ...props
 }) => {
   const cluster = useSelector((state) => state.wallet.network.cluster);
-  const tokenInfo = tokenList
-    .filterByClusterSlug(cluster)
-    .getList()
-    .find((token) => token.symbol === symbol || token.address === address);
+
+  // TODO: need to add cluster
+  const tokenMap = useTokenMap();
+  const tokenInfo =
+    tokenMap.get(address) ||
+    tokenList
+      .filterByClusterSlug(cluster)
+      .getList()
+      .find((token) => token.symbol === symbol || token.address === address);
 
   const isWrapped = useMemo(() => tokenInfo?.tags?.find((tag) => tag.includes('wrapped')), [
     tokenInfo,
