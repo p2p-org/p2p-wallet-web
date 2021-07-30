@@ -369,7 +369,9 @@ export const APIFactory = memoizeWith(
     //     minimumToAmountWithoutSlippage,
     //     'down',
     //     slippage,
-    //   ).toNumber();
+    //   )
+    //     .floor()
+    //     .toNumber();
     //
     //   instructions.push(
     //     TokenSwap.swapInstruction(
@@ -410,11 +412,9 @@ export const APIFactory = memoizeWith(
     //     true,
     //   );
     //
-    //   const feeMinimumToAmountWithSlippage = adjustForSlippage(
-    //     feeCompensationAmountIn,
-    //     'up',
-    //     1,
-    //   ).toNumber();
+    //   const feeMinimumToAmountWithSlippage = adjustForSlippage(feeCompensationAmountIn, 'up', 1)
+    //     .floor()
+    //     .toNumber();
     //
     //   instructions.push(
     //     SystemProgram.createAccount({
@@ -500,7 +500,7 @@ export const APIFactory = memoizeWith(
     //     signers,
     //   };
     // };
-
+    //
     // const swap = async (
     //   parameters: SwapParameters & { feeCompensationPool: Pool },
     // ): Promise<string> => {
