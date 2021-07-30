@@ -379,7 +379,9 @@ export const APIFactory = memoizeWith(
         minimumToAmountWithoutSlippage,
         'down',
         slippage,
-      ).toNumber();
+      )
+        .floor()
+        .toNumber();
 
       instructions.push(
         TokenSwap.swapInstruction(
@@ -420,11 +422,9 @@ export const APIFactory = memoizeWith(
         true,
       );
 
-      const feeMinimumToAmountWithSlippage = adjustForSlippage(
-        feeCompensationAmountIn,
-        'up',
-        1,
-      ).toNumber();
+      const feeMinimumToAmountWithSlippage = adjustForSlippage(feeCompensationAmountIn, 'up', 1)
+        .floor()
+        .toNumber();
 
       instructions.push(
         SystemProgram.createAccount({
