@@ -76,12 +76,7 @@ export class ManualWallet extends Wallet {
       const message = transaction.serializeMessage();
       const signature = nacl.sign.detached(message, this.account.secretKey);
       transaction.addSignature(this.account.publicKey, Buffer.from(signature));
-
-      console.log(1111, transaction.serializeMessage().toString('base64'));
     }
-
-    console.log(787878, transactions);
-
     return Promise.resolve(transactions);
   }
 }
