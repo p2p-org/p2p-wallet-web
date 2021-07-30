@@ -1,14 +1,10 @@
 import React, { FunctionComponent, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 
 import { styled } from '@linaria/react';
+import { useSwapContext } from '@project-serum/swap-ui';
 import classNames from 'classnames';
-import { isNil } from 'ramda';
 
-import { DEFAULT_SLIPPAGE } from 'api/pool/Pool';
 import { Button, Icon, Input } from 'components/ui';
-import { updateTokenPairState } from 'store/slices/tokenPair/TokenPairSlice';
-import { tokenPairSelector } from 'store/slices/tokenPair/utils/tokenPair';
 import { trackEvent } from 'utils/analytics';
 
 const Wrapper = styled.div`
@@ -141,13 +137,10 @@ const BottomButton = styled(Button)`
 `;
 
 export const SettingsAction: FunctionComponent = () => {
-  const dispatch = useDispatch();
   const [isShow, setIsShow] = useState(false);
   const [isCustomShow, setIsCustomShow] = useState(false);
-  const { slippage } = useSelector(tokenPairSelector);
-  const [nextSlippage, setNextSlippage] = useState(
-    isNil(slippage) ? DEFAULT_SLIPPAGE : String(slippage),
-  );
+  const { slippage, setSlippage } = useSwapContext();
+  const [nextSlippage, setNextSlippage] = useState(String(slippage));
 
   const handleToggleShow = () => {
     setIsShow((state) => !state);
@@ -164,11 +157,7 @@ export const SettingsAction: FunctionComponent = () => {
       slippage: Number(nextSlippage),
     });
 
-    dispatch(
-      updateTokenPairState({
-        slippage: Number(nextSlippage),
-      }),
-    );
+    setSlippage(Number(nextSlippage));
     setIsShow(false);
   };
 

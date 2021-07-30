@@ -1,5 +1,4 @@
-import { AccountLayout, Token as SPLToken } from '@solana/spl-token';
-import { TokenSwap } from '@solana/spl-token-swap';
+import { Token as SPLToken } from '@solana/spl-token';
 import {
   Account,
   PublicKey,
@@ -12,19 +11,15 @@ import bs58 from 'bs58';
 import { memoizeWith, toString } from 'ramda';
 
 import { getConnection } from 'api/connection';
-import { isReverseSwap, SwapParameters, validateSwapParameters } from 'api/pool';
-import { adjustForSlippage, Pool } from 'api/pool/Pool';
-import poolConfig from 'api/pool/pool.config';
 import {
   ASSOCIATED_TOKEN_ACCOUNT_PROGRAM_ID,
   TOKEN_PROGRAM_ID,
   TransferParameters,
 } from 'api/token';
-import { Token } from 'api/token/Token';
 import { TokenAccount } from 'api/token/TokenAccount';
 import { getWallet } from 'api/wallet';
-import { feeRelayerUrl, localSwapProgramId, NetworkType } from 'config/constants';
-import { WRAPPED_SOL_MINT } from 'constants/solana/bufferLayouts';
+import { feeRelayerUrl, NetworkType } from 'config/constants';
+// import { WRAPPED_SOL_MINT } from 'constants/solana/bufferLayouts';
 
 export const KNOWN_FEE_PAYER_PUBKEYS = new Set(['FG4Y3yX4AAchp1HvNZ7LfzFTewF2f6nDoMDCohTFrdpT']);
 
@@ -75,7 +70,7 @@ type InstructionsAndParams = {
 
 export interface API {
   transfer: (parameters: TransferParameters, tokenAccount: TokenAccount) => Promise<string>;
-  swap: (parameters: SwapParameters & { feeCompensationPool: Pool }) => Promise<string>;
+  // swap: (parameters: SwapParameters & { feeCompensationPool: Pool }) => Promise<string>;
 }
 
 const getFeePayerPubkey = async (): Promise<PublicKey> => {
@@ -203,11 +198,6 @@ export const APIFactory = memoizeWith(
   toString,
   (network: NetworkType): API => {
     const connection = getConnection(network);
-    const poolConfigForCluster = poolConfig[network.cluster];
-    const swapProgramId = poolConfigForCluster.swapProgramId || localSwapProgramId;
-    if (!swapProgramId) {
-      throw new Error('No TokenSwap program ID defined');
-    }
 
     const makeTransaction = async (
       feePayer: PublicKey,
@@ -315,230 +305,230 @@ export const APIFactory = memoizeWith(
       });
     };
 
-    const makeSwapInstructionsAndParams = async (
-      parameters: SwapParameters & { feeCompensationPool: Pool },
-      feePayer: PublicKey,
-    ): Promise<InstructionsAndParams> => {
-      const { fromAccount, fromAmount, pool, slippage, feeCompensationPool } = parameters;
-      const instructions = [];
-      const signers: Account[] = [];
-      let feeAmount = 0;
-
-      const accountRentExempt = await connection.getMinimumBalanceForRentExemption(
-        AccountLayout.span,
-      );
-
-      const {
-        feeCalculator: { lamportsPerSignature },
-      } = await connection.getRecentBlockhash();
-
-      // const userTransferAuthority = new Account();
-      const userTransferAuthorityPubkey = getWallet().pubkey; // userTransferAuthority.publicKey;
-      // signers.push(userTransferAuthority);
-
-      feeAmount = lamportsPerSignature + lamportsPerSignature; // fee relayer + userTransferAuthority
-
-      const isReverse = isReverseSwap(parameters);
-      const toToken = isReverse ? parameters.pool.tokenA.mint : parameters.pool.tokenB.mint;
-      const toAccount = parameters.toAccount?.address;
-      let userDestination = toAccount;
-
-      if (!parameters.toAccount) {
-        const associatedTokenAddress = await SPLToken.getAssociatedTokenAddress(
-          ASSOCIATED_TOKEN_ACCOUNT_PROGRAM_ID,
-          TOKEN_PROGRAM_ID,
-          toToken.address,
-          getWallet().pubkey,
-        );
-
-        instructions.push(
-          SPLToken.createAssociatedTokenAccountInstruction(
-            ASSOCIATED_TOKEN_ACCOUNT_PROGRAM_ID,
-            TOKEN_PROGRAM_ID,
-            toToken.address,
-            associatedTokenAddress,
-            getWallet().pubkey,
-            feePayer,
-          ),
-        );
-
-        userDestination = associatedTokenAddress;
-        feeAmount += accountRentExempt;
-      }
-
-      const poolIntoAccount = isReverse ? pool.tokenB : pool.tokenA;
-      const poolFromAccount = isReverse ? pool.tokenA : pool.tokenB;
-
-      const minimumToAmountWithoutSlippage = parameters.pool.calculateAmountInOtherToken(
-        fromAccount.mint,
-        fromAmount,
-        true,
-      );
-
-      const minimumToAmountWithSlippage = adjustForSlippage(
-        minimumToAmountWithoutSlippage,
-        'down',
-        slippage,
-      )
-        .floor()
-        .toNumber();
-
-      instructions.push(
-        TokenSwap.swapInstruction(
-          pool.address,
-          pool.tokenSwapAuthority(),
-          userTransferAuthorityPubkey,
-          fromAccount.address,
-          poolIntoAccount.address,
-          poolFromAccount.address,
-          userDestination || getWallet().pubkey,
-          pool.poolToken.address,
-          pool.feeAccount.address,
-          null,
-          swapProgramId,
-          TOKEN_PROGRAM_ID,
-          parameters.fromAmount,
-          minimumToAmountWithSlippage,
-        ),
-      );
-
-      // fee_compensation_swap
-      const feePayerWsolAccount = new Account();
-      feeAmount += lamportsPerSignature;
-
-      const isReverseFeeCompensation = feeCompensationPool.tokenB.mint.equals(
-        new Token(WRAPPED_SOL_MINT, 9, 0),
-      );
-      const feeCompensationPoolIntoAccount = isReverseFeeCompensation
-        ? feeCompensationPool.tokenB
-        : feeCompensationPool.tokenA;
-      const feeCompensationPoolFromAccount = isReverseFeeCompensation
-        ? feeCompensationPool.tokenA
-        : feeCompensationPool.tokenB;
-
-      const feeCompensationAmountIn = feeCompensationPool.calculateAmountInOtherToken(
-        feeCompensationPoolIntoAccount.mint,
-        feeAmount,
-        true,
-      );
-
-      const feeMinimumToAmountWithSlippage = adjustForSlippage(feeCompensationAmountIn, 'up', 1)
-        .floor()
-        .toNumber();
-
-      instructions.push(
-        SystemProgram.createAccount({
-          fromPubkey: feePayer,
-          newAccountPubkey: feePayerWsolAccount.publicKey,
-          lamports: accountRentExempt,
-          space: AccountLayout.span,
-          programId: TOKEN_PROGRAM_ID,
-        }),
-      );
-
-      instructions.push(
-        SPLToken.createInitAccountInstruction(
-          TOKEN_PROGRAM_ID,
-          WRAPPED_SOL_MINT,
-          feePayerWsolAccount.publicKey,
-          feePayer,
-        ),
-      );
-
-      instructions.push(
-        TokenSwap.swapInstruction(
-          feeCompensationPool.address,
-          feeCompensationPool.tokenSwapAuthority(),
-          userTransferAuthorityPubkey,
-          fromAccount.address,
-          feeCompensationPoolFromAccount.address,
-          feeCompensationPoolIntoAccount.address,
-          feePayerWsolAccount.publicKey,
-          feeCompensationPool.poolToken.address,
-          feeCompensationPool.feeAccount.address,
-          null,
-          swapProgramId,
-          TOKEN_PROGRAM_ID,
-          feeMinimumToAmountWithSlippage,
-          feeAmount,
-        ),
-      );
-
-      instructions.push(
-        SPLToken.createCloseAccountInstruction(
-          TOKEN_PROGRAM_ID,
-          feePayerWsolAccount.publicKey,
-          feePayer,
-          feePayer,
-          [],
-        ),
-      );
-
-      return {
-        instructions,
-        params: {
-          user_source_token_account_pubkey: fromAccount.address.toBase58(),
-          user_destination_pubkey: toAccount ? toAccount.toBase58() : getWallet().pubkey.toBase58(),
-          source_token_mint_pubkey: fromAccount.mint.address.toBase58(),
-          destination_token_mint_pubkey: toToken.address.toBase58(),
-          user_authority_pubkey: userTransferAuthorityPubkey.toBase58(),
-          user_swap: {
-            account_pubkey: pool.address.toBase58(),
-            authority_pubkey: pool.tokenSwapAuthority().toBase58(),
-            transfer_authority_pubkey: userTransferAuthorityPubkey.toBase58(),
-            source_pubkey: poolIntoAccount.address.toBase58(),
-            destination_pubkey: poolFromAccount.address.toBase58(),
-            pool_token_mint_pubkey: pool.poolToken.address.toBase58(),
-            pool_fee_account_pubkey: pool.feeAccount.address.toBase58(),
-            amount_in: fromAmount,
-            minimum_amount_out: minimumToAmountWithSlippage,
-          },
-          fee_compensation_swap: {
-            account_pubkey: feeCompensationPool.address.toBase58(),
-            authority_pubkey: feeCompensationPool.tokenSwapAuthority().toBase58(),
-            transfer_authority_pubkey: userTransferAuthorityPubkey.toBase58(),
-            source_pubkey: feeCompensationPoolFromAccount.address.toBase58(),
-            destination_pubkey: feeCompensationPoolIntoAccount.address.toBase58(),
-            pool_token_mint_pubkey: feeCompensationPool.poolToken.address.toBase58(),
-            pool_fee_account_pubkey: feeCompensationPool.feeAccount.address.toBase58(),
-            amount_in: feeMinimumToAmountWithSlippage,
-            minimum_amount_out: feeAmount,
-          },
-          fee_payer_wsol_account_keypair: bs58.encode(feePayerWsolAccount.secretKey),
-        },
-        path: '/swap_spl_token_with_fee_compensation',
-        signers,
-      };
-    };
-
-    const swap = async (
-      parameters: SwapParameters & { feeCompensationPool: Pool },
-    ): Promise<string> => {
-      if (!feeRelayerUrl) {
-        throw new Error('feeRelayerUrl must be set');
-      }
-
-      validateSwapParameters(parameters);
-
-      const feePayer = await getFeePayerPubkey();
-
-      const { instructions, params, path, signers } = await makeSwapInstructionsAndParams(
-        parameters,
-        feePayer,
-      );
-
-      const { signature, blockhash } = await makeTransaction(feePayer, instructions, signers || []);
-
-      return sendTransaction(path, {
-        blockhash,
-        signature,
-        ...params,
-      });
-    };
+    // const makeSwapInstructionsAndParams = async (
+    //   parameters: SwapParameters & { feeCompensationPool: Pool },
+    //   feePayer: PublicKey,
+    // ): Promise<InstructionsAndParams> => {
+    //   const { fromAccount, fromAmount, pool, slippage, feeCompensationPool } = parameters;
+    //   const instructions = [];
+    //   const signers: Account[] = [];
+    //   let feeAmount = 0;
+    //
+    //   const accountRentExempt = await connection.getMinimumBalanceForRentExemption(
+    //     AccountLayout.span,
+    //   );
+    //
+    //   const {
+    //     feeCalculator: { lamportsPerSignature },
+    //   } = await connection.getRecentBlockhash();
+    //
+    //   // const userTransferAuthority = new Account();
+    //   const userTransferAuthorityPubkey = getWallet().pubkey; // userTransferAuthority.publicKey;
+    //   // signers.push(userTransferAuthority);
+    //
+    //   feeAmount = lamportsPerSignature + lamportsPerSignature; // fee relayer + userTransferAuthority
+    //
+    //   const isReverse = isReverseSwap(parameters);
+    //   const toToken = isReverse ? parameters.pool.tokenA.mint : parameters.pool.tokenB.mint;
+    //   const toAccount = parameters.toAccount?.address;
+    //   let userDestination = toAccount;
+    //
+    //   if (!parameters.toAccount) {
+    //     const associatedTokenAddress = await SPLToken.getAssociatedTokenAddress(
+    //       ASSOCIATED_TOKEN_ACCOUNT_PROGRAM_ID,
+    //       TOKEN_PROGRAM_ID,
+    //       toToken.address,
+    //       getWallet().pubkey,
+    //     );
+    //
+    //     instructions.push(
+    //       SPLToken.createAssociatedTokenAccountInstruction(
+    //         ASSOCIATED_TOKEN_ACCOUNT_PROGRAM_ID,
+    //         TOKEN_PROGRAM_ID,
+    //         toToken.address,
+    //         associatedTokenAddress,
+    //         getWallet().pubkey,
+    //         feePayer,
+    //       ),
+    //     );
+    //
+    //     userDestination = associatedTokenAddress;
+    //     feeAmount += accountRentExempt;
+    //   }
+    //
+    //   const poolIntoAccount = isReverse ? pool.tokenB : pool.tokenA;
+    //   const poolFromAccount = isReverse ? pool.tokenA : pool.tokenB;
+    //
+    //   const minimumToAmountWithoutSlippage = parameters.pool.calculateAmountInOtherToken(
+    //     fromAccount.mint,
+    //     fromAmount,
+    //     true,
+    //   );
+    //
+    //   const minimumToAmountWithSlippage = adjustForSlippage(
+    //     minimumToAmountWithoutSlippage,
+    //     'down',
+    //     slippage,
+    //   )
+    //     .floor()
+    //     .toNumber();
+    //
+    //   instructions.push(
+    //     TokenSwap.swapInstruction(
+    //       pool.address,
+    //       pool.tokenSwapAuthority(),
+    //       userTransferAuthorityPubkey,
+    //       fromAccount.address,
+    //       poolIntoAccount.address,
+    //       poolFromAccount.address,
+    //       userDestination || getWallet().pubkey,
+    //       pool.poolToken.address,
+    //       pool.feeAccount.address,
+    //       null,
+    //       swapProgramId,
+    //       TOKEN_PROGRAM_ID,
+    //       parameters.fromAmount,
+    //       minimumToAmountWithSlippage,
+    //     ),
+    //   );
+    //
+    //   // fee_compensation_swap
+    //   const feePayerWsolAccount = new Account();
+    //   feeAmount += lamportsPerSignature;
+    //
+    //   const isReverseFeeCompensation = feeCompensationPool.tokenB.mint.equals(
+    //     new Token(WRAPPED_SOL_MINT, 9, 0),
+    //   );
+    //   const feeCompensationPoolIntoAccount = isReverseFeeCompensation
+    //     ? feeCompensationPool.tokenB
+    //     : feeCompensationPool.tokenA;
+    //   const feeCompensationPoolFromAccount = isReverseFeeCompensation
+    //     ? feeCompensationPool.tokenA
+    //     : feeCompensationPool.tokenB;
+    //
+    //   const feeCompensationAmountIn = feeCompensationPool.calculateAmountInOtherToken(
+    //     feeCompensationPoolIntoAccount.mint,
+    //     feeAmount,
+    //     true,
+    //   );
+    //
+    //   const feeMinimumToAmountWithSlippage = adjustForSlippage(feeCompensationAmountIn, 'up', 1)
+    //     .floor()
+    //     .toNumber();
+    //
+    //   instructions.push(
+    //     SystemProgram.createAccount({
+    //       fromPubkey: feePayer,
+    //       newAccountPubkey: feePayerWsolAccount.publicKey,
+    //       lamports: accountRentExempt,
+    //       space: AccountLayout.span,
+    //       programId: TOKEN_PROGRAM_ID,
+    //     }),
+    //   );
+    //
+    //   instructions.push(
+    //     SPLToken.createInitAccountInstruction(
+    //       TOKEN_PROGRAM_ID,
+    //       WRAPPED_SOL_MINT,
+    //       feePayerWsolAccount.publicKey,
+    //       feePayer,
+    //     ),
+    //   );
+    //
+    //   instructions.push(
+    //     TokenSwap.swapInstruction(
+    //       feeCompensationPool.address,
+    //       feeCompensationPool.tokenSwapAuthority(),
+    //       userTransferAuthorityPubkey,
+    //       fromAccount.address,
+    //       feeCompensationPoolFromAccount.address,
+    //       feeCompensationPoolIntoAccount.address,
+    //       feePayerWsolAccount.publicKey,
+    //       feeCompensationPool.poolToken.address,
+    //       feeCompensationPool.feeAccount.address,
+    //       null,
+    //       swapProgramId,
+    //       TOKEN_PROGRAM_ID,
+    //       feeMinimumToAmountWithSlippage,
+    //       feeAmount,
+    //     ),
+    //   );
+    //
+    //   instructions.push(
+    //     SPLToken.createCloseAccountInstruction(
+    //       TOKEN_PROGRAM_ID,
+    //       feePayerWsolAccount.publicKey,
+    //       feePayer,
+    //       feePayer,
+    //       [],
+    //     ),
+    //   );
+    //
+    //   return {
+    //     instructions,
+    //     params: {
+    //       user_source_token_account_pubkey: fromAccount.address.toBase58(),
+    //       user_destination_pubkey: toAccount ? toAccount.toBase58() : getWallet().pubkey.toBase58(),
+    //       source_token_mint_pubkey: fromAccount.mint.address.toBase58(),
+    //       destination_token_mint_pubkey: toToken.address.toBase58(),
+    //       user_authority_pubkey: userTransferAuthorityPubkey.toBase58(),
+    //       user_swap: {
+    //         account_pubkey: pool.address.toBase58(),
+    //         authority_pubkey: pool.tokenSwapAuthority().toBase58(),
+    //         transfer_authority_pubkey: userTransferAuthorityPubkey.toBase58(),
+    //         source_pubkey: poolIntoAccount.address.toBase58(),
+    //         destination_pubkey: poolFromAccount.address.toBase58(),
+    //         pool_token_mint_pubkey: pool.poolToken.address.toBase58(),
+    //         pool_fee_account_pubkey: pool.feeAccount.address.toBase58(),
+    //         amount_in: fromAmount,
+    //         minimum_amount_out: minimumToAmountWithSlippage,
+    //       },
+    //       fee_compensation_swap: {
+    //         account_pubkey: feeCompensationPool.address.toBase58(),
+    //         authority_pubkey: feeCompensationPool.tokenSwapAuthority().toBase58(),
+    //         transfer_authority_pubkey: userTransferAuthorityPubkey.toBase58(),
+    //         source_pubkey: feeCompensationPoolFromAccount.address.toBase58(),
+    //         destination_pubkey: feeCompensationPoolIntoAccount.address.toBase58(),
+    //         pool_token_mint_pubkey: feeCompensationPool.poolToken.address.toBase58(),
+    //         pool_fee_account_pubkey: feeCompensationPool.feeAccount.address.toBase58(),
+    //         amount_in: feeMinimumToAmountWithSlippage,
+    //         minimum_amount_out: feeAmount,
+    //       },
+    //       fee_payer_wsol_account_keypair: bs58.encode(feePayerWsolAccount.secretKey),
+    //     },
+    //     path: '/swap_spl_token_with_fee_compensation',
+    //     signers,
+    //   };
+    // };
+    //
+    // const swap = async (
+    //   parameters: SwapParameters & { feeCompensationPool: Pool },
+    // ): Promise<string> => {
+    //   if (!feeRelayerUrl) {
+    //     throw new Error('feeRelayerUrl must be set');
+    //   }
+    //
+    //   validateSwapParameters(parameters);
+    //
+    //   const feePayer = await getFeePayerPubkey();
+    //
+    //   const { instructions, params, path, signers } = await makeSwapInstructionsAndParams(
+    //     parameters,
+    //     feePayer,
+    //   );
+    //
+    //   const { signature, blockhash } = await makeTransaction(feePayer, instructions, signers || []);
+    //
+    //   return sendTransaction(path, {
+    //     blockhash,
+    //     signature,
+    //     ...params,
+    //   });
+    // };
 
     return {
       transfer,
-      swap,
+      // swap,
     };
   },
 );

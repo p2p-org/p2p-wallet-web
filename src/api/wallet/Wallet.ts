@@ -24,6 +24,10 @@ export abstract class Wallet extends EventEmitter {
 
   abstract get pubkey(): PublicKey;
 
+  get publicKey(): PublicKey {
+    return this.pubkey;
+  }
+
   abstract disconnect(): void;
 
   /**
@@ -43,4 +47,6 @@ export abstract class Wallet extends EventEmitter {
    * @protected
    */
   protected abstract signTransaction(transaction: Transaction): Promise<Transaction>;
+
+  protected abstract signAllTransactions(transaction: Transaction[]): Promise<Transaction[]>;
 }
