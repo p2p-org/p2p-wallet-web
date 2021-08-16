@@ -135,6 +135,18 @@ export const APIFactory = memoizeWith(
         return null;
       }
 
+      if (
+        network.cluster === 'devnet' &&
+        address.toBase58() === 'FsaLodPu4VmSwXGr3gWfwANe4vKf8XSZcCh1CEeJ3jpD'
+      ) {
+        return {
+          chainId: 101,
+          address: 'FsaLodPu4VmSwXGr3gWfwANe4vKf8XSZcCh1CEeJ3jpD',
+          name: 'renBTC',
+          decimals: 8,
+          symbol: 'renBTC',
+        };
+      }
       const configForToken = find(propEq('address', address.toBase58()), clusterConfig);
 
       if (!configForToken) {
