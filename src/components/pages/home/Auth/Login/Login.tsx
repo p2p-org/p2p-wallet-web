@@ -41,6 +41,7 @@ const BackStyled = styled(Back)`
 type PageTypes = 'restore' | 'main' | 'password' | 'derivableAccounts';
 
 const backToPage: {
+  // eslint-disable-next-line no-unused-vars
   [page in PageTypes]: PageTypes;
 } = {
   restore: 'main',

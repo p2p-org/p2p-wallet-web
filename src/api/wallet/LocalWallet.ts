@@ -10,6 +10,7 @@ import { Wallet, WalletEvent } from './Wallet';
  */
 export class LocalWallet extends Wallet {
   private account: Account;
+  private _publicKey: PublicKey;
 
   constructor(endpoint: string) {
     super(endpoint);
@@ -22,13 +23,18 @@ export class LocalWallet extends Wallet {
     }
 
     this.account = new Account(JSON.parse(localPrivateKey));
+    this._publicKey = this.account.publicKey;
 
     // simulate connecting to an external wallet;
     setImmediate(() => this.emit(WalletEvent.CONNECT));
   }
 
   get pubkey(): PublicKey {
-    return this.account.publicKey;
+    return this._publicKey;
+  }
+
+  get publicKey(): PublicKey {
+    return this._publicKey;
   }
 
   // eslint-disable-next-line class-methods-use-this

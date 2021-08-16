@@ -97,7 +97,6 @@ const DonutChartOrigin: FunctionComponent<Props> = ({
   };
 
   const segments = useMemo(() => {
-    // eslint-disable-next-line unicorn/no-reduce
     const total = data.reduce((p, c) => p + c.amount, 0);
 
     let startAngle = 0;

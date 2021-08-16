@@ -40,6 +40,7 @@ const BackStyled = styled(Back)`
 type PageTypes = 'mnemonic' | 'paste' | 'password';
 
 const backToPage: {
+  // eslint-disable-next-line no-unused-vars
   [page in PageTypes]: PageTypes;
 } = {
   mnemonic: 'mnemonic',

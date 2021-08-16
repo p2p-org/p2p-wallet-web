@@ -150,7 +150,6 @@ export const TokenRow: FunctionComponent<Props> = ({
 }) => {
   const dispatch = useDispatch();
   const cluster = useSelector((state) => state.wallet.network.cluster);
-  // eslint-disable-next-line unicorn/consistent-function-scoping
   const handleMenuItemClick = () => {
     const tokenAddress = token.address.toBase58();
     if (isZeroBalancesHidden && token.balance.lte(0)) {

@@ -449,7 +449,6 @@ export const updateAccountReducer = (
   return {
     ...state,
     tokenAccounts: updatedAccounts.map((account) => account.serialize()),
-    // eslint-disable-next-line unicorn/prefer-spread
     zeroBalanceTokens: Array.from(loadZeroBalanceTokens()),
   };
 };
@@ -464,10 +463,8 @@ const makeInitialState = (): WalletsState => ({
     : WalletType.MANUAL,
   tokenAccounts: [],
   derivableTokenAccounts: [],
-  // eslint-disable-next-line unicorn/prefer-spread
   hiddenTokens: Array.from(loadHiddenTokens()),
   settings: loadSettings(),
-  // eslint-disable-next-line unicorn/prefer-spread
   zeroBalanceTokens: Array.from(loadZeroBalanceTokens()),
 });
 
@@ -493,9 +490,7 @@ const walletSlice = createSlice({
     },
     updateHiddenTokens: (state) => ({
       ...state,
-      // eslint-disable-next-line unicorn/prefer-spread
       hiddenTokens: Array.from(loadHiddenTokens()),
-      // eslint-disable-next-line unicorn/prefer-spread
       zeroBalanceTokens: Array.from(loadZeroBalanceTokens()),
     }),
     updateSettings: (state, action: PayloadAction<Partial<WalletSettings>>) => {

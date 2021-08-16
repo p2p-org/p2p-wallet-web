@@ -1998,7 +1998,7 @@
 
 "@project-serum/swap-ui@git+https://github.com/beautyfree/swap-ui.git":
   version "0.2.1"
-  resolved "git+https://github.com/beautyfree/swap-ui.git#435a3926dc45b8d9650de4c6046b11298ce2c956"
+  resolved "git+https://github.com/beautyfree/swap-ui.git#c695357e17a4aa8382c3e176d10143faab792528"
   dependencies:
     "@project-serum/serum" "^0.13.34"
     "@project-serum/swap" "^0.1.0-alpha.31"

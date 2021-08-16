@@ -79,14 +79,12 @@ function addOrDeleteItem(set: Set<string>, item: string, itemKey: string) {
     set.add(item);
   }
 
-  // eslint-disable-next-line unicorn/prefer-spread
   localStorage.setItem(itemKey, JSON.stringify(Array.from(set)));
 }
 
 function removeItem(set: Set<string>, item: string, itemKey: string) {
   if (set.has(item)) {
     set.delete(item);
-    // eslint-disable-next-line unicorn/prefer-spread
     localStorage.setItem(itemKey, JSON.stringify(Array.from(set)));
   }
 }

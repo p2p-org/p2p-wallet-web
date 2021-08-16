@@ -41,6 +41,7 @@ export type NetworkNameType =
   | 'solana-testnet';
 
 type NetworksByNameType = {
+  // eslint-disable-next-line no-unused-vars
   [name in NetworkNameType]: NetworkType;
 };
 

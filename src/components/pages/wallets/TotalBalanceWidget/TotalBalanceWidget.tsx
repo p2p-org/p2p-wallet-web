@@ -68,7 +68,6 @@ export const TotalBalanceWidget: FunctionComponent<Props> = ({ onSymbolChange })
 
   const totalBalance = useMemo(
     () =>
-      // eslint-disable-next-line unicorn/no-reduce
       tokenAccounts.reduce((prev, tokenAccount) => {
         const rate = rateSelector(tokenAccount.mint.symbol)(state);
         if (rate) {

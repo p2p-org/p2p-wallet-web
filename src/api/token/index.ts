@@ -230,7 +230,6 @@ export const APIFactory = memoizeWith(
         }),
       );
 
-      // eslint-disable-next-line unicorn/no-reduce
       return results.reduce((prev, cur) => {
         if (cur) {
           return prev?.concat(cur);

@@ -24,9 +24,7 @@ export abstract class Wallet extends EventEmitter {
 
   abstract get pubkey(): PublicKey;
 
-  get publicKey(): PublicKey {
-    return this.pubkey;
-  }
+  abstract get publicKey(): PublicKey;
 
   abstract disconnect(): void;
 

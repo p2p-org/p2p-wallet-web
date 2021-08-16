@@ -16,19 +16,17 @@ import { getWallet } from 'api/wallet';
 export const Providers: FC = ({ children }) => {
   const [tokenList, setTokenList] = useState<TokenListContainer | null>(null);
 
-  useEffect(() => {
-    void new TokenListProvider().resolve().then(setTokenList);
-  }, [setTokenList]);
-
   const provider = useMemo(() => {
-    const opts: ConfirmOptions = {
-      preflightCommitment: 'recent',
-      commitment: 'recent',
-    };
-
     try {
-      const wallet = getWallet() as Wallet;
+      const wallet = Object.assign(
+        Object.create(Object.getPrototypeOf(getWallet())),
+        getWallet(),
+      ) as Wallet;
       const connection = getConnection();
+      const opts: ConfirmOptions = {
+        preflightCommitment: 'recent',
+        commitment: 'recent',
+      };
 
       return new Provider(connection, wallet, opts);
     } catch {
@@ -36,11 +34,21 @@ export const Providers: FC = ({ children }) => {
     }
   }, []);
 
+  const swapClient = useMemo(() => {
+    if (!tokenList || !provider) {
+      return null;
+    }
+
+    return new SwapClient(provider, tokenList);
+  }, [provider, tokenList]);
+
+  useEffect(() => {
+    void new TokenListProvider().resolve().then(setTokenList);
+  }, [setTokenList]);
+
   if (!tokenList || !provider) {
     return null;
   }
-
-  const swapClient = new SwapClient(provider, tokenList);
 
   return (
     <TokenContextProvider provider={provider}>

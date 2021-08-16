@@ -6,6 +6,7 @@ const {
   addWebpackPlugin,
   setWebpackPublicPath,
   disableChunk,
+  addWebpackAlias,
 } = require('customize-cra');
 const SpritePlugin = require('svg-sprite-loader/plugin');
 const PrerenderSPAPlugin = require('prerender-spa-plugin');
@@ -24,6 +25,10 @@ module.exports = override(
         staticDir: path.join(__dirname, 'build'),
       }),
     ),
+  addWebpackAlias({
+    ['react']: path.resolve(__dirname, './node_modules/react'),
+    ['react-dom']: path.resolve(__dirname, './node_modules/react-dom'),
+  }),
   addWebpackModuleRule({
     test: /\.tsx?$/,
     exclude: /node_modules/,
