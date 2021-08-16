@@ -7,12 +7,12 @@ import { Hint } from 'components/common/Hint';
 import { PriceLine } from 'components/pages/swap/SwapWidget/PriceLine';
 import { Properties } from 'components/pages/swap/SwapWidget/Properties';
 import { Reverse } from 'components/pages/swap/SwapWidget/Reverse';
+import serumLogo from 'components/pages/swap/SwapWidget/serum_logo.svg';
 import { SettingsAction } from 'components/pages/swap/SwapWidget/SettingsAction';
 import { SwapFromForm } from 'components/pages/swap/SwapWidget/SwapFromForm';
 import { SwapToForm } from 'components/pages/swap/SwapWidget/SwapToForm';
 
 import { WrapperWidgetPage } from '../../../common/SendSwapWidget/common/styled';
-import serumLogo from './serum_logo.svg';
 import { SwapButton } from './SwapButton';
 
 const ActionsWrapper = styled.div`

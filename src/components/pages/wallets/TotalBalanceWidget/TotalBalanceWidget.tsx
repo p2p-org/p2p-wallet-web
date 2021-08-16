@@ -148,6 +148,9 @@ export const TotalBalanceWidget: FunctionComponent<Props> = ({ onSymbolChange })
       apiKey: process.env.REACT_APP_TRANSAK_API_KEY, // Your API Key
       environment: 'STAGING', // STAGING/PRODUCTION
       defaultCryptoCurrency: 'SOL',
+      cryptoCurrencyList: 'SOL',
+
+      networks: 'solana,mainnet',
       walletAddress: publicKey, // Your customer's wallet address
       themeColor: '5887FF', // App theme color
       fiatCurrency: '', // INR/GBP

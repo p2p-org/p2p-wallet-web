@@ -164,14 +164,14 @@ export const SwapButton: FC = () => {
         const toOpenOrders = toMarket ? openOrders.get(toMarket?.address.toString()) : undefined;
         const fromWalletAddr = fromMint.equals(SOL_MINT)
           ? wrappedSolAccount?.publicKey
-          : (fromWallet
+          : fromWallet
           ? fromWallet.publicKey
-          : undefined);
+          : undefined;
         const toWalletAddr = toMint.equals(SOL_MINT)
           ? wrappedSolAccount?.publicKey
-          : (toWallet
+          : toWallet
           ? toWallet.publicKey
-          : undefined);
+          : undefined;
 
         return swapClient.swapTxs({
           fromMint,

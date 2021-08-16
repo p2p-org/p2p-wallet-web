@@ -45,4 +45,6 @@ export abstract class Wallet extends EventEmitter {
    * @protected
    */
   protected abstract signTransaction(transaction: Transaction): Promise<Transaction>;
+
+  protected abstract signAllTransactions(transaction: Transaction[]): Promise<Transaction[]>;
 }

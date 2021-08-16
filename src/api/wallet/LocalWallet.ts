@@ -48,4 +48,13 @@ export class LocalWallet extends Wallet {
     transaction.addSignature(this.account.publicKey, Buffer.from(signature));
     return Promise.resolve(transaction);
   }
+
+  async signAllTransactions(transactions: Transaction[]): Promise<Transaction[]> {
+    for (const transaction of transactions) {
+      const message = transaction.serializeMessage();
+      const signature = nacl.sign.detached(message, this.account.secretKey);
+      transaction.addSignature(this.account.publicKey, Buffer.from(signature));
+    }
+    return Promise.resolve(transactions);
+  }
 }

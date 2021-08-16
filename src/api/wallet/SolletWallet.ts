@@ -44,4 +44,8 @@ export class SolletWallet extends Wallet {
   signTransaction(transaction: Transaction): Promise<Transaction> {
     return this.provider.signTransaction(transaction);
   }
+
+  signAllTransactions(transactions: Transaction[]): Promise<Transaction[]> {
+    return this.provider.signAllTransactions(transactions);
+  }
 }

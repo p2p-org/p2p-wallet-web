@@ -1,3 +1,4 @@
+import { SOL_MINT } from '@project-serum/swap-ui';
 import {
   createAsyncThunk,
   createSlice,
@@ -36,13 +37,12 @@ import { DEFAULT_NETWORK, NetworkType, swapHostFeeAddress } from 'config/constan
 import { SYSTEM_PROGRAM_ID, WRAPPED_SOL_MINT } from 'constants/solana/bufferLayouts';
 import { RootState } from 'store/rootReducer';
 import { getAvailableTokens, wipeAction } from 'store/slices/GlobalSlice';
-import { getPools } from 'store/slices/pool/PoolSlice';
 import { getRatesCandle, getRatesMarkets } from 'store/slices/rate/RateSlice';
-import { updateEntityArray } from 'store/slices/tokenPair/utils/tokenPair';
 import {
   addPendingTransaction,
   updateTransactions,
 } from 'store/slices/transaction/TransactionSlice';
+import { updateEntityArray } from 'store/utils';
 import { minorAmountToMajor } from 'utils/amount';
 import {
   loadHiddenTokens,
@@ -88,7 +88,7 @@ const getSolToken = async (TokenAPI: API, publicKey: PublicKey, isDerivable?: bo
 
   // Fake token to simulate SOL as Token
   const mint = new Token(
-    SYSTEM_PROGRAM_ID,
+    SOL_MINT,
     9,
     0,
     undefined,
@@ -308,7 +308,6 @@ export const connectWallet = createAsyncThunk<string, WalletDataType | undefined
     // to avail of the token caching feature
     await thunkAPI.dispatch(getAvailableTokens());
     void thunkAPI.dispatch(getTokenAccountsForWallet());
-    void thunkAPI.dispatch(getPools());
     void thunkAPI.dispatch(getRatesMarkets());
     void thunkAPI.dispatch(getRatesCandle({ symbol: 'SOL', type: 'month' }));
 
