@@ -2,7 +2,6 @@ import React, { FunctionComponent, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 
 import { Layout } from 'components/common/Layout';
-import { Providers } from 'components/pages/swap/Providers';
 import { SwapWidget } from 'components/pages/swap/SwapWidget';
 import { trackEvent } from 'utils/analytics';
 
@@ -13,13 +12,5 @@ export const Swap: FunctionComponent = () => {
     trackEvent('swap_open', { fromPage: location.state.fromPage });
   }, []);
 
-  return (
-    <Layout
-      rightColumn={
-        <Providers>
-          <SwapWidget />
-        </Providers>
-      }
-    />
-  );
+  return <Layout rightColumn={<SwapWidget />} />;
 };

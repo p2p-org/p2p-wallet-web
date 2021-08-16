@@ -11,10 +11,11 @@ import { Decimal } from 'decimal.js';
 import { complement, isNil, memoizeWith, toString } from 'ramda';
 
 import { getConnection, getConnectionTransactions } from 'api/connection';
+import poolConfig from 'api/pool/pool.config';
 import { APIFactory as TokenAPIFactory } from 'api/token';
 import { Token } from 'api/token/Token';
 import { TokenAccount } from 'api/token/TokenAccount';
-import { NetworkType } from 'config/constants';
+import { localSwapProgramId, NetworkType } from 'config/constants';
 import { SYSTEM_PROGRAM_ID, TOKEN_PROGRAM_ID } from 'constants/solana/bufferLayouts';
 import { CacheTTL } from 'lib/cachettl';
 
@@ -40,6 +41,14 @@ export const APIFactory = memoizeWith(
     const connection = getConnection(network);
     const connectionTransactions = getConnectionTransactions(network);
     const tokenAPI = TokenAPIFactory(network);
+    const poolConfigForCluster = poolConfig[network.cluster];
+
+    const swapProgramId = poolConfigForCluster.swapProgramId || localSwapProgramId;
+    if (!swapProgramId) {
+      throw new Error('No TokenSwap program ID defined');
+    }
+
+    console.log(`Swap Program ID ${swapProgramId.toBase58()}.`);
 
     type ConfirmedTransaction = {
       programId: PublicKey;
@@ -97,7 +106,7 @@ export const APIFactory = memoizeWith(
       // swap contract
       const swapInstructionIndex = instructions.findIndex(
         (inst) =>
-          // inst.programId.equals(swapProgramId) ||
+          inst.programId.equals(swapProgramId) ||
           inst.programId.toBase58() === '9qvG1zUp8xF1Bi4m6UdRNby1BAAuaDrUxSpv4CmRRMjL' || // main old swap
           inst.programId.toBase58() === 'DjVE6JNiYqPL2QXyCUUh8rNjHrbz9hXHNYt99MQ59qw1', // main orca
       );

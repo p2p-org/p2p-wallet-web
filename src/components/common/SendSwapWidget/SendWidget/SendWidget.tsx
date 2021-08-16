@@ -114,6 +114,15 @@ const HintWrapper = styled.div`
   border-top: 1px solid ${rgba('#000', 0.05)};
 `;
 
+const Error = styled.div`
+  margin-left: 66px;
+
+  font-weight: 600;
+  font-size: 16px;
+
+  color: #f43d3d;
+`;
+
 type Props = {
   publicKey: string | null;
 };
@@ -327,6 +336,7 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
     : false;
 
   const isDisabled = isExecuting;
+  const isValidDestinationAddress = isValidAddress(toTokenPublicKey);
 
   // TODO
   const isNeedCreateWallet = false;
@@ -391,6 +401,9 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
         <ToSendWrapper>
           <FromTitle>Send to SOL or any SPL token address</FromTitle>
           <ToAddressInput value={toTokenPublicKey || ''} onChange={handleToPublicKeyChange} />
+          {toTokenPublicKey.length > 0 && !isValidDestinationAddress ? (
+            <Error>Check recepient address</Error>
+          ) : undefined}
           {isShowConfirmAddressSwitch ? (
             <ConfirmWrapper>
               <Switch
@@ -413,7 +426,7 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
               disabled={
                 isDisabled ||
                 isValidAmount(fromAmount) ||
-                !isValidAddress(toTokenPublicKey) ||
+                !isValidDestinationAddress ||
                 !hasBalance ||
                 (isShowConfirmAddressSwitch && !isConfirmCorrectAddress)
               }

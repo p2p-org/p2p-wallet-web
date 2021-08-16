@@ -1,4 +1,3 @@
-import { SOL_MINT } from '@project-serum/swap-ui';
 import { AccountLayout, MintLayout, Token as SPLToken } from '@solana/spl-token';
 import { TokenInfo } from '@solana/spl-token-registry';
 import {
@@ -136,6 +135,18 @@ export const APIFactory = memoizeWith(
         return null;
       }
 
+      if (
+        network.cluster === 'devnet' &&
+        address.toBase58() === 'FsaLodPu4VmSwXGr3gWfwANe4vKf8XSZcCh1CEeJ3jpD'
+      ) {
+        return {
+          chainId: 101,
+          address: 'FsaLodPu4VmSwXGr3gWfwANe4vKf8XSZcCh1CEeJ3jpD',
+          name: 'renBTC',
+          decimals: 8,
+          symbol: 'renBTC',
+        };
+      }
       const configForToken = find(propEq('address', address.toBase58()), clusterConfig);
 
       if (!configForToken) {
@@ -380,7 +391,7 @@ export const APIFactory = memoizeWith(
       if (account.equals(getWallet().pubkey)) {
         const balance = await connection.getBalance(account);
         const mint = new Token(
-          SOL_MINT,
+          SYSTEM_PROGRAM_ID,
           9,
           0,
           undefined,
@@ -396,7 +407,7 @@ export const APIFactory = memoizeWith(
       // For SOL tokens
       if (getParsedAccountInfoResult.value?.owner.equals(SYSTEM_PROGRAM_ID)) {
         const mint = new Token(
-          SOL_MINT,
+          SYSTEM_PROGRAM_ID,
           9,
           0,
           undefined,
