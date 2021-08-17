@@ -1,11 +1,14 @@
 import { PublicKey, Transaction } from '@solana/web3.js';
 import EventEmitter from 'eventemitter3';
 
-// eslint-disable-next-line no-shadow
 export enum WalletEvent {
+  // eslint-disable-next-line no-unused-vars
   CONNECT = 'connect',
+  // eslint-disable-next-line no-unused-vars
   DISCONNECT = 'disconnect',
+  // eslint-disable-next-line no-unused-vars
   SIGNED = 'signed',
+  // eslint-disable-next-line no-unused-vars
   CONFIRMED = 'confirmed',
 }
 

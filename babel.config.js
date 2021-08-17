@@ -1,6 +1,8 @@
 module.exports = {
   presets: [['react-app', { flow: false, typescript: true }], '@linaria'],
   plugins: [
+    ['@babel/plugin-proposal-private-methods', { loose: true }],
+    ['@babel/plugin-proposal-class-properties', { loose: true }],
     [
       'module-resolver',
       {

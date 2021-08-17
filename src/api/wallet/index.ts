@@ -33,12 +33,16 @@ const POST_TRANSACTION_SLEEP_MS = postTransactionSleepMS || 500;
 let wallet: Wallet | null;
 let connection: Connection | null;
 
-// eslint-disable-next-line no-shadow
 export enum WalletType {
+  // eslint-disable-next-line no-unused-vars
   LOCAL,
+  // eslint-disable-next-line no-unused-vars
   MANUAL,
+  // eslint-disable-next-line no-unused-vars
   SOLLET,
+  // eslint-disable-next-line no-unused-vars
   SOLLET_EXTENSION,
+  // eslint-disable-next-line no-unused-vars
   PHANTOM,
 }
 
