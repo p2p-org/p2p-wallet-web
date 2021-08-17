@@ -133,8 +133,7 @@ export const LayoutOrigin: FunctionComponent<Props> = ({
                       <ColumnRight>{rightColumn}</ColumnRight>
                     </ColumnRightWrapper>
                   </ColumnsWrapper>
-                ) : // eslint-disable-next-line unicorn/no-nested-ternary
-                centered ? (
+                ) : centered ? (
                   <CenteredWrapper>{centered}</CenteredWrapper>
                 ) : (
                   children

@@ -14,6 +14,6 @@
   "include": [
     "./src/**/*",
     "./test/[^e2e]/*",
-    "./node_modules/@solana/web3.js/lib/types/index.d.ts"
+    "./node_modules/@solana/web3.js/lib/types/index.d.ts",
   ]
 }

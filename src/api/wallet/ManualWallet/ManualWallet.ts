@@ -25,6 +25,10 @@ export class ManualWallet extends Wallet {
   // @ts-ignore
   private account: Account;
 
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  private _publicKey: PublicKey;
+
   constructor(network: string, data: ManualWalletData) {
     super(network);
 
@@ -44,6 +48,7 @@ export class ManualWallet extends Wallet {
       const seed = Buffer.from(data.seed, 'hex');
 
       this.account = getAccountFromSeed(seed, 0, data.derivationPath);
+      this._publicKey = this.account.publicKey;
 
       // can be too fast and handler will not be set
       setTimeout(() => {
@@ -56,7 +61,11 @@ export class ManualWallet extends Wallet {
   }
 
   get pubkey(): PublicKey {
-    return this.account.publicKey;
+    return this._publicKey;
+  }
+
+  get publicKey(): PublicKey {
+    return this._publicKey;
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -69,5 +78,14 @@ export class ManualWallet extends Wallet {
     const signature = nacl.sign.detached(message, this.account.secretKey);
     transaction.addSignature(this.account.publicKey, Buffer.from(signature));
     return Promise.resolve(transaction);
+  }
+
+  async signAllTransactions(transactions: Transaction[]): Promise<Transaction[]> {
+    for (const transaction of transactions) {
+      const message = transaction.serializeMessage();
+      const signature = nacl.sign.detached(message, this.account.secretKey);
+      transaction.addSignature(this.account.publicKey, Buffer.from(signature));
+    }
+    return Promise.resolve(transactions);
   }
 }

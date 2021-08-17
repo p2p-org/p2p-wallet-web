@@ -47,11 +47,19 @@ export class PhantomtWallet extends Wallet {
     return this.provider.publicKey;
   }
 
+  get publicKey(): PublicKey {
+    return this.provider.publicKey;
+  }
+
   disconnect(): void {
     void this.provider.disconnect();
   }
 
   signTransaction(transaction: Transaction): Promise<Transaction> {
     return this.provider.signTransaction(transaction);
+  }
+
+  signAllTransactions(transactions: Transaction[]): Promise<Transaction[]> {
+    return this.provider.signAllTransactions(transactions);
   }
 }

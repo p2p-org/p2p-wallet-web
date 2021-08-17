@@ -150,7 +150,6 @@ export const TokenSettingsWidget: FunctionComponent<Props> = ({
     );
   };
 
-  // eslint-disable-next-line unicorn/consistent-function-scoping
   const handleHideTokenClick = (pubKey: web3.PublicKey) => () => {
     const tokenAddress = pubKey.toBase58();
     if (isZeroBalancesHidden && isZeroBalance) {

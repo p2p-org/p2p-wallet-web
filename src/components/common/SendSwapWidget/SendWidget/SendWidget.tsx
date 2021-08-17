@@ -172,26 +172,26 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
     (state: RootState) => state.wallet.settings.useFreeTransactions,
   );
 
-  if (!useFreeTransactions) {
-    useEffect(() => {
-      const mount = async () => {
-        try {
-          const resultRentFee = unwrapResult(
-            await dispatch(getMinimumBalanceForRentExemption(AccountLayout.span)),
-          );
+  useEffect(() => {
+    const mount = async () => {
+      try {
+        const resultRentFee = unwrapResult(
+          await dispatch(getMinimumBalanceForRentExemption(AccountLayout.span)),
+        );
 
-          const resultRecentBlockhash = unwrapResult(await dispatch(getRecentBlockhash()));
+        const resultRecentBlockhash = unwrapResult(await dispatch(getRecentBlockhash()));
 
-          setRentFee(formatFee(resultRentFee));
-          setTxFee(formatFee(resultRecentBlockhash.feeCalculator.lamportsPerSignature));
-        } catch (error) {
-          console.log(error);
-        }
-      };
+        setRentFee(formatFee(resultRentFee));
+        setTxFee(formatFee(resultRecentBlockhash.feeCalculator.lamportsPerSignature));
+      } catch (error) {
+        console.log(error);
+      }
+    };
 
+    if (!useFreeTransactions) {
       void mount();
-    }, []);
-  }
+    }
+  }, []);
 
   useEffect(() => {
     const checkDestinationAddress = async () => {

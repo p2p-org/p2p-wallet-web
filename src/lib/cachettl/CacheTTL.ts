@@ -36,7 +36,6 @@ export class CacheTTL<T> {
   }
 
   toArray() {
-    // eslint-disable-next-line unicorn/prefer-spread
     return Array.from(this.caches.values()).map((item) => item.cachedResult);
   }
 }

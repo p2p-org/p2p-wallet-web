@@ -63,7 +63,6 @@ export const getConfig = (data: number[][]): Highcharts.Options => ({
       marker: {
         radius: 0,
       },
-      // eslint-disable-next-line unicorn/no-null
       threshold: null,
       dataGrouping: { enabled: false },
     },

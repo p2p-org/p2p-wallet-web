@@ -343,7 +343,6 @@ export const TransactionDetailsModal: FC<Props> = ({ signature, source, close })
                 processing: !transaction.slot,
               })}
             />{' '}
-            {/* eslint-disable-next-line unicorn/no-nested-ternary */}
             {transaction.meta?.err ? 'Failed' : !transaction.slot ? 'Pending' : 'Completed'}
           </Status>
         </StatusWrapper>

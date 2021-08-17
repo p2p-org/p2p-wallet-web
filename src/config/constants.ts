@@ -15,11 +15,6 @@ export const swapHostFeeAddress = process.env.REACT_APP_SWAP_HOST_FEE_ADDRESS
 
 export const cryptoCompareApiKey = process.env.REACT_APP_CRYPTO_COMPARE_API_KEY;
 
-// Env vars that do not start with "REACT_APP_" are available in tests only
-export const localSwapProgramId = process.env.REACT_APP_SWAP_PROGRAM_ID
-  ? new PublicKey(process.env.REACT_APP_SWAP_PROGRAM_ID)
-  : null;
-
 // the default commitment uesd by the Solana web3 connection when checking the blockchain state
 export const defaultCommitment: Commitment =
   (process.env.REACT_APP_DEFAULT_COMMITMENT as Commitment) || 'confirmed';
@@ -46,6 +41,7 @@ export type NetworkNameType =
   | 'solana-testnet';
 
 type NetworksByNameType = {
+  // eslint-disable-next-line no-unused-vars
   [name in NetworkNameType]: NetworkType;
 };
 

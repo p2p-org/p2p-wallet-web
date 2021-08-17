@@ -1,4 +1,3 @@
-// eslint-disable-next-line eslint-comments/disable-enable-pair
 /* eslint-disable react/no-array-index-key */
 import React, { FC, useEffect, useMemo, useState } from 'react';
 
@@ -176,7 +175,6 @@ export const Password: FC<Props> = ({ type, next }) => {
       return;
     }
 
-    // eslint-disable-next-line unicorn/no-reduce
     const counter = [isLowerCase, isUpperCase, isNumber, isMinLength].reduce(
       (prev, curr) => (curr ? prev + 1 : prev),
       0,

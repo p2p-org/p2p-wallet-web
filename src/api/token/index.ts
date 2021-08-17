@@ -1,3 +1,4 @@
+import { SOL_MINT } from '@project-serum/swap-ui';
 import { AccountLayout, MintLayout, Token as SPLToken } from '@solana/spl-token';
 import { TokenInfo } from '@solana/spl-token-registry';
 import {
@@ -241,7 +242,6 @@ export const APIFactory = memoizeWith(
         }),
       );
 
-      // eslint-disable-next-line unicorn/no-reduce
       return results.reduce((prev, cur) => {
         if (cur) {
           return prev?.concat(cur);
@@ -392,7 +392,7 @@ export const APIFactory = memoizeWith(
       if (account.equals(getWallet().pubkey)) {
         const balance = await connection.getBalance(account);
         const mint = new Token(
-          SYSTEM_PROGRAM_ID,
+          SOL_MINT,
           9,
           0,
           undefined,
@@ -408,7 +408,7 @@ export const APIFactory = memoizeWith(
       // For SOL tokens
       if (getParsedAccountInfoResult.value?.owner.equals(SYSTEM_PROGRAM_ID)) {
         const mint = new Token(
-          SYSTEM_PROGRAM_ID,
+          SOL_MINT,
           9,
           0,
           undefined,

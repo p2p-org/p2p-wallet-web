@@ -44,7 +44,6 @@ export const retryableProxy = <U, R>(
     currentValue: Promise<T>,
     currentIndex: number,
   ): Promise<T> => {
-    // eslint-disable-next-line unicorn/consistent-function-scoping
     const call = async () => target.apply(thisArg, argArray);
 
     // if it hasn't been called yet, call the function
@@ -66,7 +65,6 @@ export const retryableProxy = <U, R>(
       console.error(error);
       console.log(`Retrying after ${sleepMs}ms. (Retried ${currentIndex} times)`);
 
-      // eslint-disable-next-line promise/no-nesting
       return sleep(sleepMs).then(call);
     });
   };

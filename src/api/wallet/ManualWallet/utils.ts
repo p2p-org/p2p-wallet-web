@@ -1,4 +1,3 @@
-// eslint-disable-next-line eslint-comments/disable-enable-pair
 /* eslint-disable no-case-declarations */
 import { Account } from '@solana/web3.js';
 import * as bip32 from 'bip32';

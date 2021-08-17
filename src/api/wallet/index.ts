@@ -76,6 +76,7 @@ export const connectWallet = async (
 
   // assign the singleton wallet.
   // Using a separate variable to simplify the type definitions
+
   wallet = newWallet;
   connection = getConnection(network);
 
