@@ -178,7 +178,6 @@ export const getTokenAccountsForWallet = createAsyncThunk<SerializableTokenAccou
     const tokenAccounts = [...solTokens, ...accountsForWallet];
 
     const listener = TokenAPI.listenToTokenAccountChanges(tokenAccounts, (updatedTokenAccount) => {
-      // eslint-disable-next-line @typescript-eslint/no-use-before-define
       thunkAPI.dispatch(updateAccount(updatedTokenAccount.serialize()));
       void thunkAPI.dispatch(updateHitory(updatedTokenAccount));
     });
@@ -209,7 +208,6 @@ export const updateTokenAccountsForWallet = createAsyncThunk<SerializableTokenAc
         const listener = TokenAPI.listenToTokenAccountChanges(
           newTokenAccounts,
           (updatedTokenAccount) => {
-            // eslint-disable-next-line @typescript-eslint/no-use-before-define
             thunkAPI.dispatch(updateAccount(updatedTokenAccount.serialize()));
           },
         );
@@ -256,7 +254,6 @@ export const autoConnect = createAsyncThunk<string | undefined>(
       processedData = (await loadMnemonicAndSeed()) as ManualWalletData;
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-use-before-define
     return unwrapResult(await thunkAPI.dispatch(connectWallet(processedData)));
   },
 );

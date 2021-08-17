@@ -143,7 +143,6 @@ export const Restore: FC<Props> = ({ setIsLoading, back }) => {
         } else {
           throw new Error(`Can't restore wallet`);
         }
-        // eslint-disable-next-line @typescript-eslint/no-shadow
       } catch (error) {
         ToastManager.error((error as Error).message);
       } finally {

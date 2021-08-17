@@ -191,7 +191,7 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
     if (!useFreeTransactions) {
       void mount();
     }
-  }, []);
+  }, [dispatch, useFreeTransactions]);
 
   useEffect(() => {
     const checkDestinationAddress = async () => {
@@ -209,7 +209,7 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
     } else {
       setIsShowConfirmAddressSwitch(false);
     }
-  }, [toTokenPublicKey]);
+  }, [dispatch, toTokenPublicKey]);
 
   const handleSubmit = async () => {
     if (!fromTokenAccount) {
@@ -246,7 +246,6 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
       }
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const result = unwrapResult(
       await dispatch(
         openModal({

@@ -14,7 +14,7 @@ export const Send: FunctionComponent = () => {
 
   useEffect(() => {
     trackEvent('send_open', { fromPage: location.state.fromPage });
-  }, []);
+  }, [location.state.fromPage]);
 
   return (
     <Layout

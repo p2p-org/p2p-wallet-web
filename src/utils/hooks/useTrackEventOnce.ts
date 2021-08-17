@@ -7,7 +7,6 @@ import { TrackEventType } from 'utils/analytics/types';
 export function useTrackEventOnce() {
   const tracked = useRef<string[]>([]);
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const trackEventOnce = useCallback<TrackEventType>((event: string, data?: any) => {
     if (tracked.current.includes(event)) {
       return;

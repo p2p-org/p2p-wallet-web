@@ -99,7 +99,7 @@ export const LayoutOrigin: FunctionComponent<Props> = ({
     } else {
       NProgress.done();
     }
-  }, [Boolean(loading)]);
+  }, [loading]);
 
   useIntervalHook(() => {
     void dispatch(updateTokenAccountsForWallet());

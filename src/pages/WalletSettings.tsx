@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux';
 import { useLocation } from 'react-router';
 import { useParams } from 'react-router-dom';
 
-import * as web3 from '@solana/web3.js';
+import { PublicKey } from '@solana/web3.js';
 
 import { TokenAccount } from 'api/token/TokenAccount';
 import { Layout } from 'components/common/Layout';
@@ -14,14 +14,14 @@ import { shortAddress } from 'utils/tokens';
 export const WalletSettings: FunctionComponent = () => {
   const location = useLocation();
   const { publicKey } = useParams<{ publicKey: string }>();
-  const tokenPublicKey = new web3.PublicKey(publicKey);
 
   const tokenAccounts = useSelector((state: RootState) =>
     state.wallet.tokenAccounts.map((account) => TokenAccount.from(account)),
   );
+  const tokenPublicKey = useMemo(() => new PublicKey(publicKey), [publicKey]);
   const tokenAccount = useMemo(
     () => tokenAccounts.find((account) => account.address.equals(tokenPublicKey)),
-    [tokenAccounts, publicKey],
+    [tokenAccounts, tokenPublicKey],
   );
 
   const tokenName = tokenAccount?.mint.symbol ? tokenAccount.mint.symbol : shortAddress(publicKey);

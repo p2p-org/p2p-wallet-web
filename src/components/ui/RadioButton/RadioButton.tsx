@@ -75,9 +75,7 @@ const Radio = styled.input`
 type Props = {
   label: string;
   checked: boolean;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   value: any;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   onChange: (value: any) => void;
   className?: string;
 };

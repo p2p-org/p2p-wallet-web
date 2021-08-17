@@ -63,6 +63,7 @@ export const TokenList: FunctionComponent<Props> = ({ items, closeModal }) => {
     };
 
     void mount();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const filteredItems = useMemo(() => {

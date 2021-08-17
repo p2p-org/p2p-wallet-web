@@ -65,7 +65,6 @@ const ModalBackground = styled.div`
 `;
 
 // TODO: types
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const modalsMap = new Map<string, LoadableComponent<any>>([
   [SHOW_MODAL_ADD_COIN, loadable(() => import('components/modals/AddCoinModal'))],
   [
@@ -123,7 +122,6 @@ export const ModalManager: FunctionComponent = () => {
 
   const getReadyDialogs = () => {
     const dialogs: (ModalState & {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       ModalComponent: LoadableComponent<any>;
     })[] = [];
 
@@ -133,7 +131,6 @@ export const ModalManager: FunctionComponent = () => {
         dialogs.push({
           type,
           modalId,
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
           props,
           ModalComponent,
         });
@@ -164,7 +161,6 @@ export const ModalManager: FunctionComponent = () => {
               {...props}
               modalId={modalId}
               modalRef={modalRef}
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
               close={(result: any) => dispatch(closeModal(modalId, result))}
             />
           </ModalWrapper>

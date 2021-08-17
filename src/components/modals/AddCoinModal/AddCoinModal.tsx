@@ -48,6 +48,7 @@ export const AddCoinModal: FunctionComponent<Props> = ({ close }) => {
     const existsMintAccounts = new Set(tokenAccounts.map((token) => token.mint.address.toBase58()));
 
     return availableTokens.filter((token) => !existsMintAccounts.has(token.address.toBase58()));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [availableTokens]);
 
   return (

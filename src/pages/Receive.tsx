@@ -12,7 +12,7 @@ export const Receive: FunctionComponent = () => {
 
   useEffect(() => {
     trackEvent('receive_open', { fromPage: location.state.fromPage });
-  }, []);
+  }, [location.state.fromPage]);
 
   return (
     <Layout

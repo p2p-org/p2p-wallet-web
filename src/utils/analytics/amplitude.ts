@@ -11,7 +11,6 @@ export const initAmplitude = () => {
   amplitude.getInstance().init(process.env.REACT_APP_AMPLITUDE_API_KEY);
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const trackEvent: TrackEventType = (event: string, data?: any) => {
   amplitude.getInstance().logEvent(event, data);
 };

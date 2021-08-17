@@ -108,11 +108,11 @@ export const DerivableAccounts: FC<Props> = ({ seed, next }) => {
     void dispatch(connect());
     // TODO: makes after login too, so maybe need to reduce
     void dispatch(getRatesMarkets());
-  }, []);
+  }, [dispatch]);
 
   useEffect(() => {
     void dispatch(getDerivableTokenAccounts({ seed, derivationPath: derivationPathItem.value }));
-  }, [seed, derivationPathItem]);
+  }, [dispatch, seed, derivationPathItem]);
 
   const handleDerivationPathChange = (item: SelectorItemType) => {
     trackEvent('login_select_derivation_path_click', { derivationPath: item.value });

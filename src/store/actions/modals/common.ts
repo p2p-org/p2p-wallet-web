@@ -4,7 +4,6 @@ import { openModal as openModalRedux } from 'redux-modals-manager';
 import { RootState } from 'store/rootReducer';
 import { DuplicateModalError } from 'utils/errors';
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const openModal = createAsyncThunk<any, { modalType: string; props?: any }>(
   `openModal`,
   (arg, thunkAPI) => {

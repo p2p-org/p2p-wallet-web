@@ -12,7 +12,6 @@ import { Button, Icon } from 'components/ui';
 import { FEATURE_ADD_TOKEN_BUTTON } from 'config/featureFlags';
 import { openModal } from 'store/actions/modals';
 import { SHOW_MODAL_ADD_COIN } from 'store/constants/modalTypes';
-import { RootState } from 'store/rootReducer';
 
 import { TokenList } from './TokenList';
 
@@ -122,13 +121,13 @@ type Props = {
 export const TokensWidget: FunctionComponent<Props> = ({ selectedSymbol }) => {
   const dispatch = useDispatch();
   const [isOpen, setIsOpen] = useState(false);
-  const tokenAccounts = useSelector((state: RootState) =>
+  const tokenAccounts = useSelector((state) =>
     state.wallet.tokenAccounts.map((account) => TokenAccount.from(account)),
   );
 
-  const hiddenTokens = useSelector((state: RootState) => state.wallet.hiddenTokens) || [];
-  const zeroBalanceTokens = useSelector((state: RootState) => state.wallet.zeroBalanceTokens) || [];
-  const { isZeroBalancesHidden } = useSelector((state: RootState) => state.wallet.settings);
+  const hiddenTokens = useSelector((state) => state.wallet.hiddenTokens || []);
+  const zeroBalanceTokens = useSelector((state) => state.wallet.zeroBalanceTokens || []);
+  const { isZeroBalancesHidden } = useSelector((state) => state.wallet.settings);
 
   const [tokens, hiddenTokensList] = useMemo(() => {
     const newTokens = [];

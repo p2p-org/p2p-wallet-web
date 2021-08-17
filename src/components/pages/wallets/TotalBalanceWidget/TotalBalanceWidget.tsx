@@ -85,9 +85,11 @@ export const TotalBalanceWidget: FunctionComponent<Props> = ({ onSymbolChange })
 
         return prev;
       }, 0),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [tokenAccounts, state.rate.markets],
   );
 
+  const hours = new Date().getHours();
   const greeting = useMemo(() => {
     let dayTime = '';
     const data = [
@@ -98,7 +100,6 @@ export const TotalBalanceWidget: FunctionComponent<Props> = ({ onSymbolChange })
       [0, 'night'],
     ] as [number, string][];
 
-    const hours = new Date().getHours();
     for (const [hour, message] of data) {
       if (hours >= hour) {
         dayTime = message;
@@ -107,7 +108,7 @@ export const TotalBalanceWidget: FunctionComponent<Props> = ({ onSymbolChange })
     }
 
     return `Good ${dayTime}!`;
-  }, [new Date().getHours()]);
+  }, [hours]);
 
   const donutData = useMemo(() => {
     const data: DonutChartData = [];
@@ -140,10 +141,10 @@ export const TotalBalanceWidget: FunctionComponent<Props> = ({ onSymbolChange })
     });
 
     return data;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tokenAccounts]);
 
   const handleTopUpClick = () => {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-assignment
     const transak = new TransakSDK({
       apiKey: process.env.REACT_APP_TRANSAK_API_KEY, // Your API Key
       environment: 'STAGING', // STAGING/PRODUCTION
@@ -161,20 +162,16 @@ export const TotalBalanceWidget: FunctionComponent<Props> = ({ onSymbolChange })
       widgetWidth: '500px',
     });
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
     transak.init();
 
     // To get all the events
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-explicit-any
     transak.on(transak.ALL_EVENTS, (data: any) => {
       console.log(data);
     });
 
     // This will trigger when the user marks payment is made.
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-explicit-any
     transak.on(transak.EVENTS.TRANSAK_ORDER_SUCCESSFUL, (orderData: any) => {
       console.log(orderData);
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
       transak.close();
     });
   };

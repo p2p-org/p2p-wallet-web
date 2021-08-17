@@ -243,19 +243,22 @@ export const SelectTokenAccount: FunctionComponent<Props> = ({
   }, []);
 
   useEffect(() => {
-    if (!listRef.current) {
+    const element = listRef.current;
+
+    if (!element) {
       return;
     }
 
-    listRef.current.addEventListener('scroll', handleScroll);
+    element.addEventListener('scroll', handleScroll);
 
     return () => {
-      if (!listRef.current) {
+      if (!element) {
         return;
       }
 
-      listRef.current.removeEventListener('scroll', handleScroll);
+      element.removeEventListener('scroll', handleScroll);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen, listRef.current]);
 
   const handleSelectorClick = () => {
@@ -314,12 +317,11 @@ export const SelectTokenAccount: FunctionComponent<Props> = ({
     const filterLower = filter.toLowerCase();
 
     return tokens.filter(
-      // eslint-disable-next-line @typescript-eslint/no-shadow
       (token) =>
         token.symbol?.toLowerCase().includes(filterLower) ||
         token.name?.toLowerCase().includes(filterLower),
     );
-  }, [tokens, filteredTokenAccounts, filter]);
+  }, [tokens, filter]);
 
   return (
     <Wrapper className={className}>
@@ -384,7 +386,6 @@ export const SelectTokenAccount: FunctionComponent<Props> = ({
             {filteredTokens?.length ? (
               <>
                 <AllTokens>All tokens</AllTokens>
-                {/* eslint-disable-next-line @typescript-eslint/no-shadow */}
                 {filteredTokens.map((token) => (
                   <TokenRow
                     key={token.address.toBase58()}

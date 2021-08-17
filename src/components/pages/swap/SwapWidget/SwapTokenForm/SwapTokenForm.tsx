@@ -369,6 +369,7 @@ export const SwapTokenForm: FC<Props> = ({
     if (!isNil(amount) && amount !== Number(localAmount)) {
       setLocalAmount(amount.toString());
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [amount]);
 
   const handleAwayClick = (e: MouseEvent) => {
@@ -401,19 +402,22 @@ export const SwapTokenForm: FC<Props> = ({
   }, 100);
 
   useEffect(() => {
-    if (!listRef.current) {
+    const element = listRef.current;
+
+    if (!element) {
       return;
     }
 
-    listRef.current.addEventListener('scroll', handleScroll);
+    element.addEventListener('scroll', handleScroll);
 
     return () => {
-      if (!listRef.current) {
+      if (!element) {
         return;
       }
 
-      listRef.current.removeEventListener('scroll', handleScroll);
+      element.removeEventListener('scroll', handleScroll);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen, listRef.current]);
 
   const handleSelectorClick = () => {
@@ -553,7 +557,6 @@ export const SwapTokenForm: FC<Props> = ({
             {filteredTokens?.length ? (
               <>
                 <AllTokens>All tokens</AllTokens>
-                {/* eslint-disable-next-line @typescript-eslint/no-shadow */}
                 {filteredTokens.map((token) => (
                   <TokenRow key={token.address} mint={token.address} onClick={handleTokenClick} />
                 ))}

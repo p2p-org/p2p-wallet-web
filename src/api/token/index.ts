@@ -225,15 +225,11 @@ export const APIFactory = memoizeWith(
 
       const results = await Promise.all(
         chunks.map(async (chunk) => {
-          const getMultipleAccountsResult = <GetMultipleAccountsResultType>(
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-ignore
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-call,no-underscore-dangle
-            await connection._rpcRequest('getMultipleAccounts', [
-              chunk,
-              { commitment: connection.commitment, encoding: 'jsonParsed' },
-            ])
-          );
+          const getMultipleAccountsResult: GetMultipleAccountsResultType = {};
+          await connection._rpcRequest('getMultipleAccounts', [
+            chunk,
+            { commitment: connection.commitment, encoding: 'jsonParsed' },
+          ]);
 
           return path<AccountInfo<Buffer | ParsedAccountData>[] | null>(
             ['result', 'value'],

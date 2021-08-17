@@ -21,11 +21,9 @@ export type ManualWalletData = ManualUserData | ManualStoredData;
  * Manual wallet implementation that uses a private key
  */
 export class ManualWallet extends Wallet {
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   private account: Account;
 
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   private _publicKey: PublicKey;
 

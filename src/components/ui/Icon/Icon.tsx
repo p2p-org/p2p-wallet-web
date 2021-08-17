@@ -109,9 +109,7 @@ export const Icon: FC<Props> = ({ name, size, height, width, ...props }) => {
 
   Object.keys(props).forEach((prop) => {
     if (isPropValid(prop)) {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       validProps[prop] = props[prop];
     }
   });

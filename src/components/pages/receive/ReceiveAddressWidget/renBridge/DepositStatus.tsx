@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { FC } from 'react';
 
 import { styled } from '@linaria/react';
@@ -156,7 +155,6 @@ const DepositStatusItem: FC<{
       if (!isCompleted(deposit)) {
         throw new Error('inconsistent state');
       }
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, no-case-declarations
       const outAmount = formatAmount((deposit.renResponse?.out as any)?.amount);
       return (
         <StatusItem>

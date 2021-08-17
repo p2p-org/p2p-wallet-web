@@ -15,14 +15,14 @@ import { shortAddress } from 'utils/tokens';
 export const WalletOrigin: FunctionComponent = () => {
   const location = useLocation();
   const { publicKey } = useParams<{ publicKey: string }>();
-  const tokenPublicKey = new PublicKey(publicKey);
 
   const tokenAccounts = useSelector((state) =>
     state.wallet.tokenAccounts.map((account) => TokenAccount.from(account)),
   );
+  const tokenPublicKey = useMemo(() => new PublicKey(publicKey), [publicKey]);
   const tokenAccount = useMemo(
     () => tokenAccounts.find((account) => account.address.equals(tokenPublicKey)),
-    [tokenAccounts, publicKey],
+    [tokenAccounts, tokenPublicKey],
   );
 
   useEffect(() => {

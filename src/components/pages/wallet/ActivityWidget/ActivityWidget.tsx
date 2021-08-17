@@ -74,13 +74,15 @@ export const ActivityWidget: FunctionComponent<Props> = ({ publicKey }) => {
     return function cleanup() {
       dispatch(setCurrentHistoryPubkey(null));
     };
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dispatch, publicKey]);
 
   useEffect(() => {
     if (isNeedUpdateTransactions) {
       void fetchData();
       dispatch(updateTransactions(false));
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isNeedUpdateTransactions]);
 
   const handleNeedLoadMore = () => {

@@ -205,7 +205,7 @@ export const TopWidgetOrigin: FunctionComponent<Props> = ({ publicKey }) => {
     };
 
     void loadCandles();
-  }, [tokenAccount?.mint.symbol]);
+  }, [dispatch, isLoading, rates, tokenAccount?.mint.symbol]);
 
   const handleScroll = throttle(() => {
     if (!widgetRef.current) {
@@ -227,6 +227,7 @@ export const TopWidgetOrigin: FunctionComponent<Props> = ({ publicKey }) => {
     return () => {
       window.removeEventListener('scroll', handleScroll);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const delta = useMemo(() => {

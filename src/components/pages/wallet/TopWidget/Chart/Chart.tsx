@@ -112,6 +112,7 @@ export const Chart: FunctionComponent<Props> = ({ publicKey }) => {
 
   useEffect(() => {
     void loadCandles(type);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tokenAccount?.mint.symbol, type]);
 
   if (!tokenAccount || !rates || rates.length === 0) {

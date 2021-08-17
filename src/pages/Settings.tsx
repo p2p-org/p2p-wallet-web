@@ -199,7 +199,7 @@ export const Settings: FunctionComponent = () => {
 
   useEffect(() => {
     trackEvent('settings_open', { fromPage: location.state.fromPage });
-  }, []);
+  }, [location.state.fromPage]);
 
   const handleLogoutClick = () => {
     trackEvent('settings_logout_click');

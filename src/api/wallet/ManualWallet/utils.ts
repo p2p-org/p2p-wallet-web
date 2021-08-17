@@ -64,12 +64,10 @@ function deriveSeed(
       return bip32.fromSeed(seed).derivePath(path).privateKey;
     case DERIVATION_PATH.bip44:
       const path44 = `m/44'/501'/${walletIndex}'`;
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       return ed25519.derivePath(path44, seed).key;
     case DERIVATION_PATH.bip44Change:
       const path44Change = `m/44'/501'/${walletIndex}'/0'`;
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       return ed25519.derivePath(path44Change, seed).key;
     default:

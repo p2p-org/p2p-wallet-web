@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any, no-unused-vars, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unused-vars,react-hooks/rules-of-hooks */
+/* eslint-disable @typescript-eslint/no-explicit-any, no-unused-vars, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unused-vars,react-hooks/rules-of-hooks,react-hooks/exhaustive-deps */
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
@@ -73,7 +73,6 @@ export function idFromParams(session: GatewaySession<any> | BurnSession<any, any
   }`;
 }
 
-// eslint-disable-next-line @typescript-eslint/ban-types
 function sessionFromMintConfigMultiple<X, CustomParams = {}>(config: {
   mintParams: MintParams;
   userAddress: string;
@@ -110,7 +109,6 @@ export interface MintConfigSingle extends MintConfig {
 }
 
 // Use this if you want to set up & restore multiple assets / destinations
-// eslint-disable-next-line @typescript-eslint/ban-types
 export interface MintConfigMultiple<CustomParams = {}> extends MintConfig {
   toMap: MintChainMap<GatewayMachineContext<any>>;
   fromMap: LockChainMap<GatewayMachineContext<any>>;

@@ -339,6 +339,7 @@ export const FromToSelectInput: FunctionComponent<Props> = ({
     if (!isNil(amount) && amount !== localAmount) {
       setLocalAmount(amount);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [amount]);
 
   const handleScroll = throttle(() => {
@@ -377,19 +378,22 @@ export const FromToSelectInput: FunctionComponent<Props> = ({
   }, []);
 
   useEffect(() => {
-    if (!listRef.current) {
+    const element = listRef.current;
+
+    if (!element) {
       return;
     }
 
-    listRef.current.addEventListener('scroll', handleScroll);
+    element.addEventListener('scroll', handleScroll);
 
     return () => {
-      if (!listRef.current) {
+      if (!element) {
         return;
       }
 
-      listRef.current.removeEventListener('scroll', handleScroll);
+      element.removeEventListener('scroll', handleScroll);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen, listRef.current]);
 
   const handleSelectorClick = () => {
@@ -512,7 +516,7 @@ export const FromToSelectInput: FunctionComponent<Props> = ({
           account.mint.name?.toLowerCase().includes(filterLower),
       )
       .sort((a, b) => b.balance.cmp(a.balance));
-  }, [tokenAccounts, filter]);
+  }, [direction, tokenAccounts, filter]);
 
   const filteredTokens = useMemo(() => {
     if (!tokens) {
@@ -530,7 +534,7 @@ export const FromToSelectInput: FunctionComponent<Props> = ({
         itemToken.symbol?.toLowerCase().includes(filterLower) ||
         itemToken.name?.toLowerCase().includes(filterLower),
     );
-  }, [tokens, filteredTokenAccounts, filter]);
+  }, [tokens, filter]);
 
   const hasBalance = tokenAccount
     ? tokenAccount.mint.toMajorDenomination(tokenAccount.balance).toNumber() >= Number(localAmount)
@@ -639,7 +643,6 @@ export const FromToSelectInput: FunctionComponent<Props> = ({
             {filteredTokens?.length ? (
               <>
                 <AllTokens>All tokens</AllTokens>
-                {/* eslint-disable-next-line @typescript-eslint/no-shadow */}
                 {filteredTokens.map((token) => (
                   <TokenRow
                     key={token.address.toBase58()}

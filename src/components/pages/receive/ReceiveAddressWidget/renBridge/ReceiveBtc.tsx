@@ -88,6 +88,7 @@ export const ReceiveBtc: FC = () => {
 
   useEffect(() => {
     setTimeRemained(getRemainingGatewayTime(mint.session.expiryTime));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [setTimeRemained]);
 
   useEffect(() => {
@@ -99,6 +100,7 @@ export const ReceiveBtc: FC = () => {
       });
       setLockFee(fees.lock ? fees.lock.toNumber() : 0);
     })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [setLockFee]);
 
   if (!isOpen(mint.session)) {

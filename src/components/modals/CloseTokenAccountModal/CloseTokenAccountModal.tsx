@@ -106,7 +106,6 @@ export const CloseTokenAccountModal: FunctionComponent<Props> = ({
     close();
   };
 
-  // eslint-disable-next-line @typescript-eslint/require-await
   const handleCloseTokenAButtonClick = async () => {
     try {
       setIsExecuting(true);

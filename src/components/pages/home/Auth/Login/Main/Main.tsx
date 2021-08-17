@@ -179,7 +179,6 @@ export const Main: FC<Props> = ({ setIsLoading, next }) => {
 
         await sleep(100);
         history.push('/wallets');
-        // eslint-disable-next-line @typescript-eslint/no-shadow
       } catch (error) {
         ToastManager.error((error as Error).message);
       } finally {

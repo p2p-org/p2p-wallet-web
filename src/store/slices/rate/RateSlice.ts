@@ -72,7 +72,6 @@ const transactionSlice = createSlice({
       action.payload
         .sort((a, b) => a.startTime - b.startTime)
         .forEach((rate) => {
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-ignore
           state.candles[action.meta.arg.symbol].push({
             price: rate.price,

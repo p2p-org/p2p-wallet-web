@@ -130,7 +130,7 @@ export const Password: FC<Props> = ({ type, next }) => {
     } else if (type === 'signup') {
       trackEvent('signup_create_password_open');
     }
-  }, []);
+  }, [type]);
 
   const handlePasswordChange = (value: string) => {
     setPassword(value);

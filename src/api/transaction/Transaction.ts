@@ -126,10 +126,10 @@ export class Transaction implements Serializable<SerializableTransaction> {
 
     const instructions: SerializedInstruction[] | undefined = this.message?.instructions?.map(
       (instruction) => {
-        const serializedInstruction = <SerializedInstruction>{
+        const serializedInstruction = {
           ...instruction,
           programId: instruction.programId.toBase58(),
-        };
+        } as SerializedInstruction;
 
         if ((instruction as PartiallyDecodedInstruction).accounts) {
           (serializedInstruction as SerializedPartiallyDecodedInstruction).accounts = (instruction as PartiallyDecodedInstruction).accounts.map(
@@ -250,10 +250,10 @@ export class Transaction implements Serializable<SerializableTransaction> {
     const instructions:
       | Instruction[]
       | undefined = serializableTransaction.message?.instructions?.map((instruction) => {
-      const originalInstruction = <Instruction>{
+      const originalInstruction = {
         ...instruction,
         programId: new PublicKey(instruction.programId),
-      };
+      } as Instruction;
 
       if ((instruction as SerializedPartiallyDecodedInstruction).accounts) {
         (originalInstruction as PartiallyDecodedInstruction).accounts = (instruction as SerializedPartiallyDecodedInstruction).accounts.map(

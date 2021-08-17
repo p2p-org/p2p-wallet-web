@@ -75,7 +75,6 @@ export const retryableProxy = <U, R>(
     apply: (target, thisArg, argArray) => {
       // reduce over the maximum number of retries.
       // if any of them pass, the code will short-circuit and skip the rest
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-return,@typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
       return [...new Array(options.count)]
         .reduce(retryReducer(target, thisArg, argArray))
         .catch((error: Error) => {

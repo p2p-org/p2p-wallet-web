@@ -163,6 +163,7 @@ export const TransactionDetailsModal: FC<Props> = ({ signature, source, close })
     if (!transaction) {
       void mount();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [signature]);
 
   const details = useMemo(() => {
@@ -174,6 +175,7 @@ export const TransactionDetailsModal: FC<Props> = ({ signature, source, close })
       transaction.short.destinationTokenAccount?.owner.toBase58() === publicKey ||
         transaction.short.destination?.toBase58() === source,
     );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [transaction?.short.destination, publicKey, source, tokenAccounts]);
 
   if (!details || !transaction) {

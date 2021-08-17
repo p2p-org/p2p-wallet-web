@@ -61,7 +61,6 @@ const ProgressLine = styled.div`
 
 type Props = {
   type: 'send' | 'swap';
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   action: AsyncThunkAction<string, any, any>;
   fromToken: Token;
   fromAmount: Decimal;
@@ -124,6 +123,7 @@ export const TransactionStatusModal: FunctionComponent<Props> = ({
       clearTimeout(timerId);
       setProgress(100);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isExecuting]);
 
   const executeAction = async () => {
@@ -149,6 +149,7 @@ export const TransactionStatusModal: FunctionComponent<Props> = ({
 
   useEffect(() => {
     void executeAction();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -178,6 +179,7 @@ export const TransactionStatusModal: FunctionComponent<Props> = ({
     };
 
     void mount();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [signature]);
 
   const isReceiver = useMemo(() => {
@@ -188,6 +190,7 @@ export const TransactionStatusModal: FunctionComponent<Props> = ({
     return tokenAccounts.find(
       (tokenAccount) => tokenAccount.address === transaction.short.destination?.toBase58(),
     );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [transaction?.short.destination, tokenAccounts]);
 
   const handleCloseClick = () => {

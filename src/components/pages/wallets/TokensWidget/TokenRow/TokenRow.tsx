@@ -160,7 +160,6 @@ export const TokenRow: FunctionComponent<Props> = ({
       removeZeroBalanceToken(tokenAddress);
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
     dispatch(updateHiddenTokens());
   };
 

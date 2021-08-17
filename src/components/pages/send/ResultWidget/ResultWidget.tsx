@@ -111,7 +111,8 @@ export const ResultWidget: FunctionComponent = () => {
     if (locationState.signature) {
       void mount();
     }
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dispatch]);
 
   const handleDetailsClick = () => {
     void dispatch(

@@ -101,7 +101,7 @@ export const Ready: FC<Props> = ({ setIsLoading, data }) => {
     } else if (data.type === 'signup') {
       trackEvent('signup_wallet_ready_open');
     }
-  }, []);
+  }, [data.type]);
 
   const handleCloseModal = (nextIsSave: boolean) => {
     setIsShowModal(false);
@@ -147,7 +147,6 @@ export const Ready: FC<Props> = ({ setIsLoading, data }) => {
 
         await sleep(100);
         history.push('/wallets');
-        // eslint-disable-next-line @typescript-eslint/no-shadow
       } catch (error) {
         ToastManager.error((error as Error).message);
       } finally {

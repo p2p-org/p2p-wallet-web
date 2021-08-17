@@ -21,7 +21,6 @@ export const global = globalCss;
 
 const render = () => {
   // Load the app dynamically, which allows for hot-reloading in development mode.
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-var-requires,global-require
   const App = require('./App').default as React.FC;
 
   assert(

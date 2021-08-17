@@ -13,9 +13,7 @@ interface PhantomProvider {
   signAllTransactions: (transactions: Transaction[]) => Promise<Transaction[]>;
   connect: () => Promise<void>;
   disconnect: () => Promise<void>;
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-explicit-any
   on: (event: PhantomEvent, handler: (args: any) => void) => void;
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-explicit-any
   request: (method: PhantomRequestMethod, params: any) => Promise<any>;
 }
 
@@ -26,9 +24,7 @@ export class PhantomtWallet extends Wallet {
     super(endpoint);
 
     let provider: PhantomProvider;
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-explicit-any
     if ((window as any)?.solana?.isPhantom) {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-explicit-any
       provider = (window as any).solana;
     } else {
       window.open('https://phantom.app/', '_blank');

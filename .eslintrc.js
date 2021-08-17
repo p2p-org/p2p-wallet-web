@@ -1,9 +1,5 @@
 module.exports = {
   root: true,
-  parser: '@typescript-eslint/parser',
-  parserOptions: {
-    project: './tsconfig.json',
-  },
   extends: [
     'react-app', // Use the recommended rules from eslint-config-react-app (bundled with Create React App)
     'plugin:react/recommended', // Use the recommended rules from eslint-plugin-react

@@ -132,7 +132,8 @@ const DonutChartOrigin: FunctionComponent<Props> = ({
         />
       );
     });
-  }, [data]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [borderRadius, data, lineWidth, offsetDegree, size]);
 
   return (
     <Wrapper>

@@ -128,12 +128,13 @@ export const CarouselMobile: FC = () => {
   const [scrollProgress, setScrollProgress] = useState(0);
 
   useEffect(() => {
+    const element = carouselRef.current;
+
     const scrollListener = () => {
-      if (!carouselRef.current) {
+      if (!element) {
         return;
       }
 
-      const element = carouselRef.current;
       const windowScroll = element.scrollLeft; // Distance of the scrollbar from the leftmost point
       const totalWidth = element.scrollWidth - element.clientWidth; // Total width the scrollbar can traverse
 
@@ -148,13 +149,13 @@ export const CarouselMobile: FC = () => {
       setScrollProgress((windowScroll / totalWidth) * 100);
     };
 
-    if (carouselRef.current) {
-      carouselRef.current.addEventListener('scroll', scrollListener);
+    if (element) {
+      element.addEventListener('scroll', scrollListener);
     }
 
     return () => {
-      if (carouselRef.current) {
-        carouselRef.current.removeEventListener('scroll', scrollListener);
+      if (element) {
+        element.removeEventListener('scroll', scrollListener);
       }
     };
   }, []);
