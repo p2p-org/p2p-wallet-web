@@ -1,7 +1,7 @@
 import React, { FunctionComponent } from 'react';
 
 import { styled } from '@linaria/react';
-import { useMint, useOwnedTokenAccount, useTokenMap } from '@project-serum/swap-ui';
+import { useOwnedTokenAccount, useTokenMap } from '@project-serum/swap-ui';
 import { PublicKey } from '@solana/web3.js';
 import { Decimal } from 'decimal.js';
 
@@ -65,12 +65,9 @@ export const TokenRow: FunctionComponent<Props> = ({ mint, onClick }) => {
   const tokenMap = useTokenMap();
   const tokenInfo = tokenMap.get(mint.toString());
   const tokenAccount = useOwnedTokenAccount(new PublicKey(mint));
-  const mintAccount = useMint(new PublicKey(mint));
 
   const balance =
-    tokenAccount &&
-    mintAccount &&
-    tokenAccount.account.amount.toNumber() / 10 ** mintAccount.decimals;
+    tokenAccount && tokenInfo && tokenAccount.account.amount.toNumber() / 10 ** tokenInfo.decimals;
 
   const handleClick = () => {
     onClick(new PublicKey(mint));
