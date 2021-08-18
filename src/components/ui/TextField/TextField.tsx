@@ -25,6 +25,8 @@ const IconWrapper = styled(Icon)`
 `;
 
 const Value = styled.div`
+  display: flex;
+
   font-weight: 600;
   font-size: 16px;
 `;
@@ -55,9 +57,13 @@ const Wrapper = styled.div`
 type Props = {
   label: string;
   value: string | React.ReactNode;
-  icon?: string;
+  icon?: string | React.ReactNode;
   onClick?: () => void;
   className?: string;
+};
+
+const renderIcon = (icon: string | React.ReactNode) => {
+  return typeof icon === 'string' ? <IconWrapper name={icon} /> : icon;
 };
 
 export const TextField: FC<Props> = ({ label, value, icon, onClick, className }) => {
@@ -67,7 +73,7 @@ export const TextField: FC<Props> = ({ label, value, icon, onClick, className })
         <Label>{label}</Label>
         <Value>{value}</Value>
       </Main>
-      {icon ? <IconWrapper name={icon} /> : undefined}
+      {icon ? renderIcon(icon) : undefined}
     </Wrapper>
   );
 };

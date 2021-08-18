@@ -6,6 +6,7 @@ import { styled } from '@linaria/react';
 import { unwrapResult } from '@reduxjs/toolkit';
 import { AccountLayout } from '@solana/spl-token';
 import { PublicKey } from '@solana/web3.js';
+import classNames from 'classnames';
 import Decimal from 'decimal.js';
 import { rgba } from 'polished';
 
@@ -14,6 +15,8 @@ import { TokenAccount } from 'api/token/TokenAccount';
 import { RateUSD } from 'components/common/RateUSD';
 import { ToastManager } from 'components/common/ToastManager';
 import { Button, Icon, Switch, Tooltip } from 'components/ui';
+import { Select, TextField } from 'components/ui';
+import { MenuItem } from 'components/ui/Select/MenuItem';
 import { openModal } from 'store/actions/modals';
 import {
   SHOW_MODAL_ERROR,
@@ -35,9 +38,6 @@ import { Hint } from '../../Hint';
 import {
   BottomWrapper,
   ButtonWrapper,
-  FeeLeft,
-  FeeLine,
-  FeeRight,
   FromToSelectInputStyled,
   FromWrapper,
   TooltipRow,
@@ -45,12 +45,18 @@ import {
   TxValue,
   WrapperWidgetPage,
 } from '../common/styled';
+import { BurnAndRelease } from './BurnAndRelease';
 import { ToAddressInput } from './ToAddressInput';
+
+const Wrapper = styled.div`
+  margin-top: 16px;
+  padding: 8px 20px;
+`;
 
 const ToSendWrapper = styled(FromWrapper)``;
 
 const FromTitle = styled.div`
-  margin-bottom: 20px;
+  margin-bottom: 8px;
 
   color: #000;
   font-weight: 600;
@@ -67,30 +73,21 @@ const InfoIcon = styled(Icon)`
   color: #a3a5ba;
 `;
 
-const FeeRightStyled = styled(FeeRight)`
-  &:hover {
-    color: #5887ff;
-
-    ${InfoIcon} {
-      color: #5887ff;
-    }
-  }
-`;
-
 const ConfirmWrapper = styled.div`
   display: flex;
   align-items: center;
   margin-top: 20px;
-  padding: 10px 20px;
+  padding: 20px 0 0;
 
-  background: #f6f6f8;
-  border-radius: 12px;
+  &.isShowConfirmAddressSwitch {
+    border-top: 1px solid #f6f6f8;
+  }
 `;
 
 const ConfirmTextWrapper = styled.div`
   display: flex;
   flex-direction: column;
-  margin-left: 20px;
+  flex-grow: 1;
 `;
 
 const ConfirmTextPrimary = styled.div`
@@ -122,6 +119,35 @@ const Error = styled.div`
 
   color: #f43d3d;
 `;
+
+const TextFieldStyled = styled(TextField)`
+  margin-bottom: 8px;
+`;
+
+const NetworkSelectWrapper = styled.div`
+  display: flex;
+  align-items: center;
+
+  margin-bottom: 8px;
+  padding: 12px 20px;
+
+  border: 1px solid #f6f6f8;
+  border-radius: 12px;
+`;
+
+const NetworkSelectText = styled.div`
+  display: flex;
+  flex-grow: 1;
+
+  font-weight: 600;
+  font-size: 16px;
+
+  &:hover {
+    color: #5887ff;
+  }
+`;
+
+const SOURCE_NETWORKS = ['solana', 'bitcoin'];
 
 type Props = {
   publicKey: string | null;
@@ -160,6 +186,9 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
   const [isExecuting, setIsExecuting] = useState(false);
   const [isShowConfirmAddressSwitch, setIsShowConfirmAddressSwitch] = useState(false);
   const [isConfirmCorrectAddress, setIsConfirmCorrectAddress] = useState(false);
+  const [destinationNetwork, setDestinationNetwork] = useState(SOURCE_NETWORKS[0]);
+  const [isInitBurnAndRelease, setIsInitBurnAndRelease] = useState(false);
+
   const tokenAccounts = useSelector((state: RootState) =>
     state.wallet.tokenAccounts.map((account) => TokenAccount.from(account)),
   );
@@ -211,7 +240,35 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
     }
   }, [dispatch, toTokenPublicKey]);
 
+  const isSolanaNetwork = destinationNetwork === 'solana';
+
   const handleSubmit = async () => {
+    if (!isSolanaNetwork) {
+      const result = unwrapResult(
+        await dispatch(
+          openModal({
+            modalType: SHOW_MODAL_TRANSACTION_CONFIRM,
+            props: {
+              type: 'send',
+              params: {
+                source: fromTokenAccount,
+                destination: toTokenPublicKey,
+                amount: fromAmount,
+              },
+            },
+          }),
+        ),
+      );
+
+      if (!result) {
+        return false;
+      }
+
+      setIsInitBurnAndRelease(true);
+
+      return;
+    }
+
     if (!fromTokenAccount) {
       throw new Error(`Didn't find token`);
     }
@@ -254,7 +311,7 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
             type: 'send',
             params: {
               source: fromTokenAccount,
-              destination,
+              destination: destination.toBase58(),
               amount: fromAmount,
             },
           },
@@ -364,79 +421,95 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
     }
   }
 
+  const isNetworkSourceSelectorVisible = fromTokenAccount?.mint.symbol === 'renBTC';
+
   return (
     <div>
       <WrapperWidgetPage title="Send" icon="top">
-        <FromWrapper>
-          <FromToSelectInputStyled
-            tokenAccounts={tokenAccounts}
-            token={fromTokenAccount?.mint}
-            tokenAccount={fromTokenAccount}
-            amount={fromAmount}
-            onTokenAccountChange={handleFromTokenAccountChange}
-            onAmountChange={handleFromAmountChange}
-            disabled={isDisabled}
-          />
-          <FeeLine>
-            {fromTokenAccount?.mint ? (
-              <FeeLeft>
-                1 {fromTokenAccount?.mint.symbol} =&nbsp;
-                <RateUSD symbol={fromTokenAccount?.mint.symbol} />
-              </FeeLeft>
+        <Wrapper>
+          <FromWrapper>
+            <FromToSelectInputStyled
+              tokenAccounts={tokenAccounts}
+              token={fromTokenAccount?.mint}
+              tokenAccount={fromTokenAccount}
+              amount={fromAmount}
+              onTokenAccountChange={handleFromTokenAccountChange}
+              onAmountChange={handleFromAmountChange}
+              disabled={isDisabled}
+            />
+          </FromWrapper>
+          <ToSendWrapper>
+            <FromTitle>To</FromTitle>
+            <ToAddressInput value={toTokenPublicKey || ''} onChange={handleToPublicKeyChange} />
+            {isSolanaNetwork && toTokenPublicKey.length > 0 && !isValidDestinationAddress ? (
+              <Error>Check recepient address</Error>
             ) : undefined}
-            <FeeRightStyled>
-              <Tooltip
-                title={
-                  <>
-                    <div>Fee: {isNeedCreateWallet ? txFee + rentFee : txFee} SOL</div>
-                    <InfoIcon name="info" />
-                  </>
-                }>
-                {toolTipItems}
-              </Tooltip>
-            </FeeRightStyled>
-          </FeeLine>
-        </FromWrapper>
-        <ToSendWrapper>
-          <FromTitle>Send to SOL or any SPL token address</FromTitle>
-          <ToAddressInput value={toTokenPublicKey || ''} onChange={handleToPublicKeyChange} />
-          {toTokenPublicKey.length > 0 && !isValidDestinationAddress ? (
-            <Error>Check recepient address</Error>
+            {isShowConfirmAddressSwitch ? (
+              <ConfirmWrapper className={classNames({ isShowConfirmAddressSwitch })}>
+                <ConfirmTextWrapper>
+                  <ConfirmTextPrimary>
+                    Is this address correct? It doesn’t have funds.
+                  </ConfirmTextPrimary>
+                  <ConfirmTextSecondary>I’m sure, It’s correct</ConfirmTextSecondary>
+                </ConfirmTextWrapper>
+                <Switch
+                  checked={isConfirmCorrectAddress}
+                  onChange={() => setIsConfirmCorrectAddress(!isConfirmCorrectAddress)}
+                />
+              </ConfirmWrapper>
+            ) : undefined}
+          </ToSendWrapper>
+          {isNetworkSourceSelectorVisible ? (
+            <NetworkSelectWrapper>
+              <NetworkSelectText>Network destination</NetworkSelectText>
+              <Select value={destinationNetwork}>
+                {SOURCE_NETWORKS.map((network) => (
+                  <MenuItem
+                    key={network}
+                    isSelected={network === destinationNetwork}
+                    onItemClick={() => setDestinationNetwork(network)}>
+                    {network}
+                  </MenuItem>
+                ))}
+              </Select>
+            </NetworkSelectWrapper>
           ) : undefined}
-          {isShowConfirmAddressSwitch ? (
-            <ConfirmWrapper>
-              <Switch
-                checked={isConfirmCorrectAddress}
-                onChange={() => setIsConfirmCorrectAddress(!isConfirmCorrectAddress)}
-              />
-              <ConfirmTextWrapper>
-                <ConfirmTextPrimary>
-                  This address has no funds, are you sure its correct?
-                </ConfirmTextPrimary>
-                <ConfirmTextSecondary>I’m sure, It’s correct</ConfirmTextSecondary>
-              </ConfirmTextWrapper>
-            </ConfirmWrapper>
+          <TextFieldStyled
+            label="Current price"
+            value={
+              <>
+                <RateUSD symbol={fromTokenAccount?.mint.symbol} /> <span>&nbsp; per SOL</span>
+              </>
+            }
+          />
+          <TextFieldStyled
+            label="Transfer fee"
+            value="Free"
+            icon={<Tooltip title={<InfoIcon name="info" />}>{toolTipItems}</Tooltip>}
+          />
+          <BottomWrapper>
+            <ButtonWrapper>
+              <Button
+                primary={!isDisabled}
+                disabled={
+                  isDisabled ||
+                  isValidAmount(fromAmount) ||
+                  (isSolanaNetwork && !isValidDestinationAddress) ||
+                  !hasBalance ||
+                  (isShowConfirmAddressSwitch && !isConfirmCorrectAddress)
+                }
+                big
+                full
+                onClick={handleSubmit}>
+                Send
+              </Button>
+            </ButtonWrapper>
+          </BottomWrapper>
+          <HintWrapper>Send SOL or any SPL Tokens on one address</HintWrapper>
+          {isInitBurnAndRelease ? (
+            <BurnAndRelease destinationAddress={toTokenPublicKey} targetAmount={fromAmount} />
           ) : undefined}
-        </ToSendWrapper>
-        <BottomWrapper>
-          <ButtonWrapper>
-            <Button
-              primary={!isDisabled}
-              disabled={
-                isDisabled ||
-                isValidAmount(fromAmount) ||
-                !isValidDestinationAddress ||
-                !hasBalance ||
-                (isShowConfirmAddressSwitch && !isConfirmCorrectAddress)
-              }
-              big
-              full
-              onClick={handleSubmit}>
-              Send
-            </Button>
-          </ButtonWrapper>
-        </BottomWrapper>
-        <HintWrapper>Send SOL or any SPL Tokens on one address</HintWrapper>
+        </Wrapper>
       </WrapperWidgetPage>
       <Hint />
     </div>
