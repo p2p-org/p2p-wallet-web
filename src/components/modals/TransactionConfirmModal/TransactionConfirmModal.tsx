@@ -2,7 +2,6 @@ import React, { FunctionComponent, useState } from 'react';
 import { useSelector } from 'react-redux';
 
 import { styled } from '@linaria/react';
-import { PublicKey } from '@solana/web3.js';
 
 import { Token } from 'api/token/Token';
 import { TokenAccount } from 'api/token/TokenAccount';
@@ -110,7 +109,7 @@ const PasswordInputStyled = styled(PasswordInput)`
 
 type TransferParams = {
   source: TokenAccount;
-  destination: PublicKey;
+  destination: string;
   amount: number;
 };
 
@@ -226,7 +225,7 @@ export const TransactionConfirmModal: FunctionComponent<Props> = ({ type, params
             </IconWrapper>
             <InfoWrapper>
               <InfoTitle>Check recepient’s address</InfoTitle>
-              <InfoValue>{(params as TransferParams).destination.toBase58()}</InfoValue>
+              <InfoValue>{(params as TransferParams).destination}</InfoValue>
             </InfoWrapper>
           </FieldInfo>
         </Section>

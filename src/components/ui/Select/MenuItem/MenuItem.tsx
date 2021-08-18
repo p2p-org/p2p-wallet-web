@@ -24,6 +24,8 @@ const Wrapper = styled.div`
   font-size: 14px;
   line-height: 140%;
 
+  text-transform: capitalize;
+
   border-radius: 8px;
   cursor: pointer;
 

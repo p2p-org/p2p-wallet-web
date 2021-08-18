@@ -1,5 +1,4 @@
 import { styled } from '@linaria/react';
-import { rgba } from 'polished';
 
 import { WidgetPage } from 'components/common/WidgetPage';
 
@@ -13,9 +12,11 @@ export const FromWrapper = styled.div`
   display: flex;
   flex-direction: column; /* to don't collapse margins of children */
 
-  padding: 24px 20px 20px;
+  margin-bottom: 8px;
+  padding: 16px 20px;
 
-  border-bottom: 1px solid ${rgba('#000', 0.05)};
+  border: 1px solid #f6f6f8;
+  border-radius: 12px;
 `;
 
 export const FromToSelectInputStyled = styled(FromToSelectInput)`
@@ -50,7 +51,7 @@ export const FeeRight = styled.div`
 `;
 
 export const BottomWrapper = styled.div`
-  padding: 24px 20px;
+  padding: 24px 0;
 
   &:not(:has(div:only-child)) {
     padding: 20px;
