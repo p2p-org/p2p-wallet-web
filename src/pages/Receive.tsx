@@ -12,7 +12,8 @@ export const Receive: FunctionComponent = () => {
 
   useEffect(() => {
     trackEvent('receive_open', { fromPage: location.state.fromPage });
-  }, [location.state.fromPage]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <Layout

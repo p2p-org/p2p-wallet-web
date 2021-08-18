@@ -199,7 +199,8 @@ export const Settings: FunctionComponent = () => {
 
   useEffect(() => {
     trackEvent('settings_open', { fromPage: location.state.fromPage });
-  }, [location.state.fromPage]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleLogoutClick = () => {
     trackEvent('settings_logout_click');

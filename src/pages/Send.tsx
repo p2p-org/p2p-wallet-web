@@ -14,7 +14,8 @@ export const Send: FunctionComponent = () => {
 
   useEffect(() => {
     trackEvent('send_open', { fromPage: location.state.fromPage });
-  }, [location.state.fromPage]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <Layout
