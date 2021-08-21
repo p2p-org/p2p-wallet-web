@@ -13,6 +13,7 @@ import { rgba } from 'polished';
 import { Token } from 'api/token/Token';
 import { TokenAccount } from 'api/token/TokenAccount';
 import { RateUSD } from 'components/common/RateUSD';
+import { FromToSelectInput } from 'components/common/SendSwapWidget/common/FromToSelectInput';
 import { ToastManager } from 'components/common/ToastManager';
 import { Button, Icon, Switch, Tooltip } from 'components/ui';
 import { Select, TextField } from 'components/ui';
@@ -38,7 +39,6 @@ import { Hint } from '../../Hint';
 import {
   BottomWrapper,
   ButtonWrapper,
-  FromToSelectInputStyled,
   FromWrapper,
   TooltipRow,
   TxName,
@@ -114,10 +114,9 @@ const HintWrapper = styled.div`
 const Error = styled.div`
   margin-left: 66px;
 
+  color: #f43d3d;
   font-weight: 600;
   font-size: 16px;
-
-  color: #f43d3d;
 `;
 
 const TextFieldStyled = styled(TextField)`
@@ -270,7 +269,7 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
     }
 
     if (!fromTokenAccount) {
-      throw new Error(`Didn't find token`);
+      throw new Error("Didn't find token");
     }
 
     const amount = new Decimal(fromAmount).mul(10 ** fromTokenAccount?.mint.decimals).toNumber();
@@ -428,7 +427,7 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
       <WrapperWidgetPage title="Send" icon="top">
         <Wrapper>
           <FromWrapper>
-            <FromToSelectInputStyled
+            <FromToSelectInput
               tokenAccounts={tokenAccounts}
               token={fromTokenAccount?.mint}
               tokenAccount={fromTokenAccount}

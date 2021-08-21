@@ -2,8 +2,6 @@ import { styled } from '@linaria/react';
 
 import { WidgetPage } from 'components/common/WidgetPage';
 
-import { FromToSelectInput } from './FromToSelectInput';
-
 export const WrapperWidgetPage = styled(WidgetPage)``;
 
 export const FromWrapper = styled.div`
@@ -17,10 +15,6 @@ export const FromWrapper = styled.div`
 
   border: 1px solid #f6f6f8;
   border-radius: 12px;
-`;
-
-export const FromToSelectInputStyled = styled(FromToSelectInput)`
-  margin-bottom: 26px;
 `;
 
 export const FeeLine = styled.div`
