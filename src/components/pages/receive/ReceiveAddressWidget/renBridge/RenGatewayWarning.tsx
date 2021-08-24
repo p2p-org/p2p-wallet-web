@@ -31,8 +31,7 @@ const AttentionIcon = styled(Icon)`
 `;
 
 const WarningItems = styled.ul`
-  margin: 0;
-  margin-bottom: 16px;
+  margin: 0 0 16px;
 
   list-style: square;
 `;

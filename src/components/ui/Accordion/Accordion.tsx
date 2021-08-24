@@ -19,7 +19,7 @@ const TitleWrapper = styled.div`
   display: flex;
   align-items: center;
 
-  padding: 20px 26px;
+  padding: 20px;
 
   cursor: pointer;
 

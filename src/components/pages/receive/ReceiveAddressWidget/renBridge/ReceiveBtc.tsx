@@ -33,10 +33,9 @@ const GatewayInfoWrapper = styled.div`
 `;
 
 const AttentionIcon = styled(Icon)`
-  margin-bottom: 14px;
-
   width: 36px;
   height: 36px;
+  margin-bottom: 14px;
 `;
 
 const GatewayInfoItems = styled.ul`
