@@ -11,10 +11,9 @@ const Main = styled.div`
 `;
 
 const Label = styled.div`
+  color: #a3a5ba;
   font-weight: 600;
   font-size: 14px;
-
-  color: #a3a5ba;
 `;
 
 const IconWrapper = styled(Icon)`
@@ -26,6 +25,7 @@ const IconWrapper = styled(Icon)`
 
 const Value = styled.div`
   display: flex;
+  margin-top: 4px;
 
   font-weight: 600;
   font-size: 16px;
@@ -35,8 +35,8 @@ const Wrapper = styled.div`
   display: flex;
   align-items: center;
 
-  padding: 12px 20px;
   width: 100%;
+  padding: 12px 20px;
 
   border: 1px solid #f6f6f8;
   border-radius: 12px;
