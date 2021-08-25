@@ -48,16 +48,25 @@ const ChevronIcon = styled(Icon)`
 `;
 
 const Content = styled.div`
-  padding: 16px 20px;
+  &:not(.noContentPadding) {
+    padding: 16px 20px;
+  }
 `;
 
 type Props = {
   title: string | React.ReactNode;
   open?: boolean;
+  noContentPadding?: boolean;
   className?: string;
 };
 
-export const Accordion: FC<Props> = ({ title, open = false, children, className }) => {
+export const Accordion: FC<Props> = ({
+  title,
+  open = false,
+  noContentPadding,
+  children,
+  className,
+}) => {
   const [isOpen, setIsOpen] = useState(open);
 
   return (
@@ -66,7 +75,9 @@ export const Accordion: FC<Props> = ({ title, open = false, children, className 
         <Title>{title}</Title>
         <ChevronIcon name="chevron" className={classNames({ isOpen })} />
       </TitleWrapper>
-      {isOpen ? <Content>{children}</Content> : undefined}
+      {isOpen ? (
+        <Content className={classNames({ noContentPadding })}>{children}</Content>
+      ) : undefined}
     </Wrapper>
   );
 };

@@ -6,7 +6,7 @@ import { rgba } from 'polished';
 import { Hint } from 'components/common/Hint';
 
 import { WrapperWidgetPage } from '../../../common/SendSwapWidget/common/styled';
-// import { Fees } from './Fees';
+import { Fees } from './Fees';
 import { PriceLine } from './PriceLine';
 // import { Properties } from './Properties';
 import { Reverse } from './Reverse';
@@ -94,7 +94,7 @@ export const SwapWidget: FC = () => {
           <Lines>
             <PriceLine />
             <Slippage />
-            {/*<Fees />*/}
+            <Fees />
           </Lines>
           <BottomWrapper>
             <SwapButton />

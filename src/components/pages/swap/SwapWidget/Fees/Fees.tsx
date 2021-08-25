@@ -8,6 +8,7 @@ const Line = styled.div`
   display: flex;
   flex-direction: column;
   flex-grow: 1;
+  padding: 12px 20px;
 `;
 
 const Label = styled.div`
@@ -24,15 +25,17 @@ const Value = styled.div`
   font-size: 16px;
 `;
 
-interface Props {}
-
-export const Fees: FC<Props> = (props) => {
+export const Fees: FC = () => {
   return (
-    <Accordion title="Swap fees">
+    <Accordion title="Swap fees" noContentPadding>
       <Line>
-        <Label>Network fee</Label>
-        <Value>0.00409856 SOL</Value>
+        <Label>Liquidity provider fees</Label>
+        <Value>0.22%</Value>
       </Line>
+      {/*<Line>*/}
+      {/*  <Label>Network fee</Label>*/}
+      {/*  <Value>0.00409856 SOL</Value>*/}
+      {/*</Line>*/}
     </Accordion>
   );
 };
