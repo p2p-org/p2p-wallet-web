@@ -11,14 +11,14 @@ import { askClipboardWritePermission, setToClipboard } from 'utils/clipboard';
 
 import { TextFieldStyled } from './styled';
 
-export const Wrapper = styled.div`
+const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
 
   padding: 16px 24px;
 `;
 
-export const QRWrapper = styled.div`
+const QRWrapper = styled.div`
   display: flex;
   flex-direction: column;
 
@@ -28,21 +28,28 @@ export const QRWrapper = styled.div`
   border-radius: 12px;
 `;
 
-export const QrTextField = styled(TextField)`
+const QRTextField = styled(TextField)`
   border: none;
-  border-radius: unset;
-
   border-bottom: 1px solid #f6f6f8;
+  border-radius: unset;
 `;
 
-export const QRCodeWrapper = styled.div`
+const QRContentWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 16px;
+`;
+
+const QRCodeWrapper = styled.div`
   position: relative;
 
   display: flex;
   align-items: center;
   justify-content: center;
 
-  padding: 16px 0;
+  padding: 16px;
 
   border-radius: 12px;
 
@@ -52,7 +59,7 @@ export const QRCodeWrapper = styled.div`
   }
 `;
 
-export const QRCopiedWrapper = styled.div`
+const QRCopiedWrapper = styled.div`
   position: absolute;
   right: 0;
   bottom: 10px;
@@ -63,7 +70,7 @@ export const QRCopiedWrapper = styled.div`
   justify-content: center;
 `;
 
-export const QRCopied = styled.div`
+const QRCopied = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
@@ -140,22 +147,24 @@ export const AddressQRCodePanel: FC<{ address: string }> = ({ address }) => {
         onClick={handleCopyClick(address, setIsAddressCopied)}
       />
       <QRWrapper>
-        <QrTextField
+        <QRTextField
           label="QR code"
           icon="qr"
           value={isImageCopied ? 'QR code Copied!' : 'Click to copy'}
           onClick={isImageCopyAvailable ? handleImageCopyClick : undefined}
         />
-        <QRCodeWrapper
-          className={classNames({ isImageCopyAvailable })}
-          onClick={isImageCopyAvailable ? handleImageCopyClick : undefined}>
-          {isImageCopied ? (
-            <QRCopiedWrapper>
-              <QRCopied>Copied</QRCopied>
-            </QRCopiedWrapper>
-          ) : undefined}
-          <QRCode id="qrcode" value={address} size={150} />
-        </QRCodeWrapper>
+        <QRContentWrapper>
+          <QRCodeWrapper
+            className={classNames({ isImageCopyAvailable })}
+            onClick={isImageCopyAvailable ? handleImageCopyClick : undefined}>
+            {isImageCopied ? (
+              <QRCopiedWrapper>
+                <QRCopied>Copied</QRCopied>
+              </QRCopiedWrapper>
+            ) : undefined}
+            <QRCode id="qrcode" value={address} size={150} />
+          </QRCodeWrapper>
+        </QRContentWrapper>
       </QRWrapper>
     </Wrapper>
   );
