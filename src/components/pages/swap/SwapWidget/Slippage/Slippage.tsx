@@ -107,7 +107,7 @@ export const Slippage: FC<Props> = (props) => {
   const handleSlippageChange = (newSlippage: string) => {
     const cleanSlippage = clearSlippage(newSlippage);
     // if slippage correct
-    if (cleanSlippage === newSlippage) {
+    if (newSlippage && cleanSlippage === newSlippage) {
       setSlippage(Number(cleanSlippage));
     }
 
