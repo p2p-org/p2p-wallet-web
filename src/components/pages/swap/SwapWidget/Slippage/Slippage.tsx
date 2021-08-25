@@ -4,7 +4,7 @@ import { styled } from '@linaria/react';
 import { useSwapContext } from '@project-serum/swap-ui';
 import classNames from 'classnames';
 
-import { Accordion, Button, Icon, Input } from 'components/ui';
+import { Accordion, Button, Input } from 'components/ui';
 
 const Title = styled.div`
   display: flex;
@@ -30,13 +30,8 @@ const OptionsWrapper = styled.div`
 `;
 
 const CustomButton = styled(Button)`
-  width: 36px;
-  padding: 0;
-`;
-
-const PenIcon = styled(Icon)`
-  width: 24px;
-  height: 24px;
+  font-size: 14px;
+  line-height: 14px;
 `;
 
 const OptionButton = styled(Button)`
@@ -126,7 +121,7 @@ export const Slippage: FC<Props> = (props) => {
     <Accordion
       title={
         <Title>
-          <Left>Which cryptocurrencies can I use?</Left> <Right>{slippage} %</Right>
+          <Left>Max price slippage</Left> <Right>{slippage} %</Right>
         </Title>
       }>
       <div>
@@ -146,7 +141,7 @@ export const Slippage: FC<Props> = (props) => {
           </OptionButton>
         ))}
         <CustomButton hollow small onClick={handleToggleCustomShow}>
-          <PenIcon name="pen" />
+          Custom
         </CustomButton>
       </OptionsWrapper>
       {isCustomShow ? (
