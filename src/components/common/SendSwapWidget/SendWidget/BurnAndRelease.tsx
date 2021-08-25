@@ -46,10 +46,9 @@ const StatusTitle = styled.div`
 `;
 
 const StatusTimestamp = styled.div`
+  color: #a3a5ba;
   font-weight: 600;
   font-size: 14px;
-
-  color: #a3a5ba;
 `;
 
 const StatusAction = styled.div``;

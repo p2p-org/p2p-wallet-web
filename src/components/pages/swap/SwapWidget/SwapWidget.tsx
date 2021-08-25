@@ -4,16 +4,18 @@ import { styled } from '@linaria/react';
 import { rgba } from 'polished';
 
 import { Hint } from 'components/common/Hint';
-import { PriceLine } from 'components/pages/swap/SwapWidget/PriceLine';
-import { Properties } from 'components/pages/swap/SwapWidget/Properties';
-import { Reverse } from 'components/pages/swap/SwapWidget/Reverse';
-import serumLogo from 'components/pages/swap/SwapWidget/serum_logo.svg';
-import { SettingsAction } from 'components/pages/swap/SwapWidget/SettingsAction';
-import { SwapFromForm } from 'components/pages/swap/SwapWidget/SwapFromForm';
-import { SwapToForm } from 'components/pages/swap/SwapWidget/SwapToForm';
 
 import { WrapperWidgetPage } from '../../../common/SendSwapWidget/common/styled';
+// import { Fees } from './Fees';
+import { PriceLine } from './PriceLine';
+// import { Properties } from './Properties';
+import { Reverse } from './Reverse';
+import serumLogo from './serum_logo.svg';
+import { SettingsAction } from './SettingsAction';
+import { Slippage } from './Slippage';
 import { SwapButton } from './SwapButton';
+import { SwapFromForm } from './SwapFromForm';
+import { SwapToForm } from './SwapToForm';
 
 const ActionsWrapper = styled.div`
   display: flex;
@@ -23,35 +25,33 @@ const ActionsWrapper = styled.div`
   }
 `;
 
-const FromWrapper = styled.div`
+const Wrapper = styled.div`
+  padding: 24px 20px;
+`;
+
+const FromSwapWrapper = styled.div`
   position: relative;
 
   display: flex;
   flex-direction: column; /* to don't collapse margins of children */
 
-  padding: 24px 20px 20px;
+  margin-bottom: 8px;
+  padding: 16px 20px;
 
-  border-bottom: 1px solid ${rgba('#000', 0.05)};
+  border: 1px solid #f6f6f8;
+  border-radius: 12px;
 `;
 
-const SwapFromFormStyled = styled(SwapFromForm)`
-  margin-bottom: 26px;
-`;
+const ToSwapWrapper = styled(FromSwapWrapper)``;
 
-const ToSwapWrapper = styled(FromWrapper)`
-  padding-top: 34px;
-`;
-
-const SwapToFormStyled = styled(SwapToForm)`
-  margin-bottom: 26px;
+const Lines = styled.div`
+  display: grid;
+  grid-gap: 8px;
+  margin-top: 32px;
 `;
 
 const BottomWrapper = styled.div`
-  padding: 24px 20px;
-
-  &:not(:has(div:only-child)) {
-    padding: 20px;
-  }
+  padding: 32px 0 0;
 `;
 
 const PoweredByBannerWrapper = styled.div`
@@ -83,18 +83,23 @@ export const SwapWidget: FC = () => {
             <SettingsAction />
           </ActionsWrapper>
         }>
-        <FromWrapper>
-          <SwapFromFormStyled />
-        </FromWrapper>
-        <ToSwapWrapper>
-          <Reverse />
-          <SwapToFormStyled />
-          <PriceLine />
-        </ToSwapWrapper>
-        <BottomWrapper>
-          <Properties />
-          <SwapButton />
-        </BottomWrapper>
+        <Wrapper>
+          <FromSwapWrapper>
+            <SwapFromForm />
+          </FromSwapWrapper>
+          <ToSwapWrapper>
+            <Reverse />
+            <SwapToForm />
+          </ToSwapWrapper>
+          <Lines>
+            <PriceLine />
+            <Slippage />
+            {/*<Fees />*/}
+          </Lines>
+          <BottomWrapper>
+            <SwapButton />
+          </BottomWrapper>
+        </Wrapper>
         <PoweredByBannerWrapper>
           <PoweredBy>Powered by </PoweredBy>
           <a href="https://dex.projectserum.com/" target="_blank" rel="noopener noreferrer noindex">

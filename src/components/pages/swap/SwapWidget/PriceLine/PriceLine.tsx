@@ -9,16 +9,14 @@ const Wrapper = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 44px;
-  margin-top: 10px;
-  padding: 0 20px;
+  height: 68px;
+  padding: 26px 20px;
 
-  color: #a3a5ba;
   font-weight: 600;
   font-size: 16px;
   line-height: 24px;
 
-  background: #f6f6f8;
+  border: 1px solid #f6f6f8;
   border-radius: 12px;
 `;
 
@@ -68,11 +66,11 @@ export const PriceLine: FC = () => {
 
   return (
     <Wrapper>
-      <Left>Price:</Left>
+      <Left>Current price</Left>
       <Right>
         <Rate>
           {fair !== undefined && toTokenInfo && fromTokenInfo
-            ? `1 ${toTokenInfo.symbol} per ${fair.toFixed(fromMintInfo?.decimals)} ${
+            ? `1 ${toTokenInfo.symbol} = ${fair.toFixed(fromMintInfo?.decimals)} ${
                 fromTokenInfo.symbol
               }`
             : `-`}

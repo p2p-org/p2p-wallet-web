@@ -56,7 +56,7 @@ const AllBalance = styled.div`
 const MainWrapper = styled.div`
   display: flex;
 
-  margin-top: 20px;
+  margin-top: 8px;
 `;
 
 const WalletIcon = styled(Icon)`
@@ -169,7 +169,6 @@ const AmountInput = styled.input`
 const BalanceWrapper = styled.div`
   display: flex;
   justify-content: space-between;
-  margin-top: 3px;
 
   color: #a3a5ba;
   font-weight: 600;

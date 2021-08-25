@@ -48,7 +48,7 @@ const ChevronIcon = styled(Icon)`
 `;
 
 const Content = styled.div`
-  padding: 20px 20px 36px;
+  padding: 16px 20px;
 `;
 
 type Props = {
