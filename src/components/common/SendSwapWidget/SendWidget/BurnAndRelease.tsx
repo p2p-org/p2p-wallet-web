@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FC, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 
 import { styled } from '@linaria/react';
@@ -70,9 +70,9 @@ const BurnStatusItem: FC<{
             {timestamp && <StatusTimestamp>{timestamp}</StatusTimestamp>}
           </Status>
           <StatusAction>
-            <Button primary onClick={() => burn()}>{`Burn ${formatAmount(
-              session.targetAmount,
-            ).toString()} ${session.sourceAsset}`}</Button>
+            <Button primary onClick={() => burn()}>{`Burn ${formatAmount(session.targetAmount)} ${
+              session.sourceAsset
+            }`}</Button>
           </StatusAction>
         </StatusItem>
       );
@@ -140,29 +140,42 @@ type Props = {
 export const BurnAndRelease: FC<Props> = ({ destinationAddress, targetAmount }) => {
   const cluster = useSelector((state) => state.wallet.network.cluster);
 
-  const network = cluster === 'mainnet-beta' ? RenNetwork.Mainnet : RenNetwork.Testnet;
+  const burnAndReleaseProps = useMemo(() => {
+    const network = cluster === 'mainnet-beta' ? RenNetwork.Mainnet : RenNetwork.Testnet;
 
-  const burnAndReleaseProps = {
-    sdk: new RenJS(network),
-    burnParams: {
-      sourceAsset: 'BTC',
-      network,
-      destinationAddress,
-      targetAmount,
-    },
-    userAddress: getWallet().pubkey,
-    from: new Solana(
-      {
-        connection: getConnection(),
-        wallet: {
-          publicKey: getWallet().pubkey,
-          signTransaction: async (tx: Transaction) => getWallet().sign(tx),
-        },
+    const amount = String(Math.floor(Number(targetAmount) * Math.pow(10, 8)));
+
+    return {
+      sdk: new RenJS(network, {
+        useV2TransactionFormat: false,
+        loadCompletedDeposits: true,
+      }),
+      burnParams: {
+        sourceAsset: Bitcoin.asset,
+        network,
+        destinationAddress,
+        targetAmount,
       },
-      network,
-    ),
-    to: new Bitcoin(),
-  };
+      userAddress: getWallet().pubkey.toBase58(),
+      from: new Solana(
+        {
+          connection: getConnection(),
+          wallet: {
+            publicKey: getWallet().pubkey,
+            signTransaction: (tx: Transaction) => getWallet().sign(tx),
+          },
+        },
+        network,
+      ).Account({
+        address: getWallet().pubkey.toBase58(),
+        value: amount,
+        amount,
+      }),
+      to: new Bitcoin().Address(destinationAddress),
+      autoSubmit: true,
+    };
+  }, [cluster, destinationAddress, targetAmount]);
+
   const machine = useBurnAndRelease(burnAndReleaseProps);
   if (!machine) return null;
 

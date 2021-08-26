@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { LockChain, MintChain, RenNetwork } from '@renproject/interfaces';
 import RenJS from '@renproject/ren';
@@ -13,8 +13,6 @@ import {
 import { BurnSession, isBurnCompleted } from '@renproject/ren-tx/build/main/types/burn';
 import { useMachine } from '@xstate/react';
 import BigNumber from 'bignumber.js/bignumber';
-
-import { idFromParams } from './useLockAndMint';
 
 interface BurnParams {
   /**
@@ -58,7 +56,7 @@ function sessionFromBurnConfigMultiple<X, Y, CustomParams = {}>(config: {
     customParams: config.customParams,
     createdAt: Date.now(),
   };
-  session.id = idFromParams(session);
+  session.id = 'tx-' + Math.floor(Math.random() * 10 ** 16);
   return session;
 }
 
@@ -73,6 +71,10 @@ export interface BurnConfig {
 export interface BurnConfigSingle extends BurnConfig {
   to: LockChain;
   from: MintChain;
+  /**
+   * Address that can cryptographically be proven to belong to a user. Used as a "from" address for some chains
+   */
+  userAddress: string;
 }
 
 // Use this if you want to set up & restore multiple assets / destinations
@@ -115,7 +117,7 @@ const buildBurnContext = <X, Y>(
     tx = sessionFromBurnConfigMultiple({
       ...config,
       sourceChain: config.from.name,
-      userAddress: '',
+      userAddress: config.userAddress,
       destinationChain: config.to.name,
       customParams: {},
     });
@@ -133,12 +135,12 @@ const buildBurnContext = <X, Y>(
 };
 
 export const useBurnAndRelease = (config: BurnConfigSingle | BurnConfigMultiple) => {
-  const context = buildBurnContext(config);
+  const context = useMemo(() => buildBurnContext(config), [config]);
   context.autoSubmit = config.autoSubmit;
 
   const [state, , machine] = useMachine(burnMachine, {
     context,
-    devTools: config.debug,
+    devTools: true,
   });
   const burn = useCallback(() => {
     machine.send({ type: 'SUBMIT' });
