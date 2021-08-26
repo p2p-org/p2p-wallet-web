@@ -40,7 +40,7 @@ const Rate = styled.div`
 `;
 
 const ChangeRateWrapper = styled.div`
-  margin-left: 20px;
+  margin-left: 12px;
 
   cursor: pointer;
 `;
