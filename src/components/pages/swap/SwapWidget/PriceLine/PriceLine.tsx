@@ -1,9 +1,9 @@
-import React, { FC } from 'react';
+import React, { FC, useState } from 'react';
 
 import { styled } from '@linaria/react';
-import { useMint, useSwapContext, useSwapFair, useTokenMap } from '@project-serum/swap-ui';
+import { useFairRoute, useMint, useSwapContext, useTokenMap } from '@project-serum/swap-ui';
 
-// import { Icon } from 'components/ui';
+import { Icon } from 'components/ui';
 
 const Wrapper = styled.div`
   display: flex;
@@ -39,30 +39,36 @@ const Rate = styled.div`
   color: #000;
 `;
 
-// const ChangeRateWrapper = styled.div`
-//   margin-left: 20px;
-//
-//   cursor: pointer;
-// `;
-//
-// const ChangeRateIcon = styled(Icon)`
-//   display: flex;
-//   width: 24px;
-//   height: 24px;
-//
-//   color: #a3a5ba;
-// `;
+const ChangeRateWrapper = styled.div`
+  margin-left: 20px;
+
+  cursor: pointer;
+`;
+
+const ChangeRateIcon = styled(Icon)`
+  display: flex;
+  width: 24px;
+  height: 24px;
+
+  color: #a3a5ba;
+`;
 
 export const PriceLine: FC = () => {
-  const { fromMint, toMint } = useSwapContext();
-  const fromMintInfo = useMint(fromMint);
-  const fair = useSwapFair();
+  const [isReverse, setIsReverse] = useState(false);
+  const { fromMint: fromMintTemp, toMint: toMintTemp } = useSwapContext();
 
+  const fromMint = isReverse ? fromMintTemp : toMintTemp;
+  const toMint = isReverse ? toMintTemp : fromMintTemp;
+
+  const fromMintInfo = useMint(fromMint);
+  const fair = useFairRoute(fromMint, toMint);
   const tokenMap = useTokenMap();
   const fromTokenInfo = tokenMap.get(fromMint.toString());
   const toTokenInfo = tokenMap.get(toMint.toString());
 
-  // const handleChangeRateClick = () => {};
+  const handleChangeRateClick = () => {
+    setIsReverse((state) => !state);
+  };
 
   return (
     <Wrapper>
@@ -74,9 +80,9 @@ export const PriceLine: FC = () => {
                 fromTokenInfo.symbol
               }`
             : `-`}
-          {/* <ChangeRateWrapper onClick={handleChangeRateClick}> */}
-          {/*  <ChangeRateIcon name="swap" /> */}
-          {/* </ChangeRateWrapper> */}
+          <ChangeRateWrapper onClick={handleChangeRateClick}>
+            <ChangeRateIcon name="swap" />
+          </ChangeRateWrapper>
         </Rate>
       </Right>
     </Wrapper>
