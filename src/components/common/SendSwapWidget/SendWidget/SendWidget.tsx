@@ -477,7 +477,8 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
             label="Current price"
             value={
               <>
-                <RateUSD symbol={fromTokenAccount?.mint.symbol} /> <span>&nbsp; per SOL</span>
+                <RateUSD symbol={fromTokenAccount?.mint.symbol} />{' '}
+                <span>&nbsp;per {fromTokenAccount?.mint.symbol} </span>
               </>
             }
           />
