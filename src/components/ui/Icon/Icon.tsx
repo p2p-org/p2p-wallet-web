@@ -1,12 +1,14 @@
+// eslint-disable-next-line simple-import-sort/sort
 import React, { FC } from 'react';
 
 import isPropValid from '@emotion/is-prop-valid';
 import { CSSProperties } from '@linaria/core';
 
 import arrow from './assets/arrow-icon.svg';
+import appStore from './assets/new/app-store-icon.svg';
 import arrowTriangle from './assets/arrow-triangle-icon.svg';
 import attention from './assets/attention-icon.svg';
-import bottom from './assets/bottom-icon.svg';
+import bottom from './assets/new/bottom-icon.svg';
 import branch from './assets/branch-icon.svg';
 import bucket from './assets/bucket-icon.svg';
 import card from './assets/card-icon.svg';
@@ -25,15 +27,16 @@ import error from './assets/error-icon.svg';
 import eyeHide from './assets/eye-hide-icon.svg';
 import eye from './assets/eye-icon.svg';
 import freeTx from './assets/free-tx-icon.svg';
-import gear from './assets/gear-icon.svg';
-import home from './assets/home-icon.svg';
+import gear from './assets/new/gear-icon.svg';
+import googlePlay from './assets/new/google-play-icon.svg';
+import home from './assets/new/home-icon.svg';
 import info from './assets/info-icon.svg';
 import lock from './assets/lock-icon.svg';
 import logout from './assets/logout-icon.svg';
 import more from './assets/more-icon.svg';
 import pen from './assets/pen-icon.svg';
 import plug from './assets/plug-icon.svg';
-import plus from './assets/plus-icon.svg';
+import plus from './assets/new/plus-icon.svg';
 import qr from './assets/qr-icon.svg';
 import questionCircle from './assets/question-circle-icon.svg';
 import reload from './assets/reload-icon.svg';
@@ -41,14 +44,15 @@ import search from './assets/search-icon.svg';
 import settings from './assets/settings-icon.svg';
 import success from './assets/success-icon.svg';
 import sun from './assets/sun-icon.svg';
-import swap from './assets/swap-icon.svg';
+import swap from './assets/new/swap-icon.svg';
 import timer from './assets/timer-icon.svg';
-import top from './assets/top-icon.svg';
+import top from './assets/new/top-icon.svg';
 import wallet from './assets/wallet-icon.svg';
 import warning from './assets/warning-icon.svg';
 
 const iconsMap = new Map<string, string>([
   ['arrow', arrow],
+  ['app-store', appStore],
   ['arrow-triangle', arrowTriangle],
   ['bottom', bottom],
   ['branch', branch],
@@ -65,6 +69,7 @@ const iconsMap = new Map<string, string>([
   ['db', db],
   ['bucket', bucket],
   ['gear', gear],
+  ['google-play', googlePlay],
   ['more', more],
   ['eye-hide', eyeHide],
   ['eye', eye],

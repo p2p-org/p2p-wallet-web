@@ -3,8 +3,10 @@ import { useLocation } from 'react-router';
 import { NavLink } from 'react-router-dom';
 
 import { styled } from '@linaria/react';
+import { Feature } from 'flagged';
 
 import { Icon } from 'components/ui';
+import { FEATURE_NAV_MENU_BUY_BUTTON } from 'config/featureFlags';
 
 const Wrapper = styled.div`
   display: grid;
@@ -14,7 +16,7 @@ const Wrapper = styled.div`
 const NavButton = styled.div`
   display: flex;
   align-items: center;
-  height: 56px;
+  height: 52px;
   padding: 10px 20px;
 
   color: #000;
@@ -30,17 +32,17 @@ const IconBlock = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
+  width: 32px;
+  height: 32px;
   margin-right: 20px;
 
   background: #f6f6f8;
-  border-radius: 8px;
+  border-radius: 12px;
 `;
 
 const NavIcon = styled(Icon)`
-  width: 24px;
-  height: 24px;
+  width: 20px;
+  height: 20px;
 
   color: #a3a5ba;
 `;
@@ -86,6 +88,27 @@ const NavLinkMenu = styled(NavLink)`
   }
 `;
 
+const Separator = styled.div`
+  display: flex;
+  align-items: center;
+  padding: 0px;
+  margin: 8px 0px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+`;
+
+const Line = styled.hr`
+  flex: none;
+  order: 0;
+  height: 2px;
+  align-self: stretch;
+  border: none;
+  flex-grow: 0;
+  margin: 0px 0px;
+  background: #f6f6f8;
+`;
+
 export const LeftNavMenu: FunctionComponent = () => {
   const location = useLocation();
 
@@ -101,6 +124,20 @@ export const LeftNavMenu: FunctionComponent = () => {
           Wallets
         </NavButton>
       </NavLinkMenu>
+
+      <Feature name={FEATURE_NAV_MENU_BUY_BUTTON}>
+        <NavLinkMenu
+          to={{ pathname: '/buy', state: { fromPage: location.pathname } }}
+          className="button">
+          <NavButton>
+            <IconBlock>
+              <NavIcon name="plus" />
+            </IconBlock>
+            Buy
+          </NavButton>
+        </NavLinkMenu>
+      </Feature>
+
       <NavLinkMenu
         to={{ pathname: '/receive', state: { fromPage: location.pathname } }}
         className="button">
@@ -139,6 +176,25 @@ export const LeftNavMenu: FunctionComponent = () => {
             <NavIcon name="gear" />
           </IconBlock>
           Settings
+        </NavButton>
+      </NavLinkMenu>
+      <Separator>
+        <Line />
+      </Separator>
+      <NavLinkMenu to={{ pathname: 'https://apple.com/' }} target="_blank" className="button">
+        <NavButton>
+          <IconBlock>
+            <NavIcon name="app-store" />
+          </IconBlock>
+          App Store
+        </NavButton>
+      </NavLinkMenu>
+      <NavLinkMenu to={{ pathname: 'https://google.com' }} target="_blank" className="button">
+        <NavButton>
+          <IconBlock>
+            <NavIcon name="google-play" />
+          </IconBlock>
+          Google Play
         </NavButton>
       </NavLinkMenu>
     </Wrapper>

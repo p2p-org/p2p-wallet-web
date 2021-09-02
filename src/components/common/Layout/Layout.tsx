@@ -19,7 +19,7 @@ import {
   COLUMNS_GRID_GUTTER,
   CONTAINER_PADDING_TOP,
 } from './constants';
-import { Download } from './Download';
+// import { Download } from './Download';
 import { LeftNavMenu } from './LeftNavMenu';
 import { ProfileWidget } from './ProfileWidget';
 
@@ -124,7 +124,7 @@ export const LayoutOrigin: FunctionComponent<Props> = ({
                           <>
                             <ProfileWidget />
                             <LeftNavMenu />
-                            <Download />
+                            {/* <Download /> */}
                           </>
                         )}
                       </ColumnLeft>
