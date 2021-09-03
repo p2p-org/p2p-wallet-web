@@ -84,7 +84,7 @@ export const ToAddressInput: FunctionComponent<Props> = ({ value, onChange }) =>
   return (
     <WrapperLabel>
       <IconWrapper className={classNames({ isFocused })}>
-        <WalletIcon name="wallet" />
+        <WalletIcon name="home" />
       </IconWrapper>
       <ToInput
         placeholder="Enter address"

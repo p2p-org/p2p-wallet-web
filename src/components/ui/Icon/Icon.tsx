@@ -16,16 +16,17 @@ import chain from './assets/chain-icon.svg';
 import change from './assets/change-icon.svg';
 import checkmark from './assets/checkmark-icon.svg';
 import chevron1 from './assets/chevron-1-icon.svg';
-import chevron from './assets/chevron-icon.svg';
+import chevron from './assets/new/chevron-icon.svg';
 import chevronRounded from './assets/chevron-rounded-icon.svg';
 import clock from './assets/clock-icon.svg';
 import close from './assets/close-icon.svg';
-import copy from './assets/copy-icon.svg';
+import copy from './assets/new/copy-icon.svg';
 import currency from './assets/currency-icon.svg';
 import db from './assets/db-icon.svg';
 import error from './assets/error-icon.svg';
-import eyeHide from './assets/eye-hide-icon.svg';
-import eye from './assets/eye-icon.svg';
+import eyeHide from './assets/new/eye-hide-icon.svg';
+import eye from './assets/new/eye-icon.svg';
+import externalLink from './assets/new/external-link-icon.svg';
 import freeTx from './assets/free-tx-icon.svg';
 import gear from './assets/new/gear-icon.svg';
 import googlePlay from './assets/new/google-play-icon.svg';
@@ -34,10 +35,10 @@ import info from './assets/info-icon.svg';
 import lock from './assets/lock-icon.svg';
 import logout from './assets/logout-icon.svg';
 import more from './assets/more-icon.svg';
-import pen from './assets/pen-icon.svg';
+import pen from './assets/new/pen-icon.svg';
 import plug from './assets/plug-icon.svg';
 import plus from './assets/new/plus-icon.svg';
-import qr from './assets/qr-icon.svg';
+import qr from './assets/new/qr-icon.svg';
 import questionCircle from './assets/question-circle-icon.svg';
 import reload from './assets/reload-icon.svg';
 import search from './assets/search-icon.svg';
@@ -73,6 +74,7 @@ const iconsMap = new Map<string, string>([
   ['more', more],
   ['eye-hide', eyeHide],
   ['eye', eye],
+  ['external-link', externalLink],
   ['search', search],
   ['settings', settings],
   ['success', success],

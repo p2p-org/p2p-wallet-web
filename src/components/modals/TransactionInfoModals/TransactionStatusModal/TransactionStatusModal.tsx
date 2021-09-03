@@ -345,7 +345,7 @@ export const TransactionStatusModal: FunctionComponent<Props> = ({
               <FieldValue>
                 {signature}{' '}
                 <ShareWrapper onClick={handleCopyClick(getExplorerUrl('tx', signature, cluster))}>
-                  <ShareIcon name="copy" />
+                  <ShareIcon name="external-link" />
                 </ShareWrapper>
               </FieldValue>
             </FieldWrapper>

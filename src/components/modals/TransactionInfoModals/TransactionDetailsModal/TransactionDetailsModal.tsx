@@ -399,7 +399,7 @@ export const TransactionDetailsModal: FC<Props> = ({ signature, source, close })
                 rel="noopener noreferrer noindex"
                 className="button">
                 <ShareWrapper>
-                  <ShareIcon name="chain" />
+                  <ShareIcon name="external-link" />
                 </ShareWrapper>
               </a>
             </FieldValue>
