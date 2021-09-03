@@ -31,7 +31,7 @@ import freeTx from './assets/free-tx-icon.svg';
 import gear from './assets/new/gear-icon.svg';
 import googlePlay from './assets/new/google-play-icon.svg';
 import home from './assets/new/home-icon.svg';
-import info from './assets/info-icon.svg';
+import info from './assets/new/info-icon.svg';
 import lock from './assets/lock-icon.svg';
 import logout from './assets/logout-icon.svg';
 import more from './assets/more-icon.svg';

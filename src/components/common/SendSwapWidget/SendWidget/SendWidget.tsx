@@ -65,8 +65,8 @@ const FromTitle = styled.div`
 `;
 
 const InfoIcon = styled(Icon)`
-  width: 20px;
-  height: 20px;
+  width: 24px;
+  height: 24px;
 
   margin-left: 10px;
 
@@ -117,6 +117,11 @@ const Error = styled.div`
   color: #f43d3d;
   font-weight: 600;
   font-size: 16px;
+`;
+
+const TextFieldTXStyled = styled(TextField)`
+  margin-bottom: 8px;
+  color: #2db533;
 `;
 
 const TextFieldStyled = styled(TextField)`
@@ -482,7 +487,7 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
               </>
             }
           />
-          <TextFieldStyled
+          <TextFieldTXStyled
             label="Transfer fee"
             value="Free"
             icon={<Tooltip title={<InfoIcon name="info" />}>{toolTipItems}</Tooltip>}
