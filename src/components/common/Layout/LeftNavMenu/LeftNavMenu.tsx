@@ -58,6 +58,7 @@ const NavLinkMenu = styled(NavLink)`
         color: #5887ff;
 
         background: #fff !important;
+        border: 1px solid #5887ff;
 
         ${NavIcon} {
           color: #5887ff;
@@ -79,6 +80,7 @@ const NavLinkMenu = styled(NavLink)`
         color: #5887ff;
 
         background: #eff3ff;
+        border: 1px solid #5887ff;
 
         ${NavIcon} {
           color: #5887ff;
