@@ -1,8 +1,8 @@
 {
   "files": {
-    "main.css": "https://p2p-org.github.io/p2p-wallet-web/static/css/main.79b8935f.chunk.css",
-    "main.js": "https://p2p-org.github.io/p2p-wallet-web/static/js/main.b3eae099.chunk.js",
-    "main.js.map": "https://p2p-org.github.io/p2p-wallet-web/static/js/main.b3eae099.chunk.js.map",
+    "main.css": "https://p2p-org.github.io/p2p-wallet-web/static/css/main.8e4a58b2.chunk.css",
+    "main.js": "https://p2p-org.github.io/p2p-wallet-web/static/js/main.06c339f6.chunk.js",
+    "main.js.map": "https://p2p-org.github.io/p2p-wallet-web/static/js/main.06c339f6.chunk.js.map",
     "runtime-main.js": "https://p2p-org.github.io/p2p-wallet-web/static/js/runtime-main.bfa2ea7a.js",
     "runtime-main.js.map": "https://p2p-org.github.io/p2p-wallet-web/static/js/runtime-main.bfa2ea7a.js.map",
     "static/css/2.8f976517.chunk.css": "https://p2p-org.github.io/p2p-wallet-web/static/css/2.8f976517.chunk.css",
@@ -34,7 +34,7 @@
     "static/css/6.655c810d.chunk.css.map": "https://p2p-org.github.io/p2p-wallet-web/static/css/6.655c810d.chunk.css.map",
     "static/css/7.0005edda.chunk.css.map": "https://p2p-org.github.io/p2p-wallet-web/static/css/7.0005edda.chunk.css.map",
     "static/css/8.c4676fbe.chunk.css.map": "https://p2p-org.github.io/p2p-wallet-web/static/css/8.c4676fbe.chunk.css.map",
-    "static/css/main.79b8935f.chunk.css.map": "https://p2p-org.github.io/p2p-wallet-web/static/css/main.79b8935f.chunk.css.map",
+    "static/css/main.8e4a58b2.chunk.css.map": "https://p2p-org.github.io/p2p-wallet-web/static/css/main.8e4a58b2.chunk.css.map",
     "static/js/2.e1eb6ab8.chunk.js.LICENSE.txt": "https://p2p-org.github.io/p2p-wallet-web/static/js/2.e1eb6ab8.chunk.js.LICENSE.txt",
     "static/media/Landing.linaria.css": "https://p2p-org.github.io/p2p-wallet-web/static/media/GT-Super-Text-Bold.24a70721.woff2",
     "static/media/app.8ce2c870.png": "https://p2p-org.github.io/p2p-wallet-web/static/media/app.8ce2c870.png",
@@ -63,7 +63,7 @@
     "static/js/runtime-main.bfa2ea7a.js",
     "static/css/2.8f976517.chunk.css",
     "static/js/2.e1eb6ab8.chunk.js",
-    "static/css/main.79b8935f.chunk.css",
-    "static/js/main.b3eae099.chunk.js"
+    "static/css/main.8e4a58b2.chunk.css",
+    "static/js/main.06c339f6.chunk.js"
   ]
 }
