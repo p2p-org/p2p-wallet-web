@@ -145,10 +145,6 @@ const NetworkSelectText = styled.div`
 
   font-weight: 600;
   font-size: 16px;
-
-  &:hover {
-    color: #5887ff;
-  }
 `;
 
 const SOURCE_NETWORKS = ['solana', 'bitcoin'];
@@ -204,6 +200,7 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
   const useFreeTransactions = useSelector(
     (state: RootState) => state.wallet.settings.useFreeTransactions,
   );
+  const isNetworkSourceSelectorVisible = fromTokenAccount?.mint.symbol === 'renBTC';
 
   useEffect(() => {
     const mount = async () => {
@@ -221,10 +218,10 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
       }
     };
 
-    if (!useFreeTransactions) {
+    if (!useFreeTransactions || isNetworkSourceSelectorVisible) {
       void mount();
     }
-  }, [dispatch, useFreeTransactions]);
+  }, [dispatch, useFreeTransactions, isNetworkSourceSelectorVisible]);
 
   useEffect(() => {
     const checkDestinationAddress = async () => {
@@ -402,7 +399,7 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
   const isNeedCreateWallet = false;
 
   const toolTipItems = [];
-  if (useFreeTransactions) {
+  if (useFreeTransactions && !isNetworkSourceSelectorVisible) {
     toolTipItems.push(
       <TooltipRow key="tooltip-row-1">Paid by p2p.org.</TooltipRow>,
       <TooltipRow key="tooltip-row-2">We take care of all transfers costs ✌.</TooltipRow>,
@@ -424,8 +421,6 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
       );
     }
   }
-
-  const isNetworkSourceSelectorVisible = fromTokenAccount?.mint.symbol === 'renBTC';
 
   return (
     <div>
@@ -489,7 +484,7 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
           />
           <TextFieldTXStyled
             label="Transfer fee"
-            value="Free"
+            value={isNetworkSourceSelectorVisible ? `${txFee} SOL` : 'Free'}
             icon={<Tooltip title={<InfoIcon name="info" />}>{toolTipItems}</Tooltip>}
           />
           <BottomWrapper>
