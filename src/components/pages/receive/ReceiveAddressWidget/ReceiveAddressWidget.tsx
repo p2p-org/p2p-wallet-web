@@ -4,7 +4,8 @@ import { styled } from '@linaria/react';
 
 import { Hint } from 'components/common/Hint';
 import { WidgetPage } from 'components/common/WidgetPage';
-import { Button } from 'components/ui';
+import { Select } from 'components/ui';
+import { MenuItem } from 'components/ui/Select/MenuItem';
 
 import { ReceiveSolana } from './ReceiveSolana';
 import { ReceiveBtc } from './renBridge/ReceiveBtc';
@@ -12,19 +13,25 @@ import { RenGatewayWarning } from './renBridge/RenGatewayWarning';
 
 const WrapperWidgetPage = styled(WidgetPage)``;
 
-const SourceNetworkButtonWrapper = styled.div`
-  display: flex;
-
-  align-items: center;
-  justify-content: center;
-
-  margin-top: 16px;
+const NetworkSelectWrapper = styled.div`
+  padding: 12px 24px 0;
 `;
 
-const SourceNetworkButtonstyled = styled(Button)`
-  margin-right: 12px;
+const NetworkSelect = styled.div`
+  display: flex;
+  align-items: center;
+  padding: 12px 20px;
 
-  text-transform: capitalize;
+  border: 1px solid #f6f6f8;
+  border-radius: 12px;
+`;
+
+const NetworkSelectText = styled.div`
+  display: flex;
+  flex-grow: 1;
+
+  font-weight: 600;
+  font-size: 16px;
 `;
 
 const SOURCE_NETWORKS = ['solana', 'bitcoin'];
@@ -33,7 +40,7 @@ export const ReceiveAddressWidget: FC = () => {
   const [sourceNetwork, setSourceNetwork] = useState('solana');
   const [isShowGatewayAddress, setIsShowGatewayAddress] = useState(false);
 
-  const handleSourceNetworkClick = (source: string) => () => {
+  const handleSourceNetworkClick = (source: string) => {
     setSourceNetwork(source);
   };
 
@@ -53,18 +60,21 @@ export const ReceiveAddressWidget: FC = () => {
   return (
     <div>
       <WrapperWidgetPage title="Receive" icon="bottom">
-        <SourceNetworkButtonWrapper>
-          {SOURCE_NETWORKS.map((source) => (
-            <SourceNetworkButtonstyled
-              key={source}
-              small
-              primary={sourceNetwork === source}
-              lightGray={sourceNetwork !== source}
-              onClick={handleSourceNetworkClick(source)}>
-              {source}
-            </SourceNetworkButtonstyled>
-          ))}
-        </SourceNetworkButtonWrapper>
+        <NetworkSelectWrapper>
+          <NetworkSelect>
+            <NetworkSelectText>Network</NetworkSelectText>
+            <Select value={sourceNetwork}>
+              {SOURCE_NETWORKS.map((network) => (
+                <MenuItem
+                  key={network}
+                  isSelected={network === sourceNetwork}
+                  onItemClick={() => handleSourceNetworkClick(network)}>
+                  {network}
+                </MenuItem>
+              ))}
+            </Select>
+          </NetworkSelect>
+        </NetworkSelectWrapper>
         {renderSourceNetworkReceivePanel()}
       </WrapperWidgetPage>
       <Hint />
