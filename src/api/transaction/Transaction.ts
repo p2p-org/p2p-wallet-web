@@ -175,6 +175,7 @@ export class Transaction implements Serializable<SerializableTransaction> {
     const typeOriginal = type;
     let icon: string | undefined;
     let isReceiver: boolean | undefined = isSameAccount;
+
     const {
       source,
       destination,
@@ -185,6 +186,7 @@ export class Transaction implements Serializable<SerializableTransaction> {
       sourceAmount,
       destinationAmount,
     } = this.short;
+
     let amount: Decimal | null = this.short.sourceAmount;
     let tokenAccount: TokenAccount | null = this.short.sourceTokenAccount;
     let token: Token | null = this.short.sourceToken;
@@ -201,13 +203,13 @@ export class Transaction implements Serializable<SerializableTransaction> {
     }
 
     if (isReceiver) {
-      if (type === 'transfer' || type === 'transferChecked') {
-        type = 'receive';
-        icon = 'bottom';
-      } else if (type !== 'createAccount') {
+      if (type === 'swap') {
         amount = this.short.destinationAmount;
         tokenAccount = this.short.destinationTokenAccount;
         token = this.short.destinationToken;
+      } else if (type === 'transfer' || type === 'transferChecked') {
+        type = 'receive';
+        icon = 'bottom';
       } else if (type === 'createAccount') {
         isReceiver = false;
       }

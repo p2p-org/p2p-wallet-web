@@ -99,16 +99,98 @@ export const APIFactory = memoizeWith(
         (inst) =>
           // inst.programId.equals(swapProgramId) ||
           inst.programId.toBase58() === '9qvG1zUp8xF1Bi4m6UdRNby1BAAuaDrUxSpv4CmRRMjL' || // main old swap
-          inst.programId.toBase58() === 'DjVE6JNiYqPL2QXyCUUh8rNjHrbz9hXHNYt99MQ59qw1', // main orca
+          inst.programId.toBase58() === 'DjVE6JNiYqPL2QXyCUUh8rNjHrbz9hXHNYt99MQ59qw1' || // main orca
+          inst.programId.toBase58() === '9W959DqEETiGZocYWCQPaJ6sBmUzgfxXfqGeTEdp3aQP' || // main orca v2
+          inst.programId.toBase58() === '22Y43yTVxuUkoRKdm9thyRhQ3SdgQS7c7kB6UNCiaczD', // serum swap
       );
-      if (swapInstructionIndex && instructions[swapInstructionIndex]) {
+
+      //if (swapInstructionIndex && instructions[swapInstructionIndex]) {
+      if (instructions[swapInstructionIndex]) {
         const swapInstruction = instructions[swapInstructionIndex] as PartiallyDecodedInstruction;
         const buf = Buffer.from(bs58.decode(swapInstruction.data));
         const instructionIndex = buf.readUInt8(0);
 
         const swapInner = innerInstructions?.find((item) => item.index === swapInstructionIndex);
-        // swap instruction
-        if (instructionIndex === 1) {
+        // swap instruction 129 & 248 - Serum, 1 - ORCA
+
+        if (instructionIndex === 129 || 248) {
+          //SERUM SWAP
+
+          type = 'swap';
+          let sourceInfo;
+          let destinationInfo;
+
+          if (swapInner) {
+            const transfersInstructions = swapInner.instructions.filter(
+              (inst: ConfirmedTransaction) =>
+                inst?.parsed?.type === 'transfer' || inst?.parsed?.type === 'transferChecked',
+            );
+            const sourceInstruction = transfersInstructions[0] as ConfirmedTransaction;
+            const destinationInstruction = (transfersInstructions[4]
+              ? transfersInstructions[4]
+              : transfersInstructions[1]) as ConfirmedTransaction;
+            sourceInfo = sourceInstruction?.parsed?.info;
+            destinationInfo = destinationInstruction?.parsed?.info;
+          }
+
+          source = sourceInfo?.source ? new PublicKey(sourceInfo.source) : null;
+
+          destination = destinationInfo?.destination
+            ? new PublicKey(destinationInfo.destination)
+            : null;
+
+          sourceTokenAccount = source ? await tokenAPI.tokenAccountInfo(source) : null;
+          destinationTokenAccount = destination
+            ? await tokenAPI.tokenAccountInfo(destination)
+            : null;
+
+          if (sourceTokenAccount) {
+            sourceToken = sourceTokenAccount.mint;
+          } else if (source && sourceInfo?.destination) {
+            const tokenAccount = await tokenAPI.tokenAccountInfo(
+              new PublicKey(sourceInfo?.destination),
+            );
+
+            if (tokenAccount) {
+              sourceToken = tokenAccount.mint;
+              sourceTokenAccount = new TokenAccount(
+                sourceToken,
+                sourceInfo.owner ? new PublicKey(sourceInfo.owner) : TOKEN_PROGRAM_ID, // TODO: fake
+                TOKEN_PROGRAM_ID,
+                source,
+                0,
+              );
+            }
+          }
+
+          if (destinationTokenAccount) {
+            destinationToken = destinationTokenAccount.mint;
+          } else if (destination && destinationInfo?.source) {
+            const tokenAccount = await tokenAPI.tokenAccountInfo(
+              new PublicKey(destinationInfo.source),
+            );
+            if (tokenAccount) {
+              destinationToken = tokenAccount.mint;
+              destinationTokenAccount = new TokenAccount(
+                destinationToken,
+                destinationInfo.owner ? new PublicKey(destinationInfo.owner) : TOKEN_PROGRAM_ID, // TODO: fake
+                TOKEN_PROGRAM_ID,
+                destination,
+                0,
+              );
+            }
+          }
+
+          sourceAmount = new Decimal(sourceInfo?.amount || sourceAmount || 0);
+          destinationAmount = new Decimal(destinationInfo?.amount || destinationAmount || 0);
+
+          if (sourceToken?.decimals) {
+            sourceAmount = sourceAmount.div(10 ** sourceToken?.decimals);
+          }
+          if (destinationToken?.decimals) {
+            destinationAmount = destinationAmount.div(10 ** destinationToken?.decimals);
+          }
+        } else if (instructionIndex === 1) {
           type = 'swap';
 
           let sourceInfo;
