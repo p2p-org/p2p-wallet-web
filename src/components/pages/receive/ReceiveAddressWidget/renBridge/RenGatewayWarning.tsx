@@ -1,8 +1,14 @@
-import React, { FC, useState } from 'react';
+import React, { FC, useCallback, useEffect, useState } from 'react';
 
 import { styled } from '@linaria/react';
+import { Bitcoin } from '@renproject/chains-bitcoin';
+import { Solana } from '@renproject/chains-solana';
 
+import { LoaderBlock } from 'components/common/LoaderBlock';
+import { ToastManager } from 'components/common/ToastManager';
 import { Button, Icon, Switch } from 'components/ui';
+import { useRenNetwork } from 'utils/hooks/renBridge/useNetwork';
+import { useSolanaProvider } from 'utils/providers/SolnaProvider';
 
 const Wrapper = styled.div`
   display: flex;
@@ -59,7 +65,62 @@ const ConfirmText = styled.div`
 `;
 
 export const RenGatewayWarning: FC<{ onShowButtonClick: () => void }> = ({ onShowButtonClick }) => {
+  const [awaiting, setAwaiting] = useState(false);
+  const [isTokenLoaded, setIsTokenLoaded] = useState(false);
+  const [hasSolanaTokenAccount, setSolanaTokenAccount] = useState<any>();
+  const solanaProvider = useSolanaProvider();
+  const network = useRenNetwork();
   const [isConfirm, setIsConfirm] = useState(false);
+
+  useEffect(() => {
+    const mount = async () => {
+      setIsTokenLoaded(false);
+      setSolanaTokenAccount(
+        await new Solana(solanaProvider, network).getAssociatedTokenAccount(Bitcoin.asset),
+      );
+      setIsTokenLoaded(true);
+    };
+
+    void mount();
+  }, [network, solanaProvider]);
+
+  const createAccount = useCallback(async () => {
+    try {
+      setAwaiting(true);
+      const solanaToken = await new Solana(solanaProvider, network).createAssociatedTokenAccount(
+        Bitcoin.asset,
+      );
+      setSolanaTokenAccount(solanaToken);
+    } catch (error) {
+      ToastManager.error((error as Error).message);
+      console.error(error);
+    } finally {
+      setAwaiting(false);
+    }
+  }, [network, solanaProvider]);
+
+  if (!isTokenLoaded) {
+    return <LoaderBlock />;
+  }
+
+  if (!hasSolanaTokenAccount) {
+    return (
+      <Wrapper>
+        <Warning>
+          <WarningIconWrapper>
+            <AttentionIcon name="attention" />
+          </WarningIconWrapper>
+          <WarningText>
+            Solana Associated Token Account Required. This will require you to sign a transaction
+            and spend some SOL.
+          </WarningText>
+        </Warning>
+        <Button primary disabled={awaiting} onClick={createAccount} style={{ margin: '26px 0' }}>
+          Create Token Account
+        </Button>
+      </Wrapper>
+    );
+  }
 
   return (
     <Wrapper>

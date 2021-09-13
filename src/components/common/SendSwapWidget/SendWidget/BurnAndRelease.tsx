@@ -1,18 +1,17 @@
 import React, { FC, useMemo } from 'react';
-import { useSelector } from 'react-redux';
 
 import { styled } from '@linaria/react';
 import { Bitcoin } from '@renproject/chains-bitcoin';
 import { Solana } from '@renproject/chains-solana';
-import { RenNetwork } from '@renproject/interfaces';
 import RenJS from '@renproject/ren';
 import { BurnSession, BurnStates, BurnTransaction, isBurnErroring } from '@renproject/ren-tx';
-import { Transaction } from '@solana/web3.js';
 
-import { getConnection } from 'api/connection';
 import { getWallet } from 'api/wallet';
+import { LoaderBlock } from 'components/common/LoaderBlock';
 import { Accordion, Button } from 'components/ui';
 import { useBurnAndRelease } from 'utils/hooks/renBridge/useBurnAndRelease.ts';
+import { useRenNetwork } from 'utils/hooks/renBridge/useNetwork';
+import { useSolanaProvider } from 'utils/providers/SolnaProvider';
 
 const StatusItems = styled.ul`
   margin: 0;
@@ -77,7 +76,7 @@ const BurnStatusItem: FC<{
         </StatusItem>
       );
     case BurnStates.CONFIRMING_BURN:
-      if (!tx) return <div>loading</div>;
+      if (!tx) return <LoaderBlock />;
       return (
         <StatusItem>
           <Status>
@@ -117,7 +116,8 @@ const BurnStatusItem: FC<{
         </StatusItem>
       );
     case BurnStates.ERROR_BURNING:
-      if (!isBurnErroring(session)) return <div>loading</div>;
+    case BurnStates.ERROR_RELEASING:
+      if (!isBurnErroring(session)) return <LoaderBlock />;
       return (
         <StatusItem>
           <Status>
@@ -125,10 +125,8 @@ const BurnStatusItem: FC<{
           </Status>
         </StatusItem>
       );
-    case BurnStates.ERROR_RELEASING:
-      return <div>Rejected</div>;
     default:
-      return <div>Loading</div>;
+      return <LoaderBlock />;
   }
 };
 
@@ -138,18 +136,13 @@ type Props = {
 };
 
 export const BurnAndRelease: FC<Props> = ({ destinationAddress, targetAmount }) => {
-  const cluster = useSelector((state) => state.wallet.network.cluster);
-
+  const solanaProvider = useSolanaProvider();
+  const network = useRenNetwork();
   const burnAndReleaseProps = useMemo(() => {
-    const network = cluster === 'mainnet-beta' ? RenNetwork.Mainnet : RenNetwork.Testnet;
-
     const amount = String(Math.floor(Number(targetAmount) * Math.pow(10, 8)));
 
     return {
-      sdk: new RenJS(network, {
-        useV2TransactionFormat: false,
-        loadCompletedDeposits: true,
-      }),
+      sdk: new RenJS(network),
       burnParams: {
         sourceAsset: Bitcoin.asset,
         network,
@@ -157,16 +150,7 @@ export const BurnAndRelease: FC<Props> = ({ destinationAddress, targetAmount }) 
         targetAmount,
       },
       userAddress: getWallet().pubkey.toBase58(),
-      from: new Solana(
-        {
-          connection: getConnection(),
-          wallet: {
-            publicKey: getWallet().pubkey,
-            signTransaction: (tx: Transaction) => getWallet().sign(tx),
-          },
-        },
-        network,
-      ).Account({
+      from: new Solana(solanaProvider, network).Account({
         address: getWallet().pubkey.toBase58(),
         value: amount,
         amount,
@@ -174,7 +158,7 @@ export const BurnAndRelease: FC<Props> = ({ destinationAddress, targetAmount }) 
       to: new Bitcoin().Address(destinationAddress),
       autoSubmit: true,
     };
-  }, [cluster, destinationAddress, targetAmount]);
+  }, [destinationAddress, network, solanaProvider, targetAmount]);
 
   const machine = useBurnAndRelease(burnAndReleaseProps);
   if (!machine) return null;

@@ -18,7 +18,7 @@ const createConnection = memoizeWith(
     const connection = new Connection(network.endpoint, {
       wsEndpoint: network.wsEndpoint,
       httpHeaders: network.httpHeaders,
-      commitment: DEFAULT_COMMITMENT,
+      // commitment: DEFAULT_COMMITMENT,
     });
 
     // Due to an issue with the solana back-end relating to CORS headers on 429 responses
