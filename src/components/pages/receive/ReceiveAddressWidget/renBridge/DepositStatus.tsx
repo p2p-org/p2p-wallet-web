@@ -155,7 +155,7 @@ const DepositStatusItem: FC<{
       if (!isCompleted(deposit)) {
         throw new Error('inconsistent state');
       }
-      const outAmount = formatAmount((deposit.renResponse?.out as any)?.amount);
+      const outAmount = formatAmount((deposit.renResponse as any).amount.toNumber());
       return (
         <StatusItem>
           <Status>

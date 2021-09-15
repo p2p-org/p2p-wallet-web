@@ -13,7 +13,7 @@ import { useSolanaProvider } from 'utils/providers/SolnaProvider';
 const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
-  padding: 16px 24px 0;
+  padding: 16px 24px;
 `;
 
 const Warning = styled.div`
@@ -115,7 +115,7 @@ export const RenGatewayWarning: FC<{ onShowButtonClick: () => void }> = ({ onSho
             and spend some SOL.
           </WarningText>
         </Warning>
-        <Button primary disabled={awaiting} onClick={createAccount} style={{ margin: '26px 0' }}>
+        <Button primary disabled={awaiting} onClick={createAccount} style={{ marginTop: '26px' }}>
           Create Token Account
         </Button>
       </Wrapper>
