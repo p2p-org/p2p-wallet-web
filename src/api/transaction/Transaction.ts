@@ -216,6 +216,11 @@ export class Transaction implements Serializable<SerializableTransaction> {
     } else if (type === 'transfer' || type === 'transferChecked') {
       type = 'transfer';
       icon = 'top';
+    } else if (type === 'mintRenBTC') {
+      icon = 'bottom';
+      isReceiver = true;
+    } else if (type === 'burnRenBTC') {
+      icon = 'top';
     }
 
     if (type) {

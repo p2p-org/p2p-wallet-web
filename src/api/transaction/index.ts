@@ -4,6 +4,7 @@ import {
   ParsedConfirmedTransaction,
   PartiallyDecodedInstruction,
   PublicKey,
+  Secp256k1Program,
   TransactionSignature,
 } from '@solana/web3.js';
 import bs58 from 'bs58';
@@ -21,6 +22,10 @@ import { CacheTTL } from 'lib/cachettl';
 import { Transaction } from './Transaction';
 
 const transactionsCache = new CacheTTL<Transaction>({ ttl: 5000 });
+const REN_BTC_MINT = [
+  /* devnet */ 'FsaLodPu4VmSwXGr3gWfwANe4vKf8XSZcCh1CEeJ3jpD',
+  /* mainnet */ 'CDJWUqTcYTVAKXAVXoQZFes5JUFc7owSeq7eMQcDSbo5',
+];
 
 export interface API {
   transactionInfo: (
@@ -424,6 +429,44 @@ export const APIFactory = memoizeWith(
         }
       }
 
+      if (
+        instructions.length === 2 &&
+        instructions[1].programId.equals(Secp256k1Program.programId)
+      ) {
+        if (innerInstructions?.length === 1 && innerInstructions[0].instructions.length === 4) {
+          const instruction = innerInstructions[0].instructions[3] as ConfirmedTransaction;
+
+          if (instruction.programId.equals(TOKEN_PROGRAM_ID)) {
+            const parsedInstruction = instruction.parsed;
+            if (
+              parsedInstruction?.type === 'mintToChecked' &&
+              REN_BTC_MINT.includes(parsedInstruction?.info.mint)
+            ) {
+              type = 'mintRenBTC';
+              sourceAmount = new Decimal(parsedInstruction?.info?.tokenAmount?.amount || 0).div(
+                10 ** 8,
+              );
+              sourceToken = await tokenAPI.tokenInfo(new PublicKey(parsedInstruction.info.mint));
+            }
+          }
+        }
+      }
+      if (
+        instructions.length === 2 &&
+        instructions[0].programId.equals(TOKEN_PROGRAM_ID) &&
+        (instructions[0] as ConfirmedTransaction)?.parsed?.type === 'burnChecked'
+      ) {
+        const instruction = instructions[0] as ConfirmedTransaction;
+        if (REN_BTC_MINT.includes(instruction?.parsed?.info.mint || '')) {
+          type = 'burnRenBTC';
+          sourceAmount = new Decimal(instruction.parsed?.info?.tokenAmount?.amount || 0).div(
+            10 ** 8,
+          );
+          sourceToken = await tokenAPI.tokenInfo(
+            new PublicKey(instruction.parsed?.info.mint || TOKEN_PROGRAM_ID),
+          );
+        }
+      }
       sourceToken = sourceToken || sourceTokenAccount?.mint || null;
       destinationToken = destinationToken || destinationTokenAccount?.mint || null;
 
