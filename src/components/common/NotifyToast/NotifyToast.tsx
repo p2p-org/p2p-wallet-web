@@ -1,17 +1,24 @@
 import React, { FunctionComponent } from 'react';
 
 import { styled } from '@linaria/react';
+import classNames from 'classnames';
 
 import { RendererParams, Toast } from 'components/common/ToastManager';
 import { TokenAvatar } from 'components/common/TokenAvatar';
 import { Icon } from 'components/ui';
 
 const ToastStyled = styled(Toast)`
+  align-items: flex-start;
   position: relative;
 
   color: #000;
 
   background-color: #fff;
+`;
+
+const ToastIconWrapper = styled.div`
+  padding: 10px;
+  border-radius: 12px;
 `;
 
 const ToastIcon = styled(Icon)`
@@ -48,10 +55,15 @@ const ToastText = styled.div`
   display: flex;
   flex-grow: 1;
   align-items: center;
+  padding-top: 5px;
 
   color: #a3a5ba;
   font-weight: 600;
   font-size: 16px;
+
+  &.confirmed {
+    color: #4caf50;
+  }
 `;
 
 const CloseButton = styled.button`
@@ -110,10 +122,23 @@ const SwapAvatarsWrapper = styled.div`
   }
 `;
 
+const ButtonWrapper = styled.div`
+  align-items: center;
+  margin-top: 8px;
+  padding-top: 12px;
+`;
+
 type TransferParams = {
-  status?: 'processing' | 'success' | 'error';
+  status?:
+    | 'processing'
+    | 'success'
+    | 'error'
+    | 'warning'
+    | 'confirmingDeposit'
+    | 'confirmedDeposit';
   symbol?: string;
   symbolB?: string;
+  button?: React.ReactNode;
 };
 
 type Props = RendererParams & TransferParams;
@@ -126,6 +151,7 @@ export const NotifyToast: FunctionComponent<Props> = ({
   symbol,
   symbolB,
   onClose,
+  button,
 }) => {
   let icon;
   let statusIcon;
@@ -152,6 +178,16 @@ export const NotifyToast: FunctionComponent<Props> = ({
         </SwapAvatarsWrapper>
       );
       break;
+    case 'mint':
+      icon = (
+        <ToastIconWrapper>
+          <ToastIcon name="warning-transparent" style={{ color: '#ffa631' }} />
+        </ToastIconWrapper>
+      );
+      break;
+    case 'confirmingDeposit':
+      icon = <TokenAvatar symbol="BTC" size={44} />;
+      break;
     default:
       icon = null;
   }
@@ -166,6 +202,12 @@ export const NotifyToast: FunctionComponent<Props> = ({
     case 'error':
       statusIcon = <StatusIcon name="warning" style={{ color: '#ff5959' }} />;
       break;
+    case 'confirmingDeposit':
+      statusIcon = <StatusIcon name="clock-transparent" style={{ color: '#a3a5ba' }} />;
+      break;
+    case 'confirmedDeposit':
+      statusIcon = <StatusIcon name="clock-transparent" />;
+      break;
     default:
       statusIcon = null;
   }
@@ -175,10 +217,11 @@ export const NotifyToast: FunctionComponent<Props> = ({
       {icon}
       <ToastWrapper>
         <ToastHeader>{header}</ToastHeader>
-        <ToastText>
+        <ToastText className={classNames({ confirmed: status === 'confirmedDeposit' })}>
           {status ? statusIcon : undefined}
           {text}
         </ToastText>
+        {button ? <ButtonWrapper>{button}</ButtonWrapper> : undefined}
       </ToastWrapper>
       {onClose ? (
         <CloseButton type="button" name="notify-toast__close" onClick={onClose}>

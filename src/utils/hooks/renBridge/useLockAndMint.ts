@@ -6,6 +6,7 @@ import { UTXO } from '@renproject/chains-bitcoin/build/main/APIs/API';
 import { DepositCommon, LockChain, MintChain, RenNetwork } from '@renproject/interfaces';
 import RenJS from '@renproject/ren';
 import {
+  AcceptedGatewayTransaction,
   buildMintContextWithMap,
   DepositStates,
   GatewayMachineContext,
@@ -52,6 +53,8 @@ interface MintParams {
   nonce?: string | Buffer;
 }
 
+export type DepositTranstaction = AcceptedGatewayTransaction<any>;
+
 // Amount of time remaining until gateway expires
 // We remove 1 day from the ren-tx expiry to reflect the extra mint
 // submission leeway
@@ -71,6 +74,10 @@ export function idFromParams(session: GatewaySession<any> | BurnSession<any, any
   return `tx-${session.userAddress}-${getSessionDay()}-${session.sourceAsset}-to-${
     session.destChain
   }`;
+}
+
+export function formatAmount(amount: string) {
+  return new BigNumber(amount).div(10 ** 8).toNumber();
 }
 
 function sessionFromMintConfigMultiple<X, CustomParams = {}>(config: {
@@ -217,6 +224,7 @@ export const useLockAndMint = (config: MintConfigSingle | MintConfigMultiple) =>
     session,
     sessionMachine: machine,
     state: state.value as GatewayStates,
+    currentState: state,
   };
 };
 

@@ -50,6 +50,8 @@ import timer from './assets/timer-icon.svg';
 import top from './assets/new/top-icon.svg';
 import wallet from './assets/wallet-icon.svg';
 import warning from './assets/warning-icon.svg';
+import warningTransparent from './assets/new/warning-transparent-icon.svg';
+import clockTransparent from './assets/new/clock-transparent-icon.svg';
 
 const iconsMap = new Map<string, string>([
   ['arrow', arrow],
@@ -98,6 +100,8 @@ const iconsMap = new Map<string, string>([
   ['clock', clock],
   ['free-tx', freeTx],
   ['info', info],
+  ['warning-transparent', warningTransparent],
+  ['clock-transparent', clockTransparent],
 ]);
 
 export type Props = {

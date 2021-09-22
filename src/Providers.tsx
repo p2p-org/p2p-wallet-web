@@ -3,6 +3,7 @@ import React, { FC, useEffect, useState } from 'react';
 import { TokenListContextProvider } from '@project-serum/swap-ui';
 import { TokenListContainer, TokenListProvider } from '@solana/spl-token-registry';
 
+import { LockAndMintProvider } from 'utils/providers/LockAndMintProvider';
 import { SolanaContextProvider } from 'utils/providers/SolnaProvider';
 
 export const Providers: FC = ({ children }) => {
@@ -18,7 +19,9 @@ export const Providers: FC = ({ children }) => {
 
   return (
     <TokenListContextProvider tokenList={tokenList}>
-      <SolanaContextProvider>{children}</SolanaContextProvider>
+      <SolanaContextProvider>
+        <LockAndMintProvider>{children}</LockAndMintProvider>
+      </SolanaContextProvider>
     </TokenListContextProvider>
   );
 };
