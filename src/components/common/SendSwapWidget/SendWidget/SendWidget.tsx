@@ -4,6 +4,8 @@ import { useHistory } from 'react-router';
 
 import { styled } from '@linaria/react';
 import { unwrapResult } from '@reduxjs/toolkit';
+import { Bitcoin } from '@renproject/chains-bitcoin';
+import { RenNetwork } from '@renproject/interfaces';
 import { AccountLayout } from '@solana/spl-token';
 import { PublicKey } from '@solana/web3.js';
 import classNames from 'classnames';
@@ -33,6 +35,7 @@ import {
 } from 'store/slices/wallet/WalletSlice';
 import { minorAmountToMajor } from 'utils/amount';
 import { trackEvent } from 'utils/analytics';
+import { useRenNetwork } from 'utils/hooks/renBridge/useNetwork';
 import { useTrackEventOnce } from 'utils/hooks/useTrackEventOnce';
 
 import { Hint } from '../../Hint';
@@ -121,7 +124,10 @@ const Error = styled.div`
 
 const TextFieldTXStyled = styled(TextField)`
   margin-bottom: 8px;
-  color: #2db533;
+
+  &.isFree {
+    color: #2db533;
+  }
 `;
 
 const TextFieldStyled = styled(TextField)`
@@ -147,6 +153,12 @@ const NetworkSelectText = styled.div`
   font-size: 16px;
 `;
 
+const SendIcon = styled(Icon)`
+  margin-right: 12px;
+  width: 24px;
+  height: 24px;
+`;
+
 const SOURCE_NETWORKS = ['solana', 'bitcoin'];
 
 type Props = {
@@ -159,14 +171,22 @@ const isValidAmount = (amount: string): boolean => {
   return amount === '' || amountValue === 0;
 };
 
-const isValidAddress = (address: string): boolean => {
-  try {
-    // eslint-disable-next-line no-new
-    new PublicKey(address);
-    return true;
-  } catch {
-    return false;
+const isValidAddress = (
+  isSolanaNetwork: boolean,
+  address: string,
+  network: RenNetwork,
+): boolean => {
+  if (isSolanaNetwork) {
+    try {
+      // eslint-disable-next-line no-new
+      new PublicKey(address);
+      return true;
+    } catch {
+      return false;
+    }
   }
+
+  return Bitcoin.utils.addressIsValid(address, network);
 };
 
 const formatFee = (amount: number): number =>
@@ -188,6 +208,8 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
   const [isConfirmCorrectAddress, setIsConfirmCorrectAddress] = useState(false);
   const [destinationNetwork, setDestinationNetwork] = useState(SOURCE_NETWORKS[0]);
   const [isInitBurnAndRelease, setIsInitBurnAndRelease] = useState(false);
+
+  const network = useRenNetwork();
 
   const tokenAccounts = useSelector((state: RootState) =>
     state.wallet.tokenAccounts.map((account) => TokenAccount.from(account)),
@@ -223,6 +245,8 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
     }
   }, [dispatch, useFreeTransactions, isNetworkSourceSelectorVisible]);
 
+  const isSolanaNetwork = destinationNetwork === 'solana';
+
   useEffect(() => {
     const checkDestinationAddress = async () => {
       const account = unwrapResult(
@@ -234,14 +258,12 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
       }
     };
 
-    if (isValidAddress(toTokenPublicKey)) {
+    if (isSolanaNetwork && isValidAddress(isSolanaNetwork, toTokenPublicKey, network)) {
       void checkDestinationAddress();
     } else {
       setIsShowConfirmAddressSwitch(false);
     }
-  }, [dispatch, toTokenPublicKey]);
-
-  const isSolanaNetwork = destinationNetwork === 'solana';
+  }, [dispatch, isSolanaNetwork, network, toTokenPublicKey]);
 
   const handleSubmit = async () => {
     if (!isSolanaNetwork) {
@@ -393,7 +415,7 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
     : false;
 
   const isDisabled = isExecuting;
-  const isValidDestinationAddress = isValidAddress(toTokenPublicKey);
+  const isValidDestinationAddress = isValidAddress(isSolanaNetwork, toTokenPublicKey, network);
 
   // TODO
   const isNeedCreateWallet = false;
@@ -440,7 +462,7 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
           <ToSendWrapper>
             <FromTitle>To</FromTitle>
             <ToAddressInput value={toTokenPublicKey || ''} onChange={handleToPublicKeyChange} />
-            {isSolanaNetwork && toTokenPublicKey.length > 0 && !isValidDestinationAddress ? (
+            {toTokenPublicKey.length > 0 && !isValidDestinationAddress ? (
               <Error>Check recepient address</Error>
             ) : undefined}
             {isShowConfirmAddressSwitch ? (
@@ -460,7 +482,7 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
           </ToSendWrapper>
           {isNetworkSourceSelectorVisible ? (
             <NetworkSelectWrapper>
-              <NetworkSelectText>Network destination</NetworkSelectText>
+              <NetworkSelectText>Network</NetworkSelectText>
               <Select value={destinationNetwork}>
                 {SOURCE_NETWORKS.map((network) => (
                   <MenuItem
@@ -484,8 +506,9 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
           />
           <TextFieldTXStyled
             label="Transfer fee"
-            value={isNetworkSourceSelectorVisible ? `${txFee} SOL` : 'Free'}
+            value={isSolanaNetwork ? 'Free' : `${txFee} SOL`}
             icon={<Tooltip title={<InfoIcon name="info" />}>{toolTipItems}</Tooltip>}
+            className={classNames({ isFree: isSolanaNetwork })}
           />
           <BottomWrapper>
             <ButtonWrapper>
@@ -501,7 +524,8 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
                 big
                 full
                 onClick={handleSubmit}>
-                Send
+                <SendIcon name="top" />
+                Send now
               </Button>
             </ButtonWrapper>
           </BottomWrapper>

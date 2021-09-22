@@ -90,10 +90,13 @@ export const APIFactory = memoizeWith(
         .excludeByTag('bull')
         .excludeByTag('wormhole')
         .getList()
-        .map((token) => token.symbol) || [];
+        .map((token) => token.symbol.toUpperCase()) || [];
 
     const getRatesMarkets = async (): Promise<Array<MarketRate>> => {
       try {
+        if (network.cluster !== 'mainnet-beta') {
+          tokenSymbols.push('RENBTC');
+        }
         const chunks = splitEvery(50, tokenSymbols);
 
         const results = await Promise.all(

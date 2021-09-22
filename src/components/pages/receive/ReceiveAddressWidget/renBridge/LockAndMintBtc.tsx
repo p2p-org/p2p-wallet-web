@@ -16,7 +16,7 @@ import { useIntervalHook } from 'utils/hooks/useIntervalHook';
 import { useLockAndMintProvider } from 'utils/providers/LockAndMintProvider';
 
 import { AddressQRCodePanel } from '../AddressQRCodePanel';
-import { Description } from '../styled';
+import { BottomInfo, Description, ExplorerA } from '../styled';
 
 const StatusItem = styled.li`
   display: flex;
@@ -256,6 +256,15 @@ export const LockAndMintBtc: FC = () => {
           />
         ))}
       </Description>
+      <BottomInfo>
+        <ExplorerA
+          href={`https://btc.com/btc/address/${lockAndMintProvider.gatewayAddress}`}
+          target="_blank"
+          rel="noopener noreferrer noindex"
+          className="button">
+          View in Bitcoin explorer
+        </ExplorerA>
+      </BottomInfo>
     </>
   );
 };

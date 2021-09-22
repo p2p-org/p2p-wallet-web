@@ -12,7 +12,7 @@ type Props = {
 };
 
 export const RateUSD: FunctionComponent<Props> = ({ symbol = '', ...props }) => {
-  const rate = useSelector(rateSelector(symbol));
+  const rate = useSelector(rateSelector(symbol.toUpperCase()));
 
   if (!rate) {
     return null;
