@@ -262,7 +262,7 @@ export const LockAndMintProvider: FC = ({ children }) => {
   const content = useMemo(() => children, [children]);
   return (
     <>
-      {config ? (
+      {publicKey && config ? (
         <LockAndMintSession
           nonce={config.nonce}
           onGatewayAddressInit={handleGatewayAddressInit}

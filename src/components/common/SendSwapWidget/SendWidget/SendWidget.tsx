@@ -6,7 +6,6 @@ import { styled } from '@linaria/react';
 import { unwrapResult } from '@reduxjs/toolkit';
 import { Bitcoin } from '@renproject/chains-bitcoin';
 import { RenNetwork } from '@renproject/interfaces';
-import { AccountLayout } from '@solana/spl-token';
 import { PublicKey } from '@solana/web3.js';
 import classNames from 'classnames';
 import Decimal from 'decimal.js';
@@ -160,6 +159,7 @@ const SendIcon = styled(Icon)`
 `;
 
 const SOURCE_NETWORKS = ['solana', 'bitcoin'];
+const BURN_ALLOCATE_ACCOUNT_SIZE = 97;
 
 type Props = {
   publicKey: string | null;
@@ -210,6 +210,7 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
   const [isInitBurnAndRelease, setIsInitBurnAndRelease] = useState(false);
 
   const network = useRenNetwork();
+  const isSolanaNetwork = destinationNetwork === 'solana';
 
   const tokenAccounts = useSelector((state: RootState) =>
     state.wallet.tokenAccounts.map((account) => TokenAccount.from(account)),
@@ -228,7 +229,7 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
     const mount = async () => {
       try {
         const resultRentFee = unwrapResult(
-          await dispatch(getMinimumBalanceForRentExemption(AccountLayout.span)),
+          await dispatch(getMinimumBalanceForRentExemption(BURN_ALLOCATE_ACCOUNT_SIZE)),
         );
 
         const resultRecentBlockhash = unwrapResult(await dispatch(getRecentBlockhash()));
@@ -244,8 +245,6 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
       void mount();
     }
   }, [dispatch, useFreeTransactions, isNetworkSourceSelectorVisible]);
-
-  const isSolanaNetwork = destinationNetwork === 'solana';
 
   useEffect(() => {
     const checkDestinationAddress = async () => {
@@ -416,10 +415,6 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
 
   const isDisabled = isExecuting;
   const isValidDestinationAddress = isValidAddress(isSolanaNetwork, toTokenPublicKey, network);
-
-  // TODO
-  const isNeedCreateWallet = false;
-
   const toolTipItems = [];
   if (useFreeTransactions && !isNetworkSourceSelectorVisible) {
     toolTipItems.push(
@@ -434,10 +429,10 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
       </TooltipRow>,
     );
 
-    if (isNeedCreateWallet) {
+    if (!isSolanaNetwork) {
       toolTipItems.push(
         <TooltipRow key="tooltip-row-4">
-          <TxName>Wallet creation:</TxName>
+          <TxName>Fee:</TxName>
           <TxValue>{`${rentFee} SOL`}</TxValue>
         </TooltipRow>,
       );
@@ -506,7 +501,7 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
           />
           <TextFieldTXStyled
             label="Transfer fee"
-            value={isSolanaNetwork ? 'Free' : `${txFee} SOL`}
+            value={isSolanaNetwork ? 'Free' : `${txFee + rentFee} SOL`}
             icon={<Tooltip title={<InfoIcon name="info" />}>{toolTipItems}</Tooltip>}
             className={classNames({ isFree: isSolanaNetwork })}
           />
