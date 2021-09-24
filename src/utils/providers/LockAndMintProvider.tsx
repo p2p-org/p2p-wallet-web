@@ -13,7 +13,14 @@ import { Bitcoin } from '@renproject/chains-bitcoin';
 import { Solana } from '@renproject/chains-solana';
 import { getRenNetworkDetails } from '@renproject/interfaces';
 import RenJS from '@renproject/ren';
-import { DepositStates, isAccepted, OpenedGatewaySession } from '@renproject/ren-tx';
+import {
+  DepositStates,
+  GatewaySession,
+  GatewayTransaction,
+  isAccepted,
+  OpenedGatewaySession,
+} from '@renproject/ren-tx';
+import { isNil } from 'ramda';
 
 import { getWallet } from 'api/wallet';
 import { NotifyToast } from 'components/common/NotifyToast';
@@ -129,6 +136,18 @@ const DepositWatcher: FC<{
   return null;
 };
 
+const getActiveDepositId = (tx: GatewaySession<any>) => {
+  if (isNil(tx.transactions)) return undefined;
+  const transactions = Object.values(tx.transactions);
+  const activeTransactions = transactions
+    .filter((t: any) => !t?.completedAt)
+    .sort(
+      (a: GatewayTransaction<any>, b: GatewayTransaction<any>) =>
+        Number(a.detectedAt || 0) - Number(b.detectedAt || 0),
+    );
+  return activeTransactions.length > 0 ? activeTransactions[0].sourceTxHash : undefined;
+};
+
 const LockAndMintSession: FC<{
   nonce: string;
   onGatewayAddressInit: (address: string) => void;
@@ -173,8 +192,8 @@ const LockAndMintSession: FC<{
     return getRenNetworkDetails(network).isTestnet ? 1 : 6;
   }, [network]);
 
-  const activeDepositId = mint.deposits.length !== 0 ? mint.deposits[0] : undefined;
   const current = mint.currentState;
+  const activeDepositId = getActiveDepositId(current.context.tx);
 
   const activeDeposit = useMemo(() => {
     if (!current.context.tx.transactions || activeDepositId === undefined) {
