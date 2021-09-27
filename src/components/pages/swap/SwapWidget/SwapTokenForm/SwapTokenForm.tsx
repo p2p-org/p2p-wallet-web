@@ -1,6 +1,7 @@
 import React, { FC, useEffect, useMemo, useRef, useState } from 'react';
 
 import { styled } from '@linaria/react';
+import { Market } from '@project-serum/serum';
 import {
   useMint,
   useOwnedTokenAccount,
@@ -164,6 +165,10 @@ const AmountInput = styled.input`
   &::placeholder {
     color: #a3a5ba;
   }
+
+  &.error {
+    color: #f43d3d;
+  }
 `;
 
 const BalanceWrapper = styled.div`
@@ -306,6 +311,7 @@ interface Props {
   setMint: (m: PublicKey) => void;
   amount: number;
   setAmount: (a: number) => void;
+  market: Market | undefined;
   disabled?: boolean;
   disabledInput?: boolean;
   className?: string;
@@ -317,6 +323,7 @@ export const SwapTokenForm: FC<Props> = ({
   setMint,
   amount,
   setAmount,
+  market,
   disabled,
   disabledInput,
   className,
@@ -342,6 +349,8 @@ export const SwapTokenForm: FC<Props> = ({
     tokenAccount.account.amount.toNumber() / 10 ** mintAccount.decimals;
 
   const hasBalance = (balance || 0) >= Number(localAmount);
+
+  const minOrderSize = market?.minOrderSize ? market.minOrderSize : 0;
 
   const boxShadow = useMemo(() => {
     return `0 5px 10px rgba(56, 60, 71, ${
@@ -497,6 +506,9 @@ export const SwapTokenForm: FC<Props> = ({
               onFocus={handleAmountFocus}
               onChange={handleAmountChange}
               disabled={disabled || disabledInput}
+              className={classNames({
+                error: Number(localAmount) ? Number(localAmount) < minOrderSize : false,
+              })}
             />
           </SpecifyTokenWrapper>
           <BalanceWrapper>

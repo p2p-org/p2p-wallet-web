@@ -1,6 +1,6 @@
 import React, { FC } from 'react';
 
-import { useSwapContext } from '@project-serum/swap-ui';
+import { useMarket, useRouteVerbose, useSwapContext } from '@project-serum/swap-ui';
 
 import { SwapTokenForm } from '../SwapTokenForm';
 
@@ -9,7 +9,10 @@ interface Props {
 }
 
 export const SwapFromForm: FC<Props> = ({ className }) => {
-  const { fromMint, setFromMint, fromAmount, setFromAmount } = useSwapContext();
+  const { fromMint, toMint, setFromMint, fromAmount, setFromAmount } = useSwapContext();
+  const route = useRouteVerbose(fromMint, toMint);
+  const fromMarket = useMarket(route && route.markets ? route.markets[0] : undefined);
+
   return (
     <SwapTokenForm
       from
@@ -17,6 +20,8 @@ export const SwapFromForm: FC<Props> = ({ className }) => {
       setMint={setFromMint}
       amount={fromAmount}
       setAmount={setFromAmount}
+      // @ts-ignore
+      market={fromMarket}
       className={className}
     />
   );

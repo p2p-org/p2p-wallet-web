@@ -153,9 +153,9 @@ const NetworkSelectText = styled.div`
 `;
 
 const SendIcon = styled(Icon)`
-  margin-right: 12px;
   width: 24px;
   height: 24px;
+  margin-right: 12px;
 `;
 
 const SOURCE_NETWORKS = ['solana', 'bitcoin'];
