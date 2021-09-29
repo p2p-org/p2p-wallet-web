@@ -15,5 +15,5 @@ export const featureFlags = {
   [FEATURE_LANDING]: true,
   [FEATURE_SETTINGS_CLOSE_ACCOUNT]: false,
   [FEATURE_SETTINGS_FREE_TRANSACTIONS]: false,
-  [FEATURE_NAV_MENU_BUY_BUTTON]: false,
+  [FEATURE_NAV_MENU_BUY_BUTTON]: true,
 };
