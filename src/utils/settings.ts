@@ -4,6 +4,7 @@ import { WalletSettings } from 'utils/types';
 const WALLET_SETTINGS_KEY = 'walletSettings';
 const WALLET_HIDDEN_TOKENS_KEY = 'walletHiddenTokens';
 const WALLET_DISPLAYED_ZERO_BALANCE_TOKENS = 'walletDisplayedZeroBalanceTokens';
+const USERNAME_BANNER_KEY = 'isUsernameBannerDisplayed';
 
 export const currencies = [
   {
@@ -124,4 +125,14 @@ export function removeZeroBalanceToken(pubkey: string) {
 export function removeClosedTokenKeys(pubkey: string) {
   removeHiddenToken(pubkey);
   removeZeroBalanceToken(pubkey);
+}
+
+export function isUsernameBannerDisplayed() {
+  const item = localStorage.getItem(USERNAME_BANNER_KEY) as string;
+  if (!item) return true;
+  return JSON.parse(item);
+}
+
+export function hideUsernameBanner() {
+  localStorage.setItem(USERNAME_BANNER_KEY, 'false');
 }
