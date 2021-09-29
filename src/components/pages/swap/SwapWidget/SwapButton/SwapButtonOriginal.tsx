@@ -1,7 +1,9 @@
 import React, { FC, useState } from 'react';
 
-import { useCanSwap, useMarket, useSwapContext, useTokenMap } from '@project-serum/swap-ui';
-
+import { useSwap } from 'app/contexts/swap';
+import { useMarket } from 'app/contexts/swap/dex';
+import { useCanSwap } from 'app/contexts/swap/swap';
+import { useTokenMap } from 'app/contexts/swap/tokenList';
 import { useSendSwap } from 'components/pages/swap/SwapWidget/SwapButton/hooks/useSendSwap';
 import { Button } from 'components/ui';
 import { swapNotification } from 'utils/transactionNotifications';
@@ -10,7 +12,7 @@ export const SwapButtonOriginal: FC = () => {
   const [isExecuting, setIsExecuting] = useState(false);
   const tokenMap = useTokenMap();
 
-  const { fromMint, toMint, fromAmount } = useSwapContext();
+  const { fromMint, toMint, fromAmount } = useSwap();
   const { swap, route } = useSendSwap();
   const canSwap = useCanSwap();
 

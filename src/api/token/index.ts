@@ -1,4 +1,3 @@
-import { SOL_MINT } from '@project-serum/swap-ui';
 import { AccountLayout, MintLayout, Token as SPLToken } from '@solana/spl-token';
 import { TokenInfo } from '@solana/spl-token-registry';
 import {
@@ -17,6 +16,7 @@ import assert from 'ts-invariant';
 import { getConnection } from 'api/connection';
 import { retryableProxy } from 'api/connection/utils/retryableProxy';
 import { getWallet, makeTransaction, sendTransaction } from 'api/wallet';
+import { SOL_MINT } from 'app/contexts/swap';
 import { NetworkType } from 'config/constants';
 import { SYSTEM_PROGRAM_ID, WRAPPED_SOL_MINT } from 'constants/solana/bufferLayouts';
 import { CacheTTL } from 'lib/cachettl';

@@ -1,19 +1,14 @@
 import { useCallback } from 'react';
 
 import { Provider } from '@project-serum/anchor';
-import {
-  FEE_MULTIPLIER,
-  SOL_MINT,
-  useDexContext,
-  useOpenOrders,
-  useSwapContext,
-  WRAPPED_SOL_MINT,
-} from '@project-serum/swap-ui';
 import { Token, TOKEN_PROGRAM_ID } from '@solana/spl-token';
 import { Keypair, PublicKey, Signer, SystemProgram, Transaction } from '@solana/web3.js';
 import BN from 'bn.js';
 
-import { useSwap } from './useSwap';
+import { SOL_MINT, useDex, useSwap, WRAPPED_SOL_MINT } from 'app/contexts/swap';
+import { FEE_MULTIPLIER, useOpenOrders } from 'app/contexts/swap/dex';
+
+import { useSwapData } from './useSwapData';
 
 async function wrapSol(
   provider: Provider,
@@ -74,10 +69,10 @@ function unwrapSol(
 }
 
 export const useSendSwap = () => {
-  const { swapClient } = useDexContext();
+  const { swapClient } = useDex();
   const openOrders = useOpenOrders();
 
-  const { fromMint, toMint, fromAmount, slippage, isStrict } = useSwapContext();
+  const { fromMint, toMint, fromAmount, slippage, isStrict } = useSwap();
   const {
     fromMintInfo,
     toMintInfo,
@@ -91,7 +86,7 @@ export const useSendSwap = () => {
     quoteWallet,
     fair,
     referral,
-  } = useSwap({ fromMint, toMint });
+  } = useSwapData({ fromMint, toMint });
 
   const swap = useCallback(async () => {
     if (!fromMintInfo || !toMintInfo) {

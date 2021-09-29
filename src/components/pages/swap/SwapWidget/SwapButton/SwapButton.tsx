@@ -1,12 +1,12 @@
 import React, { FC } from 'react';
 
-import { SOL_MINT, useSwapContext } from '@project-serum/swap-ui';
+import { SOL_MINT, useSwap } from 'app/contexts/swap';
 
 // import { SwapButtonFeeRelayer } from './SwapButtonFeeRelayer';
 import { SwapButtonOriginal } from './SwapButtonOriginal';
 
 export const SwapButton: FC = () => {
-  const { fromMint } = useSwapContext();
+  const { fromMint } = useSwap();
 
   const isSol = fromMint.equals(SOL_MINT);
 

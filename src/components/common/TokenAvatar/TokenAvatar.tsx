@@ -2,10 +2,10 @@ import React, { FunctionComponent, HTMLAttributes, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 
 import { styled } from '@linaria/react';
-import { useTokenMap } from '@project-serum/swap-ui';
 import classNames from 'classnames';
 
 import tokenList from 'api/token/token.config';
+import { useTokenMap } from 'app/contexts/swap/tokenList/hooks';
 import { Jazzicon } from 'components/common/TokenAvatar/Jazzicon';
 import { Avatar } from 'components/ui';
 
@@ -61,7 +61,7 @@ export const TokenAvatar: FunctionComponent<Props & HTMLAttributes<HTMLDivElemen
   // TODO: need to add cluster
   const tokenMap = useTokenMap();
   const tokenInfo =
-    tokenMap.get(address) ||
+    tokenMap.get(address!) ||
     tokenList
       .filterByClusterSlug(cluster)
       .getList()

@@ -1,9 +1,9 @@
 import React, { FunctionComponent, useState } from 'react';
 
 import { styled } from '@linaria/react';
-import { useSwapContext } from '@project-serum/swap-ui';
 import classNames from 'classnames';
 
+import { useSwap } from 'app/contexts/swap';
 import { Button, Icon, Input } from 'components/ui';
 import { trackEvent } from 'utils/analytics';
 
@@ -139,7 +139,7 @@ const BottomButton = styled(Button)`
 export const SettingsAction: FunctionComponent = () => {
   const [isShow, setIsShow] = useState(false);
   const [isCustomShow, setIsCustomShow] = useState(false);
-  const { slippage, setSlippage } = useSwapContext();
+  const { slippage, setSlippage } = useSwap();
   const [nextSlippage, setNextSlippage] = useState(String(slippage));
 
   const handleToggleShow = () => {

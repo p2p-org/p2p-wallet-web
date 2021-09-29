@@ -1,9 +1,9 @@
 import React, { FC, useState } from 'react';
 
 import { styled } from '@linaria/react';
-import { useSwapContext } from '@project-serum/swap-ui';
 import classNames from 'classnames';
 
+import { useSwap } from 'app/contexts/swap';
 import { Accordion, Button, Input } from 'components/ui';
 
 const Title = styled.div`
@@ -76,7 +76,7 @@ const CustomLabel = styled.label`
 interface Props {}
 
 export const Slippage: FC<Props> = (props) => {
-  const { slippage, setSlippage } = useSwapContext();
+  const { slippage, setSlippage } = useSwap();
   const [isCustomShow, setIsCustomShow] = useState(false);
   const [localSlippage, setLocalSlippage] = useState(String(slippage));
 

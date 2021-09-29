@@ -1,14 +1,10 @@
-import {
-  useMarket,
-  useMint,
-  useOwnedTokenAccount,
-  useReferral,
-  useRouteVerbose,
-} from '@project-serum/swap-ui';
-import { useFairRoute } from '@project-serum/swap-ui';
 import { PublicKey } from '@solana/web3.js';
 
-type UseSwapReturn = {
+import { useFairRoute, useMarket, useRouteVerbose } from 'app/contexts/swap/dex';
+import { useReferral } from 'app/contexts/swap/swap';
+import { useMint, useOwnedTokenAccount } from 'app/contexts/swap/token';
+
+interface UseSwapData {
   fromMintInfo: ReturnType<typeof useMint>;
   toMintInfo: ReturnType<typeof useMint>;
   fromWallet: ReturnType<typeof useOwnedTokenAccount>;
@@ -21,15 +17,15 @@ type UseSwapReturn = {
   quoteWallet: ReturnType<typeof useOwnedTokenAccount>;
   fair: ReturnType<typeof useFairRoute>;
   referral: ReturnType<typeof useReferral>;
-};
+}
 
-export const useSwap = ({
+export const useSwapData = ({
   fromMint,
   toMint,
 }: {
   fromMint: PublicKey;
   toMint: PublicKey;
-}): UseSwapReturn => {
+}): UseSwapData => {
   const fromMintInfo = useMint(fromMint);
   const toMintInfo = useMint(toMint);
 

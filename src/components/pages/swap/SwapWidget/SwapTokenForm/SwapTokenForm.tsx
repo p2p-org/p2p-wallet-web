@@ -2,18 +2,14 @@ import React, { FC, useEffect, useMemo, useRef, useState } from 'react';
 
 import { styled } from '@linaria/react';
 import { Market } from '@project-serum/serum';
-import {
-  useMint,
-  useOwnedTokenAccount,
-  useSwappableTokens,
-  useTokenMap,
-} from '@project-serum/swap-ui';
 import { PublicKey } from '@solana/web3.js';
 import classNames from 'classnames';
 import { Decimal } from 'decimal.js';
 import throttle from 'lodash.throttle';
 import { isNil } from 'ramda';
 
+import { useMint, useOwnedTokenAccount } from 'app/contexts/swap/token';
+import { useSwappableTokens, useTokenMap } from 'app/contexts/swap/tokenList';
 import { AmountUSD } from 'components/common/AmountUSD';
 import { Empty } from 'components/common/Empty';
 import { SlideContainer } from 'components/common/SlideContainer';
@@ -311,7 +307,7 @@ interface Props {
   setMint: (m: PublicKey) => void;
   amount: number;
   setAmount: (a: number) => void;
-  market: Market | undefined;
+  market?: Market;
   disabled?: boolean;
   disabledInput?: boolean;
   className?: string;

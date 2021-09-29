@@ -28,20 +28,20 @@
     "@loadable/component": "^5.14.1",
     "@material-ui/core": "^4.12.3",
     "@material-ui/icons": "^4.11.2",
-    "@project-serum/anchor": "^0.11.1",
+    "@project-serum/anchor": "^0.16.2",
+    "@project-serum/serum": "^0.13.60",
     "@project-serum/sol-wallet-adapter": "^0.2.0",
     "@project-serum/swap": "^0.1.0-alpha.31",
-    "@project-serum/swap-ui": "git+https://github.com/beautyfree/swap-ui.git",
     "@reduxjs/toolkit": "^1.5.0",
     "@renproject/chains-bitcoin": "^2.5.1",
     "@renproject/chains-solana": "^2.5.1",
     "@renproject/interfaces": "^2.5.1",
     "@renproject/ren": "^2.5.1",
     "@renproject/ren-tx": "^2.5.1",
-    "@solana/spl-token": "^0.1.4",
-    "@solana/spl-token-registry": "^0.2.216",
+    "@solana/spl-token": "^0.1.8",
+    "@solana/spl-token-registry": "^0.2.268",
     "@solana/spl-token-swap": "^0.1.0",
-    "@solana/web3.js": "^1.21.0",
+    "@solana/web3.js": "^1.29.2",
     "@transak/transak-sdk": "^1.0.28",
     "@ukstv/jazzicon-react": "^1.0.0",
     "@xstate/react": "^1.5.1",
@@ -85,6 +85,7 @@
     "sanitize.css": "^12.0.1",
     "ts-invariant": "^0.5.1",
     "tweetnacl": "^1.0.3",
+    "unstated-next": "^1.1.0",
     "xstate": "^4.23.1",
     "yarn": "^1.22.10"
   },
@@ -152,10 +153,6 @@
     "svg-sprite-loader": "^6.0.5",
     "svgo-loader": "^3.0.0",
     "typescript": "^4.2.3"
-  },
-  "resolutions": {
-    "@project-serum/swap-ui/react": "17.0.2",
-    "@project-serum/swap-ui/react-dom": "17.0.2"
   },
   "browserslist": {
     "production": [

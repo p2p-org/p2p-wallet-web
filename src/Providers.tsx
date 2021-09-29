@@ -1,16 +1,19 @@
 import React, { FC, useEffect, useState } from 'react';
 
-import { TokenListContextProvider } from '@project-serum/swap-ui';
-import { TokenListContainer, TokenListProvider } from '@solana/spl-token-registry';
+import {
+  TokenListContainer as SPLTokenListContainer,
+  TokenListProvider as SPLTokenListProvider,
+} from '@solana/spl-token-registry';
 
+import { TokenListProvider } from 'app/contexts/swap';
 import { LockAndMintProvider } from 'utils/providers/LockAndMintProvider';
 import { SolanaContextProvider } from 'utils/providers/SolnaProvider';
 
 export const Providers: FC = ({ children }) => {
-  const [tokenList, setTokenList] = useState<TokenListContainer | null>(null);
+  const [tokenList, setTokenList] = useState<SPLTokenListContainer | null>(null);
 
   useEffect(() => {
-    void new TokenListProvider().resolve().then(setTokenList);
+    void new SPLTokenListProvider().resolve().then(setTokenList);
   }, [setTokenList]);
 
   if (!tokenList) {
@@ -18,10 +21,10 @@ export const Providers: FC = ({ children }) => {
   }
 
   return (
-    <TokenListContextProvider tokenList={tokenList}>
+    <TokenListProvider initialState={{ tokenList }}>
       <SolanaContextProvider>
         <LockAndMintProvider>{children}</LockAndMintProvider>
       </SolanaContextProvider>
-    </TokenListContextProvider>
+    </TokenListProvider>
   );
 };

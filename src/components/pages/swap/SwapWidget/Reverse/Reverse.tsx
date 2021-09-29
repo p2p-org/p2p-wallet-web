@@ -1,8 +1,8 @@
 import React, { FC } from 'react';
 
 import { styled } from '@linaria/react';
-import { useSwapContext } from '@project-serum/swap-ui';
 
+import { useSwap } from 'app/contexts/swap';
 import { Icon } from 'components/ui';
 
 const ReverseWrapper = styled.div`
@@ -30,7 +30,7 @@ const ReverseIcon = styled(Icon)`
 `;
 
 export const Reverse: FC = () => {
-  const { swapToFromMints } = useSwapContext();
+  const { swapToFromMints } = useSwap();
 
   const handleReverseClick = () => {
     swapToFromMints();

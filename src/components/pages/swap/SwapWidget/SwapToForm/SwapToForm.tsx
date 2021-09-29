@@ -1,6 +1,6 @@
 import React, { FC } from 'react';
 
-import { useSwapContext } from '@project-serum/swap-ui';
+import { useSwap } from 'app/contexts/swap';
 
 import { SwapTokenForm } from '../SwapTokenForm';
 
@@ -9,7 +9,8 @@ interface Props {
 }
 
 export const SwapToForm: FC<Props> = ({ className }) => {
-  const { toMint, setToMint, toAmount, setToAmount } = useSwapContext();
+  const { toMint, setToMint, toAmount, setToAmount } = useSwap();
+
   return (
     <SwapTokenForm
       from={false}

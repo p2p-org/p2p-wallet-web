@@ -1,8 +1,9 @@
 import React, { FC } from 'react';
 
 import { styled } from '@linaria/react';
-import { useSwapContext } from '@project-serum/swap-ui';
 import { isNil } from 'ramda';
+
+import { useSwap } from 'app/contexts/swap';
 
 // import { TooltipRow, TxName, TxValue } from 'components/common/SendSwapWidget/common/styled';
 // import { Tooltip } from 'components/ui';
@@ -37,7 +38,7 @@ const PropertyValue = styled.div`
 // `;
 
 export const Properties: FC = () => {
-  const { slippage } = useSwapContext();
+  const { slippage } = useSwap();
 
   return (
     <Wrapper>

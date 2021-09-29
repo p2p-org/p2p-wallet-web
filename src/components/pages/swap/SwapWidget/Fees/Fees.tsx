@@ -2,7 +2,10 @@ import React, { FC } from 'react';
 
 import { styled } from '@linaria/react';
 
+import { SOL_MINT, useSwap } from 'app/contexts/swap';
 import { Accordion } from 'components/ui';
+
+import { FeesOriginal } from './FeesOriginal';
 
 const Line = styled.div`
   display: flex;
@@ -26,6 +29,10 @@ const Value = styled.div`
 `;
 
 export const Fees: FC = () => {
+  const { fromMint } = useSwap();
+
+  const isSol = fromMint.equals(SOL_MINT);
+
   return (
     <Accordion title="Swap fees" noContentPadding>
       <Line>
@@ -36,6 +43,7 @@ export const Fees: FC = () => {
       {/*  <Label>Network fee</Label>*/}
       {/*  <Value>0.00409856 SOL</Value>*/}
       {/*</Line>*/}
+      {isSol ? <FeesOriginal /> : <FeesOriginal />}
     </Accordion>
   );
 };

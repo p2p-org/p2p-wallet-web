@@ -1,8 +1,11 @@
 import React, { FC, useState } from 'react';
 
 import { styled } from '@linaria/react';
-import { useFairRoute, useMint, useSwapContext, useTokenMap } from '@project-serum/swap-ui';
 
+import { useSwap } from 'app/contexts/swap';
+import { useFairRoute } from 'app/contexts/swap/dex';
+import { useMint } from 'app/contexts/swap/token';
+import { useTokenMap } from 'app/contexts/swap/tokenList';
 import { Icon } from 'components/ui';
 
 const Wrapper = styled.div`
@@ -55,7 +58,7 @@ const ChangeRateIcon = styled(Icon)`
 
 export const PriceLine: FC = () => {
   const [isReverse, setIsReverse] = useState(false);
-  const { fromMint: fromMintTemp, toMint: toMintTemp } = useSwapContext();
+  const { fromMint: fromMintTemp, toMint: toMintTemp } = useSwap();
 
   const fromMint = isReverse ? fromMintTemp : toMintTemp;
   const toMint = isReverse ? toMintTemp : fromMintTemp;

@@ -14,7 +14,7 @@ module.exports = {
           lib: './src/lib',
           store: './src/store',
           api: './src/api',
-          features: './src/features',
+          app: './src/app',
           pages: './src/pages',
           components: './src/components',
           assets: './src/assets',

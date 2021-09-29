@@ -1,10 +1,11 @@
 import React, { FunctionComponent } from 'react';
 
 import { styled } from '@linaria/react';
-import { useOwnedTokenAccount, useTokenMap } from '@project-serum/swap-ui';
 import { PublicKey } from '@solana/web3.js';
 import { Decimal } from 'decimal.js';
 
+import { useOwnedTokenAccount } from 'app/contexts/swap/token';
+import { useTokenMap } from 'app/contexts/swap/tokenList';
 import { AmountUSD } from 'components/common/AmountUSD';
 import { TokenAvatar } from 'components/common/TokenAvatar';
 import { shortAddress } from 'utils/tokens';
