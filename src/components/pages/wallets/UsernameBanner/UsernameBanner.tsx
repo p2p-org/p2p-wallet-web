@@ -8,6 +8,7 @@ import { styled } from '@linaria/react';
 import { Icon } from 'components/ui';
 import { openModal } from 'store/actions/modals';
 import { SHOW_MODAL_PROCEED_USERNAME } from 'store/constants/modalTypes';
+import { useUsername } from 'utils/hooks/useUsername';
 import { isUsernameBannerDisplayed } from 'utils/settings';
 
 const Wrapper = styled.div`
@@ -80,10 +81,15 @@ const Text = styled.div`
 export const UsernameBanner: FC = () => {
   const dispatch = useDispatch();
   const [isBannerDisplayed, setIsBannerDisplayed] = useState<boolean>(true);
+  const { username } = useUsername();
 
   useEffect(() => {
-    setIsBannerDisplayed(isUsernameBannerDisplayed());
-  }, [setIsBannerDisplayed]);
+    if (username) {
+      setIsBannerDisplayed(false);
+    } else {
+      setIsBannerDisplayed(isUsernameBannerDisplayed());
+    }
+  }, [setIsBannerDisplayed, username]);
 
   const onClose = async () => {
     const result = await dispatch(

@@ -76,3 +76,6 @@ export const networks: NetworksByNameType = {
 export const DEFAULT_NETWORK: NetworkType = networks['serum-mainnet'];
 
 export const feeRelayerUrl = process.env.REACT_APP_FEE_RELAYER_URL;
+
+export const nameSericeUrl =
+  process.env.REACT_APP_NAME_SERVICE_URL || `${feeRelayerUrl}/name_register`;

@@ -10,6 +10,8 @@ import Decimal from 'decimal.js';
 import { mergeDeepRight } from 'ramda';
 
 import { APIFactory as FeeRelayerAPIFactory } from 'api/feeRelayer';
+import { LookupResponce } from 'api/nameService';
+import { APIFactory as NameServiceApi } from 'api/nameService';
 import { API, APIFactory as TokenAPIFactory, TransferParameters } from 'api/token';
 import { AccountListener } from 'api/token/AccountListener';
 import colors from 'api/token/colors.config';
@@ -70,6 +72,7 @@ export interface WalletsState {
   hiddenTokens: Array<string> | null;
   settings: WalletSettings;
   zeroBalanceTokens: Array<string>;
+  username: string | null;
 }
 
 /**
@@ -307,12 +310,21 @@ export const connectWallet = createAsyncThunk<string, WalletDataType | undefined
     void thunkAPI.dispatch(getTokenAccountsForWallet());
     void thunkAPI.dispatch(getRatesMarkets());
     void thunkAPI.dispatch(getRatesCandle({ symbol: 'SOL', type: 'month' }));
+    void thunkAPI.dispatch(lookupName(wallet.pubkey.toBase58()));
 
     if (swapHostFeeAddress) {
       void thunkAPI.dispatch(precacheTokenAccounts(swapHostFeeAddress));
     }
 
     return wallet.pubkey.toBase58();
+  },
+);
+
+export const lookupName = createAsyncThunk<LookupResponce | null, string>(
+  `${WALLET_SLICE_NAME}/lookupName`,
+  async (owner) => {
+    const names = await NameServiceApi(owner).lookupName(owner);
+    return names.length > 0 ? names[0] : null;
   },
 );
 
@@ -463,6 +475,7 @@ const makeInitialState = (): WalletsState => ({
   hiddenTokens: Array.from(loadHiddenTokens()),
   settings: loadSettings(),
   zeroBalanceTokens: Array.from(loadZeroBalanceTokens()),
+  username: null,
 });
 
 /**
@@ -546,6 +559,13 @@ const walletSlice = createSlice({
       return {
         ...state,
         tokenAccounts: [],
+      };
+    });
+
+    builder.addCase(lookupName.fulfilled, (state, action) => {
+      return {
+        ...state,
+        username: (action.payload as LookupResponce)?.name,
       };
     });
   },
