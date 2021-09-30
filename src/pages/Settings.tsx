@@ -1,17 +1,20 @@
 import React, { FunctionComponent, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router';
-import { useLocation } from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router-dom';
 
 import { styled } from '@linaria/react';
+import classNames from 'classnames';
 import { Feature } from 'flagged';
 import { rgba } from 'polished';
 
 import { forgetWallet } from 'api/wallet/ManualWallet';
+import AppStoreBadge from 'assets/images/app-store-badge.png';
+import GooglePlayBadge from 'assets/images/google-play-badge.png';
 import { Card } from 'components/common/Card';
 import { Layout } from 'components/common/Layout';
 import { WidgetPage } from 'components/common/WidgetPage';
-import { Icon, Select, Switch } from 'components/ui';
+import { Accordion, Icon, Select, Switch } from 'components/ui';
 import { MenuItem } from 'components/ui/Select/MenuItem';
 import { FEATURE_SETTINGS_FREE_TRANSACTIONS, FEATURE_SETTINGS_LIST } from 'config/featureFlags';
 import { disconnect, updateSettings } from 'store/slices/wallet/WalletSlice';
@@ -168,6 +171,32 @@ const ChevronWrapper = styled.div`
   transform: rotate(270deg);
 `;
 
+const AccordionWrapper = styled.div`
+  padding: 0 20px;
+`;
+
+const AccordionTitle = styled.div`
+  display: flex;
+  justify-content: space-between;
+  width: 95%;
+`;
+
+const AccordionTitlePrimary = styled.div``;
+
+const AccordionTitleSecondary = styled.div`
+  &.warning {
+    color: #f43d3d;
+  }
+`;
+
+const MobileButtons = styled.div`
+  display: flex;
+  justify-content: space-between;
+
+  width: 263px;
+  padding: 5px 0;
+`;
+
 type RowProps = {
   icon: string;
   title: React.ReactNode;
@@ -260,6 +289,41 @@ export const Settings: FunctionComponent = () => {
                   }
                 />
               </Feature>
+              <AccordionWrapper>
+                <Accordion
+                  open={(location.state as any)?.isUsernameActive}
+                  title={
+                    <AccordionTitle>
+                      <AccordionTitlePrimary>Username</AccordionTitlePrimary>
+                      <AccordionTitleSecondary className={classNames({ warning: true })}>
+                        Not yet reserved
+                      </AccordionTitleSecondary>
+                    </AccordionTitle>
+                  }>
+                  <div style={{ marginBottom: '20px' }}>
+                    You can receive and send tokens using your P2P username or link. Also, users,
+                    who know your URL or username can send you any token, even if you don’t have it
+                    in your wallets list.
+                  </div>
+                  <div>You can access the feature in the app</div>
+                  <MobileButtons>
+                    <NavLink
+                      to={{ pathname: 'https://google.com' }}
+                      target="_blank"
+                      className="button">
+                      {/* eslint-disable-next-line jsx-a11y/alt-text */}
+                      <img src={GooglePlayBadge} width="135" height="40" />
+                    </NavLink>
+                    <NavLink
+                      to={{ pathname: 'https://apple.com/' }}
+                      target="_blank"
+                      className="button">
+                      {/* eslint-disable-next-line jsx-a11y/alt-text */}
+                      <img src={AppStoreBadge} width="120" height="40" />
+                    </NavLink>
+                  </MobileButtons>
+                </Accordion>
+              </AccordionWrapper>
               <Row
                 icon="branch"
                 title="Network"

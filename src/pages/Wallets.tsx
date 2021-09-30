@@ -3,7 +3,7 @@ import React, { FunctionComponent, useEffect, useState } from 'react';
 import { styled } from '@linaria/react';
 
 import { Layout } from 'components/common/Layout';
-import { TokensWidget } from 'components/pages/wallets';
+import { TokensWidget, UsernameBanner } from 'components/pages/wallets';
 import { TotalBalanceWidget } from 'components/pages/wallets/TotalBalanceWidget';
 import { trackEvent } from 'utils/analytics';
 
@@ -32,6 +32,7 @@ export const Wallets: FunctionComponent = () => {
     <Layout
       rightColumn={
         <WrapperTemp>
+          <UsernameBanner />
           <TotalBalanceWidget onSymbolChange={handleSymbolChange} />
           <TokensWidget selectedSymbol={selectedSymbol} />
         </WrapperTemp>

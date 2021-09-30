@@ -2,12 +2,10 @@ import React, { FunctionComponent, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 
 import { styled } from '@linaria/react';
-import TransakSDK from '@transak/transak-sdk';
 
 import { TokenAccount } from 'api/token/TokenAccount';
 import { LoaderBlock } from 'components/common/LoaderBlock';
 import { Widget } from 'components/common/Widget';
-import { Button } from 'components/ui';
 import { rateSelector } from 'store/selectors/rates';
 
 import { DonutChart, DonutChartData } from '../DonutChart';
@@ -60,7 +58,6 @@ type Props = {
 };
 
 export const TotalBalanceWidget: FunctionComponent<Props> = ({ onSymbolChange }) => {
-  const publicKey = useSelector((state) => state.wallet.publicKey);
   const tokenAccounts = useSelector((state) =>
     state.wallet.tokenAccounts.map((account) => TokenAccount.from(account)),
   );
@@ -144,47 +141,8 @@ export const TotalBalanceWidget: FunctionComponent<Props> = ({ onSymbolChange })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tokenAccounts]);
 
-  const handleTopUpClick = () => {
-    const transak = new TransakSDK({
-      apiKey: process.env.REACT_APP_TRANSAK_API_KEY, // Your API Key
-      environment: 'STAGING', // STAGING/PRODUCTION
-      defaultCryptoCurrency: 'SOL',
-      cryptoCurrencyList: 'SOL,USDC',
-      networks: 'solana,mainnet',
-      walletAddress: publicKey, // Your customer's wallet address
-      themeColor: '5887FF', // App theme color
-      fiatCurrency: '', // INR/GBP
-      email: '', // Your customer's email address
-      redirectURL: '',
-      hostURL: window.location.origin,
-      widgetHeight: '680px',
-      widgetWidth: '500px',
-    });
-
-    transak.init();
-
-    // To get all the events
-    transak.on(transak.ALL_EVENTS, (data: any) => {
-      console.log(data);
-    });
-
-    // This will trigger when the user marks payment is made.
-    transak.on(transak.EVENTS.TRANSAK_ORDER_SUCCESSFUL, (orderData: any) => {
-      console.log(orderData);
-      transak.close();
-    });
-  };
-
   return (
-    <WrapperWidget
-      title={`${greeting} 👋`}
-      action={
-        process.env.REACT_APP_TRANSAK_API_KEY ? (
-          <Button lightBlue onClick={handleTopUpClick}>
-            Top up
-          </Button>
-        ) : undefined
-      }>
+    <WrapperWidget title={`${greeting} 👋`}>
       <TotalWrapper>
         <PriceWrapper>
           <TotalText>Total balance</TotalText>

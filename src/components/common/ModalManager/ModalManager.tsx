@@ -10,6 +10,7 @@ import {
   SHOW_MODAL_ADD_COIN,
   SHOW_MODAL_CLOSE_TOKEN_ACCOUNT,
   SHOW_MODAL_ERROR,
+  SHOW_MODAL_PROCEED_USERNAME,
   SHOW_MODAL_TRANSACTION_CONFIRM,
   SHOW_MODAL_TRANSACTION_DETAILS,
   SHOW_MODAL_TRANSACTION_STATUS,
@@ -83,6 +84,7 @@ const modalsMap = new Map<string, LoadableComponent<any>>([
     SHOW_MODAL_CLOSE_TOKEN_ACCOUNT,
     loadable(() => import('components/modals/CloseTokenAccountModal')),
   ],
+  [SHOW_MODAL_PROCEED_USERNAME, loadable(() => import('components/modals/ProceedUsernameModal'))],
   [SHOW_MODAL_ERROR, loadable(() => import('components/modals/ErrorModal'))],
 ]);
 

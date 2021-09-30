@@ -11,6 +11,7 @@ import { ModalManager } from 'components/common/ModalManager';
 import { NotifyToast } from 'components/common/NotifyToast';
 import { ToastManager } from 'components/common/ToastManager';
 import { FEATURE_LANDING } from 'config/featureFlags';
+import { Buy } from 'pages/Buy';
 import { Home } from 'pages/Home';
 import { Landing } from 'pages/Landing';
 import { Receive } from 'pages/Receive';
@@ -50,6 +51,7 @@ const App: React.FC = () => {
             <AuthRequiredRoute path="/swap/:publicKey?" component={Swap} />
             <AuthRequiredRoute path="/settings/network" component={SettingsNetwork} />
             <AuthRequiredRoute path="/settings" component={Settings} />
+            <AuthRequiredRoute path="/buy" component={Buy} />
           </Switch>
           <Intercom />
         </Router>

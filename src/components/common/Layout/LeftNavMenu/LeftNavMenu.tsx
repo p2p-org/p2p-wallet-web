@@ -1,8 +1,10 @@
 import React, { FunctionComponent } from 'react';
+import { useSelector } from 'react-redux';
 import { useLocation } from 'react-router';
 import { NavLink } from 'react-router-dom';
 
 import { styled } from '@linaria/react';
+import TransakSDK from '@transak/transak-sdk';
 import { Feature } from 'flagged';
 
 import { Icon } from 'components/ui';
@@ -111,8 +113,61 @@ const Line = styled.hr`
   background: #f6f6f8;
 `;
 
+const BuyButton = styled.div`
+  cursor: pointer;
+
+  &:hover {
+    ${NavButton} {
+      color: #5887ff;
+
+      ${IconBlock} {
+        color: #5887ff;
+
+        background: #eff3ff;
+        border: 1px solid #5887ff;
+
+        ${NavIcon} {
+          color: #5887ff;
+        }
+      }
+    }
+  }
+`;
+
 export const LeftNavMenu: FunctionComponent = () => {
   const location = useLocation();
+  const publicKey = useSelector((state) => state.wallet.publicKey);
+
+  const handleTransakClick = () => {
+    const transak = new TransakSDK({
+      apiKey: process.env.REACT_APP_TRANSAK_API_KEY, // Your API Key
+      environment: 'STAGING', // STAGING/PRODUCTION
+      defaultCryptoCurrency: 'SOL',
+      cryptoCurrencyList: 'SOL,USDT',
+      networks: 'solana,mainnet',
+      walletAddress: publicKey, // Your customer's wallet address
+      themeColor: '5887FF', // App theme color
+      fiatCurrency: '', // INR/GBP
+      email: '', // Your customer's email address
+      redirectURL: '',
+      hostURL: window.location.origin,
+      widgetHeight: '680px',
+      widgetWidth: '500px',
+    });
+
+    transak.init();
+
+    // To get all the events
+    transak.on(transak.ALL_EVENTS, (data: any) => {
+      console.log(data);
+    });
+
+    // This will trigger when the user marks payment is made.
+    transak.on(transak.EVENTS.TRANSAK_ORDER_SUCCESSFUL, (orderData: any) => {
+      console.log(orderData);
+      transak.close();
+    });
+  };
 
   return (
     <Wrapper>
@@ -128,16 +183,18 @@ export const LeftNavMenu: FunctionComponent = () => {
       </NavLinkMenu>
 
       <Feature name={FEATURE_NAV_MENU_BUY_BUTTON}>
-        <NavLinkMenu
+        {/* <NavLinkMenu
           to={{ pathname: '/buy', state: { fromPage: location.pathname } }}
-          className="button">
+          className="button"> */}
+        <BuyButton className="button" onClick={handleTransakClick}>
           <NavButton>
             <IconBlock>
               <NavIcon name="plus" />
             </IconBlock>
             Buy
           </NavButton>
-        </NavLinkMenu>
+        </BuyButton>
+        {/* </NavLinkMenu> */}
       </Feature>
 
       <NavLinkMenu
