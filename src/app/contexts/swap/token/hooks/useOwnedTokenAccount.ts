@@ -1,5 +1,3 @@
-// Null => none exists.
-// Undefined => loading.
 import { useEffect, useState } from 'react';
 
 import { BN } from '@project-serum/anchor';
@@ -12,6 +10,8 @@ import { useToken } from '../../token';
 import { _OWNED_TOKEN_ACCOUNTS_CACHE } from '../common/cache';
 import { parseTokenAccountData } from '../utils/getOwnedAssociatedTokenAccounts';
 
+// Null => none exists.
+// Undefined => loading.
 export function useOwnedTokenAccount(
   mint?: PublicKey,
 ): { publicKey: PublicKey; account: TokenAccount } | null | undefined {

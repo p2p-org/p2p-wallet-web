@@ -6,8 +6,9 @@ import { rgba } from 'polished';
 import { Hint } from 'components/common/Hint';
 
 import { WrapperWidgetPage } from '../../../common/SendSwapWidget/common/styled';
+import { CurrentPrice } from './CurrentPrice';
 import { Fees } from './Fees';
-import { PriceLine } from './PriceLine';
+// import { PriceImpact } from './PriceImpact';
 // import { Properties } from './Properties';
 import { Reverse } from './Reverse';
 import serumLogo from './serum_logo.svg';
@@ -92,7 +93,8 @@ export const SwapWidget: FC = () => {
             <SwapToForm />
           </ToSwapWrapper>
           <Lines>
-            <PriceLine />
+            <CurrentPrice />
+            {/*<PriceImpact />*/}
             <Slippage />
             <Fees />
           </Lines>

@@ -1,7 +1,6 @@
 import React, { FC, useEffect, useMemo, useRef, useState } from 'react';
 
 import { styled } from '@linaria/react';
-import { Market } from '@project-serum/serum';
 import { PublicKey } from '@solana/web3.js';
 import classNames from 'classnames';
 import { Decimal } from 'decimal.js';
@@ -307,7 +306,7 @@ interface Props {
   setMint: (m: PublicKey) => void;
   amount: number;
   setAmount: (a: number) => void;
-  market?: Market;
+  minOrderSize?: number;
   disabled?: boolean;
   disabledInput?: boolean;
   className?: string;
@@ -319,7 +318,7 @@ export const SwapTokenForm: FC<Props> = ({
   setMint,
   amount,
   setAmount,
-  market,
+  minOrderSize,
   disabled,
   disabledInput,
   className,
@@ -345,8 +344,6 @@ export const SwapTokenForm: FC<Props> = ({
     tokenAccount.account.amount.toNumber() / 10 ** mintAccount.decimals;
 
   const hasBalance = (balance || 0) >= Number(localAmount);
-
-  const minOrderSize = market?.minOrderSize ? market.minOrderSize : 0;
 
   const boxShadow = useMemo(() => {
     return `0 5px 10px rgba(56, 60, 71, ${
@@ -445,7 +442,8 @@ export const SwapTokenForm: FC<Props> = ({
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     let nextAmount = e.target.value
       .replace(',', '.')
-      .replace(/[^\d.]/g, '')
+      .replace(/[^\d.,]/g, '')
+      .replace(/^0(\d+)/g, '$1')
       .replace(/^(\d*\.?)|(\d*)\.?/g, '$1$2');
 
     if (nextAmount === '.') {

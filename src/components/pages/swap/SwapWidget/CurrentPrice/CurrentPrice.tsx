@@ -56,7 +56,7 @@ const ChangeRateIcon = styled(Icon)`
   color: #a3a5ba;
 `;
 
-export const PriceLine: FC = () => {
+export const CurrentPrice: FC = () => {
   const [isReverse, setIsReverse] = useState(false);
   const { fromMint: fromMintTemp, toMint: toMintTemp } = useSwap();
 
@@ -65,6 +65,7 @@ export const PriceLine: FC = () => {
 
   const fromMintInfo = useMint(fromMint);
   const fair = useFairRoute(fromMint, toMint);
+
   const tokenMap = useTokenMap();
   const fromTokenInfo = tokenMap.get(fromMint.toString());
   const toTokenInfo = tokenMap.get(toMint.toString());

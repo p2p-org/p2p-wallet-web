@@ -2,11 +2,12 @@ import { useEffect, useState } from 'react';
 
 import * as anchor from '@project-serum/anchor';
 import { Market, OpenOrders } from '@project-serum/serum';
-import { Swap as SwapClient } from '@project-serum/swap';
 import { MintLayout } from '@solana/spl-token';
 import { PublicKey } from '@solana/web3.js';
 import * as assert from 'assert';
 import { createContainer } from 'unstated-next';
+
+import { Swap as SwapClient } from 'app/libs/swap';
 
 import { DEX_PID } from '../common/constants';
 import { setMintCache } from '../token/utils/setMintCache';
@@ -22,7 +23,11 @@ export interface UseDex {
   swapClient: SwapClient;
 }
 
-const useDexInternal = (props: any): UseDex => {
+export interface UseDexArgs {
+  swapClient: SwapClient;
+}
+
+const useDexInternal = (props: UseDexArgs): UseDex => {
   const [ooAccounts, setOoAccounts] = useState<Map<string, Array<OpenOrders>>>(new Map());
   const swapClient = props.swapClient;
 
@@ -60,8 +65,10 @@ const useDexInternal = (props: any): UseDex => {
     ).then(async (openOrders) => {
       const newOoAccounts = new Map();
       let markets = new Set<string>();
+
       openOrders.forEach((oo) => {
         markets.add(oo.market.toString());
+
         if (newOoAccounts.get(oo.market.toString())) {
           newOoAccounts.get(oo.market.toString()).push(oo);
         } else {

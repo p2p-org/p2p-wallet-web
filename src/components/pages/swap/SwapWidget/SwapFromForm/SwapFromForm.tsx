@@ -1,8 +1,7 @@
 import React, { FC } from 'react';
 
 import { useSwap } from 'app/contexts/swap';
-import { useMarket } from 'app/contexts/swap/dex';
-import { useRouteVerbose } from 'app/contexts/swap/dex';
+import { useMinOrder } from 'app/contexts/swap/dex';
 
 import { SwapTokenForm } from '../SwapTokenForm';
 
@@ -11,9 +10,8 @@ interface Props {
 }
 
 export const SwapFromForm: FC<Props> = ({ className }) => {
-  const { fromMint, toMint, setFromMint, fromAmount, setFromAmount } = useSwap();
-  const route = useRouteVerbose(fromMint, toMint);
-  const fromMarket = useMarket(route && route.markets ? route.markets[0] : undefined);
+  const { fromMint, setFromMint, fromAmount, setFromAmount } = useSwap();
+  const { minOrderSize } = useMinOrder();
 
   return (
     <SwapTokenForm
@@ -22,7 +20,7 @@ export const SwapFromForm: FC<Props> = ({ className }) => {
       setMint={setFromMint}
       amount={fromAmount}
       setAmount={setFromAmount}
-      market={fromMarket}
+      minOrderSize={minOrderSize}
       className={className}
     />
   );

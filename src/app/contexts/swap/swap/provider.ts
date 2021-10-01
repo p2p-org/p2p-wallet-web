@@ -104,16 +104,6 @@ const useSwapInternal = (props: UseSwapArgs = {}): UseSwap => {
     setFromAmount(fromAmount);
   }, [fair, fromAmount, setFromAmount]);
 
-  const swapToFromMints = useCallback(() => {
-    const oldFrom = fromMint;
-    const oldTo = toMint;
-    const oldToAmount = toAmount;
-
-    _setFromAmount(oldToAmount);
-    setFromMint(oldTo);
-    setToMint(oldFrom);
-  }, [fromMint, toAmount, toMint]);
-
   const setToAmount = useCallback(
     (amount: number) => {
       if (fair === undefined) {
@@ -127,6 +117,16 @@ const useSwapInternal = (props: UseSwapArgs = {}): UseSwap => {
     },
     [fair],
   );
+
+  const swapToFromMints = useCallback(() => {
+    const oldFrom = fromMint;
+    const oldTo = toMint;
+    const oldToAmount = toAmount;
+
+    _setFromAmount(oldToAmount);
+    setFromMint(oldTo);
+    setToMint(oldFrom);
+  }, [fromMint, toAmount, toMint]);
 
   return {
     fromMint,

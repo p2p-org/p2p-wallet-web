@@ -1,0 +1,1 @@
+export { CurrentPrice } from './CurrentPrice';

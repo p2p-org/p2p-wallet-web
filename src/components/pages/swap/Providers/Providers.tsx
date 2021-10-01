@@ -1,17 +1,30 @@
 import React, { FC, useEffect, useMemo, useState } from 'react';
 
+// import { useParams } from 'react-router-dom';
 import { Provider, Wallet } from '@project-serum/anchor';
-import { Swap as SwapClient } from '@project-serum/swap';
 import { TokenListContainer, TokenListProvider } from '@solana/spl-token-registry';
 import { ConfirmOptions } from '@solana/web3.js';
 
 import { getConnection } from 'api/connection';
 import { getWallet } from 'api/wallet';
 import { DexProvider, SwapProvider, TokenProvider } from 'app/contexts/swap';
+import { Swap as SwapClient } from 'app/libs/swap';
 
 export const Providers: FC = ({ children }) => {
+  // const { publicKey } = useParams<{ publicKey: string }>();
+
   const [tokenList, setTokenList] = useState<TokenListContainer | null>(null);
   const wallet = getWallet();
+
+  const fromMint = useMemo(
+    () => {
+      // TODO: need to load mint by publickey
+      return undefined;
+    },
+    [
+      /*publicKey*/
+    ],
+  );
 
   const provider = useMemo(() => {
     try {
@@ -31,6 +44,10 @@ export const Providers: FC = ({ children }) => {
     }
   }, [wallet]);
 
+  useEffect(() => {
+    void new TokenListProvider().resolve().then(setTokenList);
+  }, [setTokenList]);
+
   const swapClient = useMemo(() => {
     if (!tokenList || !provider) {
       return null;
@@ -39,18 +56,14 @@ export const Providers: FC = ({ children }) => {
     return new SwapClient(provider, tokenList);
   }, [provider, tokenList]);
 
-  useEffect(() => {
-    void new TokenListProvider().resolve().then(setTokenList);
-  }, [setTokenList]);
-
-  if (!tokenList || !provider) {
+  if (!swapClient || !tokenList || !provider) {
     return null;
   }
 
   return (
     <TokenProvider initialState={{ provider }}>
       <DexProvider initialState={{ swapClient }}>
-        <SwapProvider>{children}</SwapProvider>
+        <SwapProvider initialState={{ fromMint }}>{children}</SwapProvider>
       </DexProvider>
     </TokenProvider>
   );

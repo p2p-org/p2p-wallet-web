@@ -1,7 +1,7 @@
-import React, { FC, useState } from 'react';
+import React, { FC, useMemo, useState } from 'react';
 
 import { useSwap } from 'app/contexts/swap';
-import { useMarket } from 'app/contexts/swap/dex';
+import { useMinOrder } from 'app/contexts/swap/dex';
 import { useCanSwap } from 'app/contexts/swap/swap';
 import { useTokenMap } from 'app/contexts/swap/tokenList';
 import { useSendSwap } from 'components/pages/swap/SwapWidget/SwapButton/hooks/useSendSwap';
@@ -12,17 +12,13 @@ export const SwapButtonOriginal: FC = () => {
   const [isExecuting, setIsExecuting] = useState(false);
   const tokenMap = useTokenMap();
 
-  const { fromMint, toMint, fromAmount } = useSwap();
+  const { fromMint, toMint } = useSwap();
   const { swap, route } = useSendSwap();
+  const { minOrderSize, isMinOrderSize } = useMinOrder();
   const canSwap = useCanSwap();
-
-  const fromMarket = useMarket(route && route.markets ? route.markets[0] : undefined);
-  const minOrderSize = fromMarket?.minOrderSize ? fromMarket.minOrderSize : 0;
 
   const fromTokenInfo = tokenMap.get(fromMint.toString());
   const toTokenInfo = tokenMap.get(toMint.toString());
-
-  const isMinAmount = Number(fromAmount) ? Number(fromAmount) >= minOrderSize : false;
 
   const onSwapClick = async () => {
     setIsExecuting(true);
@@ -48,27 +44,25 @@ export const SwapButtonOriginal: FC = () => {
         ...notificationParams,
       });
     } catch (error) {
-      console.error('Something wrong with swap:', error);
+      console.error('Something wrong with swap:', error.toString());
 
       swapNotification({
         header: 'Swap didn’t complete!',
         status: 'error',
         ...notificationParams,
-        text: (error as Error).message,
+        text: (error as Error).toString(),
       });
-
-      throw error;
     } finally {
       setIsExecuting(false);
     }
   };
 
-  const renderActionText = () => {
+  const renderActionText = useMemo(() => {
     if (isExecuting) {
       return 'Processing...';
     }
 
-    if (!isMinAmount) {
+    if (!isMinOrderSize) {
       return `Amount is under min order size ${minOrderSize}`;
     }
 
@@ -81,13 +75,13 @@ export const SwapButtonOriginal: FC = () => {
     }
 
     return 'This pair is unavailable';
-  };
+  }, [fromMint, isExecuting, isMinOrderSize, minOrderSize, route, toMint]);
 
-  const isDisabled = !canSwap || !isMinAmount;
+  const isDisabled = !canSwap || !isMinOrderSize;
 
   return (
     <Button primary disabled={isDisabled} big full onClick={onSwapClick}>
-      {renderActionText()}
+      {renderActionText}
     </Button>
   );
 };
