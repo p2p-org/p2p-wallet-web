@@ -77,6 +77,7 @@ export const useMinOrder = () => {
     fromMarket?.decoded.baseMint,
     fromMarket?.minOrderSize,
     fromMint,
+    fromMintInfo,
     quoteExchangeRate,
     route?.markets?.length,
     toExchangeRate,
