@@ -36,6 +36,7 @@ import { minorAmountToMajor } from 'utils/amount';
 import { trackEvent } from 'utils/analytics';
 import { useRenNetwork } from 'utils/hooks/renBridge/useNetwork';
 import { useTrackEventOnce } from 'utils/hooks/useTrackEventOnce';
+import { useFetchFees } from 'utils/providers/LockAndMintProvider';
 
 import { Hint } from '../../Hint';
 import {
@@ -195,6 +196,16 @@ const formatFee = (amount: number): number =>
     .toDecimalPlaces(9)
     .toNumber();
 
+const getTransactionFee = (amount: string, fees: any) => {
+  const amountNumber = Number(amount);
+  const renTxTypeFee = fees.burn;
+  const networkFee = Number(fees.release) / 10 ** 8;
+  const renVMFee = Number(renTxTypeFee) / 10000; // percent value
+  const renVMFeeAmount = Number(amountNumber * renVMFee);
+  const total = Number(Number(amountNumber - renVMFeeAmount - networkFee).toFixed(6));
+  return total > 0 ? total : 0;
+};
+
 export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
   const dispatch = useDispatch();
   const history = useHistory();
@@ -208,9 +219,12 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
   const [isConfirmCorrectAddress, setIsConfirmCorrectAddress] = useState(false);
   const [destinationNetwork, setDestinationNetwork] = useState(SOURCE_NETWORKS[0]);
   const [isInitBurnAndRelease, setIsInitBurnAndRelease] = useState(false);
+  const [renBtcMinimalAmount, setRenBtcMinimalAmount] = useState(0);
 
   const network = useRenNetwork();
   const isSolanaNetwork = destinationNetwork === 'solana';
+
+  const { fees, pending: isFetchingFee } = useFetchFees(!isSolanaNetwork);
 
   const tokenAccounts = useSelector((state: RootState) =>
     state.wallet.tokenAccounts.map((account) => TokenAccount.from(account)),
@@ -394,6 +408,10 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
 
   const handleFromAmountChange = (minorAmount: string, type?: string) => {
     setFromAmount(minorAmount);
+    if (!isSolanaNetwork && !isFetchingFee) {
+      const amount = getTransactionFee(minorAmount, fees);
+      setRenBtcMinimalAmount(amount);
+    }
 
     if (type === 'available') {
       trackEvent('send_available_click', { sum: Number(minorAmount) });
@@ -438,6 +456,8 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
       );
     }
   }
+
+  const hasRenBtcMinimalAmount = isNetworkSourceSelectorVisible ? renBtcMinimalAmount > 0 : true;
 
   return (
     <div>
@@ -514,7 +534,8 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
                   isValidAmount(fromAmount) ||
                   (isSolanaNetwork && !isValidDestinationAddress) ||
                   !hasBalance ||
-                  (isShowConfirmAddressSwitch && !isConfirmCorrectAddress)
+                  (isShowConfirmAddressSwitch && !isConfirmCorrectAddress) ||
+                  !hasRenBtcMinimalAmount
                 }
                 big
                 full
