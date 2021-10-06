@@ -457,7 +457,8 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
     }
   }
 
-  const hasRenBtcMinimalAmount = isNetworkSourceSelectorVisible ? renBtcMinimalAmount > 0 : true;
+  const hasRenBtcMinimalAmount =
+    isNetworkSourceSelectorVisible && !isSolanaNetwork ? renBtcMinimalAmount > 0 : true;
 
   return (
     <div>
