@@ -35,7 +35,7 @@ export type NetworkType = {
 
 export type NetworkNameType =
   | 'serum-mainnet'
-  | 'free-rpcpool'
+  | 'p2p-rpcpool'
   | 'solana-mainnet'
   | 'solana-devnet'
   | 'solana-testnet';
@@ -46,15 +46,15 @@ type NetworksByNameType = {
 };
 
 export const networks: NetworksByNameType = {
+  'p2p-rpcpool': {
+    name: 'p2p-rpcpool',
+    cluster: 'mainnet-beta',
+    endpoint: 'https://p2p.rpcpool.com/',
+  },
   'serum-mainnet': {
     name: 'serum-mainnet',
     cluster: 'mainnet-beta',
     endpoint: 'https://solana-api.projectserum.com',
-  },
-  'free-rpcpool': {
-    name: 'free-rpcpool',
-    cluster: 'mainnet-beta',
-    endpoint: 'https://free.rpcpool.com',
   },
   'solana-mainnet': {
     name: 'solana-mainnet',
@@ -73,7 +73,7 @@ export const networks: NetworksByNameType = {
   },
 };
 
-export const DEFAULT_NETWORK: NetworkType = networks['serum-mainnet'];
+export const DEFAULT_NETWORK: NetworkType = networks['p2p-rpcpool'];
 
 export const feeRelayerUrl = process.env.REACT_APP_FEE_RELAYER_URL;
 
