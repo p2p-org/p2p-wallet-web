@@ -11,7 +11,8 @@ import { useSelector } from 'react-redux';
 
 import { Bitcoin } from '@renproject/chains-bitcoin';
 import { Solana } from '@renproject/chains-solana';
-import { getRenNetworkDetails } from '@renproject/interfaces';
+import { SolanaProvider } from '@renproject/chains-solana';
+import { getRenNetworkDetails, RenNetwork } from '@renproject/interfaces';
 import RenJS from '@renproject/ren';
 import {
   DepositStates,
@@ -47,11 +48,30 @@ type LockAndMintContext = {
   initializeConfig: () => void;
   gatewayAddress: string;
   expiryTime: number;
-  fee: number;
   deposits: Deposits;
 };
 
 const Context = createContext<null | LockAndMintContext>(null);
+
+type RenJSCache = Record<RenNetwork, RenJS>;
+
+const renJsCache: Partial<RenJSCache> = {};
+const getRenjs = (network: RenNetwork) => {
+  if (!renJsCache[network]) {
+    renJsCache[network] = new RenJS(network);
+  }
+  return renJsCache[network] as RenJS;
+};
+
+const chainsCache: any = {};
+const getChains = (network: RenNetwork, solanaProvider: SolanaProvider) => {
+  const { bitcoin, solana } = chainsCache;
+  if (!bitcoin && !solana) {
+    chainsCache.bitcoin = new Bitcoin();
+    chainsCache.solana = new Solana(solanaProvider, network);
+  }
+  return chainsCache;
+};
 
 const showDepositToast = (sourceTxConfs: number, sourceTxConfTarget: number) => {
   const isCompleted = sourceTxConfs !== sourceTxConfTarget;
@@ -151,38 +171,26 @@ const getActiveDepositId = (tx: GatewaySession<any>) => {
 const LockAndMintSession: FC<{
   nonce: string;
   onGatewayAddressInit: (address: string) => void;
-  onFeeChange: (fee: number) => void;
   onDepositChage: (depositId: string, deposit: DepositState) => void;
-}> = ({ nonce, onGatewayAddressInit, onFeeChange, onDepositChage }) => {
+}> = ({ nonce, onGatewayAddressInit, onDepositChage }) => {
   const solanaProvider = useSolana();
   const network = useRenNetwork();
+  const { bitcoin, solana } = getChains(network, solanaProvider);
   const lockAndMintParams = useMemo(() => {
     return {
-      sdk: new RenJS(network),
+      sdk: getRenjs(network),
       mintParams: {
         sourceAsset: Bitcoin.asset,
         network,
         destAddress: getWallet().pubkey.toBase58(),
         nonce: nonce,
       },
-      from: new Bitcoin(),
-      to: new Solana(solanaProvider, network),
+      from: bitcoin,
+      to: solana,
     };
-  }, [network, nonce, solanaProvider]);
+  }, [bitcoin, network, nonce, solana]);
 
   const mint = useLockAndMint(lockAndMintParams);
-  useEffect(() => {
-    const mount = async () => {
-      const fees = await lockAndMintParams.sdk.getFees({
-        asset: Bitcoin.asset,
-        from: lockAndMintParams.from,
-        to: lockAndMintParams.to,
-      });
-      onFeeChange(fees.lock ? fees.lock.toNumber() : 0);
-    };
-
-    mount();
-  }, [lockAndMintParams.from, lockAndMintParams.sdk, lockAndMintParams.to, onFeeChange]);
 
   useEffect(() => {
     onGatewayAddressInit((mint.session as OpenedGatewaySession<any>).gatewayAddress);
@@ -223,7 +231,6 @@ export const LockAndMintProvider: FC = ({ children }) => {
   const publicKey = useSelector((state) => state.wallet.publicKey);
   const [config, setConfig] = useState<MintConfig | null>(null);
   const [gatewayAddress, setGatewayAddress] = useState<string>('');
-  const [fee, setFee] = useState<number>(0);
   const [deposits, setDeposits] = useState<Deposits>({});
 
   useEffect(() => {
@@ -246,12 +253,6 @@ export const LockAndMintProvider: FC = ({ children }) => {
   const handleGatewayAddressInit = useCallback((address: string) => {
     if (address) {
       setGatewayAddress(address);
-    }
-  }, []);
-
-  const handleFee = useCallback((fee: number) => {
-    if (fee) {
-      setFee(fee);
     }
   }, []);
 
@@ -285,7 +286,6 @@ export const LockAndMintProvider: FC = ({ children }) => {
         <LockAndMintSession
           nonce={config.nonce}
           onGatewayAddressInit={handleGatewayAddressInit}
-          onFeeChange={handleFee}
           onDepositChage={handleDepositsChange}
         />
       ) : undefined}
@@ -294,7 +294,6 @@ export const LockAndMintProvider: FC = ({ children }) => {
           isConfigInitialized: !!config,
           initializeConfig,
           gatewayAddress,
-          fee,
           expiryTime,
           deposits,
         }}>
@@ -310,4 +309,49 @@ export const useLockAndMintProvider = (): LockAndMintContext => {
     throw new Error('Context not available');
   }
   return ctx;
+};
+
+const feesCache: any = {};
+export const useFetchFees = (isNeedLoadFee = true) => {
+  const solanaProvider = useSolana();
+  const network = useRenNetwork();
+  const { bitcoin, solana } = getChains(network, solanaProvider);
+  const initialFees = {
+    mint: 0,
+    burn: 0,
+    lock: 0,
+    release: 0,
+  };
+  const [fees, setFees] = useState(initialFees);
+  const [pending, setPending] = useState(false);
+
+  useEffect(() => {
+    const fetchFees = async () => {
+      setPending(true);
+      const rates = await getRenjs(network).getFees({
+        asset: Bitcoin.asset,
+        from: bitcoin,
+        to: solana,
+      });
+      setPending(false);
+      const fees = {
+        mint: rates.mint,
+        burn: rates.burn,
+        lock: rates.lock ? rates.lock.toNumber() : 0,
+        release: rates.release ? rates.release.toNumber() : 0,
+      };
+      setFees(fees);
+      feesCache.fees = fees;
+      feesCache.timestamp = Date.now();
+    };
+
+    if (
+      isNeedLoadFee &&
+      (!feesCache.timestamp || feesCache.timestamp + 1000 * 60 * 5 <= Date.now())
+    ) {
+      void fetchFees();
+    }
+  }, [bitcoin, isNeedLoadFee, network, solana]);
+
+  return { fees, pending };
 };

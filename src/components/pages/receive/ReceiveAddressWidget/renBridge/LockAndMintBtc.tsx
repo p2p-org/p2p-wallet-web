@@ -5,7 +5,9 @@ import { Bitcoin } from '@renproject/chains-bitcoin';
 import { getRenNetworkDetails } from '@renproject/interfaces';
 import { DepositStates } from '@renproject/ren-tx';
 
+import { Loader } from 'components/common/Loader';
 import { LoaderBlock } from 'components/common/LoaderBlock';
+import { UsernameAddressWidget } from 'components/common/UsernameAddressWidget';
 import { Icon } from 'components/ui';
 import { Accordion, Button } from 'components/ui';
 import { getFormattedHMS } from 'utils/dates';
@@ -13,10 +15,9 @@ import { getRemainingGatewayTime } from 'utils/hooks/renBridge/useLockAndMint';
 import { DepositTranstaction, formatAmount } from 'utils/hooks/renBridge/useLockAndMint';
 import { useRenNetwork } from 'utils/hooks/renBridge/useNetwork';
 import { useIntervalHook } from 'utils/hooks/useIntervalHook';
-import { useLockAndMintProvider } from 'utils/providers/LockAndMintProvider';
+import { useFetchFees, useLockAndMintProvider } from 'utils/providers/LockAndMintProvider';
 
-import { AddressQRCodePanel } from '../AddressQRCodePanel';
-import { BottomInfo, Description, ExplorerA } from '../styled';
+import { BottomInfo, Description, ExplorerA, UsernameAddressWidgetWrapper } from '../styled';
 
 const StatusItem = styled.li`
   display: flex;
@@ -66,6 +67,10 @@ const GatewayInfoItems = styled.ul`
 `;
 
 const GatewayInfoItem = styled.li``;
+
+const MinimumTxAmount = styled.div`
+  display: flex;
+`;
 
 const renderStates = ({
   currentState,
@@ -219,6 +224,8 @@ export const LockAndMintBtc: FC = () => {
     lockAndMintProvider.initializeConfig();
   }
 
+  const { fees, pending: isFetchingFee } = useFetchFees();
+
   if (!lockAndMintProvider.gatewayAddress) {
     return <LoaderBlock />;
   }
@@ -236,8 +243,14 @@ export const LockAndMintBtc: FC = () => {
               another coin.
             </GatewayInfoItem>
             <GatewayInfoItem>
-              Minimum transaction amount of{' '}
-              <strong>{`${(lockAndMintProvider.fee / 10 ** 8) * 2} ${Bitcoin.asset}`}</strong>.
+              <MinimumTxAmount>
+                <div>Minimum transaction amount of &nbsp;</div>
+                {isFetchingFee ? (
+                  <Loader />
+                ) : (
+                  <strong>{`${(fees.lock / 10 ** 8) * 2} ${Bitcoin.asset}.`}</strong>
+                )}
+              </MinimumTxAmount>
             </GatewayInfoItem>
             <GatewayInfoItem>
               <HMSCountdown milliseconds={timeRemained} /> is the remaining time to safely send the
@@ -246,7 +259,9 @@ export const LockAndMintBtc: FC = () => {
           </GatewayInfoItems>
         </GatewayInfoWrapper>
       </Description>
-      <AddressQRCodePanel address={lockAndMintProvider.gatewayAddress} />
+      <UsernameAddressWidgetWrapper>
+        <UsernameAddressWidget address={lockAndMintProvider.gatewayAddress} />
+      </UsernameAddressWidgetWrapper>
       <Description>
         {Object.keys(lockAndMintProvider.deposits).map((depositId) => (
           <DepositStatus

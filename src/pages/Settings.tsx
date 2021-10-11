@@ -199,6 +199,10 @@ const MobileButtons = styled.div`
   padding: 5px 0;
 `;
 
+const Text = styled.div`
+  margin-bottom: 20px;
+`;
+
 type RowProps = {
   icon: string;
   title: React.ReactNode;
@@ -305,32 +309,46 @@ export const Settings: FunctionComponent = () => {
                     </AccordionTitle>
                   }>
                   {username ? (
-                    <UsernameAddressWidget
-                      address={publicKey || ''}
-                      username={`${username}${domain}`}
-                    />
+                    <>
+                      <Text>
+                        Your P2P username allows you to receive any token within the Solana network
+                        even if it is not included in your wallet list.
+                      </Text>
+                      <UsernameAddressWidget
+                        address={publicKey || ''}
+                        username={`${username}${domain}`}
+                      />
+                    </>
                   ) : (
                     <>
-                      <div style={{ marginBottom: '20px' }}>
+                      <Text>
                         You can receive and send tokens using your P2P username or link. Also,
                         users, who know your URL or username can send you any token, even if you
                         don’t have it in your wallets list.
-                      </div>
+                      </Text>
                       <div>You can access the feature in the app</div>
                       <MobileButtons>
                         <NavLink
                           to={{ pathname: 'https://google.com' }}
                           target="_blank"
                           className="button">
-                          {/* eslint-disable-next-line jsx-a11y/alt-text */}
-                          <img src={GooglePlayBadge} width="135" height="40" />
+                          <img
+                            src={GooglePlayBadge}
+                            width="135"
+                            height="40"
+                            alt="Download P2P Wallet at the Google Play Store"
+                          />
                         </NavLink>
                         <NavLink
                           to={{ pathname: 'https://apple.com/' }}
                           target="_blank"
                           className="button">
-                          {/* eslint-disable-next-line jsx-a11y/alt-text */}
-                          <img src={AppStoreBadge} width="120" height="40" />
+                          <img
+                            src={AppStoreBadge}
+                            width="120"
+                            height="40"
+                            alt="Download P2P Wallet from the App Store"
+                          />
                         </NavLink>
                       </MobileButtons>
                     </>
