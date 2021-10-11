@@ -330,7 +330,7 @@ export const lookupName = createAsyncThunk<LookupResponce | null, string>(
 );
 
 export const resolveUsername = createAsyncThunk<string | null, string>(
-  `${WALLET_SLICE_NAME}/lookupName`,
+  `${WALLET_SLICE_NAME}/resolveUsername`,
   async (username, thunkAPI) => {
     const state: RootState = thunkAPI.getState() as RootState;
     const result = await NameServiceApi(state.wallet.network.cluster).resolveName(username);
