@@ -3,7 +3,7 @@ import React, { FunctionComponent, useState } from 'react';
 import { styled } from '@linaria/react';
 import classNames from 'classnames';
 
-import { useSwap } from 'app/contexts/swap';
+import { useSwap } from 'app/contexts/swapSerum';
 import { Button, Icon, Input } from 'components/ui';
 import { trackEvent } from 'utils/analytics';
 

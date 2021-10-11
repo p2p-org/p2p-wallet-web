@@ -3,7 +3,7 @@ import { Token, TOKEN_PROGRAM_ID } from '@solana/spl-token';
 import { Keypair, PublicKey, Signer, SystemProgram, Transaction } from '@solana/web3.js';
 import BN from 'bn.js';
 
-import { SOL_MINT, WRAPPED_SOL_MINT } from 'app/contexts/swap';
+import { SOL_MINT, WRAPPED_SOL_MINT } from 'app/contexts/swapSerum';
 
 export async function wrapSol(
   provider: Provider,

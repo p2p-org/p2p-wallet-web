@@ -1,9 +1,9 @@
 import React, { FC, useMemo, useState } from 'react';
 
-import { useSwap } from 'app/contexts/swap';
-import { useMinOrder } from 'app/contexts/swap/dex';
-import { useCanSwap } from 'app/contexts/swap/swap';
-import { useTokenMap } from 'app/contexts/swap/tokenList';
+import { useSwap } from 'app/contexts/swapSerum';
+import { useMinOrder } from 'app/contexts/swapSerum/dex';
+import { useCanSwap } from 'app/contexts/swapSerum/swap';
+import { useTokenMap } from 'app/contexts/swapSerum/tokenList';
 import { useSendSwap } from 'components/pages/swap/SwapWidget/SwapButton/hooks/useSendSwap';
 import { Button } from 'components/ui';
 import { swapNotification } from 'utils/transactionNotifications';

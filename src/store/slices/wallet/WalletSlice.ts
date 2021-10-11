@@ -33,7 +33,7 @@ import {
   ManualWalletData,
 } from 'api/wallet/ManualWallet';
 import { WalletEvent } from 'api/wallet/Wallet';
-import { SOL_MINT } from 'app/contexts/swap';
+import { SOL_MINT } from 'app/contexts/swapSerum';
 import { ToastManager } from 'components/common/ToastManager';
 import { DEFAULT_NETWORK, NetworkType, swapHostFeeAddress } from 'config/constants';
 import { SYSTEM_PROGRAM_ID, WRAPPED_SOL_MINT } from 'constants/solana/bufferLayouts';

@@ -1,8 +1,8 @@
 import { PublicKey } from '@solana/web3.js';
 
-import { useFairRoute, useMarket, useRouteVerbose } from 'app/contexts/swap/dex';
-import { useReferral } from 'app/contexts/swap/swap';
-import { useMint, useOwnedTokenAccount } from 'app/contexts/swap/token';
+import { useFairRoute, useMarket, useRouteVerbose } from 'app/contexts/swapSerum/dex';
+import { useReferral } from 'app/contexts/swapSerum/swap';
+import { useMint, useOwnedTokenAccount } from 'app/contexts/swapSerum/token';
 
 interface UseSwapData {
   fromMintInfo: ReturnType<typeof useMint>;

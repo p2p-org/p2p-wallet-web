@@ -1,152 +1,333 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
-import { PublicKey } from '@solana/web3.js';
-import assert from 'assert';
+import { ZERO } from '@orca-so/sdk';
+import { u64 } from '@solana/spl-token';
 import { createContainer } from 'unstated-next';
 
-import { SRM_MINT, USDC_MINT } from '../common/constants';
-import { FEE_MULTIPLIER } from '../dex';
-import { _useSwapFair } from './hooks/useSwapFair';
+import { useSolana } from 'app/contexts/solana';
+import { useConfig, usePools, usePrice, useUser } from 'app/contexts/swap';
+import SlippageTolerance from 'app/contexts/swap/models/SlippageTolerance';
+import Trade from 'app/contexts/swap/models/Trade';
+import { getMaxAge } from 'app/contexts/swap/utils/AsyncCache';
+import { getTradeId } from 'app/contexts/swap/utils/pools';
+import { minSolBalanceForSwap } from 'app/contexts/swap/utils/tokenAccounts';
+import { Keys, useLocalStorage } from 'utils/hooks/useLocalStorage';
 
-const DEFAULT_SLIPPAGE_PERCENT = 0.5;
+export const defaultSelectedTokens = {
+  input: 'USDC',
+  output: 'SOL',
+};
+
+const DEFAULT_SLIPPAGE_TOLERANCE_STATE = { numerator: '10', denominator: '1000' };
+
+export enum ButtonState {
+  ConnectWallet,
+  LoadingUserData,
+  RouteDoesNotExist,
+  Exchange,
+  TwoTransactionsStepOne,
+  TwoTransactionsConfirmStepOne,
+  TwoTransactionsSendingStepOne,
+  TwoTransactionsRetryStepOne,
+  TwoTransactionsStepTwo,
+  TwoTransactionsConfirmStepTwo,
+  TwoTransactionsSendingStepTwo,
+  TwoTransactionsRetryStepTwo,
+  ConfirmWallet,
+  SendingTransaction,
+  ZeroInputValue,
+  InputTokenAccountDoesNotExist,
+  InsufficientBalance,
+  OutputTooHigh,
+  NotEnoughSOL,
+  HighPriceImpact,
+  Retry,
+}
+
+export const stepOneLoadingStates = [
+  ButtonState.TwoTransactionsConfirmStepOne,
+  ButtonState.TwoTransactionsSendingStepOne,
+];
+
+export const stepOneStates = stepOneLoadingStates.concat(
+  ButtonState.TwoTransactionsStepOne,
+  ButtonState.TwoTransactionsRetryStepOne,
+);
+
+export const stepTwoLoadingStates = [
+  ButtonState.TwoTransactionsConfirmStepTwo,
+  ButtonState.TwoTransactionsSendingStepTwo,
+];
+
+export const stepTwoStates = stepTwoLoadingStates.concat(
+  ButtonState.TwoTransactionsStepTwo,
+  ButtonState.TwoTransactionsRetryStepTwo,
+);
 
 export interface UseSwap {
+  trade: Trade;
+
   // Mint being traded from. The user must own these tokens.
-  fromMint: PublicKey;
-  setFromMint: (m: PublicKey) => void;
+  // fromMint: PublicKey;
+  setInputTokenName: (m: string) => void;
 
   // Mint being traded to. The user will receive these tokens after the swap.
-  toMint: PublicKey;
-  setToMint: (m: PublicKey) => void;
+  // toMint: PublicKey;
+  setOutputTokenName: (m: string) => void;
 
   // Amount used for the swap.
-  fromAmount: number;
-  setFromAmount: (a: number) => void;
+  // fromAmount: number;
+  setInputAmount: (a: u64) => void;
 
   // *Expected* amount received from the swap.
-  toAmount: number;
-  setToAmount: (a: number) => void;
+  // toAmount: number;
+  setOutputAmount: (a: u64) => void;
 
   // Function to flip what we consider to be the "to" and "from" mints.
-  swapToFromMints: () => void;
+  switchTokens: () => void;
 
-  // The amount (in units of percent) a swap can be off from the estimate
-  // shown to the user.
-  slippage: number;
-  setSlippage: (n: number) => void;
+  slippageTolerance: SlippageTolerance;
+  setSlippageTolerance: (tolerance: SlippageTolerance) => void;
 
-  // Null if the user is using fairs directly from DEX prices.
-  // Otherwise, a user specified override for the price to use when calculating
-  // swap amounts.
-  fairOverride: number | null;
-  setFairOverride: (n: number | null) => void;
-
-  // The referral *owner* address. Associated token accounts must be created,
-  // first, for this to be used.
-  referral?: PublicKey;
-
-  // True if all newly created market accounts should be closed in the
-  // same user flow (ideally in the same transaction).
-  isClosingNewAccounts: boolean;
-
-  // True if the swap exchange rate should be a function of nothing but the
-  // from and to tokens, ignoring any quote tokens that may have been
-  // accumulated by performing the swap.
-  //
-  // Always false (for now).
-  isStrict: boolean;
-  setIsStrict: (isStrict: boolean) => void;
-
-  setIsClosingNewAccounts: (b: boolean) => void;
+  // referral?: PublicKey;
 }
 
 export type UseSwapArgs = {
-  fromMint?: PublicKey;
-  toMint?: PublicKey;
-  fromAmount?: number;
-  toAmount?: number;
-  referral?: PublicKey;
+  fromMint?: string;
+  toMint?: string;
+  // fromAmount?: number;
+  // toAmount?: number;
+  // referral?: PublicKey;
 };
 
 const useSwapInternal = (props: UseSwapArgs = {}): UseSwap => {
-  const [fromMint, setFromMint] = useState(props.fromMint ?? SRM_MINT);
-  const [toMint, setToMint] = useState(props.toMint ?? USDC_MINT);
-  const [fromAmount, _setFromAmount] = useState(props.fromAmount ?? 0);
-  const [toAmount, _setToAmount] = useState(props.toAmount ?? 0);
-  const [isClosingNewAccounts, setIsClosingNewAccounts] = useState(false);
-  const [isStrict, setIsStrict] = useState(false);
-  const [slippage, setSlippage] = useState(DEFAULT_SLIPPAGE_PERCENT);
-  const [fairOverride, setFairOverride] = useState<number | null>(null);
-  const fair = _useSwapFair(fromMint, toMint, fairOverride);
-  const referral = props.referral;
+  const { wallet } = useSolana();
+  const { tokenConfigs, routeConfigs } = useConfig();
+  const [inputTokenName, _setInputTokenName] = useState(props.fromMint ?? 'USDC');
+  const [outputTokenName, _setOutputTokenName] = useState(props.toMint ?? 'SOL');
+  const [slippageToleranceState, setSlippageToleranceState] = useLocalStorage<{
+    numerator: string;
+    denominator: string;
+  }>(Keys.SLIPPAGE_TOLERANCE, DEFAULT_SLIPPAGE_TOLERANCE_STATE);
+  const [buttonState, setButtonState] = useState(ButtonState.ConnectWallet);
+  const [isFairnessIndicatorCollapsed, setIsFairnessIndicatorCollapsed] = useState(true);
 
-  assert.ok(slippage >= 0);
+  const slippageTolerance = useMemo(() => {
+    return new SlippageTolerance(
+      new u64(slippageToleranceState.numerator),
+      new u64(slippageToleranceState.denominator),
+    );
+  }, [slippageToleranceState.numerator, slippageToleranceState.denominator]);
 
-  const setFromAmount = useCallback(
-    (amount: number) => {
-      if (fair === undefined) {
-        _setFromAmount(0);
-        _setToAmount(0);
-        return;
-      }
+  const setSlippageTolerance = useCallback((tolerance: SlippageTolerance) => {
+    setSlippageToleranceState({
+      numerator: tolerance.numerator.toString(),
+      denominator: tolerance.denominator.toString(),
+    });
+  }, []);
 
-      _setFromAmount(amount);
-      _setToAmount(FEE_MULTIPLIER * (amount / fair));
-    },
-    [fair],
+  const [trade, setTrade] = useState<Trade>(
+    () =>
+      new Trade({
+        inputTokenName,
+        outputTokenName,
+        amount: ZERO,
+        isInputAmount: true,
+        outputTooHigh: false,
+        slippageTolerance,
+        tokenConfigs,
+        routes: routeConfigs[getTradeId(inputTokenName, outputTokenName)],
+      }),
   );
 
+  const tradeId = getTradeId(trade.inputTokenName, trade.outputTokenName);
+
+  const [isRefreshRateIncreased, setIsRefreshRateIncreased] = useState(false);
+  const maxAge = getMaxAge(isRefreshRateIncreased);
+
+  const { useAsyncBatchedPools, fetchPool } = usePools();
+  const poolIds = routeConfigs[tradeId]
+    .flat()
+    .filter((poolId, idx, list) => list.indexOf(poolId) === idx);
+  const asyncPools = useAsyncBatchedPools(poolIds, maxAge);
+
+  const { useAsyncStandardTokenAccounts, refreshStandardTokenAccounts } = useUser();
+  const asyncStandardTokenAccounts = useAsyncStandardTokenAccounts(maxAge);
+  const inputUserTokenAccount = asyncStandardTokenAccounts.value?.[trade.inputTokenName];
+  const outputUserTokenAccount = asyncStandardTokenAccounts.value?.[trade.outputTokenName];
+  const solUserTokenAccount = asyncStandardTokenAccounts.value?.['SOL'];
+
+  const { useAsyncMergedPrices } = usePrice();
+  const asyncPrices = useAsyncMergedPrices();
+  const inputTokenPrice = asyncPrices.value?.[trade.inputTokenName];
+  const outputTokenPrice = asyncPrices.value?.[trade.outputTokenName];
+
+  const minSolBalanceRequired = minSolBalanceForSwap(
+    tokenConfigs['SOL'].decimals,
+    !!asyncStandardTokenAccounts.value &&
+      trade.requiresTwoTransactions(asyncStandardTokenAccounts.value),
+  );
+
+  function resetButtonStateIfTwoTransactionStates() {
+    setButtonState((buttonState) => {
+      if (stepOneStates.includes(buttonState) || stepTwoStates.includes(buttonState)) {
+        return ButtonState.ConnectWallet;
+      }
+
+      return buttonState;
+    });
+  }
+
+  function resetStates() {
+    resetButtonStateIfTwoTransactionStates();
+    setIsFairnessIndicatorCollapsed(true);
+  }
+
+  const setInputTokenName = useCallback(
+    (tokenName: string) => {
+      const routes = routeConfigs[getTradeId(tokenName, trade.outputTokenName)];
+      _setInputTokenName(tokenName);
+      setTrade(trade.updateInputToken(tokenName, routes));
+      resetStates();
+    },
+    [routeConfigs, trade],
+  );
+
+  const setOutputTokenName = useCallback(
+    (tokenName: string) => {
+      const routes = routeConfigs[getTradeId(trade.inputTokenName, tokenName)];
+      _setOutputTokenName(tokenName);
+      setTrade(trade.updateOutputToken(tokenName, routes));
+      resetStates();
+    },
+    [routeConfigs, trade],
+  );
+
+  const setInputAmount = useCallback(
+    (amount: u64) => {
+      resetButtonStateIfTwoTransactionStates();
+      setTrade(trade.updateInputAmount(amount));
+    },
+    [trade],
+  );
+
+  const setOutputAmount = useCallback((amount: u64) => {
+    resetButtonStateIfTwoTransactionStates();
+    setTrade(trade.updateOutputAmount(amount));
+  }, []);
+
+  const switchTokens = useCallback(() => {
+    resetButtonStateIfTwoTransactionStates();
+    _setInputTokenName(trade.outputTokenName);
+    _setOutputTokenName(trade.inputTokenName);
+    setTrade(trade.switchTokens());
+  }, [trade]);
+
+  // Update trade instance when pool data becomes available
   useEffect(() => {
-    if (!fair) {
+    if (!trade.pools && asyncPools.value) {
+      setTrade(trade.updatePools(asyncPools.value));
+    }
+  }, [trade, asyncPools.value]);
+
+  // Update trade instance when pool data refreshes
+  useEffect(() => {
+    if (asyncPools.value) {
+      setTrade((trade) => trade.updatePools(asyncPools.value));
+    }
+  }, [asyncPools]);
+
+  useEffect(() => {
+    setTrade((trade) => trade.updateSlippageTolerance(slippageTolerance));
+  }, [slippageTolerance]);
+
+  useEffect(() => {
+    if (
+      buttonState === ButtonState.ConfirmWallet ||
+      buttonState === ButtonState.SendingTransaction ||
+      stepTwoStates.includes(buttonState) ||
+      stepOneLoadingStates.includes(buttonState)
+    ) {
       return;
     }
 
-    setFromAmount(fromAmount);
-  }, [fair, fromAmount, setFromAmount]);
+    if (!trade.routes.length) {
+      setButtonState(ButtonState.RouteDoesNotExist);
+    } else if (!wallet) {
+      setButtonState(ButtonState.ConnectWallet);
+    } else if (!asyncStandardTokenAccounts.value || !asyncPools.value) {
+      setButtonState(ButtonState.LoadingUserData);
+    } else {
+      const inputAmount = trade.getInputAmount();
 
-  const setToAmount = useCallback(
-    (amount: number) => {
-      if (fair === undefined) {
-        _setFromAmount(0);
-        _setToAmount(0);
-        return;
+      let solRemainingForFees = solUserTokenAccount?.getAmount() || ZERO;
+      if (inputTokenName === 'SOL') {
+        solRemainingForFees = solRemainingForFees.lt(inputAmount)
+          ? ZERO
+          : solRemainingForFees.sub(inputAmount);
       }
 
-      _setToAmount(amount);
-      _setFromAmount((amount * fair) / FEE_MULTIPLIER);
-    },
-    [fair],
-  );
+      if (inputAmount.eq(ZERO)) {
+        setButtonState(ButtonState.ZeroInputValue);
+      } else if (solRemainingForFees.lt(minSolBalanceRequired)) {
+        setButtonState(ButtonState.NotEnoughSOL);
+      } else if (!inputUserTokenAccount || inputUserTokenAccount.getAmount().lt(inputAmount)) {
+        setButtonState(ButtonState.InsufficientBalance);
+      } else {
+        // If the button is currently in a step one state but can now
+        // exchange in one transaction, move forward to Step Two
+        if (
+          buttonState === ButtonState.TwoTransactionsStepOne &&
+          !trade.requiresTwoTransactions(asyncStandardTokenAccounts.value)
+        ) {
+          setButtonState(ButtonState.TwoTransactionsStepTwo);
+        }
+        // If the exchange needs to be broken up into two, set to Step One
+        else if (trade.requiresTwoTransactions(asyncStandardTokenAccounts.value)) {
+          setButtonState(ButtonState.TwoTransactionsStepOne);
+        } else if (trade.isPriceImpactHigh()) {
+          setButtonState(ButtonState.HighPriceImpact);
+        } else {
+          setButtonState(ButtonState.Exchange);
+        }
+      }
+    }
+  }, [
+    wallet,
+    inputTokenName,
+    tokenConfigs,
+    asyncPools,
+    buttonState,
+    asyncStandardTokenAccounts,
+    inputUserTokenAccount,
+    trade,
+    outputUserTokenAccount,
+    solUserTokenAccount,
+    minSolBalanceRequired,
+  ]);
 
-  const swapToFromMints = useCallback(() => {
-    const oldFrom = fromMint;
-    const oldTo = toMint;
-    const oldToAmount = toAmount;
-
-    _setFromAmount(oldToAmount);
-    setFromMint(oldTo);
-    setToMint(oldFrom);
-  }, [fromMint, toAmount, toMint]);
+  useEffect(() => {
+    setIsRefreshRateIncreased(
+      buttonState === ButtonState.Exchange ||
+        buttonState === ButtonState.HighPriceImpact ||
+        buttonState === ButtonState.TwoTransactionsConfirmStepTwo,
+    );
+  }, [buttonState]);
 
   return {
-    fromMint,
-    setFromMint,
-    toMint,
-    setToMint,
-    fromAmount,
-    setFromAmount,
-    toAmount,
-    setToAmount,
-    swapToFromMints,
-    slippage,
-    setSlippage,
-    fairOverride,
-    setFairOverride,
-    isClosingNewAccounts,
-    isStrict,
-    setIsStrict,
-    setIsClosingNewAccounts,
-    referral,
+    trade,
+    // fromMint,
+    setInputTokenName,
+    // toMint,
+    setOutputTokenName,
+    // fromAmount,
+    setInputAmount,
+    // toAmount,
+    setOutputAmount,
+    switchTokens,
+    slippageTolerance,
+    setSlippageTolerance,
+    // referral,
   };
 };
 

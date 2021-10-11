@@ -5,9 +5,9 @@ import {
   TokenListProvider as SPLTokenListProvider,
 } from '@solana/spl-token-registry';
 
-import { TokenListProvider } from 'app/contexts/swap';
+import { SolanaProvider } from 'app/contexts/solana';
+import { TokenListProvider } from 'app/contexts/swapSerum';
 import { LockAndMintProvider } from 'utils/providers/LockAndMintProvider';
-import { SolanaContextProvider } from 'utils/providers/SolnaProvider';
 
 export const Providers: FC = ({ children }) => {
   const [tokenList, setTokenList] = useState<SPLTokenListContainer | null>(null);
@@ -22,9 +22,9 @@ export const Providers: FC = ({ children }) => {
 
   return (
     <TokenListProvider initialState={{ tokenList }}>
-      <SolanaContextProvider>
+      <SolanaProvider>
         <LockAndMintProvider>{children}</LockAndMintProvider>
-      </SolanaContextProvider>
+      </SolanaProvider>
     </TokenListProvider>
   );
 };

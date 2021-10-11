@@ -2,8 +2,8 @@ import { useCallback } from 'react';
 
 import BN from 'bn.js';
 
-import { useDex, useSwap } from 'app/contexts/swap';
-import { FEE_MULTIPLIER, useOpenOrders } from 'app/contexts/swap/dex';
+import { useDex, useSwap } from 'app/contexts/swapSerum';
+import { FEE_MULTIPLIER, useOpenOrders } from 'app/contexts/swapSerum/dex';
 
 import { useSwapData } from './useSwapData';
 

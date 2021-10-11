@@ -2,7 +2,7 @@ import React, { FC } from 'react';
 
 import { styled } from '@linaria/react';
 
-import { SOL_MINT, useSwap } from 'app/contexts/swap';
+import { SOL_MINT, useSwap } from 'app/contexts/swapSerum';
 import { Accordion } from 'components/ui';
 
 import { FeesOriginal } from './FeesOriginal';

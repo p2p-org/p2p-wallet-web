@@ -30,10 +30,10 @@ const ReverseIcon = styled(Icon)`
 `;
 
 export const Reverse: FC = () => {
-  const { swapToFromMints } = useSwap();
+  const { switchTokens } = useSwap();
 
   const handleReverseClick = () => {
-    swapToFromMints();
+    switchTokens();
   };
 
   return (

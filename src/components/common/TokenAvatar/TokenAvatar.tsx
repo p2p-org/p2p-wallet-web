@@ -5,7 +5,7 @@ import { styled } from '@linaria/react';
 import classNames from 'classnames';
 
 import tokenList from 'api/token/token.config';
-import { useTokenMap } from 'app/contexts/swap/tokenList/hooks';
+import { useTokenMap } from 'app/contexts/swapSerum/tokenList/hooks';
 import { Jazzicon } from 'components/common/TokenAvatar/Jazzicon';
 import { Avatar } from 'components/ui';
 
@@ -61,7 +61,7 @@ export const TokenAvatar: FunctionComponent<Props & HTMLAttributes<HTMLDivElemen
   // TODO: need to add cluster
   const tokenMap = useTokenMap();
   const tokenInfo =
-    tokenMap.get(address!) ||
+    (address && tokenMap.get(address)) ||
     tokenList
       .filterByClusterSlug(cluster)
       .getList()

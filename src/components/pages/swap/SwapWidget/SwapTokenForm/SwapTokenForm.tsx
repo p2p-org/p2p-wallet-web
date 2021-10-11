@@ -1,14 +1,12 @@
 import React, { FC, useEffect, useMemo, useRef, useState } from 'react';
 
 import { styled } from '@linaria/react';
-import { PublicKey } from '@solana/web3.js';
+import { u64 } from '@solana/spl-token';
 import classNames from 'classnames';
-import { Decimal } from 'decimal.js';
 import throttle from 'lodash.throttle';
 import { isNil } from 'ramda';
 
-import { useMint, useOwnedTokenAccount } from 'app/contexts/swap/token';
-import { useSwappableTokens, useTokenMap } from 'app/contexts/swap/tokenList';
+import { useConfig } from 'app/contexts/swap';
 import { AmountUSD } from 'components/common/AmountUSD';
 import { Empty } from 'components/common/Empty';
 import { SlideContainer } from 'components/common/SlideContainer';
@@ -300,25 +298,29 @@ const AllTokens = styled(TitleTokens)`
 
 const SCROLL_THRESHOLD = 15;
 
+function matchesFilter(str: string, filter: string) {
+  return str.toLowerCase().indexOf(filter.toLowerCase().trim()) >= 0;
+}
+
 interface Props {
-  from: boolean;
-  mint: PublicKey;
-  setMint: (m: PublicKey) => void;
-  amount: number;
-  setAmount: (a: number) => void;
-  minOrderSize?: number;
+  isInput?: boolean;
+  tokenName: string;
+  setTokenName: (m: string) => void;
+  pairTokenName: string;
+  amount: u64;
+  setAmount: (a: u64) => void;
   disabled?: boolean;
   disabledInput?: boolean;
   className?: string;
 }
 
 export const SwapTokenForm: FC<Props> = ({
-  from,
-  mint,
-  setMint,
+  isInput,
+  tokenName,
+  setTokenName,
+  pairTokenName,
   amount,
   setAmount,
-  minOrderSize,
   disabled,
   disabledInput,
   className,
@@ -330,41 +332,25 @@ export const SwapTokenForm: FC<Props> = ({
   const [localAmount, setLocalAmount] = useState(String(amount));
   const [scrollTop, setScrollTop] = useState(0);
   const [filter, setFilter] = useState('');
-  const { swappableTokens } = useSwappableTokens();
+  const { tokenConfigs } = useConfig();
 
-  const tokenMap = useTokenMap();
-  const tokenInfo = tokenMap.get(mint.toString());
+  const tokenInfo = tokenConfigs[tokenName];
 
-  const tokenAccount = useOwnedTokenAccount(mint);
-  const mintAccount = useMint(mint);
+  // const tokenAccount = useOwnedTokenAccount(mint);
+  // const mintAccount = useMint(mint);
 
-  const balance =
-    tokenAccount &&
-    mintAccount &&
-    tokenAccount.account.amount.toNumber() / 10 ** mintAccount.decimals;
+  // const balance =
+  //   tokenAccount &&
+  //   mintAccount &&
+  //   tokenAccount.account.amount.toNumber() / 10 ** mintAccount.decimals;
 
-  const hasBalance = (balance || 0) >= Number(localAmount);
+  // const hasBalance = (balance || 0) >= Number(localAmount);
 
   const boxShadow = useMemo(() => {
     return `0 5px 10px rgba(56, 60, 71, ${
       scrollTop >= SCROLL_THRESHOLD ? '0.05' : 0.003 * scrollTop
     }`;
   }, [scrollTop]);
-
-  const filteredTokens = useMemo(() => {
-    if (!filter) {
-      return swappableTokens;
-    }
-
-    const filterLower = filter.toLowerCase();
-
-    return swappableTokens.filter(
-      (itemToken) =>
-        itemToken.symbol.toLowerCase().startsWith(filterLower) ||
-        itemToken.name.toLowerCase().startsWith(filterLower) ||
-        itemToken.address.toLowerCase().startsWith(filterLower),
-    );
-  }, [swappableTokens, filter]);
 
   useEffect(() => {
     if (!isNil(amount) && amount !== Number(localAmount)) {
@@ -422,10 +408,6 @@ export const SwapTokenForm: FC<Props> = ({
   }, [isOpen, listRef.current]);
 
   const handleSelectorClick = () => {
-    if (!tokenMap.size) {
-      return;
-    }
-
     setIsOpen(!isOpen);
   };
 
@@ -463,20 +445,41 @@ export const SwapTokenForm: FC<Props> = ({
     setFilter(nextFilter);
   };
 
-  const handleTokenClick = (nextMint: PublicKey) => {
+  const handleTokenClick = (tokenName: string) => {
     setIsOpen(false);
-    setMint(nextMint);
+    setTokenName(tokenName);
   };
+
+  const filteredTokens = useMemo(
+    () =>
+      Object.keys(tokenConfigs)
+        .filter((tokenSymbol) => tokenSymbol !== pairTokenName && tokenSymbol !== tokenName)
+        .filter(
+          // Exclude liquidity tokens
+          (tokenSymbol) => !tokenSymbol.includes('/'),
+        )
+        .filter((tokenSymbol) => {
+          if (filter === '') {
+            return true;
+          }
+
+          return (
+            matchesFilter(tokenSymbol, filter) ||
+            matchesFilter(tokenConfigs[tokenSymbol].name, filter)
+          );
+        }),
+    [tokenConfigs, filter],
+  );
 
   return (
     <Wrapper className={className}>
       <TopWrapper>
-        <FromTitle>{from ? 'From' : 'To'}</FromTitle>
+        <FromTitle>{isInput ? 'From' : 'To'}</FromTitle>
       </TopWrapper>
       <MainWrapper>
-        <TokenAvatarWrapper className={classNames({ isOpen: isOpen && !mint })}>
-          {mint ? (
-            <TokenAvatar address={mint.toBase58()} size={44} />
+        <TokenAvatarWrapper className={classNames({ isOpen: isOpen && !tokenName })}>
+          {tokenName ? (
+            <TokenAvatar address={tokenInfo?.mint.toString()} size={44} />
           ) : (
             <WalletIcon name="wallet" />
           )}
@@ -487,8 +490,8 @@ export const SwapTokenForm: FC<Props> = ({
               ref={selectorRef}
               onClick={handleSelectorClick}
               className={classNames({ isOpen })}>
-              <TokenName title={tokenInfo?.address}>
-                {tokenInfo?.symbol || shortAddress(mint.toBase58()) || <EmptyName>—</EmptyName>}
+              <TokenName title={tokenInfo?.mint.toString()}>
+                {tokenName || shortAddress(tokenInfo?.mint.toString()) || <EmptyName>—</EmptyName>}
               </TokenName>
               <ChevronWrapper>
                 <ChevronIcon name="arrow-triangle" />
@@ -500,33 +503,30 @@ export const SwapTokenForm: FC<Props> = ({
               onFocus={handleAmountFocus}
               onChange={handleAmountChange}
               disabled={disabled || disabledInput}
-              className={classNames({
-                error: Number(localAmount) ? Number(localAmount) < minOrderSize : false,
-              })}
             />
           </SpecifyTokenWrapper>
-          <BalanceWrapper>
-            <BalanceText>
-              {tokenAccount && mintAccount ? (
-                from && !disabled ? (
-                  <AllBalance
-                    onClick={() => setAmount(balance || 0)}
-                    className={classNames({ disabled, error: !hasBalance })}>
-                    Available: {balance?.toFixed(mintAccount.decimals)}
-                  </AllBalance>
-                ) : (
-                  <>Balance: {balance?.toFixed(mintAccount.decimals)}</>
-                )
-              ) : undefined}
-              {!mint ? 'Select currency' : undefined}
-            </BalanceText>
-            {mint ? (
-              <BalanceText>
-                ≈{' '}
-                <AmountUSDStyled value={new Decimal(localAmount || 0)} symbol={tokenInfo?.symbol} />
-              </BalanceText>
-            ) : undefined}
-          </BalanceWrapper>
+          {/*<BalanceWrapper>*/}
+          {/*  <BalanceText>*/}
+          {/*    {tokenAccount && mintAccount ? (*/}
+          {/*      isInput && !disabled ? (*/}
+          {/*        <AllBalance*/}
+          {/*          onClick={() => setAmount(balance || 0)}*/}
+          {/*          className={classNames({ disabled, error: !hasBalance })}>*/}
+          {/*          Available: {balance?.toFixed(mintAccount.decimals)}*/}
+          {/*        </AllBalance>*/}
+          {/*      ) : (*/}
+          {/*        <>Balance: {balance?.toFixed(mintAccount.decimals)}</>*/}
+          {/*      )*/}
+          {/*    ) : undefined}*/}
+          {/*    {!mint ? 'Select currency' : undefined}*/}
+          {/*  </BalanceText>*/}
+          {/*  {mint ? (*/}
+          {/*    <BalanceText>*/}
+          {/*      ≈{' '}*/}
+          {/*      <AmountUSDStyled value={new Decimal(localAmount || 0)} symbol={tokenInfo?.symbol} />*/}
+          {/*    </BalanceText>*/}
+          {/*  ) : undefined}*/}
+          {/*</BalanceWrapper>*/}
         </InfoWrapper>
       </MainWrapper>
       {isOpen ? (
@@ -563,7 +563,7 @@ export const SwapTokenForm: FC<Props> = ({
               <>
                 <AllTokens>All tokens</AllTokens>
                 {filteredTokens.map((token) => (
-                  <TokenRow key={token.address} mint={token.address} onClick={handleTokenClick} />
+                  <TokenRow key={token} tokenName={token} onClick={handleTokenClick} />
                 ))}
               </>
             ) : undefined}

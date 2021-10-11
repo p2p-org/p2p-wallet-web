@@ -3,7 +3,7 @@ import React, { FC } from 'react';
 import { styled } from '@linaria/react';
 import { isNil } from 'ramda';
 
-import { useSwap } from 'app/contexts/swap';
+import { useSwap } from 'app/contexts/swapSerum';
 
 // import { TooltipRow, TxName, TxValue } from 'components/common/SendSwapWidget/common/styled';
 // import { Tooltip } from 'components/ui';

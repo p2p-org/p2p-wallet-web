@@ -4,8 +4,9 @@ import { styled } from '@linaria/react';
 import { PublicKey } from '@solana/web3.js';
 import { Decimal } from 'decimal.js';
 
-import { useOwnedTokenAccount } from 'app/contexts/swap/token';
-import { useTokenMap } from 'app/contexts/swap/tokenList';
+import { useConfig } from 'app/contexts/swap';
+import { useOwnedTokenAccount } from 'app/contexts/swapSerum/token';
+import { useTokenMap } from 'app/contexts/swapSerum/tokenList';
 import { AmountUSD } from 'components/common/AmountUSD';
 import { TokenAvatar } from 'components/common/TokenAvatar';
 import { shortAddress } from 'utils/tokens';
@@ -58,42 +59,42 @@ const Bottom = styled.div`
 `;
 
 type Props = {
-  mint: string;
-  onClick: (token: PublicKey) => void;
+  tokenName: string;
+  onClick: (tokenName: string) => void;
 };
 
-export const TokenRow: FunctionComponent<Props> = ({ mint, onClick }) => {
-  const tokenMap = useTokenMap();
-  const tokenInfo = tokenMap.get(mint.toString());
-  const tokenAccount = useOwnedTokenAccount(new PublicKey(mint));
+export const TokenRow: FunctionComponent<Props> = ({ tokenName, onClick }) => {
+  const { tokenConfigs } = useConfig();
+  const tokenInfo = tokenConfigs[tokenName];
+  // const tokenAccount = useOwnedTokenAccount(new PublicKey(mint));
 
-  const balance =
-    tokenAccount && tokenInfo && tokenAccount.account.amount.toNumber() / 10 ** tokenInfo.decimals;
+  // const balance =
+  //   tokenAccount && tokenInfo && tokenAccount.account.amount.toNumber() / 10 ** tokenInfo.decimals;
 
   const handleClick = () => {
-    onClick(new PublicKey(mint));
+    onClick(tokenName);
   };
 
   return (
     <Wrapper onClick={handleClick}>
       <ItemWrapper>
-        <TokenAvatar address={tokenInfo?.address} size={44} />
+        <TokenAvatar symbol={tokenName} address={tokenInfo?.mint.toString()} size={44} />
         <Info>
           <Top>
-            <TokenSymbol title={tokenInfo?.address}>
-              {tokenInfo?.symbol || shortAddress(mint)}
+            <TokenSymbol title={tokenInfo?.mint.toString()}>
+              {tokenName || shortAddress(tokenInfo?.mint.toString())}
             </TokenSymbol>
-            {tokenAccount ? (
-              <AmountUSD symbol={tokenInfo?.symbol} value={new Decimal(balance || 0)} />
-            ) : undefined}
+            {/*{tokenAccount ? (*/}
+            {/*  <AmountUSD symbol={tokenInfo?.symbol} value={new Decimal(balance || 0)} />*/}
+            {/*) : undefined}*/}
           </Top>
           <Bottom>
             <div>{tokenInfo?.name}</div>
-            {tokenAccount ? (
-              <div>
-                {balance} {tokenInfo?.symbol}
-              </div>
-            ) : undefined}
+            {/*{tokenAccount ? (*/}
+            {/*  <div>*/}
+            {/*    {balance} {tokenInfo?.symbol}*/}
+            {/*  </div>*/}
+            {/*) : undefined}*/}
           </Bottom>
         </Info>
       </ItemWrapper>

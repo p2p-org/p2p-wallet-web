@@ -4,11 +4,11 @@ import { styled } from '@linaria/react';
 import { Bitcoin } from '@renproject/chains-bitcoin';
 import { Solana } from '@renproject/chains-solana';
 
+import { useSolana } from 'app/contexts/solana';
 import { LoaderBlock } from 'components/common/LoaderBlock';
 import { ToastManager } from 'components/common/ToastManager';
 import { Button, Icon, Switch } from 'components/ui';
 import { useRenNetwork } from 'utils/hooks/renBridge/useNetwork';
-import { useSolanaProvider } from 'utils/providers/SolnaProvider';
 
 const Wrapper = styled.div`
   display: flex;
@@ -68,7 +68,7 @@ export const RenGatewayWarning: FC<{ onShowButtonClick: () => void }> = ({ onSho
   const [awaiting, setAwaiting] = useState(false);
   const [isTokenLoaded, setIsTokenLoaded] = useState(false);
   const [hasSolanaTokenAccount, setSolanaTokenAccount] = useState<any>();
-  const solanaProvider = useSolanaProvider();
+  const solanaProvider = useSolana();
   const network = useRenNetwork();
   const [isConfirm, setIsConfirm] = useState(false);
 

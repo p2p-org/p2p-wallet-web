@@ -7,11 +7,11 @@ import RenJS from '@renproject/ren';
 import { BurnSession, BurnStates, BurnTransaction, isBurnErroring } from '@renproject/ren-tx';
 
 import { getWallet } from 'api/wallet';
+import { useSolana } from 'app/contexts/solana';
 import { LoaderBlock } from 'components/common/LoaderBlock';
 import { Accordion, Button } from 'components/ui';
 import { useBurnAndRelease } from 'utils/hooks/renBridge/useBurnAndRelease.ts';
 import { useRenNetwork } from 'utils/hooks/renBridge/useNetwork';
-import { useSolanaProvider } from 'utils/providers/SolnaProvider';
 
 const StatusItems = styled.ul`
   margin: 0;
@@ -136,7 +136,7 @@ type Props = {
 };
 
 export const BurnAndRelease: FC<Props> = ({ destinationAddress, targetAmount }) => {
-  const solanaProvider = useSolanaProvider();
+  const solanaProvider = useSolana();
   const network = useRenNetwork();
   const burnAndReleaseProps = useMemo(() => {
     const amount = String(Math.floor(Number(targetAmount) * Math.pow(10, 8)));

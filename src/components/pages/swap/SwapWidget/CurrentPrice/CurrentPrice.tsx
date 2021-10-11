@@ -2,10 +2,10 @@ import React, { FC, useState } from 'react';
 
 import { styled } from '@linaria/react';
 
-import { useSwap } from 'app/contexts/swap';
-import { useFairRoute } from 'app/contexts/swap/dex';
-import { useMint } from 'app/contexts/swap/token';
-import { useTokenMap } from 'app/contexts/swap/tokenList';
+import { useSwap } from 'app/contexts/swapSerum';
+import { useFairRoute } from 'app/contexts/swapSerum/dex';
+import { useMint } from 'app/contexts/swapSerum/token';
+import { useTokenMap } from 'app/contexts/swapSerum/tokenList';
 import { Icon } from 'components/ui';
 
 const Wrapper = styled.div`

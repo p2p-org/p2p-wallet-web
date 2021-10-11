@@ -1,7 +1,7 @@
 import { Program } from '@project-serum/anchor';
 import { Keypair, PublicKey } from '@solana/web3.js';
 
-import { SOL_MINT } from 'app/contexts/swap';
+import { SOL_MINT } from 'app/contexts/swapSerum';
 
 import { USDC_PUBKEY, USDT_PUBKEY } from '../constants';
 import { SwapParams } from '../types';

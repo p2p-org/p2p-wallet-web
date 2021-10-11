@@ -1,7 +1,6 @@
 import React, { FC } from 'react';
 
 import { useSwap } from 'app/contexts/swap';
-import { useMinOrder } from 'app/contexts/swap/dex';
 
 import { SwapTokenForm } from '../SwapTokenForm';
 
@@ -10,17 +9,16 @@ interface Props {
 }
 
 export const SwapFromForm: FC<Props> = ({ className }) => {
-  const { fromMint, setFromMint, fromAmount, setFromAmount } = useSwap();
-  const { minOrderSize } = useMinOrder();
+  const { trade, setInputTokenName, setInputAmount } = useSwap();
 
   return (
     <SwapTokenForm
-      from
-      mint={fromMint}
-      setMint={setFromMint}
-      amount={fromAmount}
-      setAmount={setFromAmount}
-      minOrderSize={minOrderSize}
+      isInput
+      tokenName={trade.inputTokenName}
+      setTokenName={setInputTokenName}
+      pairTokenName={trade.outputTokenName}
+      amount={trade.getInputAmount()}
+      setAmount={setInputAmount}
       className={className}
     />
   );

@@ -23,6 +23,7 @@ import {
 import { isNil } from 'ramda';
 
 import { getWallet } from 'api/wallet';
+import { useSolana } from 'app/contexts/solana';
 import { NotifyToast } from 'components/common/NotifyToast';
 import { ToastManager } from 'components/common/ToastManager';
 import { Button } from 'components/ui';
@@ -30,7 +31,6 @@ import { useLockAndMint } from 'utils/hooks/renBridge/useLockAndMint';
 import { DepositTranstaction, formatAmount } from 'utils/hooks/renBridge/useLockAndMint';
 import { useRenNetwork } from 'utils/hooks/renBridge/useNetwork';
 import { initConfig, loadAndDeleteExpired, MintConfig } from 'utils/lockAndMintConfig';
-import { useSolanaProvider } from 'utils/providers/SolnaProvider';
 
 export type DepositState = {
   currentState: DepositStates;
@@ -154,7 +154,7 @@ const LockAndMintSession: FC<{
   onFeeChange: (fee: number) => void;
   onDepositChage: (depositId: string, deposit: DepositState) => void;
 }> = ({ nonce, onGatewayAddressInit, onFeeChange, onDepositChage }) => {
-  const solanaProvider = useSolanaProvider();
+  const solanaProvider = useSolana();
   const network = useRenNetwork();
   const lockAndMintParams = useMemo(() => {
     return {
