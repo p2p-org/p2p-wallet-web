@@ -2,11 +2,12 @@ import React, { FC, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 
 import { TokenAccount } from 'api/token/TokenAccount';
+import { UsernameAddressWidget } from 'components/common/UsernameAddressWidget';
 import { Accordion } from 'components/ui';
 import { getExplorerUrl } from 'utils/connection';
+import { useUsername } from 'utils/hooks/useUsername';
 
-import { AddressQRCodePanel } from './AddressQRCodePanel';
-import { BottomInfo, Description, ExplorerA } from './styled';
+import { BottomInfo, Description, ExplorerA, UsernameAddressWidgetWrapper } from './styled';
 
 export const ReceiveSolana: FC = () => {
   const cluster = useSelector((state) => state.wallet.network.cluster);
@@ -19,6 +20,7 @@ export const ReceiveSolana: FC = () => {
     () => availableTokenAccounts.find((account) => account.address.toBase58() === publicKey),
     [availableTokenAccounts, publicKey],
   );
+  const { username, domain } = useUsername();
 
   if (!solAccount) {
     return null;
@@ -36,7 +38,12 @@ export const ReceiveSolana: FC = () => {
           FTX.
         </Accordion>
       </Description>
-      <AddressQRCodePanel address={solAccount.address.toBase58()} />
+      <UsernameAddressWidgetWrapper>
+        <UsernameAddressWidget
+          address={publicKey || ''}
+          username={username ? `${username}${domain}` : ''}
+        />
+      </UsernameAddressWidgetWrapper>
       <BottomInfo>
         <ExplorerA
           href={getExplorerUrl('address', solAccount.address.toBase58(), cluster)}

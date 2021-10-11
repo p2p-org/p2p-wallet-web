@@ -30,3 +30,8 @@ export const ExplorerA = styled.a`
     color: #458aff;
   }
 `;
+
+export const UsernameAddressWidgetWrapper = styled.div`
+  margin-bottom: 16px;
+  padding: 0 24px;
+`;

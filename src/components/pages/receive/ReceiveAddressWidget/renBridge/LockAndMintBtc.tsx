@@ -7,6 +7,7 @@ import { DepositStates } from '@renproject/ren-tx';
 
 import { Loader } from 'components/common/Loader';
 import { LoaderBlock } from 'components/common/LoaderBlock';
+import { UsernameAddressWidget } from 'components/common/UsernameAddressWidget';
 import { Icon } from 'components/ui';
 import { Accordion, Button } from 'components/ui';
 import { getFormattedHMS } from 'utils/dates';
@@ -16,8 +17,7 @@ import { useRenNetwork } from 'utils/hooks/renBridge/useNetwork';
 import { useIntervalHook } from 'utils/hooks/useIntervalHook';
 import { useFetchFees, useLockAndMintProvider } from 'utils/providers/LockAndMintProvider';
 
-import { AddressQRCodePanel } from '../AddressQRCodePanel';
-import { BottomInfo, Description, ExplorerA } from '../styled';
+import { BottomInfo, Description, ExplorerA, UsernameAddressWidgetWrapper } from '../styled';
 
 const StatusItem = styled.li`
   display: flex;
@@ -259,7 +259,9 @@ export const LockAndMintBtc: FC = () => {
           </GatewayInfoItems>
         </GatewayInfoWrapper>
       </Description>
-      <AddressQRCodePanel address={lockAndMintProvider.gatewayAddress} />
+      <UsernameAddressWidgetWrapper>
+        <UsernameAddressWidget address={lockAndMintProvider.gatewayAddress} />
+      </UsernameAddressWidgetWrapper>
       <Description>
         {Object.keys(lockAndMintProvider.deposits).map((depositId) => (
           <DepositStatus
