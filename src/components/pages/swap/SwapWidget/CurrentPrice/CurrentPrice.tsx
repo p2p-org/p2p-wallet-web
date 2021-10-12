@@ -1,11 +1,9 @@
 import React, { FC, useState } from 'react';
 
 import { styled } from '@linaria/react';
+import Decimal from 'decimal.js';
 
-import { useSwap } from 'app/contexts/swapSerum';
-import { useFairRoute } from 'app/contexts/swapSerum/dex';
-import { useMint } from 'app/contexts/swapSerum/token';
-import { useTokenMap } from 'app/contexts/swapSerum/tokenList';
+import { useSwap } from 'app/contexts/swap';
 import { Icon } from 'components/ui';
 
 const Wrapper = styled.div`
@@ -57,33 +55,31 @@ const ChangeRateIcon = styled(Icon)`
 `;
 
 export const CurrentPrice: FC = () => {
+  const { trade } = useSwap();
   const [isReverse, setIsReverse] = useState(false);
-  const { fromMint: fromMintTemp, toMint: toMintTemp } = useSwap();
-
-  const fromMint = isReverse ? fromMintTemp : toMintTemp;
-  const toMint = isReverse ? toMintTemp : fromMintTemp;
-
-  const fromMintInfo = useMint(fromMint);
-  const fair = useFairRoute(fromMint, toMint);
-
-  const tokenMap = useTokenMap();
-  const fromTokenInfo = tokenMap.get(fromMint.toString());
-  const toTokenInfo = tokenMap.get(toMint.toString());
 
   const handleChangeRateClick = () => {
     setIsReverse((state) => !state);
   };
+
+  function formatExchangeRate(): string {
+    const one = new Decimal(1);
+    return (isReverse ? one.div(trade.getExchangeRate()) : trade.getExchangeRate())
+      .toSignificantDigits(6)
+      .toString();
+  }
+
+  if (trade.getExchangeRate().eq(0)) {
+    return null;
+  }
 
   return (
     <Wrapper>
       <Left>Current price</Left>
       <Right>
         <Rate>
-          {fair !== undefined && toTokenInfo && fromTokenInfo
-            ? `1 ${toTokenInfo.symbol} = ${fair.toFixed(fromMintInfo?.decimals)} ${
-                fromTokenInfo.symbol
-              }`
-            : `-`}
+          1 {isReverse ? trade.outputTokenName : trade.inputTokenName} = {formatExchangeRate()}{' '}
+          {isReverse ? trade.inputTokenName : trade.outputTokenName}
           <ChangeRateWrapper onClick={handleChangeRateClick}>
             <ChangeRateIcon name="swap" />
           </ChangeRateWrapper>

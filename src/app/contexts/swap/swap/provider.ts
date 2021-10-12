@@ -112,6 +112,8 @@ export interface UseSwap {
   inputTokenAmount: u64 | undefined;
   inputTokenPrice: number | undefined;
   outputTokenPrice: number | undefined;
+  intermediateTokenName: string | undefined;
+  intermediateTokenPrice: number | undefined;
   buttonState: ButtonState;
   onSetupTokenAccounts: () => Promise<void>;
   onSwap: () => Promise<void>;
@@ -169,6 +171,7 @@ const useSwapInternal = (props: UseSwapArgs = {}): UseSwap => {
   );
 
   const tradeId = getTradeId(trade.inputTokenName, trade.outputTokenName);
+  const intermediateTokenName = trade.getIntermediateTokenName();
 
   const [isRefreshRateIncreased, setIsRefreshRateIncreased] = useState(false);
   const maxAge = getMaxAge(isRefreshRateIncreased);
@@ -189,14 +192,15 @@ const useSwapInternal = (props: UseSwapArgs = {}): UseSwap => {
   const asyncPrices = useAsyncMergedPrices();
   const inputTokenPrice = asyncPrices.value?.[trade.inputTokenName];
   const outputTokenPrice = asyncPrices.value?.[trade.outputTokenName];
+  const intermediateTokenPrice = intermediateTokenName
+    ? asyncPrices.value?.[intermediateTokenName]
+    : undefined;
 
   const minSolBalanceRequired = minSolBalanceForSwap(
     tokenConfigs['SOL'].decimals,
     !!asyncStandardTokenAccounts.value &&
       trade.requiresTwoTransactions(asyncStandardTokenAccounts.value),
   );
-
-  const intermediateTokenName = trade.getIntermediateTokenName();
 
   const resetButtonStateIfTwoTransactionStates = useCallback(() => {
     setButtonState((buttonState) => {
@@ -586,8 +590,10 @@ const useSwapInternal = (props: UseSwapArgs = {}): UseSwap => {
     asyncStandardTokenAccounts.value,
     connection,
     fetchPool,
+    inputTokenName,
     inputUserTokenAccount,
     intermediateTokenName,
+    outputTokenName,
     outputUserTokenAccount?.account,
     programIds,
     refreshStandardTokenAccounts,
@@ -609,6 +615,8 @@ const useSwapInternal = (props: UseSwapArgs = {}): UseSwap => {
     inputTokenAmount,
     inputTokenPrice,
     outputTokenPrice,
+    intermediateTokenName,
+    intermediateTokenPrice,
     buttonState,
     onSetupTokenAccounts,
     onSwap,

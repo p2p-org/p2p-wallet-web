@@ -6,6 +6,8 @@ import { rgba } from 'polished';
 import { Hint } from 'components/common/Hint';
 
 import { WrapperWidgetPage } from '../../../common/SendSwapWidget/common/styled';
+import { CurrentPrice } from './CurrentPrice';
+import { Fees } from './Fees';
 import orcaLogo from './orca_logo.svg';
 // import { PriceImpact } from './PriceImpact';
 // import { Properties } from './Properties';
@@ -102,10 +104,10 @@ export const SwapWidget: FC = () => {
             <SwapToForm />
           </ToSwapWrapper>
           <Lines>
-            {/*<CurrentPrice />*/}
+            <CurrentPrice />
             {/*/!*<PriceImpact />*!/*/}
             <Slippage />
-            {/*<Fees />*/}
+            <Fees />
           </Lines>
           <BottomWrapper>
             <SwapButton />
