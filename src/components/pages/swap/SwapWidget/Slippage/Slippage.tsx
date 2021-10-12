@@ -3,7 +3,8 @@ import React, { FC, useState } from 'react';
 import { styled } from '@linaria/react';
 import classNames from 'classnames';
 
-import { useSwap } from 'app/contexts/swapSerum';
+import { useSwap } from 'app/contexts/swap';
+import SlippageTolerance from 'app/contexts/swap/models/SlippageTolerance';
 import { Accordion, Button, Input } from 'components/ui';
 
 const Title = styled.div`
@@ -73,12 +74,18 @@ const CustomLabel = styled.label`
   line-height: 21px;
 `;
 
-interface Props {}
+const SLIPPAGES = ['0.1', '0.5', '1', '5'];
 
-export const Slippage: FC<Props> = (props) => {
-  const { slippage, setSlippage } = useSwap();
+export const Slippage: FC = () => {
+  const { slippageTolerance, setSlippageTolerance } = useSwap();
   const [isCustomShow, setIsCustomShow] = useState(false);
-  const [localSlippage, setLocalSlippage] = useState(String(slippage));
+  const [localSlippage, setLocalSlippage] = useState<string>(
+    !SLIPPAGES.some((slippage) => {
+      return SlippageTolerance.fromString(slippage).eq(slippageTolerance);
+    })
+      ? slippageTolerance.toString()
+      : '',
+  );
 
   const clearSlippage = (nextSlippage: string) => {
     let cleanSlippage = nextSlippage.replace(/,/g, '.'); // , to .
@@ -96,21 +103,25 @@ export const Slippage: FC<Props> = (props) => {
   };
 
   const handleSlippageClick = (newSlippage: string) => () => {
-    setSlippage(Number(clearSlippage(newSlippage)));
+    setSlippageTolerance(SlippageTolerance.fromString(newSlippage));
   };
 
   const handleSlippageChange = (newSlippage: string) => {
     const cleanSlippage = clearSlippage(newSlippage);
     // if slippage correct
-    if (newSlippage && cleanSlippage === newSlippage) {
-      setSlippage(Number(cleanSlippage));
+    if (newSlippage && Number(localSlippage) && cleanSlippage === newSlippage) {
+      setSlippageTolerance(SlippageTolerance.fromString(cleanSlippage));
     }
 
     setLocalSlippage(cleanSlippage);
   };
 
   const handleSlippageBlur = () => {
-    setSlippage(Number(localSlippage));
+    if (!Number(localSlippage)) {
+      return;
+    }
+
+    setSlippageTolerance(SlippageTolerance.fromString(localSlippage));
   };
 
   const handleToggleCustomShow = () => {
@@ -121,7 +132,7 @@ export const Slippage: FC<Props> = (props) => {
     <Accordion
       title={
         <Title>
-          <Left>Max price slippage</Left> <Right>{slippage} %</Right>
+          <Left>Max price slippage</Left> <Right>{slippageTolerance.toString()} %</Right>
         </Title>
       }>
       <div>
@@ -130,13 +141,13 @@ export const Slippage: FC<Props> = (props) => {
         periods of higher volatility when market orders are used.
       </div>
       <OptionsWrapper>
-        {[0.1, 0.5, 1, 5].map((value) => (
+        {SLIPPAGES.map((value) => (
           <OptionButton
             key={value}
             lightGray
             small
-            className={classNames({ active: slippage === value })}
-            onClick={handleSlippageClick(String(value))}>
+            className={classNames({ active: slippageTolerance.stringEq(value) })}
+            onClick={handleSlippageClick(value)}>
             {value}%
           </OptionButton>
         ))}

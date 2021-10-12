@@ -6,10 +6,11 @@ import { rgba } from 'polished';
 import { Hint } from 'components/common/Hint';
 
 import { WrapperWidgetPage } from '../../../common/SendSwapWidget/common/styled';
+import orcaLogo from './orca_logo.svg';
 // import { PriceImpact } from './PriceImpact';
 // import { Properties } from './Properties';
 import { Reverse } from './Reverse';
-import serumLogo from './serum_logo.svg';
+import { Slippage } from './Slippage';
 import { SwapButton } from './SwapButton';
 import { SwapFromForm } from './SwapFromForm';
 import { SwapToForm } from './SwapToForm';
@@ -103,7 +104,7 @@ export const SwapWidget: FC = () => {
           <Lines>
             {/*<CurrentPrice />*/}
             {/*/!*<PriceImpact />*!/*/}
-            {/*<Slippage />*/}
+            <Slippage />
             {/*<Fees />*/}
           </Lines>
           <BottomWrapper>
@@ -113,7 +114,7 @@ export const SwapWidget: FC = () => {
         <PoweredByBannerWrapper>
           <PoweredBy>Powered by </PoweredBy>
           <a href="https://www.orca.so/" target="_blank" rel="noopener noreferrer noindex">
-            <img src={serumLogo} alt="Orca" />
+            <img src={orcaLogo} alt="Orca" />
           </a>
         </PoweredByBannerWrapper>
       </WrapperWidgetPage>

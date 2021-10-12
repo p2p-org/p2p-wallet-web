@@ -94,8 +94,6 @@ const useConfigInternal = (): UseConfig => {
 
   const tokenConfigs = createTokenConfig(tokens[network]) as TokenConfigs;
 
-  console.log(333, tokenConfigs);
-
   const aquafarmConfigs = Object.fromEntries(
     Object.entries(aquafarms[network]).map(([poolAddress, obj]) => {
       return [poolAddress, createAquafarmConfig(obj)];
