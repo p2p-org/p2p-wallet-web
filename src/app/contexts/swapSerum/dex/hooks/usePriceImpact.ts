@@ -12,7 +12,6 @@ export function usePriceImpact(): number {
   const route = useRoute(fromMint, toMint);
   // Use last route item to find impact
   const market = route ? route[route.length - 1] : undefined;
-  console.log(111, market?.toBase58());
 
   const orderbook = useOrderbook(market);
 
@@ -44,12 +43,10 @@ export function usePriceImpact(): number {
       order = orders.next();
     }
 
-    console.log(111, initialPrice, priceAfterOrder);
-
     const priceChange = Math.abs(initialPrice - priceAfterOrder);
     const priceImpact = (priceChange * 100) / initialPrice;
     return priceImpact;
-  }, [orderbook, toAmount]);
+  }, [orderbook, toAmount, toMint]);
 
   return priceImpact;
 }
