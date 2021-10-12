@@ -264,7 +264,10 @@ export const TopWidgetOrigin: FunctionComponent<Props> = ({ publicKey }) => {
           </ButtonStyled>
         </Link>
         <Link
-          to={{ pathname: `/swap/${publicKey}`, state: { fromPage: location.pathname } }}
+          to={{
+            pathname: `/swap/${tokenAccount?.mint.symbol}`,
+            state: { fromPage: location.pathname },
+          }}
           title="Swap"
           onClick={() => trackEvent('wallet_swap_click')}
           className="button">

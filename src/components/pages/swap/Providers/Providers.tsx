@@ -1,4 +1,5 @@
 import React, { FC } from 'react';
+import { useParams } from 'react-router-dom';
 
 import {
   ConfigProvider,
@@ -9,12 +10,14 @@ import {
 } from 'app/contexts/swap';
 
 export const Providers: FC = ({ children }) => {
+  const { symbol } = useParams<{ symbol?: string }>();
+
   return (
     <ConfigProvider>
       <UserProvider>
         <PoolsProvider>
           <PriceProvider>
-            <SwapProvider>{children}</SwapProvider>
+            <SwapProvider initialState={{ inputTokenName: symbol }}>{children}</SwapProvider>
           </PriceProvider>
         </PoolsProvider>
       </UserProvider>
