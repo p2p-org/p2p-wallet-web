@@ -13,6 +13,7 @@ export const SwapToForm: FC<Props> = ({ className }) => {
 
   return (
     <SwapTokenForm
+      trade={trade}
       tokenName={trade.outputTokenName}
       setTokenName={setOutputTokenName}
       pairTokenName={trade.inputTokenName}

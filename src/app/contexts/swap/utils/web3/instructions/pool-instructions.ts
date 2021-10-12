@@ -1,5 +1,6 @@
 import { u64 } from '@solana/spl-token';
 import { PublicKey, TransactionInstruction } from '@solana/web3.js';
+import { Buffer } from 'buffer';
 import * as BufferLayout from 'buffer-layout';
 
 import * as Layout from './layout';

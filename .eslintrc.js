@@ -21,7 +21,7 @@ module.exports = {
 
     // https://basarat.gitbooks.io/typescript/docs/tips/defaultIsBad.html
     'import/prefer-default-export': 'off',
-    'import/no-default-export': 'error',
+    // 'import/no-default-export': 'error',
 
     // sort
     'sort-imports': 'off',

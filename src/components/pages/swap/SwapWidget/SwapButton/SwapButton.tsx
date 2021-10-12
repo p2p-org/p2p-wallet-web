@@ -1,14 +1,14 @@
 import React, { FC } from 'react';
 
-import { SOL_MINT, useSwap } from 'app/contexts/swapSerum';
+import { useSwap } from 'app/contexts/swap';
 
 // import { SwapButtonFeeRelayer } from './SwapButtonFeeRelayer';
 import { SwapButtonOriginal } from './SwapButtonOriginal';
 
 export const SwapButton: FC = () => {
-  const { fromMint } = useSwap();
+  const { trade } = useSwap();
 
-  const isSol = fromMint.equals(SOL_MINT);
+  const isSol = trade.inputTokenName === 'SOL';
 
   if (isSol) {
     return <SwapButtonOriginal />;

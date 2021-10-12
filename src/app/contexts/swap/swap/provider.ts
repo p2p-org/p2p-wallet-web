@@ -68,19 +68,15 @@ export interface UseSwap {
   trade: Trade;
 
   // Mint being traded from. The user must own these tokens.
-  // fromMint: PublicKey;
   setInputTokenName: (m: string) => void;
 
   // Mint being traded to. The user will receive these tokens after the swap.
-  // toMint: PublicKey;
   setOutputTokenName: (m: string) => void;
 
   // Amount used for the swap.
-  // fromAmount: number;
   setInputAmount: (a: u64) => void;
 
   // *Expected* amount received from the swap.
-  // toAmount: number;
   setOutputAmount: (a: u64) => void;
 
   // Function to flip what we consider to be the "to" and "from" mints.
@@ -90,27 +86,32 @@ export interface UseSwap {
   setSlippageTolerance: (tolerance: SlippageTolerance) => void;
 
   // referral?: PublicKey;
+
+  inputTokenAmount: u64 | undefined;
+  buttonState: ButtonState;
+  onSetupTokenAccounts: () => Promise<void>;
+  onSwap: () => Promise<void>;
 }
 
 export type UseSwapArgs = {
-  fromMint?: string;
-  toMint?: string;
+  inputTokenName?: string;
+  outputTokenName?: string;
   // fromAmount?: number;
   // toAmount?: number;
   // referral?: PublicKey;
 };
 
 const useSwapInternal = (props: UseSwapArgs = {}): UseSwap => {
-  const { wallet } = useSolana();
-  const { tokenConfigs, routeConfigs } = useConfig();
-  const [inputTokenName, _setInputTokenName] = useState(props.fromMint ?? 'USDC');
-  const [outputTokenName, _setOutputTokenName] = useState(props.toMint ?? 'SOL');
+  const { wallet, connection } = useSolana();
+  const { programIds, tokenConfigs, routeConfigs } = useConfig();
+  const [inputTokenName, _setInputTokenName] = useState(props.inputTokenName ?? 'USDC');
+  const [outputTokenName, _setOutputTokenName] = useState(props.outputTokenName ?? 'SOL');
   const [slippageToleranceState, setSlippageToleranceState] = useLocalStorage<{
     numerator: string;
     denominator: string;
   }>(Keys.SLIPPAGE_TOLERANCE, DEFAULT_SLIPPAGE_TOLERANCE_STATE);
   const [buttonState, setButtonState] = useState(ButtonState.ConnectWallet);
-  const [isFairnessIndicatorCollapsed, setIsFairnessIndicatorCollapsed] = useState(true);
+  // const [isFairnessIndicatorCollapsed, setIsFairnessIndicatorCollapsed] = useState(true);
 
   const slippageTolerance = useMemo(() => {
     return new SlippageTolerance(
@@ -168,6 +169,8 @@ const useSwapInternal = (props: UseSwapArgs = {}): UseSwap => {
       trade.requiresTwoTransactions(asyncStandardTokenAccounts.value),
   );
 
+  const intermediateTokenName = trade.getIntermediateTokenName();
+
   function resetButtonStateIfTwoTransactionStates() {
     setButtonState((buttonState) => {
       if (stepOneStates.includes(buttonState) || stepTwoStates.includes(buttonState)) {
@@ -180,7 +183,7 @@ const useSwapInternal = (props: UseSwapArgs = {}): UseSwap => {
 
   function resetStates() {
     resetButtonStateIfTwoTransactionStates();
-    setIsFairnessIndicatorCollapsed(true);
+    // setIsFairnessIndicatorCollapsed(true);
   }
 
   const setInputTokenName = useCallback(
@@ -314,20 +317,236 @@ const useSwapInternal = (props: UseSwapArgs = {}): UseSwap => {
     );
   }, [buttonState]);
 
+  const inputTokenAmount = inputUserTokenAccount?.accountInfo.amount;
+
+  const onSetupTokenAccounts = useCallback(async () => {
+    // setErrorMessage('');
+
+    if (!asyncStandardTokenAccounts.value) {
+      throw new Error('UserTokenAccounts has not loaded yet');
+    }
+
+    if (!wallet) {
+      throw new Error('Wallet not set');
+    }
+
+    const tokenNames = trade.getTokenNamesToSetup(asyncStandardTokenAccounts.value);
+    setButtonState(ButtonState.TwoTransactionsConfirmStepOne);
+
+    let txSignature, executeSetup;
+
+    try {
+      ({ txSignature, executeSetup } = await trade.confirmSetup(
+        connection,
+        tokenConfigs,
+        programIds,
+        wallet,
+        tokenNames,
+      ));
+      // setSolanaExplorerLink(getExplorerUrl('tx', txSignature, cluster));
+    } catch (e) {
+      console.error(e);
+      // setErrorMessage(walletConfirmationFailure);
+      setButtonState(ButtonState.TwoTransactionsStepOne);
+      return;
+    }
+
+    setButtonState(ButtonState.TwoTransactionsSendingStepOne);
+
+    try {
+      await executeSetup();
+    } catch (e) {
+      console.error(e);
+      // setErrorMessage('Something went wrong during setup. Please try again.');
+      setButtonState(ButtonState.TwoTransactionsRetryStepOne);
+      return;
+    }
+
+    // Hack: Pause for 10 seconds to increase the probability
+    // that we fetch the new token account even if the RPC server
+    // is unstable.
+    await new Promise((resolve) => setTimeout(resolve, 10_000));
+
+    try {
+      await refreshStandardTokenAccounts();
+    } catch (e) {
+      console.error(e);
+    }
+
+    setButtonState(ButtonState.TwoTransactionsStepTwo);
+    // setSolanaExplorerLink('');
+
+    // const snackbarKey = enqueueSnackbar(
+    //   <SetupNotification
+    //     closeSnackbar={() => closeSnackbar(snackbarKey)}
+    //     txid={txSignature}
+    //     tokenNames={tokenNames}
+    //   />,
+    // );
+  }, [
+    asyncStandardTokenAccounts.value,
+    connection,
+    programIds,
+    refreshStandardTokenAccounts,
+    tokenConfigs,
+    trade,
+    wallet,
+  ]);
+
+  const onSwap = useCallback(async () => {
+    // setErrorMessage('');
+
+    if (!asyncPools.value) {
+      throw new Error('Pools have not loaded yet');
+    }
+
+    if (!asyncStandardTokenAccounts.value || !inputUserTokenAccount) {
+      throw new Error('UserTokenAccounts has not loaded yet');
+    }
+
+    const inputAmount = trade.getInputAmount();
+    const outputAmount = trade.getOutputAmount();
+
+    if (inputAmount.eq(ZERO) || outputAmount.eq(ZERO)) {
+      throw new Error('Input amount has not been set');
+    }
+
+    if (!trade.derivedFields) {
+      throw new Error('Derived fields not set');
+    }
+
+    if (!wallet) {
+      throw new Error('Wallet not set');
+    }
+
+    const inputUserTokenPublicKey = inputUserTokenAccount.account;
+
+    setButtonState((buttonState) => {
+      if (buttonState === ButtonState.TwoTransactionsStepTwo) {
+        return ButtonState.TwoTransactionsConfirmStepTwo;
+      }
+
+      return ButtonState.ConfirmWallet;
+    });
+
+    const intermediateTokenPublicKey = intermediateTokenName
+      ? asyncStandardTokenAccounts.value[intermediateTokenName]
+      : undefined;
+
+    let executeExchange, txSignature;
+    try {
+      ({ executeExchange, txSignature } = await trade.confirmExchange(
+        connection,
+        tokenConfigs,
+        programIds,
+        wallet,
+        inputUserTokenPublicKey,
+        intermediateTokenPublicKey?.account,
+        outputUserTokenAccount?.account,
+      ));
+      // setSolanaExplorerLink(getExplorerUrl('tx', txSignature, cluster));
+    } catch (e) {
+      console.error(e);
+      // setErrorMessage(walletConfirmationFailure);
+      setButtonState((buttonState) => {
+        if (buttonState === ButtonState.TwoTransactionsConfirmStepTwo) {
+          return ButtonState.TwoTransactionsStepTwo;
+        }
+
+        return ButtonState.Exchange;
+      });
+      return;
+    }
+
+    setButtonState((buttonState) => {
+      if (buttonState === ButtonState.TwoTransactionsConfirmStepTwo) {
+        return ButtonState.TwoTransactionsSendingStepTwo;
+      }
+
+      return ButtonState.SendingTransaction;
+    });
+
+    function getFailedTransactionErrorMessage(rawMessage: string) {
+      if (rawMessage.includes('Transaction too large')) {
+        return 'Transaction failed. Please try again.';
+      } else if (rawMessage.includes('custom program error: 0x10')) {
+        return 'The price moved more than your slippage tolerance setting. You can increase your tolerance or simply try again.';
+      } else if (rawMessage.includes('Blockhash not found')) {
+        return 'Transaction timed out. Please try again.';
+      } else {
+        return 'Oops, something went wrong. Please try again!';
+      }
+    }
+
+    try {
+      await executeExchange();
+    } catch (e) {
+      console.error(e);
+      const error = getFailedTransactionErrorMessage(e.message);
+      // setErrorMessage(error);
+      setButtonState((buttonState) => {
+        if (buttonState === ButtonState.TwoTransactionsSendingStepTwo) {
+          return ButtonState.TwoTransactionsRetryStepTwo;
+        }
+
+        return ButtonState.Retry;
+      });
+      return;
+    }
+
+    try {
+      const fetchingUserTokenAccounts = refreshStandardTokenAccounts();
+      await Promise.all(trade.derivedFields.selectedRoute.map((poolId) => fetchPool(poolId)));
+      await fetchingUserTokenAccounts;
+    } catch (e) {
+      console.error(e);
+    }
+
+    setTrade(trade.clearAmounts());
+    setButtonState(ButtonState.Exchange);
+    // setSolanaExplorerLink('');
+
+    // const snackbarKey = enqueueSnackbar(
+    //   <ExchangeNotification
+    //     closeSnackbar={() => closeSnackbar(snackbarKey)}
+    //     txid={txSignature}
+    //     inputTokenAmount={inputAmount}
+    //     inputTokenName={trade.inputTokenName}
+    //     outputTokenAmount={outputAmount}
+    //     outputTokenName={trade.outputTokenName}
+    //     inputDecimals={tokenConfigs[trade.inputTokenName].decimals}
+    //     outputDecimals={tokenConfigs[trade.outputTokenName].decimals}
+    //   />,
+    // );
+  }, [
+    asyncPools.value,
+    asyncStandardTokenAccounts.value,
+    connection,
+    fetchPool,
+    inputUserTokenAccount,
+    intermediateTokenName,
+    outputUserTokenAccount?.account,
+    programIds,
+    refreshStandardTokenAccounts,
+    tokenConfigs,
+    trade,
+    wallet,
+  ]);
+
   return {
     trade,
-    // fromMint,
     setInputTokenName,
-    // toMint,
     setOutputTokenName,
-    // fromAmount,
     setInputAmount,
-    // toAmount,
     setOutputAmount,
     switchTokens,
     slippageTolerance,
     setSlippageTolerance,
     // referral,
+    inputTokenAmount,
+    buttonState,
+    onSetupTokenAccounts,
+    onSwap,
   };
 };
 

@@ -104,7 +104,7 @@ export default class TransactionBuilder {
     transaction.add(...this.instructions.concat(this.cleanupInstructions));
 
     // Transaction must specify `recentBlockhash` to prevent replay attacks
-    transaction.recentBlockhash = (await connection.getRecentBlockhash('singleGossip')).blockhash;
+    transaction.recentBlockhash = (await connection.getRecentBlockhash()).blockhash;
 
     // Generate all required signatures; add owner's signature later
     transaction.setSigners(

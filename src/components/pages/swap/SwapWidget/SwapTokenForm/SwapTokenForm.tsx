@@ -7,12 +7,16 @@ import throttle from 'lodash.throttle';
 import { isNil } from 'ramda';
 
 import { useConfig } from 'app/contexts/swap';
+import Trade from 'app/contexts/swap/models/Trade';
+import { formatBigNumber, parseString } from 'app/contexts/swap/utils/format';
+import { useOwnedTokenAccount } from 'app/contexts/swapSerum/token';
 import { AmountUSD } from 'components/common/AmountUSD';
 import { Empty } from 'components/common/Empty';
 import { SlideContainer } from 'components/common/SlideContainer';
 import { TokenAvatar } from 'components/common/TokenAvatar';
 import { Icon } from 'components/ui';
 import { SearchInput } from 'components/ui/SearchInput';
+import { usePreviousValueHook } from 'utils/hooks/usePreviousValueHook';
 import { shortAddress } from 'utils/tokens';
 
 import { TokenRow } from './TokenRow';
@@ -303,24 +307,28 @@ function matchesFilter(str: string, filter: string) {
 }
 
 interface Props {
+  trade: Trade;
   isInput?: boolean;
   tokenName: string;
   setTokenName: (m: string) => void;
   pairTokenName: string;
   amount: u64;
   setAmount: (a: u64) => void;
+  maxAmount?: u64 | undefined;
   disabled?: boolean;
   disabledInput?: boolean;
   className?: string;
 }
 
 export const SwapTokenForm: FC<Props> = ({
+  trade,
   isInput,
   tokenName,
   setTokenName,
   pairTokenName,
   amount,
   setAmount,
+  maxAmount,
   disabled,
   disabledInput,
   className,
@@ -328,36 +336,43 @@ export const SwapTokenForm: FC<Props> = ({
   const selectorRef = useRef<HTMLDivElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
-  const [isOpen, setIsOpen] = useState(false);
-  const [localAmount, setLocalAmount] = useState(String(amount));
-  const [scrollTop, setScrollTop] = useState(0);
-  const [filter, setFilter] = useState('');
+
   const { tokenConfigs } = useConfig();
+  const [isOpen, setIsOpen] = useState(false);
+  const [amountString, setAmountString] = useState(String(amount));
+  const [filter, setFilter] = useState('');
+  const [scrollTop, setScrollTop] = useState(0);
+  const previousTrade = usePreviousValueHook(trade);
 
   const tokenInfo = tokenConfigs[tokenName];
 
-  // const tokenAccount = useOwnedTokenAccount(mint);
-  // const mintAccount = useMint(mint);
+  // Update the input value if the trade object provides a new amount
+  useEffect(() => {
+    if (trade === previousTrade) {
+      return;
+    }
 
-  // const balance =
-  //   tokenAccount &&
-  //   mintAccount &&
-  //   tokenAccount.account.amount.toNumber() / 10 ** mintAccount.decimals;
+    const decimals = tokenConfigs[tokenName].decimals;
+    if (parseString(amountString, decimals).eq(amount)) {
+      return;
+    }
 
-  // const hasBalance = (balance || 0) >= Number(localAmount);
+    setAmountString(formatBigNumber(amount, decimals));
+  }, [trade, previousTrade, amount, amountString, tokenConfigs, tokenName]);
+
+  // useEffect(() => {
+  //   const decimals = tokenConfigs[tokenName].decimals;
+  //   if (!isNil(amount) && amount.eq(parseString(amountString, decimals))) {
+  //     setAmountString(amount.toString());
+  //   }
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [amount]);
 
   const boxShadow = useMemo(() => {
     return `0 5px 10px rgba(56, 60, 71, ${
       scrollTop >= SCROLL_THRESHOLD ? '0.05' : 0.003 * scrollTop
     }`;
   }, [scrollTop]);
-
-  useEffect(() => {
-    if (!isNil(amount) && amount !== Number(localAmount)) {
-      setLocalAmount(amount.toString());
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [amount]);
 
   const handleAwayClick = (e: MouseEvent) => {
     if (
@@ -416,8 +431,8 @@ export const SwapTokenForm: FC<Props> = ({
 
     if (Number(nextAmount) === 0) {
       nextAmount = '';
-      setLocalAmount(nextAmount);
-      setAmount(0);
+      setAmountString(nextAmount);
+      setAmount(new u64(0));
     }
   };
 
@@ -432,10 +447,12 @@ export const SwapTokenForm: FC<Props> = ({
       nextAmount = '0.';
     }
 
-    setLocalAmount(nextAmount);
+    setAmountString(nextAmount);
 
     if (!isNil(Number(nextAmount))) {
-      setAmount(Number(nextAmount));
+      const tokenConfig = tokenConfigs[tokenName];
+      const maxDecimals = tokenConfig.decimals;
+      setAmount(parseString(nextAmount, maxDecimals));
     }
   };
 
@@ -499,34 +516,35 @@ export const SwapTokenForm: FC<Props> = ({
             </TokenWrapper>
             <AmountInput
               placeholder={Number(0).toFixed(tokenInfo?.decimals || 0)}
-              value={localAmount}
+              value={amountString === '0' && !isInput ? '' : amountString}
               onFocus={handleAmountFocus}
               onChange={handleAmountChange}
               disabled={disabled || disabledInput}
             />
           </SpecifyTokenWrapper>
-          {/*<BalanceWrapper>*/}
-          {/*  <BalanceText>*/}
-          {/*    {tokenAccount && mintAccount ? (*/}
-          {/*      isInput && !disabled ? (*/}
-          {/*        <AllBalance*/}
-          {/*          onClick={() => setAmount(balance || 0)}*/}
-          {/*          className={classNames({ disabled, error: !hasBalance })}>*/}
-          {/*          Available: {balance?.toFixed(mintAccount.decimals)}*/}
-          {/*        </AllBalance>*/}
-          {/*      ) : (*/}
-          {/*        <>Balance: {balance?.toFixed(mintAccount.decimals)}</>*/}
-          {/*      )*/}
-          {/*    ) : undefined}*/}
-          {/*    {!mint ? 'Select currency' : undefined}*/}
-          {/*  </BalanceText>*/}
-          {/*  {mint ? (*/}
-          {/*    <BalanceText>*/}
-          {/*      ≈{' '}*/}
-          {/*      <AmountUSDStyled value={new Decimal(localAmount || 0)} symbol={tokenInfo?.symbol} />*/}
-          {/*    </BalanceText>*/}
-          {/*  ) : undefined}*/}
-          {/*</BalanceWrapper>*/}
+          <BalanceWrapper>
+            <BalanceText>
+              {
+                isInput && maxAmount ? (
+                  <AllBalance
+                    onClick={() => setAmount(maxAmount)}
+                    className={classNames({ disabled, error: !maxAmount })}>
+                    Available: {formatBigNumber(maxAmount, tokenConfigs[tokenName].decimals)}
+                  </AllBalance>
+                ) : undefined
+                //   (
+                //   <>Balance: {formatBigNumber(maxAmount, tokenConfigs[tokenName].decimals)}</>
+                // )
+              }
+              {/*{!mint ? 'Select currency' : undefined}*/}
+            </BalanceText>
+            {/*{mint ? (*/}
+            {/*  <BalanceText>*/}
+            {/*    ≈{' '}*/}
+            {/*    <AmountUSDStyled value={new Decimal(localAmount || 0)} symbol={tokenInfo?.symbol} />*/}
+            {/*  </BalanceText>*/}
+            {/*) : undefined}*/}
+          </BalanceWrapper>
         </InfoWrapper>
       </MainWrapper>
       {isOpen ? (
