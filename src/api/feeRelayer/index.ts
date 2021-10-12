@@ -113,7 +113,7 @@ const sendTransaction = async (
 
     const result = await res.text();
 
-    return result;
+    return result.replace(/[[\]']+/g, '');
   } catch (error) {
     throw new Error(`Can't send transaction: ${error}`);
   }

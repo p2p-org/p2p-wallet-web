@@ -85,6 +85,11 @@ const InfoTitle = styled.div`
   line-height: 24px;
 `;
 
+const Username = styled(InfoTitle)`
+  font-size: 16px;
+  color: #000;
+`;
+
 const InfoValue = styled.div`
   color: #000;
   font-weight: 600;
@@ -110,6 +115,7 @@ const PasswordInputStyled = styled(PasswordInput)`
 type TransferParams = {
   source: TokenAccount;
   destination: string;
+  username?: string;
   amount: number;
 };
 
@@ -224,7 +230,11 @@ export const TransactionConfirmModal: FunctionComponent<Props> = ({ type, params
               <WalletIcon name="wallet" />
             </IconWrapper>
             <InfoWrapper>
-              <InfoTitle>Check recepient’s address</InfoTitle>
+              {(params as TransferParams).username ? (
+                <Username>{(params as TransferParams).username}</Username>
+              ) : (
+                <InfoTitle>Check recepient’s address</InfoTitle>
+              )}
               <InfoValue>{(params as TransferParams).destination}</InfoValue>
             </InfoWrapper>
           </FieldInfo>

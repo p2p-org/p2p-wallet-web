@@ -52,7 +52,7 @@ const ToInput = styled.input`
 
   color: #000;
   font-weight: 600;
-  font-size: 18px;
+  font-size: 16px;
   line-height: 120%;
 
   background: transparent;
@@ -62,17 +62,64 @@ const ToInput = styled.input`
 
   appearance: none;
 
+  &.isAddressResolved {
+    height: 18px;
+    font-size: 16px;
+  }
+
+  &.hasError {
+    height: 18px;
+    font-size: 16px;
+  }
+
   &::placeholder {
     color: ${rgba('#A3A5BA', 0.5)};
   }
 `;
 
+const AddressWrapper = styled.div`
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+`;
+
+const Address = styled.div`
+  flex-grow: 1;
+  margin-left: 20px;
+
+  font-weight: 600;
+  font-size: 14px;
+
+  color: #a3a5ba;
+`;
+
+const BlueText = styled.span`
+  color: #5887ff;
+`;
+
+const Error = styled.div`
+  flex-grow: 1;
+  margin-left: 20px;
+
+  font-weight: 600;
+  font-size: 14px;
+
+  color: #f43d3d;
+`;
+
 type Props = {
   value: string;
+  resolvedAddress?: string | null;
+  isAddressInvalid: boolean;
   onChange: (publicKey: string) => void;
 };
 
-export const ToAddressInput: FunctionComponent<Props> = ({ value, onChange }) => {
+export const ToAddressInput: FunctionComponent<Props> = ({
+  value,
+  resolvedAddress,
+  isAddressInvalid = false,
+  onChange,
+}) => {
   const [isFocused, setIsFocused] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -86,13 +133,24 @@ export const ToAddressInput: FunctionComponent<Props> = ({ value, onChange }) =>
       <IconWrapper className={classNames({ isFocused })}>
         <WalletIcon name="home" />
       </IconWrapper>
-      <ToInput
-        placeholder="Enter address"
-        value={value}
-        onChange={handleChange}
-        onFocus={() => setIsFocused(true)}
-        onBlur={() => setIsFocused(false)}
-      />
+      <AddressWrapper>
+        <ToInput
+          className={classNames({ isAddressResolved: resolvedAddress, hasError: isAddressInvalid })}
+          placeholder="Enter address"
+          value={value}
+          onChange={handleChange}
+          onFocus={() => setIsFocused(true)}
+          onBlur={() => setIsFocused(false)}
+        />
+        {resolvedAddress ? (
+          <Address>
+            <BlueText>{resolvedAddress.slice(0, 4)}</BlueText>
+            {resolvedAddress.slice(4, -4)}
+            <BlueText>{resolvedAddress.slice(-4)}</BlueText>
+          </Address>
+        ) : undefined}
+        {isAddressInvalid ? <Error>There’s no address like this</Error> : undefined}
+      </AddressWrapper>
     </WrapperLabel>
   );
 };
