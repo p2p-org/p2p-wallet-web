@@ -322,9 +322,20 @@ export const connectWallet = createAsyncThunk<string, WalletDataType | undefined
 
 export const lookupName = createAsyncThunk<LookupResponce | null, string>(
   `${WALLET_SLICE_NAME}/lookupName`,
-  async (owner) => {
-    const names = await NameServiceApi(owner).lookupName(owner);
+  async (owner, thunkAPI) => {
+    const state: RootState = thunkAPI.getState() as RootState;
+    const names = await NameServiceApi(state.wallet.network.cluster).lookupName(owner);
     return names.length > 0 ? names[0] : null;
+  },
+);
+
+export const resolveUsername = createAsyncThunk<string | null, string>(
+  `${WALLET_SLICE_NAME}/resolveUsername`,
+  async (username, thunkAPI) => {
+    const state: RootState = thunkAPI.getState() as RootState;
+    const result = await NameServiceApi(state.wallet.network.cluster).resolveName(username);
+    if (!result) return null;
+    return result.owner;
   },
 );
 

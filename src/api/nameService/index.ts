@@ -8,8 +8,15 @@ export type LookupResponce = {
   parent: string;
 };
 
+export type ResolveUsernameResponce = {
+  parent_name: string;
+  owner: string;
+  class: string;
+};
+
 export interface API {
   lookupName: (owner: string | null) => Promise<Array<LookupResponce>>;
+  resolveName: (name: string) => Promise<ResolveUsernameResponce | null>;
 }
 
 export const APIFactory = memoizeWith(
@@ -33,8 +40,27 @@ export const APIFactory = memoizeWith(
       }
     };
 
+    const resolveName = async (name: string): Promise<ResolveUsernameResponce | null> => {
+      if (!name) return null;
+      try {
+        const res = await fetch(`${nameSericeUrl}/${name}`);
+
+        if (res.status === 404) {
+          return null;
+        }
+
+        const result = await res.json();
+
+        return result;
+      } catch (error) {
+        console.error(error);
+        return null;
+      }
+    };
+
     return {
       lookupName,
+      resolveName,
     };
   },
 );

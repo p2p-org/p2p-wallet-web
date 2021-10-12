@@ -30,6 +30,7 @@ import {
   getMinimumBalanceForRentExemption,
   getRecentBlockhash,
   getTokenAccount,
+  resolveUsername,
   transfer,
 } from 'store/slices/wallet/WalletSlice';
 import { minorAmountToMajor } from 'utils/amount';
@@ -161,6 +162,7 @@ const SendIcon = styled(Icon)`
 
 const SOURCE_NETWORKS = ['solana', 'bitcoin'];
 const BURN_ALLOCATE_ACCOUNT_SIZE = 97;
+const USERNAME_MAX_LENGTH = 15;
 
 type Props = {
   publicKey: string | null;
@@ -220,6 +222,7 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
   const [destinationNetwork, setDestinationNetwork] = useState(SOURCE_NETWORKS[0]);
   const [isInitBurnAndRelease, setIsInitBurnAndRelease] = useState(false);
   const [renBtcMinimalAmount, setRenBtcMinimalAmount] = useState(0);
+  const [usernameResolvedAddress, setUsernameResolvedAddress] = useState<string | null>(null);
 
   const network = useRenNetwork();
   const isSolanaNetwork = destinationNetwork === 'solana';
@@ -238,6 +241,26 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
     (state: RootState) => state.wallet.settings.useFreeTransactions,
   );
   const isNetworkSourceSelectorVisible = fromTokenAccount?.mint.symbol === 'renBTC';
+
+  useEffect(() => {
+    async function resolveName() {
+      const resolved = unwrapResult(await dispatch(resolveUsername(toTokenPublicKey)));
+      if (resolved) {
+        setUsernameResolvedAddress(resolved);
+      } else {
+        setUsernameResolvedAddress(null);
+      }
+    }
+    if (
+      isSolanaNetwork &&
+      toTokenPublicKey.length > 0 &&
+      toTokenPublicKey.length <= USERNAME_MAX_LENGTH
+    ) {
+      resolveName();
+    } else {
+      setUsernameResolvedAddress(null);
+    }
+  }, [dispatch, isSolanaNetwork, toTokenPublicKey]);
 
   useEffect(() => {
     const mount = async () => {
@@ -315,7 +338,9 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
       throw new Error('Invalid amount');
     }
 
-    const destination = new PublicKey(toTokenPublicKey);
+    const destination = new PublicKey(
+      usernameResolvedAddress ? usernameResolvedAddress : toTokenPublicKey,
+    );
 
     if (fromTokenAccount?.mint.symbol !== 'SOL') {
       const account = unwrapResult(await dispatch(getTokenAccount(destination)));
@@ -432,7 +457,11 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
     : false;
 
   const isDisabled = isExecuting;
-  const isValidDestinationAddress = isValidAddress(isSolanaNetwork, toTokenPublicKey, network);
+  const isValidDestinationAddress = isValidAddress(
+    isSolanaNetwork,
+    usernameResolvedAddress ? usernameResolvedAddress : toTokenPublicKey,
+    network,
+  );
   const toolTipItems = [];
   if (useFreeTransactions && !isNetworkSourceSelectorVisible) {
     toolTipItems.push(
@@ -478,7 +507,7 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
           <ToSendWrapper>
             <FromTitle>To</FromTitle>
             <ToAddressInput value={toTokenPublicKey || ''} onChange={handleToPublicKeyChange} />
-            {toTokenPublicKey.length > 0 && !isValidDestinationAddress ? (
+            {toTokenPublicKey.length > USERNAME_MAX_LENGTH && !isValidDestinationAddress ? (
               <Error>Check recepient address</Error>
             ) : undefined}
             {isShowConfirmAddressSwitch ? (
