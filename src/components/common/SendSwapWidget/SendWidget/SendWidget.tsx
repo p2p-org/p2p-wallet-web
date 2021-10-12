@@ -162,7 +162,6 @@ const SendIcon = styled(Icon)`
 
 const SOURCE_NETWORKS = ['solana', 'bitcoin'];
 const BURN_ALLOCATE_ACCOUNT_SIZE = 97;
-const USERNAME_MAX_LENGTH = 15;
 
 type Props = {
   publicKey: string | null;
@@ -179,7 +178,7 @@ const isValidAddress = (
   address: string,
   network: RenNetwork,
 ): boolean => {
-  if (isSolanaNetwork) {
+  if (isSolanaNetwork && address.length >= 40) {
     try {
       // eslint-disable-next-line no-new
       new PublicKey(address);
@@ -223,10 +222,9 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
   const [isInitBurnAndRelease, setIsInitBurnAndRelease] = useState(false);
   const [renBtcMinimalAmount, setRenBtcMinimalAmount] = useState(0);
   const [usernameResolvedAddress, setUsernameResolvedAddress] = useState<string | null>(null);
+  const [isSolanaNetwork, setIsSolanaNetwork] = useState(true);
 
   const network = useRenNetwork();
-  const isSolanaNetwork = destinationNetwork === 'solana';
-
   const { fees, pending: isFetchingFee } = useFetchFees(!isSolanaNetwork);
 
   const tokenAccounts = useSelector((state: RootState) =>
@@ -243,6 +241,17 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
   const isNetworkSourceSelectorVisible = fromTokenAccount?.mint.symbol === 'renBTC';
 
   useEffect(() => {
+    if (destinationNetwork !== 'solana') {
+      setIsSolanaNetwork(false);
+    } else {
+      setIsSolanaNetwork(true);
+    }
+    if (destinationNetwork !== 'solana' && fromTokenAccount?.mint.symbol !== 'renBTC') {
+      setIsSolanaNetwork(true);
+    }
+  }, [destinationNetwork, fromTokenAccount?.mint.symbol]);
+
+  useEffect(() => {
     async function resolveName() {
       const resolved = unwrapResult(await dispatch(resolveUsername(toTokenPublicKey)));
       if (resolved) {
@@ -251,11 +260,7 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
         setUsernameResolvedAddress(null);
       }
     }
-    if (
-      isSolanaNetwork &&
-      toTokenPublicKey.length > 0 &&
-      toTokenPublicKey.length <= USERNAME_MAX_LENGTH
-    ) {
+    if (isSolanaNetwork && toTokenPublicKey.length > 0 && toTokenPublicKey.length <= 40) {
       resolveName();
     } else {
       setUsernameResolvedAddress(null);
@@ -374,6 +379,7 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
               source: fromTokenAccount,
               destination: destination.toBase58(),
               amount: fromAmount,
+              username: usernameResolvedAddress ? toTokenPublicKey : '',
             },
           },
         }),
@@ -457,11 +463,10 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
     : false;
 
   const isDisabled = isExecuting;
-  const isValidDestinationAddress = isValidAddress(
-    isSolanaNetwork,
-    usernameResolvedAddress ? usernameResolvedAddress : toTokenPublicKey,
-    network,
-  );
+  const destinationAddress = usernameResolvedAddress ? usernameResolvedAddress : toTokenPublicKey;
+  const isValidDestinationAddress = destinationAddress.length
+    ? isValidAddress(isSolanaNetwork, destinationAddress, network)
+    : true;
   const toolTipItems = [];
   if (useFreeTransactions && !isNetworkSourceSelectorVisible) {
     toolTipItems.push(
@@ -506,10 +511,12 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
           </FromWrapper>
           <ToSendWrapper>
             <FromTitle>To</FromTitle>
-            <ToAddressInput value={toTokenPublicKey || ''} onChange={handleToPublicKeyChange} />
-            {toTokenPublicKey.length > USERNAME_MAX_LENGTH && !isValidDestinationAddress ? (
-              <Error>Check recepient address</Error>
-            ) : undefined}
+            <ToAddressInput
+              value={toTokenPublicKey || ''}
+              resolvedAddress={usernameResolvedAddress}
+              isAddressInvalid={!isValidDestinationAddress}
+              onChange={handleToPublicKeyChange}
+            />
             {isShowConfirmAddressSwitch ? (
               <ConfirmWrapper className={classNames({ isShowConfirmAddressSwitch })}>
                 <ConfirmTextWrapper>
