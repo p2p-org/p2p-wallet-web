@@ -1,56 +1,26 @@
-import React, { FC, useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
+import React, { FC } from 'react';
 
 import { styled } from '@linaria/react';
-import { ZERO } from '@orca-so/sdk';
-import { u64 } from '@solana/spl-token';
 import { rgba } from 'polished';
 
-import { useSolana } from 'app/contexts/solana';
-import { useConfig, usePools, usePrice, useSwap } from 'app/contexts/swap';
-import SlippageTolerance from 'app/contexts/swap/models/SlippageTolerance';
-import Trade from 'app/contexts/swap/models/Trade';
-import { UserTokenAccountMap, useUser } from 'app/contexts/swap/user';
-import { getMaxAge } from 'app/contexts/swap/utils/AsyncCache';
-import {
-  getOraclePrice,
-  getRateDifferenceFromOracle,
-  isFairPrice,
-} from 'app/contexts/swap/utils/fairness';
-import { getTradeId } from 'app/contexts/swap/utils/pools';
-import { displayPriceImpact } from 'app/contexts/swap/utils/priceImpact';
-import {
-  getInputToken,
-  getOutputToken,
-  updateInputToken,
-  updateOutputToken,
-  useSelectedTokens,
-} from 'app/contexts/swap/utils/selectedTokens';
-import { minSolBalanceForSwap } from 'app/contexts/swap/utils/tokenAccounts';
 import { Hint } from 'components/common/Hint';
-import { getExplorerUrl } from 'utils/connection';
-import { useLocalStorage } from 'utils/hooks/useLocalStorage';
 
 import { WrapperWidgetPage } from '../../../common/SendSwapWidget/common/styled';
-import { CurrentPrice } from './CurrentPrice';
-import { Fees } from './Fees';
 // import { PriceImpact } from './PriceImpact';
 // import { Properties } from './Properties';
 import { Reverse } from './Reverse';
 import serumLogo from './serum_logo.svg';
-import { SettingsAction } from './SettingsAction';
-import { Slippage } from './Slippage';
 import { SwapButton } from './SwapButton';
 import { SwapFromForm } from './SwapFromForm';
 import { SwapToForm } from './SwapToForm';
 
-const ActionsWrapper = styled.div`
-  display: flex;
-
-  &:not(:last-child) {
-    margin-right: 10px;
-  }
-`;
+// const ActionsWrapper = styled.div`
+//   display: flex;
+//
+//   &:not(:last-child) {
+//     margin-right: 10px;
+//   }
+// `;
 
 const Wrapper = styled.div`
   padding: 24px 20px;
@@ -100,15 +70,6 @@ const PoweredBy = styled.div`
 `;
 
 export const SwapWidget: FC = () => {
-  // const { wallet, connection } = useSolana();
-  // const { programIds, tokenConfigs } = useConfig();
-  const { trade } = useSwap();
-
-  // const intermediateTokenName = trade.getIntermediateTokenName();
-
-  // const [errorMessage, setErrorMessage] = useState<React.ReactNode>('');
-  // const [solanaExplorerLink, setSolanaExplorerLink] = useState('');
-
   // useEffect(() => {
   //   if (trade.outputTooHigh) {
   //     setErrorMessage('The amount you entered is too high. Please try a smaller amount.');

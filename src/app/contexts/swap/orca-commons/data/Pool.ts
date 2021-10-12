@@ -4,9 +4,13 @@ import { PublicKey } from '@solana/web3.js';
 import type { AquafarmConfig, PoolConfig, PoolJSON } from '../types';
 
 export enum CurveType {
+  // eslint-disable-next-line no-unused-vars
   ConstantProduct = 0,
+  // eslint-disable-next-line no-unused-vars
   ConstantPrice = 1,
+  // eslint-disable-next-line no-unused-vars
   Stable = 2,
+  // eslint-disable-next-line no-unused-vars
   Offset = 3,
 }
 

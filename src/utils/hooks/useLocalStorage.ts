@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useReducer } from 'react';
 
 export enum Keys {
-  SELECTED_TOKENS = 'SELECTED_TOKENS',
+  // eslint-disable-next-line
   SLIPPAGE_TOLERANCE = 'SLIPPAGE_TOLERANCE',
 }
 

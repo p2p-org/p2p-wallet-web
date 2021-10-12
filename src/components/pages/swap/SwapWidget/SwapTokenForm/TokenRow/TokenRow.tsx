@@ -1,13 +1,8 @@
 import React, { FunctionComponent } from 'react';
 
 import { styled } from '@linaria/react';
-import { PublicKey } from '@solana/web3.js';
-import { Decimal } from 'decimal.js';
 
 import { useConfig } from 'app/contexts/swap';
-import { useOwnedTokenAccount } from 'app/contexts/swapSerum/token';
-import { useTokenMap } from 'app/contexts/swapSerum/tokenList';
-import { AmountUSD } from 'components/common/AmountUSD';
 import { TokenAvatar } from 'components/common/TokenAvatar';
 import { shortAddress } from 'utils/tokens';
 

@@ -5,7 +5,7 @@ import { u64 } from '@solana/spl-token';
 import { createContainer } from 'unstated-next';
 
 import { useSolana } from 'app/contexts/solana';
-import { useConfig, usePools, usePrice, useUser } from 'app/contexts/swap';
+import { useConfig, usePools, useUser } from 'app/contexts/swap';
 import SlippageTolerance from 'app/contexts/swap/models/SlippageTolerance';
 import Trade from 'app/contexts/swap/models/Trade';
 import { getMaxAge } from 'app/contexts/swap/utils/AsyncCache';
@@ -21,26 +21,47 @@ export const defaultSelectedTokens = {
 const DEFAULT_SLIPPAGE_TOLERANCE_STATE = { numerator: '10', denominator: '1000' };
 
 export enum ButtonState {
+  // eslint-disable-next-line no-unused-vars
   ConnectWallet,
+  // eslint-disable-next-line no-unused-vars
   LoadingUserData,
+  // eslint-disable-next-line no-unused-vars
   RouteDoesNotExist,
+  // eslint-disable-next-line no-unused-vars
   Exchange,
+  // eslint-disable-next-line no-unused-vars
   TwoTransactionsStepOne,
+  // eslint-disable-next-line no-unused-vars
   TwoTransactionsConfirmStepOne,
+  // eslint-disable-next-line no-unused-vars
   TwoTransactionsSendingStepOne,
+  // eslint-disable-next-line no-unused-vars
   TwoTransactionsRetryStepOne,
+  // eslint-disable-next-line no-unused-vars
   TwoTransactionsStepTwo,
+  // eslint-disable-next-line no-unused-vars
   TwoTransactionsConfirmStepTwo,
+  // eslint-disable-next-line no-unused-vars
   TwoTransactionsSendingStepTwo,
+  // eslint-disable-next-line no-unused-vars
   TwoTransactionsRetryStepTwo,
+  // eslint-disable-next-line no-unused-vars
   ConfirmWallet,
+  // eslint-disable-next-line no-unused-vars
   SendingTransaction,
+  // eslint-disable-next-line no-unused-vars
   ZeroInputValue,
+  // eslint-disable-next-line no-unused-vars
   InputTokenAccountDoesNotExist,
+  // eslint-disable-next-line no-unused-vars
   InsufficientBalance,
+  // eslint-disable-next-line no-unused-vars
   OutputTooHigh,
+  // eslint-disable-next-line no-unused-vars
   NotEnoughSOL,
+  // eslint-disable-next-line no-unused-vars
   HighPriceImpact,
+  // eslint-disable-next-line no-unused-vars
   Retry,
 }
 
@@ -120,12 +141,15 @@ const useSwapInternal = (props: UseSwapArgs = {}): UseSwap => {
     );
   }, [slippageToleranceState.numerator, slippageToleranceState.denominator]);
 
-  const setSlippageTolerance = useCallback((tolerance: SlippageTolerance) => {
-    setSlippageToleranceState({
-      numerator: tolerance.numerator.toString(),
-      denominator: tolerance.denominator.toString(),
-    });
-  }, []);
+  const setSlippageTolerance = useCallback(
+    (tolerance: SlippageTolerance) => {
+      setSlippageToleranceState({
+        numerator: tolerance.numerator.toString(),
+        denominator: tolerance.denominator.toString(),
+      });
+    },
+    [setSlippageToleranceState],
+  );
 
   const [trade, setTrade] = useState<Trade>(
     () =>
@@ -158,10 +182,10 @@ const useSwapInternal = (props: UseSwapArgs = {}): UseSwap => {
   const outputUserTokenAccount = asyncStandardTokenAccounts.value?.[trade.outputTokenName];
   const solUserTokenAccount = asyncStandardTokenAccounts.value?.['SOL'];
 
-  const { useAsyncMergedPrices } = usePrice();
-  const asyncPrices = useAsyncMergedPrices();
-  const inputTokenPrice = asyncPrices.value?.[trade.inputTokenName];
-  const outputTokenPrice = asyncPrices.value?.[trade.outputTokenName];
+  // const { useAsyncMergedPrices } = usePrice();
+  // const asyncPrices = useAsyncMergedPrices();
+  // const inputTokenPrice = asyncPrices.value?.[trade.inputTokenName];
+  // const outputTokenPrice = asyncPrices.value?.[trade.outputTokenName];
 
   const minSolBalanceRequired = minSolBalanceForSwap(
     tokenConfigs['SOL'].decimals,
@@ -171,7 +195,7 @@ const useSwapInternal = (props: UseSwapArgs = {}): UseSwap => {
 
   const intermediateTokenName = trade.getIntermediateTokenName();
 
-  function resetButtonStateIfTwoTransactionStates() {
+  const resetButtonStateIfTwoTransactionStates = useCallback(() => {
     setButtonState((buttonState) => {
       if (stepOneStates.includes(buttonState) || stepTwoStates.includes(buttonState)) {
         return ButtonState.ConnectWallet;
@@ -179,12 +203,12 @@ const useSwapInternal = (props: UseSwapArgs = {}): UseSwap => {
 
       return buttonState;
     });
-  }
+  }, [setButtonState]);
 
-  function resetStates() {
+  const resetStates = useCallback(() => {
     resetButtonStateIfTwoTransactionStates();
     // setIsFairnessIndicatorCollapsed(true);
-  }
+  }, [resetButtonStateIfTwoTransactionStates]);
 
   const setInputTokenName = useCallback(
     (tokenName: string) => {
@@ -193,7 +217,7 @@ const useSwapInternal = (props: UseSwapArgs = {}): UseSwap => {
       setTrade(trade.updateInputToken(tokenName, routes));
       resetStates();
     },
-    [routeConfigs, trade],
+    [resetStates, routeConfigs, trade],
   );
 
   const setOutputTokenName = useCallback(
@@ -203,7 +227,7 @@ const useSwapInternal = (props: UseSwapArgs = {}): UseSwap => {
       setTrade(trade.updateOutputToken(tokenName, routes));
       resetStates();
     },
-    [routeConfigs, trade],
+    [resetStates, routeConfigs, trade],
   );
 
   const setInputAmount = useCallback(
@@ -211,20 +235,23 @@ const useSwapInternal = (props: UseSwapArgs = {}): UseSwap => {
       resetButtonStateIfTwoTransactionStates();
       setTrade(trade.updateInputAmount(amount));
     },
-    [trade],
+    [resetButtonStateIfTwoTransactionStates, trade],
   );
 
-  const setOutputAmount = useCallback((amount: u64) => {
-    resetButtonStateIfTwoTransactionStates();
-    setTrade(trade.updateOutputAmount(amount));
-  }, []);
+  const setOutputAmount = useCallback(
+    (amount: u64) => {
+      resetButtonStateIfTwoTransactionStates();
+      setTrade(trade.updateOutputAmount(amount));
+    },
+    [resetButtonStateIfTwoTransactionStates, trade],
+  );
 
   const switchTokens = useCallback(() => {
     resetButtonStateIfTwoTransactionStates();
     _setInputTokenName(trade.outputTokenName);
     _setOutputTokenName(trade.inputTokenName);
     setTrade(trade.switchTokens());
-  }, [trade]);
+  }, [trade, resetButtonStateIfTwoTransactionStates]);
 
   // Update trade instance when pool data becomes available
   useEffect(() => {
@@ -333,10 +360,10 @@ const useSwapInternal = (props: UseSwapArgs = {}): UseSwap => {
     const tokenNames = trade.getTokenNamesToSetup(asyncStandardTokenAccounts.value);
     setButtonState(ButtonState.TwoTransactionsConfirmStepOne);
 
-    let txSignature, executeSetup;
+    let executeSetup;
 
     try {
-      ({ txSignature, executeSetup } = await trade.confirmSetup(
+      ({ executeSetup } = await trade.confirmSetup(
         connection,
         tokenConfigs,
         programIds,
@@ -433,9 +460,9 @@ const useSwapInternal = (props: UseSwapArgs = {}): UseSwap => {
       ? asyncStandardTokenAccounts.value[intermediateTokenName]
       : undefined;
 
-    let executeExchange, txSignature;
+    let executeExchange;
     try {
-      ({ executeExchange, txSignature } = await trade.confirmExchange(
+      ({ executeExchange } = await trade.confirmExchange(
         connection,
         tokenConfigs,
         programIds,
@@ -466,23 +493,23 @@ const useSwapInternal = (props: UseSwapArgs = {}): UseSwap => {
       return ButtonState.SendingTransaction;
     });
 
-    function getFailedTransactionErrorMessage(rawMessage: string) {
-      if (rawMessage.includes('Transaction too large')) {
-        return 'Transaction failed. Please try again.';
-      } else if (rawMessage.includes('custom program error: 0x10')) {
-        return 'The price moved more than your slippage tolerance setting. You can increase your tolerance or simply try again.';
-      } else if (rawMessage.includes('Blockhash not found')) {
-        return 'Transaction timed out. Please try again.';
-      } else {
-        return 'Oops, something went wrong. Please try again!';
-      }
-    }
+    // function getFailedTransactionErrorMessage(rawMessage: string) {
+    //   if (rawMessage.includes('Transaction too large')) {
+    //     return 'Transaction failed. Please try again.';
+    //   } else if (rawMessage.includes('custom program error: 0x10')) {
+    //     return 'The price moved more than your slippage tolerance setting. You can increase your tolerance or simply try again.';
+    //   } else if (rawMessage.includes('Blockhash not found')) {
+    //     return 'Transaction timed out. Please try again.';
+    //   } else {
+    //     return 'Oops, something went wrong. Please try again!';
+    //   }
+    // }
 
     try {
       await executeExchange();
     } catch (e) {
       console.error(e);
-      const error = getFailedTransactionErrorMessage(e.message);
+      // const error = getFailedTransactionErrorMessage(e.message);
       // setErrorMessage(error);
       setButtonState((buttonState) => {
         if (buttonState === ButtonState.TwoTransactionsSendingStepTwo) {

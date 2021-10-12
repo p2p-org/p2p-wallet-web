@@ -9,8 +9,7 @@ import { isNil } from 'ramda';
 import { useConfig } from 'app/contexts/swap';
 import Trade from 'app/contexts/swap/models/Trade';
 import { formatBigNumber, parseString } from 'app/contexts/swap/utils/format';
-import { useOwnedTokenAccount } from 'app/contexts/swapSerum/token';
-import { AmountUSD } from 'components/common/AmountUSD';
+// import { AmountUSD } from 'components/common/AmountUSD';
 import { Empty } from 'components/common/Empty';
 import { SlideContainer } from 'components/common/SlideContainer';
 import { TokenAvatar } from 'components/common/TokenAvatar';
@@ -182,9 +181,9 @@ const BalanceText = styled.div`
   display: flex;
 `;
 
-const AmountUSDStyled = styled(AmountUSD)`
-  margin-left: 3px;
-`;
+// const AmountUSDStyled = styled(AmountUSD)`
+//   margin-left: 3px;
+// `;
 
 const DropDownListContainer = styled.div`
   position: absolute;
@@ -485,7 +484,7 @@ export const SwapTokenForm: FC<Props> = ({
             matchesFilter(tokenConfigs[tokenSymbol].name, filter)
           );
         }),
-    [tokenConfigs, filter],
+    [tokenConfigs, pairTokenName, tokenName, filter],
   );
 
   return (

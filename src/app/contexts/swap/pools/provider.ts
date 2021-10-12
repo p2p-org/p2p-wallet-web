@@ -1,12 +1,9 @@
-import { u64 } from '@solana/spl-token';
-import Decimal from 'decimal.js';
 import { createContainer } from 'unstated-next';
 
 import { useSolana } from 'app/contexts/solana';
 import { useConfig } from 'app/contexts/swap';
 
 import ConstantProductPool from '../models/ConstantProductPool';
-import OrcaPoolInterface from '../models/OrcaPoolInterface';
 import StablePool from '../models/StablePool';
 import TradeablePoolInterface from '../models/TradeablePoolInterface';
 import { CurveType } from '../orca-commons';
@@ -18,7 +15,9 @@ export type TradeablePoolsMap = {
 };
 
 export enum PoolError {
+  // eslint-disable-next-line no-unused-vars
   DOES_NOT_EXIST = 'Pool does not exist',
+  // eslint-disable-next-line no-unused-vars
   UNSUPPORTED_TYPE = 'Pool type not supported',
 }
 

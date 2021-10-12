@@ -2,10 +2,15 @@ import React, { FC } from 'react';
 
 import { ButtonState, useSwap } from 'app/contexts/swap';
 import { Button } from 'components/ui';
-import { swapNotification } from 'utils/transactionNotifications';
+// import { swapNotification } from 'utils/transactionNotifications';
 
 export const SwapButtonOriginal: FC = () => {
-  const { buttonState, trade, onSetupTokenAccounts, onSwap } = useSwap();
+  const {
+    buttonState,
+    trade,
+    // onSetupTokenAccounts,
+    onSwap,
+  } = useSwap();
 
   // const onSwapClick = async () => {
   //   setIsExecuting(true);
@@ -69,12 +74,12 @@ export const SwapButtonOriginal: FC = () => {
           Swap Anyway
         </Button>
       );
-    case ButtonState.TwoTransactionsStepOne:
-    case ButtonState.TwoTransactionsConfirmStepOne:
+    // case ButtonState.TwoTransactionsStepOne:
+    // case ButtonState.TwoTransactionsConfirmStepOne:
     // case ButtonState.TwoTransactionsSendingStepOne:
     //   return <TwoStepExchangeButtons onClickSetup={setupTokenAccounts} buttonState={buttonState} />;
-    case ButtonState.TwoTransactionsStepTwo:
-    case ButtonState.TwoTransactionsConfirmStepTwo:
+    // case ButtonState.TwoTransactionsStepTwo:
+    // case ButtonState.TwoTransactionsConfirmStepTwo:
     // case ButtonState.TwoTransactionsSendingStepTwo:
     //   return <TwoStepExchangeButtons onClickExchange={onSubmit} buttonState={buttonState} />;
     case ButtonState.RouteDoesNotExist:
