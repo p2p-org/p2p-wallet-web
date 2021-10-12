@@ -19,3 +19,8 @@ export function ceilingDivision(dividend: u64, divisor: u64): [u64, u64] {
 
   return [quotient, divisor];
 }
+
+export function countDecimals(input: string): number {
+  if (input.indexOf('.') === -1) return 0;
+  return (input && input.split('.')[1].length) || 0;
+}

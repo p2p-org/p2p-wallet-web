@@ -1,6 +1,8 @@
 import { ZERO } from '@orca-so/sdk';
 import { u64 } from '@solana/spl-token';
 
+import { countDecimals } from './math';
+
 const floatRegex = /^(\d*)?(\.)?(\d*)?$/;
 const MAX_SIGNIFICANT_DIGITS = 5;
 
@@ -57,4 +59,36 @@ export function formatBigNumber(
   }
 
   return `${integers.toString()}.${fractionsString}`;
+}
+
+export function getUSDValue(amount: u64, decimals: number, price: number): number {
+  return getNumber(amount, decimals) * price;
+}
+
+export function getNumber(amount: u64, decimals: number): number {
+  return parseFloat(formatBigNumber(amount, decimals));
+}
+
+export function formatNumberToUSD(
+  amount: number,
+  options: { showCents: boolean } = { showCents: true },
+) {
+  const numFractionDigits = options.showCents ? 2 : 0;
+  const numWithFixedFractionDigits = amount.toFixed(numFractionDigits);
+  if (numWithFixedFractionDigits === '0' || numWithFixedFractionDigits === '0.00') {
+    const numWithFixedSigFigs = amount.toPrecision(3);
+    const numDecimals = countDecimals(numWithFixedSigFigs);
+    return amount.toLocaleString('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: numDecimals,
+      maximumFractionDigits: numDecimals,
+    });
+  }
+  return amount.toLocaleString('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: numFractionDigits,
+  });
 }

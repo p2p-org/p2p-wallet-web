@@ -5,13 +5,14 @@ import { u64 } from '@solana/spl-token';
 import { createContainer } from 'unstated-next';
 
 import { useSolana } from 'app/contexts/solana';
-import { useConfig, usePools, useUser } from 'app/contexts/swap';
+import { useConfig, usePools, usePrice, useUser } from 'app/contexts/swap';
 import SlippageTolerance from 'app/contexts/swap/models/SlippageTolerance';
 import Trade from 'app/contexts/swap/models/Trade';
 import { getMaxAge } from 'app/contexts/swap/utils/AsyncCache';
 import { getTradeId } from 'app/contexts/swap/utils/pools';
 import { minSolBalanceForSwap } from 'app/contexts/swap/utils/tokenAccounts';
 import { Keys, useLocalStorage } from 'utils/hooks/useLocalStorage';
+import { swapNotification } from 'utils/transactionNotifications';
 
 export const defaultSelectedTokens = {
   input: 'USDC',
@@ -109,6 +110,8 @@ export interface UseSwap {
   // referral?: PublicKey;
 
   inputTokenAmount: u64 | undefined;
+  inputTokenPrice: number | undefined;
+  outputTokenPrice: number | undefined;
   buttonState: ButtonState;
   onSetupTokenAccounts: () => Promise<void>;
   onSwap: () => Promise<void>;
@@ -182,10 +185,10 @@ const useSwapInternal = (props: UseSwapArgs = {}): UseSwap => {
   const outputUserTokenAccount = asyncStandardTokenAccounts.value?.[trade.outputTokenName];
   const solUserTokenAccount = asyncStandardTokenAccounts.value?.['SOL'];
 
-  // const { useAsyncMergedPrices } = usePrice();
-  // const asyncPrices = useAsyncMergedPrices();
-  // const inputTokenPrice = asyncPrices.value?.[trade.inputTokenName];
-  // const outputTokenPrice = asyncPrices.value?.[trade.outputTokenName];
+  const { useAsyncMergedPrices } = usePrice();
+  const asyncPrices = useAsyncMergedPrices();
+  const inputTokenPrice = asyncPrices.value?.[trade.inputTokenName];
+  const outputTokenPrice = asyncPrices.value?.[trade.outputTokenName];
 
   const minSolBalanceRequired = minSolBalanceForSwap(
     tokenConfigs['SOL'].decimals,
@@ -460,6 +463,18 @@ const useSwapInternal = (props: UseSwapArgs = {}): UseSwap => {
       ? asyncStandardTokenAccounts.value[intermediateTokenName]
       : undefined;
 
+    const notificationParams = {
+      text: `${inputTokenName} to ${outputTokenName}`,
+      symbol: inputTokenName,
+      symbolB: outputTokenName,
+    };
+
+    swapNotification({
+      header: 'Swap processing...',
+      status: 'processing',
+      ...notificationParams,
+    });
+
     let executeExchange;
     try {
       ({ executeExchange } = await trade.confirmExchange(
@@ -482,6 +497,14 @@ const useSwapInternal = (props: UseSwapArgs = {}): UseSwap => {
 
         return ButtonState.Exchange;
       });
+
+      swapNotification({
+        header: 'Swap didn’t complete!',
+        status: 'error',
+        ...notificationParams,
+        text: 'Click approve in your wallet to continue.',
+      });
+
       return;
     }
 
@@ -493,23 +516,29 @@ const useSwapInternal = (props: UseSwapArgs = {}): UseSwap => {
       return ButtonState.SendingTransaction;
     });
 
-    // function getFailedTransactionErrorMessage(rawMessage: string) {
-    //   if (rawMessage.includes('Transaction too large')) {
-    //     return 'Transaction failed. Please try again.';
-    //   } else if (rawMessage.includes('custom program error: 0x10')) {
-    //     return 'The price moved more than your slippage tolerance setting. You can increase your tolerance or simply try again.';
-    //   } else if (rawMessage.includes('Blockhash not found')) {
-    //     return 'Transaction timed out. Please try again.';
-    //   } else {
-    //     return 'Oops, something went wrong. Please try again!';
-    //   }
-    // }
+    function getFailedTransactionErrorMessage(rawMessage: string) {
+      if (rawMessage.includes('Transaction too large')) {
+        return 'Transaction failed. Please try again.';
+      } else if (rawMessage.includes('custom program error: 0x10')) {
+        return 'The price moved more than your slippage tolerance setting. You can increase your tolerance or simply try again.';
+      } else if (rawMessage.includes('Blockhash not found')) {
+        return 'Transaction timed out. Please try again.';
+      } else {
+        return 'Oops, something went wrong. Please try again!';
+      }
+    }
 
     try {
       await executeExchange();
+
+      swapNotification({
+        header: 'Swapped successfuly!',
+        status: 'success',
+        ...notificationParams,
+      });
     } catch (e) {
       console.error(e);
-      // const error = getFailedTransactionErrorMessage(e.message);
+      const error = getFailedTransactionErrorMessage(e.message);
       // setErrorMessage(error);
       setButtonState((buttonState) => {
         if (buttonState === ButtonState.TwoTransactionsSendingStepTwo) {
@@ -517,6 +546,13 @@ const useSwapInternal = (props: UseSwapArgs = {}): UseSwap => {
         }
 
         return ButtonState.Retry;
+      });
+
+      swapNotification({
+        header: 'Swap didn’t complete!',
+        status: 'error',
+        ...notificationParams,
+        text: error,
       });
       return;
     }
@@ -571,6 +607,8 @@ const useSwapInternal = (props: UseSwapArgs = {}): UseSwap => {
     setSlippageTolerance,
     // referral,
     inputTokenAmount,
+    inputTokenPrice,
+    outputTokenPrice,
     buttonState,
     onSetupTokenAccounts,
     onSwap,

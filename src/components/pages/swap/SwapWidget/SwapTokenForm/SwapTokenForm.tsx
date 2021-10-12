@@ -1,6 +1,7 @@
 import React, { FC, useEffect, useMemo, useRef, useState } from 'react';
 
 import { styled } from '@linaria/react';
+import { ZERO } from '@orca-so/sdk';
 import { u64 } from '@solana/spl-token';
 import classNames from 'classnames';
 import throttle from 'lodash.throttle';
@@ -8,7 +9,12 @@ import { isNil } from 'ramda';
 
 import { useConfig } from 'app/contexts/swap';
 import Trade from 'app/contexts/swap/models/Trade';
-import { formatBigNumber, parseString } from 'app/contexts/swap/utils/format';
+import {
+  formatBigNumber,
+  formatNumberToUSD,
+  getUSDValue,
+  parseString,
+} from 'app/contexts/swap/utils/format';
 // import { AmountUSD } from 'components/common/AmountUSD';
 import { Empty } from 'components/common/Empty';
 import { SlideContainer } from 'components/common/SlideContainer';
@@ -181,9 +187,10 @@ const BalanceText = styled.div`
   display: flex;
 `;
 
-// const AmountUSDStyled = styled(AmountUSD)`
-//   margin-left: 3px;
-// `;
+// styled(AmountUSD)
+const AmountUSDStyled = styled.div`
+  margin-left: 3px;
+`;
 
 const DropDownListContainer = styled.div`
   position: absolute;
@@ -314,6 +321,7 @@ interface Props {
   amount: u64;
   setAmount: (a: u64) => void;
   maxAmount?: u64 | undefined;
+  price: number | undefined;
   disabled?: boolean;
   disabledInput?: boolean;
   className?: string;
@@ -328,6 +336,7 @@ export const SwapTokenForm: FC<Props> = ({
   amount,
   setAmount,
   maxAmount,
+  price,
   disabled,
   disabledInput,
   className,
@@ -339,6 +348,7 @@ export const SwapTokenForm: FC<Props> = ({
   const { tokenConfigs } = useConfig();
   const [isOpen, setIsOpen] = useState(false);
   const [amountString, setAmountString] = useState(String(amount));
+  const [usdValue, setUSDValue] = useState('');
   const [filter, setFilter] = useState('');
   const [scrollTop, setScrollTop] = useState(0);
   const previousTrade = usePreviousValueHook(trade);
@@ -359,13 +369,14 @@ export const SwapTokenForm: FC<Props> = ({
     setAmountString(formatBigNumber(amount, decimals));
   }, [trade, previousTrade, amount, amountString, tokenConfigs, tokenName]);
 
-  // useEffect(() => {
-  //   const decimals = tokenConfigs[tokenName].decimals;
-  //   if (!isNil(amount) && amount.eq(parseString(amountString, decimals))) {
-  //     setAmountString(amount.toString());
-  //   }
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [amount]);
+  useEffect(() => {
+    if (amount.eq(ZERO) || !price) {
+      setUSDValue('');
+      return;
+    }
+
+    setUSDValue(formatNumberToUSD(getUSDValue(amount, tokenConfigs[tokenName].decimals, price)));
+  }, [tokenName, price, amount, tokenConfigs]);
 
   const boxShadow = useMemo(() => {
     return `0 5px 10px rgba(56, 60, 71, ${
@@ -537,12 +548,12 @@ export const SwapTokenForm: FC<Props> = ({
               }
               {/*{!mint ? 'Select currency' : undefined}*/}
             </BalanceText>
-            {/*{mint ? (*/}
-            {/*  <BalanceText>*/}
-            {/*    ≈{' '}*/}
-            {/*    <AmountUSDStyled value={new Decimal(localAmount || 0)} symbol={tokenInfo?.symbol} />*/}
-            {/*  </BalanceText>*/}
-            {/*) : undefined}*/}
+            {usdValue ? (
+              <BalanceText>
+                ≈ <AmountUSDStyled>{usdValue}</AmountUSDStyled>
+                {/*<AmountUSDStyled value={new Decimal(localAmount || 0)} symbol={tokenInfo?.symbol} />*/}
+              </BalanceText>
+            ) : undefined}
           </BalanceWrapper>
         </InfoWrapper>
       </MainWrapper>

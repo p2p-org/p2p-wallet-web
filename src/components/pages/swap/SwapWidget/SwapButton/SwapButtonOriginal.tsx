@@ -2,7 +2,6 @@ import React, { FC } from 'react';
 
 import { ButtonState, useSwap } from 'app/contexts/swap';
 import { Button } from 'components/ui';
-// import { swapNotification } from 'utils/transactionNotifications';
 
 export const SwapButtonOriginal: FC = () => {
   const {
@@ -11,43 +10,6 @@ export const SwapButtonOriginal: FC = () => {
     // onSetupTokenAccounts,
     onSwap,
   } = useSwap();
-
-  // const onSwapClick = async () => {
-  //   setIsExecuting(true);
-  //
-  //   const notificationParams = {
-  //     text: `${fromTokenInfo?.symbol} to ${toTokenInfo?.symbol}`,
-  //     symbol: fromTokenInfo?.symbol,
-  //     symbolB: toTokenInfo?.symbol,
-  //   };
-  //
-  //   try {
-  //     swapNotification({
-  //       header: 'Swap processing...',
-  //       status: 'processing',
-  //       ...notificationParams,
-  //     });
-  //
-  //     await swap();
-  //
-  //     swapNotification({
-  //       header: 'Swapped successfuly!',
-  //       status: 'success',
-  //       ...notificationParams,
-  //     });
-  //   } catch (error) {
-  //     console.error('Something wrong with swap:', error.toString());
-  //
-  //     swapNotification({
-  //       header: 'Swap didn’t complete!',
-  //       status: 'error',
-  //       ...notificationParams,
-  //       text: (error as Error).toString(),
-  //     });
-  //   } finally {
-  //     setIsExecuting(false);
-  //   }
-  // };
 
   switch (buttonState) {
     case ButtonState.ConnectWallet:
@@ -130,5 +92,7 @@ export const SwapButtonOriginal: FC = () => {
           Connecting wallet...
         </Button>
       );
+    default:
+      return null;
   }
 };
