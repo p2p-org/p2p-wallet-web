@@ -3,13 +3,10 @@ import React, { FC } from 'react';
 import { ButtonState, useSwap } from 'app/contexts/swap';
 import { Button } from 'components/ui';
 
+import { TwoStepExchangeButtons } from './TwoStepExchangeButtons';
+
 export const SwapButtonOriginal: FC = () => {
-  const {
-    buttonState,
-    trade,
-    // onSetupTokenAccounts,
-    onSwap,
-  } = useSwap();
+  const { buttonState, trade, onSetupTokenAccounts, onSwap } = useSwap();
 
   switch (buttonState) {
     case ButtonState.ConnectWallet:
@@ -20,30 +17,34 @@ export const SwapButtonOriginal: FC = () => {
       );
     case ButtonState.Exchange:
       return (
-        <Button primary big full onClick={() => onSwap()}>
+        <Button primary big full onClick={onSwap}>
           Swap
         </Button>
       );
     case ButtonState.Retry:
       return (
-        <Button primary big full onClick={() => onSwap()}>
+        <Button primary big full onClick={onSwap}>
           Retry
         </Button>
       );
     case ButtonState.HighPriceImpact:
       return (
-        <Button primary big full onClick={() => onSwap()}>
+        <Button primary big full onClick={onSwap}>
           Swap Anyway
         </Button>
       );
-    // case ButtonState.TwoTransactionsStepOne:
-    // case ButtonState.TwoTransactionsConfirmStepOne:
-    // case ButtonState.TwoTransactionsSendingStepOne:
-    //   return <TwoStepExchangeButtons onClickSetup={setupTokenAccounts} buttonState={buttonState} />;
-    // case ButtonState.TwoTransactionsStepTwo:
-    // case ButtonState.TwoTransactionsConfirmStepTwo:
-    // case ButtonState.TwoTransactionsSendingStepTwo:
-    //   return <TwoStepExchangeButtons onClickExchange={onSubmit} buttonState={buttonState} />;
+    case ButtonState.TwoTransactionsStepOne:
+    case ButtonState.TwoTransactionsConfirmStepOne:
+    case ButtonState.TwoTransactionsSendingStepOne:
+    case ButtonState.TwoTransactionsRetryStepOne:
+      return (
+        <TwoStepExchangeButtons onClickSetup={onSetupTokenAccounts} buttonState={buttonState} />
+      );
+    case ButtonState.TwoTransactionsStepTwo:
+    case ButtonState.TwoTransactionsConfirmStepTwo:
+    case ButtonState.TwoTransactionsSendingStepTwo:
+    case ButtonState.TwoTransactionsRetryStepTwo:
+      return <TwoStepExchangeButtons onClickExchange={onSwap} buttonState={buttonState} />;
     case ButtonState.RouteDoesNotExist:
       return (
         <Button primary big full disabled>
