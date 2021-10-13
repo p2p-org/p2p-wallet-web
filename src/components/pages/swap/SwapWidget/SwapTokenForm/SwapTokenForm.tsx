@@ -6,10 +6,10 @@ import classNames from 'classnames';
 import throttle from 'lodash.throttle';
 import { isNil } from 'ramda';
 
-import { useConfig, UserTokenAccountMap, useSwap } from 'app/contexts/swap';
+import { useConfig, usePrice, UserTokenAccountMap, useSwap } from 'app/contexts/swap';
 import TokenAccount from 'app/contexts/swap/models/TokenAccount';
 import Trade from 'app/contexts/swap/models/Trade';
-import { formatBigNumber, parseString } from 'app/contexts/swap/utils/format';
+import { formatBigNumber, getUSDValue, parseString } from 'app/contexts/swap/utils/format';
 import { Empty } from 'components/common/Empty';
 import { SlideContainer } from 'components/common/SlideContainer';
 import { TokenAvatar } from 'components/common/TokenAvatar';
@@ -316,7 +316,6 @@ interface Props {
   amount: u64;
   setAmount: (a: u64) => void;
   maxAmount?: u64 | undefined;
-  price: number | undefined;
   disabled?: boolean;
   disabledInput?: boolean;
   className?: string;
@@ -331,7 +330,6 @@ export const SwapTokenForm: FC<Props> = ({
   amount,
   setAmount,
   maxAmount,
-  price,
   disabled,
   disabledInput,
   className,
@@ -347,6 +345,12 @@ export const SwapTokenForm: FC<Props> = ({
   const [filter, setFilter] = useState('');
   const [scrollTop, setScrollTop] = useState(0);
   const previousTrade = usePreviousValueHook(trade);
+
+  const { useAsyncMergedPrices } = usePrice();
+  const asyncPrices = useAsyncMergedPrices();
+
+  const hasAsyncPrices = !!asyncPrices.value;
+  const hasAsyncStandardTokenAccounts = !!asyncStandardTokenAccounts;
 
   const tokenInfo = tokenConfigs[tokenName];
 
@@ -510,9 +514,40 @@ export const SwapTokenForm: FC<Props> = ({
           matchesFilter(tokenConfigs[tokenSymbol].name, filter)
         );
       })
-      .sort((a, b) => b.getAmount().cmp(a.getAmount()));
+      .sort((a, b) => b.getAmount().cmp(a.getAmount()))
+      .sort((a, b) => {
+        const mintAddressA = a.accountInfo.mint.toBase58();
+        const tokenSymbolA = mintToTokenName[mintAddressA];
+
+        const mintAddressB = b.accountInfo.mint.toBase58();
+        const tokenSymbolB = mintToTokenName[mintAddressB];
+
+        // const aUSD = toDecimal(a.getAmount())
+        //   .div(10 ** tokenConfigs[tokenSymbolA].decimals)
+        //   .toDecimalPlaces(tokenConfigs[tokenSymbolA].decimals);
+        //
+        // const bUSD = toDecimal(b.getAmount())
+        //   .div(10 ** tokenConfigs[tokenSymbolB].decimals)
+        //   .toDecimalPlaces(tokenConfigs[tokenSymbolB].decimals);
+        // return aUSD.cmp(bUSD);
+
+        const aUSD = getUSDValue(
+          a.getAmount(),
+          tokenConfigs[tokenSymbolA].decimals,
+          asyncPrices.value?.[tokenSymbolA] || 0,
+        );
+        const bUSD = getUSDValue(
+          b.getAmount(),
+          tokenConfigs[tokenSymbolB].decimals,
+          asyncPrices.value?.[tokenSymbolB] || 0,
+        );
+
+        return bUSD < aUSD ? -1 : a === b ? 0 : 1;
+      });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
-    asyncStandardTokenAccounts,
+    hasAsyncPrices,
+    hasAsyncStandardTokenAccounts,
     filter,
     isInput,
     mintToTokenName,
@@ -592,16 +627,17 @@ export const SwapTokenForm: FC<Props> = ({
                     Available: {formatBigNumber(maxAmount, tokenConfigs[tokenName].decimals)}
                   </AllBalance>
                 ) : undefined
-                //   (
-                //   <>Balance: {formatBigNumber(maxAmount, tokenConfigs[tokenName].decimals)}</>
+                // (
+                //   <>
+                //     Balance:{' '}
+                //     {formatBigNumber(maxAmount || new u64(0), tokenConfigs[tokenName].decimals)}
+                //   </>
                 // )
               }
-              {/*{!mint ? 'Select currency' : undefined}*/}
             </BalanceText>
             {!amount.eqn(0) ? (
               <BalanceText>
                 ≈ <AmountUSDStyled amount={amount} tokenName={tokenName} />
-                {/*<AmountUSDStyled value={new Decimal(localAmount || 0)} symbol={tokenInfo?.symbol} />*/}
               </BalanceText>
             ) : undefined}
           </BalanceWrapper>
