@@ -8,6 +8,7 @@ import { TokenAccount } from 'api/token/TokenAccount';
 import { WalletType } from 'api/wallet';
 import { loadMnemonicAndSeed } from 'api/wallet/ManualWallet';
 import { ERROR_WRONG_PASSWORD } from 'api/wallet/ManualWallet/errors';
+import { AddressText } from 'components/common/AddressText';
 import { ErrorHint } from 'components/common/ErrorHint';
 import { Modal } from 'components/common/Modal';
 import { PasswordInput } from 'components/common/PasswordInput';
@@ -235,7 +236,9 @@ export const TransactionConfirmModal: FunctionComponent<Props> = ({ type, params
               ) : (
                 <InfoTitle>Check recepient’s address</InfoTitle>
               )}
-              <InfoValue>{(params as TransferParams).destination}</InfoValue>
+              <InfoValue>
+                <AddressText address={(params as TransferParams).destination} medium />
+              </InfoValue>
             </InfoWrapper>
           </FieldInfo>
         </Section>
