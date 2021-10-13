@@ -4,6 +4,7 @@ import { styled } from '@linaria/react';
 import QRCode from 'qrcode.react';
 
 import Logo from 'assets/images/logo.png';
+import { AddressText } from 'components/common/AddressText';
 import { ToastManager } from 'components/common/ToastManager';
 import { Button } from 'components/ui';
 import { askClipboardWritePermission, setToClipboard } from 'utils/clipboard';
@@ -33,17 +34,6 @@ const Username = styled.div`
 
   font-weight: 600;
   font-size: 20px;
-`;
-
-const Address = styled.div`
-  flex-grow: 1;
-
-  font-weight: 600;
-  font-size: 16px;
-`;
-
-const BlueText = styled.span`
-  color: #5887ff;
 `;
 
 const LogoImg = styled.img`
@@ -108,11 +98,7 @@ export const UsernameAddressWidget: FC<Props> = ({ address, username }) => {
         </QRCodeWrapper>
         <UsernameAddress>
           {username ? <Username>{username}</Username> : undefined}
-          <Address>
-            <BlueText>{address.slice(0, 4)}</BlueText>
-            {address.slice(4, -4)}
-            <BlueText>{address.slice(-4)}</BlueText>
-          </Address>
+          <AddressText address={address} medium />
           <LogoImg src={Logo} />
         </UsernameAddress>
       </UsernameAddressWrapper>

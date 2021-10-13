@@ -4,6 +4,7 @@ import { styled } from '@linaria/react';
 import classNames from 'classnames';
 import { rgba } from 'polished';
 
+import { AddressText } from 'components/common/AddressText';
 import { Icon } from 'components/ui';
 
 const WalletIcon = styled(Icon)`
@@ -48,7 +49,6 @@ const WrapperLabel = styled.label`
 
 const ToInput = styled.input`
   flex: 1;
-  margin-left: 20px;
 
   color: #000;
   font-weight: 600;
@@ -81,25 +81,11 @@ const AddressWrapper = styled.div`
   display: flex;
   flex: 1;
   flex-direction: column;
-`;
-
-const Address = styled.div`
-  flex-grow: 1;
   margin-left: 20px;
-
-  font-weight: 600;
-  font-size: 14px;
-
-  color: #a3a5ba;
-`;
-
-const BlueText = styled.span`
-  color: #5887ff;
 `;
 
 const Error = styled.div`
   flex-grow: 1;
-  margin-left: 20px;
 
   font-weight: 600;
   font-size: 14px;
@@ -142,13 +128,7 @@ export const ToAddressInput: FunctionComponent<Props> = ({
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
         />
-        {resolvedAddress ? (
-          <Address>
-            <BlueText>{resolvedAddress.slice(0, 4)}</BlueText>
-            {resolvedAddress.slice(4, -4)}
-            <BlueText>{resolvedAddress.slice(-4)}</BlueText>
-          </Address>
-        ) : undefined}
+        {resolvedAddress ? <AddressText address={resolvedAddress} small gray /> : undefined}
         {isAddressInvalid ? <Error>There’s no address like this</Error> : undefined}
       </AddressWrapper>
     </WrapperLabel>
