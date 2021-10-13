@@ -1,13 +1,33 @@
 import React, { FC, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 
+import { styled } from '@linaria/react';
+
 import { TokenAccount } from 'api/token/TokenAccount';
 import { UsernameAddressWidget } from 'components/common/UsernameAddressWidget';
-import { Accordion } from 'components/ui';
+import { Accordion, Icon } from 'components/ui';
 import { getExplorerUrl } from 'utils/connection';
 import { useUsername } from 'utils/hooks/useUsername';
 
 import { BottomInfo, Description, ExplorerA, UsernameAddressWidgetWrapper } from './styled';
+
+const InfoBlock = styled.div`
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px;
+  padding: 12px 20px;
+
+  background: #fafbfc;
+  border-radius: 12px;
+`;
+
+const QuestionIcon = styled(Icon)`
+  margin-right: 13px;
+  width: 44px;
+  height: 44px;
+
+  color: #5887ff;
+`;
 
 export const ReceiveSolana: FC = () => {
   const cluster = useSelector((state) => state.wallet.network.cluster);
@@ -28,6 +48,13 @@ export const ReceiveSolana: FC = () => {
   return (
     <>
       <Description>
+        <InfoBlock>
+          <QuestionIcon name="info" />
+          <div>
+            Receive any token within the <strong>Solana network</strong> even if it is not included
+            in your wallet list
+          </div>
+        </InfoBlock>
         <Accordion title="Which cryptocurrencies can I use?">
           The Solana Program Library (SPL) is a collection of on-chain programs maintained by the
           Solana team. The SPL Token program is the token standard of the Solana blockchain.
