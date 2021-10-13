@@ -5,7 +5,7 @@ import { u64 } from '@solana/spl-token';
 import { createContainer } from 'unstated-next';
 
 import { useSolana } from 'app/contexts/solana';
-import { useConfig, usePools, usePrice, useUser } from 'app/contexts/swap';
+import { useConfig, usePools, usePrice, UserTokenAccountMap, useUser } from 'app/contexts/swap';
 import SlippageTolerance from 'app/contexts/swap/models/SlippageTolerance';
 import Trade from 'app/contexts/swap/models/Trade';
 import { getMaxAge } from 'app/contexts/swap/utils/AsyncCache';
@@ -109,6 +109,7 @@ export interface UseSwap {
 
   // referral?: PublicKey;
 
+  asyncStandardTokenAccounts: UserTokenAccountMap | null;
   inputTokenAmount: u64 | undefined;
   inputTokenPrice: number | undefined;
   outputTokenPrice: number | undefined;
@@ -612,6 +613,7 @@ const useSwapInternal = (props: UseSwapArgs = {}): UseSwap => {
     slippageTolerance,
     setSlippageTolerance,
     // referral,
+    asyncStandardTokenAccounts: asyncStandardTokenAccounts?.value,
     inputTokenAmount,
     inputTokenPrice,
     outputTokenPrice,

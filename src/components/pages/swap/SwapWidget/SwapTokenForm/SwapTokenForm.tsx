@@ -1,21 +1,15 @@
 import React, { FC, useEffect, useMemo, useRef, useState } from 'react';
 
 import { styled } from '@linaria/react';
-import { ZERO } from '@orca-so/sdk';
 import { u64 } from '@solana/spl-token';
 import classNames from 'classnames';
 import throttle from 'lodash.throttle';
 import { isNil } from 'ramda';
 
-import { useConfig } from 'app/contexts/swap';
+import { useConfig, UserTokenAccountMap, useSwap } from 'app/contexts/swap';
+import TokenAccount from 'app/contexts/swap/models/TokenAccount';
 import Trade from 'app/contexts/swap/models/Trade';
-import {
-  formatBigNumber,
-  formatNumberToUSD,
-  getUSDValue,
-  parseString,
-} from 'app/contexts/swap/utils/format';
-// import { AmountUSD } from 'components/common/AmountUSD';
+import { formatBigNumber, parseString } from 'app/contexts/swap/utils/format';
 import { Empty } from 'components/common/Empty';
 import { SlideContainer } from 'components/common/SlideContainer';
 import { TokenAvatar } from 'components/common/TokenAvatar';
@@ -24,6 +18,8 @@ import { SearchInput } from 'components/ui/SearchInput';
 import { usePreviousValueHook } from 'utils/hooks/usePreviousValueHook';
 import { shortAddress } from 'utils/tokens';
 
+import { AmountUSD } from '../AmountUSD/AmountUSD';
+import { TokenAccountRow } from './TokenAccountRow';
 import { TokenRow } from './TokenRow';
 
 const Wrapper = styled.div``;
@@ -187,8 +183,7 @@ const BalanceText = styled.div`
   display: flex;
 `;
 
-// styled(AmountUSD)
-const AmountUSDStyled = styled.div`
+const AmountUSDStyled = styled(AmountUSD)`
   margin-left: 3px;
 `;
 
@@ -298,9 +293,9 @@ const TitleTokens = styled.div`
   line-height: 140%;
 `;
 
-// const YourTokens = styled(TitleTokens)`
-//   height: 32px;
-// `;
+const YourTokens = styled(TitleTokens)`
+  height: 32px;
+`;
 
 const AllTokens = styled(TitleTokens)`
   height: 44px;
@@ -345,10 +340,10 @@ export const SwapTokenForm: FC<Props> = ({
   const dropdownRef = useRef<HTMLDivElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
 
-  const { tokenConfigs } = useConfig();
+  const { tokenConfigs, mintToTokenName } = useConfig();
+  const { asyncStandardTokenAccounts } = useSwap();
   const [isOpen, setIsOpen] = useState(false);
   const [amountString, setAmountString] = useState(String(amount));
-  const [usdValue, setUSDValue] = useState('');
   const [filter, setFilter] = useState('');
   const [scrollTop, setScrollTop] = useState(0);
   const previousTrade = usePreviousValueHook(trade);
@@ -368,15 +363,6 @@ export const SwapTokenForm: FC<Props> = ({
 
     setAmountString(formatBigNumber(amount, decimals));
   }, [trade, previousTrade, amount, amountString, tokenConfigs, tokenName]);
-
-  useEffect(() => {
-    if (amount.eq(ZERO) || !price) {
-      setUSDValue('');
-      return;
-    }
-
-    setUSDValue(formatNumberToUSD(getUSDValue(amount, tokenConfigs[tokenName].decimals, price)));
-  }, [tokenName, price, amount, tokenConfigs]);
 
   const boxShadow = useMemo(() => {
     return `0 5px 10px rgba(56, 60, 71, ${
@@ -472,20 +458,78 @@ export const SwapTokenForm: FC<Props> = ({
     setFilter(nextFilter);
   };
 
+  const handleTokenAccountClick = (nextTokenAccount: TokenAccount) => {
+    setIsOpen(false);
+
+    const mintAddress = nextTokenAccount.accountInfo.mint.toBase58();
+    const tokenName = mintToTokenName[mintAddress];
+    setTokenName(tokenName);
+  };
+
   const handleTokenClick = (tokenName: string) => {
     setIsOpen(false);
     setTokenName(tokenName);
   };
 
+  const filteredTokenAccounts = useMemo((): TokenAccount[] => {
+    if (!asyncStandardTokenAccounts) {
+      return [];
+    }
+
+    const tokenAccounts = Object.entries(asyncStandardTokenAccounts).reduce(
+      (tokenAccountMap, [tokenName, tokenAccount]) => {
+        tokenAccountMap[tokenName] = tokenAccount;
+        return tokenAccountMap;
+      },
+      {} as UserTokenAccountMap,
+    );
+
+    // Token with balance in from selector
+    let filteredWithBalance = Object.values(asyncStandardTokenAccounts);
+    if (isInput) {
+      filteredWithBalance = Object.entries(tokenAccounts)
+        .filter(([_, tokenAccount]) => tokenAccount.getAmount().gtn(0))
+        .map(([_, tokenAccount]) => tokenAccount);
+    }
+
+    return filteredWithBalance
+      .filter((account) => {
+        const mintAddress = account.accountInfo.mint.toBase58();
+        const tokenSymbol = mintToTokenName[mintAddress];
+
+        if (tokenSymbol === pairTokenName || tokenSymbol === tokenName) {
+          return false;
+        }
+
+        if (filter === '') {
+          return true;
+        }
+
+        return (
+          matchesFilter(tokenSymbol, filter) ||
+          matchesFilter(tokenConfigs[tokenSymbol].name, filter)
+        );
+      })
+      .sort((a, b) => b.getAmount().cmp(a.getAmount()));
+  }, [
+    asyncStandardTokenAccounts,
+    filter,
+    isInput,
+    mintToTokenName,
+    pairTokenName,
+    tokenConfigs,
+    tokenName,
+  ]);
+
   const filteredTokens = useMemo(
     () =>
-      Object.keys(tokenConfigs)
-        .filter((tokenSymbol) => tokenSymbol !== pairTokenName && tokenSymbol !== tokenName)
+      Object.entries(tokenConfigs)
+        .filter(([tokenSymbol]) => tokenSymbol !== pairTokenName && tokenSymbol !== tokenName)
         .filter(
           // Exclude liquidity tokens
-          (tokenSymbol) => !tokenSymbol.includes('/'),
+          ([tokenSymbol]) => !tokenSymbol.includes('/'),
         )
-        .filter((tokenSymbol) => {
+        .filter(([tokenSymbol]) => {
           if (filter === '') {
             return true;
           }
@@ -494,8 +538,14 @@ export const SwapTokenForm: FC<Props> = ({
             matchesFilter(tokenSymbol, filter) ||
             matchesFilter(tokenConfigs[tokenSymbol].name, filter)
           );
-        }),
-    [tokenConfigs, pairTokenName, tokenName, filter],
+        })
+        .filter(([_, config]) => {
+          return !filteredTokenAccounts.find((tokenAccount) =>
+            tokenAccount.accountInfo.mint.equals(config.mint),
+          );
+        })
+        .map(([tokenSymbol]) => tokenSymbol),
+    [tokenConfigs, pairTokenName, tokenName, filter, filteredTokenAccounts],
   );
 
   return (
@@ -548,9 +598,9 @@ export const SwapTokenForm: FC<Props> = ({
               }
               {/*{!mint ? 'Select currency' : undefined}*/}
             </BalanceText>
-            {usdValue ? (
+            {!amount.eqn(0) ? (
               <BalanceText>
-                ≈ <AmountUSDStyled>{usdValue}</AmountUSDStyled>
+                ≈ <AmountUSDStyled amount={amount} tokenName={tokenName} />
                 {/*<AmountUSDStyled value={new Decimal(localAmount || 0)} symbol={tokenInfo?.symbol} />*/}
               </BalanceText>
             ) : undefined}
@@ -575,19 +625,19 @@ export const SwapTokenForm: FC<Props> = ({
             </SlideContainer>
           </DropDownHeader>
           <DropDownList ref={listRef}>
-            {/* {filteredTokenAccounts?.length ? ( */}
-            {/*  <> */}
-            {/*    {direction === 'to' ? <YourTokens>Your tokens</YourTokens> : undefined} */}
-            {/*    {filteredTokenAccounts.map((account) => ( */}
-            {/*      <TokenAccountRow */}
-            {/*        key={account.address.toBase58()} */}
-            {/*        tokenAccount={account} */}
-            {/*        onClick={handleTokenAccountClick} */}
-            {/*      /> */}
-            {/*    ))} */}
-            {/*  </> */}
-            {/* ) : undefined} */}
-            {filteredTokens?.length ? (
+            {filteredTokenAccounts?.length ? (
+              <>
+                <YourTokens>Your tokens</YourTokens>
+                {filteredTokenAccounts.map((account) => (
+                  <TokenAccountRow
+                    key={account.account.toBase58()}
+                    tokenAccount={account}
+                    onClick={handleTokenAccountClick}
+                  />
+                ))}
+              </>
+            ) : undefined}
+            {!isInput && filteredTokens?.length ? (
               <>
                 <AllTokens>All tokens</AllTokens>
                 {filteredTokens.map((token) => (
@@ -595,11 +645,9 @@ export const SwapTokenForm: FC<Props> = ({
                 ))}
               </>
             ) : undefined}
-            {
-              /* !filteredTokenAccounts?.length && */ !filteredTokens?.length ? (
-                <Empty type="search" />
-              ) : undefined
-            }
+            {!filteredTokenAccounts?.length && !filteredTokens?.length ? (
+              <Empty type="search" />
+            ) : undefined}
           </DropDownList>
         </DropDownListContainer>
       ) : undefined}
