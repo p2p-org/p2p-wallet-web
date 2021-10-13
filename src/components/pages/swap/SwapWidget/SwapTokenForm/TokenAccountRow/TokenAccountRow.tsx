@@ -4,6 +4,8 @@ import { styled } from '@linaria/react';
 
 import { useConfig } from 'app/contexts/swap';
 import TokenAccount from 'app/contexts/swap/models/TokenAccount';
+import { getNumber } from 'app/contexts/swap/utils/format';
+import { useTokenMap } from 'app/contexts/swapSerum/tokenList';
 import { TokenAvatar } from 'components/common/TokenAvatar';
 import { shortAddress } from 'utils/tokens';
 
@@ -63,10 +65,12 @@ type Props = {
 };
 
 export const TokenAccountRow: FC<Props> = ({ tokenAccount, onClick, className }) => {
-  const { mintToTokenName } = useConfig();
+  const { mintToTokenName, tokenConfigs } = useConfig();
+  const tokenMap = useTokenMap();
 
   const mintAddress = tokenAccount.accountInfo.mint.toBase58();
   const tokenName = mintToTokenName[mintAddress];
+  const tokenNameFull = tokenMap.get(tokenConfigs[tokenName].mint.toBase58())?.name;
 
   const handleClick = () => {
     if (onClick) {
@@ -84,9 +88,9 @@ export const TokenAccountRow: FC<Props> = ({ tokenAccount, onClick, className })
             <AmountUSD tokenName={tokenName} amount={tokenAccount.getAmount()} />
           </Top>
           <Bottom>
-            <div>{shortAddress(mintAddress)}</div>
+            <div>{tokenNameFull}</div>
             <div>
-              {tokenAccount.getAmount().toString()} {tokenName}
+              {getNumber(tokenAccount.getAmount(), tokenConfigs[tokenName].decimals)} {tokenName}
             </div>
           </Bottom>
         </Info>
