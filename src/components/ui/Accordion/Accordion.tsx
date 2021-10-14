@@ -67,6 +67,7 @@ type Props = {
   title: string | React.ReactNode;
   right?: string | React.ReactNode;
   open?: boolean;
+  hideRightIfOpen?: boolean;
   noContentPadding?: boolean;
   className?: string;
 };
@@ -75,6 +76,7 @@ export const Accordion: FC<Props> = ({
   title,
   right,
   open = false,
+  hideRightIfOpen,
   noContentPadding,
   children,
   className,
@@ -86,7 +88,7 @@ export const Accordion: FC<Props> = ({
       <TitleWrapper onClick={() => setIsOpen(!isOpen)} className={classNames({ isOpen })}>
         <Title>
           <Left>{title}</Left>
-          {right ? <Right>{right}</Right> : right}
+          {right ? hideRightIfOpen && isOpen ? undefined : <Right>{right}</Right> : undefined}
         </Title>
         <ChevronIcon name="chevron" className={classNames({ isOpen })} />
       </TitleWrapper>
