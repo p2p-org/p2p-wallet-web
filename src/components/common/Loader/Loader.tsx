@@ -1,4 +1,4 @@
-import React, { FunctionComponent } from 'react';
+import React, { FC } from 'react';
 
 import { styled } from '@linaria/react';
 
@@ -64,9 +64,13 @@ const Inner = styled.div`
   }
 `;
 
-export const Loader: FunctionComponent = (props) => {
+interface Props {
+  size?: string;
+}
+
+export const Loader: FC<Props> = ({ size, ...props }) => {
   return (
-    <Wrapper {...props}>
+    <Wrapper style={{ width: size && `${size}px`, height: size && `${size}px` }} {...props}>
       <Inner />
     </Wrapper>
   );

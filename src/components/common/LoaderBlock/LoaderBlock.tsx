@@ -12,13 +12,14 @@ const Wrapper = styled.div`
 `;
 
 type Props = {
+  size?: string;
   className?: string;
 };
 
-export const LoaderBlock: FunctionComponent<Props> = ({ className }) => {
+export const LoaderBlock: FunctionComponent<Props> = ({ size, className }) => {
   return (
     <Wrapper className={className}>
-      <Loader />
+      <Loader size={size} />
     </Wrapper>
   );
 };
