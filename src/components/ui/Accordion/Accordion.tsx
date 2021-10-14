@@ -30,10 +30,20 @@ const TitleWrapper = styled.div`
 
 const Title = styled.div`
   display: flex;
-  flex-grow: 1;
+  flex: 1;
+  align-content: space-between;
 
   font-weight: 600;
   font-size: 16px;
+`;
+
+const Left = styled.div`
+  display: flex;
+  flex-grow: 1;
+`;
+
+const Right = styled.div`
+  margin-right: 12px;
 `;
 
 const ChevronIcon = styled(Icon)`
@@ -55,6 +65,7 @@ const Content = styled.div`
 
 type Props = {
   title: string | React.ReactNode;
+  right?: string | React.ReactNode;
   open?: boolean;
   noContentPadding?: boolean;
   className?: string;
@@ -62,6 +73,7 @@ type Props = {
 
 export const Accordion: FC<Props> = ({
   title,
+  right,
   open = false,
   noContentPadding,
   children,
@@ -72,7 +84,10 @@ export const Accordion: FC<Props> = ({
   return (
     <Wrapper className={className}>
       <TitleWrapper onClick={() => setIsOpen(!isOpen)} className={classNames({ isOpen })}>
-        <Title>{title}</Title>
+        <Title>
+          <Left>{title}</Left>
+          {right ? <Right>{right}</Right> : right}
+        </Title>
         <ChevronIcon name="chevron" className={classNames({ isOpen })} />
       </TitleWrapper>
       {isOpen ? (
