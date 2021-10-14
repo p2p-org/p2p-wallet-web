@@ -13,7 +13,6 @@ import { UserTokenAccountMap } from '../user';
 import { getSignature, sendAndConfirm } from '../utils/transactions';
 import TransactionBuilder from '../utils/web3/TransactionBuilder';
 import SlippageTolerance from './SlippageTolerance';
-import { isStablePool } from './StablePool';
 import TradeablePoolInterface, { OutputTooHighError } from './TradeablePoolInterface';
 
 type TradeParameters = {
@@ -38,14 +37,12 @@ type DerivedFields = {
   fees: u64[]; // fees is the amount paid to LPs, denominated in the swap's output token
   selectedRoute: Route;
   doubleHopFields: DoubleHopFields | null;
-  isStableSwap: boolean;
 };
 
 type DoubleHopFields = {
   intermediateTokenName: string;
   intermediateOutputAmount: u64;
   minimumIntermediateOutputAmount: u64;
-  isStableSwap: boolean;
 };
 
 // Trade is an immutable struct that stores metadata about the current trade.
@@ -124,14 +121,6 @@ export default class Trade {
   getPoolFromSelectedRoute(poolIndex: number): TradeablePoolInterface | undefined {
     const poolId = this.derivedFields?.selectedRoute[poolIndex];
     return poolId ? this.pools?.[poolId] : undefined;
-  }
-
-  isStableSwap(): boolean {
-    return this.derivedFields?.isStableSwap || false;
-  }
-
-  isDoubleHopStableSwap(): boolean {
-    return this.derivedFields?.doubleHopFields?.isStableSwap || false;
   }
 
   isPriceImpactHigh() {
@@ -429,7 +418,6 @@ function getDoubleHopFields(
       inputTokenName,
       slippageTolerance,
     ),
-    isStableSwap: isStablePool(route[1]),
   };
 }
 
@@ -615,27 +603,12 @@ function deriveTrade(parameters: TradeParameters): Trade {
     inputAmount = otherAmount;
   }
 
-  const isStableSwap = isStablePool(route[0]);
   const minimumOutputAmount = getMinimumOutputAmount(
     route,
     pools,
     inputAmount,
     parameters.inputTokenName,
     parameters.slippageTolerance,
-  );
-  const doubleHopFields = getDoubleHopFields(
-    route,
-    pools,
-    inputAmount,
-    parameters.inputTokenName,
-    parameters.slippageTolerance,
-  );
-
-  const baseOutputAmount = getBaseOutputAmount(
-    route,
-    pools,
-    inputAmount,
-    parameters.inputTokenName,
   );
 
   const inputDecimal = new BigDecimal(inputAmount.toString()).div(
@@ -644,13 +617,27 @@ function deriveTrade(parameters: TradeParameters): Trade {
   const outputDecimal = new BigDecimal(outputAmount.toString()).div(
     new BigDecimal(10).pow(parameters.tokenConfigs[parameters.outputTokenName].decimals),
   );
-  const baseOutputDecimal = new BigDecimal(baseOutputAmount.toString());
   const exchangeRate = outputDecimal.dividedBy(inputDecimal);
+
+  const baseOutputAmount = getBaseOutputAmount(
+    route,
+    pools,
+    inputAmount,
+    parameters.inputTokenName,
+  );
+  const baseOutputDecimal = new BigDecimal(baseOutputAmount.toString());
   const priceImpact = baseOutputDecimal
     .minus(outputAmount.toString())
     .dividedBy(baseOutputDecimal)
     .mul(new BigDecimal(100));
 
+  const doubleHopFields = getDoubleHopFields(
+    route,
+    pools,
+    inputAmount,
+    parameters.inputTokenName,
+    parameters.slippageTolerance,
+  );
   // TODO: Check that this is correct
   const fees = route.map((route, idx) => {
     const pool = pools[route];
@@ -672,7 +659,6 @@ function deriveTrade(parameters: TradeParameters): Trade {
     derivedFields: {
       otherAmount,
       selectedRoute: route,
-      isStableSwap,
       minimumOutputAmount,
       baseOutputAmount,
       exchangeRate,

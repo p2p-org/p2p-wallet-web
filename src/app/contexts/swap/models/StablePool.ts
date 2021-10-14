@@ -10,10 +10,6 @@ import OrcaPool from './OrcaPool';
 import OrcaPoolInterface from './OrcaPoolInterface';
 import { OutputTooHighError } from './TradeablePoolInterface';
 
-export function isStablePool(poolId: string): boolean {
-  return poolId.includes('[stable]');
-}
-
 export default class StablePool extends OrcaPool implements OrcaPoolInterface {
   getOutputAmount(inputAmount: u64, inputTokenName: string): u64 {
     const [poolInputAmount, poolOutputAmount] = this.getTokenAmountsFromInput(inputTokenName);
