@@ -2,7 +2,13 @@ import React, { FC } from 'react';
 
 import { styled } from '@linaria/react';
 
-import { ButtonState, stepOneLoadingStates, stepTwoLoadingStates } from 'app/contexts/swap';
+import {
+  ButtonState,
+  stepOneLoadingStates,
+  stepOneStates,
+  stepTwoLoadingStates,
+  stepTwoStates,
+} from 'app/contexts/swap';
 import { LoaderBlock } from 'components/common/LoaderBlock';
 import { Button } from 'components/ui';
 
@@ -21,15 +27,15 @@ export const TwoStepExchangeButtons: FC<Props> = ({
   onClickExchange = () => {},
   buttonState,
 }) => {
-  const isStepOne = buttonState === ButtonState.TwoTransactionsStepOne;
+  const isStepOne = stepOneStates.includes(buttonState);
   const isStepOneRetry = buttonState === ButtonState.TwoTransactionsRetryStepOne;
   const isStepOneLoading = stepOneLoadingStates.includes(buttonState);
 
-  const isStepTwo = buttonState === ButtonState.TwoTransactionsStepTwo;
+  const isStepTwo = stepTwoStates.includes(buttonState);
   const isStepTwoRetry = buttonState === ButtonState.TwoTransactionsRetryStepTwo;
   const isStepTwoLoading = stepTwoLoadingStates.includes(buttonState);
 
-  if (isStepOne || isStepOneRetry || isStepOneLoading) {
+  if (isStepOne) {
     return (
       <Button primary big full disabled={isStepOneLoading} onClick={onClickSetup}>
         {isStepOneLoading && <LoaderBlockStyled />}
@@ -38,7 +44,7 @@ export const TwoStepExchangeButtons: FC<Props> = ({
     );
   }
 
-  if (isStepTwo || isStepTwoRetry || isStepTwoLoading) {
+  if (isStepTwo) {
     return (
       <Button primary big full disabled={isStepTwoLoading} onClick={onClickExchange}>
         {isStepTwoLoading && <LoaderBlockStyled />}
