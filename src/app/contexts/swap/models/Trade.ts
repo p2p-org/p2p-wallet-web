@@ -1,6 +1,6 @@
 import { ZERO } from '@orca-so/sdk';
 import { AccountLayout, u64 } from '@solana/spl-token';
-import { Connection, PublicKey } from '@solana/web3.js';
+import { Connection, PublicKey, Transaction } from '@solana/web3.js';
 import BigDecimal from 'decimal.js';
 
 import { Wallet } from 'api/wallet/Wallet';
@@ -230,6 +230,7 @@ export default class Trade {
     tokenNames: string[],
   ): Promise<{
     txSignature: string;
+    signedTransaction: Transaction;
     executeSetup: () => Promise<null>;
   }> {
     const transactionBuilder = new TransactionBuilder();
@@ -250,6 +251,7 @@ export default class Trade {
 
     return {
       txSignature: getSignature(signedTransaction),
+      signedTransaction,
       executeSetup: sendAndConfirm(connection, signedTransaction),
     };
   }
@@ -264,6 +266,7 @@ export default class Trade {
     outputUserTokenPublicKey: PublicKey | undefined,
   ): Promise<{
     txSignature: string;
+    signedTransaction: Transaction;
     executeExchange: () => Promise<null>;
   }> {
     if (!this.pools || !this.derivedFields) {
@@ -339,6 +342,7 @@ export default class Trade {
 
     return {
       txSignature: getSignature(signedTransaction),
+      signedTransaction,
       executeExchange: sendAndConfirm(connection, signedTransaction),
     };
   }
