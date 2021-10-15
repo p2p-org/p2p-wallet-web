@@ -12,11 +12,12 @@ export type ResolveUsernameResponce = {
   parent_name: string;
   owner: string;
   class: string;
+  name: string;
 };
 
 export interface API {
   lookupName: (owner: string | null) => Promise<Array<LookupResponce>>;
-  resolveName: (name: string) => Promise<ResolveUsernameResponce | null>;
+  resolveName: (name: string) => Promise<Array<ResolveUsernameResponce>>;
 }
 
 export const APIFactory = memoizeWith(
@@ -40,13 +41,13 @@ export const APIFactory = memoizeWith(
       }
     };
 
-    const resolveName = async (name: string): Promise<ResolveUsernameResponce | null> => {
-      if (!name) return null;
+    const resolveName = async (name: string): Promise<Array<ResolveUsernameResponce>> => {
+      if (!name) return [];
       try {
-        const res = await fetch(`${nameSericeUrl}/${name}`);
+        const res = await fetch(`${nameSericeUrl}/resolve/${name}`);
 
         if (res.status === 404) {
-          return null;
+          return [];
         }
 
         const result = await res.json();
@@ -54,7 +55,7 @@ export const APIFactory = memoizeWith(
         return result;
       } catch (error) {
         console.error(error);
-        return null;
+        return [];
       }
     };
 
