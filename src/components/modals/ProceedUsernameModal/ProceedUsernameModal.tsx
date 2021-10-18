@@ -37,14 +37,10 @@ const Description = styled.div`
 
 const Buttons = styled.div`
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
 
   margin-bottom: 16px;
   padding: 16px 20px;
-`;
-
-const ButtonProceed = styled(Button)`
-  width: 234px;
 `;
 
 const ButtonCancel = styled(Button)`
@@ -104,10 +100,7 @@ export const ProceedUsernameModal: FC<Props> = ({ close }) => {
         or iOS app.
       </Description>
       <Buttons>
-        <ButtonProceed primary onClick={handleCloseClick}>
-          Proceed
-        </ButtonProceed>
-        <ButtonCancel lightBlue onClick={handleCloseButtonClick}>
+        <ButtonCancel primary onClick={handleCloseButtonClick}>
           Proceed &amp; don’t show again
         </ButtonCancel>
       </Buttons>
