@@ -5,7 +5,7 @@ import { styled } from '@linaria/react';
 
 import { TokenAccount } from 'api/token/TokenAccount';
 import { UsernameAddressWidget } from 'components/common/UsernameAddressWidget';
-import { Accordion, Icon } from 'components/ui';
+import { Accordion } from 'components/ui';
 import { getExplorerUrl } from 'utils/connection';
 import { useUsername } from 'utils/hooks/useUsername';
 
@@ -19,14 +19,6 @@ const InfoBlock = styled.div`
 
   background: #fafbfc;
   border-radius: 12px;
-`;
-
-const QuestionIcon = styled(Icon)`
-  margin-right: 13px;
-  width: 44px;
-  height: 44px;
-
-  color: #5887ff;
 `;
 
 export const ReceiveSolana: FC = () => {
@@ -49,7 +41,6 @@ export const ReceiveSolana: FC = () => {
     <>
       <Description>
         <InfoBlock>
-          <QuestionIcon name="info" />
           <div>
             Receive any token within the <strong>Solana network</strong> even if it is not included
             in your wallet list
