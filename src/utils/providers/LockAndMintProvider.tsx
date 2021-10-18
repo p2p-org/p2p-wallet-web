@@ -311,18 +311,32 @@ export const useLockAndMintProvider = (): LockAndMintContext => {
   return ctx;
 };
 
-const feesCache: any = {};
-export const useFetchFees = (isNeedLoadFee = true) => {
-  const solanaProvider = useSolana();
-  const network = useRenNetwork();
-  const { bitcoin, solana } = getChains(network, solanaProvider);
-  const initialFees = {
+type Fees = {
+  mint: number;
+  burn: number;
+  lock: number;
+  release: number;
+};
+
+type FeesCache = {
+  timestamp: number;
+  fees: Fees;
+};
+
+const feesCache: FeesCache = {
+  timestamp: 0,
+  fees: {
     mint: 0,
     burn: 0,
     lock: 0,
     release: 0,
-  };
-  const [fees, setFees] = useState(initialFees);
+  },
+};
+export const useFetchFees = (isNeedLoadFee = true) => {
+  const solanaProvider = useSolana();
+  const network = useRenNetwork();
+  const { bitcoin, solana } = getChains(network, solanaProvider);
+  const [fees, setFees] = useState(feesCache.fees);
   const [pending, setPending] = useState(false);
 
   useEffect(() => {
@@ -350,6 +364,8 @@ export const useFetchFees = (isNeedLoadFee = true) => {
       (!feesCache.timestamp || feesCache.timestamp + 1000 * 60 * 5 <= Date.now())
     ) {
       void fetchFees();
+    } else {
+      setFees(feesCache.fees);
     }
   }, [bitcoin, isNeedLoadFee, network, solana]);
 
