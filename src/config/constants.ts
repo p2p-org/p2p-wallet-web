@@ -79,3 +79,6 @@ export const feeRelayerUrl = process.env.REACT_APP_FEE_RELAYER_URL;
 
 export const nameSericeUrl =
   process.env.REACT_APP_NAME_SERVICE_URL || `${feeRelayerUrl}name_register`;
+
+export const appStorePath = 'https://apple.com/';
+export const playStorePath = 'https://google.com';

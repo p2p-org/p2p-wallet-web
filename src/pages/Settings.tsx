@@ -6,17 +6,16 @@ import { NavLink, useLocation } from 'react-router-dom';
 import { styled } from '@linaria/react';
 import classNames from 'classnames';
 import { Feature } from 'flagged';
-import { rgba } from 'polished';
 
 import { forgetWallet } from 'api/wallet/ManualWallet';
 import AppStoreBadge from 'assets/images/app-store-badge.png';
 import GooglePlayBadge from 'assets/images/google-play-badge.png';
-import { Card } from 'components/common/Card';
 import { Layout } from 'components/common/Layout';
 import { UsernameAddressWidget } from 'components/common/UsernameAddressWidget';
 import { WidgetPage } from 'components/common/WidgetPage';
 import { Accordion, Icon, Select, Switch } from 'components/ui';
 import { MenuItem } from 'components/ui/Select/MenuItem';
+import { appStorePath, playStorePath } from 'config/constants';
 import { FEATURE_SETTINGS_FREE_TRANSACTIONS, FEATURE_SETTINGS_LIST } from 'config/featureFlags';
 import { disconnect, updateSettings } from 'store/slices/wallet/WalletSlice';
 import { trackEvent } from 'utils/analytics';
@@ -29,109 +28,53 @@ const Wrapper = styled.div`
   grid-gap: 24px;
 `;
 
-const RowsWrapper = styled.div`
+const ItemsWrapper = styled.div`
   margin-top: 10px;
+  padding: 20px;
+
+  border-bottom: 1px solid #f6f6f8;
 `;
 
-const RowWrapper = styled.div`
-  position: relative;
-
+const Item = styled.div`
   display: flex;
   align-items: center;
-  height: 76px;
-  margin: 0 10px;
-  padding: 6px 0;
+  padding: 20px;
+
+  border: 1px solid #f6f6f8;
+  border-radius: 12px;
 
   &:not(:last-child) {
-    &::after {
-      position: absolute;
-      right: 10px;
-      bottom: 0;
-      left: 10px;
-
-      border-bottom: 1px solid ${rgba(0, 0, 0, 0.05)};
-
-      content: '';
-    }
+    margin-bottom: 8px;
   }
 `;
 
-const RowIconWrapper = styled.div`
+const ItemTitle = styled.div`
   display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 36px;
-  height: 36px;
-  margin-right: 20px;
+  flex-grow: 1;
 
-  background: #f6f6f8;
-  border-radius: 12px;
-`;
-
-const RowIcon = styled(Icon)`
-  width: 24px;
-  height: 24px;
-
-  color: #a3a5ba;
-`;
-
-const CenterWrapper = styled.div`
-  display: flex;
-  flex: 1;
-  align-items: center;
-  height: 64px;
-  padding: 0 10px;
-
-  border-radius: 12px;
-  cursor: pointer;
-
-  &:hover {
-    background: #f6f6f8;
-
-    ${RowIconWrapper} {
-      background: #fff;
-    }
-
-    ${RowIcon} {
-      color: #5887ff;
-    }
-  }
-`;
-
-const SecondaryWrapper = styled.div`
-  display: flex;
-`;
-
-const FieldNameWrapper = styled.div`
-  display: flex;
-  flex: 1;
-  align-items: center;
-
-  color: #000;
-  font-weight: 600;
   font-size: 16px;
-  line-height: 24px;
+  font-weight: 600;
 `;
 
-const LogoutCard = styled(Card)`
-  padding: 0;
+const ItemAction = styled.div`
+  display: flex;
+  align-items: center;
 `;
 
-const LogoutIcon = styled(RowIcon)`
-  width: 20px;
-  height: 20px;
-
-  color: #a3a5ba;
+const LogoutWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  padding: 20px;
 `;
 
-const LogoutWrapper = styled(RowWrapper)`
+const Logout = styled.div`
+  padding: 0 10px;
+  font-size: 16px;
+  font-weight: 600;
+
+  color: #f43d3d;
+
   cursor: pointer;
-
-  &:hover {
-    ${LogoutIcon} {
-      color: #f43d3d;
-    }
-  }
 `;
 
 const CurrencyItem = styled.div``;
@@ -151,6 +94,8 @@ const Title = styled.div`
   font-weight: 600;
   font-size: 16px;
 
+  text-align: right;
+
   &.overflow-ellipsis {
     width: 250px;
     overflow: hidden;
@@ -161,8 +106,8 @@ const Title = styled.div`
 `;
 
 const ChevronIcon = styled(Icon)`
-  width: 16px;
-  height: 16px;
+  width: 20px;
+  height: 20px;
 
   color: #a3a5ba;
 `;
@@ -173,8 +118,8 @@ const ChevronWrapper = styled.div`
   transform: rotate(270deg);
 `;
 
-const AccordionWrapper = styled.div`
-  padding: 0 20px;
+const AccordionItem = styled.div`
+  margin-bottom: 8px;
 `;
 
 const AccordionTitle = styled.div`
@@ -202,29 +147,6 @@ const MobileButtons = styled.div`
 const Text = styled.div`
   margin-bottom: 20px;
 `;
-
-type RowProps = {
-  icon: string;
-  title: React.ReactNode;
-  secondary?: React.ReactNode;
-  onClick?: () => void;
-};
-
-const Row: FunctionComponent<RowProps> = ({ icon, title, secondary, onClick }) => {
-  return (
-    <RowWrapper onClick={onClick}>
-      <CenterWrapper>
-        <FieldNameWrapper>
-          <RowIconWrapper>
-            <RowIcon name={icon} />
-          </RowIconWrapper>
-          {title}
-        </FieldNameWrapper>
-        <SecondaryWrapper>{secondary}</SecondaryWrapper>
-      </CenterWrapper>
-    </RowWrapper>
-  );
-};
 
 export const Settings: FunctionComponent = () => {
   const location = useLocation<{ fromPage: string }>();
@@ -256,13 +178,11 @@ export const Settings: FunctionComponent = () => {
       rightColumn={
         <Wrapper>
           <WidgetPage icon="gear" title="Settings">
-            <RowsWrapper>
+            <ItemsWrapper>
               <Feature name={FEATURE_SETTINGS_LIST}>
-                <Row icon="reload" title="Backup" />
-                <Row
-                  icon="currency"
-                  title="Currency"
-                  secondary={
+                <Item>
+                  <ItemTitle>Currency</ItemTitle>
+                  <ItemAction>
                     <Select value={settings.currency}>
                       {currencies.map(({ ticker, name, symbol }) => (
                         <MenuItem
@@ -276,14 +196,11 @@ export const Settings: FunctionComponent = () => {
                         </MenuItem>
                       ))}
                     </Select>
-                  }
-                />
-                <Row icon="card" title="Payment methods" />
-                <Row icon="lock" title="Security" />
-                <Row
-                  icon="sun"
-                  title="Appearance"
-                  secondary={
+                  </ItemAction>
+                </Item>
+                <Item>
+                  <ItemTitle>Appearance</ItemTitle>
+                  <ItemAction>
                     <Select value={settings.appearance}>
                       {appearance.map((value) => (
                         <MenuItem
@@ -294,10 +211,10 @@ export const Settings: FunctionComponent = () => {
                         </MenuItem>
                       ))}
                     </Select>
-                  }
-                />
+                  </ItemAction>
+                </Item>
               </Feature>
-              <AccordionWrapper>
+              <AccordionItem>
                 <Accordion
                   open={(location.state as any)?.isUsernameActive}
                   title={
@@ -329,7 +246,7 @@ export const Settings: FunctionComponent = () => {
                       <div>You can access the feature in the app</div>
                       <MobileButtons>
                         <NavLink
-                          to={{ pathname: 'https://google.com' }}
+                          to={{ pathname: playStorePath }}
                           target="_blank"
                           className="button">
                           <img
@@ -339,10 +256,7 @@ export const Settings: FunctionComponent = () => {
                             alt="Download P2P Wallet at the Google Play Store"
                           />
                         </NavLink>
-                        <NavLink
-                          to={{ pathname: 'https://apple.com/' }}
-                          target="_blank"
-                          className="button">
+                        <NavLink to={{ pathname: appStorePath }} target="_blank" className="button">
                           <img
                             src={AppStoreBadge}
                             width="120"
@@ -354,26 +268,26 @@ export const Settings: FunctionComponent = () => {
                     </>
                   )}
                 </Accordion>
-              </AccordionWrapper>
-              <Row
-                icon="branch"
-                title="Network"
-                secondary={
-                  <>
-                    <Title className="overflow-ellipsis">{network.endpoint}</Title>
-                    <ChevronWrapper>
-                      <ChevronIcon name="chevron" />
-                    </ChevronWrapper>
-                  </>
-                }
-                onClick={() => {
-                  history.push('/settings/network');
-                }}
-              />
-              <Row
-                icon="eye-hide"
-                title="Hide zero balances"
-                secondary={
+              </AccordionItem>
+              <Item>
+                <ItemTitle>Network</ItemTitle>
+                <ItemAction
+                  onClick={() => {
+                    history.push('/settings/network');
+                  }}
+                  style={{ cursor: 'pointer' }}>
+                  <Title className="overflow-ellipsis">{network.endpoint}</Title>
+                  <ChevronWrapper
+                    onClick={() => {
+                      history.push('/settings/network');
+                    }}>
+                    <ChevronIcon name="chevron" />
+                  </ChevronWrapper>
+                </ItemAction>
+              </Item>
+              <Item>
+                <ItemTitle>Hide zero balances</ItemTitle>
+                <ItemAction>
                   <Switch
                     checked={settings.isZeroBalancesHidden}
                     onChange={(checked) => {
@@ -385,14 +299,12 @@ export const Settings: FunctionComponent = () => {
                       })();
                     }}
                   />
-                }
-              />
-
+                </ItemAction>
+              </Item>
               <Feature name={FEATURE_SETTINGS_FREE_TRANSACTIONS}>
-                <Row
-                  icon="free-tx"
-                  title="Use free transactions"
-                  secondary={
+                <Item>
+                  <ItemTitle>Use free transactions</ItemTitle>
+                  <ItemAction>
                     <Switch
                       checked={settings.useFreeTransactions}
                       onChange={(checked) =>
@@ -401,23 +313,14 @@ export const Settings: FunctionComponent = () => {
                         })()
                       }
                     />
-                  }
-                />
+                  </ItemAction>
+                </Item>
               </Feature>
-            </RowsWrapper>
-          </WidgetPage>
-          <LogoutCard withShadow>
-            <LogoutWrapper onClick={handleLogoutClick}>
-              <CenterWrapper>
-                <FieldNameWrapper>
-                  <RowIconWrapper>
-                    <LogoutIcon name="logout" />
-                  </RowIconWrapper>
-                  Logout
-                </FieldNameWrapper>
-              </CenterWrapper>
+            </ItemsWrapper>
+            <LogoutWrapper>
+              <Logout onClick={handleLogoutClick}>Logout now</Logout>
             </LogoutWrapper>
-          </LogoutCard>
+          </WidgetPage>
         </Wrapper>
       }
     />
