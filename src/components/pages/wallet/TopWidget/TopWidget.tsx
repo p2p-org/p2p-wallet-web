@@ -9,6 +9,7 @@ import classNames from 'classnames';
 import throttle from 'lodash.throttle';
 
 import { TokenAccount } from 'api/token/TokenAccount';
+import { useConfig } from 'app/contexts/swap';
 import { AmountUSD } from 'components/common/AmountUSD';
 import { COLUMN_RIGHT_WIDTH } from 'components/common/Layout/constants';
 import { TokenAvatar } from 'components/common/TokenAvatar';
@@ -175,6 +176,7 @@ type Props = {
 export const TopWidgetOrigin: FunctionComponent<Props> = ({ publicKey }) => {
   const dispatch = useDispatch();
   const location = useLocation();
+  const { tokenConfigs } = useConfig();
   const widgetRef = useRef<HTMLDivElement>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isShowFixed, setIsShowFixed] = useState(false);
@@ -263,18 +265,20 @@ export const TopWidgetOrigin: FunctionComponent<Props> = ({ publicKey }) => {
             <PlusIcon name="top" />
           </ButtonStyled>
         </Link>
-        <Link
-          to={{
-            pathname: `/swap/${tokenAccount?.mint.symbol}`,
-            state: { fromPage: location.pathname },
-          }}
-          title="Swap"
-          onClick={() => trackEvent('wallet_swap_click')}
-          className="button">
-          <ButtonStyled primary small>
-            <PlusIcon name="swap" />
-          </ButtonStyled>
-        </Link>
+        {tokenAccount?.mint.symbol && tokenConfigs[tokenAccount?.mint.symbol] ? (
+          <Link
+            to={{
+              pathname: `/swap/${tokenAccount?.mint.symbol}`,
+              state: { fromPage: location.pathname },
+            }}
+            title="Swap"
+            onClick={() => trackEvent('wallet_swap_click')}
+            className="button">
+            <ButtonStyled primary small>
+              <PlusIcon name="swap" />
+            </ButtonStyled>
+          </Link>
+        ) : undefined}
         {!isMainnet && tokenAccount?.mint.symbol === 'SOL' ? (
           <ButtonStyled primary small title="Airdrop" onClick={handleAirdropClick}>
             <PlusIcon name="plug" />

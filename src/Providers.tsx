@@ -7,6 +7,7 @@ import {
 
 import { SolanaProvider } from 'app/contexts/solana';
 import { TokenListProvider } from 'app/contexts/swapSerum';
+import { Providers as SwapProviders } from 'components/pages/swap/Providers';
 import { LockAndMintProvider } from 'utils/providers/LockAndMintProvider';
 
 export const Providers: FC = ({ children }) => {
@@ -23,7 +24,9 @@ export const Providers: FC = ({ children }) => {
   return (
     <TokenListProvider initialState={{ tokenList }}>
       <SolanaProvider>
-        <LockAndMintProvider>{children}</LockAndMintProvider>
+        <LockAndMintProvider>
+          <SwapProviders>{children}</SwapProviders>
+        </LockAndMintProvider>
       </SolanaProvider>
     </TokenListProvider>
   );

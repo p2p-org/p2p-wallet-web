@@ -33,8 +33,8 @@ const App: React.FC = () => {
 
   return (
     <>
-      <Providers>
-        <Router basename={process.env.REACT_APP_BASENAME}>
+      <Router basename={process.env.REACT_APP_BASENAME}>
+        <Providers>
           <Switch>
             {isFeatureLanding ? (
               <Route path="/" component={Landing} exact />
@@ -54,11 +54,11 @@ const App: React.FC = () => {
             <AuthRequiredRoute path="/buy" component={Buy} />
           </Switch>
           <Intercom />
-        </Router>
-        <ModalManager />
-        <ToastManager anchor="left" renderToast={(props) => <NotifyToast {...props} />} />
-        <FeaturesToggle />
-      </Providers>
+          <ModalManager />
+          <ToastManager anchor="left" renderToast={(props) => <NotifyToast {...props} />} />
+          <FeaturesToggle />
+        </Providers>
+      </Router>
     </>
   );
 };
