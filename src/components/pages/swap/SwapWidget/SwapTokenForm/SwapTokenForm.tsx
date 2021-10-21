@@ -349,7 +349,6 @@ export const SwapTokenForm: FC<Props> = ({
   const { useAsyncMergedPrices } = usePrice();
   const asyncPrices = useAsyncMergedPrices();
 
-  const hasAsyncPrices = !!asyncPrices.value;
   const hasAsyncStandardTokenAccounts = !!asyncStandardTokenAccounts;
 
   const tokenInfo = tokenConfigs[tokenName];
@@ -546,7 +545,7 @@ export const SwapTokenForm: FC<Props> = ({
       });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
-    hasAsyncPrices,
+    asyncPrices.value,
     hasAsyncStandardTokenAccounts,
     filter,
     isInput,
