@@ -199,12 +199,26 @@ export const Main: FC<Props> = ({ setIsLoading, next }) => {
     { leading: false, trailing: true },
   );
 
-  const handleSeedChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+  const handleMnemonicChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const { value } = e.target;
     setMnemonic(value);
     validateMnemonic(value);
 
     trackEventOnce('login_seed_keydown');
+  };
+
+  const handleMnemonicPaste = (e: React.ClipboardEvent<HTMLTextAreaElement>) => {
+    const value = e.clipboardData.getData('text').trim();
+    setMnemonic(value);
+    validateMnemonic(value);
+
+    trackEventOnce('login_seed_keydown');
+  };
+
+  const handleMnemonicBlur = (e: React.FocusEvent<HTMLTextAreaElement>) => {
+    const value = e.target.value.trim();
+    setMnemonic(value);
+    validateMnemonic(value);
   };
 
   const handleContinueClick = () => {
@@ -240,7 +254,9 @@ export const Main: FC<Props> = ({ setIsLoading, next }) => {
         <MnemonicTextarea
           placeholder="Seed phrase"
           value={mnemonic}
-          onChange={handleSeedChange}
+          onChange={handleMnemonicChange}
+          onPaste={handleMnemonicPaste}
+          onBlur={handleMnemonicBlur}
           className={classNames({ hasError })}
         />
         {hasError ? <ErrorHint error="Incorrect seed phrase" /> : undefined}

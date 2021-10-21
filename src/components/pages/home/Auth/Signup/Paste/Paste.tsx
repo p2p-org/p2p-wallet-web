@@ -3,11 +3,10 @@ import React, { FC, useEffect, useState } from 'react';
 import { styled } from '@linaria/react';
 import classNames from 'classnames';
 
+import { ErrorHint } from 'components/common/ErrorHint';
 import { Button } from 'components/pages/home/Auth/common/Button';
 import { trackEvent } from 'utils/analytics';
 import { useTrackEventOnce } from 'utils/hooks/useTrackEventOnce';
-
-import { ErrorHint } from '../../../../../common/ErrorHint';
 
 const Wrapper = styled.div`
   display: flex;
@@ -87,8 +86,20 @@ export const Paste: FC<Props> = ({ mnemonic, next }) => {
     setHasError(value !== mnemonic);
   };
 
-  const handleMnemonicInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+  const handleMnemonicChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const { value } = e.target;
+    setUserMnemonic(value);
+
+    if (userMnemonic) {
+      validateMnemonic(value);
+      trackEventOnce('signup_seed_pasted');
+    }
+  };
+
+  const handleMnemonicPaste = (e: React.ClipboardEvent<HTMLTextAreaElement>) => {
+    e.preventDefault();
+
+    const value = e.clipboardData.getData('text').trim();
     setUserMnemonic(value);
 
     if (userMnemonic) {
@@ -121,7 +132,8 @@ export const Paste: FC<Props> = ({ mnemonic, next }) => {
         <MnemonicTextarea
           placeholder="Seed phrase"
           value={userMnemonic}
-          onInput={handleMnemonicInput}
+          onChange={handleMnemonicChange}
+          onPaste={handleMnemonicPaste}
           onBlur={handleMnemonicBlur}
           className={classNames({ hasError })}
         />
