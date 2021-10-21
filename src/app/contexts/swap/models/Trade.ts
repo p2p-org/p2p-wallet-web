@@ -10,7 +10,7 @@ import { ZERO_DECIMAL } from '../constants';
 import { TokenConfigs } from '../orca-commons';
 import { TradeablePoolsMap } from '../pools';
 import { UserTokenAccountMap } from '../user';
-import { getSignature, sendAndConfirm } from '../utils/transactions';
+import { getSignature, sendAndConfirm, sendAndConfirmFast } from '../utils/transactions';
 import TransactionBuilder from '../utils/web3/TransactionBuilder';
 import SlippageTolerance from './SlippageTolerance';
 import TradeablePoolInterface, { OutputTooHighError } from './TradeablePoolInterface';
@@ -353,7 +353,7 @@ export default class Trade {
       txSignatureSetup: signedSetupTx ? getSignature(signedSetupTx) : undefined,
       executeSetup: signedSetupTx ? sendAndConfirm(connection, signedSetupTx) : undefined,
       txSignatureSwap: getSignature(signedSwapTx),
-      executeSwap: sendAndConfirm(connection, signedSwapTx),
+      executeSwap: sendAndConfirmFast(connection, signedSwapTx),
     };
   }
 }

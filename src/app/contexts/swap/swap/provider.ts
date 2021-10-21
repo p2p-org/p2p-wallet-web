@@ -367,6 +367,11 @@ const useSwapInternal = (props: UseSwapArgs = {}): UseSwap => {
       }
     }
 
+    // // Hack: Pause for 10 seconds to increase the probability
+    // // that we fetch the new token account even if the RPC server
+    // // is unstable.
+    // await new Promise((resolve) => setTimeout(resolve, 10_000));
+
     function getFailedTransactionErrorMessage(rawMessage: string) {
       if (rawMessage.includes('Transaction too large')) {
         return 'Transaction failed. Please try again.';
