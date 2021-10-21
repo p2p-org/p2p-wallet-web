@@ -94,8 +94,8 @@ export type UseSwapArgs = {
 const useSwapInternal = (props: UseSwapArgs = {}): UseSwap => {
   const { wallet, connection } = useSolana();
   const { programIds, tokenConfigs, routeConfigs } = useConfig();
-  const [inputTokenName, _setInputTokenName] = useState(props.inputTokenName ?? 'USDC');
-  const [outputTokenName, _setOutputTokenName] = useState(props.outputTokenName ?? 'SOL');
+  const [inputTokenName, _setInputTokenName] = useState(props.inputTokenName ?? 'SOL');
+  const [outputTokenName, _setOutputTokenName] = useState(props.outputTokenName ?? 'USDC');
   const [slippageToleranceState, setSlippageToleranceState] = useLocalStorage<{
     numerator: string;
     denominator: string;
