@@ -235,6 +235,9 @@ export const LockAndMintBtc: FC = () => {
               another coin.
             </GatewayInfoItem>
             <GatewayInfoItem>
+              You will receive <strong>renBTC.</strong>
+            </GatewayInfoItem>
+            <GatewayInfoItem>
               <MinimumTxAmount>
                 <div>Minimum transaction amount of &nbsp;</div>
                 {isFetchingFee ? (
@@ -248,7 +251,6 @@ export const LockAndMintBtc: FC = () => {
               <HMSCountdown milliseconds={timeRemained} /> is the remaining time to safely send the
               assets.
             </GatewayInfoItem>
-            <GatewayInfoItem>You will receive renBTC</GatewayInfoItem>
           </GatewayInfoItems>
         </GatewayInfoWrapper>
       </Description>
