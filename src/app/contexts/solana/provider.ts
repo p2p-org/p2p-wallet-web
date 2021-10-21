@@ -30,6 +30,7 @@ const useSolanaInternal = (): UseSolana => {
     return {
       publicKey: getWallet().pubkey,
       signTransaction: (tx: Transaction) => getWallet().sign(tx),
+      signAllTransactions: (txs: Transaction[]) => getWallet().signAllTransactions(txs),
     };
   }, [publicKey]);
 

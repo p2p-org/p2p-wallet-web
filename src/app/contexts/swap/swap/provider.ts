@@ -31,22 +31,6 @@ export enum ButtonState {
   // eslint-disable-next-line no-unused-vars
   Exchange,
   // eslint-disable-next-line no-unused-vars
-  TwoTransactionsStepOne,
-  // eslint-disable-next-line no-unused-vars
-  TwoTransactionsConfirmStepOne,
-  // eslint-disable-next-line no-unused-vars
-  TwoTransactionsSendingStepOne,
-  // eslint-disable-next-line no-unused-vars
-  TwoTransactionsRetryStepOne,
-  // eslint-disable-next-line no-unused-vars
-  TwoTransactionsStepTwo,
-  // eslint-disable-next-line no-unused-vars
-  TwoTransactionsConfirmStepTwo,
-  // eslint-disable-next-line no-unused-vars
-  TwoTransactionsSendingStepTwo,
-  // eslint-disable-next-line no-unused-vars
-  TwoTransactionsRetryStepTwo,
-  // eslint-disable-next-line no-unused-vars
   ConfirmWallet,
   // eslint-disable-next-line no-unused-vars
   SendingTransaction,
@@ -65,26 +49,6 @@ export enum ButtonState {
   // eslint-disable-next-line no-unused-vars
   Retry,
 }
-
-export const stepOneLoadingStates = [
-  ButtonState.TwoTransactionsConfirmStepOne,
-  ButtonState.TwoTransactionsSendingStepOne,
-];
-
-export const stepOneStates = stepOneLoadingStates.concat(
-  ButtonState.TwoTransactionsStepOne,
-  ButtonState.TwoTransactionsRetryStepOne,
-);
-
-export const stepTwoLoadingStates = [
-  ButtonState.TwoTransactionsConfirmStepTwo,
-  ButtonState.TwoTransactionsSendingStepTwo,
-];
-
-export const stepTwoStates = stepTwoLoadingStates.concat(
-  ButtonState.TwoTransactionsStepTwo,
-  ButtonState.TwoTransactionsRetryStepTwo,
-);
 
 export interface UseSwap {
   trade: Trade;
@@ -116,7 +80,6 @@ export interface UseSwap {
   intermediateTokenName: string | undefined;
   intermediateTokenPrice: number | undefined;
   buttonState: ButtonState;
-  onSetupTokenAccounts: () => Promise<void>;
   onSwap: () => Promise<void>;
 }
 
@@ -199,33 +162,16 @@ const useSwapInternal = (props: UseSwapArgs = {}): UseSwap => {
 
   const minSolBalanceRequired = minSolBalanceForSwap(
     tokenConfigs['SOL'].decimals,
-    !!asyncStandardTokenAccounts.value &&
-      trade.requiresTwoTransactions(asyncStandardTokenAccounts.value),
+    !!asyncStandardTokenAccounts.value,
   );
-
-  const resetButtonStateIfTwoTransactionStates = useCallback(() => {
-    setButtonState((buttonState) => {
-      if (stepOneStates.includes(buttonState) || stepTwoStates.includes(buttonState)) {
-        return ButtonState.ConnectWallet;
-      }
-
-      return buttonState;
-    });
-  }, [setButtonState]);
-
-  const resetStates = useCallback(() => {
-    resetButtonStateIfTwoTransactionStates();
-    // setIsFairnessIndicatorCollapsed(true);
-  }, [resetButtonStateIfTwoTransactionStates]);
 
   const setInputTokenName = useCallback(
     (tokenName: string) => {
       const routes = routeConfigs[getTradeId(tokenName, trade.outputTokenName)];
       _setInputTokenName(tokenName);
       setTrade(trade.updateInputToken(tokenName, routes));
-      resetStates();
     },
-    [resetStates, routeConfigs, trade],
+    [routeConfigs, trade],
   );
 
   const setOutputTokenName = useCallback(
@@ -233,33 +179,29 @@ const useSwapInternal = (props: UseSwapArgs = {}): UseSwap => {
       const routes = routeConfigs[getTradeId(trade.inputTokenName, tokenName)];
       _setOutputTokenName(tokenName);
       setTrade(trade.updateOutputToken(tokenName, routes));
-      resetStates();
     },
-    [resetStates, routeConfigs, trade],
+    [routeConfigs, trade],
   );
 
   const setInputAmount = useCallback(
     (amount: u64) => {
-      resetButtonStateIfTwoTransactionStates();
       setTrade(trade.updateInputAmount(amount));
     },
-    [resetButtonStateIfTwoTransactionStates, trade],
+    [trade],
   );
 
   const setOutputAmount = useCallback(
     (amount: u64) => {
-      resetButtonStateIfTwoTransactionStates();
       setTrade(trade.updateOutputAmount(amount));
     },
-    [resetButtonStateIfTwoTransactionStates, trade],
+    [trade],
   );
 
   const switchTokens = useCallback(() => {
-    resetButtonStateIfTwoTransactionStates();
     _setInputTokenName(trade.outputTokenName);
     _setOutputTokenName(trade.inputTokenName);
     setTrade(trade.switchTokens());
-  }, [trade, resetButtonStateIfTwoTransactionStates]);
+  }, [trade]);
 
   // Update trade instance when pool data becomes available
   useEffect(() => {
@@ -282,9 +224,7 @@ const useSwapInternal = (props: UseSwapArgs = {}): UseSwap => {
   useEffect(() => {
     if (
       buttonState === ButtonState.ConfirmWallet ||
-      buttonState === ButtonState.SendingTransaction ||
-      stepTwoStates.includes(buttonState) ||
-      stepOneLoadingStates.includes(buttonState)
+      buttonState === ButtonState.SendingTransaction
     ) {
       return;
     }
@@ -312,18 +252,7 @@ const useSwapInternal = (props: UseSwapArgs = {}): UseSwap => {
       } else if (!inputUserTokenAccount || inputUserTokenAccount.getAmount().lt(inputAmount)) {
         setButtonState(ButtonState.InsufficientBalance);
       } else {
-        // If the button is currently in a step one state but can now
-        // exchange in one transaction, move forward to Step Two
-        if (
-          buttonState === ButtonState.TwoTransactionsStepOne &&
-          !trade.requiresTwoTransactions(asyncStandardTokenAccounts.value)
-        ) {
-          setButtonState(ButtonState.TwoTransactionsStepTwo);
-        }
-        // If the exchange needs to be broken up into two, set to Step One
-        else if (trade.requiresTwoTransactions(asyncStandardTokenAccounts.value)) {
-          setButtonState(ButtonState.TwoTransactionsStepOne);
-        } else if (trade.isPriceImpactHigh()) {
+        if (trade.isPriceImpactHigh()) {
           setButtonState(ButtonState.HighPriceImpact);
         } else {
           setButtonState(ButtonState.Exchange);
@@ -346,87 +275,11 @@ const useSwapInternal = (props: UseSwapArgs = {}): UseSwap => {
 
   useEffect(() => {
     setIsRefreshRateIncreased(
-      buttonState === ButtonState.Exchange ||
-        buttonState === ButtonState.HighPriceImpact ||
-        buttonState === ButtonState.TwoTransactionsConfirmStepTwo,
+      buttonState === ButtonState.Exchange || buttonState === ButtonState.HighPriceImpact,
     );
   }, [buttonState]);
 
   const inputTokenAmount = inputUserTokenAccount?.accountInfo.amount;
-
-  const onSetupTokenAccounts = useCallback(async () => {
-    // setErrorMessage('');
-
-    if (!asyncStandardTokenAccounts.value) {
-      throw new Error('UserTokenAccounts has not loaded yet');
-    }
-
-    if (!wallet) {
-      throw new Error('Wallet not set');
-    }
-
-    const tokenNames = trade.getTokenNamesToSetup(asyncStandardTokenAccounts.value);
-    setButtonState(ButtonState.TwoTransactionsConfirmStepOne);
-
-    let executeSetup;
-
-    try {
-      ({ executeSetup } = await trade.confirmSetup(
-        connection,
-        tokenConfigs,
-        programIds,
-        wallet,
-        tokenNames,
-      ));
-      // setSolanaExplorerLink(getExplorerUrl('tx', txSignature, cluster));
-    } catch (e) {
-      console.error(e);
-      // setErrorMessage(walletConfirmationFailure);
-      setButtonState(ButtonState.TwoTransactionsStepOne);
-      return;
-    }
-
-    setButtonState(ButtonState.TwoTransactionsSendingStepOne);
-
-    try {
-      await executeSetup();
-    } catch (e) {
-      console.error(e);
-      // setErrorMessage('Something went wrong during setup. Please try again.');
-      setButtonState(ButtonState.TwoTransactionsRetryStepOne);
-      return;
-    }
-
-    // Hack: Pause for 10 seconds to increase the probability
-    // that we fetch the new token account even if the RPC server
-    // is unstable.
-    await new Promise((resolve) => setTimeout(resolve, 10_000));
-
-    try {
-      await refreshStandardTokenAccounts();
-    } catch (e) {
-      console.error(e);
-    }
-
-    setButtonState(ButtonState.TwoTransactionsStepTwo);
-    // setSolanaExplorerLink('');
-
-    // const snackbarKey = enqueueSnackbar(
-    //   <SetupNotification
-    //     closeSnackbar={() => closeSnackbar(snackbarKey)}
-    //     txid={txSignature}
-    //     tokenNames={tokenNames}
-    //   />,
-    // );
-  }, [
-    asyncStandardTokenAccounts.value,
-    connection,
-    programIds,
-    refreshStandardTokenAccounts,
-    tokenConfigs,
-    trade,
-    wallet,
-  ]);
 
   const onSwap = useCallback(async () => {
     // setErrorMessage('');
@@ -456,13 +309,7 @@ const useSwapInternal = (props: UseSwapArgs = {}): UseSwap => {
 
     const inputUserTokenPublicKey = inputUserTokenAccount.account;
 
-    setButtonState((buttonState) => {
-      if (buttonState === ButtonState.TwoTransactionsStepTwo) {
-        return ButtonState.TwoTransactionsConfirmStepTwo;
-      }
-
-      return ButtonState.ConfirmWallet;
-    });
+    setButtonState(() => ButtonState.ConfirmWallet);
 
     const intermediateTokenPublicKey = intermediateTokenName
       ? asyncStandardTokenAccounts.value[intermediateTokenName]
@@ -480,9 +327,9 @@ const useSwapInternal = (props: UseSwapArgs = {}): UseSwap => {
       ...notificationParams,
     });
 
-    let executeExchange;
+    let executeSetup, executeSwap;
     try {
-      ({ executeExchange } = await trade.confirmExchange(
+      ({ executeSetup, executeSwap } = await trade.confirmExchange(
         connection,
         tokenConfigs,
         programIds,
@@ -495,13 +342,7 @@ const useSwapInternal = (props: UseSwapArgs = {}): UseSwap => {
     } catch (e) {
       console.error(e);
       // setErrorMessage(walletConfirmationFailure);
-      setButtonState((buttonState) => {
-        if (buttonState === ButtonState.TwoTransactionsConfirmStepTwo) {
-          return ButtonState.TwoTransactionsStepTwo;
-        }
-
-        return ButtonState.Exchange;
-      });
+      setButtonState(() => ButtonState.Exchange);
 
       swapNotification({
         header: 'Swap didn’t complete!',
@@ -513,13 +354,18 @@ const useSwapInternal = (props: UseSwapArgs = {}): UseSwap => {
       return;
     }
 
-    setButtonState((buttonState) => {
-      if (buttonState === ButtonState.TwoTransactionsConfirmStepTwo) {
-        return ButtonState.TwoTransactionsSendingStepTwo;
-      }
+    setButtonState(() => ButtonState.SendingTransaction);
 
-      return ButtonState.SendingTransaction;
-    });
+    if (executeSetup) {
+      try {
+        await executeSetup();
+      } catch (e) {
+        console.error(e);
+        // setErrorMessage('Something went wrong during setup. Please try again.');
+        setButtonState(ButtonState.Retry);
+        return;
+      }
+    }
 
     function getFailedTransactionErrorMessage(rawMessage: string) {
       if (rawMessage.includes('Transaction too large')) {
@@ -534,7 +380,7 @@ const useSwapInternal = (props: UseSwapArgs = {}): UseSwap => {
     }
 
     try {
-      await executeExchange();
+      await executeSwap();
 
       swapNotification({
         header: 'Swapped successfuly!',
@@ -545,13 +391,7 @@ const useSwapInternal = (props: UseSwapArgs = {}): UseSwap => {
       console.error(e);
       const error = getFailedTransactionErrorMessage(e.message);
       // setErrorMessage(error);
-      setButtonState((buttonState) => {
-        if (buttonState === ButtonState.TwoTransactionsSendingStepTwo) {
-          return ButtonState.TwoTransactionsRetryStepTwo;
-        }
-
-        return ButtonState.Retry;
-      });
+      setButtonState(() => ButtonState.Retry);
 
       swapNotification({
         header: 'Swap didn’t complete!',
@@ -620,7 +460,6 @@ const useSwapInternal = (props: UseSwapArgs = {}): UseSwap => {
     intermediateTokenName,
     intermediateTokenPrice,
     buttonState,
-    onSetupTokenAccounts,
     onSwap,
   };
 };

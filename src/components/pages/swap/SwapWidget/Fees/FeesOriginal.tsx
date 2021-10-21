@@ -5,7 +5,7 @@ import { styled } from '@linaria/react';
 import { LAMPORTS_PER_SOL } from '@solana/web3.js';
 
 import { useSolana } from 'app/contexts/solana';
-import { stepOneStates, useConfig, usePrice, useSwap } from 'app/contexts/swap';
+import { useConfig, usePrice, useSwap } from 'app/contexts/swap';
 import { formatBigNumber, formatNumberToUSD } from 'app/contexts/swap/utils/format';
 import { LoaderBlock } from 'components/common/LoaderBlock';
 
@@ -27,7 +27,7 @@ const LoaderBlockStyled = styled(LoaderBlock)`
 export const FeesOriginal: FC = () => {
   const { wallet, connection } = useSolana();
   const { programIds, tokenConfigs } = useConfig();
-  const { trade, intermediateTokenName, asyncStandardTokenAccounts, buttonState } = useSwap();
+  const { trade, intermediateTokenName, asyncStandardTokenAccounts } = useSwap();
   const { useAsyncMergedPrices } = usePrice();
   const asyncPrices = useAsyncMergedPrices();
 
@@ -112,37 +112,34 @@ export const FeesOriginal: FC = () => {
   const transactionFee = useAsync(async () => {
     const { feeCalculator } = await connection.getRecentBlockhash();
 
-    let signedTransaction;
-    if (stepOneStates.includes(buttonState)) {
-      ({ signedTransaction } = await trade.confirmSetup(
-        connection,
-        tokenConfigs,
-        programIds,
-        wallet,
-        tokenNames,
-      ));
-    } else {
-      const inputUserTokenPublicKey = asyncStandardTokenAccounts?.[trade.inputTokenName];
-      const intermediateTokenPublicKey = intermediateTokenName
-        ? asyncStandardTokenAccounts?.[intermediateTokenName]
-        : undefined;
-      const outputUserTokenAccount = asyncStandardTokenAccounts?.[trade.outputTokenName];
+    const inputUserTokenPublicKey = asyncStandardTokenAccounts?.[trade.inputTokenName];
+    const intermediateTokenPublicKey = intermediateTokenName
+      ? asyncStandardTokenAccounts?.[intermediateTokenName]
+      : undefined;
+    const outputUserTokenAccount = asyncStandardTokenAccounts?.[trade.outputTokenName];
 
-      ({ signedTransaction } = await trade.confirmExchange(
-        connection,
-        tokenConfigs,
-        programIds,
-        wallet,
-        inputUserTokenPublicKey?.account,
-        intermediateTokenPublicKey?.account,
-        outputUserTokenAccount?.account,
-      ));
+    let { setupTransaction, swapTransaction } = await trade.prepareExchangeTransactions(
+      connection,
+      tokenConfigs,
+      programIds,
+      wallet,
+      inputUserTokenPublicKey?.account,
+      intermediateTokenPublicKey?.account,
+      outputUserTokenAccount?.account,
+    );
+
+    let setupFee;
+    if (setupTransaction) {
+      setupFee =
+        (setupTransaction.signatures.length * feeCalculator.lamportsPerSignature) /
+        LAMPORTS_PER_SOL;
     }
 
-    return (
-      (signedTransaction.signatures.length * feeCalculator.lamportsPerSignature) / LAMPORTS_PER_SOL
-    );
-  }, [connection, buttonState, tokenNames, programIds, tokenConfigs, trade, wallet]);
+    let swapFee =
+      (swapTransaction.signatures.length * feeCalculator.lamportsPerSignature) / LAMPORTS_PER_SOL;
+
+    return { setupFee, swapFee };
+  }, [connection, tokenNames, programIds, tokenConfigs, trade, wallet]);
 
   const totalFee = useAsync(async () => {
     let totalFeeUSD = 0;
@@ -165,12 +162,40 @@ export const FeesOriginal: FC = () => {
 
     if (priceSOL) {
       const accountsCreationFeeUSD = accountsCreationFeeSOL * priceSOL;
-      const transactionFeeUSD = (transactionFee.result || 0) * priceSOL;
-      totalFeeUSD += accountsCreationFeeUSD + transactionFeeUSD;
+
+      let transactionSetupFeeUSD = 0;
+      if (transactionFee.result?.setupFee) {
+        transactionSetupFeeUSD = transactionFee.result.setupFee * priceSOL;
+      }
+
+      let transactionSwapFeeUSD = 0;
+      if (transactionFee.result?.swapFee) {
+        transactionSwapFeeUSD = transactionFee.result.swapFee * priceSOL;
+      }
+
+      totalFeeUSD += accountsCreationFeeUSD + transactionSetupFeeUSD + transactionSwapFeeUSD;
     }
 
     return formatNumberToUSD(totalFeeUSD);
   }, [tokenNames, transactionFee.result, feePools, asyncPrices.value]);
+
+  const renderTransactionFee = () => {
+    if (transactionFee.loading) {
+      return <LoaderBlockStyled size="16" />;
+    }
+
+    if (transactionFee.result) {
+      return (
+        <>
+          {transactionFee.result.setupFee &&
+            `${transactionFee.result.setupFee} SOL (Create token accounts) + `}
+          {transactionFee.result.swapFee && `${transactionFee.result.swapFee} SOL (Swap)`}
+        </>
+      );
+    }
+
+    return "Can't calculate";
+  };
 
   return (
     <FeesAccordion totalFee={totalFee}>
@@ -189,13 +214,7 @@ export const FeesOriginal: FC = () => {
       </Line>
       <Line>
         <Label>Transaction fee</Label>
-        <Value>
-          {transactionFee.loading ? (
-            <LoaderBlockStyled size="16" />
-          ) : (
-            `${transactionFee.result} SOL`
-          )}
-        </Value>
+        <Value>{renderTransactionFee()}</Value>
       </Line>
       <Line className="topBorder">
         <Label>Total fee</Label>

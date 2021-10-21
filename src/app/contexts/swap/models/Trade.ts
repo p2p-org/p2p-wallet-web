@@ -177,32 +177,6 @@ export default class Trade {
     return deriveTrade({ ...this, slippageTolerance });
   }
 
-  requiresTwoTransactions(userStandardTokenAccounts: UserTokenAccountMap): boolean {
-    const doubleHopFields = this.derivedFields?.doubleHopFields;
-    if (!doubleHopFields) {
-      return false;
-    }
-
-    let initializationCount = 0;
-
-    if (this.inputTokenName === 'SOL') {
-      initializationCount++;
-    }
-
-    if (
-      doubleHopFields.intermediateTokenName === 'SOL' ||
-      !userStandardTokenAccounts[doubleHopFields.intermediateTokenName]
-    ) {
-      initializationCount++;
-    }
-
-    if (this.outputTokenName === 'SOL' || !userStandardTokenAccounts[this.outputTokenName]) {
-      initializationCount++;
-    }
-
-    return initializationCount > 1;
-  }
-
   getTokenNamesToSetup(userStandardTokenAccounts: UserTokenAccountMap): string[] {
     const tokenNames = [];
 
@@ -222,41 +196,7 @@ export default class Trade {
     return tokenNames;
   }
 
-  async confirmSetup(
-    connection: Connection,
-    tokenConfigs: TokenConfigs,
-    programIds: ProgramIds,
-    wallet: Wallet, // TODO: chane to soma package
-    tokenNames: string[],
-  ): Promise<{
-    txSignature: string;
-    signedTransaction: Transaction;
-    executeSetup: () => Promise<null>;
-  }> {
-    const transactionBuilder = new TransactionBuilder();
-
-    await Promise.all(
-      tokenNames.map((tokenName) =>
-        transactionBuilder.createAssociatedTokenAccount(
-          wallet.publicKey,
-          tokenConfigs[tokenName].mint,
-          programIds.token,
-        ),
-      ),
-    );
-
-    const transaction = await transactionBuilder.build(connection, wallet.publicKey);
-
-    const signedTransaction = await wallet.signTransaction(transaction);
-
-    return {
-      txSignature: getSignature(signedTransaction),
-      signedTransaction,
-      executeSetup: sendAndConfirm(connection, signedTransaction),
-    };
-  }
-
-  async confirmExchange(
+  async prepareExchangeTransactions(
     connection: Connection,
     tokenConfigs: TokenConfigs,
     programIds: ProgramIds,
@@ -265,25 +205,47 @@ export default class Trade {
     intermediateUserTokenPublicKey: PublicKey | undefined,
     outputUserTokenPublicKey: PublicKey | undefined,
   ): Promise<{
-    txSignature: string;
-    signedTransaction: Transaction;
-    executeExchange: () => Promise<null>;
+    setupTransaction: Transaction | undefined;
+    swapTransaction: Transaction;
   }> {
     if (!this.pools || !this.derivedFields) {
       throw new Error('Can not initiate an exchange before retrieving the loader');
     }
 
+    const setupTransactionBuilder = new TransactionBuilder();
+
+    const intermediateTokenName = this.getIntermediateTokenName();
+    if (
+      intermediateTokenName &&
+      intermediateTokenName !== 'SOL' &&
+      !intermediateUserTokenPublicKey
+    ) {
+      intermediateUserTokenPublicKey = await setupTransactionBuilder.createAssociatedTokenAccount(
+        wallet.publicKey,
+        tokenConfigs[intermediateTokenName].mint,
+        programIds.token,
+      );
+    }
+
+    if (this.outputTokenName !== 'SOL' && !outputUserTokenPublicKey) {
+      outputUserTokenPublicKey = await setupTransactionBuilder.createAssociatedTokenAccount(
+        wallet.publicKey,
+        tokenConfigs[this.outputTokenName].mint,
+        programIds.token,
+      );
+    }
+
+    const swapTransactionBuilder = new TransactionBuilder();
+
     const accountRentExempt = await connection.getMinimumBalanceForRentExemption(
       AccountLayout.span,
     );
-
-    const transactionBuilder = new TransactionBuilder();
 
     const doubleHopFields = this.derivedFields.doubleHopFields;
     if (!doubleHopFields) {
       const pool = this.pools[this.derivedFields.selectedRoute[0]];
 
-      const result = await pool.constructExchange(
+      await pool.constructExchange(
         wallet,
         tokenConfigs,
         programIds,
@@ -292,12 +254,12 @@ export default class Trade {
         this.getInputAmount(),
         this.derivedFields.minimumOutputAmount,
         accountRentExempt,
-        transactionBuilder,
+        swapTransactionBuilder,
         this.inputTokenName === 'SOL' ? undefined : inputUserTokenPublicKey,
         outputUserTokenPublicKey,
       );
 
-      outputUserTokenPublicKey = result.outputUserTokenPublicKey;
+      // outputUserTokenPublicKey = result.outputUserTokenPublicKey;
     } else {
       const pool0 = this.pools[this.derivedFields.selectedRoute[0]];
 
@@ -310,7 +272,7 @@ export default class Trade {
         this.getInputAmount(),
         doubleHopFields.minimumIntermediateOutputAmount,
         accountRentExempt,
-        transactionBuilder,
+        swapTransactionBuilder,
         this.inputTokenName === 'SOL' ? undefined : inputUserTokenPublicKey,
         intermediateUserTokenPublicKey,
       );
@@ -318,8 +280,7 @@ export default class Trade {
       intermediateUserTokenPublicKey = result0.outputUserTokenPublicKey;
 
       const pool1 = this.pools[this.derivedFields.selectedRoute[1]];
-
-      const result1 = await pool1.constructExchange(
+      await pool1.constructExchange(
         wallet,
         tokenConfigs,
         programIds,
@@ -328,22 +289,71 @@ export default class Trade {
         doubleHopFields.intermediateOutputAmount,
         this.derivedFields.minimumOutputAmount,
         accountRentExempt,
-        transactionBuilder,
+        swapTransactionBuilder,
         intermediateUserTokenPublicKey,
         outputUserTokenPublicKey,
       );
 
-      outputUserTokenPublicKey = result1.outputUserTokenPublicKey;
+      // outputUserTokenPublicKey = result1.outputUserTokenPublicKey;
     }
 
-    const transaction = await transactionBuilder.build(connection, wallet.publicKey);
+    let setupTransaction = undefined;
+    if (setupTransactionBuilder.instructions.length) {
+      setupTransaction = await setupTransactionBuilder.build(connection, wallet.publicKey);
+    }
 
-    const signedTransaction = await wallet.signTransaction(transaction);
+    const swapTransaction = await swapTransactionBuilder.build(connection, wallet.publicKey);
 
     return {
-      txSignature: getSignature(signedTransaction),
-      signedTransaction,
-      executeExchange: sendAndConfirm(connection, signedTransaction),
+      setupTransaction,
+      swapTransaction,
+    };
+  }
+
+  async confirmExchange(
+    connection: Connection,
+    tokenConfigs: TokenConfigs,
+    programIds: ProgramIds,
+    wallet: Wallet,
+    inputUserTokenPublicKey: PublicKey,
+    intermediateUserTokenPublicKey: PublicKey | undefined,
+    outputUserTokenPublicKey: PublicKey | undefined,
+  ): Promise<{
+    txSignatureSetup: string | undefined;
+    executeSetup: (() => Promise<null>) | undefined;
+    txSignatureSwap: string;
+    executeSwap: () => Promise<null>;
+  }> {
+    const { setupTransaction, swapTransaction } = await this.prepareExchangeTransactions(
+      connection,
+      tokenConfigs,
+      programIds,
+      wallet,
+      inputUserTokenPublicKey,
+      intermediateUserTokenPublicKey,
+      outputUserTokenPublicKey,
+    );
+
+    const txs: Transaction[] = [];
+    if (setupTransaction) {
+      txs.push(setupTransaction);
+    }
+    txs.push(swapTransaction);
+
+    const signedTxs = await wallet.signAllTransactions(txs);
+
+    let signedSetupTx, signedSwapTx;
+    if (signedTxs.length === 2) {
+      [signedSetupTx, signedSwapTx] = signedTxs;
+    } else {
+      [signedSwapTx] = signedTxs;
+    }
+
+    return {
+      txSignatureSetup: signedSetupTx ? getSignature(signedSetupTx) : undefined,
+      executeSetup: signedSetupTx ? sendAndConfirm(connection, signedSetupTx) : undefined,
+      txSignatureSwap: getSignature(signedSwapTx),
+      executeSwap: sendAndConfirm(connection, signedSwapTx),
     };
   }
 }

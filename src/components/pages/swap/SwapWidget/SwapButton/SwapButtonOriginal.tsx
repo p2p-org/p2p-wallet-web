@@ -3,10 +3,8 @@ import React, { FC } from 'react';
 import { ButtonState, useSwap } from 'app/contexts/swap';
 import { Button } from 'components/ui';
 
-import { TwoStepExchangeButtons } from './TwoStepExchangeButtons';
-
 export const SwapButtonOriginal: FC = () => {
-  const { buttonState, trade, onSetupTokenAccounts, onSwap } = useSwap();
+  const { buttonState, trade, onSwap } = useSwap();
 
   switch (buttonState) {
     case ButtonState.ConnectWallet:
@@ -33,18 +31,6 @@ export const SwapButtonOriginal: FC = () => {
           Swap Anyway
         </Button>
       );
-    case ButtonState.TwoTransactionsStepOne:
-    case ButtonState.TwoTransactionsConfirmStepOne:
-    case ButtonState.TwoTransactionsSendingStepOne:
-    case ButtonState.TwoTransactionsRetryStepOne:
-      return (
-        <TwoStepExchangeButtons onClickSetup={onSetupTokenAccounts} buttonState={buttonState} />
-      );
-    case ButtonState.TwoTransactionsStepTwo:
-    case ButtonState.TwoTransactionsConfirmStepTwo:
-    case ButtonState.TwoTransactionsSendingStepTwo:
-    case ButtonState.TwoTransactionsRetryStepTwo:
-      return <TwoStepExchangeButtons onClickExchange={onSwap} buttonState={buttonState} />;
     case ButtonState.RouteDoesNotExist:
       return (
         <Button primary big full disabled>

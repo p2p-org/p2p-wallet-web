@@ -126,14 +126,7 @@ export default class OrcaPool {
       throw new Error('inputUserTokenPublicKey must be defined if inputTokenName is not SOL');
     }
 
-    // If necessary, create a TokenAccount for the output token
-    if (!outputUserTokenPublicKey) {
-      outputUserTokenPublicKey = await transactionBuilder.createAssociatedTokenAccount(
-        wallet.publicKey,
-        tokenConfigs[outputTokenName].mint,
-        programIds.token,
-      );
-    } else if (outputTokenName === 'SOL') {
+    if (outputTokenName === 'SOL') {
       const account = transactionBuilder.createWSOLAccount(
         wallet.publicKey,
         ZERO,
@@ -142,6 +135,8 @@ export default class OrcaPool {
         tokenConfigs['SOL'].mint,
       );
       outputUserTokenPublicKey = account.publicKey;
+    } else if (!outputUserTokenPublicKey) {
+      throw new Error('outputUserTokenPublicKey must be defined if inputTokenName is not SOL');
     }
 
     const userTransferAuthority = new Account();
