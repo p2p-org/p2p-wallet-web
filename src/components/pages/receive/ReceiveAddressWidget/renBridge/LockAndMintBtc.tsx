@@ -8,7 +8,6 @@ import { DepositStates } from '@renproject/ren-tx';
 import { Loader } from 'components/common/Loader';
 import { LoaderBlock } from 'components/common/LoaderBlock';
 import { UsernameAddressWidget } from 'components/common/UsernameAddressWidget';
-import { Icon } from 'components/ui';
 import { Accordion, Button } from 'components/ui';
 import { getFormattedHMS } from 'utils/dates';
 import { getRemainingGatewayTime } from 'utils/hooks/renBridge/useLockAndMint';
@@ -52,12 +51,6 @@ const GatewayInfoWrapper = styled.div`
 
   background: rgba(163, 165, 186, 0.05);
   border-radius: 12px;
-`;
-
-const AttentionIcon = styled(Icon)`
-  width: 36px;
-  height: 36px;
-  margin-bottom: 14px;
 `;
 
 const GatewayInfoItems = styled.ul`
@@ -236,7 +229,6 @@ export const LockAndMintBtc: FC = () => {
     <>
       <Description>
         <GatewayInfoWrapper>
-          <AttentionIcon name="attention" />
           <GatewayInfoItems>
             <GatewayInfoItem>
               This address accepts <strong>only Bitcoin</strong>. You may lose assets by sending
@@ -256,6 +248,7 @@ export const LockAndMintBtc: FC = () => {
               <HMSCountdown milliseconds={timeRemained} /> is the remaining time to safely send the
               assets.
             </GatewayInfoItem>
+            <GatewayInfoItem>You will receive renBTC</GatewayInfoItem>
           </GatewayInfoItems>
         </GatewayInfoWrapper>
       </Description>

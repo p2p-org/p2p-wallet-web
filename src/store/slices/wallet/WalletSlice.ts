@@ -10,7 +10,7 @@ import Decimal from 'decimal.js';
 import { mergeDeepRight } from 'ramda';
 
 import { APIFactory as FeeRelayerAPIFactory } from 'api/feeRelayer';
-import { LookupResponce } from 'api/nameService';
+import { LookupResponce, ResolveUsernameResponce } from 'api/nameService';
 import { APIFactory as NameServiceApi } from 'api/nameService';
 import { API, APIFactory as TokenAPIFactory, TransferParameters } from 'api/token';
 import { AccountListener } from 'api/token/AccountListener';
@@ -329,13 +329,12 @@ export const lookupName = createAsyncThunk<LookupResponce | null, string>(
   },
 );
 
-export const resolveUsername = createAsyncThunk<string | null, string>(
+export const resolveUsername = createAsyncThunk<Array<ResolveUsernameResponce>, string>(
   `${WALLET_SLICE_NAME}/resolveUsername`,
   async (username, thunkAPI) => {
     const state: RootState = thunkAPI.getState() as RootState;
     const result = await NameServiceApi(state.wallet.network.cluster).resolveName(username);
-    if (!result) return null;
-    return result.owner;
+    return result;
   },
 );
 

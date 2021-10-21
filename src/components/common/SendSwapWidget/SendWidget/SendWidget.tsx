@@ -11,6 +11,7 @@ import classNames from 'classnames';
 import Decimal from 'decimal.js';
 import { rgba } from 'polished';
 
+import { ResolveUsernameResponce } from 'api/nameService';
 import { Token } from 'api/token/Token';
 import { TokenAccount } from 'api/token/TokenAccount';
 import { RateUSD } from 'components/common/RateUSD';
@@ -223,6 +224,7 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
   const [renBtcMinimalAmount, setRenBtcMinimalAmount] = useState(0);
   const [usernameResolvedAddress, setUsernameResolvedAddress] = useState<string | null>(null);
   const [isSolanaNetwork, setIsSolanaNetwork] = useState(true);
+  const [resolvedNames, setResolvedNames] = useState<Array<ResolveUsernameResponce>>([]);
 
   const network = useRenNetwork();
   const { fees, pending: isFetchingFee } = useFetchFees(!isSolanaNetwork);
@@ -254,10 +256,12 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
   useEffect(() => {
     async function resolveName() {
       const resolved = unwrapResult(await dispatch(resolveUsername(toTokenPublicKey)));
-      if (resolved) {
-        setUsernameResolvedAddress(resolved);
-      } else {
-        setUsernameResolvedAddress(null);
+      setResolvedNames([]);
+      setUsernameResolvedAddress(null);
+      if (resolved.length === 1) {
+        setUsernameResolvedAddress(resolved[0].owner);
+      } else if (resolved.length > 1) {
+        setResolvedNames(resolved);
       }
     }
     if (isSolanaNetwork && toTokenPublicKey.length > 0 && toTokenPublicKey.length <= 40) {
@@ -454,7 +458,16 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
   const handleToPublicKeyChange = (nextPublicKey: string) => {
     setToTokenPublicKey(nextPublicKey);
 
+    if (!nextPublicKey) {
+      setResolvedNames([]);
+    }
+
     trackEventOnce('send_address_keydown');
+  };
+
+  const handleResolveNameChange = ({ address, name }: any) => {
+    setToTokenPublicKey(name);
+    setUsernameResolvedAddress(address);
   };
 
   const hasBalance = fromTokenAccount
@@ -516,6 +529,8 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
               resolvedAddress={usernameResolvedAddress}
               isAddressInvalid={!isValidDestinationAddress}
               onChange={handleToPublicKeyChange}
+              resolvedNames={resolvedNames}
+              onResolvedNameClick={handleResolveNameChange}
             />
             {isShowConfirmAddressSwitch ? (
               <ConfirmWrapper className={classNames({ isShowConfirmAddressSwitch })}>
