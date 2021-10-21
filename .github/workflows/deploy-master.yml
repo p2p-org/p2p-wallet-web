@@ -25,6 +25,8 @@ jobs:
           REACT_APP_AMPLITUDE_API_KEY: ${{ secrets.REACT_APP_AMPLITUDE_API_KEY }}
           REACT_APP_TRANSAK_API_KEY: ${{ secrets.REACT_APP_TRANSAK_API_KEY }}
           REACT_APP_INTERCOM_APP_ID: ${{ secrets.REACT_APP_INTERCOM_APP_ID }}
+          REACT_APP_MOONPAY_WIDGET_URL: ${{ secrets.REACT_APP_MOONPAY_WIDGET_URL }}
+          REACT_APP_MOONPAY_API_KEY: ${{ secrets.REACT_APP_MOONPAY_API_KEY }}
         run: 'npm run build'
       - name: Publish
         uses: cloudflare/wrangler-action@1.3.0
