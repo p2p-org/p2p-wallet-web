@@ -225,6 +225,7 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
   const [usernameResolvedAddress, setUsernameResolvedAddress] = useState<string | null>(null);
   const [isSolanaNetwork, setIsSolanaNetwork] = useState(true);
   const [resolvedNames, setResolvedNames] = useState<Array<ResolveUsernameResponce>>([]);
+  const [isResolvingNames, setisResolvingNames] = useState(false);
 
   const network = useRenNetwork();
   const { fees, pending: isFetchingFee } = useFetchFees(!isSolanaNetwork);
@@ -255,7 +256,9 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
 
   useEffect(() => {
     async function resolveName() {
+      setisResolvingNames(true);
       const resolved = unwrapResult(await dispatch(resolveUsername(toTokenPublicKey)));
+      setisResolvingNames(false);
       setResolvedNames([]);
       setUsernameResolvedAddress(null);
       if (resolved.length === 1) {
@@ -531,6 +534,7 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
               onChange={handleToPublicKeyChange}
               resolvedNames={resolvedNames}
               onResolvedNameClick={handleResolveNameChange}
+              isResolvingNames={isResolvingNames}
             />
             {isShowConfirmAddressSwitch ? (
               <ConfirmWrapper className={classNames({ isShowConfirmAddressSwitch })}>

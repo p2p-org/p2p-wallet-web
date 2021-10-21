@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useEffect, useState } from 'react';
+import React, { FunctionComponent, useEffect, useRef, useState } from 'react';
 
 import { styled } from '@linaria/react';
 import classNames from 'classnames';
@@ -6,6 +6,7 @@ import { rgba } from 'polished';
 
 import { ResolveUsernameResponce } from 'api/nameService';
 import { AddressText } from 'components/common/AddressText';
+import { Loader } from 'components/common/Loader';
 import { Icon } from 'components/ui';
 
 const WalletIcon = styled(Icon)`
@@ -164,11 +165,18 @@ const Name = styled.div`
   font-size: 16px;
 `;
 
+const LoaderWrapper = styled.div`
+  position: absolute;
+  right: 0;
+  top: 8px;
+`;
+
 type Props = {
   value: string;
   resolvedAddress?: string | null;
   isAddressInvalid: boolean;
   resolvedNames: ResolveUsernameResponce[];
+  isResolvingNames: boolean;
   onResolvedNameClick: (props: any) => void;
   onChange: (publicKey: string) => void;
 };
@@ -178,9 +186,12 @@ export const ToAddressInput: FunctionComponent<Props> = ({
   resolvedAddress,
   isAddressInvalid = false,
   resolvedNames = [],
+  isResolvingNames = false,
   onResolvedNameClick,
   onChange,
 }) => {
+  const inputRef = useRef<HTMLInputElement>(null);
+  const listRef = useRef<HTMLUListElement>(null);
   const [isFocused, setIsFocused] = useState(false);
   const [isResolvedNamesListOpen, setIsResolvedNamesListOpen] = useState(false);
 
@@ -190,6 +201,23 @@ export const ToAddressInput: FunctionComponent<Props> = ({
     } else {
       setIsResolvedNamesListOpen(false);
     }
+  }, [resolvedNames.length]);
+
+  useEffect(() => {
+    const clickListener = (e: MouseEvent) => {
+      if (!listRef.current?.contains(e.target as HTMLDivElement)) {
+        setIsResolvedNamesListOpen(false);
+      }
+      if (inputRef.current?.contains(e.target as HTMLDivElement) && resolvedNames.length > 1) {
+        setIsResolvedNamesListOpen(true);
+      }
+    };
+
+    window.addEventListener('click', clickListener);
+
+    return () => {
+      window.removeEventListener('click', clickListener);
+    };
   }, [resolvedNames.length]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -220,13 +248,19 @@ export const ToAddressInput: FunctionComponent<Props> = ({
           onChange={handleChange}
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
+          ref={inputRef}
         />
         {resolvedAddress ? <AddressText address={resolvedAddress} small gray /> : undefined}
-        {!isResolvedNamesListOpen && isAddressInvalid ? (
+        {!isResolvingNames && !isResolvedNamesListOpen && isAddressInvalid ? (
           <Error>There’s no address like this</Error>
         ) : undefined}
+        {isResolvingNames ? (
+          <LoaderWrapper>
+            <Loader />
+          </LoaderWrapper>
+        ) : undefined}
         {isResolvedNamesListOpen ? (
-          <ResolvedNamesList>
+          <ResolvedNamesList ref={listRef}>
             {resolvedNames.map((item: any) => (
               <ResolvedNamesItem
                 key={item.name}
