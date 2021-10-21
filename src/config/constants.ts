@@ -82,3 +82,6 @@ export const nameSericeUrl =
 
 export const appStorePath = 'https://apple.com/';
 export const playStorePath = 'https://google.com';
+
+export const moonpayWidgetUrl = process.env.REACT_APP_MOONPAY_WIDGET_URL;
+export const moonpayApiKey = process.env.REACT_APP_MOONPAY_API_KEY;

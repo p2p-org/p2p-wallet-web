@@ -4,14 +4,14 @@ import { styled } from '@linaria/react';
 
 import { WidgetPage } from 'components/common/WidgetPage';
 
-import { TransakWidget } from './TransakWidget';
+import { MoonpayWidget } from './MoonpayWidget';
 
 const WrapperWidgetPage = styled(WidgetPage)``;
 
 export const BuyWidget: FC = () => {
   return (
     <WrapperWidgetPage title="Buy" icon="plus">
-      <TransakWidget />
+      <MoonpayWidget />
     </WrapperWidgetPage>
   );
 };
