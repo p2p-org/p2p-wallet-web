@@ -88,7 +88,11 @@ export const TokenAccountRow: FC<Props> = ({ tokenAccount, onClick, className })
             <AmountUSD tokenName={tokenName} amount={tokenAccount.getAmount()} />
           </Top>
           <Bottom>
-            <div>{tokenNameFull}</div>
+            <div>
+              {tokenName === 'SOL'
+                ? shortAddress(tokenAccount.accountInfo.owner.toBase58())
+                : tokenNameFull}
+            </div>
             <div>
               {getNumber(tokenAccount.getAmount(), tokenConfigs[tokenName].decimals)} {tokenName}
             </div>
