@@ -1,4 +1,5 @@
 import React, { FC, useEffect, useState } from 'react';
+import { useRef } from 'react';
 
 import { styled } from '@linaria/react';
 import classNames from 'classnames';
@@ -74,6 +75,7 @@ interface Props {
 }
 
 export const Paste: FC<Props> = ({ mnemonic, next }) => {
+  const mnemonicRef = useRef<HTMLTextAreaElement | null>(null);
   const trackEventOnce = useTrackEventOnce();
   const [userMnemonic, setUserMnemonic] = useState('');
   const [hasError, setHasError] = useState(false);
@@ -82,30 +84,29 @@ export const Paste: FC<Props> = ({ mnemonic, next }) => {
     trackEvent('signup_paste_seed_open');
   }, []);
 
+  useEffect(() => {
+    if (mnemonicRef.current) {
+      mnemonicRef.current.style.height = 'inherit';
+      mnemonicRef.current.style.height = `${mnemonicRef.current.scrollHeight}px`;
+    }
+  }, [mnemonic]);
+
   const validateMnemonic = (value: string) => {
     setHasError(value !== mnemonic);
   };
 
-  const handleMnemonicChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+  const handleMnemonicInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const { value } = e.target;
-    setUserMnemonic(value);
+    const valueTrimmed = value.trim();
 
-    if (userMnemonic) {
-      validateMnemonic(value);
-      trackEventOnce('signup_seed_pasted');
+    if (valueTrimmed === mnemonic) {
+      setUserMnemonic(valueTrimmed);
+    } else {
+      setUserMnemonic(value);
     }
-  };
 
-  const handleMnemonicPaste = (e: React.ClipboardEvent<HTMLTextAreaElement>) => {
-    e.preventDefault();
-
-    const value = e.clipboardData.getData('text').trim();
-    setUserMnemonic(value);
-
-    if (userMnemonic) {
-      validateMnemonic(value);
-      trackEventOnce('signup_seed_pasted');
-    }
+    validateMnemonic(valueTrimmed);
+    trackEventOnce('signup_seed_pasted');
   };
 
   const handleMnemonicBlur = (e: React.FocusEvent<HTMLTextAreaElement>) => {
@@ -130,10 +131,10 @@ export const Paste: FC<Props> = ({ mnemonic, next }) => {
       </PasteMnemonicHint>
       <MnemonicWrapper>
         <MnemonicTextarea
+          ref={mnemonicRef}
           placeholder="Seed phrase"
           value={userMnemonic}
-          onChange={handleMnemonicChange}
-          onPaste={handleMnemonicPaste}
+          onInput={handleMnemonicInput}
           onBlur={handleMnemonicBlur}
           className={classNames({ hasError })}
         />

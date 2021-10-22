@@ -1,4 +1,5 @@
 import React, { FC, useEffect, useState } from 'react';
+import { useRef } from 'react';
 import { batch, useDispatch } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 
@@ -154,6 +155,7 @@ type Props = {
 export const Main: FC<Props> = ({ setIsLoading, next }) => {
   const history = useHistory();
   const dispatch = useDispatch();
+  const mnemonicRef = useRef<HTMLTextAreaElement | null>(null);
   const trackEventOnce = useTrackEventOnce();
   const [mnemonic, setMnemonic] = useState(localMnemonic || '');
   const [hasError, setHasError] = useState(false);
@@ -161,6 +163,13 @@ export const Main: FC<Props> = ({ setIsLoading, next }) => {
   useEffect(() => {
     trackEvent('login_open');
   }, []);
+
+  useEffect(() => {
+    if (mnemonicRef.current) {
+      mnemonicRef.current.style.height = 'inherit';
+      mnemonicRef.current.style.height = `${mnemonicRef.current.scrollHeight}px`;
+    }
+  }, [mnemonic]);
 
   const handleConnectByClick = (type: WalletType) => () => {
     batch(async () => {
@@ -199,18 +208,16 @@ export const Main: FC<Props> = ({ setIsLoading, next }) => {
     { leading: false, trailing: true },
   );
 
-  const handleMnemonicChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+  const handleMnemonicInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const { value } = e.target;
-    setMnemonic(value);
-    validateMnemonic(value);
+    const valueTrimmed = value.trim();
 
-    trackEventOnce('login_seed_keydown');
-  };
-
-  const handleMnemonicPaste = (e: React.ClipboardEvent<HTMLTextAreaElement>) => {
-    const value = e.clipboardData.getData('text').trim();
-    setMnemonic(value);
-    validateMnemonic(value);
+    if (bip39.validateMnemonic(valueTrimmed)) {
+      setMnemonic(valueTrimmed);
+    } else {
+      setMnemonic(value);
+    }
+    validateMnemonic(valueTrimmed);
 
     trackEventOnce('login_seed_keydown');
   };
@@ -252,10 +259,10 @@ export const Main: FC<Props> = ({ setIsLoading, next }) => {
       <SecurityWrapper>
         <SecurityKey>Enter security key</SecurityKey>
         <MnemonicTextarea
+          ref={mnemonicRef}
           placeholder="Seed phrase"
           value={mnemonic}
-          onChange={handleMnemonicChange}
-          onPaste={handleMnemonicPaste}
+          onInput={handleMnemonicInput}
           onBlur={handleMnemonicBlur}
           className={classNames({ hasError })}
         />
