@@ -1,8 +1,10 @@
-import React, { FC } from 'react';
+import React, { FC, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 
 import { styled } from '@linaria/react';
 import { rgba } from 'polished';
 
+import { useSwap } from 'app/contexts/swap';
 import { Hint } from 'components/common/Hint';
 
 import { WrapperWidgetPage } from '../../../common/SendSwapWidget/common/styled';
@@ -73,6 +75,16 @@ const PoweredBy = styled.div`
 `;
 
 export const SwapWidget: FC = () => {
+  const { symbol } = useParams<{ symbol?: string }>();
+  const { setInputTokenName } = useSwap();
+
+  useEffect(() => {
+    console.log(111);
+    if (symbol) {
+      setInputTokenName(symbol);
+    }
+  }, [symbol]);
+
   // useEffect(() => {
   //   if (trade.outputTooHigh) {
   //     setErrorMessage('The amount you entered is too high. Please try a smaller amount.');
