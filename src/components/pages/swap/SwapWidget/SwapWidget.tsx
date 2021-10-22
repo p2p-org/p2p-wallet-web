@@ -79,10 +79,10 @@ export const SwapWidget: FC = () => {
   const { setInputTokenName } = useSwap();
 
   useEffect(() => {
-    console.log(111);
     if (symbol) {
       setInputTokenName(symbol);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [symbol]);
 
   // useEffect(() => {
