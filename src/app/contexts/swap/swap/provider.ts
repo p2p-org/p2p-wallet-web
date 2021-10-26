@@ -471,6 +471,7 @@ const useSwapInternal = (props: UseSwapArgs = {}): UseSwap => {
     refreshStandardTokenAccounts,
     tokenConfigs,
     trade,
+    dispatch,
     wallet,
   ]);
 
