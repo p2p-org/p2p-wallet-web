@@ -116,11 +116,10 @@ export const APIFactory = memoizeWith(
         const instructionIndex = buf.readUInt8(0);
 
         const swapInner = innerInstructions?.find((item) => item.index === swapInstructionIndex);
+
         // swap instruction 129 & 248 - Serum, 1 - ORCA
-
-        if (instructionIndex === 129 || 248) {
-          //SERUM SWAP
-
+        // SERUM SWAP
+        if ([129, 248].includes(instructionIndex)) {
           type = 'swap';
           let sourceInfo;
           let destinationInfo;
