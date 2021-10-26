@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useDispatch } from 'react-redux';
 
 import { ZERO } from '@orca-so/sdk';
+import { unwrapResult } from '@reduxjs/toolkit';
 import { u64 } from '@solana/spl-token';
 import { createContainer } from 'unstated-next';
 
@@ -11,6 +13,8 @@ import Trade from 'app/contexts/swap/models/Trade';
 import { getMaxAge } from 'app/contexts/swap/utils/AsyncCache';
 import { getTradeId } from 'app/contexts/swap/utils/pools';
 import { minSolBalanceForSwap } from 'app/contexts/swap/utils/tokenAccounts';
+import { openModal } from 'store/actions/modals';
+import { SHOW_MODAL_TRANSACTION_CONFIRM } from 'store/constants/modalTypes';
 import { Keys, useLocalStorage } from 'utils/hooks/useLocalStorage';
 import { swapNotification } from 'utils/transactionNotifications';
 
@@ -92,6 +96,7 @@ export type UseSwapArgs = {
 };
 
 const useSwapInternal = (props: UseSwapArgs = {}): UseSwap => {
+  const dispatch = useDispatch();
   const { wallet, connection } = useSolana();
   const { programIds, tokenConfigs, routeConfigs } = useConfig();
   const [inputTokenName, _setInputTokenName] = useState(props.inputTokenName ?? 'SOL');
@@ -305,6 +310,27 @@ const useSwapInternal = (props: UseSwapArgs = {}): UseSwap => {
 
     if (!wallet) {
       throw new Error('Wallet not set');
+    }
+
+    const result = unwrapResult(
+      await dispatch(
+        openModal({
+          modalType: SHOW_MODAL_TRANSACTION_CONFIRM,
+          props: {
+            type: 'swap',
+            params: {
+              inputTokenName: inputTokenName,
+              outputTokenName: outputTokenName,
+              inputAmount: trade.getInputAmount(),
+              minimumOutputAmount: trade.getMinimumOutputAmount(),
+            },
+          },
+        }),
+      ),
+    );
+
+    if (!result) {
+      return false;
     }
 
     const inputUserTokenPublicKey = inputUserTokenAccount.account;

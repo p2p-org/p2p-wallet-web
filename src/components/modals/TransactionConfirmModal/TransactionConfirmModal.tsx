@@ -3,99 +3,20 @@ import { useSelector } from 'react-redux';
 
 import { styled } from '@linaria/react';
 
-import { Token } from 'api/token/Token';
-import { TokenAccount } from 'api/token/TokenAccount';
 import { WalletType } from 'api/wallet';
 import { loadMnemonicAndSeed } from 'api/wallet/ManualWallet';
 import { ERROR_WRONG_PASSWORD } from 'api/wallet/ManualWallet/errors';
-import { AddressText } from 'components/common/AddressText';
 import { ErrorHint } from 'components/common/ErrorHint';
 import { Modal } from 'components/common/Modal';
 import { PasswordInput } from 'components/common/PasswordInput';
-import { TokenAvatar } from 'components/common/TokenAvatar';
-import { Button, Icon } from 'components/ui';
+import { Button } from 'components/ui';
+
+import { Section } from './common/styled';
+import { Send, TransferParams } from './Send';
+import { Swap, SwapParams } from './Swap';
 
 const WrapperModal = styled(Modal)`
   flex-basis: 588px;
-`;
-
-const Section = styled.div`
-  padding: 20px;
-
-  &.swap {
-    padding: 20px 20px 0;
-  }
-
-  &.send {
-    padding: 0 20px;
-  }
-
-  &:not(:last-child) {
-    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-  }
-`;
-
-const SectionTitle = styled.div`
-  color: #a3a5ba;
-  font-weight: 600;
-  font-size: 14px;
-  line-height: 140%;
-`;
-
-const FieldInfo = styled.div`
-  display: flex;
-  padding: 20px 0;
-
-  &:not(:last-child) {
-    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-  }
-`;
-
-const WalletIcon = styled(Icon)`
-  width: 24px;
-  height: 24px;
-
-  color: #a3a5ba;
-`;
-
-const IconWrapper = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 44px;
-  height: 44px;
-
-  background: #f6f6f8;
-  border-radius: 12px;
-`;
-
-const InfoWrapper = styled.div`
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  justify-content: center;
-  margin: 0 9px 0 12px;
-`;
-
-const InfoTitle = styled.div`
-  margin-bottom: 2px;
-
-  color: #a3a5ba;
-  font-weight: 600;
-  font-size: 14px;
-  line-height: 24px;
-`;
-
-const Username = styled(InfoTitle)`
-  font-size: 16px;
-  color: #000;
-`;
-
-const InfoValue = styled.div`
-  color: #000;
-  font-weight: 600;
-  font-size: 16px;
-  line-height: 16px;
 `;
 
 const SubTitle = styled.span`
@@ -112,22 +33,6 @@ const SubTitle = styled.span`
 const PasswordInputStyled = styled(PasswordInput)`
   height: 46px;
 `;
-
-type TransferParams = {
-  source: TokenAccount;
-  destination: string;
-  username?: string;
-  amount: number;
-};
-
-type SwapParams = {
-  firstToken: Token;
-  firstTokenAccount: TokenAccount;
-  secondToken: Token;
-  secondTokenAccount: TokenAccount;
-  firstAmount: number;
-  secondAmount: number;
-};
 
 type Props = {
   type: 'send' | 'swap';
@@ -211,94 +116,9 @@ export const TransactionConfirmModal: FunctionComponent<Props> = ({ type, params
       description={renderDescription()}
       close={handleCloseClick}
       footer={renderButtons()}>
-      {type === 'send' ? (
-        <Section className="send">
-          <FieldInfo>
-            <TokenAvatar
-              symbol={(params as TransferParams).source.mint.symbol}
-              address={(params as TransferParams).source.mint.address.toBase58()}
-              size={44}
-            />
-            <InfoWrapper>
-              <InfoTitle>Check the amount</InfoTitle>
-              <InfoValue>
-                {(params as TransferParams).amount} {(params as TransferParams).source.mint.symbol}
-              </InfoValue>
-            </InfoWrapper>
-          </FieldInfo>
-          <FieldInfo>
-            <IconWrapper>
-              <WalletIcon name="wallet" />
-            </IconWrapper>
-            <InfoWrapper>
-              {(params as TransferParams).username ? (
-                <Username>{(params as TransferParams).username}</Username>
-              ) : (
-                <InfoTitle>Check recepient’s address</InfoTitle>
-              )}
-              <InfoValue>
-                <AddressText address={(params as TransferParams).destination} medium />
-              </InfoValue>
-            </InfoWrapper>
-          </FieldInfo>
-        </Section>
-      ) : undefined}
+      {type === 'send' ? <Send params={params as TransferParams} /> : undefined}
+      {type === 'swap' ? <Swap params={params as SwapParams} /> : undefined}
 
-      {type === 'swap' ? (
-        <>
-          <Section className="swap">
-            <SectionTitle>From</SectionTitle>
-            <FieldInfo>
-              <TokenAvatar
-                symbol={(params as SwapParams).firstToken.symbol}
-                address={(params as SwapParams).firstToken.address.toBase58()}
-                size={44}
-              />
-              <InfoWrapper>
-                <InfoTitle>Check the amount</InfoTitle>
-                <InfoValue>
-                  {(params as SwapParams).firstToken
-                    .toMajorDenomination((params as SwapParams).firstAmount)
-                    .toNumber()}{' '}
-                  {(params as SwapParams).firstToken.symbol}
-                </InfoValue>
-              </InfoWrapper>
-            </FieldInfo>
-          </Section>
-          <Section className="top">
-            <SectionTitle>To</SectionTitle>
-            <FieldInfo>
-              <TokenAvatar
-                symbol={(params as SwapParams).secondToken.symbol}
-                address={(params as SwapParams).secondToken.address.toBase58()}
-                size={44}
-              />
-              <InfoWrapper>
-                <InfoTitle>Minimum receive</InfoTitle>
-                <InfoValue>
-                  {(params as SwapParams).secondToken
-                    .toMajorDenomination((params as SwapParams).secondAmount)
-                    .toNumber()}{' '}
-                  {(params as SwapParams).secondToken.symbol}
-                </InfoValue>
-              </InfoWrapper>
-            </FieldInfo>
-            <FieldInfo>
-              <IconWrapper>
-                <WalletIcon name="wallet" />
-              </IconWrapper>
-              <InfoWrapper>
-                <InfoTitle>Destination wallet</InfoTitle>
-                <InfoValue>
-                  {(params as SwapParams).secondTokenAccount
-                    ? (params as SwapParams).secondTokenAccount.address.toBase58()
-                    : 'Will be created after transaction processing'}
-                </InfoValue>
-              </InfoWrapper>
-            </FieldInfo>
-          </Section>
-        </>
-      ) : undefined}
       {walletType === WalletType.MANUAL ? (
         <Section>
           <SubTitle>Enter password to confirm</SubTitle>
