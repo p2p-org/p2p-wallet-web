@@ -100,22 +100,32 @@ export const APIFactory = memoizeWith(
       const postTokenBalances = transactionInfo?.meta?.postTokenBalances;
 
       // swap contract
-      const swapInstructionIndex = instructions.findIndex(
-        (inst) =>
-          // inst.programId.equals(swapProgramId) ||
-          inst.programId.toBase58() === '9qvG1zUp8xF1Bi4m6UdRNby1BAAuaDrUxSpv4CmRRMjL' || // main old swap
-          inst.programId.toBase58() === 'DjVE6JNiYqPL2QXyCUUh8rNjHrbz9hXHNYt99MQ59qw1' || // main orca
-          inst.programId.toBase58() === '9W959DqEETiGZocYWCQPaJ6sBmUzgfxXfqGeTEdp3aQP' || // main orca v2
-          inst.programId.toBase58() === '22Y43yTVxuUkoRKdm9thyRhQ3SdgQS7c7kB6UNCiaczD', // serum swap
-      );
+      const swapInstructionIndexes = instructions
+        .map((inst, index) => {
+          if (
+            inst.programId.toBase58() === '9qvG1zUp8xF1Bi4m6UdRNby1BAAuaDrUxSpv4CmRRMjL' || // main old swap
+            inst.programId.toBase58() === 'DjVE6JNiYqPL2QXyCUUh8rNjHrbz9hXHNYt99MQ59qw1' || // main orca
+            inst.programId.toBase58() === '9W959DqEETiGZocYWCQPaJ6sBmUzgfxXfqGeTEdp3aQP' || // main orca v2
+            inst.programId.toBase58() === '22Y43yTVxuUkoRKdm9thyRhQ3SdgQS7c7kB6UNCiaczD' // serum swap
+          ) {
+            return index;
+          }
+
+          return '';
+        })
+        .filter(String);
 
       //if (swapInstructionIndex && instructions[swapInstructionIndex]) {
-      if (instructions[swapInstructionIndex]) {
-        const swapInstruction = instructions[swapInstructionIndex] as PartiallyDecodedInstruction;
+      if (swapInstructionIndexes.length) {
+        const swapInstruction = instructions[
+          swapInstructionIndexes[0] as number
+        ] as PartiallyDecodedInstruction;
         const buf = Buffer.from(bs58.decode(swapInstruction.data));
         const instructionIndex = buf.readUInt8(0);
 
-        const swapInner = innerInstructions?.find((item) => item.index === swapInstructionIndex);
+        const swapInner = innerInstructions?.find(
+          (item) => item.index === swapInstructionIndexes[0],
+        );
 
         // swap instruction 129 & 248 - Serum, 1 - ORCA
         // SERUM SWAP
@@ -200,15 +210,34 @@ export const APIFactory = memoizeWith(
           let sourceInfo;
           let destinationInfo;
 
-          if (swapInner) {
-            const transfersInstructions = swapInner.instructions.filter(
-              (inst: ConfirmedTransaction) =>
-                inst?.parsed?.type === 'transfer' || inst?.parsed?.type === 'transferChecked',
-            );
-            const sourceInstruction = transfersInstructions[0] as ConfirmedTransaction;
-            const destinationInstruction = transfersInstructions[1] as ConfirmedTransaction;
-            sourceInfo = sourceInstruction?.parsed?.info;
-            destinationInfo = destinationInstruction?.parsed?.info;
+          const swapInners = innerInstructions?.filter((item) =>
+            swapInstructionIndexes.includes(item.index),
+          );
+
+          if (swapInners) {
+            if (swapInners.length === 1) {
+              const transfersInstructions = swapInners[0].instructions.filter(
+                (inst: ConfirmedTransaction) =>
+                  inst?.parsed?.type === 'transfer' || inst?.parsed?.type === 'transferChecked',
+              );
+              const sourceInstruction = transfersInstructions[0] as ConfirmedTransaction;
+              const destinationInstruction = transfersInstructions[1] as ConfirmedTransaction;
+              sourceInfo = sourceInstruction?.parsed?.info;
+              destinationInfo = destinationInstruction?.parsed?.info;
+            } else if (swapInners.length === 2) {
+              const transfersInstructionsOne = swapInners[0].instructions.filter(
+                (inst: ConfirmedTransaction) =>
+                  inst?.parsed?.type === 'transfer' || inst?.parsed?.type === 'transferChecked',
+              );
+              const transfersInstructionsTwo = swapInners[1].instructions.filter(
+                (inst: ConfirmedTransaction) =>
+                  inst?.parsed?.type === 'transfer' || inst?.parsed?.type === 'transferChecked',
+              );
+              const sourceInstruction = transfersInstructionsOne[0] as ConfirmedTransaction;
+              const destinationInstruction = transfersInstructionsTwo[1] as ConfirmedTransaction;
+              sourceInfo = sourceInstruction?.parsed?.info;
+              destinationInfo = destinationInstruction?.parsed?.info;
+            }
           }
 
           const closeInstruction = instructions.find(

@@ -84,7 +84,7 @@ export interface UseSwap {
   intermediateTokenName: string | undefined;
   intermediateTokenPrice: number | undefined;
   buttonState: ButtonState;
-  onSwap: () => Promise<void>;
+  onSwap: () => Promise<boolean | undefined>;
 }
 
 export type UseSwapArgs = {
