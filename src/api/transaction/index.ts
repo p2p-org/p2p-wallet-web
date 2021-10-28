@@ -1,10 +1,10 @@
 import {
-  ConfirmedSignaturesForAddress2Options,
   LAMPORTS_PER_SOL,
   ParsedConfirmedTransaction,
   PartiallyDecodedInstruction,
   PublicKey,
   Secp256k1Program,
+  SignaturesForAddressOptions,
   TransactionSignature,
 } from '@solana/web3.js';
 import bs58 from 'bs58';
@@ -34,7 +34,7 @@ export interface API {
   ) => Promise<Transaction | null>;
   getTransactionsForAddress: (
     account: PublicKey,
-    options?: ConfirmedSignaturesForAddress2Options,
+    options?: SignaturesForAddressOptions,
   ) => Promise<Transaction[]>;
 }
 
@@ -595,14 +595,14 @@ export const APIFactory = memoizeWith(
      */
     const getTransactionsForAddress = async (
       account: PublicKey,
-      options?: ConfirmedSignaturesForAddress2Options,
+      options?: SignaturesForAddressOptions,
     ): Promise<Transaction[]> => {
       console.log('Get transactions for the address', {
         account: account.toBase58(),
       });
 
       const confirmedSignaturesInfos = await connectionTransactions
-        .getConfirmedSignaturesForAddress2(account, options)
+        .getSignaturesForAddress(account, options, 'confirmed')
         .catch((error: Error) => {
           console.error(`Error getting transaction signatures for ${account.toBase58()}`, error);
           throw error;

@@ -15,6 +15,7 @@ import { getTradeId } from 'app/contexts/swap/utils/pools';
 import { minSolBalanceForSwap } from 'app/contexts/swap/utils/tokenAccounts';
 import { openModal } from 'store/actions/modals';
 import { SHOW_MODAL_TRANSACTION_CONFIRM } from 'store/constants/modalTypes';
+import { updateTransactions } from 'store/slices/transaction/TransactionSlice';
 import { Keys, useLocalStorage } from 'utils/hooks/useLocalStorage';
 import { swapNotification } from 'utils/transactionNotifications';
 
@@ -437,6 +438,9 @@ const useSwapInternal = (props: UseSwapArgs = {}): UseSwap => {
       const fetchingUserTokenAccounts = refreshStandardTokenAccounts();
       await Promise.all(trade.derivedFields.selectedRoute.map((poolId) => fetchPool(poolId)));
       await fetchingUserTokenAccounts;
+
+      // TODO: until we made new transactions package
+      dispatch(updateTransactions(true));
     } catch (e) {
       console.error(e);
     }

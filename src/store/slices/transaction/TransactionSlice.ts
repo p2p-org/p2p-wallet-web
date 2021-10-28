@@ -1,10 +1,6 @@
 /* eslint-disable no-param-reassign */
 import { createAction, createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import {
-  ConfirmedSignaturesForAddress2Options,
-  PublicKey,
-  TransactionSignature,
-} from '@solana/web3.js';
+import { PublicKey, SignaturesForAddressOptions, TransactionSignature } from '@solana/web3.js';
 import { mergeRight, pathOr, uniq } from 'ramda';
 
 import { APIFactory } from 'api/transaction';
@@ -18,7 +14,7 @@ export const addPendingTransaction = createAction<SerializableTransaction>('addP
 
 export const getTransactions = createAsyncThunk<
   Array<SerializableTransaction>,
-  { publicKey: PublicKey; options?: ConfirmedSignaturesForAddress2Options }
+  { publicKey: PublicKey; options?: SignaturesForAddressOptions }
 >(`${TRANSACTION_SLICE_NAME}/getTransactions`, async ({ publicKey, options }, thunkAPI) => {
   const state: RootState = thunkAPI.getState() as RootState;
 

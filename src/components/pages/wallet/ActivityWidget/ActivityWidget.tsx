@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import { styled } from '@linaria/react';
 import { unwrapResult } from '@reduxjs/toolkit';
-import { ConfirmedSignaturesForAddress2Options, PublicKey } from '@solana/web3.js';
+import { PublicKey, SignaturesForAddressOptions } from '@solana/web3.js';
 import { last } from 'ramda';
 
 import { Empty } from 'components/common/Empty';
@@ -45,7 +45,7 @@ export const ActivityWidget: FunctionComponent<Props> = ({ publicKey }) => {
   const fetchData = async (isPaging?: boolean) => {
     setIsLoading(true);
     try {
-      const options: ConfirmedSignaturesForAddress2Options = {
+      const options: SignaturesForAddressOptions = {
         limit: LIMIT,
       };
 
