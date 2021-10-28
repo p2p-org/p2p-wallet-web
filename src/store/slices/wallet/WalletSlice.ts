@@ -143,8 +143,8 @@ export const getTokenAccount = createAsyncThunk<TokenAccount | null, PublicKey>(
   },
 );
 
-const updateHitory = createAsyncThunk<void, TokenAccount>(
-  `${WALLET_SLICE_NAME}/updateHitory`,
+const updateHistory = createAsyncThunk<void, TokenAccount>(
+  `${WALLET_SLICE_NAME}/updateHistory`,
   (account, thunkAPI) => {
     const state: RootState = thunkAPI.getState() as RootState;
 
@@ -182,7 +182,7 @@ export const getTokenAccountsForWallet = createAsyncThunk<SerializableTokenAccou
 
     const listener = TokenAPI.listenToTokenAccountChanges(tokenAccounts, (updatedTokenAccount) => {
       thunkAPI.dispatch(updateAccount(updatedTokenAccount.serialize()));
-      void thunkAPI.dispatch(updateHitory(updatedTokenAccount));
+      void thunkAPI.dispatch(updateHistory(updatedTokenAccount));
     });
 
     accountsListeners.push(listener);
