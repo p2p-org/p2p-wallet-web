@@ -28,7 +28,7 @@ const Wrapper = styled.div`
   display: flex;
   flex-direction: column; /* to don't collapse margins of children */
 
-  margin-bottom: 8px;
+  margin-bottom: -1px;
   padding: 16px 20px;
 
   border: 1px solid #f6f6f8;
