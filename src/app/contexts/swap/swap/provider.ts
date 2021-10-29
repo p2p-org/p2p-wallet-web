@@ -81,6 +81,7 @@ export interface UseSwap {
   asyncStandardTokenAccounts: UserTokenAccountMap | null;
   inputTokenAmount: u64 | undefined;
   inputTokenPrice: number | undefined;
+  outputTokenAmount: u64 | undefined;
   outputTokenPrice: number | undefined;
   intermediateTokenName: string | undefined;
   intermediateTokenPrice: number | undefined;
@@ -286,6 +287,7 @@ const useSwapInternal = (props: UseSwapArgs = {}): UseSwap => {
   }, [buttonState]);
 
   const inputTokenAmount = inputUserTokenAccount?.accountInfo.amount;
+  const outputTokenAmount = outputUserTokenAccount?.accountInfo.amount;
 
   const onSwap = useCallback(async () => {
     // setErrorMessage('');
@@ -492,6 +494,7 @@ const useSwapInternal = (props: UseSwapArgs = {}): UseSwap => {
     asyncStandardTokenAccounts: asyncStandardTokenAccounts?.value,
     inputTokenAmount,
     inputTokenPrice,
+    outputTokenAmount,
     outputTokenPrice,
     intermediateTokenName,
     intermediateTokenPrice,

@@ -5,10 +5,17 @@ import { styled } from '@linaria/react';
 import { useSwap } from 'app/contexts/swap';
 import { Icon } from 'components/ui';
 
+const Wrapper = styled.div`
+  position: relative;
+  z-index: 1;
+
+  display: flex;
+  justify-content: center;
+`;
+
 const ReverseWrapper = styled.div`
   position: absolute;
   top: -24px;
-  right: 32px;
 
   display: flex;
   align-items: center;
@@ -37,8 +44,10 @@ export const Reverse: FC = () => {
   };
 
   return (
-    <ReverseWrapper onClick={handleReverseClick}>
-      <ReverseIcon name="swap" />
-    </ReverseWrapper>
+    <Wrapper>
+      <ReverseWrapper onClick={handleReverseClick}>
+        <ReverseIcon name="swap" />
+      </ReverseWrapper>
+    </Wrapper>
   );
 };

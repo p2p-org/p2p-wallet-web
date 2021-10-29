@@ -22,7 +22,18 @@ import { AmountUSD } from '../AmountUSD/AmountUSD';
 import { TokenAccountRow } from './TokenAccountRow';
 import { TokenRow } from './TokenRow';
 
-const Wrapper = styled.div``;
+const Wrapper = styled.div`
+  position: relative;
+
+  display: flex;
+  flex-direction: column; /* to don't collapse margins of children */
+
+  margin-bottom: 8px;
+  padding: 16px 20px;
+
+  border: 1px solid #f6f6f8;
+  border-radius: 12px;
+`;
 
 const TopWrapper = styled.div`
   display: flex;
@@ -37,6 +48,9 @@ const FromTitle = styled.div`
 `;
 
 const AllBalance = styled.div`
+  display: flex;
+  align-items: center;
+
   color: #5887ff;
 
   cursor: pointer;
@@ -58,11 +72,17 @@ const MainWrapper = styled.div`
   margin-top: 8px;
 `;
 
-const WalletIcon = styled(Icon)`
+const WalletTokenIcon = styled(Icon)`
   width: 24px;
   height: 24px;
 
   color: #a3a5ba;
+`;
+
+const WalletBalanceIcon = styled(Icon)`
+  width: 20px;
+  height: 20px;
+  margin-right: 5px;
 `;
 
 const TokenAvatarWrapper = styled.div`
@@ -78,7 +98,7 @@ const TokenAvatarWrapper = styled.div`
   &.isOpen {
     background: #5887ff;
 
-    ${WalletIcon} {
+    ${WalletTokenIcon} {
       color: #fff;
     }
   }
@@ -90,7 +110,7 @@ const InfoWrapper = styled.div`
   flex-direction: column;
   min-width: 0;
 
-  margin-left: 20px;
+  margin-left: 12px;
 `;
 
 const SpecifyTokenWrapper = styled.div`
@@ -171,16 +191,18 @@ const AmountInput = styled.input`
 
 const BalanceWrapper = styled.div`
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
+  height: 24px;
+`;
+
+const BalanceText = styled.div`
+  display: flex;
+  align-items: center;
 
   color: #a3a5ba;
   font-weight: 600;
   font-size: 16px;
   line-height: 24px;
-`;
-
-const BalanceText = styled.div`
-  display: flex;
 `;
 
 const AmountUSDStyled = styled(AmountUSD)`
@@ -585,14 +607,32 @@ export const SwapTokenForm: FC<Props> = ({
   return (
     <Wrapper className={className}>
       <TopWrapper>
-        <FromTitle>{isInput ? 'From' : 'To'}</FromTitle>
+        <FromTitle>{isInput ? 'From' : 'To'} </FromTitle>
+        <BalanceText>
+          {maxAmount ? (
+            isInput ? (
+              <AllBalance
+                onClick={() => setAmount(maxAmount)}
+                className={classNames({ disabled, error: !maxAmount })}>
+                <WalletBalanceIcon name="wallet" />
+                {formatBigNumber(maxAmount, tokenConfigs[tokenName].decimals)} {tokenName}
+              </AllBalance>
+            ) : (
+              <>
+                <WalletBalanceIcon name="wallet" />
+                {formatBigNumber(maxAmount || new u64(0), tokenConfigs[tokenName].decimals)}{' '}
+                {tokenName}
+              </>
+            )
+          ) : undefined}
+        </BalanceText>
       </TopWrapper>
       <MainWrapper>
         <TokenAvatarWrapper className={classNames({ isOpen: isOpen && !tokenName })}>
           {tokenName ? (
             <TokenAvatar address={tokenInfo?.mint.toString()} size={44} />
           ) : (
-            <WalletIcon name="wallet" />
+            <WalletTokenIcon name="wallet" />
           )}
         </TokenAvatarWrapper>
         <InfoWrapper>
@@ -617,23 +657,6 @@ export const SwapTokenForm: FC<Props> = ({
             />
           </SpecifyTokenWrapper>
           <BalanceWrapper>
-            <BalanceText>
-              {
-                isInput && maxAmount ? (
-                  <AllBalance
-                    onClick={() => setAmount(maxAmount)}
-                    className={classNames({ disabled, error: !maxAmount })}>
-                    Available: {formatBigNumber(maxAmount, tokenConfigs[tokenName].decimals)}
-                  </AllBalance>
-                ) : undefined
-                // (
-                //   <>
-                //     Balance:{' '}
-                //     {formatBigNumber(maxAmount || new u64(0), tokenConfigs[tokenName].decimals)}
-                //   </>
-                // )
-              }
-            </BalanceText>
             {!amount.eqn(0) ? (
               <BalanceText>
                 ≈ <AmountUSDStyled amount={amount} tokenName={tokenName} />

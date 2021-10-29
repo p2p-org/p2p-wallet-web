@@ -9,7 +9,7 @@ interface Props {
 }
 
 export const SwapToForm: FC<Props> = ({ className }) => {
-  const { trade, setOutputTokenName, setOutputAmount } = useSwap();
+  const { trade, setOutputTokenName, setOutputAmount, outputTokenAmount } = useSwap();
 
   return (
     <SwapTokenForm
@@ -19,6 +19,7 @@ export const SwapToForm: FC<Props> = ({ className }) => {
       pairTokenName={trade.inputTokenName}
       amount={trade.getOutputAmount()}
       setAmount={setOutputAmount}
+      maxAmount={outputTokenAmount}
       className={className}
     />
   );

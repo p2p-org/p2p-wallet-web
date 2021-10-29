@@ -31,21 +31,6 @@ const Wrapper = styled.div`
   padding: 24px 20px;
 `;
 
-const FromSwapWrapper = styled.div`
-  position: relative;
-
-  display: flex;
-  flex-direction: column; /* to don't collapse margins of children */
-
-  margin-bottom: 8px;
-  padding: 16px 20px;
-
-  border: 1px solid #f6f6f8;
-  border-radius: 12px;
-`;
-
-const ToSwapWrapper = styled(FromSwapWrapper)``;
-
 const Lines = styled.div`
   display: grid;
   grid-gap: 8px;
@@ -108,13 +93,9 @@ export const SwapWidget: FC = () => {
         // }
       >
         <Wrapper>
-          <FromSwapWrapper>
-            <SwapFromForm />
-          </FromSwapWrapper>
-          <ToSwapWrapper>
-            <Reverse />
-            <SwapToForm />
-          </ToSwapWrapper>
+          <SwapFromForm />
+          <Reverse />
+          <SwapToForm />
           <Lines>
             <CurrentPrice />
             {/*/!*<PriceImpact />*!/*/}
