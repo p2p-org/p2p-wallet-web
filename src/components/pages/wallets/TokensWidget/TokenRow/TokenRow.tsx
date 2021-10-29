@@ -169,6 +169,15 @@ export const TokenRow: FunctionComponent<Props> = ({
     .getList()
     .find((t) => t.symbol === token.mint.symbol || t.address === token.mint.address.toBase58());
 
+  // TODO: refactor
+  const renderTokenName = () => {
+    if (isNotSOL) {
+      return tokenInfo?.name;
+    } else {
+      return 'Solana';
+    }
+  };
+
   return (
     <Wrapper className={classNames({ isHidden, isSelected })}>
       <WrapperLink to={`/wallet/${token.address.toBase58()}`}>
@@ -188,7 +197,7 @@ export const TokenRow: FunctionComponent<Props> = ({
             />
           </Top>
           <Bottom>
-            <div title={token.address.toBase58()}>{tokenInfo?.name}</div>
+            <div title={token.address.toBase58()}>{renderTokenName()}</div>
             <div>
               {token.mint.toMajorDenomination(token.balance).toString()} {token.mint.symbol}
             </div>
