@@ -70,7 +70,8 @@ export const TokenAccountRow: FC<Props> = ({ tokenAccount, onClick, className })
 
   const mintAddress = tokenAccount.accountInfo.mint.toBase58();
   const tokenName = mintToTokenName[mintAddress];
-  const tokenNameFull = tokenMap.get(tokenConfigs[tokenName].mint.toBase58())?.name;
+  const tokenNameFull =
+    tokenConfigs[tokenName].name || tokenMap.get(tokenConfigs[tokenName].mint.toBase58())?.name;
 
   const handleClick = () => {
     if (onClick) {
@@ -88,11 +89,7 @@ export const TokenAccountRow: FC<Props> = ({ tokenAccount, onClick, className })
             <AmountUSD tokenName={tokenName} amount={tokenAccount.getAmount()} />
           </Top>
           <Bottom>
-            <div>
-              {tokenName === 'SOL'
-                ? shortAddress(tokenAccount.accountInfo.owner.toBase58())
-                : tokenNameFull}
-            </div>
+            <div>{tokenNameFull}</div>
             <div>
               {getNumber(tokenAccount.getAmount(), tokenConfigs[tokenName].decimals)} {tokenName}
             </div>

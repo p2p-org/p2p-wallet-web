@@ -86,11 +86,7 @@ export const TokenAccountRow: FunctionComponent<Props> = ({ tokenAccount, onClic
             />
           </Top>
           <Bottom>
-            <div>
-              {tokenAccount.mint.symbol === 'SOL'
-                ? shortAddress(tokenAccount.address.toBase58())
-                : tokenAccount.mint.name}
-            </div>
+            <div>{tokenAccount.mint.name}</div>
             <div>
               {tokenAccount?.mint.toMajorDenomination(tokenAccount.balance).toString()}{' '}
               {tokenAccount.mint.symbol}

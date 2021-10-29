@@ -88,7 +88,6 @@
   },
   "MER": {
     "mint": "MERt85fc5boKw3BW1eYdxonEuJNvXbiMbs6hvheau5K",
-    "name": "Mercurial",
     "decimals": 6,
     "fetchPrice": true
   },

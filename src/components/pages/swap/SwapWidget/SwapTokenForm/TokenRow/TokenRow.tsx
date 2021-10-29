@@ -61,10 +61,6 @@ type Props = {
 export const TokenRow: FunctionComponent<Props> = ({ tokenName, onClick }) => {
   const { tokenConfigs } = useConfig();
   const tokenInfo = tokenConfigs[tokenName];
-  // const tokenAccount = useOwnedTokenAccount(new PublicKey(mint));
-
-  // const balance =
-  //   tokenAccount && tokenInfo && tokenAccount.account.amount.toNumber() / 10 ** tokenInfo.decimals;
 
   const handleClick = () => {
     onClick(tokenName);
@@ -79,17 +75,9 @@ export const TokenRow: FunctionComponent<Props> = ({ tokenName, onClick }) => {
             <TokenSymbol title={tokenInfo?.mint.toString()}>
               {tokenName || shortAddress(tokenInfo?.mint.toString())}
             </TokenSymbol>
-            {/*{tokenAccount ? (*/}
-            {/*  <AmountUSD symbol={tokenInfo?.symbol} value={new Decimal(balance || 0)} />*/}
-            {/*) : undefined}*/}
           </Top>
           <Bottom>
             <div>{tokenInfo?.name}</div>
-            {/*{tokenAccount ? (*/}
-            {/*  <div>*/}
-            {/*    {balance} {tokenInfo?.symbol}*/}
-            {/*  </div>*/}
-            {/*) : undefined}*/}
           </Bottom>
         </Info>
       </ItemWrapper>
