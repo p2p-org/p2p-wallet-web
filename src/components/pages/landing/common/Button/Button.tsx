@@ -4,6 +4,8 @@ import { Link } from 'react-router-dom';
 import { styled } from '@linaria/react';
 import classNames from 'classnames';
 
+import { appStorePath, playStorePath } from 'config/constants';
+
 export const ButtonLink = styled(Link)`
   position: relative;
 
@@ -108,7 +110,7 @@ export const ButtonIOS: FC<ButtonProps & HTMLAttributes<HTMLElement>> = ({
 }) => {
   return (
     <ButtonLink
-      to="https://testflight.apple.com/join/hxaQVX0E"
+      to={appStorePath}
       className={classNames(className, { glow, green: true })}
       {...props}>
       <Text className="ios">Download for iOS</Text>
@@ -123,7 +125,7 @@ export const ButtonAndroid: FC<ButtonProps & HTMLAttributes<HTMLElement>> = ({
 }) => {
   return (
     <ButtonLink
-      to="https://testflight.apple.com/join/hxaQVX0E"
+      to={playStorePath}
       className={classNames(className, { glow, green: true })}
       {...props}>
       <Text className="android">Download for Android</Text>

@@ -6,6 +6,7 @@ import { styled } from '@linaria/react';
 import { Feature } from 'flagged';
 
 import { Icon } from 'components/ui';
+import { appStorePath, playStorePath } from 'config/constants';
 import { FEATURE_NAV_MENU_BUY_BUTTON } from 'config/featureFlags';
 
 const Wrapper = styled.div`
@@ -183,10 +184,7 @@ export const LeftNavMenu: FunctionComponent = () => {
       <Separator>
         <Line />
       </Separator>
-      <NavLinkMenu
-        to={{ pathname: 'https://testflight.apple.com/join/hxaQVX0E' }}
-        target="_blank"
-        className="button">
+      <NavLinkMenu to={{ pathname: appStorePath }} target="_blank" className="button">
         <NavButton>
           <IconBlock>
             <NavIcon name="app-store" />
@@ -194,10 +192,7 @@ export const LeftNavMenu: FunctionComponent = () => {
           App Store
         </NavButton>
       </NavLinkMenu>
-      <NavLinkMenu
-        to={{ pathname: 'https://play.google.com/store/apps/details?id=org.p2p.wallet' }}
-        target="_blank"
-        className="button">
+      <NavLinkMenu to={{ pathname: playStorePath }} target="_blank" className="button">
         <NavButton>
           <IconBlock>
             <NavIcon name="google-play" />
