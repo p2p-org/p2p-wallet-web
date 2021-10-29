@@ -107,8 +107,26 @@ export const ButtonIOS: FC<ButtonProps & HTMLAttributes<HTMLElement>> = ({
   ...props
 }) => {
   return (
-    <ButtonLink to="#" className={classNames(className, { glow, green: true })} {...props}>
+    <ButtonLink
+      to="https://testflight.apple.com/join/hxaQVX0E"
+      className={classNames(className, { glow, green: true })}
+      {...props}>
       <Text className="ios">Download for iOS</Text>
+    </ButtonLink>
+  );
+};
+
+export const ButtonAndroid: FC<ButtonProps & HTMLAttributes<HTMLElement>> = ({
+  glow,
+  className,
+  ...props
+}) => {
+  return (
+    <ButtonLink
+      to="https://testflight.apple.com/join/hxaQVX0E"
+      className={classNames(className, { glow, green: true })}
+      {...props}>
+      <Text className="android">Download for Android</Text>
     </ButtonLink>
   );
 };

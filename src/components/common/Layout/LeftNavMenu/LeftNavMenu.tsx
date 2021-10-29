@@ -183,7 +183,10 @@ export const LeftNavMenu: FunctionComponent = () => {
       <Separator>
         <Line />
       </Separator>
-      <NavLinkMenu to={{ pathname: 'https://apple.com/' }} target="_blank" className="button">
+      <NavLinkMenu
+        to={{ pathname: 'https://testflight.apple.com/join/hxaQVX0E' }}
+        target="_blank"
+        className="button">
         <NavButton>
           <IconBlock>
             <NavIcon name="app-store" />
@@ -191,7 +194,10 @@ export const LeftNavMenu: FunctionComponent = () => {
           App Store
         </NavButton>
       </NavLinkMenu>
-      <NavLinkMenu to={{ pathname: 'https://google.com' }} target="_blank" className="button">
+      <NavLinkMenu
+        to={{ pathname: 'https://play.google.com/store/apps/details?id=org.p2p.wallet' }}
+        target="_blank"
+        className="button">
         <NavButton>
           <IconBlock>
             <NavIcon name="google-play" />
