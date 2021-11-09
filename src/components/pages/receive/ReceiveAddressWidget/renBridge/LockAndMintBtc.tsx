@@ -243,9 +243,10 @@ export const LockAndMintBtc: FC = () => {
                 {isFetchingFee ? (
                   <Loader />
                 ) : (
-                  <strong>{`${(fees.lock / 10 ** 8) * 2} ${Bitcoin.asset}`}</strong>
+                  <>
+                    <strong>{`${(fees.lock / 10 ** 8) * 2} ${Bitcoin.asset}`}</strong>.
+                  </>
                 )}
-                {'.'}
               </MinimumTxAmount>
             </GatewayInfoItem>
             <GatewayInfoItem>
