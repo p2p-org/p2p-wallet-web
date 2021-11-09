@@ -8,7 +8,6 @@ import { Select } from 'components/ui';
 import { MenuItem } from 'components/ui/Select/MenuItem';
 
 import { ReceiveSolana } from './ReceiveSolana';
-// import { ReceiveBtc } from './renBridge/ReceiveBtc';
 import { LockAndMintBtc } from './renBridge/LockAndMintBtc';
 import { RenGatewayWarning } from './renBridge/RenGatewayWarning';
 
@@ -49,7 +48,6 @@ export const ReceiveAddressWidget: FC = () => {
     switch (sourceNetwork) {
       case 'bitcoin':
         if (isShowGatewayAddress) {
-          // return <ReceiveBtc />;
           return <LockAndMintBtc />;
         }
         return <RenGatewayWarning onShowButtonClick={() => setIsShowGatewayAddress(true)} />;

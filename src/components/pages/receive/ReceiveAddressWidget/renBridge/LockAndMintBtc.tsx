@@ -235,16 +235,17 @@ export const LockAndMintBtc: FC = () => {
               another coin.
             </GatewayInfoItem>
             <GatewayInfoItem>
-              You will receive <strong>renBTC.</strong>
+              You will receive <strong>renBTC</strong>.
             </GatewayInfoItem>
             <GatewayInfoItem>
               <MinimumTxAmount>
-                <div>Minimum transaction amount of &nbsp;</div>
+                Minimum transaction amount of &nbsp;
                 {isFetchingFee ? (
                   <Loader />
                 ) : (
-                  <strong>{`${(fees.lock / 10 ** 8) * 2} ${Bitcoin.asset}.`}</strong>
+                  <strong>{`${(fees.lock / 10 ** 8) * 2} ${Bitcoin.asset}`}</strong>
                 )}
+                {'.'}
               </MinimumTxAmount>
             </GatewayInfoItem>
             <GatewayInfoItem>
