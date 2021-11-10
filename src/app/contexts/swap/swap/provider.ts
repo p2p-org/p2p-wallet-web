@@ -102,7 +102,12 @@ const useSwapInternal = (props: UseSwapArgs = {}): UseSwap => {
   const { wallet, connection } = useSolana();
   const { programIds, tokenConfigs, routeConfigs } = useConfig();
   const [inputTokenName, _setInputTokenName] = useState(props.inputTokenName ?? 'SOL');
-  const [outputTokenName, _setOutputTokenName] = useState(props.outputTokenName ?? 'USDC');
+  const _outputTokenName = props.outputTokenName
+    ? props.outputTokenName
+    : inputTokenName === 'USDC'
+    ? 'SOL'
+    : 'USDC';
+  const [outputTokenName, _setOutputTokenName] = useState(_outputTokenName);
   const [slippageToleranceState, setSlippageToleranceState] = useLocalStorage<{
     numerator: string;
     denominator: string;
