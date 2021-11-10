@@ -10,7 +10,7 @@ import { getWallet } from 'api/wallet';
 import { useSolana } from 'app/contexts/solana';
 import { LoaderBlock } from 'components/common/LoaderBlock';
 import { Accordion, Button } from 'components/ui';
-import { useBurnAndRelease } from 'utils/hooks/renBridge/useBurnAndRelease.ts';
+import { useBurnAndRelease } from 'utils/hooks/renBridge/useBurnAndRelease';
 import { useRenNetwork } from 'utils/hooks/renBridge/useNetwork';
 
 const StatusItems = styled.ul`
