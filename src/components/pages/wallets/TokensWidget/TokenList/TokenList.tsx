@@ -12,10 +12,7 @@ const Wrapper = styled.div`
   margin: 0 10px;
 `;
 
-const sortByUSDBalance = (rates: { [pair: string]: number }) => (
-  a: TokenAccount,
-  b: TokenAccount,
-) => {
+const sortByRules = (rates: { [pair: string]: number }) => (a: TokenAccount, b: TokenAccount) => {
   if (a.mint.symbol === 'SOL' || b.mint.symbol === 'SOL') {
     return a.mint.symbol === 'SOL' ? -1 : 1;
   }
@@ -72,7 +69,7 @@ export const TokenList: FunctionComponent<Props> = ({
   const rates = useSelector((state) => state.rate.markets);
 
   const tokens = useMemo(() => {
-    return items.sort(sortByUSDBalance(rates));
+    return items.sort(sortByRules(rates));
   }, [items, rates]);
 
   if (tokens.length === 0 && !isHidden) {

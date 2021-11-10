@@ -15,8 +15,8 @@ import { ResolveUsernameResponce } from 'api/nameService';
 import { Token } from 'api/token/Token';
 import { TokenAccount } from 'api/token/TokenAccount';
 import { RateUSD } from 'components/common/RateUSD';
-import { FromToSelectInput } from 'components/common/SendSwapWidget/common/FromToSelectInput';
 import { ToastManager } from 'components/common/ToastManager';
+import { FromToSelectInput } from 'components/pages/send/SendWidget/FromToSelectInput';
 import { Button, Icon, Switch, Tooltip } from 'components/ui';
 import { Select, TextField } from 'components/ui';
 import { MenuItem } from 'components/ui/Select/MenuItem';
@@ -40,7 +40,8 @@ import { useRenNetwork } from 'utils/hooks/renBridge/useNetwork';
 import { useTrackEventOnce } from 'utils/hooks/useTrackEventOnce';
 import { useFetchFees } from 'utils/providers/LockAndMintProvider';
 
-import { Hint } from '../../Hint';
+import { Hint } from '../../../common/Hint';
+import { BurnAndRelease } from './BurnAndRelease';
 import {
   BottomWrapper,
   ButtonWrapper,
@@ -49,8 +50,7 @@ import {
   TxName,
   TxValue,
   WrapperWidgetPage,
-} from '../common/styled';
-import { BurnAndRelease } from './BurnAndRelease';
+} from './common/styled';
 import { ToAddressInput } from './ToAddressInput';
 
 const Wrapper = styled.div`

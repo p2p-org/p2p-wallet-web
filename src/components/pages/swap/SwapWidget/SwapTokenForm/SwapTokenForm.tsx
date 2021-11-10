@@ -213,7 +213,7 @@ const DropDownListContainer = styled.div`
   position: absolute;
   right: 0;
   left: 0;
-  z-index: 1;
+  z-index: 2;
 
   margin-top: 8px;
   overflow: hidden;

@@ -3,8 +3,8 @@ import { useSelector } from 'react-redux';
 import { useLocation, useParams } from 'react-router-dom';
 
 import { Layout } from 'components/common/Layout';
-import { SendWidget } from 'components/common/SendSwapWidget/SendWidget';
 import { ResultWidget } from 'components/pages/send/ResultWidget';
+import { SendWidget } from 'components/pages/send/SendWidget';
 import { trackEvent } from 'utils/analytics';
 
 export const Send: FunctionComponent = () => {

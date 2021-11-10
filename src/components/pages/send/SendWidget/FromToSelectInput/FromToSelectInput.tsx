@@ -1,4 +1,5 @@
 import React, { FunctionComponent, useEffect, useMemo, useRef, useState } from 'react';
+import { useSelector } from 'react-redux';
 
 import { styled } from '@linaria/react';
 import classNames from 'classnames';
@@ -9,16 +10,15 @@ import { isNil } from 'ramda';
 import { Token } from 'api/token/Token';
 import { TokenAccount } from 'api/token/TokenAccount';
 import { AmountUSD } from 'components/common/AmountUSD';
+import { Empty } from 'components/common/Empty';
 import { SlideContainer } from 'components/common/SlideContainer';
+import { TokenAccountRow } from 'components/common/TokenAccountRow';
 import { TokenAvatar } from 'components/common/TokenAvatar';
+import { TokenRow } from 'components/common/TokenRow';
 import { Icon } from 'components/ui';
 import { SearchInput } from 'components/ui/SearchInput';
 import { majorAmountToMinor, minorAmountToMajor } from 'utils/amount';
 import { shortAddress } from 'utils/tokens';
-
-import { Empty } from '../../../Empty';
-import { TokenAccountRow } from '../../../TokenAccountRow';
-import { TokenRow } from '../../../TokenRow';
 
 const Wrapper = styled.div``;
 
@@ -334,6 +334,7 @@ export const FromToSelectInput: FunctionComponent<Props> = ({
   const [localAmount, setLocalAmount] = useState(String(amount));
   const [isOpen, setIsOpen] = useState(false);
   const [scrollTop, setScrollTop] = useState(0);
+  const rates = useSelector((state) => state.rate.markets);
 
   useEffect(() => {
     if (!isNil(amount) && amount !== localAmount) {
@@ -504,19 +505,26 @@ export const FromToSelectInput: FunctionComponent<Props> = ({
       filteredWithBalance = tokenAccounts.filter((account) => account.balance.gt(0));
     }
 
-    if (!filter) {
-      return filteredWithBalance;
-    }
-
     const filterLower = filter.toLowerCase();
     return filteredWithBalance
       .filter(
         (account) =>
+          !filterLower ||
           account.mint.symbol?.toLowerCase().includes(filterLower) ||
           account.mint.name?.toLowerCase().includes(filterLower),
       )
-      .sort((a, b) => b.balance.cmp(a.balance));
-  }, [direction, tokenAccounts, filter]);
+      .sort((a, b) => b.balance.cmp(a.balance))
+      .sort((a, b) => {
+        const aUSD =
+          a.mint.toMajorDenomination(a.balance).toNumber() *
+          (a.mint.symbol ? rates[a.mint.symbol] || 0 : 0);
+        const bUSD =
+          b.mint.toMajorDenomination(b.balance).toNumber() *
+          (b.mint.symbol ? rates[b.mint.symbol] || 0 : 0);
+
+        return bUSD < aUSD ? -1 : a === b ? 0 : 1;
+      });
+  }, [tokenAccounts, direction, filter, rates]);
 
   const filteredTokens = useMemo(() => {
     if (!tokens) {

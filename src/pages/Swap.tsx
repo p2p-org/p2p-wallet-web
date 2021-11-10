@@ -1,5 +1,5 @@
 import React, { FunctionComponent, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useParams } from 'react-router-dom';
 
 import { SwapProvider } from 'app/contexts/swap';
 import { Layout } from 'components/common/Layout';
@@ -8,6 +8,7 @@ import { trackEvent } from 'utils/analytics';
 
 export const Swap: FunctionComponent = () => {
   const location = useLocation<{ fromPage: string }>();
+  const { symbol } = useParams<{ symbol?: string }>();
 
   useEffect(() => {
     trackEvent('swap_open', { fromPage: location.state.fromPage });
@@ -17,7 +18,7 @@ export const Swap: FunctionComponent = () => {
   return (
     <Layout
       rightColumn={
-        <SwapProvider>
+        <SwapProvider initialState={{ inputTokenName: symbol }}>
           <SwapWidget />
         </SwapProvider>
       }

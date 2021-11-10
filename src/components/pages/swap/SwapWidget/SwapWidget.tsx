@@ -1,13 +1,11 @@
-import React, { FC, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import React, { FC } from 'react';
 
 import { styled } from '@linaria/react';
 import { rgba } from 'polished';
 
-import { useSwap } from 'app/contexts/swap';
 import { Hint } from 'components/common/Hint';
+import { WidgetPage } from 'components/common/WidgetPage';
 
-import { WrapperWidgetPage } from '../../../common/SendSwapWidget/common/styled';
 import { CurrentPrice } from './CurrentPrice';
 import { Fees } from './Fees';
 import orcaLogo from './orca_logo.svg';
@@ -26,6 +24,8 @@ import { SwapToForm } from './SwapToForm';
 //     margin-right: 10px;
 //   }
 // `;
+
+const WrapperWidgetPage = styled(WidgetPage)``;
 
 const Wrapper = styled.div`
   padding: 24px 20px;
@@ -60,16 +60,6 @@ const PoweredBy = styled.div`
 `;
 
 export const SwapWidget: FC = () => {
-  const { symbol } = useParams<{ symbol?: string }>();
-  const { setInputTokenName } = useSwap();
-
-  useEffect(() => {
-    if (symbol) {
-      setInputTokenName(symbol);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [symbol]);
-
   // useEffect(() => {
   //   if (trade.outputTooHigh) {
   //     setErrorMessage('The amount you entered is too high. Please try a smaller amount.');
