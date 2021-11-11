@@ -15,7 +15,6 @@ import { ResolveUsernameResponce } from 'api/nameService';
 import { Token } from 'api/token/Token';
 import { TokenAccount } from 'api/token/TokenAccount';
 import { RateUSD } from 'components/common/RateUSD';
-import { ToastManager } from 'components/common/ToastManager';
 import { FromToSelectInput } from 'components/pages/send/SendWidget/FromToSelectInput';
 import { Button, Icon, Switch, Tooltip } from 'components/ui';
 import { Select, TextField } from 'components/ui';
@@ -424,8 +423,6 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
           }),
         ),
       );
-    } catch (error) {
-      ToastManager.error((error as Error).message);
     } finally {
       setIsExecuting(false);
     }

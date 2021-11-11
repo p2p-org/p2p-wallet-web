@@ -2,7 +2,6 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch } from 'react-redux';
 
 import { ZERO } from '@orca-so/sdk';
-import { unwrapResult } from '@reduxjs/toolkit';
 import { u64 } from '@solana/spl-token';
 import { createContainer } from 'unstated-next';
 
@@ -13,8 +12,6 @@ import Trade from 'app/contexts/swap/models/Trade';
 import { getMaxAge } from 'app/contexts/swap/utils/AsyncCache';
 import { getTradeId } from 'app/contexts/swap/utils/pools';
 import { minSolBalanceForSwap } from 'app/contexts/swap/utils/tokenAccounts';
-import { openModal } from 'store/actions/modals';
-import { SHOW_MODAL_TRANSACTION_CONFIRM } from 'store/constants/modalTypes';
 import { updateTransactions } from 'store/slices/transaction/TransactionSlice';
 import { Keys, useLocalStorage } from 'utils/hooks/useLocalStorage';
 import { swapNotification } from 'utils/transactionNotifications';
@@ -86,7 +83,7 @@ export interface UseSwap {
   intermediateTokenName: string | undefined;
   intermediateTokenPrice: number | undefined;
   buttonState: ButtonState;
-  onSwap: () => Promise<boolean | undefined>;
+  onSwap: () => Promise<string | undefined>;
 }
 
 export type UseSwapArgs = {
@@ -320,27 +317,6 @@ const useSwapInternal = (props: UseSwapArgs = {}): UseSwap => {
       throw new Error('Wallet not set');
     }
 
-    const result = unwrapResult(
-      await dispatch(
-        openModal({
-          modalType: SHOW_MODAL_TRANSACTION_CONFIRM,
-          props: {
-            type: 'swap',
-            params: {
-              inputTokenName: inputTokenName,
-              outputTokenName: outputTokenName,
-              inputAmount: trade.getInputAmount(),
-              minimumOutputAmount: trade.getMinimumOutputAmount(),
-            },
-          },
-        }),
-      ),
-    );
-
-    if (!result) {
-      return false;
-    }
-
     const inputUserTokenPublicKey = inputUserTokenAccount.account;
 
     setButtonState(() => ButtonState.ConfirmWallet);
@@ -361,9 +337,9 @@ const useSwapInternal = (props: UseSwapArgs = {}): UseSwap => {
       ...notificationParams,
     });
 
-    let executeSetup, executeSwap;
+    let executeSetup, executeSwap, txSignatureSwap;
     try {
-      ({ executeSetup, executeSwap } = await trade.confirmExchange(
+      ({ executeSetup, executeSwap, txSignatureSwap } = await trade.confirmExchange(
         connection,
         tokenConfigs,
         programIds,
@@ -378,14 +354,14 @@ const useSwapInternal = (props: UseSwapArgs = {}): UseSwap => {
       // setErrorMessage(walletConfirmationFailure);
       setButtonState(() => ButtonState.Exchange);
 
+      const error = 'Click approve in your wallet to continue.';
       swapNotification({
         header: 'Swap didn’t complete!',
         status: 'error',
         ...notificationParams,
-        text: 'Click approve in your wallet to continue.',
+        text: error,
       });
-
-      return;
+      throw new Error(error);
     }
 
     setButtonState(() => ButtonState.SendingTransaction);
@@ -428,17 +404,18 @@ const useSwapInternal = (props: UseSwapArgs = {}): UseSwap => {
       });
     } catch (e) {
       console.error(e);
-      const error = getFailedTransactionErrorMessage(e.message);
       // setErrorMessage(error);
       setButtonState(() => ButtonState.Retry);
 
+      const error = getFailedTransactionErrorMessage(e.message);
       swapNotification({
         header: 'Swap didn’t complete!',
         status: 'error',
         ...notificationParams,
         text: error,
       });
-      return;
+
+      throw new Error(error);
     }
 
     try {
@@ -454,20 +431,8 @@ const useSwapInternal = (props: UseSwapArgs = {}): UseSwap => {
 
     setTrade(trade.clearAmounts());
     setButtonState(ButtonState.Exchange);
-    // setSolanaExplorerLink('');
 
-    // const snackbarKey = enqueueSnackbar(
-    //   <ExchangeNotification
-    //     closeSnackbar={() => closeSnackbar(snackbarKey)}
-    //     txid={txSignature}
-    //     inputTokenAmount={inputAmount}
-    //     inputTokenName={trade.inputTokenName}
-    //     outputTokenAmount={outputAmount}
-    //     outputTokenName={trade.outputTokenName}
-    //     inputDecimals={tokenConfigs[trade.inputTokenName].decimals}
-    //     outputDecimals={tokenConfigs[trade.outputTokenName].decimals}
-    //   />,
-    // );
+    return txSignatureSwap;
   }, [
     asyncPools.value,
     asyncStandardTokenAccounts.value,

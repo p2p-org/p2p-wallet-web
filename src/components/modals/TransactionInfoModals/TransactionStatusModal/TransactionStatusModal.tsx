@@ -4,13 +4,9 @@ import { useDispatch, useSelector } from 'react-redux';
 import { styled } from '@linaria/react';
 import { AsyncThunkAction, unwrapResult } from '@reduxjs/toolkit';
 import classNames from 'classnames';
-import { Decimal } from 'decimal.js';
 
-import { Token } from 'api/token/Token';
 import { Transaction } from 'api/transaction/Transaction';
-import { AmountUSD } from 'components/common/AmountUSD';
 import { ToastManager } from 'components/common/ToastManager';
-import { TokenAvatar } from 'components/common/TokenAvatar';
 import { Button } from 'components/ui';
 import { getTransaction } from 'store/slices/transaction/TransactionSlice';
 import { trackEvent } from 'utils/analytics';
@@ -33,20 +29,13 @@ import {
   Header,
   OtherIcon,
   ProgressWrapper,
-  SendWrapper,
   ShareIcon,
   ShareWrapper,
-  SwapAmount,
-  SwapBlock,
-  SwapColumn,
-  SwapIcon,
-  SwapInfo,
-  SwapWrapper,
   Title,
-  ValueCurrency,
-  ValueOriginal,
   Wrapper,
 } from '../common/styled';
+import { Send, TransferParams } from './Send';
+import { Swap, SwapParams } from './Swap';
 
 const INITIAL_PROGRESS = 5;
 
@@ -59,16 +48,6 @@ const ProgressLine = styled.div`
   transition: width 0.15s;
 `;
 
-type Props = {
-  type: 'send' | 'swap';
-  action: AsyncThunkAction<string, any, any>;
-  fromToken: Token;
-  fromAmount: Decimal;
-  toToken?: Token;
-  toAmount?: Decimal;
-  close: (signature: string | null) => void;
-};
-
 const handleCopyClick = (str: string) => () => {
   try {
     void navigator.clipboard.writeText(str);
@@ -78,13 +57,20 @@ const handleCopyClick = (str: string) => () => {
   }
 };
 
+type SendActionType = AsyncThunkAction<string, any, any>;
+type SwapActionType = () => Promise<string>;
+
+type Props = {
+  type: 'send' | 'swap';
+  action: SendActionType | SwapActionType;
+  params: TransferParams | SwapParams;
+  close: (signature: string | null) => void;
+};
+
 export const TransactionStatusModal: FunctionComponent<Props> = ({
   type,
   action,
-  fromToken,
-  fromAmount,
-  toToken,
-  toAmount,
+  params,
   close,
 }) => {
   const dispatch = useDispatch();
@@ -130,20 +116,35 @@ export const TransactionStatusModal: FunctionComponent<Props> = ({
     try {
       setIsExecuting(true);
 
-      const resultSignature = unwrapResult(await dispatch(action));
-      setSignature(resultSignature);
+      switch (type) {
+        case 'send': {
+          const resultSignature = unwrapResult(await dispatch(action as SendActionType));
+          setSignature(resultSignature);
 
-      if (type === 'send') {
-        transferNotification({
-          header: 'Sent',
-          text: `- ${fromToken.toMajorDenomination(fromAmount).toString()} ${fromToken.symbol}`,
-          symbol: fromToken.symbol,
-        });
+          transferNotification({
+            header: 'Sent',
+            text: `- ${(params as TransferParams).fromToken
+              .toMajorDenomination((params as TransferParams).fromAmount)
+              .toString()} ${(params as TransferParams).fromToken.symbol}`,
+            symbol: (params as TransferParams).fromToken.symbol,
+          });
+          break;
+        }
+        case 'swap': {
+          const resultSignature = await (action as SwapActionType)();
+          setSignature(resultSignature);
+          break;
+        }
+        default:
+          throw new Error('Wrong type');
       }
     } catch (error) {
       setTransactionError((error as Error).message);
       setIsExecuting(false);
-      ToastManager.error(type, (error as Error).message);
+
+      if (type === 'send') {
+        ToastManager.error(type, (error as Error).message);
+      }
     }
   };
 
@@ -184,10 +185,10 @@ export const TransactionStatusModal: FunctionComponent<Props> = ({
 
   const isReceiver = useMemo(() => {
     if (!transaction) {
-      return null;
+      return false;
     }
 
-    return tokenAccounts.find(
+    return !!tokenAccounts.find(
       (tokenAccount) => tokenAccount.address === transaction.short.destination?.toBase58(),
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -251,7 +252,7 @@ export const TransactionStatusModal: FunctionComponent<Props> = ({
   const renderDescription = () => {
     if (isSuccess) {
       return type === 'send'
-        ? `You’ve successfully sent ${fromToken.symbol}`
+        ? `You’ve successfully sent ${(params as TransferParams).fromToken.symbol}`
         : 'You’ve successfully swapped tokens';
     }
 
@@ -288,56 +289,13 @@ export const TransactionStatusModal: FunctionComponent<Props> = ({
       </ProgressWrapper>
       <Content>
         {type === 'send' ? (
-          <SendWrapper>
-            <ValueCurrency>
-              {isReceiver ? '+' : '-'}{' '}
-              {transaction?.short.destinationAmount.toNumber() ||
-                fromToken.toMajorDenomination(fromAmount).toString()}{' '}
-              {transaction?.short.sourceToken?.symbol || fromToken.symbol}
-            </ValueCurrency>
-            <ValueOriginal>
-              <AmountUSD
-                prefix={isReceiver ? '+' : '-'}
-                symbol={transaction?.short.sourceToken?.symbol || fromToken.symbol}
-                value={
-                  transaction?.short.destinationAmount || fromToken.toMajorDenomination(fromAmount)
-                }
-              />
-            </ValueOriginal>
-          </SendWrapper>
+          <Send
+            params={params as TransferParams}
+            transaction={transaction}
+            isReceiver={isReceiver}
+          />
         ) : undefined}
-        {/* // TODO: actual swap transaction details */}
-        {type === 'swap' && toToken && toAmount ? (
-          <SwapWrapper>
-            <SwapColumn>
-              <SwapInfo>
-                <TokenAvatar
-                  symbol={fromToken.symbol}
-                  address={fromToken?.address.toBase58()}
-                  size={44}
-                />
-                <SwapAmount>
-                  - {fromToken.toMajorDenomination(fromAmount).toString()} {fromToken.symbol}
-                </SwapAmount>
-              </SwapInfo>
-            </SwapColumn>
-            <SwapBlock>
-              <SwapIcon name="swap" />
-            </SwapBlock>
-            <SwapColumn>
-              <SwapInfo>
-                <TokenAvatar
-                  symbol={toToken.symbol}
-                  address={toToken?.address.toBase58()}
-                  size={44}
-                />
-                <SwapAmount>
-                  + {toToken.toMajorDenomination(toAmount).toString()} {toToken.symbol}
-                </SwapAmount>
-              </SwapInfo>
-            </SwapColumn>
-          </SwapWrapper>
-        ) : undefined}
+        {type === 'swap' ? <Swap params={params as SwapParams} /> : undefined}
         {signature ? (
           <FieldsWrapper>
             <FieldWrapper>
