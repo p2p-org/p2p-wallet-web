@@ -57,6 +57,8 @@ const handleCopyClick = (str: string) => () => {
   }
 };
 
+const DEFAULT_TRANSACTION_ERROR = 'Transaction error';
+
 type SendActionType = AsyncThunkAction<string, any, any>;
 type SwapActionType = () => Promise<string>;
 
@@ -76,7 +78,6 @@ export const TransactionStatusModal: FunctionComponent<Props> = ({
   const dispatch = useDispatch();
   const [progress, setProgress] = useState(5);
   const [isExecuting, setIsExecuting] = useState(false);
-  const [transactionError, setTransactionError] = useState('');
   const [signature, setSignature] = useState<string | null>(null);
   const transaction = useSelector(
     (state) =>
@@ -84,6 +85,9 @@ export const TransactionStatusModal: FunctionComponent<Props> = ({
         state.transaction.items[signature] &&
         Transaction.from(state.transaction.items[signature])) ||
       null,
+  );
+  const [transactionError, setTransactionError] = useState(
+    transaction?.meta?.err ? DEFAULT_TRANSACTION_ERROR : '',
   );
   const cluster = useSelector((state) => state.wallet.network.cluster);
   const tokenAccounts = useSelector((state) => state.wallet.tokenAccounts);
@@ -162,21 +166,21 @@ export const TransactionStatusModal: FunctionComponent<Props> = ({
       try {
         const trx = unwrapResult(await dispatch(getTransaction(signature)));
 
-        if (!trx) {
+        if (trx) {
+          if (trx.meta?.err) {
+            setTransactionError(DEFAULT_TRANSACTION_ERROR);
+          } else if (transactionError) {
+            setTransactionError('');
+          }
+        } else {
           setTimeout(mount, 3000);
-          return;
-        }
-
-        if (transactionError) {
-          setTransactionError('');
         }
       } catch (error) {
         setTransactionError((error as Error).message);
-        setIsExecuting(false);
         ToastManager.error((error as Error).message);
+      } finally {
+        setIsExecuting(false);
       }
-
-      setIsExecuting(false);
     };
 
     void mount();
@@ -234,8 +238,8 @@ export const TransactionStatusModal: FunctionComponent<Props> = ({
     close(signature);
   };
 
-  const isProcessing = !signature || !transaction;
-  const isSuccess = signature && transaction;
+  const isProcessing = (!signature || !transaction) && !transactionError;
+  const isSuccess = signature && transaction && !transactionError;
 
   const renderTitle = () => {
     if (isSuccess) {
