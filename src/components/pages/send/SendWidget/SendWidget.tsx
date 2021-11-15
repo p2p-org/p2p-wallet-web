@@ -417,8 +417,10 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
             props: {
               type: 'send',
               action,
-              fromToken: fromTokenAccount.mint,
-              fromAmount: new Decimal(amount),
+              params: {
+                fromToken: fromTokenAccount.mint,
+                fromAmount: new Decimal(amount),
+              },
             },
           }),
         ),
