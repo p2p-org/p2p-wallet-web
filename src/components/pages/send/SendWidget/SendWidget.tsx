@@ -312,6 +312,13 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
     }
   }, [dispatch, isSolanaNetwork, network, toTokenPublicKey]);
 
+  useEffect(() => {
+    if (!isSolanaNetwork && !isFetchingFee) {
+      const amount = getTransactionFee(fromAmount, fees);
+      setRenBtcMinimalAmount(amount);
+    }
+  }, [fees, fromAmount, isFetchingFee, isSolanaNetwork]);
+
   const handleSubmit = async () => {
     if (!isSolanaNetwork) {
       const result = unwrapResult(
@@ -445,10 +452,6 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
 
   const handleFromAmountChange = (minorAmount: string, type?: string) => {
     setFromAmount(minorAmount);
-    if (!isSolanaNetwork && !isFetchingFee) {
-      const amount = getTransactionFee(minorAmount, fees);
-      setRenBtcMinimalAmount(amount);
-    }
 
     if (type === 'available') {
       trackEvent('send_available_click', { sum: Number(minorAmount) });
@@ -587,7 +590,7 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
                 disabled={
                   isDisabled ||
                   isValidAmount(fromAmount) ||
-                  (isSolanaNetwork && !isValidDestinationAddress) ||
+                  !isValidDestinationAddress ||
                   !hasBalance ||
                   (isShowConfirmAddressSwitch && !isConfirmCorrectAddress) ||
                   !hasRenBtcMinimalAmount
