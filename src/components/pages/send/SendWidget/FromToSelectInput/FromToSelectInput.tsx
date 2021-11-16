@@ -18,6 +18,7 @@ import { TokenRow } from 'components/common/TokenRow';
 import { Icon } from 'components/ui';
 import { SearchInput } from 'components/ui/SearchInput';
 import { majorAmountToMinor, minorAmountToMajor } from 'utils/amount';
+import { sortByRules } from 'utils/sort';
 import { shortAddress } from 'utils/tokens';
 
 const Wrapper = styled.div``;
@@ -513,17 +514,7 @@ export const FromToSelectInput: FunctionComponent<Props> = ({
           account.mint.symbol?.toLowerCase().includes(filterLower) ||
           account.mint.name?.toLowerCase().includes(filterLower),
       )
-      .sort((a, b) => b.balance.cmp(a.balance))
-      .sort((a, b) => {
-        const aUSD =
-          a.mint.toMajorDenomination(a.balance).toNumber() *
-          (a.mint.symbol ? rates[a.mint.symbol] || 0 : 0);
-        const bUSD =
-          b.mint.toMajorDenomination(b.balance).toNumber() *
-          (b.mint.symbol ? rates[b.mint.symbol] || 0 : 0);
-
-        return bUSD < aUSD ? -1 : a === b ? 0 : 1;
-      });
+      .sort(sortByRules(rates));
   }, [tokenAccounts, direction, filter, rates]);
 
   const filteredTokens = useMemo(() => {

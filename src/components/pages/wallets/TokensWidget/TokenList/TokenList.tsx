@@ -5,56 +5,13 @@ import { styled } from '@linaria/react';
 
 import { TokenAccount } from 'api/token/TokenAccount';
 import { LoaderBlock } from 'components/common/LoaderBlock';
+import { sortByRules } from 'utils/sort';
 
 import { TokenRow } from '../TokenRow';
 
 const Wrapper = styled.div`
   margin: 0 10px;
 `;
-
-const sortByRules = (rates: { [pair: string]: number }) => (a: TokenAccount, b: TokenAccount) => {
-  if (a.mint.symbol === 'SOL' || b.mint.symbol === 'SOL') {
-    return a.mint.symbol === 'SOL' ? -1 : 1;
-  }
-
-  if (!a.mint.symbol || !b.mint.symbol) {
-    return !a.mint.symbol ? 1 : -1;
-  }
-
-  if (a.mint.symbol && b.mint.symbol) {
-    const aRateSymbol = a.mint.symbol.toUpperCase();
-    const bRateSymbol = b.mint.symbol.toUpperCase();
-
-    if (rates[aRateSymbol] && rates[bRateSymbol]) {
-      const aUSDBalance = a.balance.toNumber() * rates[aRateSymbol];
-      const bUSDBalance = b.balance.toNumber() * rates[bRateSymbol];
-
-      if (aUSDBalance !== bUSDBalance) {
-        return aUSDBalance > bUSDBalance ? -1 : 1;
-      }
-    }
-
-    if (rates[aRateSymbol] && !rates[bRateSymbol]) {
-      return -1;
-    }
-
-    if (!rates[aRateSymbol] && rates[bRateSymbol]) {
-      return 1;
-    }
-  }
-
-  const aBalance = a.mint.toMajorDenomination(a.balance);
-  const bBalance = b.mint.toMajorDenomination(b.balance);
-  if (!aBalance.eq(bBalance)) {
-    return aBalance.gt(bBalance) ? -1 : 1;
-  }
-
-  if (a.mint.symbol && b.mint.symbol && a.mint.symbol !== b.mint.symbol) {
-    return a.mint.symbol < b.mint.symbol ? -1 : 1;
-  }
-
-  return a.mint.address < b.mint.address ? -1 : 1;
-};
 
 type Props = {
   items: TokenAccount[];
