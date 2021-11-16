@@ -240,7 +240,7 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
   const useFreeTransactions = useSelector(
     (state: RootState) => state.wallet.settings.useFreeTransactions,
   );
-  const isNetworkSourceSelectorVisible = fromTokenAccount?.mint.symbol === 'renBTC';
+  const isNetworkSourceSelectorVisible = fromTokenAccount?.mint.symbol === 'RENBTC';
 
   useEffect(() => {
     if (destinationNetwork !== 'solana') {
@@ -248,7 +248,7 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
     } else {
       setIsSolanaNetwork(true);
     }
-    if (destinationNetwork !== 'solana' && fromTokenAccount?.mint.symbol !== 'renBTC') {
+    if (destinationNetwork !== 'solana' && fromTokenAccount?.mint.symbol !== 'RENBTC') {
       setIsSolanaNetwork(true);
     }
   }, [destinationNetwork, fromTokenAccount?.mint.symbol]);

@@ -22,20 +22,23 @@ const sortByRules = (rates: { [pair: string]: number }) => (a: TokenAccount, b: 
   }
 
   if (a.mint.symbol && b.mint.symbol) {
-    if (rates[a.mint.symbol] && rates[b.mint.symbol]) {
-      const aUSDBalance = a.balance.toNumber() * rates[a.mint.symbol];
-      const bUSDBalance = b.balance.toNumber() * rates[b.mint.symbol];
+    const aRateSymbol = a.mint.symbol.toUpperCase();
+    const bRateSymbol = b.mint.symbol.toUpperCase();
+
+    if (rates[aRateSymbol] && rates[bRateSymbol]) {
+      const aUSDBalance = a.balance.toNumber() * rates[aRateSymbol];
+      const bUSDBalance = b.balance.toNumber() * rates[bRateSymbol];
 
       if (aUSDBalance !== bUSDBalance) {
         return aUSDBalance > bUSDBalance ? -1 : 1;
       }
     }
 
-    if (rates[a.mint.symbol] && !rates[b.mint.symbol]) {
+    if (rates[aRateSymbol] && !rates[bRateSymbol]) {
       return -1;
     }
 
-    if (!rates[a.mint.symbol] && rates[b.mint.symbol]) {
+    if (!rates[aRateSymbol] && rates[bRateSymbol]) {
       return 1;
     }
   }

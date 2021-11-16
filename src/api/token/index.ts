@@ -145,7 +145,7 @@ export const APIFactory = memoizeWith(
           address: 'FsaLodPu4VmSwXGr3gWfwANe4vKf8XSZcCh1CEeJ3jpD',
           name: 'renBTC',
           decimals: 8,
-          symbol: 'renBTC',
+          symbol: 'RENBTC',
         };
       }
       const configForToken = find(propEq('address', address.toBase58()), clusterConfig);
