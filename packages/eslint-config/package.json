@@ -1,0 +1,32 @@
+{
+  "name": "@p2p-wallet-web/eslint-config",
+  "version": "1.0.0",
+  "license": "MIT",
+  "main": "lib/eslint-config.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "files": [
+    "lib"
+  ],
+  "scripts": {
+    "test": "echo \"Error: run tests from root\" && exit 1"
+  },
+  "dependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.4.0",
+    "@typescript-eslint/parser": "^5.4.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-import-resolver-node": "^0.3.6",
+    "eslint-plugin-import": "^2.24.2",
+    "eslint-plugin-prettier": "^4.0.0",
+    "eslint-plugin-simple-import-sort": "^7.0.0",
+    "eslint-plugin-unused-imports": "^2.0.0",
+    "prettier": "^2.4.1"
+  },
+  "peerDependencies": {
+    "eslint": ">=7"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

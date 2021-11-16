@@ -48,7 +48,7 @@ Install the following extensions in your code editor for linting and ease of wor
 - eslint
 - prettier
 - stylint
-- styled-components
+- linaria
 
 # Contributing
 
