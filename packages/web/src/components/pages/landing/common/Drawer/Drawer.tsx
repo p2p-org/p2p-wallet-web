@@ -118,7 +118,8 @@ export const Drawer: FC<Props> = ({ isOpen, onDrawerClose }) => {
           <MenuLink
             to="/signup"
             onClick={() => trackEvent('landing_create_wallet_click')}
-            className="green">
+            className="green"
+          >
             Create new wallet
           </MenuLink>
         </DrawerMenu>

@@ -15,7 +15,8 @@ export const FeesAccordion: FC<Props> = ({ totalFee, children }) => {
       title="Swap fees"
       right={totalFee.loading ? <LoaderBlock /> : totalFee.result}
       hideRightIfOpen
-      noContentPadding>
+      noContentPadding
+    >
       {children}
     </Accordion>
   );

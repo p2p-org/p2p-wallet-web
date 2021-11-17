@@ -50,7 +50,8 @@ export const MoonpayWidget: FC = () => {
         width="100%"
         height="100%"
         src={urlWithParams}
-        title="MoonPay Widget">
+        title="MoonPay Widget"
+      >
         <p>Your browser does not support iframes.</p>
       </iframe>
     </Wrapper>

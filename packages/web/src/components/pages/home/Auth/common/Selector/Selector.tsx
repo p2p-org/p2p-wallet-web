@@ -151,7 +151,8 @@ export const Selector: FC<Props> = ({ value, items, onChange, className }) => {
       <MainWrapper
         ref={selectorRef}
         onClick={handleSelectorClick}
-        className={classNames({ isOpen })}>
+        className={classNames({ isOpen })}
+      >
         <Value>{renderValue()}</Value>
         <ChevronWrapper className={classNames({ isOpen })}>
           <ChevronIcon name="arrow-triangle" />

@@ -168,7 +168,8 @@ export const TokensWidget: FunctionComponent<Props> = ({ selectedSymbol }) => {
             <IconPlus name="plus" /> Add Token
           </AddButton>
         </Feature>
-      }>
+      }
+    >
       <TokenList
         items={tokens}
         selectedSymbol={selectedSymbol}

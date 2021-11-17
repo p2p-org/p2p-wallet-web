@@ -169,7 +169,8 @@ export const Header: FC<Props> = ({ onDrawerToggle }) => {
           <Button
             to="/signup"
             onClick={() => trackEvent('landing_create_wallet_click')}
-            className="white">
+            className="white"
+          >
             Create wallet
           </Button>
         </Right>

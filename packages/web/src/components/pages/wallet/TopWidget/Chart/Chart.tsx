@@ -148,27 +148,32 @@ export const Chart: FunctionComponent<Props> = ({ publicKey }) => {
       <BottomWrapper>
         <FilterButton
           className={classNames({ active: type === 'last1h' })}
-          onClick={handleFilterClick('last1h')}>
+          onClick={handleFilterClick('last1h')}
+        >
           1H
         </FilterButton>
         <FilterButton
           className={classNames({ active: type === 'last4h' })}
-          onClick={handleFilterClick('last4h')}>
+          onClick={handleFilterClick('last4h')}
+        >
           4H
         </FilterButton>
         <FilterButton
           className={classNames({ active: type === 'day' })}
-          onClick={handleFilterClick('day')}>
+          onClick={handleFilterClick('day')}
+        >
           1D
         </FilterButton>
         <FilterButton
           className={classNames({ active: type === 'week' })}
-          onClick={handleFilterClick('week')}>
+          onClick={handleFilterClick('week')}
+        >
           1W
         </FilterButton>
         <FilterButton
           className={classNames({ active: type === 'month' })}
-          onClick={handleFilterClick('month')}>
+          onClick={handleFilterClick('month')}
+        >
           1M
         </FilterButton>
       </BottomWrapper>

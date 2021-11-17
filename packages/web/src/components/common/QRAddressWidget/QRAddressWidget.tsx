@@ -337,7 +337,8 @@ export const QRAddressWidgetOrigin: FunctionComponent<Props> = ({ publicKey, cla
             <Text>Scan or copy QR code</Text>
             <QRCodeWrapper
               className={classNames({ isImageCopyAvailable })}
-              onClick={isImageCopyAvailable ? handleImageCopyClick : undefined}>
+              onClick={isImageCopyAvailable ? handleImageCopyClick : undefined}
+            >
               {isImageCopied ? (
                 <QRCopiedWrapper>
                   <QRCopied>Copied</QRCopied>
@@ -359,7 +360,8 @@ export const QRAddressWidgetOrigin: FunctionComponent<Props> = ({ publicKey, cla
                   href={getExplorerUrl('address', tokenAccount.address.toBase58(), cluster)}
                   target="_blank"
                   rel="noopener noreferrer noindex"
-                  className="button">
+                  className="button"
+                >
                   <ShareWrapper>
                     <ShareIcon name="external-link" />
                   </ShareWrapper>
@@ -369,7 +371,8 @@ export const QRAddressWidgetOrigin: FunctionComponent<Props> = ({ publicKey, cla
                 <FieldGroup>
                   <FieldTitle>{tokenAccount.mint.symbol} Mint Address</FieldTitle>
                   <FieldValue
-                    onClick={handleCopyClick('mint', tokenAccount.mint.address.toBase58())}>
+                    onClick={handleCopyClick('mint', tokenAccount.mint.address.toBase58())}
+                  >
                     {tokenAccount.mint.address.toBase58()}
                   </FieldValue>
                 </FieldGroup>
@@ -377,7 +380,8 @@ export const QRAddressWidgetOrigin: FunctionComponent<Props> = ({ publicKey, cla
                   href={getExplorerUrl('address', tokenAccount.mint.address.toBase58(), cluster)}
                   target="_blank"
                   rel="noopener noreferrer noindex"
-                  className="button">
+                  className="button"
+                >
                   <ShareWrapper>
                     <ShareIcon name="external-link" />
                   </ShareWrapper>

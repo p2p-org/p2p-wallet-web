@@ -261,7 +261,8 @@ export const TopWidgetOrigin: FunctionComponent<Props> = ({ publicKey }) => {
           to={{ pathname: `/send/${publicKey}`, state: { fromPage: location.pathname } }}
           title="Send"
           onClick={() => trackEvent('wallet_send_click')}
-          className="button">
+          className="button"
+        >
           <ButtonStyled primary small>
             <PlusIcon name="top" />
           </ButtonStyled>
@@ -274,7 +275,8 @@ export const TopWidgetOrigin: FunctionComponent<Props> = ({ publicKey }) => {
             }}
             title="Swap"
             onClick={() => trackEvent('wallet_swap_click')}
-            className="button">
+            className="button"
+          >
             <ButtonStyled primary small>
               <PlusIcon name="swap" />
             </ButtonStyled>
@@ -370,7 +372,8 @@ export const TopWidgetOrigin: FunctionComponent<Props> = ({ publicKey }) => {
                       state: { fromPage: location.pathname },
                     }}
                     title="Settings"
-                    className="button">
+                    className="button"
+                  >
                     <TokenSettingsButton small>
                       <TokenSettingsIcon name="gear" />
                     </TokenSettingsButton>
@@ -380,7 +383,8 @@ export const TopWidgetOrigin: FunctionComponent<Props> = ({ publicKey }) => {
             </Header>
           ) : undefined
         }
-        action={renderButtons()}>
+        action={renderButtons()}
+      >
         {renderContent()}
         {tokenAccount ? <Chart publicKey={tokenAccount.address} /> : undefined}
       </WrapperWidget>

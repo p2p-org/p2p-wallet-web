@@ -615,7 +615,8 @@ export const SwapTokenForm: FC<Props> = ({
             isInput ? (
               <AllBalance
                 onClick={() => setAmount(maxAmount)}
-                className={classNames({ disabled, error: !maxAmount })}>
+                className={classNames({ disabled, error: !maxAmount })}
+              >
                 <WalletBalanceIcon name="wallet" />
                 {formatBigNumber(maxAmount, tokenConfigs[tokenName].decimals)} {tokenName}
               </AllBalance>
@@ -642,7 +643,8 @@ export const SwapTokenForm: FC<Props> = ({
             <TokenWrapper
               ref={selectorRef}
               onClick={handleSelectorClick}
-              className={classNames({ isOpen })}>
+              className={classNames({ isOpen })}
+            >
               <TokenName title={tokenInfo?.mint.toString()}>
                 {tokenName || shortAddress(tokenInfo?.mint.toString()) || <EmptyName>—</EmptyName>}
               </TokenName>
@@ -672,7 +674,8 @@ export const SwapTokenForm: FC<Props> = ({
           <DropDownHeader
             style={{
               boxShadow,
-            }}>
+            }}
+          >
             <Title>Select token</Title>
             <SlideContainer>
               <FiltersWrapper>

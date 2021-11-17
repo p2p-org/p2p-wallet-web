@@ -140,7 +140,8 @@ export const DerivableAccounts: FC<Props> = ({ seed, next }) => {
             ) : (
               <QuestionIcon name="question-circle" />
             )
-          }>
+          }
+        >
           <PopoverContent>
             By default, P2P wallet will use m/44&apos;/501&apos;/0&apos;/0&apos; as the derivation
             path for the main wallet. To use an alternative path, try restoring an existing wallet.

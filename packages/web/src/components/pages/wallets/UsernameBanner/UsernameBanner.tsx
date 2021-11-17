@@ -112,7 +112,8 @@ export const UsernameBanner: FC = () => {
         to={{
           pathname: '/settings',
           state: { fromPage: location.pathname, isUsernameActive: true },
-        }}>
+        }}
+      >
         <Header>Reserve your P2P username now</Header>
         <Text>
           Any token can be received using username regardless of whether it is in your wallets list

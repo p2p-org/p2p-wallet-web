@@ -561,7 +561,8 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
                   <MenuItem
                     key={network}
                     isSelected={network === destinationNetwork}
-                    onItemClick={() => setDestinationNetwork(network)}>
+                    onItemClick={() => setDestinationNetwork(network)}
+                  >
                     {network}
                   </MenuItem>
                 ))}
@@ -597,7 +598,8 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
                 }
                 big
                 full
-                onClick={handleSubmit}>
+                onClick={handleSubmit}
+              >
                 <SendIcon name="top" />
                 Send now
               </Button>

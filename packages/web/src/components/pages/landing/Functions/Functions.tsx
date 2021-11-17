@@ -532,19 +532,22 @@ export const Functions: FC = () => {
           <Selectors>
             <Selector
               className={classNames({ active: activeSlide === 'send' })}
-              onClick={handleClick('send')}>
+              onClick={handleClick('send')}
+            >
               <Icon className="send" />
               <SelectorName>Send</SelectorName>
             </Selector>
             <Selector
               className={classNames({ active: activeSlide === 'store' })}
-              onClick={handleClick('store')}>
+              onClick={handleClick('store')}
+            >
               <Icon className="store" />
               <SelectorName>Store</SelectorName>
             </Selector>
             <Selector
               className={classNames({ active: activeSlide === 'swap' })}
-              onClick={handleClick('swap')}>
+              onClick={handleClick('swap')}
+            >
               <Icon className="swap" />
               <SelectorName>Swap</SelectorName>
             </Selector>

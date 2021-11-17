@@ -120,7 +120,8 @@ export const LeftNavMenu: FunctionComponent = () => {
     <Wrapper>
       <NavLinkMenu
         to={{ pathname: '/wallets', state: { fromPage: location.pathname } }}
-        className="button">
+        className="button"
+      >
         <NavButton>
           <IconBlock>
             <NavIcon name="home" />
@@ -132,7 +133,8 @@ export const LeftNavMenu: FunctionComponent = () => {
       <Feature name={FEATURE_NAV_MENU_BUY_BUTTON}>
         <NavLinkMenu
           to={{ pathname: '/buy', state: { fromPage: location.pathname } }}
-          className="button">
+          className="button"
+        >
           <NavButton>
             <IconBlock>
               <NavIcon name="plus" />
@@ -144,7 +146,8 @@ export const LeftNavMenu: FunctionComponent = () => {
 
       <NavLinkMenu
         to={{ pathname: '/receive', state: { fromPage: location.pathname } }}
-        className="button">
+        className="button"
+      >
         <NavButton>
           <IconBlock>
             <NavIcon name="bottom" />
@@ -154,7 +157,8 @@ export const LeftNavMenu: FunctionComponent = () => {
       </NavLinkMenu>
       <NavLinkMenu
         to={{ pathname: '/send', state: { fromPage: location.pathname } }}
-        className="button">
+        className="button"
+      >
         <NavButton>
           <IconBlock>
             <NavIcon name="top" />
@@ -164,7 +168,8 @@ export const LeftNavMenu: FunctionComponent = () => {
       </NavLinkMenu>
       <NavLinkMenu
         to={{ pathname: '/swap', state: { fromPage: location.pathname } }}
-        className="button">
+        className="button"
+      >
         <NavButton>
           <IconBlock>
             <NavIcon name="swap" />
@@ -174,7 +179,8 @@ export const LeftNavMenu: FunctionComponent = () => {
       </NavLinkMenu>
       <NavLinkMenu
         to={{ pathname: '/settings', state: { fromPage: location.pathname } }}
-        className="button">
+        className="button"
+      >
         <NavButton>
           <IconBlock>
             <NavIcon name="gear" />

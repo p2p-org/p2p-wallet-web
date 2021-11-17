@@ -129,7 +129,8 @@ const DepositWatcher: FC<{
                 if (onClose) {
                   onClose();
                 }
-              }}>{`Mint ${rawAmount} BTC`}</Button>
+              }}
+            >{`Mint ${rawAmount} BTC`}</Button>
           }
         />
       ));
@@ -286,7 +287,8 @@ export const LockAndMintProvider: FC = ({ children }) => {
           gatewayAddress,
           expiryTime,
           deposits,
-        }}>
+        }}
+      >
         {content}
       </Context.Provider>
     </>

@@ -398,7 +398,8 @@ export const TransactionDetailsModal: FC<Props> = ({ signature, source, close })
                 href={getExplorerUrl('tx', signature, cluster)}
                 target="_blank"
                 rel="noopener noreferrer noindex"
-                className="button">
+                className="button"
+              >
                 <ShareWrapper>
                   <ShareIcon name="external-link" />
                 </ShareWrapper>

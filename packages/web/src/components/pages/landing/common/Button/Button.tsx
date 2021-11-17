@@ -174,7 +174,8 @@ export const ButtonIOS: FC<ButtonProps & HTMLAttributes<HTMLElement>> = ({
       href={appStorePath}
       target="_blank"
       className={classNames(className, { glow, green: true })}
-      {...props}>
+      {...props}
+    >
       <Text className="ios">Download for iOS</Text>
     </ButtonA>
   );
@@ -190,7 +191,8 @@ export const ButtonAndroid: FC<ButtonProps & HTMLAttributes<HTMLElement>> = ({
       href={playStorePath}
       target="_blank"
       className={classNames(className, { glow, green: true })}
-      {...props}>
+      {...props}
+    >
       <Text className="android">Download for Android</Text>
     </ButtonA>
   );

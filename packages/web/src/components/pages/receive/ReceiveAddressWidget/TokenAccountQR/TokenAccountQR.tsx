@@ -338,7 +338,8 @@ export const TokenAccountQR: FunctionComponent<Props> = ({
               </QRText>
               <QRCodeWrapper
                 className={classNames({ isImageCopyAvailable })}
-                onClick={isImageCopyAvailable ? handleImageCopyClick : undefined}>
+                onClick={isImageCopyAvailable ? handleImageCopyClick : undefined}
+              >
                 {isImageCopied ? (
                   <QRCopiedWrapper>
                     <QRCopied>Copied</QRCopied>
@@ -355,7 +356,8 @@ export const TokenAccountQR: FunctionComponent<Props> = ({
             </QRContent>
             <Address
               className={classNames({ isAddressCopied })}
-              onClick={handleCopyClick(tokenAccount.address.toBase58(), setIsAddressCopied)}>
+              onClick={handleCopyClick(tokenAccount.address.toBase58(), setIsAddressCopied)}
+            >
               {isAddressCopied ? 'Address Copied!' : tokenAccount.address.toBase58()}
             </Address>
           </QRWrapper>
@@ -371,7 +373,8 @@ export const TokenAccountQR: FunctionComponent<Props> = ({
                   primary
                   disabled={isExecuting}
                   onClick={handleAddClick}
-                  className={classNames({ isExecuting })}>
+                  className={classNames({ isExecuting })}
+                >
                   {isExecuting ? (
                     <LoaderBlockStyled />
                   ) : (
@@ -385,7 +388,8 @@ export const TokenAccountQR: FunctionComponent<Props> = ({
                   <AddInfo
                     className={classNames({
                       isError: isInfluencedFunds,
-                    })}>
+                    })}
+                  >
                     {`will cost ${fee} SOL`}
                     {isInfluencedFunds ? ' (Influenced funds)' : ''}
                   </AddInfo>
@@ -417,7 +421,8 @@ export const TokenAccountQR: FunctionComponent<Props> = ({
                 )}
                 target="_blank"
                 rel="noopener noreferrer noindex"
-                className="button">
+                className="button"
+              >
                 View in Solana explorer
               </ExplorerA>
             </>

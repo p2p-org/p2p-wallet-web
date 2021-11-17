@@ -180,7 +180,8 @@ export const TokenSettingsWidget: FunctionComponent<Props> = ({
               disabled={!isZeroBalance}
               small
               title="Close token account"
-              onClick={handleCloseTokenAccountClick}>
+              onClick={handleCloseTokenAccountClick}
+            >
               <IconWrapper>
                 <StyledIcon name="bucket" />
               </IconWrapper>
@@ -207,7 +208,8 @@ export const TokenSettingsWidget: FunctionComponent<Props> = ({
           </TokenSettingsIconWrapper>
           Wallet settings
         </TitleWrapper>
-      }>
+      }
+    >
       <Settings>{renderSettings()}</Settings>
     </WrapperWidget>
   );

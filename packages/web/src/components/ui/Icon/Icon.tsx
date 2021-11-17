@@ -137,7 +137,8 @@ export const Icon: FC<Props> = ({ name, size, height, width, ...props }) => {
       viewBox={icon.viewBox}
       height={size || height}
       width={size || width}
-      {...props}>
+      {...props}
+    >
       <use xlinkHref={`#${icon.id}`} />
     </svg>
   );

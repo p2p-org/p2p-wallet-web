@@ -284,7 +284,8 @@ export const TransactionStatusModal: FunctionComponent<Props> = ({
             isProcessing,
             isSuccess,
             isError: Boolean(transactionError),
-          })}>
+          })}
+        >
           {isSuccess ? (
             <CheckmarkIcon name="checkmark" />
           ) : (
@@ -345,7 +346,8 @@ export const TransactionStatusModal: FunctionComponent<Props> = ({
                     trackEvent('swap_explorer_click', { transactionConfirmed: !isExecuting });
                   }
                 }}
-                className="button">
+                className="button"
+              >
                 <ButtonExplorer lightGray>View in blockchain explorer</ButtonExplorer>
               </a>
             ) : undefined}

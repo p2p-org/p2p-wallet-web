@@ -118,7 +118,8 @@ export const TransactionConfirmModal: FunctionComponent<Props> = ({ type, params
       title="Double check and confirm"
       description={renderDescription()}
       close={handleCloseClick}
-      footer={renderButtons()}>
+      footer={renderButtons()}
+    >
       {type === 'send' ? <Send params={params as TransferParams} /> : undefined}
       {type === 'swap' ? <Swap params={params as SwapParams} /> : undefined}
 

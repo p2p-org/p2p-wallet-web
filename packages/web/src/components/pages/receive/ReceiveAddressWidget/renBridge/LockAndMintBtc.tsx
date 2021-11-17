@@ -274,7 +274,8 @@ export const LockAndMintBtc: FC = () => {
           href={`https://btc.com/btc/address/${lockAndMintProvider.gatewayAddress}`}
           target="_blank"
           rel="noopener noreferrer noindex"
-          className="button">
+          className="button"
+        >
           View in Bitcoin explorer
         </ExplorerA>
       </BottomInfo>

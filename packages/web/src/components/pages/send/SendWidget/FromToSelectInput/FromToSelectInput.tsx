@@ -558,7 +558,8 @@ export const FromToSelectInput: FunctionComponent<Props> = ({
             <TokenWrapper
               ref={selectorRef}
               onClick={handleSelectorClick}
-              className={classNames({ isOpen })}>
+              className={classNames({ isOpen })}
+            >
               <TokenName title={token?.address.toBase58()}>
                 {token?.symbol ||
                   (tokenAccount && shortAddress(tokenAccount.address.toBase58())) || (
@@ -583,7 +584,8 @@ export const FromToSelectInput: FunctionComponent<Props> = ({
                 direction === 'from' && !disabled ? (
                   <AllBalance
                     onClick={handleAllBalanceClick}
-                    className={classNames({ disabled, error: !hasBalance })}>
+                    className={classNames({ disabled, error: !hasBalance })}
+                  >
                     Available: {renderBalance()}
                   </AllBalance>
                 ) : (
@@ -605,7 +607,8 @@ export const FromToSelectInput: FunctionComponent<Props> = ({
           <DropDownHeader
             style={{
               boxShadow,
-            }}>
+            }}
+          >
             <Title>Select token</Title>
             <SlideContainer>
               <FiltersWrapper>

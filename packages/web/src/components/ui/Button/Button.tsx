@@ -174,7 +174,8 @@ export const Button: FunctionComponent<Props & React.ButtonHTMLAttributes<HTMLBu
         medium,
         big,
         full,
-      })}>
+      })}
+    >
       {children}
     </Wrapper>
   );

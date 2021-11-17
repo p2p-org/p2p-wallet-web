@@ -191,7 +191,8 @@ export const Settings: FunctionComponent = () => {
                         <MenuItem
                           key={ticker}
                           isSelected={ticker === settings.currency}
-                          onItemClick={onItemClickHandler({ currency: ticker })}>
+                          onItemClick={onItemClickHandler({ currency: ticker })}
+                        >
                           <CurrencyItem>
                             {name}
                             <Symbol>{`(${symbol})`}</Symbol>
@@ -209,7 +210,8 @@ export const Settings: FunctionComponent = () => {
                         <MenuItem
                           key={value}
                           isSelected={value === settings.appearance}
-                          onItemClick={onItemClickHandler({ appearance: value })}>
+                          onItemClick={onItemClickHandler({ appearance: value })}
+                        >
                           <Capitalize>{value}</Capitalize>
                         </MenuItem>
                       ))}
@@ -227,7 +229,8 @@ export const Settings: FunctionComponent = () => {
                         {username ? `${username}${domain}` : 'Not yet reserved'}
                       </AccordionTitleSecondary>
                     </AccordionTitle>
-                  }>
+                  }
+                >
                   {username ? (
                     <>
                       <Text>
@@ -251,7 +254,8 @@ export const Settings: FunctionComponent = () => {
                         <NavLink
                           to={{ pathname: playStorePath }}
                           target="_blank"
-                          className="button">
+                          className="button"
+                        >
                           <img
                             src={GooglePlayBadge}
                             width="135"
@@ -278,12 +282,14 @@ export const Settings: FunctionComponent = () => {
                   onClick={() => {
                     history.push('/settings/network');
                   }}
-                  style={{ cursor: 'pointer' }}>
+                  style={{ cursor: 'pointer' }}
+                >
                   <Title className="overflow-ellipsis">{network.endpoint}</Title>
                   <ChevronWrapper
                     onClick={() => {
                       history.push('/settings/network');
-                    }}>
+                    }}
+                  >
                     <ChevronIcon name="chevron" />
                   </ChevronWrapper>
                 </ItemAction>

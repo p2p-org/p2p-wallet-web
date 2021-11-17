@@ -71,7 +71,8 @@ const WidgetPageOriginal: FunctionComponent<Props> = ({
       }
       action={action}
       className={className}
-      {...props}>
+      {...props}
+    >
       {children}
     </WrapperWidget>
   );

@@ -290,7 +290,8 @@ export const TokenRow: FunctionComponent<Props> = ({
             primary
             disabled={isExecuting}
             onClick={handleAddClick}
-            className={classNames({ isExecuting })}>
+            className={classNames({ isExecuting })}
+          >
             {isExecuting ? (
               <LoaderBlockStyled />
             ) : (
@@ -310,13 +311,15 @@ export const TokenRow: FunctionComponent<Props> = ({
                 href={getExplorerUrl('address', token.address.toBase58(), cluster)}
                 target="_blank"
                 rel="noopener noreferrer noindex"
-                className="button">
+                className="button"
+              >
                 View in Solana explorer
               </ExplorerA>
               <RightInfo
                 className={classNames({
                   isError: isInfluencedFunds,
-                })}>
+                })}
+              >
                 {`will cost ${fee} SOL`}
                 {isInfluencedFunds ? ' (Influenced funds)' : ''}
               </RightInfo>

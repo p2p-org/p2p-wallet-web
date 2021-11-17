@@ -69,7 +69,8 @@ export const ReceiveAddressWidget: FC = () => {
                 <MenuItem
                   key={network}
                   isSelected={network === sourceNetwork}
-                  onItemClick={() => handleSourceNetworkClick(network)}>
+                  onItemClick={() => handleSourceNetworkClick(network)}
+                >
                   {network}
                 </MenuItem>
               ))}

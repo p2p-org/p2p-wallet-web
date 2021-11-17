@@ -157,7 +157,8 @@ export const AddressQRCodePanel: FC<{ address: string }> = ({ address }) => {
         <QRContentWrapper>
           <QRCodeWrapper
             className={classNames({ isImageCopyAvailable })}
-            onClick={isImageCopyAvailable ? handleImageCopyClick : undefined}>
+            onClick={isImageCopyAvailable ? handleImageCopyClick : undefined}
+          >
             {isImageCopied ? (
               <QRCopiedWrapper>
                 <QRCopied>Copied</QRCopied>

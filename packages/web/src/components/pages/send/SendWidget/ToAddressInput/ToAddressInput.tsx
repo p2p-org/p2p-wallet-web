@@ -268,7 +268,8 @@ export const ToAddressInput: FunctionComponent<Props> = ({
                 onClick={handleItemClick({
                   address: item.owner,
                   name: item.name,
-                })}>
+                })}
+              >
                 <WalletIconWrapper>
                   <WalletIcon name="home" />
                 </WalletIconWrapper>

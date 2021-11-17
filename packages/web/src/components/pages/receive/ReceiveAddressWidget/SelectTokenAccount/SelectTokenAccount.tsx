@@ -329,7 +329,8 @@ export const SelectTokenAccount: FunctionComponent<Props> = ({
       <MainWrapper
         ref={selectorRef}
         onClick={handleSelectorClick}
-        className={classNames({ isOpen })}>
+        className={classNames({ isOpen })}
+      >
         <TokenAvatarWrapper className={classNames({ isOpen: isOpen && !token })}>
           {token ? (
             <TokenAvatar symbol={token.symbol} address={token.address.toBase58()} size={40} />
@@ -360,7 +361,8 @@ export const SelectTokenAccount: FunctionComponent<Props> = ({
           <DropDownHeader
             style={{
               boxShadow,
-            }}>
+            }}
+          >
             <SlideContainer>
               <FiltersWrapper>
                 <SearchInput

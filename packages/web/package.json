@@ -8,7 +8,7 @@
     "deploy": "wrangler publish -e production",
     "deploy-gp": "gh-pages -d build",
     "start": "react-app-rewired start",
-    "build": "react-app-rewired build",
+    "build": "DISABLE_ESLINT_PLUGIN=true react-app-rewired build",
     "test": "react-app-rewired test --env=jsdom",
     "eject": "react-scripts eject",
     "lint": "eslint src --ext js,ts,tsx --cache src --fix",
@@ -108,6 +108,7 @@
     "@types/webpack-env": "^1.16.0",
     "@welldone-software/why-did-you-render": "^6.2.0",
     "assert": "^2.0.0",
+    "babel-loader": "8.1.0",
     "babel-plugin-module-resolver": "^4.0.0",
     "babel-preset-react-app": "^10.0.0",
     "customize-cra": "^1.0.0",
@@ -125,7 +126,8 @@
     "stylelint-prettier": "^1.1.2",
     "svg-sprite-loader": "^6.0.5",
     "svgo-loader": "^3.0.0",
-    "typescript": "^4.4.4"
+    "typescript": "^4.4.4",
+    "webpack": "4.44.2"
   },
   "browserslist": {
     "production": [

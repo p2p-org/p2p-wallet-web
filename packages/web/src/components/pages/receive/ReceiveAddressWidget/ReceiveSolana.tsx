@@ -68,7 +68,8 @@ export const ReceiveSolana: FC = () => {
           href={getExplorerUrl('address', solAccount.address.toBase58(), cluster)}
           target="_blank"
           rel="noopener noreferrer noindex"
-          className="button">
+          className="button"
+        >
           View in Solana explorer
         </ExplorerA>
       </BottomInfo>

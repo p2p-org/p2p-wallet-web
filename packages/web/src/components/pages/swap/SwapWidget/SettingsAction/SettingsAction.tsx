@@ -203,7 +203,8 @@ export const SettingsAction: FunctionComponent = () => {
                 lightGray
                 small
                 className={classNames({ active: nextSlippage === value })}
-                onClick={() => handleSlippageChange(value)}>
+                onClick={() => handleSlippageChange(value)}
+              >
                 {value}%
               </OptionButton>
             ))}

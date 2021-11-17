@@ -457,9 +457,11 @@ export class ToastManager extends PureComponent<Props, State> {
           style={{
             transform: `translate(0, -${bottomOffset}px)`,
           }}
-          className={classNames({ isInvisible: !isOffsetCalculated, isRight })}>
+          className={classNames({ isInvisible: !isOffsetCalculated, isRight })}
+        >
           <ToastWrapper
-            className={classNames({ isRight, isAppearing: isOffsetCalculated, isHiding })}>
+            className={classNames({ isRight, isAppearing: isOffsetCalculated, isHiding })}
+          >
             {render ? (
               render({ type, header, text, onClose: () => this.onCloseClick(id) })
             ) : (

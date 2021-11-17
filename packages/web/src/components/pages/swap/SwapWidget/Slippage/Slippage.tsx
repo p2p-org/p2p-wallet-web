@@ -135,7 +135,8 @@ export const Slippage: FC = () => {
         <Title>
           <Left>Max price slippage</Left> <Right>{slippageTolerance.toString()} %</Right>
         </Title>
-      }>
+      }
+    >
       <div>
         Slippage refers to the difference between the expected price of a trade and the price at
         which the trade is executed. Slippage can occur at any time but is most prevalent during
@@ -148,7 +149,8 @@ export const Slippage: FC = () => {
             lightGray
             small
             className={classNames({ active: slippageTolerance.stringEq(value) })}
-            onClick={handleSlippageClick(value)}>
+            onClick={handleSlippageClick(value)}
+          >
             {value}%
           </OptionButton>
         ))}
