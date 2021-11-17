@@ -10,7 +10,7 @@ zone_id = "54ed3a4176c8757eda8e95af8b2192ad"
 workers_dev = true
 
 [site]
-bucket = "./build"
+bucket = "./packages/web/build"
 entry-point = "workers-site"
 
 [env.production]

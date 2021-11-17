@@ -12,8 +12,18 @@ jobs:
     name: Deploy
     steps:
       - uses: actions/checkout@v2
+
+      - name: Cache node_modules
+        uses: actions/cache@v2
+        with:
+          path: |
+            node_modules
+            */*/node_modules
+          key: ${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
+
       - name: Install dependecies
-        run: 'npm install'
+        run: yarn install --frozen-lockfile
+
       - name: Build site
         env:
           PUBLIC_URL: ${{ secrets.PUBLIC_URL }}
@@ -27,9 +37,10 @@ jobs:
           REACT_APP_INTERCOM_APP_ID: ${{ secrets.REACT_APP_INTERCOM_APP_ID }}
           REACT_APP_MOONPAY_WIDGET_URL: ${{ secrets.REACT_APP_MOONPAY_WIDGET_URL }}
           REACT_APP_MOONPAY_API_KEY: ${{ secrets.REACT_APP_MOONPAY_API_KEY }}
-        run: 'npm run build'
+        run: yarn build
+
       - name: Publish
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./build
+          publish_dir: ./packages/web/build
