@@ -3045,7 +3045,7 @@
     npmlog "^4.1.2"
     write-file-atomic "^3.0.3"
 
-"@linaria/babel-preset@^3.0.0-beta.13", "@linaria/babel-preset@^3.0.0-beta.4":
+"@linaria/babel-preset@^3.0.0-beta.13":
   version "3.0.0-beta.13"
   resolved "https://registry.yarnpkg.com/@linaria/babel-preset/-/babel-preset-3.0.0-beta.13.tgz#bce5c199bfd72f754fb962dc72c292f076150b72"
   integrity sha512-UeurIwmORp1lG+f69bKquRug7ZFVSrQha6TJWvHmGQIFwFx5qpMCXJLhOp2dUpM4y7/NhbKYXqj58RtG3wi4ZQ==
@@ -3059,7 +3059,7 @@
     source-map "^0.7.3"
     stylis "^3.5.4"
 
-"@linaria/core@^3.0.0-beta.13", "@linaria/core@^3.0.0-beta.4":
+"@linaria/core@^3.0.0-beta.13":
   version "3.0.0-beta.13"
   resolved "https://registry.yarnpkg.com/@linaria/core/-/core-3.0.0-beta.13.tgz#049c5be5faa67e341e413a0f6b641d5d78d91056"
   integrity sha512-3zEi5plBCOsEzUneRVuQb+2SAx3qaC1dj0FfFAI6zIJQoDWu0dlSwKijMRack7oO9tUWrchfj3OkKQAd1LBdVg==
@@ -3078,7 +3078,7 @@
   dependencies:
     "@linaria/babel-preset" "^3.0.0-beta.13"
 
-"@linaria/react@^3.0.0-beta.7":
+"@linaria/react@^3.0.0-beta.13":
   version "3.0.0-beta.13"
   resolved "https://registry.yarnpkg.com/@linaria/react/-/react-3.0.0-beta.13.tgz#93a788d2792bd0d2f9f34acfc58e293c17c82d7f"
   integrity sha512-N7+xnWHEPembwyGRKCKZDkN2O2N/WYp96ftScPezQuAacLEYYsDGFXNY0AV0c+38JUkpcj6J2BMn6vpIwPw/1A==
@@ -3086,7 +3086,7 @@
     "@emotion/is-prop-valid" "^0.8.8"
     "@linaria/core" "^3.0.0-beta.13"
 
-"@linaria/shaker@^3.0.0-beta.7":
+"@linaria/shaker@^3.0.0-beta.13":
   version "3.0.0-beta.13"
   resolved "https://registry.yarnpkg.com/@linaria/shaker/-/shaker-3.0.0-beta.13.tgz#df01ae1c182dfac984a04d05e56cab3e9411b5ab"
   integrity sha512-/ejyBA63pY5OnGK4VxrcD7FxYdQ/weRuPZyy8YEWgh0vVkyeXegwrfupfn+Nt7Lodnej+hrMexloKjxe2NTKfA==
@@ -3101,7 +3101,7 @@
     babel-plugin-transform-react-remove-prop-types "^0.4.24"
     ts-invariant "^0.9.0"
 
-"@linaria/stylelint@^3.0.0-beta.7":
+"@linaria/stylelint@^3.0.0-beta.13":
   version "3.0.0-beta.13"
   resolved "https://registry.yarnpkg.com/@linaria/stylelint/-/stylelint-3.0.0-beta.13.tgz#ac31337909dd5a936fddaf53ed68451f5f3ebfed"
   integrity sha512-nv4PDnpwX425iwQCXgk7powkhYEOX3Y1S88iQ+S3+AFWmBbXIxzGGMO6wonKByphsxbyhmVJWbJDaraHvBfB4g==
@@ -3109,7 +3109,7 @@
     "@linaria/babel-preset" "^3.0.0-beta.13"
     strip-ansi "^5.2.0"
 
-"@linaria/webpack-loader@^3.0.0-beta.7":
+"@linaria/webpack-loader@^3.0.0-beta.13":
   version "3.0.0-beta.13"
   resolved "https://registry.yarnpkg.com/@linaria/webpack-loader/-/webpack-loader-3.0.0-beta.13.tgz#766a9445386ee4a2b5e1e7f9cce9239a66292a3e"
   integrity sha512-c05FzE3aQLWDrCHnvBUU7tIdkbfrOCWdm5GTuF+pcK+TBZ2kF8qXO6InEEqyXeol5HWp5fuwC6WnWGFKAcUqRQ==
@@ -19327,7 +19327,7 @@ svg-parser@^2.0.2:
   resolved "https://registry.yarnpkg.com/svg-parser/-/svg-parser-2.0.4.tgz#fdc2e29e13951736140b76cb122c8ee6630eb6b5"
   integrity sha512-e4hG1hRwoOdRb37cIMSgzNsxyzKfayW6VOflrwvR+/bzrkyxY/31WkbgnQpgtrNp1SdpJvpUAGTa/ZoiPNDuRQ==
 
-svg-sprite-loader@^6.0.5:
+svg-sprite-loader@^6.0.11:
   version "6.0.11"
   resolved "https://registry.yarnpkg.com/svg-sprite-loader/-/svg-sprite-loader-6.0.11.tgz#a4d60cee3d74232a2c17d31c73a2008295f61220"
   integrity sha512-TedsTf8wsHH6HgdwKjUveDZRC6q5gPloYV8A8/zZaRWP929J7x6TzQ6MvZFl+YYDJuJ0Akyuu/vNVJ+fbPuYXg==
