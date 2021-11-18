@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { styled } from '@linaria/react';
 import classNames from 'classnames';
 
-import { Icon } from 'components/ui/Icon';
+import { Icon } from 'components/ui';
 
 const Wrapper = styled.div`
   display: flex;

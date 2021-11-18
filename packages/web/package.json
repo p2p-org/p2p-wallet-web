@@ -126,7 +126,6 @@
     "stylelint-prettier": "^1.1.2",
     "svg-sprite-loader": "^6.0.11",
     "svgo-loader": "^3.0.0",
-    "typescript": "^4.4.4",
     "webpack": "4.44.2"
   },
   "browserslist": {
