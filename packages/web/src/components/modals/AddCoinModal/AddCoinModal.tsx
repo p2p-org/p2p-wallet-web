@@ -4,7 +4,7 @@ import { useSelector } from 'react-redux';
 
 import { styled } from '@linaria/react';
 
-import { Token } from 'api/token/Token';
+import type { Token } from 'api/token/Token';
 import { TokenAccount } from 'api/token/TokenAccount';
 import { Modal } from 'components/common/Modal';
 import type { RootState } from 'store/rootReducer';
@@ -33,9 +33,7 @@ export const AddCoinModal: FunctionComponent<Props> = ({ close }) => {
   const tokenAccounts = useSelector((state: RootState) =>
     state.wallet.tokenAccounts.map((token) => TokenAccount.from(token)),
   );
-  const availableTokens = useSelector((state: RootState) =>
-    state.global.availableTokens.map((token) => Token.from(token)),
-  );
+  const availableTokens: Token[] = [];
 
   const closeModal = () => {
     close();

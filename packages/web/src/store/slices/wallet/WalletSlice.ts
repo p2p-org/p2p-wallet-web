@@ -27,7 +27,7 @@ import type { NetworkType } from 'config/constants';
 import { DEFAULT_NETWORK, swapHostFeeAddress } from 'config/constants';
 import { SYSTEM_PROGRAM_ID, WRAPPED_SOL_MINT } from 'constants/solana/bufferLayouts';
 import type { RootState } from 'store/rootReducer';
-import { getAvailableTokens, wipeAction } from 'store/slices/GlobalSlice';
+import { wipeAction } from 'store/slices/GlobalSlice';
 import { getRatesCandle, getRatesMarkets } from 'store/slices/rate/RateSlice';
 import {
   addPendingTransaction,
@@ -293,9 +293,6 @@ export const connectWallet = createAsyncThunk<string, WalletDataType | undefined
       );
     }
 
-    // Get tokens first before getting accounts and pools,
-    // to avail of the token caching feature
-    await thunkAPI.dispatch(getAvailableTokens());
     void thunkAPI.dispatch(getTokenAccountsForWallet());
     void thunkAPI.dispatch(getRatesMarkets());
     void thunkAPI.dispatch(getRatesCandle({ symbol: 'SOL', type: 'month' }));

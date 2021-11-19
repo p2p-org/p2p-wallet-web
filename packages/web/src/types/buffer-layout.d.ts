@@ -1,3 +1,4 @@
+// https://github.com/project-serum/anchor/blob/master/ts/types/buffer-layout/index.d.ts
 declare module 'buffer-layout' {
   // TODO: remove `any`.
   export class Layout<T = any> {
