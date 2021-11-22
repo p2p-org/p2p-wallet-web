@@ -37,7 +37,7 @@ module.exports = {
       },
     ],
 
-    "unused-imports/no-unused-imports": "error",
+    "unused-imports/no-unused-imports": "warn",
 
     "@typescript-eslint/consistent-type-imports": "error",
     "@typescript-eslint/no-unused-vars": [
@@ -49,5 +49,24 @@ module.exports = {
         argsIgnorePattern: "^_",
       },
     ],
+    "@typescript-eslint/ban-ts-comment": "warn",
+    "@typescript-eslint/no-unsafe-argument": "warn",
+    "@typescript-eslint/no-unsafe-assignment": "warn",
+    "@typescript-eslint/no-unsafe-member-access": "warn",
+    "@typescript-eslint/no-unsafe-call": "warn",
+    "@typescript-eslint/no-unsafe-return": "warn",
+    "@typescript-eslint/no-misused-promises": "warn",
+    "@typescript-eslint/restrict-template-expressions": "warn",
+    "@typescript-eslint/unbound-method": "warn",
+    "@typescript-eslint/restrict-plus-operands": "warn",
+    "no-async-promise-executor": "warn",
+    "@typescript-eslint/no-floating-promises": "warn",
+    "@typescript-eslint/restrict-plus-operands": "warn",
+    "@typescript-eslint/ban-types": "warn",
+    "@typescript-eslint/require-await": "warn",
+    "no-prototype-builtins": "warn",
+    "no-constant-condition": "warn",
+    "@typescript-eslint/no-empty-function": "warn",
+    "@typescript-eslint/no-var-requires": "warn",
   },
 };
