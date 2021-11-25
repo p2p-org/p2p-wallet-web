@@ -5,8 +5,8 @@ import { styled } from '@linaria/react';
 
 import { useConfig } from 'app/contexts/swap';
 import type TokenAccount from 'app/contexts/swap/models/TokenAccount';
+import { useTokenMap } from 'app/contexts/swap/tokenList';
 import { getNumber } from 'app/contexts/swap/utils/format';
-import { useTokenMap } from 'app/contexts/swapSerum/tokenList';
 import { TokenAvatar } from 'components/common/TokenAvatar';
 import { shortAddress } from 'utils/tokens';
 

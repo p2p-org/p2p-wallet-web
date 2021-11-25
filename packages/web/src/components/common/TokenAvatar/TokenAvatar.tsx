@@ -6,7 +6,7 @@ import { styled } from '@linaria/react';
 import classNames from 'classnames';
 
 import tokenList from 'api/token/token.config';
-import { useTokenMap } from 'app/contexts/swapSerum/tokenList/hooks';
+import { useTokenMap } from 'app/contexts/swap/tokenList';
 import { Jazzicon } from 'components/common/TokenAvatar/Jazzicon';
 import { Avatar } from 'components/ui';
 

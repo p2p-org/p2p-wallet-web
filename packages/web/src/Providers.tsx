@@ -5,7 +5,7 @@ import type { TokenListContainer as SPLTokenListContainer } from '@solana/spl-to
 import { TokenListProvider as SPLTokenListProvider } from '@solana/spl-token-registry';
 
 import { SolanaProvider } from 'app/contexts/solana';
-import { TokenListProvider } from 'app/contexts/swapSerum';
+import { TokenListProvider } from 'app/contexts/swap';
 import { Providers as SwapProviders } from 'components/pages/swap/Providers';
 import { LockAndMintProvider } from 'utils/providers/LockAndMintProvider';
 
