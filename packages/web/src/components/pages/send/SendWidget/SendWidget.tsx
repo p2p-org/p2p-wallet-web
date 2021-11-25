@@ -207,6 +207,9 @@ const getTransactionFee = (amount: string, fees: any) => {
   return total > 0 ? total : 0;
 };
 
+const isRenBtcSelected = (tokenAccount: TokenAccount | undefined): boolean =>
+  tokenAccount ? tokenAccount?.mint.symbol?.toLowerCase() === 'renbtc' : false;
+
 export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
   const dispatch = useDispatch();
   const history = useHistory();
@@ -240,7 +243,7 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
   const useFreeTransactions = useSelector(
     (state: RootState) => state.wallet.settings.useFreeTransactions,
   );
-  const isNetworkSourceSelectorVisible = fromTokenAccount?.mint.symbol === 'RENBTC';
+  const isNetworkSourceSelectorVisible = isRenBtcSelected(fromTokenAccount);
 
   useEffect(() => {
     if (destinationNetwork !== 'solana') {
@@ -248,7 +251,7 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
     } else {
       setIsSolanaNetwork(true);
     }
-    if (destinationNetwork !== 'solana' && fromTokenAccount?.mint.symbol !== 'RENBTC') {
+    if (destinationNetwork !== 'solana' && !isRenBtcSelected(fromTokenAccount)) {
       setIsSolanaNetwork(true);
     }
   }, [destinationNetwork, fromTokenAccount?.mint.symbol]);
