@@ -21,7 +21,7 @@ import { awaitConfirmation, getBalance, getWallet, getWalletUnsafe, WalletType }
 import type { ManualWalletData } from 'api/wallet/ManualWallet';
 import { getDerivableAccounts, loadMnemonicAndSeed } from 'api/wallet/ManualWallet';
 import { WalletEvent } from 'api/wallet/Wallet';
-import { SOL_MINT } from 'app/contexts/swapSerum';
+import { SOL_MINT } from 'app/contexts/swap';
 import { ToastManager } from 'components/common/ToastManager';
 import type { NetworkType } from 'config/constants';
 import { DEFAULT_NETWORK, swapHostFeeAddress } from 'config/constants';
