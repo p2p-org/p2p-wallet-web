@@ -33,7 +33,7 @@ export interface UseTokenMetasArgs {}
 
 const useTokenMetasInternal = (props: UseTokenMetasArgs): UseTokenMetas => {
   const { cluster } = useConnection();
-  const [tokenList, setTokenList] = useState<TokenListContainer>();
+  const [tokenList, setTokenList] = useState<TokenListContainer | undefined>();
 
   useEffect(() => {
     void new TokenListProvider().resolve().then(setTokenList);
@@ -69,5 +69,7 @@ const useTokenMetasInternal = (props: UseTokenMetasArgs): UseTokenMetas => {
   };
 };
 
-export const { Provider: TokenMetasProvider, useContainer: useTokenMetas } =
-  createContainer(useTokenMetasInternal);
+export const { Provider: TokenMetasProvider, useContainer: useTokenMetas } = createContainer<
+  UseTokenMetas,
+  UseTokenMetasArgs
+>(useTokenMetasInternal);

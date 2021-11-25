@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
+import type { TokenInfo } from '@solana/spl-token-registry';
 import { mergeAll, splitEvery } from 'ramda';
 import assert from 'ts-invariant';
 import { createContainer } from 'unstated-next';
@@ -58,7 +59,7 @@ const useRatesInternal = (props: UseRatesArgs): UseRates => {
         .excludeByTag('bull')
         .excludeByTag('wormhole')
         .getList()
-        .map((token) => token.symbol.toUpperCase()) || []
+        .map((token: TokenInfo) => token.symbol.toUpperCase()) || []
     );
   }, [tokenList]);
 
@@ -131,17 +132,13 @@ const useRatesInternal = (props: UseRatesArgs): UseRates => {
 
       const result = mergeAll(results);
 
-      console.log(444, result);
-
-      const rates = tokenSymbols.reduce((acc, symbol) => {
+      const rates = tokenSymbols.reduce((acc: Markets, symbol: string) => {
         if (result[symbol]?.[BASE_CURRENCY]) {
           acc[symbol] = result[symbol]![BASE_CURRENCY]!;
         }
 
         return acc;
       }, <Markets>{});
-
-      console.log(333, rates);
 
       setMarkets((state) => ({
         ...state,
