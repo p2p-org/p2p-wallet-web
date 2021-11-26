@@ -6,6 +6,7 @@ import { styled } from '@linaria/react';
 import type { TokenAccount } from 'api/token/TokenAccount';
 import { AmountUSD } from 'components/common/AmountUSD';
 import { TokenAvatar } from 'components/common/TokenAvatar';
+import { formatAccountBalance } from 'utils/amount';
 import { shortAddress } from 'utils/tokens';
 
 const Wrapper = styled.div`
@@ -89,8 +90,7 @@ export const TokenAccountRow: FunctionComponent<Props> = ({ tokenAccount, onClic
           <Bottom>
             <div>{tokenAccount.mint.name}</div>
             <div>
-              {tokenAccount?.mint.toMajorDenomination(tokenAccount.balance).toString()}{' '}
-              {tokenAccount.mint.symbol}
+              {formatAccountBalance(tokenAccount)} {tokenAccount.mint.symbol}
             </div>
           </Bottom>
         </Info>

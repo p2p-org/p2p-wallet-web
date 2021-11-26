@@ -14,6 +14,7 @@ import { TokenAvatar } from 'components/common/TokenAvatar';
 import { Menu } from 'components/ui';
 import { MenuItem } from 'components/ui/Menu/MenuItem';
 import { updateHiddenTokens } from 'store/slices/wallet/WalletSlice';
+import { formatAccountBalance } from 'utils/amount';
 import {
   hideUnhideToken,
   hideUnhideZeroBalanceToken,
@@ -200,7 +201,7 @@ export const TokenRow: FunctionComponent<Props> = ({
           <Bottom>
             <div title={token.address.toBase58()}>{renderTokenName()}</div>
             <div>
-              {token.mint.toMajorDenomination(token.balance).toString()} {token.mint.symbol}
+              {formatAccountBalance(token)} {token.mint.symbol}
             </div>
           </Bottom>
         </Content>

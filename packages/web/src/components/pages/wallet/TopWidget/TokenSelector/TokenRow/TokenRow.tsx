@@ -7,6 +7,7 @@ import { rgba } from 'polished';
 import type { TokenAccount } from 'api/token/TokenAccount';
 import { RateUSD } from 'components/common/RateUSD';
 import { TokenAvatar } from 'components/common/TokenAvatar';
+import { formatAccountBalance } from 'utils/amount';
 
 const Wrapper = styled.div`
   padding: 15px 12px;
@@ -76,7 +77,7 @@ export const TokenRow: FunctionComponent<Props> = ({ token, onItemClick }) => {
           <Bottom>
             <div>{token.mint.symbol}</div>{' '}
             <div>
-              {token.mint.toMajorDenomination(token.balance).toString()} {token.mint.symbol}
+              {formatAccountBalance(token)} {token.mint.symbol}
             </div>
           </Bottom>
         </Info>

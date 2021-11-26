@@ -19,6 +19,7 @@ import { Button, Icon } from 'components/ui';
 import { rateSelector } from 'store/selectors/rates';
 import { getRatesCandle } from 'store/slices/rate/RateSlice';
 import { airdrop } from 'store/slices/wallet/WalletSlice';
+import { formatAccountBalance } from 'utils/amount';
 import { trackEvent } from 'utils/analytics';
 import { shortAddress } from 'utils/tokens';
 
@@ -337,8 +338,7 @@ export const TopWidgetOrigin: FunctionComponent<Props> = ({ publicKey }) => {
         ) : undefined}
         <BottomWrapper className={classNames({ isSticky })}>
           <ValueOriginal>
-            {tokenAccount.mint.toMajorDenomination(tokenAccount.balance).toString()}{' '}
-            {tokenAccount.mint.symbol}
+            {formatAccountBalance(tokenAccount)} {tokenAccount.mint.symbol}
           </ValueOriginal>
           {renderDelta(isSticky)}
         </BottomWrapper>

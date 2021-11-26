@@ -18,7 +18,7 @@ import { TokenAvatar } from 'components/common/TokenAvatar';
 import { TokenRow } from 'components/common/TokenRow';
 import { Icon } from 'components/ui';
 import { SearchInput } from 'components/ui/SearchInput';
-import { majorAmountToMinor, minorAmountToMajor } from 'utils/amount';
+import { formatAccountBalance, majorAmountToMinor, minorAmountToMajor } from 'utils/amount';
 import { sortByRules } from 'utils/sort';
 import { shortAddress } from 'utils/tokens';
 
@@ -491,9 +491,7 @@ export const FromToSelectInput: FunctionComponent<Props> = ({
       }
     }
 
-    return `${tokenAccount?.mint.toMajorDenomination(tokenAccount.balance).toString()} ${
-      tokenAccount?.mint.symbol
-    }`;
+    return `${formatAccountBalance(tokenAccount)} ${tokenAccount?.mint.symbol}`;
   };
 
   const filteredTokenAccounts = useMemo(() => {

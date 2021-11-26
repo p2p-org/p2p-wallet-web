@@ -2,6 +2,7 @@ import BN from 'bn.js';
 import { Decimal } from 'decimal.js';
 
 import type { Token } from 'api/token/Token';
+import type { TokenAccount } from 'api/token/TokenAccount';
 
 export const toDecimal = (num: number | BN | Decimal): Decimal => new Decimal(`${num}`);
 export const toBN = (num: number | Decimal): BN => new BN(`${num}`);
@@ -22,3 +23,6 @@ export const formatValueWithDecimals = (value: string, decimals: number): string
   `${value.slice(0, Math.max(0, value.length - decimals))}.${value.slice(
     Math.max(0, value.length - decimals),
   )}`;
+
+export const formatAccountBalance = (tokenAccount: TokenAccount): string =>
+  tokenAccount.mint.toMajorDenomination(tokenAccount.balance).toFixed();
