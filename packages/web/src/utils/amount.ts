@@ -26,3 +26,9 @@ export const formatValueWithDecimals = (value: string, decimals: number): string
 
 export const formatAccountBalance = (tokenAccount: TokenAccount): string =>
   tokenAccount.mint.toMajorDenomination(tokenAccount.balance).toFixed();
+
+export const formatBalance = (amount: number, decimals: number): string =>
+  toDecimal(amount)
+    .div(10 ** decimals)
+    .toDecimalPlaces(decimals)
+    .toFixed();

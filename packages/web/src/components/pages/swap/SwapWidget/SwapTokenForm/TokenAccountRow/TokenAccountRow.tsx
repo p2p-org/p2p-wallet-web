@@ -6,8 +6,8 @@ import { styled } from '@linaria/react';
 import { useConfig } from 'app/contexts/swap';
 import type TokenAccount from 'app/contexts/swap/models/TokenAccount';
 import { useTokenMap } from 'app/contexts/swap/tokenList';
-import { getNumber } from 'app/contexts/swap/utils/format';
 import { TokenAvatar } from 'components/common/TokenAvatar';
+import { formatBalance } from 'utils/amount';
 import { shortAddress } from 'utils/tokens';
 
 import { AmountUSD } from '../../AmountUSD';
@@ -92,7 +92,8 @@ export const TokenAccountRow: FC<Props> = ({ tokenAccount, onClick, className })
           <Bottom>
             <div>{tokenNameFull}</div>
             <div>
-              {getNumber(tokenAccount.getAmount(), tokenConfigs[tokenName].decimals)} {tokenName}
+              {formatBalance(tokenAccount.getAmount(), tokenConfigs[tokenName].decimals)}{' '}
+              {tokenName}
             </div>
           </Bottom>
         </Info>
