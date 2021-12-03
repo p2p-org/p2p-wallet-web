@@ -212,7 +212,7 @@ export const updateTokenAccountsForWallet = createAsyncThunk<SerializableTokenAc
 
         transferNotification({
           header: 'Received',
-          text: `+ ${minorAmountToMajor(account.balance, account.mint).toString()} ${symbol}`,
+          text: `+ ${minorAmountToMajor(account.balance, account.mint).toFixed()} ${symbol}`,
           symbol,
         });
       }
@@ -446,7 +446,7 @@ export const updateAccountReducer = (
 
     transferNotification({
       header: 'Received',
-      text: `+ ${minorAmountToMajor(amount, token.mint).toString()} ${symbol}`,
+      text: `+ ${minorAmountToMajor(amount, token.mint).toFixed()} ${symbol}`,
       symbol,
     });
   }

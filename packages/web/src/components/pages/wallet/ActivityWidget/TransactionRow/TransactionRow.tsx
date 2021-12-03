@@ -286,7 +286,7 @@ export const TransactionRow: FunctionComponent<Props> = ({ transaction, source }
             <div>
               {details.typeOriginal ? (
                 <>
-                  {details.isReceiver ? '+' : '-'} {details.amount.toNumber()}{' '}
+                  {details.isReceiver ? '+' : '-'} {details.amount.toFixed()}{' '}
                   {details.token?.symbol}
                 </>
               ) : (

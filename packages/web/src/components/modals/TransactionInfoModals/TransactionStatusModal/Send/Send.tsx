@@ -28,8 +28,8 @@ export const Send: FC<Props> = ({ params: { fromToken, fromAmount }, transaction
     <SendWrapper>
       <ValueCurrency>
         {isReceiver ? '+' : '-'}{' '}
-        {transaction?.short.destinationAmount.toNumber() ||
-          fromToken.toMajorDenomination(fromAmount).toString()}{' '}
+        {transaction?.short.destinationAmount.toFixed() ||
+          fromToken.toMajorDenomination(fromAmount).toFixed()}{' '}
         {transaction?.short.sourceToken?.symbol || fromToken.symbol}
       </ValueCurrency>
       <ValueOriginal>

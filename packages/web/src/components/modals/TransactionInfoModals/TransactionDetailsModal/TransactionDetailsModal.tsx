@@ -265,7 +265,7 @@ export const TransactionDetailsModal: FC<Props> = ({ signature, source, close })
                 size={44}
               />
               <SwapAmount>
-                - {details.sourceAmount.toNumber()} {details.sourceToken?.symbol}
+                - {details.sourceAmount.toFixed()} {details.sourceToken?.symbol}
               </SwapAmount>
             </SwapInfo>
           </SwapColumn>
@@ -280,7 +280,7 @@ export const TransactionDetailsModal: FC<Props> = ({ signature, source, close })
                 size={44}
               />
               <SwapAmount>
-                + {details.destinationAmount.toNumber()} {details.destinationToken?.symbol}
+                + {details.destinationAmount.toFixed()} {details.destinationToken?.symbol}
               </SwapAmount>
             </SwapInfo>
           </SwapColumn>
@@ -292,7 +292,7 @@ export const TransactionDetailsModal: FC<Props> = ({ signature, source, close })
       return (
         <SendWrapper>
           <ValueCurrency>
-            {details.isReceiver ? '+' : '-'} {details.amount.toNumber()} {details.token?.symbol}
+            {details.isReceiver ? '+' : '-'} {details.amount.toFixed()} {details.token?.symbol}
           </ValueCurrency>
           <ValueOriginal>
             <AmountUSD
@@ -359,12 +359,12 @@ export const TransactionDetailsModal: FC<Props> = ({ signature, source, close })
                 <FieldValue>
                   {details.type === 'swap' ? (
                     <>
-                      {details.sourceAmount.toNumber()} {details.sourceToken?.symbol} to{' '}
-                      {details.destinationAmount.toNumber()} {details.destinationToken?.symbol}
+                      {details.sourceAmount.toFixed()} {details.sourceToken?.symbol} to{' '}
+                      {details.destinationAmount.toFixed()} {details.destinationToken?.symbol}
                     </>
                   ) : (
                     <>
-                      {details.amount.toNumber()} {details.token?.symbol}
+                      {details.amount.toFixed()} {details.token?.symbol}
                     </>
                   )}
                 </FieldValue>

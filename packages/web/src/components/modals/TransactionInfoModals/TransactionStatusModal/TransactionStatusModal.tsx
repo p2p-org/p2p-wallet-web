@@ -133,7 +133,7 @@ export const TransactionStatusModal: FunctionComponent<Props> = ({
             header: 'Sent',
             text: `- ${(params as TransferParams).fromToken
               .toMajorDenomination((params as TransferParams).fromAmount)
-              .toString()} ${(params as TransferParams).fromToken.symbol}`,
+              .toFixed()} ${(params as TransferParams).fromToken.symbol}`,
             symbol: (params as TransferParams).fromToken.symbol,
           });
           break;
