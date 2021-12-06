@@ -1,6 +1,8 @@
 import type { FC } from 'react';
 import React from 'react';
 
+import { Decimal } from 'decimal.js';
+
 import type { TokenAccount } from 'api/token/TokenAccount';
 import { AddressText } from 'components/common/AddressText';
 import { TokenAvatar } from 'components/common/TokenAvatar';
@@ -39,7 +41,7 @@ export const Send: FC<Props> = ({ params }) => {
         <InfoWrapper>
           <InfoTitle>Check the amount</InfoTitle>
           <InfoValue>
-            {params.amount} {params.source.mint.symbol}
+            {new Decimal(params.amount).toFixed()} {params.source.mint.symbol}
           </InfoValue>
         </InfoWrapper>
       </FieldInfo>

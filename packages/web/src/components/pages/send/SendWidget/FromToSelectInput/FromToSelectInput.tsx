@@ -570,7 +570,7 @@ export const FromToSelectInput: FunctionComponent<Props> = ({
             </TokenWrapper>
             <AmountInput
               placeholder={token?.toMajorDenomination(0).toString() || '0'}
-              value={localAmount}
+              value={new Decimal(localAmount || 0).toFixed()}
               onFocus={handleAmountFocus}
               onChange={handleAmountChange}
               disabled={disabled || disabledInput}
