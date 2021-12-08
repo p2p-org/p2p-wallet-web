@@ -1,9 +1,9 @@
 import type { FunctionComponent } from 'react';
 import React, { useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 
 import { styled } from '@linaria/react';
-import { unwrapResult } from '@reduxjs/toolkit';
+import { useConnectionContext } from '@p2p-wallet-web/core';
 import classNames from 'classnames';
 import { rgba } from 'polished';
 import QRCode from 'qrcode.react';
@@ -14,7 +14,6 @@ import type { TokenAccount } from 'api/token/TokenAccount';
 import { LoaderBlock } from 'components/common/LoaderBlock';
 import { ToastManager } from 'components/common/ToastManager';
 import { Button, Icon } from 'components/ui';
-import { createAccountForToken } from 'store/slices/wallet/WalletSlice';
 import { setToClipboard } from 'utils/clipboard';
 import { getExplorerUrl } from 'utils/connection';
 
@@ -269,7 +268,7 @@ export const TokenAccountQR: FunctionComponent<Props> = ({
   const [isNew, setIsNew] = useState(false);
   const [isImageCopied, setIsImageCopied] = useState(false);
   const [isImageCopyAvailable] = useState(false);
-  const cluster = useSelector((state) => state.wallet.network.cluster);
+  const { network } = useConnectionContext();
 
   // useEffect(() => {
   //   askClipboardWritePermission()
@@ -299,8 +298,8 @@ export const TokenAccountQR: FunctionComponent<Props> = ({
   const handleAddClick = async () => {
     try {
       setIsExecuting(true);
-      const newTokenAccount = unwrapResult(await dispatch(createAccountForToken({ token })));
-      onTokenAccountCreate(newTokenAccount.mint, newTokenAccount);
+      // const newTokenAccount = unwrapResult(await dispatch(createAccountForToken({ token })));
+      // onTokenAccountCreate(newTokenAccount.mint, newTokenAccount);
       setIsNew(true);
     } catch (error) {
       setError(true);
@@ -417,7 +416,7 @@ export const TokenAccountQR: FunctionComponent<Props> = ({
                 href={getExplorerUrl(
                   'address',
                   (tokenAccount || token).address.toBase58(),
-                  cluster,
+                  network,
                 )}
                 target="_blank"
                 rel="noopener noreferrer noindex"

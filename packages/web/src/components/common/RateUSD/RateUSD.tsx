@@ -1,10 +1,8 @@
 import type { FunctionComponent } from 'react';
 import React from 'react';
-import { useSelector } from 'react-redux';
 
 import { styled } from '@linaria/react';
-
-import { rateSelector } from 'store/selectors/rates';
+import { useMarketRate } from '@p2p-wallet-web/core';
 
 const Wrapper = styled.div``;
 
@@ -13,7 +11,7 @@ type Props = {
 };
 
 export const RateUSD: FunctionComponent<Props> = ({ symbol = '', ...props }) => {
-  const rate = useSelector(rateSelector(symbol.toUpperCase()));
+  const rate = useMarketRate(symbol.toUpperCase());
 
   if (!rate) {
     return null;

@@ -1,7 +1,8 @@
 import type { FunctionComponent } from 'react';
 import React, { useEffect } from 'react';
-import { useSelector } from 'react-redux';
 import { useLocation, useParams } from 'react-router-dom';
+
+import { useWallet } from '@p2p-wallet-web/core';
 
 import { Layout } from 'components/common/Layout';
 import { ResultWidget } from 'components/pages/send/ResultWidget';
@@ -11,7 +12,7 @@ import { trackEvent } from 'utils/analytics';
 export const Send: FunctionComponent = () => {
   const location = useLocation<{ fromPage: string }>();
   const { publicKey, status } = useParams<{ publicKey: string; status: string }>();
-  const publicKeySol = useSelector((state) => state.wallet.publicKey);
+  const { publicKey: publicKeySol } = useWallet();
 
   useEffect(() => {
     trackEvent('send_open', { fromPage: location.state.fromPage });
@@ -25,7 +26,7 @@ export const Send: FunctionComponent = () => {
           ? {
               currentName: 'Result',
               backTo: {
-                pathname: `/send/${publicKey || publicKeySol}`,
+                pathname: `/send/${publicKey || publicKeySol?.toBase58()}`,
                 state: { fromPage: location.pathname },
               },
             }
@@ -33,7 +34,7 @@ export const Send: FunctionComponent = () => {
       }
       rightColumn={
         status !== 'result' ? (
-          <SendWidget publicKey={publicKey || publicKeySol} />
+          <SendWidget publicKey={publicKey || publicKeySol?.toBase58()} />
         ) : (
           <ResultWidget />
         )

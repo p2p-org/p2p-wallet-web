@@ -1,8 +1,9 @@
 import type { FunctionComponent } from 'react';
 import React, { useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 
 import { styled } from '@linaria/react';
+import { useConnectionContext } from '@p2p-wallet-web/core';
 import classNames from 'classnames';
 import { rgba } from 'polished';
 
@@ -11,7 +12,6 @@ import { LoaderBlock } from 'components/common/LoaderBlock';
 import { ToastManager } from 'components/common/ToastManager';
 import { TokenAvatar } from 'components/common/TokenAvatar';
 import { Button, Icon } from 'components/ui';
-import { createAccountForToken } from 'store/slices/wallet/WalletSlice';
 import { getExplorerUrl } from 'utils/connection';
 
 const Wrapper = styled.div`
@@ -225,7 +225,7 @@ export const TokenRow: FunctionComponent<Props> = ({
   const [isExecuting, setIsExecuting] = useState(false);
   const [isError, setError] = useState(false);
   const [isMintCopied, setIsMintCopied] = useState(false);
-  const cluster = useSelector((state) => state.wallet.network.cluster);
+  const { network } = useConnectionContext();
 
   const handleChevronClick = () => {
     setIsOpen(!isOpen);
@@ -234,7 +234,7 @@ export const TokenRow: FunctionComponent<Props> = ({
   const handleAddClick = async () => {
     try {
       setIsExecuting(true);
-      await dispatch(createAccountForToken({ token }));
+      // await dispatch(createAccountForToken({ token }));
     } catch (error) {
       setError(true);
       console.log(error);
@@ -308,7 +308,7 @@ export const TokenRow: FunctionComponent<Props> = ({
           ) : (
             <>
               <ExplorerA
-                href={getExplorerUrl('address', token.address.toBase58(), cluster)}
+                href={getExplorerUrl('address', token.address.toBase58(), network)}
                 target="_blank"
                 rel="noopener noreferrer noindex"
                 className="button"

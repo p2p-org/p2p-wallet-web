@@ -1,34 +1,24 @@
-import { AccountLayout, MintLayout, Token as SPLToken } from '@solana/spl-token';
+import { NATIVE_MINT, Token as SPLToken, TOKEN_PROGRAM_ID } from '@solana/spl-token';
 import type { TokenInfo } from '@solana/spl-token-registry';
-import type {
-  AccountInfo,
-  ParsedAccountData,
-  RpcResponseAndContext,
-  TransactionInstruction,
-} from '@solana/web3.js';
+import type { AccountInfo, ParsedAccountData, RpcResponseAndContext } from '@solana/web3.js';
 import { Account, PublicKey, SystemProgram } from '@solana/web3.js';
 import BN from 'bn.js';
-import { complement, find, isNil, memoizeWith, path, propEq, splitEvery, toString } from 'ramda';
-import assert from 'ts-invariant';
+import { find, memoizeWith, path, propEq, splitEvery, toString } from 'ramda';
 
 import { getConnection } from 'api/connection';
 import { retryableProxy } from 'api/connection/utils/retryableProxy';
 import { getWallet, makeTransaction, sendTransaction } from 'api/wallet';
 import { SOL_MINT } from 'app/contexts/swap';
 import type { NetworkType } from 'config/constants';
-import { SYSTEM_PROGRAM_ID, WRAPPED_SOL_MINT } from 'constants/solana/bufferLayouts';
+import { SYSTEM_PROGRAM_ID } from 'constants/solana/bufferLayouts';
 import { CacheTTL } from 'lib/cachettl';
 import { toDecimal } from 'utils/amount';
-import { makeNewAccountInstruction } from 'utils/transaction';
 
-import type { AccountUpdateEvent } from './AccountListener';
-import { ACCOUNT_UPDATED_EVENT, AccountListener } from './AccountListener';
 import colors from './colors.config';
 import { Token } from './Token';
 import tokenList from './token.config';
 import { TokenAccount } from './TokenAccount';
 
-export const TOKEN_PROGRAM_ID = new PublicKey('TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA');
 export const ASSOCIATED_TOKEN_ACCOUNT_PROGRAM_ID: PublicKey = new PublicKey(
   'ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL',
 );
@@ -44,8 +34,6 @@ const tokensCache = new Map<string, Token>();
 // uses for precache SWAP_HOST_FEE_ADDRESS token accounts
 export const tokenAccountsPrecache = new CacheTTL<TokenAccount>();
 
-type TokenAccountUpdateCallback = (tokenAccount: TokenAccount) => void;
-
 export type TransferParameters = {
   source: PublicKey;
   destination: PublicKey;
@@ -53,55 +41,14 @@ export type TransferParameters = {
 };
 
 export interface API {
-  getTokens: () => Promise<Token[]>;
   tokenInfo: (mint: PublicKey) => Promise<Token>;
   tokenInfoUncached: (mint: PublicKey) => Promise<Token>;
   tokenAccountInfo: (account: PublicKey) => Promise<TokenAccount | null>;
-  updateTokenAccountInfo: (tokenAccount: TokenAccount) => Promise<TokenAccount | null>;
   tokensInfo: (mints: PublicKey[]) => Promise<Token[]>;
-  tokensAccountsInfo: (mints: PublicKey[]) => Promise<TokenAccount[]>;
-  getAccountsForToken: (token: Token) => Promise<TokenAccount[]>;
-  getAccountsForWallet: (owner?: PublicKey) => Promise<TokenAccount[]>;
   getConfigForToken: (address: PublicKey) => TokenInfo | null;
-  precacheTokenAccounts: (owner: PublicKey) => Promise<void>;
-  createToken: (decimals?: number, mintAuthority?: PublicKey) => Promise<Token>;
-  createAccountForToken: (token: Token, owner?: PublicKey) => Promise<TokenAccount>;
-  mintTo: (recipient: TokenAccount, tokenAmount: number) => Promise<string>;
-  createMint: (amount: number, decimals: number, initialAccount: Account) => Promise<string>;
   transfer: (parameters: TransferParameters) => Promise<string>;
-  approveInstruction: (
-    sourceAccount: TokenAccount,
-    delegate: PublicKey,
-    amount: number,
-  ) => TransactionInstruction;
-  approve: (sourceAccount: TokenAccount, delegate: PublicKey, amount: number) => Promise<string>;
-  listenToTokenAccountChanges: (
-    accounts: Array<TokenAccount>,
-    callback: TokenAccountUpdateCallback,
-  ) => AccountListener;
   closeAccount: (publicKey: PublicKey) => Promise<string>;
 }
-
-const mintTo = async (recipient: TokenAccount, tokenAmount: number): Promise<string> => {
-  const token = recipient.mint;
-  assert(
-    token.mintAuthority && getWallet().pubkey.equals(token.mintAuthority),
-    `The current wallet does not have the authority to mint tokens for mint ${token}`,
-  );
-
-  const mintToInstruction = SPLToken.createMintToInstruction(
-    TOKEN_PROGRAM_ID,
-    token.address,
-    recipient.address,
-    getWallet().pubkey,
-    [],
-    tokenAmount,
-  );
-
-  const transaction = await makeTransaction([mintToInstruction]);
-
-  return sendTransaction(transaction);
-};
 
 const transferSol = async (parameters: TransferParameters): Promise<string> => {
   console.log('Transfer SOL amount', parameters.amount);
@@ -155,7 +102,7 @@ export const APIFactory = memoizeWith(toString, (network: NetworkType): API => {
   };
 
   /**
-   * The output from the solana web3 library when parsing the on-chain data
+   * The output from the blockchain web3 library when parsing the on-chain data
    * for an spl token account
    */
   type ParsedTokenAccountInfo = {
@@ -282,63 +229,6 @@ export const APIFactory = memoizeWith(toString, (network: NetworkType): API => {
     return tokens;
   });
 
-  const tokensAccountsInfo = retryableProxy<PublicKey[], TokenAccount[]>(
-    async (mints: PublicKey[]) => {
-      const result = await getMultipleAccounts(mints);
-
-      const tokens: TokenAccount[] = [];
-
-      mints.forEach(async (mint, index) => {
-        const ownerProgram = path<string>([index, 'owner'], result) || TOKEN_PROGRAM_ID.toBase58();
-        const accountInfo = path<{
-          isNative: boolean;
-          mint: string;
-          owner: string;
-          state: string;
-          tokenAmount: {
-            amount: string;
-            decimals: number;
-          };
-        }>([index, 'data', 'parsed', 'info'], result);
-        if (!accountInfo) {
-          return;
-        }
-
-        const mintTokenInfo = await tokenInfo(new PublicKey(accountInfo.mint));
-
-        const tokenAccount = new TokenAccount(
-          mintTokenInfo,
-          new PublicKey(accountInfo.owner),
-          new PublicKey(ownerProgram),
-          mint,
-          toDecimal(new BN(accountInfo.tokenAmount.amount)),
-        );
-
-        tokens.push(tokenAccount);
-      });
-
-      return tokens;
-    },
-  );
-
-  const getTokens = async (): Promise<Token[]> => {
-    const clusterConfig = tokenList
-      .filterByClusterSlug(network.cluster)
-      .excludeByTag('nft')
-      .excludeByTag('leveraged')
-      .excludeByTag('bull')
-      .excludeByTag('lp-token')
-      .getList();
-
-    if (!clusterConfig) {
-      return [];
-    }
-
-    const tokensAddresses = clusterConfig.map((config: TokenInfo) => new PublicKey(config.address));
-
-    return tokensInfo(tokensAddresses);
-  };
-
   type GetAccountInfoResponse = AccountInfo<Buffer | ParsedAccountData> | null;
 
   const extractParsedTokenAccountInfo = (
@@ -376,7 +266,7 @@ export const APIFactory = memoizeWith(toString, (network: NetworkType): API => {
       );
     }
 
-    const mintTokenInfo = getConfigForToken(WRAPPED_SOL_MINT);
+    const mintTokenInfo = getConfigForToken(NATIVE_MINT);
 
     // For SOL simulated token
     if (account.equals(getWallet().pubkey)) {
@@ -418,341 +308,6 @@ export const APIFactory = memoizeWith(toString, (network: NetworkType): API => {
     }
 
     return null;
-  };
-
-  const updateTokenAccountInfo = async (tokenAccount: TokenAccount) => {
-    const updatedTokenAccount = await tokenAccountInfo(tokenAccount.address);
-
-    if (!updatedTokenAccount) {
-      return null;
-    }
-
-    updatedTokenAccount.setPrevious(tokenAccount);
-
-    return updatedTokenAccount;
-  };
-
-  /**
-   * Get all token accounts for this wallet
-   */
-  const getAccountsForWallet = async (owner?: PublicKey): Promise<TokenAccount[]> => {
-    const ownerKey = owner || getWallet().pubkey;
-
-    console.log('Token program ID', TOKEN_PROGRAM_ID.toBase58());
-    const allParsedAccountInfos = await connection
-      .getParsedTokenAccountsByOwner(ownerKey, {
-        programId: TOKEN_PROGRAM_ID,
-      })
-      .catch((error) => {
-        console.error(`Error getting accounts for ${ownerKey.toBase58()}`, error);
-        throw error;
-      });
-
-    // const res = await connection._rpcRequest('getProgramAccounts', [
-    //   TOKEN_PROGRAM_ID.toBase58(),
-    //   {
-    //     commitment: connection.commitment,
-    //     filters: [
-    //       {
-    //         memcmp: {
-    //           offset: AccountLayout.offsetOf('owner'),
-    //           bytes: ownerKey.toBase58(),
-    //         },
-    //       },
-    //       {
-    //         dataSize: AccountLayout.span,
-    //       },
-    //     ],
-    //     // encoding: 'jsonParsed',
-    //   },
-    // ]);
-
-    const secondTokenAccount = async (accountResult: {
-      pubkey: PublicKey;
-      account: AccountInfo<ParsedAccountData>;
-    }): Promise<TokenAccount | null> => {
-      const parsedTokenAccountInfo = extractParsedTokenAccountInfo(accountResult.account);
-
-      if (!parsedTokenAccountInfo) {
-        return null;
-      }
-
-      const mintAddress = new PublicKey(parsedTokenAccountInfo.mint);
-      const token = await tokenInfo(mintAddress);
-
-      return new TokenAccount(
-        token,
-        new PublicKey(parsedTokenAccountInfo.owner),
-        accountResult.account.owner,
-        accountResult.pubkey,
-        toDecimal(new BN(parsedTokenAccountInfo.tokenAmount.amount)),
-      );
-    };
-
-    const mints: PublicKey[] = [];
-
-    allParsedAccountInfos.value.forEach((accountResult) => {
-      const parsedTokenAccountInfo = extractParsedTokenAccountInfo(accountResult.account);
-
-      if (!parsedTokenAccountInfo) {
-        return;
-      }
-
-      mints.push(new PublicKey(parsedTokenAccountInfo.mint));
-    });
-
-    await tokensInfo(mints);
-
-    const allTokenAccounts = await Promise.all(
-      allParsedAccountInfos.value.map((account) => secondTokenAccount(account)),
-    );
-
-    return allTokenAccounts.filter(complement(isNil)) as TokenAccount[];
-  };
-
-  const precacheTokenAccounts = async (owner: PublicKey) => {
-    const tokenAccounts = await getAccountsForWallet(owner);
-
-    tokenAccounts.forEach((tokenAccount) => {
-      tokenAccountsPrecache.set(tokenAccount.address.toBase58(), tokenAccount);
-    });
-  };
-
-  /**
-   * Get the wallet's accounts for a token
-   * @param token
-   * @param owner
-   */
-  const getAccountsForToken = async (token: Token, owner?: PublicKey): Promise<TokenAccount[]> => {
-    console.log("Finding the wallet's accounts for the token", {
-      wallet: { address: getWallet().pubkey.toBase58() },
-      token: {
-        address: token.address.toBase58(),
-      },
-    });
-
-    const allAccounts = await getAccountsForWallet(owner);
-    return allAccounts.filter(propEq('mint', token));
-  };
-
-  const listenToTokenAccountChanges = (
-    accounts: Array<TokenAccount>,
-    callback: TokenAccountUpdateCallback,
-  ) => {
-    const accountListener = new AccountListener(connection);
-
-    accounts.map((account) => accountListener.listenTo(account));
-
-    accountListener.on(ACCOUNT_UPDATED_EVENT, async (event: AccountUpdateEvent) => {
-      const updatedAccount = await updateTokenAccountInfo(event.tokenAccount);
-
-      if (updatedAccount) {
-        callback(updatedAccount);
-      }
-    });
-
-    return accountListener;
-  };
-
-  const createToken = async (decimals?: number, mintAuthority?: PublicKey) => {
-    const mintAccount = new Account();
-    const createAccountInstruction = await makeNewAccountInstruction(
-      network,
-      mintAccount.publicKey,
-      MintLayout,
-      TOKEN_PROGRAM_ID,
-    );
-
-    // the mint authority (who can create tokens) defaults to the wallet.
-    // For Pools, it should be set to the pool token authority
-    const mintAuthorityKey = mintAuthority || getWallet().pubkey;
-    const initMintInstruction = SPLToken.createInitMintInstruction(
-      TOKEN_PROGRAM_ID,
-      mintAccount.publicKey,
-      decimals || 2,
-      mintAuthorityKey,
-      null,
-    );
-
-    const transaction = await makeTransaction(
-      [createAccountInstruction, initMintInstruction],
-      [mintAccount],
-    );
-
-    console.log('creating token');
-    await sendTransaction(transaction);
-
-    return tokenInfo(mintAccount.publicKey);
-  };
-
-  /**
-   * Create a Token account for this token, owned by the passed-in owner,
-   * or the wallet
-   * @param {Token} token The token to create an account for
-   * @param {PublicKey} [owner] The optional owner of the created token account
-   */
-  const createAccountForToken = async (
-    token: Token,
-    owner?: PublicKey, // defaults to the wallet - used to create accounts owned by a Pool
-  ): Promise<TokenAccount> => {
-    console.log('Creating an account on the wallet for the token', {
-      wallet: { address: getWallet().pubkey.toBase58() },
-      token: {
-        address: token.address.toBase58(),
-      },
-    });
-
-    // ensure the token actually exists before going any further
-    const checkToken = await tokenInfo(token.address);
-    console.log('Creating an account for token', checkToken.toString());
-
-    // if no recipient is set, use the wallet
-    const ownerKey = owner || getWallet().pubkey;
-
-    // this is the new token account.
-    // It will be assigned to the current wallet in the initAccount instruction
-    const newAccount = new Account();
-    console.log('New token account owner', {
-      address: newAccount.publicKey.toBase58(),
-      owner: ownerKey.toBase58(),
-    });
-
-    // Instruction to create a new Solana account
-    const createAccountInstruction = await makeNewAccountInstruction(
-      network,
-      newAccount.publicKey,
-      AccountLayout,
-      TOKEN_PROGRAM_ID,
-    );
-
-    // Instruction to assign the new account to the token program
-    const initTokenAccountInstruction = SPLToken.createInitAccountInstruction(
-      TOKEN_PROGRAM_ID,
-      token.address,
-      newAccount.publicKey,
-      ownerKey,
-    );
-
-    const transaction = await makeTransaction(
-      [createAccountInstruction, initTokenAccountInstruction],
-      [newAccount],
-    );
-
-    await sendTransaction(transaction);
-
-    const updatedInfo = await tokenAccountInfo(newAccount.publicKey);
-
-    if (!updatedInfo) {
-      throw new Error('Unable to retrieve the created token account');
-    }
-
-    return updatedInfo;
-  };
-
-  const createMint = async (
-    amount: number,
-    decimals: number,
-    initialAccount: Account,
-  ): Promise<string> => {
-    const mintAccount = new Account();
-    // const token = new SPLToken(connection, mintAccount.publicKey, programId, payer);
-
-    // Allocate memory for the account
-    const balanceNeededMint = await connection.getMinimumBalanceForRentExemption(MintLayout.span);
-
-    const instructions = [];
-
-    // createMintAccountInstruction
-    instructions.push(
-      SystemProgram.createAccount({
-        fromPubkey: getWallet().pubkey,
-        newAccountPubkey: mintAccount.publicKey,
-        lamports: balanceNeededMint,
-        space: MintLayout.span,
-        programId: TOKEN_PROGRAM_ID,
-      }),
-    );
-
-    // createInitMintInstruction
-    instructions.push(
-      SPLToken.createInitMintInstruction(
-        TOKEN_PROGRAM_ID,
-        mintAccount.publicKey,
-        decimals,
-        getWallet().pubkey,
-        null,
-      ),
-    );
-
-    const signers = [mintAccount];
-
-    if (amount > 0) {
-      signers.push(initialAccount);
-
-      const balanceNeededAccount = await connection.getMinimumBalanceForRentExemption(
-        AccountLayout.span,
-      );
-
-      // createAccountInstruction
-      instructions.push(
-        SystemProgram.createAccount({
-          fromPubkey: getWallet().pubkey,
-          newAccountPubkey: initialAccount.publicKey,
-          lamports: balanceNeededAccount,
-          space: AccountLayout.span,
-          programId: TOKEN_PROGRAM_ID,
-        }),
-      );
-
-      // createInitAccountInstruction
-      instructions.push(
-        SPLToken.createInitAccountInstruction(
-          TOKEN_PROGRAM_ID,
-          mintAccount.publicKey,
-          initialAccount.publicKey,
-          getWallet().pubkey,
-        ),
-      );
-
-      // createMintToInstruction
-      instructions.push(
-        SPLToken.createMintToInstruction(
-          TOKEN_PROGRAM_ID,
-          mintAccount.publicKey,
-          initialAccount.publicKey,
-          getWallet().pubkey,
-          [],
-          amount,
-        ),
-      );
-    }
-
-    const transaction = await makeTransaction(instructions, signers);
-
-    return sendTransaction(transaction);
-  };
-
-  function approveInstruction(sourceAccount: TokenAccount, delegate: PublicKey, amount: number) {
-    return SPLToken.createApproveInstruction(
-      TOKEN_PROGRAM_ID,
-      sourceAccount.address,
-      delegate,
-      getWallet().pubkey,
-      [],
-      amount,
-    );
-  }
-
-  const approve = async (
-    sourceAccount: TokenAccount,
-    delegate: PublicKey,
-    amount: number,
-  ): Promise<string> => {
-    const instruction = approveInstruction(sourceAccount, delegate, amount);
-
-    const transaction = await makeTransaction([instruction]);
-
-    return sendTransaction(transaction);
   };
 
   const transferBetweenSplTokenAccounts = async (
@@ -880,25 +435,12 @@ export const APIFactory = memoizeWith(toString, (network: NetworkType): API => {
   };
 
   return {
-    getTokens,
     tokenInfo,
     tokenInfoUncached,
     tokensInfo,
     tokenAccountInfo,
-    tokensAccountsInfo,
-    updateTokenAccountInfo,
-    createAccountForToken,
-    createToken,
-    mintTo,
-    createMint,
     transfer,
-    approveInstruction,
-    approve,
-    getAccountsForToken,
-    getAccountsForWallet,
     getConfigForToken,
-    precacheTokenAccounts,
-    listenToTokenAccountChanges,
     closeAccount,
   };
 });

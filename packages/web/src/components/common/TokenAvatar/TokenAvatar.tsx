@@ -1,8 +1,9 @@
 import type { FunctionComponent, HTMLAttributes } from 'react';
 import React, { useMemo } from 'react';
-import { useSelector } from 'react-redux';
 
 import { styled } from '@linaria/react';
+import { useConnectionContext } from '@p2p-wallet-web/core';
+import type { Token } from '@saberhq/token-utils';
 import classNames from 'classnames';
 
 import tokenList from 'api/token/token.config';
@@ -44,38 +45,51 @@ const WrappedBy = styled.div`
 `;
 
 type Props = {
-  src?: string;
   size?: string | number;
-  symbol?: string;
-  address?: string;
+  token?: Token;
+  symbol?: string; // TODO: remove
+  address?: string; // TODO: remove
 };
 
 export const TokenAvatar: FunctionComponent<Props & HTMLAttributes<HTMLDivElement>> = ({
+  token,
   symbol,
   address,
-  src,
   className,
   ...props
 }) => {
-  const cluster = useSelector((state) => state.wallet.network.cluster);
+  const { network } = useConnectionContext();
 
-  // TODO: need to add cluster
-  const tokenMap = useTokenMap();
-  const tokenInfo =
-    (address && tokenMap.get(address)) ||
-    tokenList
-      .filterByClusterSlug(cluster)
-      .getList()
-      .find((token) => token.symbol === symbol || token.address === address);
+  const tokenMap = useTokenMap(); // TODO: remove
 
-  const isWrapped = useMemo(
-    () => tokenInfo?.tags?.find((tag) => tag.includes('wrapped')),
-    [tokenInfo],
-  );
+  // TODO: remove
+  const tokenInfo = useMemo(() => {
+    if (token) {
+      return null;
+    }
+
+    return (
+      (address && tokenMap.get(address)) ||
+      tokenList
+        .filterByClusterSlug(network)
+        .getList()
+        .find((token) => token.symbol === symbol || token.address === address)
+    );
+  }, [address, network, symbol, tokenMap]); // TODO: remove
+
+  const isWrapped = useMemo(() => {
+    if (token) {
+      return token.hasTag('wrapped');
+    }
+
+    return tokenInfo?.tags?.find((tag) => tag.includes('wrapped'));
+  }, [token, tokenInfo]);
 
   return (
-    <Wrapper className={classNames(className, { isNotExists: !tokenInfo })}>
-      {(!tokenInfo || !tokenInfo.logoURI) && address ? (
+    <Wrapper className={classNames(className, { isNotExists: !tokenInfo || !token })}>
+      {token ? (
+        <Avatar src={token.icon} {...props} />
+      ) : (!tokenInfo || !tokenInfo.logoURI) && address ? (
         <Jazzicon address={address} {...props} />
       ) : (
         <Avatar src={tokenInfo?.logoURI || undefined} {...props} />

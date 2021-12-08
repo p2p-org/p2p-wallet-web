@@ -1,3 +1,4 @@
+import { TOKEN_PROGRAM_ID } from '@solana/spl-token';
 import type {
   ParsedConfirmedTransaction,
   PartiallyDecodedInstruction,
@@ -14,7 +15,7 @@ import { APIFactory as TokenAPIFactory } from 'api/token';
 import type { Token } from 'api/token/Token';
 import { TokenAccount } from 'api/token/TokenAccount';
 import type { NetworkType } from 'config/constants';
-import { SYSTEM_PROGRAM_ID, TOKEN_PROGRAM_ID } from 'constants/solana/bufferLayouts';
+import { SYSTEM_PROGRAM_ID } from 'constants/solana/bufferLayouts';
 import { CacheTTL } from 'lib/cachettl';
 
 import { Transaction } from './Transaction';

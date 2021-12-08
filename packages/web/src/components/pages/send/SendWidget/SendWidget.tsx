@@ -1,9 +1,10 @@
 import type { FunctionComponent } from 'react';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router';
 
 import { styled } from '@linaria/react';
+import { useUserTokenAccount, useUserTokenAccounts, useWallet } from '@p2p-wallet-web/core';
 import { unwrapResult } from '@reduxjs/toolkit';
 import { Bitcoin } from '@renproject/chains-bitcoin';
 import type { RenNetwork } from '@renproject/interfaces';
@@ -14,7 +15,7 @@ import { rgba } from 'polished';
 
 import type { ResolveUsernameResponce } from 'api/nameService';
 import type { Token } from 'api/token/Token';
-import { TokenAccount } from 'api/token/TokenAccount';
+import type { TokenAccount } from 'api/token/TokenAccount';
 import { RateUSD } from 'components/common/RateUSD';
 import { FromToSelectInput } from 'components/pages/send/SendWidget/FromToSelectInput';
 import { Button, Icon, Select, Switch, TextField, Tooltip } from 'components/ui';
@@ -26,14 +27,7 @@ import {
   SHOW_MODAL_TRANSACTION_STATUS,
 } from 'store/constants/modalTypes';
 import type { RootState } from 'store/rootReducer';
-import {
-  getMinimumBalanceForRentExemption,
-  getRecentBlockhash,
-  getTokenAccount,
-  resolveUsername,
-  transfer,
-} from 'store/slices/wallet/WalletSlice';
-import { minorAmountToMajor } from 'utils/amount';
+import { getTokenAccount, resolveUsername, transfer } from 'store/slices/wallet/WalletSlice';
 import { trackEvent } from 'utils/analytics';
 import { useRenNetwork } from 'utils/hooks/renBridge/useNetwork';
 import { useTrackEventOnce } from 'utils/hooks/useTrackEventOnce';
@@ -163,10 +157,6 @@ const SendIcon = styled(Icon)`
 const SOURCE_NETWORKS = ['solana', 'bitcoin'];
 const BURN_ALLOCATE_ACCOUNT_SIZE = 97;
 
-type Props = {
-  publicKey: string | null;
-};
-
 const isValidAmount = (amount: string): boolean => {
   const amountValue = Number.parseFloat(amount);
 
@@ -207,6 +197,10 @@ const getTransactionFee = (amount: string, fees: any) => {
   return total > 0 ? total : 0;
 };
 
+type Props = {
+  publicKey: string | undefined;
+};
+
 export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
   const dispatch = useDispatch();
   const history = useHistory();
@@ -226,21 +220,17 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
   const [resolvedNames, setResolvedNames] = useState<Array<ResolveUsernameResponce>>([]);
   const [isResolvingNames, setisResolvingNames] = useState(false);
 
+  const { connection } = useWallet();
   const network = useRenNetwork();
   const { fees, pending: isFetchingFee } = useFetchFees(!isSolanaNetwork);
 
-  const tokenAccounts = useSelector((state: RootState) =>
-    state.wallet.tokenAccounts.map((account) => TokenAccount.from(account)),
-  );
-  const fromTokenAccount = useMemo(
-    () => tokenAccounts.find((account) => account.address.toBase58() === publicKey),
-    [tokenAccounts, publicKey],
-  );
+  const tokenAccounts = useUserTokenAccounts();
+  const fromTokenAccount = useUserTokenAccount(publicKey);
 
   const useFreeTransactions = useSelector(
     (state: RootState) => state.wallet.settings.useFreeTransactions,
   );
-  const isNetworkSourceSelectorVisible = fromTokenAccount?.mint.symbol === 'RENBTC';
+  const isNetworkSourceSelectorVisible = fromTokenAccount?.balance?.token.symbol === 'RENBTC';
 
   useEffect(() => {
     if (destinationNetwork !== 'solana') {
@@ -248,10 +238,10 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
     } else {
       setIsSolanaNetwork(true);
     }
-    if (destinationNetwork !== 'solana' && fromTokenAccount?.mint.symbol !== 'RENBTC') {
+    if (destinationNetwork !== 'solana' && fromTokenAccount?.balance?.token.symbol !== 'RENBTC') {
       setIsSolanaNetwork(true);
     }
-  }, [destinationNetwork, fromTokenAccount?.mint.symbol]);
+  }, [destinationNetwork, fromTokenAccount?.balance?.token.symbol]);
 
   useEffect(() => {
     async function resolveName() {
@@ -276,11 +266,11 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
   useEffect(() => {
     const mount = async () => {
       try {
-        const resultRentFee = unwrapResult(
-          await dispatch(getMinimumBalanceForRentExemption(BURN_ALLOCATE_ACCOUNT_SIZE)),
+        const resultRentFee = await connection.getMinimumBalanceForRentExemption(
+          BURN_ALLOCATE_ACCOUNT_SIZE,
         );
 
-        const resultRecentBlockhash = unwrapResult(await dispatch(getRecentBlockhash()));
+        const resultRecentBlockhash = await connection.getRecentBlockhash();
 
         setRentFee(formatFee(resultRentFee));
         setTxFee(formatFee(resultRecentBlockhash.feeCalculator.lamportsPerSignature));
@@ -346,11 +336,13 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
       return;
     }
 
-    if (!fromTokenAccount) {
+    if (!fromTokenAccount || !fromTokenAccount.mint || !fromTokenAccount?.balance) {
       throw new Error("Didn't find token");
     }
 
-    const amount = new Decimal(fromAmount).mul(10 ** fromTokenAccount?.mint.decimals).toNumber();
+    const amount = new Decimal(fromAmount)
+      .mul(10 ** fromTokenAccount?.balance?.token.decimals)
+      .toNumber();
 
     if (!amount || amount <= 0) {
       throw new Error('Invalid amount');
@@ -360,13 +352,13 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
       usernameResolvedAddress ? usernameResolvedAddress : toTokenPublicKey,
     );
 
-    if (fromTokenAccount?.mint.symbol !== 'SOL') {
+    if (fromTokenAccount?.balance.token.symbol !== 'SOL') {
       const account = unwrapResult(await dispatch(getTokenAccount(destination)));
 
       if (
         account &&
         account.mint.symbol !== 'SOL' &&
-        !account.mint.address.equals(fromTokenAccount.mint.address)
+        !account.mint.address.equals(fromTokenAccount.mint)
       ) {
         void dispatch(
           openModal({
@@ -374,7 +366,7 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
             props: {
               icon: 'wallet',
               header: 'Wallet address is not valid',
-              text: `The wallet address is not valid. It must be a ${fromTokenAccount.mint.symbol} wallet address`,
+              text: `The wallet address is not valid. It must be a ${fromTokenAccount.balance.token.symbol} wallet address`,
             },
           }),
         );
@@ -407,13 +399,13 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
       setIsExecuting(true);
 
       const action = transfer({
-        source: fromTokenAccount.address,
+        source: fromTokenAccount.key,
         destination,
         amount,
       });
 
       trackEvent('send_send_click', {
-        tokenTicker: fromTokenAccount.mint.symbol || '',
+        tokenTicker: fromTokenAccount.balance.token.symbol || '',
         sum: amount,
       });
 
@@ -475,9 +467,8 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
     setUsernameResolvedAddress(address);
   };
 
-  const hasBalance = fromTokenAccount
-    ? minorAmountToMajor(fromTokenAccount.balance, fromTokenAccount.mint).toNumber() >=
-      Number(fromAmount)
+  const hasBalance = fromTokenAccount?.balance
+    ? fromTokenAccount.balance?.asNumber >= Number(fromAmount)
     : false;
 
   const isDisabled = isExecuting;
@@ -519,8 +510,8 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
           <FromWrapper>
             <FromToSelectInput
               tokenAccounts={tokenAccounts}
-              token={fromTokenAccount?.mint}
               tokenAccount={fromTokenAccount}
+              token={fromTokenAccount?.balance?.token}
               amount={fromAmount}
               onTokenAccountChange={handleFromTokenAccountChange}
               onAmountChange={handleFromAmountChange}
@@ -573,8 +564,8 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
             label="Current price"
             value={
               <>
-                <RateUSD symbol={fromTokenAccount?.mint.symbol} />{' '}
-                <span>&nbsp;per {fromTokenAccount?.mint.symbol} </span>
+                <RateUSD symbol={fromTokenAccount?.balance?.token.symbol} />{' '}
+                <span>&nbsp;per {fromTokenAccount?.balance?.token.symbol} </span>
               </>
             }
           />

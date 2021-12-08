@@ -1,15 +1,11 @@
 import type { FunctionComponent } from 'react';
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Helmet } from 'react-helmet';
-import { useDispatch, useSelector } from 'react-redux';
 import Sticky from 'react-stickynode';
 
 import { styled } from '@linaria/react';
+import { useWallet } from '@p2p-wallet-web/core';
 import NProgress from 'nprogress';
-
-import type { RootState } from 'store/rootReducer';
-import { updateTokenAccountsForWallet } from 'store/slices/wallet/WalletSlice';
-import { useIntervalHook } from 'utils/hooks/useIntervalHook';
 
 import type { BreadcrumbType } from '../Header';
 import { Header } from '../Header';
@@ -91,21 +87,19 @@ export const LayoutOrigin: FunctionComponent<Props> = ({
   centered,
   children,
 }) => {
-  const dispatch = useDispatch();
-  const connected = useSelector((state: RootState) => state.wallet.connected);
-  const loading = useSelector((state: RootState) => state.global.loading);
+  const { connected } = useWallet();
 
-  useEffect(() => {
-    if (loading) {
-      NProgress.start();
-    } else {
-      NProgress.done();
-    }
-  }, [loading]);
+  // useEffect(() => {
+  //   if (loading) {
+  //     NProgress.start();
+  //   } else {
+  //     NProgress.done();
+  //   }
+  // }, [loading]);
 
-  useIntervalHook(() => {
-    void dispatch(updateTokenAccountsForWallet());
-  }, 5000);
+  // useIntervalHook(() => {
+  //   void dispatch(updateTokenAccountsForWallet());
+  // }, 5000);
 
   return (
     <>

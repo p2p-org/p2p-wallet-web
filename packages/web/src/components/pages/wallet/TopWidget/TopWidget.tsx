@@ -1,24 +1,26 @@
 import type { FunctionComponent } from 'react';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { useLocation } from 'react-router';
 import { Link } from 'react-router-dom';
 
 import { styled } from '@linaria/react';
-import { SystemProgram } from '@solana/web3.js';
+import {
+  useConnectionContext,
+  useRates,
+  useSolana,
+  useUserTokenAccount,
+} from '@p2p-wallet-web/core';
+import { LAMPORTS_PER_SOL, SystemProgram } from '@solana/web3.js';
 import classNames from 'classnames';
 import throttle from 'lodash.throttle';
 
-import { TokenAccount } from 'api/token/TokenAccount';
 import { useConfig } from 'app/contexts/swap';
 import { AmountUSD } from 'components/common/AmountUSD';
 import { COLUMN_RIGHT_WIDTH } from 'components/common/Layout/constants';
 import { TokenAvatar } from 'components/common/TokenAvatar';
 import { Widget } from 'components/common/Widget';
 import { Button, Icon } from 'components/ui';
-import { rateSelector } from 'store/selectors/rates';
-import { getRatesCandle } from 'store/slices/rate/RateSlice';
-import { airdrop } from 'store/slices/wallet/WalletSlice';
 import { trackEvent } from 'utils/analytics';
 import { shortAddress } from 'utils/tokens';
 
@@ -181,34 +183,32 @@ export const TopWidgetOrigin: FunctionComponent<Props> = ({ publicKey }) => {
   const widgetRef = useRef<HTMLDivElement>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isShowFixed, setIsShowFixed] = useState(false);
-  const type = useSelector((state) => state.rate.candlesType);
-  const cluster = useSelector((state) => state.wallet.network.cluster);
-  const tokenAccounts = useSelector((state) =>
-    state.wallet.tokenAccounts.map((account) => TokenAccount.from(account)),
-  );
-  const tokenAccount = useMemo(
-    () => tokenAccounts.find((account) => account.address.toBase58() === publicKey),
-    [tokenAccounts, publicKey],
-  );
-  const rate = useSelector(rateSelector(tokenAccount?.mint.symbol));
-  const rates = useSelector((state) =>
-    tokenAccount?.mint.symbol ? state.rate.candles[tokenAccount?.mint.symbol] : undefined,
-  );
-  const isMainnet = cluster === 'mainnet-beta';
+  const { providerMut } = useSolana();
+
+  const { network } = useConnectionContext();
+  const tokenAccount = useUserTokenAccount(publicKey);
+  const { candlesType, candles, markets, getRatesCandle } = useRates();
+  const rate = tokenAccount?.balance?.token.symbol
+    ? markets[tokenAccount.balance.token.symbol]
+    : null;
+  const rates = tokenAccount?.balance?.token.symbol
+    ? candles[tokenAccount.balance.token.symbol]
+    : null;
+  const isMainnet = network === 'mainnet-beta';
 
   useEffect(() => {
     const loadCandles = async () => {
-      if (isLoading || !tokenAccount?.mint.symbol || rates) {
+      if (isLoading || !tokenAccount?.balance?.token.symbol || rates) {
         return;
       }
 
       setIsLoading(true);
-      await dispatch(getRatesCandle({ symbol: tokenAccount.mint.symbol, type: 'month' }));
+      await getRatesCandle(tokenAccount.balance.token.symbol, 'month');
       setIsLoading(false);
     };
 
     void loadCandles();
-  }, [dispatch, isLoading, rates, tokenAccount?.mint.symbol]);
+  }, [dispatch, isLoading, rates, tokenAccount?.balance?.token.symbol]);
 
   const handleScroll = throttle(() => {
     if (!widgetRef.current) {
@@ -238,15 +238,15 @@ export const TopWidgetOrigin: FunctionComponent<Props> = ({ publicKey }) => {
       return null;
     }
 
-    const diff = rates[rates.length - 1].price - rates[rates.length - 2].price;
-    const sum = rates[rates.length - 1].price + rates[rates.length - 2].price;
+    const diff = rates[rates.length - 1]!.price - rates[rates.length - 2]!.price;
+    const sum = rates[rates.length - 1]!.price + rates[rates.length - 2]!.price;
     const percentage = 100 * (diff / (sum / 2));
 
     return { diff, percentage };
   }, [rates]);
 
   const handleAirdropClick = () => {
-    void dispatch(airdrop());
+    void providerMut?.requestAirdrop(LAMPORTS_PER_SOL);
   };
 
   const renderButtons = () => {
@@ -267,10 +267,10 @@ export const TopWidgetOrigin: FunctionComponent<Props> = ({ publicKey }) => {
             <PlusIcon name="top" />
           </ButtonStyled>
         </Link>
-        {tokenAccount?.mint.symbol && tokenConfigs[tokenAccount?.mint.symbol] ? (
+        {tokenAccount?.balance?.token.symbol && tokenConfigs[tokenAccount?.balance.token.symbol] ? (
           <Link
             to={{
-              pathname: `/swap/${tokenAccount?.mint.symbol}`,
+              pathname: `/swap/${tokenAccount.balance.token.symbol}`,
               state: { fromPage: location.pathname },
             }}
             title="Swap"
@@ -282,7 +282,7 @@ export const TopWidgetOrigin: FunctionComponent<Props> = ({ publicKey }) => {
             </ButtonStyled>
           </Link>
         ) : undefined}
-        {!isMainnet && tokenAccount?.mint.symbol === 'SOL' ? (
+        {!isMainnet && tokenAccount?.balance?.token.symbol === 'SOL' ? (
           <ButtonStyled primary small title="Airdrop" onClick={handleAirdropClick}>
             <PlusIcon name="plug" />
           </ButtonStyled>
@@ -299,7 +299,7 @@ export const TopWidgetOrigin: FunctionComponent<Props> = ({ publicKey }) => {
     let period = '';
 
     // eslint-disable-next-line default-case
-    switch (type) {
+    switch (candlesType) {
       case 'last1h':
       case 'last4h':
         period = '1 minute';
@@ -327,18 +327,14 @@ export const TopWidgetOrigin: FunctionComponent<Props> = ({ publicKey }) => {
 
     return (
       <PriceWrapped className={classNames({ isSticky })}>
-        {rate ? (
+        {rate && tokenAccount.balance ? (
           <ValueCurrency className={classNames({ isSticky })}>
-            <AmountUSD
-              value={tokenAccount.mint.toMajorDenomination(tokenAccount.balance)}
-              symbol={tokenAccount.mint.symbol}
-            />
+            <AmountUSD value={tokenAccount.balance} symbol={tokenAccount.balance?.token.symbol} />
           </ValueCurrency>
         ) : undefined}
         <BottomWrapper className={classNames({ isSticky })}>
           <ValueOriginal>
-            {tokenAccount.mint.toMajorDenomination(tokenAccount.balance).toString()}{' '}
-            {tokenAccount.mint.symbol}
+            {tokenAccount.balance?.toExact()} {tokenAccount.balance?.token.symbol}
           </ValueOriginal>
           {renderDelta(isSticky)}
         </BottomWrapper>
@@ -354,17 +350,17 @@ export const TopWidgetOrigin: FunctionComponent<Props> = ({ publicKey }) => {
           tokenAccount ? (
             <Header>
               <TokenAvatar
-                symbol={tokenAccount?.mint.symbol}
-                address={tokenAccount?.mint.address.toBase58()}
+                symbol={tokenAccount?.balance?.token.symbol}
+                address={tokenAccount?.mint?.toBase58()}
                 size="44"
               />
               <TokenInfo>
-                <TokenSymbol>{tokenAccount?.mint.symbol}</TokenSymbol>
-                <TokenName title={tokenAccount.address.toBase58()}>
-                  {tokenAccount?.mint.name || shortAddress(tokenAccount.address.toBase58())}
+                <TokenSymbol>{tokenAccount.balance?.token.symbol}</TokenSymbol>
+                <TokenName title={tokenAccount.key.toBase58()}>
+                  {tokenAccount?.balance?.token.name || shortAddress(tokenAccount.key.toBase58())}
                 </TokenName>
               </TokenInfo>
-              {tokenAccount?.mint.address.equals(SystemProgram.programId) ? undefined : (
+              {tokenAccount?.mint?.equals(SystemProgram.programId) ? undefined : (
                 <TokenSettings>
                   <Link
                     to={{
@@ -386,14 +382,14 @@ export const TopWidgetOrigin: FunctionComponent<Props> = ({ publicKey }) => {
         action={renderButtons()}
       >
         {renderContent()}
-        {tokenAccount ? <Chart publicKey={tokenAccount.address} /> : undefined}
+        {tokenAccount ? <Chart publicKey={tokenAccount.key} /> : undefined}
       </WrapperWidget>
       {isShowFixed ? (
         <WrapperFixed>
           <FixedInfoWrapper>
             <TokenAvatar
-              symbol={tokenAccount?.mint.symbol}
-              address={tokenAccount?.mint.address.toBase58()}
+              symbol={tokenAccount?.balance?.token.symbol}
+              address={tokenAccount?.mint?.toBase58()}
               size={36}
             />
             {renderContent(true)}

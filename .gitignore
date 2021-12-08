@@ -33,3 +33,7 @@ yarn-error.log*
 
 # wragglet
 workers-site
+
+# dashed files and folders
+__*/
+__

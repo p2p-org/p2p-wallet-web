@@ -3,6 +3,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { styled } from '@linaria/react';
+import { useWallet } from '@p2p-wallet-web/core';
 import { unwrapResult } from '@reduxjs/toolkit';
 import type { TransactionSignature } from '@solana/web3.js';
 import classNames from 'classnames';
@@ -143,9 +144,8 @@ type Props = {
 
 export const TransactionDetailsModal: FC<Props> = ({ signature, source, close }) => {
   const dispatch = useDispatch();
-  const publicKey = useSelector((state) => state.wallet.publicKey);
   const [isShowDetails, setShowDetails] = useState(false);
-  const cluster = useSelector((state) => state.wallet.network.cluster);
+  const { network, publicKey } = useWallet();
   const transaction = useSelector(
     (state) =>
       state.transaction.items[signature] && Transaction.from(state.transaction.items[signature]),
@@ -395,7 +395,7 @@ export const TransactionDetailsModal: FC<Props> = ({ signature, source, close })
             <FieldValue>
               {signature}{' '}
               <a
-                href={getExplorerUrl('tx', signature, cluster)}
+                href={getExplorerUrl('tx', signature, network)}
                 target="_blank"
                 rel="noopener noreferrer noindex"
                 className="button"

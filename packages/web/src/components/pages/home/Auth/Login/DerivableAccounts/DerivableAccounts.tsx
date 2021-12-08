@@ -1,17 +1,13 @@
 import type { FC } from 'react';
-import React, { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import React, { useState } from 'react';
 
 import { styled } from '@linaria/react';
+import { DERIVATION_PATH, useDerivableTokenAccounts } from '@p2p-wallet-web/core';
 
-import { TokenAccount } from 'api/token/TokenAccount';
-import { DERIVATION_PATH } from 'api/wallet/ManualWallet';
 import { TokenAccountRow } from 'components/common/TokenAccountRow';
 import { Button } from 'components/pages/home/Auth/common/Button';
 import { Icon } from 'components/ui';
 import { Popover } from 'components/ui/Popover';
-import { getRatesMarkets } from 'store/slices/rate/RateSlice';
-import { connect, getDerivableTokenAccounts } from 'store/slices/wallet/WalletSlice';
 import { trackEvent } from 'utils/analytics';
 
 import { Selector } from '../../common/Selector';
@@ -81,15 +77,15 @@ const TokenAccountRowStyled = styled(TokenAccountRow)`
 const DERIVATION_PATHS_WITH_LABELS: SelectorItemType[] = [
   {
     label: `m/44'/501'/0'`,
-    value: DERIVATION_PATH.bip44,
+    value: DERIVATION_PATH.Bip44,
   },
   {
     label: `m/44'/501'/0'/0'`,
-    value: DERIVATION_PATH.bip44Change,
+    value: DERIVATION_PATH.Bip44Change,
   },
   {
     label: `m/501'/0'/0/0 (deprecated)`,
-    value: DERIVATION_PATH.deprecated,
+    value: DERIVATION_PATH.Deprecated,
   },
 ];
 
@@ -99,21 +95,8 @@ type Props = {
 };
 
 export const DerivableAccounts: FC<Props> = ({ seed, next }) => {
-  const dispatch = useDispatch();
-  const [derivationPathItem, setDerivationPathItem] = useState(DERIVATION_PATHS_WITH_LABELS[1]);
-  const derivableTokenAccounts = useSelector((state) =>
-    state.wallet.derivableTokenAccounts.map((account) => TokenAccount.from(account)),
-  );
-
-  useEffect(() => {
-    void dispatch(connect());
-    // TODO: makes after login too, so maybe need to reduce
-    void dispatch(getRatesMarkets());
-  }, [dispatch]);
-
-  useEffect(() => {
-    void dispatch(getDerivableTokenAccounts({ seed, derivationPath: derivationPathItem.value }));
-  }, [dispatch, seed, derivationPathItem]);
+  const [derivationPathItem, setDerivationPathItem] = useState(DERIVATION_PATHS_WITH_LABELS[1]!);
+  const derivableTokenAccounts = useDerivableTokenAccounts(seed, derivationPathItem.value);
 
   const handleDerivationPathChange = (item: SelectorItemType) => {
     trackEvent('login_select_derivation_path_click', { derivationPath: item.value });
@@ -156,10 +139,11 @@ export const DerivableAccounts: FC<Props> = ({ seed, next }) => {
 
       <Derivable>Derivable Accounts</Derivable>
       <AccountsWrapper>
-        {derivableTokenAccounts?.map((tokenAccount) => (
+        {derivableTokenAccounts.map((tokenAccount) => (
           <TokenAccountRowStyled
-            key={tokenAccount.address.toBase58()}
+            key={tokenAccount.key.toBase58()}
             tokenAccount={tokenAccount}
+            showAddress
           />
         ))}
       </AccountsWrapper>

@@ -1,4 +1,4 @@
-import { Token as SPLToken } from '@solana/spl-token';
+import { Token as SPLToken, TOKEN_PROGRAM_ID } from '@solana/spl-token';
 import type { Account, SignaturePubkeyPair, TransactionInstruction } from '@solana/web3.js';
 import { PublicKey, SystemProgram, Transaction } from '@solana/web3.js';
 import bs58 from 'bs58';
@@ -6,12 +6,11 @@ import { memoizeWith, toString } from 'ramda';
 
 import { getConnection } from 'api/connection';
 import type { TransferParameters } from 'api/token';
-import { ASSOCIATED_TOKEN_ACCOUNT_PROGRAM_ID, TOKEN_PROGRAM_ID } from 'api/token';
+import { ASSOCIATED_TOKEN_ACCOUNT_PROGRAM_ID } from 'api/token';
 import type { TokenAccount } from 'api/token/TokenAccount';
 import { getWallet } from 'api/wallet';
 import type { NetworkType } from 'config/constants';
 import { feeRelayerUrl } from 'config/constants';
-// import { WRAPPED_SOL_MINT } from 'constants/solana/bufferLayouts';
 
 export const KNOWN_FEE_PAYER_PUBKEYS = new Set(['FG4Y3yX4AAchp1HvNZ7LfzFTewF2f6nDoMDCohTFrdpT']);
 

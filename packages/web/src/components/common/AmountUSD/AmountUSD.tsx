@@ -1,30 +1,23 @@
 import type { FunctionComponent } from 'react';
 import React from 'react';
-import { useSelector } from 'react-redux';
 
 import type { CSSProperties } from '@linaria/core';
 import { styled } from '@linaria/react';
-import { Decimal } from 'decimal.js';
-
-import { rateSelector } from 'store/selectors/rates';
+import { useMarketRate } from '@p2p-wallet-web/core';
+import type { TokenAmount } from '@saberhq/token-utils';
 
 const Wrapper = styled.div``;
 
 type Props = {
   prefix?: string;
-  value?: Decimal;
+  value: TokenAmount;
   symbol?: string;
   style?: CSSProperties;
   className?: string;
 };
 
-export const AmountUSD: FunctionComponent<Props> = ({
-  prefix,
-  value = new Decimal(0),
-  symbol = '',
-  ...props
-}) => {
-  const rate = useSelector(rateSelector(symbol.toUpperCase()));
+export const AmountUSD: FunctionComponent<Props> = ({ prefix, value, symbol = '', ...props }) => {
+  const rate = useMarketRate(symbol.toUpperCase());
 
   if (!rate) {
     return null;
@@ -34,7 +27,7 @@ export const AmountUSD: FunctionComponent<Props> = ({
     <Wrapper title="Amount in USD" {...props}>
       {prefix ? `${prefix} ` : undefined}
       {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(
-        value.times(rate).toNumber(),
+        value.asNumber * rate,
       )}
     </Wrapper>
   );

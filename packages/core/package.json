@@ -2,24 +2,29 @@
   "name": "@p2p-wallet-web/core",
   "version": "1.0.0",
   "license": "MIT",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "dist/cjs/index.js",
+  "module": "dist/esm/index.js",
   "files": [
     "dist/"
   ],
   "scripts": {
-    "docs": "typedoc --excludePrivate --out ./docs src/index.ts --includeVersion --readme none",
-    "build": "tsc",
-    "watch": "tsc -w"
+    "build": "rm -fr dist/ && tsc && tsc -P tsconfig.esm.json",
+    "watch": "rm -fr dist/ && tsc -w"
   },
   "dependencies": {
+    "@p2p-wallet-web/sail": "^2.8.0",
+    "@saberhq/token-utils": "^1.7.4",
+    "@saberhq/use-solana": "^1.7.4",
     "@solana/spl-token": "^0.1.8",
-    "@solana/wallet-adapter-base": "^0.7.0",
-    "@solana/wallet-adapter-react": "^0.13.1",
-    "@solana/wallet-adapter-wallets": "^0.11.3",
+    "bip32": "^2.0.6",
+    "bs58": "^4.0.1",
     "buffer-layout": "^1.2.2",
+    "ed25519-hd-key": "^1.2.0",
+    "jsbi": "^4.1.0",
+    "pbkdf2": "^3.1.2",
     "react-use": "^17.3.1",
     "ts-invariant": "^0.9.3",
+    "tweetnacl": "^1.0.3",
     "typescript": "^4.5.2",
     "unstated-next": "^1.1.0"
   },

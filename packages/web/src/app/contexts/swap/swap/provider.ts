@@ -2,10 +2,10 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch } from 'react-redux';
 
 import { ZERO } from '@orca-so/sdk';
+import { useSolana } from '@p2p-wallet-web/core';
 import { u64 } from '@solana/spl-token';
 import { createContainer } from 'unstated-next';
 
-import { useSolana } from 'app/contexts/solana';
 import type { UserTokenAccountMap } from 'app/contexts/swap';
 import { useConfig, usePools, usePrice, useUser } from 'app/contexts/swap';
 import SlippageTolerance from 'app/contexts/swap/models/SlippageTolerance';

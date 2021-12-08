@@ -5,13 +5,13 @@ import { useAsync } from 'react-async-hook';
 import { styled } from '@linaria/react';
 import { LAMPORTS_PER_SOL } from '@solana/web3.js';
 
-import { useSolana } from 'app/contexts/solana';
 import { useConfig, usePrice, useSwap } from 'app/contexts/swap';
 import { formatBigNumber, formatNumberToUSD } from 'app/contexts/swap/utils/format';
 import { LoaderBlock } from 'components/common/LoaderBlock';
 
 import { Label, Line, Value } from './common/styled';
 import { FeesAccordion } from './FeesAccordion';
+import { useSolana } from '@p2p-wallet-web/core';
 
 // TODO: is it right?
 const ATA_ACCOUNT_CREATION_FEE = 0.00203928;

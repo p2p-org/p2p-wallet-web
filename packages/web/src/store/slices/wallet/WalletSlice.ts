@@ -1,38 +1,21 @@
 import type { Draft, PayloadAction } from '@reduxjs/toolkit';
-import { createAsyncThunk, createSlice, unwrapResult } from '@reduxjs/toolkit';
-import type { Account, Blockhash, FeeCalculator, PublicKey } from '@solana/web3.js';
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import type { Blockhash, FeeCalculator, PublicKey } from '@solana/web3.js';
 import Decimal from 'decimal.js';
 import { mergeDeepRight } from 'ramda';
 
 import { APIFactory as FeeRelayerAPIFactory } from 'api/feeRelayer';
 import type { LookupResponce, ResolveUsernameResponce } from 'api/nameService';
 import { APIFactory as NameServiceApi } from 'api/nameService';
-import type { API, TransferParameters } from 'api/token';
+import type { TransferParameters } from 'api/token';
 import { APIFactory as TokenAPIFactory } from 'api/token';
-import type { AccountListener } from 'api/token/AccountListener';
-import colors from 'api/token/colors.config';
-import { Token } from 'api/token/Token';
 import type { SerializableTokenAccount } from 'api/token/TokenAccount';
 import { TokenAccount } from 'api/token/TokenAccount';
 import { Transaction } from 'api/transaction/Transaction';
-import type { WalletDataType } from 'api/wallet';
 import * as WalletAPI from 'api/wallet';
-import { awaitConfirmation, getBalance, getWallet, getWalletUnsafe, WalletType } from 'api/wallet';
-import type { ManualWalletData } from 'api/wallet/ManualWallet';
-import { getDerivableAccounts, loadMnemonicAndSeed } from 'api/wallet/ManualWallet';
-import { WalletEvent } from 'api/wallet/Wallet';
-import { SOL_MINT } from 'app/contexts/swap';
-import { ToastManager } from 'components/common/ToastManager';
-import type { NetworkType } from 'config/constants';
-import { DEFAULT_NETWORK, swapHostFeeAddress } from 'config/constants';
-import { SYSTEM_PROGRAM_ID, WRAPPED_SOL_MINT } from 'constants/solana/bufferLayouts';
+import { awaitConfirmation } from 'api/wallet';
 import type { RootState } from 'store/rootReducer';
-import { wipeAction } from 'store/slices/GlobalSlice';
-import { getRatesCandle, getRatesMarkets } from 'store/slices/rate/RateSlice';
-import {
-  addPendingTransaction,
-  updateTransactions,
-} from 'store/slices/transaction/TransactionSlice';
+import { addPendingTransaction } from 'store/slices/transaction/TransactionSlice';
 import { updateEntityArray } from 'store/utils';
 import { minorAmountToMajor } from 'utils/amount';
 import {
@@ -45,81 +28,15 @@ import {
 import { transferNotification } from 'utils/transactionNotifications';
 import type { WalletSettings } from 'utils/types';
 
-const STORAGE_KEY_TYPE = 'type';
-
 export const WALLET_SLICE_NAME = 'wallet';
 
-const accountsListeners: AccountListener[] = [];
-
 export interface WalletsState {
-  network: NetworkType;
-  connected: boolean;
-  publicKey: string | null;
-  type: WalletType;
   tokenAccounts: Array<SerializableTokenAccount>;
-  derivableTokenAccounts: Array<SerializableTokenAccount>;
   hiddenTokens: Array<string> | null;
   settings: WalletSettings;
   zeroBalanceTokens: Array<string>;
   username: string | null;
 }
-
-/**
- * Async action to disconnect from a wallet.
- */
-export const disconnect = createAsyncThunk(`${WALLET_SLICE_NAME}/disconnect`, (_, thunkAPI) => {
-  WalletAPI.disconnect();
-  thunkAPI.dispatch(wipeAction());
-  ToastManager.error('Wallet disconnected');
-});
-
-// Simulate SOL token account
-const getSolToken = async (TokenAPI: API, publicKey: PublicKey, isDerivable?: boolean) => {
-  const balance = await getBalance(publicKey);
-  const tokenInfo = TokenAPI.getConfigForToken(WRAPPED_SOL_MINT);
-
-  // Fake token to simulate SOL as Token
-  const mint = new Token(
-    SOL_MINT,
-    9,
-    0,
-    undefined,
-    'Solana',
-    'SOL',
-    colors.SOL,
-    tokenInfo?.logoURI,
-  );
-  return new TokenAccount(
-    mint,
-    SYSTEM_PROGRAM_ID,
-    SYSTEM_PROGRAM_ID,
-    publicKey,
-    balance,
-    isDerivable,
-  );
-};
-
-export const getDerivableTokenAccounts = createAsyncThunk<
-  SerializableTokenAccount[],
-  { seed: string; derivationPath: string }
->(`${WALLET_SLICE_NAME}/getDerivableTokenAccounts`, async (data, thunkAPI) => {
-  const state: RootState = thunkAPI.getState() as RootState;
-  const walletState = state.wallet;
-  const TokenAPI = TokenAPIFactory(walletState.network);
-  // if didn't connected(need for DerivableAccount component/page)
-  const walletPublicKey = getWalletUnsafe()?.pubkey || null;
-
-  const accounts = getDerivableAccounts(data.seed, data.derivationPath);
-  const publicKeys = accounts.map((account) => account.publicKey);
-
-  const promises = publicKeys.map((publicKey) => {
-    const isDerivable = walletPublicKey ? !walletPublicKey?.equals(publicKey) : false;
-    return getSolToken(TokenAPI, publicKey, isDerivable);
-  });
-  const derivableTokenAccounts = await Promise.all(promises);
-
-  return derivableTokenAccounts.map((tokenAccount) => tokenAccount.serialize()) || [];
-});
 
 export const getTokenAccount = createAsyncThunk<TokenAccount | null, PublicKey>(
   `${WALLET_SLICE_NAME}/getTokenAccount`,
@@ -132,131 +49,47 @@ export const getTokenAccount = createAsyncThunk<TokenAccount | null, PublicKey>(
   },
 );
 
-const updateHistory = createAsyncThunk<void, TokenAccount>(
-  `${WALLET_SLICE_NAME}/updateHistory`,
-  (account, thunkAPI) => {
-    const state: RootState = thunkAPI.getState() as RootState;
-
-    if (state.transaction.currentHistoryPubkey === account.address.toBase58()) {
-      thunkAPI.dispatch(updateTransactions(true));
-    }
-  },
-);
-
-export const getTokenAccountsForWallet = createAsyncThunk<SerializableTokenAccount[]>(
-  `${WALLET_SLICE_NAME}/getTokenAccountsForWallet`,
-  async (_, thunkAPI) => {
-    const state: RootState = thunkAPI.getState() as RootState;
-    const { network, type, derivableTokenAccounts } = state.wallet;
-    const TokenAPI = TokenAPIFactory(network);
-
-    const solTokens = [];
-
-    // If manual
-    if (type === WalletType.MANUAL) {
-      // TODO: temp for future feature
-      solTokens.push(TokenAccount.from(derivableTokenAccounts[0]));
-      // derivableTokenAccounts.forEach((account) => solTokens.push(TokenAccount.from(account)));
-    } else {
-      // Simulated SOL token for sollet and other wallet types
-      const publicKey = getWallet().pubkey;
-      solTokens.push(await getSolToken(TokenAPI, publicKey));
-    }
-
-    // Get all Tokens
-    const accountsForWallet = await TokenAPI.getAccountsForWallet();
-
-    // Merge SOL and Tokens as token accounts
-    const tokenAccounts = [...solTokens, ...accountsForWallet];
-
-    const listener = TokenAPI.listenToTokenAccountChanges(tokenAccounts, (updatedTokenAccount) => {
-      thunkAPI.dispatch(updateAccount(updatedTokenAccount.serialize()));
-      void thunkAPI.dispatch(updateHistory(updatedTokenAccount));
-    });
-
-    accountsListeners.push(listener);
-
-    return tokenAccounts.map((tokenAccount) => tokenAccount.serialize());
-  },
-);
-
-export const updateTokenAccountsForWallet = createAsyncThunk<SerializableTokenAccount[]>(
-  `${WALLET_SLICE_NAME}/updateTokenAccountsForWallet`,
-  async (_, thunkAPI) => {
-    const state: RootState = thunkAPI.getState() as RootState;
-    const { network, tokenAccounts } = state.wallet;
-    const TokenAPI = TokenAPIFactory(network);
-
-    const accountsForWallet = await TokenAPI.getAccountsForWallet();
-
-    const tokenAccountsAddresses = new Set(tokenAccounts.map((token) => token.address));
-
-    const newTokenAccounts = [];
-
-    for (const account of accountsForWallet) {
-      if (!tokenAccountsAddresses.has(account.address.toBase58())) {
-        newTokenAccounts.push(account);
-
-        const listener = TokenAPI.listenToTokenAccountChanges(
-          newTokenAccounts,
-          (updatedTokenAccount) => {
-            thunkAPI.dispatch(updateAccount(updatedTokenAccount.serialize()));
-          },
-        );
-
-        accountsListeners.push(listener);
-
-        ToastManager.info('Wallet successfully created!');
-
-        const { symbol } = account.mint;
-
-        transferNotification({
-          header: 'Received',
-          text: `+ ${minorAmountToMajor(account.balance, account.mint).toString()} ${symbol}`,
-          symbol,
-        });
-      }
-    }
-
-    return newTokenAccounts.map((tokenAccount) => tokenAccount.serialize());
-  },
-);
-
-export const precacheTokenAccounts = createAsyncThunk<void, PublicKey>(
-  `${WALLET_SLICE_NAME}/precacheTokenAccounts`,
-  async (publicKey, thunkAPI) => {
-    const state: RootState = thunkAPI.getState() as RootState;
-    const walletState = state.wallet;
-    const TokenAPI = TokenAPIFactory(walletState.network);
-
-    await TokenAPI.precacheTokenAccounts(publicKey);
-  },
-);
-
-export const autoConnect = createAsyncThunk<string | undefined>(
-  `${WALLET_SLICE_NAME}/autoConnect`,
-  async (_, thunkAPI) => {
-    const {
-      wallet: { type },
-    }: RootState = thunkAPI.getState() as RootState;
-
-    let processedData;
-
-    if (type === WalletType.MANUAL) {
-      processedData = (await loadMnemonicAndSeed()) as ManualWalletData;
-    }
-
-    return unwrapResult(await thunkAPI.dispatch(connectWallet(processedData)));
-  },
-);
-
-export const connect = createAsyncThunk(`${WALLET_SLICE_NAME}/connect`, (_, thunkAPI) => {
-  const {
-    wallet: { network },
-  }: RootState = thunkAPI.getState() as RootState;
-
-  WalletAPI.connect(network);
-});
+// export const updateTokenAccountsForWallet = createAsyncThunk<SerializableTokenAccount[]>(
+//   `${WALLET_SLICE_NAME}/updateTokenAccountsForWallet`,
+//   async (_, thunkAPI) => {
+//     const state: RootState = thunkAPI.getState() as RootState;
+//     const { network, tokenAccounts } = state.wallet;
+//     const TokenAPI = TokenAPIFactory(network);
+//
+//     const accountsForWallet = await TokenAPI.getAccountsForWallet();
+//
+//     const tokenAccountsAddresses = new Set(tokenAccounts.map((token) => token.address));
+//
+//     const newTokenAccounts = [];
+//
+//     for (const account of accountsForWallet) {
+//       if (!tokenAccountsAddresses.has(account.address.toBase58())) {
+//         newTokenAccounts.push(account);
+//
+//         const listener = TokenAPI.listenToTokenAccountChanges(
+//           newTokenAccounts,
+//           (updatedTokenAccount) => {
+//             thunkAPI.dispatch(updateAccount(updatedTokenAccount.serialize()));
+//           },
+//         );
+//
+//         accountsListeners.push(listener);
+//
+//         ToastManager.info('Wallet successfully created!');
+//
+//         const { symbol } = account.mint;
+//
+//         transferNotification({
+//           header: 'Received',
+//           text: `+ ${minorAmountToMajor(account.balance, account.mint).toString()} ${symbol}`,
+//           symbol,
+//         });
+//       }
+//     }
+//
+//     return newTokenAccounts.map((tokenAccount) => tokenAccount.serialize());
+//   },
+// );
 
 /**
  * Async action to connect to a wallet. Creates a new wallet instance,
@@ -266,45 +99,36 @@ export const connect = createAsyncThunk(`${WALLET_SLICE_NAME}/connect`, (_, thun
  * The output of the action is the user's public key in Base58 form,
  * so that the user can verify it.
  */
-export const connectWallet = createAsyncThunk<string, WalletDataType | undefined>(
-  `${WALLET_SLICE_NAME}/connectWallet`,
-  async (data, thunkAPI) => {
-    const {
-      wallet: { network, type },
-    }: RootState = thunkAPI.getState() as RootState;
-
-    const wallet = await WalletAPI.connectWallet(network, type, data);
-
-    wallet.on(WalletEvent.DISCONNECT, () => {
-      void thunkAPI.dispatch(disconnect());
-      ToastManager.error('Wallet disconnected');
-    });
-
-    // wallet.on(WalletEvent.CONFIRMED, ({ transactionSignature }) =>
-    //   ToastManager.info(`Confirmed: ${transactionSignature}`),
-    // );
-
-    ToastManager.info('Wallet connected');
-
-    // Make and store derivable before getAvailableTokens
-    if (type === WalletType.MANUAL && data?.seed && data?.derivationPath) {
-      await thunkAPI.dispatch(
-        getDerivableTokenAccounts({ seed: data.seed, derivationPath: data.derivationPath }),
-      );
-    }
-
-    void thunkAPI.dispatch(getTokenAccountsForWallet());
-    void thunkAPI.dispatch(getRatesMarkets());
-    void thunkAPI.dispatch(getRatesCandle({ symbol: 'SOL', type: 'month' }));
-    void thunkAPI.dispatch(lookupName(wallet.pubkey.toBase58()));
-
-    if (swapHostFeeAddress) {
-      void thunkAPI.dispatch(precacheTokenAccounts(swapHostFeeAddress));
-    }
-
-    return wallet.pubkey.toBase58();
-  },
-);
+// export const connectWallet = createAsyncThunk<string, WalletDataType | undefined>(
+//   `${WALLET_SLICE_NAME}/connectWallet`,
+//   async (data, thunkAPI) => {
+//     const {
+//       wallet: { network, type },
+//     }: RootState = thunkAPI.getState() as RootState;
+//
+//     const wallet = await WalletAPI.connectWallet(network, type, data);
+//
+//     wallet.on(WalletEvent.DISCONNECT, () => {
+//       void thunkAPI.dispatch(disconnect());
+//       ToastManager.error('Wallet disconnected');
+//     });
+//
+//     // wallet.on(WalletEvent.CONFIRMED, ({ transactionSignature }) =>
+//     //   ToastManager.info(`Confirmed: ${transactionSignature}`),
+//     // );
+//
+//     ToastManager.info('Wallet connected');
+//
+//
+//     void thunkAPI.dispatch(lookupName(wallet.pubkey.toBase58()));
+//
+//     if (swapHostFeeAddress) {
+//       void thunkAPI.dispatch(precacheTokenAccounts(swapHostFeeAddress));
+//     }
+//
+//     return wallet.pubkey.toBase58();
+//   },
+// );
 
 export const lookupName = createAsyncThunk<LookupResponce | null, string>(
   `${WALLET_SLICE_NAME}/lookupName`,
@@ -367,28 +191,6 @@ export const transfer = createAsyncThunk<string, TransferParameters>(
   },
 );
 
-export const createMint = createAsyncThunk<
-  string,
-  { amount: number; decimals: number; initialAccount: Account }
->(`${WALLET_SLICE_NAME}/createMint`, async (parameters, thunkAPI) => {
-  const state: RootState = thunkAPI.getState() as RootState;
-  const walletState = state.wallet;
-  const TokenAPI = TokenAPIFactory(walletState.network);
-
-  return TokenAPI.createMint(parameters.amount, parameters.decimals, parameters.initialAccount);
-});
-
-export const createAccountForToken = createAsyncThunk<TokenAccount, { token: Token }>(
-  `${WALLET_SLICE_NAME}/createAccountForToken`,
-  async (parameters, thunkAPI) => {
-    const state: RootState = thunkAPI.getState() as RootState;
-    const walletState = state.wallet;
-    const TokenAPI = TokenAPIFactory(walletState.network);
-
-    return TokenAPI.createAccountForToken(parameters.token);
-  },
-);
-
 export const closeTokenAccount = createAsyncThunk<string, { publicKey: PublicKey }>(
   `${WALLET_SLICE_NAME}/closeAccount`,
   async (parameters, thunkAPI) => {
@@ -397,13 +199,6 @@ export const closeTokenAccount = createAsyncThunk<string, { publicKey: PublicKey
     const TokenAPI = TokenAPIFactory(walletState.network);
 
     return TokenAPI.closeAccount(parameters.publicKey);
-  },
-);
-
-export const airdrop = createAsyncThunk<void>(
-  `${WALLET_SLICE_NAME}/airdrop`,
-  async (): Promise<void> => {
-    await WalletAPI.airdrop();
   },
 );
 
@@ -460,14 +255,7 @@ export const updateAccountReducer = (
 
 // The initial wallet state. No wallet is connected yet.
 const makeInitialState = (): WalletsState => ({
-  network: loadSettings().network || DEFAULT_NETWORK,
-  connected: false,
-  publicKey: null,
-  type: localStorage.getItem(STORAGE_KEY_TYPE)
-    ? Number(localStorage.getItem(STORAGE_KEY_TYPE))
-    : WalletType.MANUAL,
   tokenAccounts: [],
-  derivableTokenAccounts: [],
   hiddenTokens: Array.from(loadHiddenTokens()),
   settings: loadSettings(),
   zeroBalanceTokens: Array.from(loadZeroBalanceTokens()),
@@ -482,18 +270,6 @@ const walletSlice = createSlice({
   initialState: makeInitialState(),
   reducers: {
     updateAccount: updateAccountReducer,
-    selectNetwork: (state, action: PayloadAction<NetworkType>) => ({
-      ...state,
-      network: action.payload,
-    }),
-    selectType: (state, action: PayloadAction<WalletType>) => {
-      localStorage.setItem(STORAGE_KEY_TYPE, String(action.payload));
-
-      return {
-        ...state,
-        type: action.payload,
-      };
-    },
     updateHiddenTokens: (state) => ({
       ...state,
       hiddenTokens: Array.from(loadHiddenTokens()),
@@ -511,35 +287,6 @@ const walletSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    // Triggered when the connect async action is completed
-    builder.addCase(connectWallet.fulfilled, (state, action) => ({
-      ...makeInitialState(),
-      publicKey: action.payload,
-      connected: true,
-      derivableTokenAccounts: state.derivableTokenAccounts,
-    }));
-    // Triggered when the disconnect async action is completed
-    builder.addCase(disconnect.fulfilled, () => ({
-      ...makeInitialState(),
-      publicKey: null,
-      connected: false,
-    }));
-    builder.addCase(getDerivableTokenAccounts.fulfilled, (state, action) => ({
-      ...state,
-      derivableTokenAccounts: action.payload,
-    }));
-    builder.addCase(getTokenAccountsForWallet.fulfilled, (state, action) => ({
-      ...state,
-      tokenAccounts: state.tokenAccounts.concat(action.payload),
-    }));
-    builder.addCase(updateTokenAccountsForWallet.fulfilled, (state, action) => ({
-      ...state,
-      tokenAccounts: state.tokenAccounts.concat(action.payload),
-    }));
-    builder.addCase(createAccountForToken.fulfilled, (state, action) => ({
-      ...state,
-      tokenAccounts: state.tokenAccounts.concat(action.payload.serialize()),
-    }));
     builder.addCase(closeTokenAccount.fulfilled, (state, action) => {
       const { publicKey } = action.meta.arg;
       const address = publicKey.toBase58();
@@ -547,14 +294,6 @@ const walletSlice = createSlice({
       return {
         ...state,
         tokenAccounts: state.tokenAccounts.filter((token) => token.address !== address),
-      };
-    });
-    builder.addCase(wipeAction, (state) => {
-      accountsListeners.map((listener) => listener.removeAllListeners());
-
-      return {
-        ...state,
-        tokenAccounts: [],
       };
     });
 
@@ -567,7 +306,6 @@ const walletSlice = createSlice({
   },
 });
 
-export const { selectNetwork, selectType, updateAccount, updateHiddenTokens, updateSettings } =
-  walletSlice.actions;
+export const { updateAccount, updateHiddenTokens, updateSettings } = walletSlice.actions;
 // eslint-disable-next-line import/no-default-export
 export default walletSlice.reducer;

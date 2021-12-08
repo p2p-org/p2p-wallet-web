@@ -3,6 +3,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { styled } from '@linaria/react';
+import { useConnectionContext } from '@p2p-wallet-web/core';
 import type { AsyncThunkAction } from '@reduxjs/toolkit';
 import { unwrapResult } from '@reduxjs/toolkit';
 import classNames from 'classnames';
@@ -93,7 +94,7 @@ export const TransactionStatusModal: FunctionComponent<Props> = ({
   const [transactionError, setTransactionError] = useState(
     transaction?.meta?.err ? DEFAULT_TRANSACTION_ERROR : '',
   );
-  const cluster = useSelector((state) => state.wallet.network.cluster);
+  const { network } = useConnectionContext();
   const tokenAccounts = useSelector((state) => state.wallet.tokenAccounts);
 
   useEffect(() => {
@@ -311,7 +312,7 @@ export const TransactionStatusModal: FunctionComponent<Props> = ({
               <FieldTitle>Transaction ID</FieldTitle>
               <FieldValue>
                 {signature}{' '}
-                <ShareWrapper onClick={handleCopyClick(getExplorerUrl('tx', signature, cluster))}>
+                <ShareWrapper onClick={handleCopyClick(getExplorerUrl('tx', signature, network))}>
                   <ShareIcon name="copy" />
                 </ShareWrapper>
               </FieldValue>
@@ -336,7 +337,7 @@ export const TransactionStatusModal: FunctionComponent<Props> = ({
             </Button>
             {signature ? (
               <a
-                href={getExplorerUrl('tx', signature, cluster)}
+                href={getExplorerUrl('tx', signature, network)}
                 target="_blank"
                 rel="noopener noreferrer noindex"
                 onClick={() => {

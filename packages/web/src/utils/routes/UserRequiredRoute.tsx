@@ -1,10 +1,9 @@
 import type { FunctionComponent } from 'react';
 import React from 'react';
-import { useSelector } from 'react-redux';
 import type { RouteProps } from 'react-router';
 import { Redirect, Route, useLocation } from 'react-router-dom';
 
-import type { RootState } from 'store/rootReducer';
+import { useWallet } from '@p2p-wallet-web/core';
 
 export const ProtectedRoute: FunctionComponent<
   {
@@ -29,8 +28,8 @@ export const ProtectedRoute: FunctionComponent<
   );
 };
 
-// ProtectedRoute is used to create specific types of protected routes like this...
+// ProtectedRoute is used to create specific types.ts of protected routes like this...
 export const AuthRequiredRoute: FunctionComponent<RouteProps> = ({ children, ...props }) => {
-  const connected = useSelector((state: RootState) => state.wallet.connected);
-  return <ProtectedRoute allow={!!connected} redirect="/login" {...props} />;
+  const { connected } = useWallet();
+  return <ProtectedRoute allow={connected} redirect="/login" {...props} />;
 };

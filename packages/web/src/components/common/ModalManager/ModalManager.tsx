@@ -10,7 +10,6 @@ import type { ModalComponentType, ModalState } from 'redux-modals-manager';
 import { closeModal } from 'redux-modals-manager';
 
 import {
-  SHOW_MODAL_ADD_COIN,
   SHOW_MODAL_CLOSE_TOKEN_ACCOUNT,
   SHOW_MODAL_ERROR,
   SHOW_MODAL_PROCEED_USERNAME,
@@ -68,9 +67,9 @@ const ModalBackground = styled.div`
   user-select: none;
 `;
 
-// TODO: types
+// TODO: types.ts
 const modalsMap = new Map<string, LoadableComponent<any>>([
-  [SHOW_MODAL_ADD_COIN, loadable(() => import('components/modals/AddCoinModal'))],
+  // [SHOW_MODAL_ADD_COIN, loadable(() => import('components/modals/AddCoinModal'))],
   [
     SHOW_MODAL_TRANSACTION_CONFIRM,
     loadable(() => import('components/modals/TransactionConfirmModal')),

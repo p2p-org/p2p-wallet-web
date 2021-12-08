@@ -3,6 +3,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 
 import { styled } from '@linaria/react';
+import { useConnectionContext } from '@p2p-wallet-web/core';
 import classNames from 'classnames';
 import { rgba } from 'polished';
 import QRCode from 'qrcode.react';
@@ -233,7 +234,7 @@ export const QRAddressWidgetOrigin: FunctionComponent<Props> = ({ publicKey, cla
   const [isShowDetails, setIsShowDetails] = useState(false);
   const [isImageCopyAvailable, setIsImageCopyAvailable] = useState(false);
   const [isImageCopied, setIsImageCopied] = useState(false);
-  const cluster = useSelector((state) => state.wallet.network.cluster);
+  const { network } = useConnectionContext();
   const solPublicKey = useSelector((state) => state.wallet.publicKey);
 
   const tokenAccounts = useSelector((state) => state.wallet.tokenAccounts);
@@ -357,7 +358,7 @@ export const QRAddressWidgetOrigin: FunctionComponent<Props> = ({ publicKey, cla
                   </FieldValue>
                 </FieldGroup>
                 <a
-                  href={getExplorerUrl('address', tokenAccount.address.toBase58(), cluster)}
+                  href={getExplorerUrl('address', tokenAccount.address.toBase58(), network)}
                   target="_blank"
                   rel="noopener noreferrer noindex"
                   className="button"
@@ -377,7 +378,7 @@ export const QRAddressWidgetOrigin: FunctionComponent<Props> = ({ publicKey, cla
                   </FieldValue>
                 </FieldGroup>
                 <a
-                  href={getExplorerUrl('address', tokenAccount.mint.address.toBase58(), cluster)}
+                  href={getExplorerUrl('address', tokenAccount.mint.address.toBase58(), network)}
                   target="_blank"
                   rel="noopener noreferrer noindex"
                   className="button"

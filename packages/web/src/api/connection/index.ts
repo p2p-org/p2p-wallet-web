@@ -21,7 +21,7 @@ const createConnection = memoizeWith(toString, (network: NetworkType): Connectio
     // commitment: DEFAULT_COMMITMENT,
   });
 
-  // Due to an issue with the solana back-end relating to CORS headers on 429 responses
+  // Due to an issue with the blockchain back-end relating to CORS headers on 429 responses
   // Rate-limiting responses are not retried correctly. Adding this proxy fixes this.
   const proxiedFunctions = [
     'getBalance',

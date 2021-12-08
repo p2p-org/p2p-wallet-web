@@ -2,6 +2,7 @@ import type { FC, ReactNode } from 'react';
 import React, { useEffect, useRef, useState } from 'react';
 
 import { styled } from '@linaria/react';
+import type { DERIVATION_PATH, ValueOf } from '@p2p-wallet-web/core';
 import classNames from 'classnames';
 
 import { Icon } from 'components/ui';
@@ -85,7 +86,10 @@ const DropDownListItem = styled.div`
   cursor: pointer;
 `;
 
-export type SelectorItemType = { value: string; label: string | ReactNode };
+export type SelectorItemType = {
+  label: string | ReactNode;
+  value: ValueOf<typeof DERIVATION_PATH>;
+};
 
 type Props = {
   value: SelectorItemType;

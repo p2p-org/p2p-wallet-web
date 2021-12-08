@@ -1,6 +1,6 @@
+import { useSolana } from '@p2p-wallet-web/core';
 import { createContainer } from 'unstated-next';
 
-import { useSolana } from 'app/contexts/solana';
 import { useConfig } from 'app/contexts/swap';
 
 import ConstantProductPool from '../models/ConstantProductPool';

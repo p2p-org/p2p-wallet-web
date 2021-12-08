@@ -1,9 +1,9 @@
 import type { FunctionComponent } from 'react';
 import React from 'react';
-import { useSelector } from 'react-redux';
 import { Link, NavLink } from 'react-router-dom';
 
 import { styled } from '@linaria/react';
+import { useWallet } from '@p2p-wallet-web/core';
 import type * as H from 'history';
 
 import Logo from 'assets/images/logo.png';
@@ -124,7 +124,7 @@ type Props = {
 };
 
 export const Header: FunctionComponent<Props> = ({ breadcrumb }) => {
-  const connected = useSelector((state) => state.wallet.connected);
+  const { connected } = useWallet();
 
   return (
     <Wrapper>

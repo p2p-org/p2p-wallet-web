@@ -3,18 +3,19 @@ import React, { useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { styled } from '@linaria/react';
+import { useUserTokenAccounts } from '@p2p-wallet-web/core';
+import { NATIVE_MINT } from '@solana/spl-token';
 import classNames from 'classnames';
 import { Feature } from 'flagged';
 import { rgba } from 'polished';
 
-import { TokenAccount } from 'api/token/TokenAccount';
 import { Widget } from 'components/common/Widget';
 import { Button, Icon } from 'components/ui';
 import { FEATURE_ADD_TOKEN_BUTTON } from 'config/featureFlags';
 import { openModal } from 'store/actions/modals';
 import { SHOW_MODAL_ADD_COIN } from 'store/constants/modalTypes';
 
-import { TokenList } from './TokenList';
+import { TokenAccountList } from './TokenAccountList';
 
 const WrapperWidget = styled(Widget)``;
 
@@ -122,34 +123,33 @@ type Props = {
 export const TokensWidget: FunctionComponent<Props> = ({ selectedSymbol }) => {
   const dispatch = useDispatch();
   const [isOpen, setIsOpen] = useState(false);
-  const tokenAccounts = useSelector((state) =>
-    state.wallet.tokenAccounts.map((account) => TokenAccount.from(account)),
-  );
+  const userTokenAccounts = useUserTokenAccounts();
 
   const hiddenTokens = useSelector((state) => state.wallet.hiddenTokens || []);
   const zeroBalanceTokens = useSelector((state) => state.wallet.zeroBalanceTokens || []);
   const { isZeroBalancesHidden } = useSelector((state) => state.wallet.settings);
 
-  const [tokens, hiddenTokensList] = useMemo(() => {
+  const [tokenAccounts, hiddenTokenAccountsList] = useMemo(() => {
     const newTokens = [];
     const newHiddenTokensList = [];
 
-    for (const token of tokenAccounts) {
+    for (const tokenAccount of userTokenAccounts) {
       if (
-        hiddenTokens.includes(token.address.toBase58()) ||
+        hiddenTokens.includes(tokenAccount.key.toBase58()) ||
         (isZeroBalancesHidden &&
-          token.balance.lte(0) &&
-          !zeroBalanceTokens.includes(token.address.toBase58()) &&
-          (token.mint.symbol !== 'SOL' || token.isDerivable))
+          (!tokenAccount.balance || tokenAccount.balance.toU64().lten(0)) &&
+          !zeroBalanceTokens.includes(tokenAccount.key.toBase58()) &&
+          tokenAccount.mint &&
+          !tokenAccount.mint.equals(NATIVE_MINT))
       ) {
-        newHiddenTokensList.push(token);
+        newHiddenTokensList.push(tokenAccount);
       } else {
-        newTokens.push(token);
+        newTokens.push(tokenAccount);
       }
     }
 
     return [newTokens, newHiddenTokensList];
-  }, [tokenAccounts, isZeroBalancesHidden, zeroBalanceTokens, hiddenTokens]);
+  }, [userTokenAccounts, isZeroBalancesHidden, zeroBalanceTokens, hiddenTokens]);
 
   const handleAddCoinClick = () => {
     void dispatch(openModal({ modalType: SHOW_MODAL_ADD_COIN }));
@@ -170,18 +170,18 @@ export const TokensWidget: FunctionComponent<Props> = ({ selectedSymbol }) => {
         </Feature>
       }
     >
-      <TokenList
-        items={tokens}
+      <TokenAccountList
+        items={tokenAccounts}
         selectedSymbol={selectedSymbol}
         isZeroBalancesHidden={isZeroBalancesHidden}
       />
-      {hiddenTokensList.length > 0 ? (
+      {hiddenTokenAccountsList.length > 0 ? (
         <HiddenTokens onClick={handleChevronClick} className={classNames({ isOpen })}>
           <HideIconWrapper>
             <IconHide name={isOpen ? 'eye-hide' : 'eye'} className={classNames({ isOpen })} />
           </HideIconWrapper>
-          <Text>{`${hiddenTokensList.length} hidden wallet${
-            hiddenTokensList.length !== 1 ? 's' : ''
+          <Text>{`${hiddenTokenAccountsList.length} hidden wallet${
+            hiddenTokenAccountsList.length !== 1 ? 's' : ''
           }`}</Text>
           <ChevronWrapper className={classNames({ isOpen })}>
             <ChevronIcon name="chevron" />
@@ -189,8 +189,8 @@ export const TokensWidget: FunctionComponent<Props> = ({ selectedSymbol }) => {
         </HiddenTokens>
       ) : undefined}
       {isOpen ? (
-        <TokenList
-          items={hiddenTokensList}
+        <TokenAccountList
+          items={hiddenTokenAccountsList}
           selectedSymbol={selectedSymbol}
           isZeroBalancesHidden={isZeroBalancesHidden}
           isHidden

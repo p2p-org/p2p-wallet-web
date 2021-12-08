@@ -1,24 +1,19 @@
 import type { FC } from 'react';
 import React, { useEffect, useRef, useState } from 'react';
-import { batch, useDispatch } from 'react-redux';
-import { useHistory } from 'react-router-dom';
+import { batch } from 'react-redux';
 
 import { styled } from '@linaria/react';
-import { unwrapResult } from '@reduxjs/toolkit';
+import { useWallet, WalletType } from '@p2p-wallet-web/core';
 import * as bip39 from 'bip39';
 import classNames from 'classnames';
 import throttle from 'lodash.throttle';
 
-import { WalletType } from 'api/wallet';
+import { ErrorHint } from 'components/common/ErrorHint';
 import { ToastManager } from 'components/common/ToastManager';
 import { Button } from 'components/pages/home/Auth/common/Button';
 import { localMnemonic } from 'config/constants';
-import { connectWallet, selectType } from 'store/slices/wallet/WalletSlice';
 import { trackEvent } from 'utils/analytics';
-import { sleep } from 'utils/common';
 import { useTrackEventOnce } from 'utils/hooks/useTrackEventOnce';
-
-import { ErrorHint } from '../../../../../common/ErrorHint';
 
 const Wrapper = styled.div``;
 
@@ -153,10 +148,9 @@ type Props = {
 };
 
 export const Main: FC<Props> = ({ setIsLoading, next }) => {
-  const history = useHistory();
-  const dispatch = useDispatch();
   const mnemonicRef = useRef<HTMLTextAreaElement | null>(null);
   const trackEventOnce = useTrackEventOnce();
+  const { activate } = useWallet();
   const [mnemonic, setMnemonic] = useState(localMnemonic || '');
   const [hasError, setHasError] = useState(false);
 
@@ -171,23 +165,19 @@ export const Main: FC<Props> = ({ setIsLoading, next }) => {
     }
   }, [mnemonic]);
 
-  const handleConnectByClick = (type: WalletType) => () => {
+  const handleConnectByClick = (walletType: WalletType) => () => {
     batch(async () => {
+      setIsLoading(true);
       try {
-        setIsLoading(true);
-        dispatch(selectType(type));
-        unwrapResult(await dispatch(connectWallet()));
+        await activate(walletType);
 
-        if (type === WalletType.SOLLET) {
+        if (walletType === WalletType.Sollet) {
           trackEventOnce('login_solletio_click');
-        } else if (type === WalletType.SOLLET_EXTENSION) {
+        } else if (walletType === WalletType.SolletExtension) {
           trackEventOnce('login_sollet_extension_click');
-        } else if (type === WalletType.PHANTOM) {
+        } else if (walletType === WalletType.Phantom) {
           trackEventOnce('login_phantom_click');
         }
-
-        await sleep(100);
-        history.push('/wallets');
       } catch (error) {
         ToastManager.error((error as Error).message);
       } finally {
@@ -237,17 +227,17 @@ export const Main: FC<Props> = ({ setIsLoading, next }) => {
   return (
     <Wrapper>
       <ButtonsWrapper>
-        <SocialButton onClick={handleConnectByClick(WalletType.SOLLET)}>
+        <SocialButton onClick={handleConnectByClick(WalletType.Sollet)}>
           <WalletIcon className="sollet" />
           Sollet.io
           <ArrowIcon />
         </SocialButton>
-        <SocialButton onClick={handleConnectByClick(WalletType.SOLLET_EXTENSION)}>
+        <SocialButton onClick={handleConnectByClick(WalletType.SolletExtension)}>
           <WalletIcon className="sollet" />
           Sollet Extension
           <ArrowIcon />
         </SocialButton>
-        <SocialButton onClick={handleConnectByClick(WalletType.PHANTOM)}>
+        <SocialButton onClick={handleConnectByClick(WalletType.Phantom)}>
           <WalletIcon className="phantom" />
           Phantom
           <ArrowIcon />

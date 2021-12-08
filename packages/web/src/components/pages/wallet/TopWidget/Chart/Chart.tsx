@@ -1,18 +1,16 @@
 import type { FunctionComponent } from 'react';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import ReactHighcharts from 'react-highcharts';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 
 import { styled } from '@linaria/react';
+import type { CandleLimitType } from '@p2p-wallet-web/core';
+import { useRates, useUserTokenAccount, useUserTokenAccounts } from '@p2p-wallet-web/core';
 import type web3 from '@solana/web3.js';
 import classNames from 'classnames';
 
-import type { CandleLimitType } from 'api/rate/CandleRate';
 // import dayjs from 'dayjs';
 // import { rgba } from 'polished';
-import { TokenAccount } from 'api/token/TokenAccount';
-import { changeCandlesType, getRatesCandle } from 'store/slices/rate/RateSlice';
-
 // import { calculateInterval, calculateStart } from 'utils/charts';
 import { getConfig } from './utils';
 
@@ -91,37 +89,34 @@ type Props = {
 export const Chart: FunctionComponent<Props> = ({ publicKey }) => {
   const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(false);
-  const type = useSelector((state) => state.rate.candlesType);
-  const tokenAccounts = useSelector((state) => state.wallet.tokenAccounts);
-  const tokenAccount = useMemo(() => {
-    const foundToken = tokenAccounts.find((account) => account.address === publicKey.toBase58());
-    return foundToken && TokenAccount.from(foundToken);
-  }, [tokenAccounts, publicKey]);
-  const rates = useSelector((state) =>
-    tokenAccount?.mint.symbol ? state.rate.candles[tokenAccount?.mint.symbol] : undefined,
-  );
+  const tokenAccounts = useUserTokenAccounts();
+  const tokenAccount = useUserTokenAccount(publicKey);
+  const { candlesType, candles, getRatesCandle, changeCandlesType } = useRates();
+  const rates = tokenAccount?.balance?.token.symbol
+    ? candles[tokenAccount.balance.token.symbol]
+    : undefined;
 
   const loadCandles = async (nextType: CandleLimitType) => {
-    if (isLoading || !tokenAccount?.mint.symbol) {
+    if (isLoading || !tokenAccount?.balance?.token.symbol) {
       return;
     }
 
     setIsLoading(true);
-    await dispatch(getRatesCandle({ symbol: tokenAccount.mint.symbol, type: nextType }));
+    await getRatesCandle(tokenAccount?.balance.token.symbol, nextType);
     setIsLoading(false);
   };
 
   useEffect(() => {
-    void loadCandles(type);
+    void loadCandles(candlesType);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tokenAccount?.mint.symbol, type]);
+  }, [tokenAccount?.balance?.token.symbol, candlesType]);
 
   if (!tokenAccount || !rates || rates.length === 0) {
     return null;
   }
 
   const handleFilterClick = (nextType: CandleLimitType) => () => {
-    dispatch(changeCandlesType(nextType));
+    changeCandlesType(nextType);
   };
 
   const data = rates.map((rate) => [rate.startTime, rate.price]);
@@ -147,31 +142,31 @@ export const Chart: FunctionComponent<Props> = ({ publicKey }) => {
       </ChartWrapper>
       <BottomWrapper>
         <FilterButton
-          className={classNames({ active: type === 'last1h' })}
+          className={classNames({ active: candlesType === 'last1h' })}
           onClick={handleFilterClick('last1h')}
         >
           1H
         </FilterButton>
         <FilterButton
-          className={classNames({ active: type === 'last4h' })}
+          className={classNames({ active: candlesType === 'last4h' })}
           onClick={handleFilterClick('last4h')}
         >
           4H
         </FilterButton>
         <FilterButton
-          className={classNames({ active: type === 'day' })}
+          className={classNames({ active: candlesType === 'day' })}
           onClick={handleFilterClick('day')}
         >
           1D
         </FilterButton>
         <FilterButton
-          className={classNames({ active: type === 'week' })}
+          className={classNames({ active: candlesType === 'week' })}
           onClick={handleFilterClick('week')}
         >
           1W
         </FilterButton>
         <FilterButton
-          className={classNames({ active: type === 'month' })}
+          className={classNames({ active: candlesType === 'month' })}
           onClick={handleFilterClick('month')}
         >
           1M

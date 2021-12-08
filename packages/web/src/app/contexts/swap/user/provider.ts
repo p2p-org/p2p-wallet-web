@@ -1,9 +1,10 @@
 import { useState } from 'react';
 
+import { useWallet } from '@p2p-wallet-web/core';
 import type { PublicKey } from '@solana/web3.js';
 import { createContainer } from 'unstated-next';
 
-import { useSolana } from 'app/contexts/solana';
+import { useBlockchain } from 'app/contexts/blockchain';
 
 import { useConfig, useProgramIds } from '../config';
 import type TokenAccount from '../models/TokenAccount';
@@ -34,28 +35,22 @@ const NOT_CONNECTED_CACHE_KEY = 'notConnected';
 
 export interface UseUser {
   useAsyncStandardTokenAccounts: (maxAge?: number) => AsyncResult<UserTokenAccountMap>;
-  getAsyncUserTokenAccountsLastUpdated(): number | undefined;
   refreshStandardTokenAccounts(): Promise<UserTokenAccountMap | undefined>;
   accountHasNonATAs: boolean;
 }
 
 export const useUserInternal = (): UseUser => {
-  const { connection, wallet, slot, setSlot } = useSolana();
+  const { slot, setSlot } = useBlockchain();
+  const { connection, publicKey } = useWallet();
   const { tokenConfigs, mintToTokenName } = useConfig();
   const { token: tokenProgramId } = useProgramIds();
   const [accountHasNonATAs, setAccountHasNonATAs] = useState(false);
 
-  function getAsyncUserTokenAccountsLastUpdated(): number | undefined {
-    const cacheKey = wallet ? getCacheKey(wallet.publicKey) : NOT_CONNECTED_CACHE_KEY;
-
-    return cache.getLastUpdate(cacheKey);
-  }
-
   function useAsyncUserTokenAccounts(maxAge: number) {
     let cacheKey, poll;
 
-    if (wallet) {
-      cacheKey = getCacheKey(wallet.publicKey);
+    if (publicKey) {
+      cacheKey = getCacheKey(publicKey);
       poll = true;
     } else {
       cacheKey = NOT_CONNECTED_CACHE_KEY;
@@ -66,7 +61,7 @@ export const useUserInternal = (): UseUser => {
   }
 
   const asyncTokenAccountsFn = async (): Promise<CacheValue> => {
-    if (!wallet) {
+    if (!publicKey) {
       return {
         standardTokenAccounts: createAsyncSuccess({}),
       };
@@ -76,7 +71,7 @@ export const useUserInternal = (): UseUser => {
       connection,
       slot,
       setSlot,
-      wallet.publicKey,
+      publicKey,
       tokenProgramId,
       tokenConfigs['SOL'].mint,
       mintToTokenName,
@@ -108,14 +103,13 @@ export const useUserInternal = (): UseUser => {
   }
 
   async function refreshStandardTokenAccounts(): Promise<UserTokenAccountMap | undefined> {
-    const cacheKey = wallet ? getCacheKey(wallet.publicKey) : NOT_CONNECTED_CACHE_KEY;
+    const cacheKey = publicKey ? getCacheKey(publicKey) : NOT_CONNECTED_CACHE_KEY;
     const result = await cache.refreshCache(cacheKey);
 
     return result?.standardTokenAccounts.value;
   }
 
   return {
-    getAsyncUserTokenAccountsLastUpdated,
     useAsyncStandardTokenAccounts,
     refreshStandardTokenAccounts,
     accountHasNonATAs,

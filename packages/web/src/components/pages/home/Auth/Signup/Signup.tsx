@@ -2,9 +2,9 @@ import type { FC } from 'react';
 import React, { useEffect, useMemo, useState } from 'react';
 
 import { styled } from '@linaria/react';
+import { DERIVATION_PATH, mnemonicToSeed } from '@p2p-wallet-web/core';
 import * as bip39 from 'bip39';
 
-import { DERIVATION_PATH, mnemonicToSeed } from 'api/wallet/ManualWallet';
 import { Password } from 'components/pages/home/Auth/common/Password';
 import { Paste } from 'components/pages/home/Auth/Signup/Paste';
 import { trackEvent } from 'utils/analytics';
@@ -81,7 +81,7 @@ export const Signup: FC<Props> = ({ next }) => {
       mnemonic,
       seed,
       password,
-      derivationPath: DERIVATION_PATH.bip44Change,
+      derivationPath: DERIVATION_PATH.Bip44Change,
     });
   };
 

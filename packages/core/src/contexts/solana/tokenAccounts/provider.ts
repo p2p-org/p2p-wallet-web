@@ -1,93 +1,46 @@
-import { useMemo, useState } from 'react';
-import { useDebounce } from 'react-use';
+import { useEffect, useState } from 'react';
 
+import { useSail } from '@p2p-wallet-web/sail';
+import type { PublicKey } from '@solana/web3.js';
 import { createContainer } from 'unstated-next';
 
-import { useIncrementingNonce } from '../../../shared/hooks/useIncrementingNonce';
-import { withTimeout } from '../../../shared/utils/promise';
-import { useConnection } from '../connection';
-import { useWallet } from '../wallet';
-import type { TokenAccount } from './models/TokenAccount';
-import { getNativeTokenBalanceAsync } from './utils/getNativeTokenBalanceAsync';
-import { getTokenAccountInfoAsync } from './utils/getTokenAccountInfoAsync';
+import { useConnectedWallet, useConnectionContext } from '../solana';
+import { precacheUserTokenAccounts } from './utils/precacheUserTokenAccounts';
 
 export interface UseTokenAccounts {
-  solanaBalance?: number;
-  tokenAccounts?: TokenAccount[];
-  tokenAccountsMap: Map<string, TokenAccount>;
-  refreshBalances: (_isRefreshingBalances: boolean) => void;
-  isRefreshingBalances: boolean;
+  userTokenAccountKeys: PublicKey[];
 }
 
-export interface UseTokenAccountsArgs {}
+const useTokenAccountsInternal = (): UseTokenAccounts => {
+  const { connection } = useConnectionContext();
+  const { loader, accountsCache } = useSail();
+  const wallet = useConnectedWallet();
+  const publicKey = wallet?.publicKey;
 
-const useTokenAccountsInternal = (props: UseTokenAccountsArgs): UseTokenAccounts => {
-  const { publicKey } = useWallet();
-  const { connection } = useConnection();
+  const [userTokenAccountKeys, setUserTokenAccountKeys] = useState<PublicKey[]>(
+    publicKey ? [publicKey] : [],
+  );
 
-  const [isRefreshingBalances, setIsRefreshingBalances] = useState(false);
-  const [solanaBalance, setSolanaBalance] = useState<number>();
-  const [tokenAccounts, setTokenAccounts] = useState<TokenAccount[]>();
-  const [increment, setIncrement] = useIncrementingNonce(10000);
-
-  const refreshBalances = async (_isRefreshingBalances = false) => {
-    if (!publicKey) {
+  useEffect(() => {
+    if (!connection || !publicKey) {
+      setUserTokenAccountKeys([]);
       return;
     }
 
-    setIsRefreshingBalances(_isRefreshingBalances);
+    // First query of useAccountsData or useParsedAccountsData set data which will update only after new fetch
+    // so we need to give userTokenAccountKeys to useUserTokenAccounts already with publicKey of user to instant show
+    // this key in list
+    setUserTokenAccountKeys((keys) => [...new Set([publicKey, ...keys])]);
 
-    try {
-      const [_solanaBalance, _tokenAccounts] = await withTimeout(
-        Promise.all([
-          getNativeTokenBalanceAsync(publicKey, connection),
-          getTokenAccountInfoAsync(publicKey, connection),
-        ]),
-        5000,
-      );
-
-      setSolanaBalance(_solanaBalance);
-      setTokenAccounts(_tokenAccounts);
-    } catch (err) {
-      console.error(err);
-      // void 0 === te && C();
-    } finally {
-      setIsRefreshingBalances(false);
-    }
-  };
-
-  useDebounce(
-    () => {
-      void refreshBalances(true);
-    },
-    200,
-    [increment],
-  );
-
-  // Token Account map for quick lookup.
-  const tokenAccountsMap = useMemo(() => {
-    const _tokenAccountsMap = new Map();
-
-    // add native balance
-
-    if (tokenAccounts) {
-      tokenAccounts.forEach((tokenAccount) => {
-        _tokenAccountsMap.set(tokenAccount.pubkey.toBase58(), tokenAccount);
-      });
-    }
-
-    return _tokenAccountsMap;
-  }, [tokenAccounts]);
-
-  // console.log(111, solanaBalance, objectArrayToMap(tokenAccounts || [], 'mintAddress'));
-  // console.log(111, solanaBalance, tokenAccounts);
+    void precacheUserTokenAccounts(connection, loader, accountsCache, publicKey).then((newKeys) => {
+      if (newKeys) {
+        setUserTokenAccountKeys((keys) => [...new Set([publicKey, ...keys, ...newKeys])]);
+      }
+    });
+  }, [accountsCache, connection, loader, publicKey, setUserTokenAccountKeys]);
 
   return {
-    solanaBalance,
-    tokenAccounts,
-    tokenAccountsMap,
-    refreshBalances,
-    isRefreshingBalances,
+    userTokenAccountKeys,
   };
 };
 

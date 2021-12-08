@@ -1,10 +1,9 @@
 import type { FC } from 'react';
-import React, { useMemo } from 'react';
-import { useSelector } from 'react-redux';
+import React from 'react';
 
 import { styled } from '@linaria/react';
+import { useWallet } from '@p2p-wallet-web/core';
 
-import { TokenAccount } from 'api/token/TokenAccount';
 import { UsernameAddressWidget } from 'components/common/UsernameAddressWidget';
 import { Accordion } from 'components/ui';
 import { getExplorerUrl } from 'utils/connection';
@@ -23,21 +22,13 @@ const InfoBlock = styled.div`
 `;
 
 export const ReceiveSolana: FC = () => {
-  const cluster = useSelector((state) => state.wallet.network.cluster);
-
-  const availableTokenAccounts = useSelector((state) =>
-    state.wallet.tokenAccounts.map((itemToken) => TokenAccount.from(itemToken)),
-  );
-  const publicKey = useSelector((state) => state.wallet.publicKey);
-  const solAccount = useMemo(
-    () => availableTokenAccounts.find((account) => account.address.toBase58() === publicKey),
-    [availableTokenAccounts, publicKey],
-  );
+  const { network, publicKey } = useWallet();
   const { username, domain } = useUsername();
 
-  if (!solAccount) {
+  if (!publicKey) {
     return null;
   }
+
   return (
     <>
       <Description>
@@ -59,13 +50,13 @@ export const ReceiveSolana: FC = () => {
       </Description>
       <UsernameAddressWidgetWrapper>
         <UsernameAddressWidget
-          address={publicKey || ''}
+          address={publicKey?.toBase58() || ''}
           username={username ? `${username}${domain}` : ''}
         />
       </UsernameAddressWidgetWrapper>
       <BottomInfo>
         <ExplorerA
-          href={getExplorerUrl('address', solAccount.address.toBase58(), cluster)}
+          href={getExplorerUrl('address', publicKey.toBase58(), network)}
           target="_blank"
           rel="noopener noreferrer noindex"
           className="button"

@@ -3,7 +3,7 @@ import { AccountLayout, u64 } from '@solana/spl-token';
 import type { AccountInfo, Connection } from '@solana/web3.js';
 import { PublicKey } from '@solana/web3.js';
 
-import type { SetSlot } from 'app/contexts/solana';
+import type { SetSlot } from 'app/contexts/blockchain';
 
 import type { MintToTokenName } from '../config';
 import TokenAccount from '../models/TokenAccount';

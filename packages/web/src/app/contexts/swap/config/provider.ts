@@ -1,5 +1,5 @@
-import { useSelector } from 'react-redux';
-
+import { useConnectionContext } from '@p2p-wallet-web/core';
+import { formatNetwork } from '@saberhq/solana-contrib';
 import { PublicKey } from '@solana/web3.js';
 import { createContainer } from 'unstated-next';
 
@@ -80,17 +80,9 @@ export interface UseConfig {
   mintToTokenName: MintToTokenName;
 }
 
-// TODO: hack
-function correctCluster(cluster: string) {
-  if (cluster === 'mainnet-beta') {
-    return 'mainnet';
-  }
-
-  return cluster;
-}
-
 const useConfigInternal = (): UseConfig => {
-  const network = useSelector((state) => correctCluster(state.wallet.network.cluster)); // getReactNetworkName();
+  const { network: originNetwork } = useConnectionContext();
+  const network = formatNetwork(originNetwork);
 
   const tokenConfigs = createTokenConfig(tokens[network]);
 

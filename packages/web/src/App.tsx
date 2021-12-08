@@ -55,9 +55,9 @@ const App: React.FC = () => {
           </Switch>
           <Intercom />
           <ModalManager />
-          <ToastManager anchor="left" renderToast={(props) => <NotifyToast {...props} />} />
           <FeaturesToggle />
         </Providers>
+        <ToastManager anchor="left" renderToast={(props) => <NotifyToast {...props} />} />
       </Router>
     </>
   );

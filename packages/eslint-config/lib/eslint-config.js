@@ -30,7 +30,7 @@ module.exports = {
           ['^react'], // react
           ['^[^\\.]'], // non-local imports
           [
-            '^constants|^config|^lib|^utils|^types|^store|^api|^app|^pages|^components|^styles|^assets',
+            '^constants|^config|^lib|^utils|^types.ts|^store|^api|^app|^pages|^components|^styles|^assets',
           ], // internal
           ['^\\.'], // local imports
         ],

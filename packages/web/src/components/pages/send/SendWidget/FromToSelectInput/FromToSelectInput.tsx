@@ -1,24 +1,23 @@
 import type { FunctionComponent } from 'react';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { useSelector } from 'react-redux';
 
 import { styled } from '@linaria/react';
+import type { TokenAccount } from '@p2p-wallet-web/core';
+import { useRates } from '@p2p-wallet-web/core';
+import type { Token } from '@saberhq/token-utils';
+import { TokenAmount } from '@saberhq/token-utils';
 import classNames from 'classnames';
-import { Decimal } from 'decimal.js';
+import JSBI from 'jsbi';
 import throttle from 'lodash.throttle';
 import { isNil } from 'ramda';
 
-import type { Token } from 'api/token/Token';
-import type { TokenAccount } from 'api/token/TokenAccount';
 import { AmountUSD } from 'components/common/AmountUSD';
 import { Empty } from 'components/common/Empty';
 import { SlideContainer } from 'components/common/SlideContainer';
 import { TokenAccountRow } from 'components/common/TokenAccountRow';
 import { TokenAvatar } from 'components/common/TokenAvatar';
-import { TokenRow } from 'components/common/TokenRow';
 import { Icon } from 'components/ui';
 import { SearchInput } from 'components/ui/SearchInput';
-import { majorAmountToMinor, minorAmountToMajor } from 'utils/amount';
 import { sortByRules } from 'utils/sort';
 import { shortAddress } from 'utils/tokens';
 
@@ -298,10 +297,12 @@ const AllTokens = styled(TitleTokens)`
   height: 44px;
 `;
 
+const SCROLL_THRESHOLD = 15;
+
 type Props = {
   direction?: 'from' | 'to';
   tokens?: Token[];
-  tokenAccounts: TokenAccount[];
+  tokenAccounts: readonly TokenAccount[];
   token?: Token;
   tokenAccount?: TokenAccount;
   amount?: string;
@@ -312,8 +313,6 @@ type Props = {
   disabledInput?: boolean;
   className?: string;
 };
-
-const SCROLL_THRESHOLD = 15;
 
 export const FromToSelectInput: FunctionComponent<Props> = ({
   direction = 'from',
@@ -336,7 +335,7 @@ export const FromToSelectInput: FunctionComponent<Props> = ({
   const [localAmount, setLocalAmount] = useState(String(amount));
   const [isOpen, setIsOpen] = useState(false);
   const [scrollTop, setScrollTop] = useState(0);
-  const rates = useSelector((state) => state.rate.markets);
+  const { markets: rates } = useRates();
 
   useEffect(() => {
     if (!isNil(amount) && amount !== localAmount) {
@@ -408,8 +407,12 @@ export const FromToSelectInput: FunctionComponent<Props> = ({
   };
 
   const handleTokenAccountClick = (nextTokenAccount: TokenAccount) => {
+    if (!nextTokenAccount.balance) {
+      return;
+    }
+
     setIsOpen(false);
-    onTokenAccountChange(nextTokenAccount.mint, nextTokenAccount);
+    onTokenAccountChange(nextTokenAccount.balance?.token, nextTokenAccount);
   };
 
   const handleTokenClick = (nextToken: Token) => {
@@ -418,7 +421,7 @@ export const FromToSelectInput: FunctionComponent<Props> = ({
   };
 
   const handleAllBalanceClick = () => {
-    if (!tokenAccount) {
+    if (!tokenAccount?.balance) {
       return;
     }
 
@@ -427,17 +430,17 @@ export const FromToSelectInput: FunctionComponent<Props> = ({
     if (feeAmountString) {
       const [feeAmount, symbol] = feeAmountString.split(' ');
 
-      if (tokenAccount?.mint.symbol === symbol) {
-        const fee = majorAmountToMinor(new Decimal(feeAmount), tokenAccount.mint);
-        const balanceWithoutFee = tokenAccount.balance.minus(fee);
-        tokenAccountBalance = balanceWithoutFee.gt(0) ? balanceWithoutFee : new Decimal(0);
+      if (feeAmount && tokenAccount?.balance?.token.symbol === symbol) {
+        const fee = new TokenAmount(tokenAccount.balance.token, JSBI.BigInt(feeAmount));
+        const balanceSubstractFee = tokenAccount.balance.subtract(fee);
+
+        tokenAccountBalance = balanceSubstractFee.greaterThan(0)
+          ? balanceSubstractFee
+          : new TokenAmount(tokenAccount.balance.token, 0);
       }
     }
 
-    onAmountChange(
-      minorAmountToMajor(tokenAccountBalance, tokenAccount.mint).toString(),
-      'available',
-    );
+    onAmountChange(tokenAccountBalance.toExact(), 'available');
   };
 
   const handleAmountFocus = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -474,26 +477,26 @@ export const FromToSelectInput: FunctionComponent<Props> = ({
   };
 
   const renderBalance = () => {
-    if (!tokenAccount) {
+    if (!tokenAccount?.balance) {
       return null;
     }
 
     if (feeAmountString) {
       const [feeAmount, symbol] = feeAmountString.split(' ');
 
-      if (tokenAccount?.mint.symbol === symbol) {
-        const fee = majorAmountToMinor(new Decimal(feeAmount), tokenAccount.mint);
-        const balanceWithoutFee = tokenAccount.balance.minus(fee);
+      if (feeAmount && tokenAccount?.balance?.token.symbol === symbol) {
+        const fee = new TokenAmount(tokenAccount.balance.token, JSBI.BigInt(feeAmount));
+        const balanceSubstractFee = tokenAccount.balance.subtract(fee);
 
-        return `${tokenAccount.mint
-          .toMajorDenomination(balanceWithoutFee.gt(0) ? balanceWithoutFee : 0)
-          .toString()} ${tokenAccount?.mint.symbol}`;
+        const tokenAccountBalance = balanceSubstractFee.greaterThan(0)
+          ? balanceSubstractFee
+          : new TokenAmount(tokenAccount.balance.token, 0);
+
+        return tokenAccountBalance.formatUnits();
       }
     }
 
-    return `${tokenAccount?.mint.toMajorDenomination(tokenAccount.balance).toString()} ${
-      tokenAccount?.mint.symbol
-    }`;
+    return tokenAccount.balance.formatUnits();
   };
 
   const filteredTokenAccounts = useMemo(() => {
@@ -504,7 +507,7 @@ export const FromToSelectInput: FunctionComponent<Props> = ({
     // Token with balance in from selector
     let filteredWithBalance = tokenAccounts;
     if (direction === 'from') {
-      filteredWithBalance = tokenAccounts.filter((account) => account.balance.gt(0));
+      filteredWithBalance = tokenAccounts.filter((account) => account.balance?.greaterThan(0));
     }
 
     const filterLower = filter.toLowerCase();
@@ -512,8 +515,9 @@ export const FromToSelectInput: FunctionComponent<Props> = ({
       .filter(
         (account) =>
           !filterLower ||
-          account.mint.symbol?.toLowerCase().includes(filterLower) ||
-          account.mint.name?.toLowerCase().includes(filterLower),
+          (account.balance &&
+            (account.balance.token.symbol?.toLowerCase().includes(filterLower) ||
+              account.balance.token.name?.toLowerCase().includes(filterLower))),
       )
       .sort(sortByRules(rates));
   }, [tokenAccounts, direction, filter, rates]);
@@ -536,8 +540,8 @@ export const FromToSelectInput: FunctionComponent<Props> = ({
     );
   }, [tokens, filter]);
 
-  const hasBalance = tokenAccount
-    ? tokenAccount.mint.toMajorDenomination(tokenAccount.balance).toNumber() >= Number(localAmount)
+  const hasBalance = tokenAccount?.balance
+    ? tokenAccount.balance.asNumber >= Number(localAmount)
     : false;
 
   return (
@@ -548,7 +552,7 @@ export const FromToSelectInput: FunctionComponent<Props> = ({
       <MainWrapper>
         <TokenAvatarWrapper className={classNames({ isOpen: isOpen && !token })}>
           {token ? (
-            <TokenAvatar symbol={token.symbol} address={token.address.toBase58()} size={44} />
+            <TokenAvatar symbol={token.symbol} address={token.address} size={44} />
           ) : (
             <WalletIcon name="wallet" />
           )}
@@ -560,18 +564,17 @@ export const FromToSelectInput: FunctionComponent<Props> = ({
               onClick={handleSelectorClick}
               className={classNames({ isOpen })}
             >
-              <TokenName title={token?.address.toBase58()}>
-                {token?.symbol ||
-                  (tokenAccount && shortAddress(tokenAccount.address.toBase58())) || (
-                    <EmptyName>—</EmptyName>
-                  )}
+              <TokenName title={token?.address}>
+                {token?.symbol || (tokenAccount && shortAddress(tokenAccount.key.toBase58())) || (
+                  <EmptyName>—</EmptyName>
+                )}
               </TokenName>
               <ChevronWrapper>
                 <ChevronIcon name="arrow-triangle" />
               </ChevronWrapper>
             </TokenWrapper>
             <AmountInput
-              placeholder={token?.toMajorDenomination(0).toString() || '0'}
+              placeholder={(token && TokenAmount.parse(token, '0').toExact()) || '0'}
               value={localAmount}
               onFocus={handleAmountFocus}
               onChange={handleAmountChange}
@@ -596,7 +599,11 @@ export const FromToSelectInput: FunctionComponent<Props> = ({
             </BalanceText>
             {token ? (
               <BalanceText>
-                ≈ <AmountUSDStyled value={new Decimal(localAmount || 0)} symbol={token?.symbol} />
+                ≈{' '}
+                <AmountUSDStyled
+                  value={TokenAmount.parse(token, localAmount || '0')}
+                  symbol={token?.symbol}
+                />
               </BalanceText>
             ) : undefined}
           </BalanceWrapper>
@@ -636,25 +643,21 @@ export const FromToSelectInput: FunctionComponent<Props> = ({
                 {direction === 'to' ? <YourTokens>Your tokens</YourTokens> : undefined}
                 {filteredTokenAccounts.map((account) => (
                   <TokenAccountRow
-                    key={account.address.toBase58()}
+                    key={account.key.toBase58()}
                     tokenAccount={account}
                     onClick={handleTokenAccountClick}
                   />
                 ))}
               </>
             ) : undefined}
-            {filteredTokens?.length ? (
-              <>
-                <AllTokens>All tokens</AllTokens>
-                {filteredTokens.map((token) => (
-                  <TokenRow
-                    key={token.address.toBase58()}
-                    token={token}
-                    onClick={handleTokenClick}
-                  />
-                ))}
-              </>
-            ) : undefined}
+            {/*{filteredTokens?.length ? (*/}
+            {/*  <>*/}
+            {/*    <AllTokens>All tokens</AllTokens>*/}
+            {/*    {filteredTokens.map((token) => (*/}
+            {/*      <TokenRow key={token.address} token={token} onClick={handleTokenClick} />*/}
+            {/*    ))}*/}
+            {/*  </>*/}
+            {/*) : undefined}*/}
             {!filteredTokenAccounts?.length && !filteredTokens?.length ? (
               <Empty type="search" />
             ) : undefined}

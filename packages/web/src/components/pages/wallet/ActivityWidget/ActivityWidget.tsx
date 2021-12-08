@@ -3,9 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { styled } from '@linaria/react';
-import { unwrapResult } from '@reduxjs/toolkit';
 import type { SignaturesForAddressOptions } from '@solana/web3.js';
-import { PublicKey } from '@solana/web3.js';
 import { last } from 'ramda';
 
 import { Empty } from 'components/common/Empty';
@@ -15,7 +13,6 @@ import { ToastManager } from 'components/common/ToastManager';
 import { Widget } from 'components/common/Widget';
 import { TransactionList } from 'components/pages/wallet/ActivityWidget/TransactionList';
 import {
-  getTransactions,
   setCurrentHistoryPubkey,
   updateTransactions,
 } from 'store/slices/transaction/TransactionSlice';
@@ -55,13 +52,13 @@ export const ActivityWidget: FunctionComponent<Props> = ({ publicKey }) => {
         options.before = order ? last(order) : undefined;
       }
 
-      const result = unwrapResult(
-        await dispatch(getTransactions({ publicKey: new PublicKey(publicKey), options })),
-      );
-
-      if (result.length === 0) {
-        setIsEnd(true);
-      }
+      // const result = unwrapResult(
+      //   await dispatch(getTransactions({ publicKey: new PublicKey(publicKey), options })),
+      // );
+      //
+      // if (result.length === 0) {
+      //   setIsEnd(true);
+      // }
     } catch (error) {
       ToastManager.error((error as Error).message);
     } finally {
