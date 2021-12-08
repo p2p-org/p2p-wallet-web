@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 
 import type { ConnectedWallet } from '@p2p-wallet-web/core';
 import {
+  NETWORK_CONFIGS,
   RatesProvider,
   SeedProvider,
   SolanaProvider,
@@ -38,7 +39,11 @@ const onDisconnect = () => {
 const CoreProviders: FC = ({ children }) => {
   return (
     <SeedProvider>
-      <SolanaProvider onConnect={onConnect} onDisconnect={onDisconnect}>
+      <SolanaProvider
+        onConnect={onConnect}
+        onDisconnect={onDisconnect}
+        networkConfigs={NETWORK_CONFIGS}
+      >
         <SailProvider>
           <TokenAccountsProvider>
             <RatesProvider>{children}</RatesProvider>
