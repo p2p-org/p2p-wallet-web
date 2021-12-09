@@ -9,13 +9,8 @@ export const precacheUserTokenAccounts = async (
   connection: Connection,
   loader: AccountLoader,
   accountsCache: AccountsCache,
-  owner?: PublicKey,
-): Promise<PublicKey[] | null> => {
-  if (!owner) {
-    // TODO: error?
-    return null;
-  }
-
+  owner: PublicKey,
+): Promise<{ keys: PublicKey[]; ownerPublicKey: PublicKey }> => {
   const filters = {
     programId: TOKEN_PROGRAM_ID,
   };
@@ -32,5 +27,8 @@ export const precacheUserTokenAccounts = async (
     });
   });
 
-  return accounts.value.map((info) => info.pubkey);
+  return {
+    keys: accounts.value.map((info) => info.pubkey),
+    ownerPublicKey: owner,
+  };
 };

@@ -32,11 +32,23 @@ const useTokenAccountsInternal = (): UseTokenAccounts => {
     // this key in list
     setUserTokenAccountKeys((keys) => [...new Set([publicKey, ...keys])]);
 
-    void precacheUserTokenAccounts(connection, loader, accountsCache, publicKey).then((newKeys) => {
-      if (newKeys) {
-        setUserTokenAccountKeys((keys) => [...new Set([publicKey, ...keys, ...newKeys])]);
-      }
-    });
+    const controller = new AbortController();
+    void precacheUserTokenAccounts(connection, loader, accountsCache, publicKey).then(
+      ({ keys, ownerPublicKey }) => {
+        // if user wallet publicKey already changed - ignore
+        if (!ownerPublicKey.equals(publicKey)) {
+          return;
+        }
+
+        if (keys) {
+          setUserTokenAccountKeys((prevKeys) => [...new Set([publicKey, ...prevKeys, ...keys])]);
+        }
+      },
+    );
+
+    return () => {
+      controller.abort();
+    };
   }, [accountsCache, connection, loader, publicKey, setUserTokenAccountKeys]);
 
   return {
