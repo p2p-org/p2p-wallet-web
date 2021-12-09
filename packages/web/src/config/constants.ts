@@ -76,9 +76,6 @@ export const DEFAULT_NETWORK: NetworkType = networks['p2p-rpcpool'];
 
 export const feeRelayerUrl = process.env.REACT_APP_FEE_RELAYER_URL;
 
-export const nameSericeUrl =
-  process.env.REACT_APP_NAME_SERVICE_URL || `${feeRelayerUrl}name_register`;
-
 export const appStorePath = 'https://testflight.apple.com/join/hxaQVX0E';
 export const playStorePath = 'https://play.google.com/store/apps/details?id=org.p2p.wallet';
 

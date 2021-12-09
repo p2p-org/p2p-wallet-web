@@ -1,16 +1,16 @@
 import { useMemo } from 'react';
-import { useSelector } from 'react-redux';
 
-import { useConnectionContext } from '@p2p-wallet-web/core';
+import { useConnectionContext } from '../../../solana/solana';
+import { useNameService } from '../provider';
 
 export type Username = {
-  username: string | null;
+  username: string | null | undefined;
   domain: string;
 };
 
 export const useUsername = (): Username => {
   const { network } = useConnectionContext();
-  const username = useSelector((state) => state.wallet.username);
+  const { username } = useNameService();
 
   const domain = network === 'mainnet-beta' ? '.p2p.sol' : '.p2p';
 

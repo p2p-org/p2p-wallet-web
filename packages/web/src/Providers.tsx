@@ -9,6 +9,7 @@ import {
   SolanaProvider,
   TokenAccountsProvider,
 } from '@p2p-wallet-web/core';
+import { NameServiceProvider } from '@p2p-wallet-web/core/dist/cjs/contexts/api/nameService';
 import { SailProvider } from '@p2p-wallet-web/sail';
 import type { TokenListContainer as SPLTokenListContainer } from '@solana/spl-token-registry';
 import { TokenListProvider as SPLTokenListProvider } from '@solana/spl-token-registry';
@@ -46,7 +47,9 @@ const CoreProviders: FC = ({ children }) => {
       >
         <SailProvider>
           <TokenAccountsProvider>
-            <RatesProvider>{children}</RatesProvider>
+            <RatesProvider>
+              <NameServiceProvider>{children}</NameServiceProvider>
+            </RatesProvider>
           </TokenAccountsProvider>
         </SailProvider>
       </SolanaProvider>

@@ -4,7 +4,13 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router';
 
 import { styled } from '@linaria/react';
-import { useUserTokenAccount, useUserTokenAccounts, useWallet } from '@p2p-wallet-web/core';
+import type { ResolveUsernameResponse } from '@p2p-wallet-web/core';
+import {
+  useNameService,
+  useUserTokenAccount,
+  useUserTokenAccounts,
+  useWallet,
+} from '@p2p-wallet-web/core';
 import { unwrapResult } from '@reduxjs/toolkit';
 import { Bitcoin } from '@renproject/chains-bitcoin';
 import type { RenNetwork } from '@renproject/interfaces';
@@ -13,7 +19,6 @@ import classNames from 'classnames';
 import Decimal from 'decimal.js';
 import { rgba } from 'polished';
 
-import type { ResolveUsernameResponce } from 'api/nameService';
 import type { Token } from 'api/token/Token';
 import type { TokenAccount } from 'api/token/TokenAccount';
 import { RateUSD } from 'components/common/RateUSD';
@@ -27,7 +32,7 @@ import {
   SHOW_MODAL_TRANSACTION_STATUS,
 } from 'store/constants/modalTypes';
 import type { RootState } from 'store/rootReducer';
-import { getTokenAccount, resolveUsername, transfer } from 'store/slices/wallet/WalletSlice';
+import { getTokenAccount, transfer } from 'store/slices/wallet/WalletSlice';
 import { trackEvent } from 'utils/analytics';
 import { useRenNetwork } from 'utils/hooks/renBridge/useNetwork';
 import { useTrackEventOnce } from 'utils/hooks/useTrackEventOnce';
@@ -217,8 +222,9 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
   const [renBtcMinimalAmount, setRenBtcMinimalAmount] = useState(0);
   const [usernameResolvedAddress, setUsernameResolvedAddress] = useState<string | null>(null);
   const [isSolanaNetwork, setIsSolanaNetwork] = useState(true);
-  const [resolvedNames, setResolvedNames] = useState<Array<ResolveUsernameResponce>>([]);
+  const [resolvedNames, setResolvedNames] = useState<ResolveUsernameResponse[]>([]);
   const [isResolvingNames, setisResolvingNames] = useState(false);
+  const { resolveUsername } = useNameService();
 
   const { connection } = useWallet();
   const network = useRenNetwork();
@@ -246,16 +252,19 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
   useEffect(() => {
     async function resolveName() {
       setisResolvingNames(true);
-      const resolved = unwrapResult(await dispatch(resolveUsername(toTokenPublicKey)));
+      const resolved = await resolveUsername(toTokenPublicKey);
+
       setisResolvingNames(false);
       setResolvedNames([]);
       setUsernameResolvedAddress(null);
+
       if (resolved.length === 1) {
         setUsernameResolvedAddress(resolved[0].owner);
       } else if (resolved.length > 1) {
         setResolvedNames(resolved);
       }
     }
+
     if (isSolanaNetwork && toTokenPublicKey.length > 0 && toTokenPublicKey.length <= 40) {
       resolveName();
     } else {

@@ -2,10 +2,10 @@ import type { FunctionComponent } from 'react';
 import React, { useEffect, useRef, useState } from 'react';
 
 import { styled } from '@linaria/react';
+import type { ResolveUsernameResponse } from '@p2p-wallet-web/core';
 import classNames from 'classnames';
 import { rgba } from 'polished';
 
-import type { ResolveUsernameResponce } from 'api/nameService';
 import { AddressText } from 'components/common/AddressText';
 import { Loader } from 'components/common/Loader';
 import { Icon } from 'components/ui';
@@ -176,7 +176,7 @@ type Props = {
   value: string;
   resolvedAddress?: string | null;
   isAddressInvalid: boolean;
-  resolvedNames: ResolveUsernameResponce[];
+  resolvedNames: ResolveUsernameResponse[];
   isResolvingNames: boolean;
   onResolvedNameClick: (props: any) => void;
   onChange: (publicKey: string) => void;

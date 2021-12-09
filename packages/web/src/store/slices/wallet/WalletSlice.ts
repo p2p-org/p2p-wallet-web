@@ -5,8 +5,6 @@ import Decimal from 'decimal.js';
 import { mergeDeepRight } from 'ramda';
 
 import { APIFactory as FeeRelayerAPIFactory } from 'api/feeRelayer';
-import type { LookupResponce, ResolveUsernameResponce } from 'api/nameService';
-import { APIFactory as NameServiceApi } from 'api/nameService';
 import type { TransferParameters } from 'api/token';
 import { APIFactory as TokenAPIFactory } from 'api/token';
 import type { SerializableTokenAccount } from 'api/token/TokenAccount';
@@ -35,7 +33,6 @@ export interface WalletsState {
   hiddenTokens: Array<string> | null;
   settings: WalletSettings;
   zeroBalanceTokens: Array<string>;
-  username: string | null;
 }
 
 export const getTokenAccount = createAsyncThunk<TokenAccount | null, PublicKey>(
@@ -120,8 +117,6 @@ export const getTokenAccount = createAsyncThunk<TokenAccount | null, PublicKey>(
 //     ToastManager.info('Wallet connected');
 //
 //
-//     void thunkAPI.dispatch(lookupName(wallet.pubkey.toBase58()));
-//
 //     if (swapHostFeeAddress) {
 //       void thunkAPI.dispatch(precacheTokenAccounts(swapHostFeeAddress));
 //     }
@@ -129,24 +124,6 @@ export const getTokenAccount = createAsyncThunk<TokenAccount | null, PublicKey>(
 //     return wallet.pubkey.toBase58();
 //   },
 // );
-
-export const lookupName = createAsyncThunk<LookupResponce | null, string>(
-  `${WALLET_SLICE_NAME}/lookupName`,
-  async (owner, thunkAPI) => {
-    const state: RootState = thunkAPI.getState() as RootState;
-    const names = await NameServiceApi(state.wallet.network.cluster).lookupName(owner);
-    return names.length > 0 ? names[0] : null;
-  },
-);
-
-export const resolveUsername = createAsyncThunk<Array<ResolveUsernameResponce>, string>(
-  `${WALLET_SLICE_NAME}/resolveUsername`,
-  async (username, thunkAPI) => {
-    const state: RootState = thunkAPI.getState() as RootState;
-    const result = await NameServiceApi(state.wallet.network.cluster).resolveName(username);
-    return result;
-  },
-);
 
 export const transfer = createAsyncThunk<string, TransferParameters>(
   `${WALLET_SLICE_NAME}/transfer`,
@@ -259,7 +236,6 @@ const makeInitialState = (): WalletsState => ({
   hiddenTokens: Array.from(loadHiddenTokens()),
   settings: loadSettings(),
   zeroBalanceTokens: Array.from(loadZeroBalanceTokens()),
-  username: null,
 });
 
 /**
@@ -294,13 +270,6 @@ const walletSlice = createSlice({
       return {
         ...state,
         tokenAccounts: state.tokenAccounts.filter((token) => token.address !== address),
-      };
-    });
-
-    builder.addCase(lookupName.fulfilled, (state, action) => {
-      return {
-        ...state,
-        username: (action.payload as LookupResponce)?.name,
       };
     });
   },

@@ -127,12 +127,11 @@ export function removeClosedTokenKeys(pubkey: string) {
   removeZeroBalanceToken(pubkey);
 }
 
-export function isUsernameBannerDisplayed() {
+export function getUsernameBannerHide() {
   const item = localStorage.getItem(USERNAME_BANNER_KEY) as string;
-  if (!item) return true;
-  return JSON.parse(item);
+  return !!item;
 }
 
 export function hideUsernameBanner() {
-  localStorage.setItem(USERNAME_BANNER_KEY, 'false');
+  localStorage.setItem(USERNAME_BANNER_KEY, 'true');
 }

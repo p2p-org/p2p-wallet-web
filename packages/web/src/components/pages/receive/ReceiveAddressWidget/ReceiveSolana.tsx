@@ -2,12 +2,11 @@ import type { FC } from 'react';
 import React from 'react';
 
 import { styled } from '@linaria/react';
-import { useWallet } from '@p2p-wallet-web/core';
+import { useUsername, useWallet } from '@p2p-wallet-web/core';
 
 import { UsernameAddressWidget } from 'components/common/UsernameAddressWidget';
 import { Accordion } from 'components/ui';
 import { getExplorerUrl } from 'utils/connection';
-import { useUsername } from 'utils/hooks/useUsername';
 
 import { BottomInfo, Description, ExplorerA, UsernameAddressWidgetWrapper } from './styled';
 

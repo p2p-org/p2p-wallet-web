@@ -5,7 +5,7 @@ import { useHistory } from 'react-router';
 import { NavLink, useLocation } from 'react-router-dom';
 
 import { styled } from '@linaria/react';
-import { useWallet } from '@p2p-wallet-web/core';
+import { useUsername, useWallet } from '@p2p-wallet-web/core';
 import classNames from 'classnames';
 import { Feature } from 'flagged';
 
@@ -20,7 +20,6 @@ import { appStorePath, playStorePath } from 'config/constants';
 import { FEATURE_SETTINGS_FREE_TRANSACTIONS, FEATURE_SETTINGS_LIST } from 'config/featureFlags';
 import { updateSettings } from 'store/slices/wallet/WalletSlice';
 import { trackEvent } from 'utils/analytics';
-import { useUsername } from 'utils/hooks/useUsername';
 import { appearance, currencies } from 'utils/settings';
 import type { WalletSettings } from 'utils/types';
 
