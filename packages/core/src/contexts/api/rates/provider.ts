@@ -7,7 +7,7 @@ import { createContainer } from 'unstated-next';
 
 import { useTokens } from '../../../hooks';
 import { useConnectionContext } from '../..';
-import { BASE_CURRENCY, CRYPTO_COMPARE_API_URL } from './constants';
+import { BASE_CURRENCY, CRYPTO_COMPARE_API_KEY, CRYPTO_COMPARE_API_URL } from './constants';
 import type {
   CandleLimitType,
   CandleRate,
@@ -16,8 +16,6 @@ import type {
   Markets,
   OrderbooksCryptoCompareResponse,
 } from './types';
-
-const CRYPTO_COMPARE_API_KEY = process.env.REACT_APP_CRYPTO_COMPARE_API_KEY;
 
 const GET_RATES_CANDLE_PATH_ADD = {
   last1h: '/histominute?limit=60',
