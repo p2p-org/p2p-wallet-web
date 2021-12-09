@@ -44,7 +44,7 @@ const backToPage: {
   // eslint-disable-next-line no-unused-vars
   [page in PageTypes]: PageTypes;
 } = {
-  // restore: 'main',
+  restore: 'main',
   main: 'main',
   password: 'main',
   derivableAccounts: 'password',

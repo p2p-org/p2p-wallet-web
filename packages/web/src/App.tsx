@@ -3,14 +3,12 @@ import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 
 import dayjs from 'dayjs';
 import localizedFormat from 'dayjs/plugin/localizedFormat';
-import { useFeature } from 'flagged';
 
 import { FeaturesToggle } from 'components/common/FeaturesToggle';
 import { Intercom } from 'components/common/Intercom';
 import { ModalManager } from 'components/common/ModalManager';
 import { NotifyToast } from 'components/common/NotifyToast';
 import { ToastManager } from 'components/common/ToastManager';
-import { FEATURE_LANDING } from 'config/featureFlags';
 import { Buy } from 'pages/Buy';
 import { Home } from 'pages/Home';
 import { Landing } from 'pages/Landing';
@@ -29,18 +27,12 @@ import { Providers } from './Providers';
 dayjs.extend(localizedFormat);
 
 const App: React.FC = () => {
-  const isFeatureLanding = useFeature(FEATURE_LANDING);
-
   return (
     <>
       <Router basename={process.env.REACT_APP_BASENAME}>
-        <Providers>
-          <Switch>
-            {isFeatureLanding ? (
-              <Route path="/" component={Landing} exact />
-            ) : (
-              <Route path="/" component={Home} exact />
-            )}
+        <Switch>
+          <Route path="/" component={Landing} exact />
+          <Providers>
             <Route path="/:type(signup|login)" component={Home} exact />
             <AuthRequiredRoute path="/wallets" component={Wallets} />
             <AuthRequiredRoute path="/wallet/:publicKey/settings" component={WalletSettings} />
@@ -52,11 +44,11 @@ const App: React.FC = () => {
             <AuthRequiredRoute path="/settings/network" component={SettingsNetwork} />
             <AuthRequiredRoute path="/settings" component={Settings} />
             <AuthRequiredRoute path="/buy" component={Buy} />
-          </Switch>
-          <Intercom />
-          <ModalManager />
-          <FeaturesToggle />
-        </Providers>
+            <ModalManager />
+          </Providers>
+        </Switch>
+        <Intercom />
+        <FeaturesToggle />
         <ToastManager anchor="left" renderToast={(props) => <NotifyToast {...props} />} />
       </Router>
     </>
