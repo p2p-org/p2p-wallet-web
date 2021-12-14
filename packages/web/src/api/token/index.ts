@@ -74,12 +74,24 @@ export const APIFactory = memoizeWith(toString, (network: NetworkObj): API => {
    * @param address
    */
   const getConfigForToken = (address: PublicKey): TokenInfo | null => {
-    const clusterConfig = tokenList.filterByClusterSlug(network.cluster).getList();
+    const clusterConfig = tokenList.filterByClusterSlug(network.network).getList();
 
     if (!clusterConfig) {
       return null;
     }
 
+    if (
+      network.network === 'devnet' &&
+      address.toBase58() === 'FsaLodPu4VmSwXGr3gWfwANe4vKf8XSZcCh1CEeJ3jpD'
+    ) {
+      return {
+        chainId: 101,
+        address: 'FsaLodPu4VmSwXGr3gWfwANe4vKf8XSZcCh1CEeJ3jpD',
+        name: 'renBTC',
+        decimals: 8,
+        symbol: 'RENBTC',
+      };
+    }
     const configForToken = find(propEq('address', address.toBase58()), clusterConfig);
 
     if (!configForToken) {
