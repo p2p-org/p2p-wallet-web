@@ -3,8 +3,12 @@ import React, { useEffect, useState } from 'react';
 import { batch } from 'react-redux';
 
 import { styled } from '@linaria/react';
-import { useSeedAndMnemonic, useWallet, WalletType } from '@p2p-wallet-web/core';
-import { deriveSecretKeyFromSeed } from '@p2p-wallet-web/core/dist/cjs/contexts/solana/seed/utils/hd_wallet';
+import {
+  deriveSecretKeyFromSeed,
+  useSeedAndMnemonic,
+  useWallet,
+  WalletType,
+} from '@p2p-wallet-web/core';
 
 import LogoImg from 'assets/images/big-logo.png';
 import { ToastManager } from 'components/common/ToastManager';

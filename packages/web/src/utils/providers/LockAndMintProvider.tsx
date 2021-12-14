@@ -12,7 +12,6 @@ import type { GatewaySession, GatewayTransaction, OpenedGatewaySession } from '@
 import { DepositStates, isAccepted } from '@renproject/ren-tx';
 import { isNil } from 'ramda';
 
-import { getWallet } from 'api/wallet';
 import { NotifyToast } from 'components/common/NotifyToast';
 import { ToastManager } from 'components/common/ToastManager';
 import { Button } from 'components/ui';
@@ -172,7 +171,7 @@ const LockAndMintSession: FC<{
       mintParams: {
         sourceAsset: Bitcoin.asset,
         network,
-        destAddress: getWallet().pubkey.toBase58(),
+        destAddress: solanaProvider.publicKey!.toBase58(),
         nonce: nonce,
       },
       from: bitcoin,

@@ -39,7 +39,7 @@ export const retryableProxy = <U, R>(
     <T>(target: GenericAsyncFunction<U, T>, thisArg: unknown, argArray: Array<U>) =>
     async (
       previousValue: Promise<T>,
-      currentValue: Promise<T>,
+      _currentValue: Promise<T>,
       currentIndex: number,
     ): Promise<T> => {
       const call = async () => target.apply(thisArg, argArray);

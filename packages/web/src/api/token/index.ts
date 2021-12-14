@@ -1,13 +1,11 @@
 import { NATIVE_MINT, Token as SPLToken, TOKEN_PROGRAM_ID } from '@solana/spl-token';
 import type { TokenInfo } from '@solana/spl-token-registry';
-import type { AccountInfo, ParsedAccountData, RpcResponseAndContext } from '@solana/web3.js';
+import type { AccountInfo, ParsedAccountData } from '@solana/web3.js';
 import { Account, PublicKey, SystemProgram } from '@solana/web3.js';
 import BN from 'bn.js';
-import { find, memoizeWith, path, propEq, splitEvery, toString } from 'ramda';
+import { find, memoizeWith, path, propEq, toString } from 'ramda';
 
 import { getConnection } from 'api/connection';
-import { retryableProxy } from 'api/connection/utils/retryableProxy';
-import { getWallet, makeTransaction, sendTransaction } from 'api/wallet';
 import { SOL_MINT } from 'app/contexts/swap';
 import type { NetworkObj } from 'config/constants';
 import { SYSTEM_PROGRAM_ID } from 'constants/solana/bufferLayouts';
@@ -44,7 +42,6 @@ export interface API {
   tokenInfo: (mint: PublicKey) => Promise<Token>;
   tokenInfoUncached: (mint: PublicKey) => Promise<Token>;
   tokenAccountInfo: (account: PublicKey) => Promise<TokenAccount | null>;
-  tokensInfo: (mints: PublicKey[]) => Promise<Token[]>;
   getConfigForToken: (address: PublicKey) => TokenInfo | null;
   transfer: (parameters: TransferParameters) => Promise<string>;
   closeAccount: (publicKey: PublicKey) => Promise<string>;
@@ -159,76 +156,6 @@ export const APIFactory = memoizeWith(toString, (network: NetworkObj): API => {
     return tokenUncached;
   };
 
-  type GetMultipleAccountsResultType = RpcResponseAndContext<AccountInfo<
-    Buffer | ParsedAccountData
-  > | null>;
-
-  const getMultipleAccounts = async (mints: PublicKey[]) => {
-    const publicKeys = mints.map((publicKey) => publicKey.toBase58());
-    const chunks = splitEvery(100, publicKeys);
-
-    const results = await Promise.all(
-      chunks.map(async (chunk) => {
-        const getMultipleAccountsResult: GetMultipleAccountsResultType = {};
-        await connection._rpcRequest('getMultipleAccounts', [
-          chunk,
-          { commitment: connection.commitment, encoding: 'jsonParsed' },
-        ]);
-
-        return path<AccountInfo<Buffer | ParsedAccountData>[] | null>(
-          ['result', 'value'],
-          getMultipleAccountsResult,
-        );
-      }),
-    );
-
-    return results.reduce((prev, cur) => {
-      if (cur) {
-        return prev?.concat(cur);
-      }
-
-      return prev;
-    }, []);
-  };
-
-  const tokensInfo = retryableProxy<PublicKey[], Token[]>(async (mints: PublicKey[]) => {
-    const result = await getMultipleAccounts(mints);
-
-    const tokens: Token[] = [];
-
-    mints.forEach((mint, index) => {
-      const mintInfo = path<{
-        decimals: number;
-        supply: number;
-        mintAuthority: string;
-      }>([index, 'data', 'parsed', 'info'], result);
-
-      if (!mintInfo) {
-        return;
-      }
-
-      const configForToken = getConfigForToken(mint);
-
-      const token = new Token(
-        mint,
-        mintInfo.decimals,
-        mintInfo.supply,
-        mintInfo.mintAuthority ? new PublicKey(mintInfo.mintAuthority) : undefined, // maps a null mintAuthority to undefined
-        configForToken?.name,
-        configForToken?.symbol,
-        configForToken?.symbol && colors[configForToken.symbol],
-        configForToken?.logoURI,
-      );
-
-      // set cache
-      tokensCache.set(mint.toBase58(), token);
-
-      tokens.push(token);
-    });
-
-    return tokens;
-  });
-
   type GetAccountInfoResponse = AccountInfo<Buffer | ParsedAccountData> | null;
 
   const extractParsedTokenAccountInfo = (
@@ -257,8 +184,7 @@ export const APIFactory = memoizeWith(toString, (network: NetworkObj): API => {
 
       return new TokenAccount(
         mintTokenInfo,
-        new PublicKey(parsedInfo.owner),
-        getParsedAccountInfoResult.value?.owner,
+        new PublicKey(parsedInfo.owner), // getParsedAccountInfoResult.value?.owner
         account,
         toDecimal(new BN(parsedInfo.tokenAmount.amount)),
         false,
@@ -282,7 +208,7 @@ export const APIFactory = memoizeWith(toString, (network: NetworkObj): API => {
         mintTokenInfo?.logoURI,
       );
 
-      return new TokenAccount(mint, SYSTEM_PROGRAM_ID, SYSTEM_PROGRAM_ID, account, balance);
+      return new TokenAccount(mint, SYSTEM_PROGRAM_ID, account, balance);
     }
 
     // For SOL tokens
@@ -300,7 +226,6 @@ export const APIFactory = memoizeWith(toString, (network: NetworkObj): API => {
 
       return new TokenAccount(
         mint,
-        SYSTEM_PROGRAM_ID,
         SYSTEM_PROGRAM_ID,
         account,
         getParsedAccountInfoResult.value?.lamports,
@@ -437,7 +362,6 @@ export const APIFactory = memoizeWith(toString, (network: NetworkObj): API => {
   return {
     tokenInfo,
     tokenInfoUncached,
-    tokensInfo,
     tokenAccountInfo,
     transfer,
     getConfigForToken,

@@ -9,7 +9,6 @@ import { APIFactory as TokenAPIFactory } from 'api/token';
 import type { SerializableTokenAccount } from 'api/token/TokenAccount';
 import { TokenAccount } from 'api/token/TokenAccount';
 import { Transaction } from 'api/transaction/Transaction';
-import { awaitConfirmation } from 'api/wallet';
 import type { RootState } from 'store/rootReducer';
 import { addPendingTransaction } from 'store/slices/transaction/TransactionSlice';
 import { updateEntityArray } from 'store/utils';
@@ -149,7 +148,7 @@ export const transfer = createAsyncThunk<string, TransferParameters>(
       ),
     );
 
-    await awaitConfirmation(resultSignature);
+    // await awaitConfirmation(resultSignature);
 
     return resultSignature;
   },

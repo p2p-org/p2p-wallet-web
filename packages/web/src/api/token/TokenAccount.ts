@@ -3,9 +3,7 @@ import type BN from 'bn.js';
 import { Decimal } from 'decimal.js';
 
 import { toDecimal } from 'utils/amount';
-import type { Serializable } from 'utils/types';
 
-import { OnChainEntity } from '../OnChainEntity';
 import type { SerializableToken } from './Token';
 import { Token } from './Token';
 
@@ -19,10 +17,7 @@ export type SerializableTokenAccount = {
   previous?: SerializableTokenAccount;
 };
 
-export class TokenAccount
-  extends OnChainEntity<TokenAccount>
-  implements Serializable<SerializableTokenAccount>
-{
+export class TokenAccount {
   readonly mint: Token;
 
   readonly owner: PublicKey;
@@ -39,11 +34,7 @@ export class TokenAccount
     address: PublicKey,
     balance: number | BN | Decimal,
     isDerivable = false,
-    currentSlot?: number,
-    previous?: TokenAccount,
   ) {
-    super(currentSlot, previous);
-
     this.mint = mint;
     this.owner = owner;
     this.address = address;
@@ -95,8 +86,6 @@ export class TokenAccount
       address: this.address.toBase58(),
       balance: this.balance.toString(),
       isDerivable: this.isDerivable,
-      lastUpdatedSlot: this.lastUpdatedSlot,
-      previous: this.previous?.serialize(),
     };
   }
 
@@ -111,8 +100,6 @@ export class TokenAccount
       new PublicKey(serializableTokenAccount.address),
       new Decimal(serializableTokenAccount.balance),
       serializableTokenAccount.isDerivable,
-      serializableTokenAccount.lastUpdatedSlot,
-      serializableTokenAccount.previous && TokenAccount.from(serializableTokenAccount.previous),
     );
   }
 }

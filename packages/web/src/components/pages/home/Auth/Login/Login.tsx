@@ -2,8 +2,8 @@ import type { FC } from 'react';
 import React, { useState } from 'react';
 
 import { styled } from '@linaria/react';
+import { mnemonicToSeed } from '@p2p-wallet-web/core';
 
-import { mnemonicToSeed } from 'api/wallet/ManualWallet';
 import { Back } from 'components/pages/home/Auth/common/Back';
 import { DerivableAccounts } from 'components/pages/home/Auth/Login/DerivableAccounts';
 

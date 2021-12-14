@@ -62,7 +62,7 @@ export const getConnectionTransactions = (network?: NetworkObj): Connection => {
     currentNetworkTransactions = { ...network };
 
     // HACK: take transactions history from the official node
-    if (network.cluster === 'mainnet-beta') {
+    if (network.network === 'mainnet-beta') {
       currentNetworkTransactions.endpoint = 'https://api.mainnet-beta.solana.com';
     }
   }

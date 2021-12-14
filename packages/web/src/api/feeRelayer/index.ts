@@ -8,7 +8,7 @@ import { getConnection } from 'api/connection';
 import type { TransferParameters } from 'api/token';
 import { ASSOCIATED_TOKEN_ACCOUNT_PROGRAM_ID } from 'api/token';
 import type { TokenAccount } from 'api/token/TokenAccount';
-import { getWallet } from 'api/wallet';
+import type { NetworkObj } from 'config/constants';
 import { feeRelayerUrl } from 'config/constants';
 
 export const KNOWN_FEE_PAYER_PUBKEYS = new Set(['FG4Y3yX4AAchp1HvNZ7LfzFTewF2f6nDoMDCohTFrdpT']);
@@ -176,7 +176,7 @@ const getSignedTransacton = async (
       })),
     );
 
-    return { transaction, signerPublicKey: signers[0].publicKey };
+    return { transaction, signerPublicKey: signers[0]!.publicKey };
   }
 
   return { transaction: await getWallet().sign(transaction), signerPublicKey: getWallet().pubkey };

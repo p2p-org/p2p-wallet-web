@@ -14,6 +14,7 @@ import { getConnection, getConnectionTransactions } from 'api/connection';
 import { APIFactory as TokenAPIFactory } from 'api/token';
 import type { Token } from 'api/token/Token';
 import { TokenAccount } from 'api/token/TokenAccount';
+import type { NetworkObj } from 'config/constants';
 import { SYSTEM_PROGRAM_ID } from 'constants/solana/bufferLayouts';
 import { CacheTTL } from 'lib/cachettl';
 
@@ -162,7 +163,6 @@ export const APIFactory = memoizeWith(toString, (network: NetworkObj): API => {
             sourceTokenAccount = new TokenAccount(
               sourceToken,
               sourceInfo.owner ? new PublicKey(sourceInfo.owner) : TOKEN_PROGRAM_ID, // TODO: fake
-              TOKEN_PROGRAM_ID,
               source,
               0,
             );
@@ -180,7 +180,6 @@ export const APIFactory = memoizeWith(toString, (network: NetworkObj): API => {
             destinationTokenAccount = new TokenAccount(
               destinationToken,
               destinationInfo.owner ? new PublicKey(destinationInfo.owner) : TOKEN_PROGRAM_ID, // TODO: fake
-              TOKEN_PROGRAM_ID,
               destination,
               0,
             );
@@ -208,7 +207,7 @@ export const APIFactory = memoizeWith(toString, (network: NetworkObj): API => {
 
         if (swapInners) {
           if (swapInners.length === 1) {
-            const transfersInstructions = swapInners[0].instructions.filter(
+            const transfersInstructions = swapInners[0]!.instructions.filter(
               (inst: ConfirmedTransaction) =>
                 inst?.parsed?.type === 'transfer' || inst?.parsed?.type === 'transferChecked',
             );
@@ -217,11 +216,11 @@ export const APIFactory = memoizeWith(toString, (network: NetworkObj): API => {
             sourceInfo = sourceInstruction?.parsed?.info;
             destinationInfo = destinationInstruction?.parsed?.info;
           } else if (swapInners.length === 2) {
-            const transfersInstructionsOne = swapInners[0].instructions.filter(
+            const transfersInstructionsOne = swapInners[0]!.instructions.filter(
               (inst: ConfirmedTransaction) =>
                 inst?.parsed?.type === 'transfer' || inst?.parsed?.type === 'transferChecked',
             );
-            const transfersInstructionsTwo = swapInners[1].instructions.filter(
+            const transfersInstructionsTwo = swapInners[1]!.instructions.filter(
               (inst: ConfirmedTransaction) =>
                 inst?.parsed?.type === 'transfer' || inst?.parsed?.type === 'transferChecked',
             );
@@ -256,7 +255,7 @@ export const APIFactory = memoizeWith(toString, (network: NetworkObj): API => {
             destinationToken =
               postTokenBalances && postTokenBalances[postTokenBalances.length - 1]
                 ? await tokenAPI.tokenInfo(
-                    new PublicKey(postTokenBalances[postTokenBalances.length - 1].mint),
+                    new PublicKey(postTokenBalances[postTokenBalances.length - 1]!.mint),
                   )
                 : null;
           }
@@ -285,7 +284,6 @@ export const APIFactory = memoizeWith(toString, (network: NetworkObj): API => {
             sourceTokenAccount = new TokenAccount(
               sourceToken,
               sourceInfo.owner ? new PublicKey(sourceInfo.owner) : TOKEN_PROGRAM_ID, // TODO: fake
-              TOKEN_PROGRAM_ID,
               source,
               0,
             );
@@ -302,7 +300,6 @@ export const APIFactory = memoizeWith(toString, (network: NetworkObj): API => {
             destinationTokenAccount = new TokenAccount(
               destinationToken,
               destinationInfo.owner ? new PublicKey(destinationInfo.owner) : TOKEN_PROGRAM_ID, // TODO: fake
-              TOKEN_PROGRAM_ID,
               destination,
               0,
             );
@@ -346,7 +343,6 @@ export const APIFactory = memoizeWith(toString, (network: NetworkObj): API => {
           destinationTokenAccount = new TokenAccount(
             mint,
             new PublicKey(initializeAccountInfo.owner),
-            TOKEN_PROGRAM_ID,
             destination,
             0,
           );
@@ -360,13 +356,7 @@ export const APIFactory = memoizeWith(toString, (network: NetworkObj): API => {
         source = info?.account ? new PublicKey(info.account) : null;
         if (info?.owner && source && preToken) {
           const mint = await tokenAPI.tokenInfo(new PublicKey(preToken.mint));
-          sourceTokenAccount = new TokenAccount(
-            mint,
-            new PublicKey(info.owner),
-            TOKEN_PROGRAM_ID,
-            source,
-            0,
-          );
+          sourceTokenAccount = new TokenAccount(mint, new PublicKey(info.owner), source, 0);
         }
         destination = info?.destination ? new PublicKey(info.destination) : null;
         destinationTokenAccount = destination ? await tokenAPI.tokenAccountInfo(destination) : null;
@@ -396,7 +386,6 @@ export const APIFactory = memoizeWith(toString, (network: NetworkObj): API => {
               destinationTokenAccount = new TokenAccount(
                 mint,
                 new PublicKey(info.authority),
-                TOKEN_PROGRAM_ID,
                 destination,
                 0,
               );
@@ -416,7 +405,6 @@ export const APIFactory = memoizeWith(toString, (network: NetworkObj): API => {
               destinationTokenAccount = new TokenAccount(
                 mint,
                 new PublicKey(info.authority),
-                TOKEN_PROGRAM_ID,
                 source,
                 0,
               );
@@ -441,9 +429,12 @@ export const APIFactory = memoizeWith(toString, (network: NetworkObj): API => {
       }
     }
 
-    if (instructions.length === 2 && instructions[1].programId.equals(Secp256k1Program.programId)) {
-      if (innerInstructions?.length === 1 && innerInstructions[0].instructions.length === 4) {
-        const instruction = innerInstructions[0].instructions[3] as ConfirmedTransaction;
+    if (
+      instructions.length === 2 &&
+      instructions[1]!.programId.equals(Secp256k1Program.programId)
+    ) {
+      if (innerInstructions?.length === 1 && innerInstructions[0]!.instructions.length === 4) {
+        const instruction = innerInstructions[0]!.instructions[3] as ConfirmedTransaction;
 
         if (instruction.programId.equals(TOKEN_PROGRAM_ID)) {
           const parsedInstruction = instruction.parsed;
@@ -462,7 +453,7 @@ export const APIFactory = memoizeWith(toString, (network: NetworkObj): API => {
     }
     if (
       instructions.length === 2 &&
-      instructions[0].programId.equals(TOKEN_PROGRAM_ID) &&
+      instructions[0]!.programId.equals(TOKEN_PROGRAM_ID) &&
       (instructions[0] as ConfirmedTransaction)?.parsed?.type === 'burnChecked'
     ) {
       const instruction = instructions[0] as ConfirmedTransaction;
@@ -602,7 +593,7 @@ export const APIFactory = memoizeWith(toString, (network: NetworkObj): API => {
 
     const transactions = await Promise.all(
       parsedTransactions.map((parsedTransaction, index) =>
-        transactionInfo(confirmedSignatures[index], parsedTransaction),
+        transactionInfo(confirmedSignatures[index]!, parsedTransaction),
       ),
     );
 
