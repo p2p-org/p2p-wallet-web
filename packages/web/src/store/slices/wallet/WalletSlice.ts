@@ -1,8 +1,7 @@
 import type { Draft, PayloadAction } from '@reduxjs/toolkit';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import type { Blockhash, FeeCalculator, PublicKey } from '@solana/web3.js';
+import type { PublicKey } from '@solana/web3.js';
 import Decimal from 'decimal.js';
-import { mergeDeepRight } from 'ramda';
 
 import { APIFactory as FeeRelayerAPIFactory } from 'api/feeRelayer';
 import type { TransferParameters } from 'api/token';
@@ -10,29 +9,17 @@ import { APIFactory as TokenAPIFactory } from 'api/token';
 import type { SerializableTokenAccount } from 'api/token/TokenAccount';
 import { TokenAccount } from 'api/token/TokenAccount';
 import { Transaction } from 'api/transaction/Transaction';
-import * as WalletAPI from 'api/wallet';
 import { awaitConfirmation } from 'api/wallet';
 import type { RootState } from 'store/rootReducer';
 import { addPendingTransaction } from 'store/slices/transaction/TransactionSlice';
 import { updateEntityArray } from 'store/utils';
 import { minorAmountToMajor } from 'utils/amount';
-import {
-  loadHiddenTokens,
-  loadSettings,
-  loadZeroBalanceTokens,
-  removeZeroBalanceToken,
-  saveSettings,
-} from 'utils/settings';
 import { transferNotification } from 'utils/transactionNotifications';
-import type { WalletSettings } from 'utils/types';
 
 export const WALLET_SLICE_NAME = 'wallet';
 
 export interface WalletsState {
   tokenAccounts: Array<SerializableTokenAccount>;
-  hiddenTokens: Array<string> | null;
-  settings: WalletSettings;
-  zeroBalanceTokens: Array<string>;
 }
 
 export const getTokenAccount = createAsyncThunk<TokenAccount | null, PublicKey>(
@@ -179,20 +166,6 @@ export const closeTokenAccount = createAsyncThunk<string, { publicKey: PublicKey
   },
 );
 
-export const getMinimumBalanceForRentExemption = createAsyncThunk<number, number>(
-  `${WALLET_SLICE_NAME}/getMinimumBalanceForRentExemption`,
-  async (length) => {
-    return WalletAPI.getMinimumBalanceForRentExemption(length);
-  },
-);
-
-export const getRecentBlockhash = createAsyncThunk<{
-  blockhash: Blockhash;
-  feeCalculator: FeeCalculator;
-}>(`${WALLET_SLICE_NAME}/getRecentBlockhash`, async () => {
-  return WalletAPI.getRecentBlockhash();
-});
-
 export const updateAccountReducer = (
   state: Draft<WalletsState>,
   action: PayloadAction<SerializableTokenAccount>,
@@ -203,10 +176,6 @@ export const updateAccountReducer = (
     token,
     state.tokenAccounts.map((account) => TokenAccount.from(account)),
   );
-
-  if (token.balance.gte(0) && state.zeroBalanceTokens.includes(token.address.toBase58())) {
-    removeZeroBalanceToken(action.payload.address);
-  }
 
   const prevBalance =
     state.tokenAccounts.find((account) => account.mint.symbol === token.mint.symbol)?.balance ||
@@ -226,16 +195,12 @@ export const updateAccountReducer = (
   return {
     ...state,
     tokenAccounts: updatedAccounts.map((account) => account.serialize()),
-    zeroBalanceTokens: Array.from(loadZeroBalanceTokens()),
   };
 };
 
 // The initial wallet state. No wallet is connected yet.
 const makeInitialState = (): WalletsState => ({
   tokenAccounts: [],
-  hiddenTokens: Array.from(loadHiddenTokens()),
-  settings: loadSettings(),
-  zeroBalanceTokens: Array.from(loadZeroBalanceTokens()),
 });
 
 /**
@@ -246,21 +211,6 @@ const walletSlice = createSlice({
   initialState: makeInitialState(),
   reducers: {
     updateAccount: updateAccountReducer,
-    updateHiddenTokens: (state) => ({
-      ...state,
-      hiddenTokens: Array.from(loadHiddenTokens()),
-      zeroBalanceTokens: Array.from(loadZeroBalanceTokens()),
-    }),
-    updateSettings: (state, action: PayloadAction<Partial<WalletSettings>>) => {
-      const newSettings = mergeDeepRight(state.settings, action.payload);
-
-      saveSettings(newSettings);
-
-      return {
-        ...state,
-        settings: newSettings,
-      };
-    },
   },
   extraReducers: (builder) => {
     builder.addCase(closeTokenAccount.fulfilled, (state, action) => {
@@ -275,6 +225,6 @@ const walletSlice = createSlice({
   },
 });
 
-export const { updateAccount, updateHiddenTokens, updateSettings } = walletSlice.actions;
+export const { updateAccount } = walletSlice.actions;
 // eslint-disable-next-line import/no-default-export
 export default walletSlice.reducer;

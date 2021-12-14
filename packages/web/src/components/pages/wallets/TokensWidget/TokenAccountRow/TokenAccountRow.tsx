@@ -1,26 +1,19 @@
 import type { FunctionComponent } from 'react';
 import React from 'react';
 import Skeleton from 'react-loading-skeleton';
-import { useDispatch } from 'react-redux';
 import { Link } from 'react-router-dom';
 
 import { styled } from '@linaria/react';
 import type { TokenAccount } from '@p2p-wallet-web/core';
-import { NATIVE_MINT } from '@solana/spl-token';
+import { NATIVE_MINT } from '@saberhq/token-utils';
 import classNames from 'classnames';
 import { rgba } from 'polished';
 
+import { useSettings } from 'app/contexts/settings';
 import { AmountUSD } from 'components/common/AmountUSD';
 import { TokenAvatar } from 'components/common/TokenAvatar';
 import { Menu } from 'components/ui';
 import { MenuItem } from 'components/ui/Menu/MenuItem';
-import { updateHiddenTokens } from 'store/slices/wallet/WalletSlice';
-import {
-  hideUnhideToken,
-  hideUnhideZeroBalanceToken,
-  removeHiddenToken,
-  removeZeroBalanceToken,
-} from 'utils/settings';
 import { shortAddress } from 'utils/tokens';
 
 const Content = styled.div`
@@ -147,22 +140,14 @@ type Props = {
 export const TokenAccountRow: FunctionComponent<Props> = ({
   tokenAccount,
   isSelected = false,
-  isZeroBalancesHidden = true,
   isHidden = false,
 }) => {
-  const dispatch = useDispatch();
+  const { toggleHideTokenAccount } = useSettings();
 
   const handleMenuItemClick = () => {
     const tokenAddress = tokenAccount.key.toBase58();
-    if (isZeroBalancesHidden && (!tokenAccount.balance || tokenAccount.balance.toU64().lten(0))) {
-      hideUnhideZeroBalanceToken(tokenAddress);
-      removeHiddenToken(tokenAddress);
-    } else {
-      hideUnhideToken(tokenAddress);
-      removeZeroBalanceToken(tokenAddress);
-    }
-
-    dispatch(updateHiddenTokens());
+    const isZero = !tokenAccount.balance || tokenAccount.balance.equalTo(0);
+    toggleHideTokenAccount(tokenAddress, isZero);
   };
 
   const isSOL = tokenAccount.mint && tokenAccount.mint.equals(NATIVE_MINT);

@@ -1,14 +1,13 @@
 import type { FunctionComponent } from 'react';
-import React, { useMemo, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import React, { useState } from 'react';
+import { useDispatch } from 'react-redux';
 
 import { styled } from '@linaria/react';
-import { useUserTokenAccounts } from '@p2p-wallet-web/core';
-import { NATIVE_MINT } from '@solana/spl-token';
 import classNames from 'classnames';
 import { Feature } from 'flagged';
 import { rgba } from 'polished';
 
+import { useTokenAccountsHidden } from 'app/contexts/settings';
 import { Widget } from 'components/common/Widget';
 import { Button, Icon } from 'components/ui';
 import { FEATURE_ADD_TOKEN_BUTTON } from 'config/featureFlags';
@@ -123,33 +122,7 @@ type Props = {
 export const TokensWidget: FunctionComponent<Props> = ({ selectedSymbol }) => {
   const dispatch = useDispatch();
   const [isOpen, setIsOpen] = useState(false);
-  const userTokenAccounts = useUserTokenAccounts();
-
-  const hiddenTokens = useSelector((state) => state.wallet.hiddenTokens || []);
-  const zeroBalanceTokens = useSelector((state) => state.wallet.zeroBalanceTokens || []);
-  const { isZeroBalancesHidden } = useSelector((state) => state.wallet.settings);
-
-  const [tokenAccounts, hiddenTokenAccountsList] = useMemo(() => {
-    const newTokens = [];
-    const newHiddenTokensList = [];
-
-    for (const tokenAccount of userTokenAccounts) {
-      if (
-        hiddenTokens.includes(tokenAccount.key.toBase58()) ||
-        (isZeroBalancesHidden &&
-          (!tokenAccount.balance || tokenAccount.balance.toU64().lten(0)) &&
-          !zeroBalanceTokens.includes(tokenAccount.key.toBase58()) &&
-          tokenAccount.mint &&
-          !tokenAccount.mint.equals(NATIVE_MINT))
-      ) {
-        newHiddenTokensList.push(tokenAccount);
-      } else {
-        newTokens.push(tokenAccount);
-      }
-    }
-
-    return [newTokens, newHiddenTokensList];
-  }, [userTokenAccounts, isZeroBalancesHidden, zeroBalanceTokens, hiddenTokens]);
+  const [tokenAccounts, hiddenTokenAccounts] = useTokenAccountsHidden();
 
   const handleAddCoinClick = () => {
     void dispatch(openModal({ modalType: SHOW_MODAL_ADD_COIN }));
@@ -170,18 +143,14 @@ export const TokensWidget: FunctionComponent<Props> = ({ selectedSymbol }) => {
         </Feature>
       }
     >
-      <TokenAccountList
-        items={tokenAccounts}
-        selectedSymbol={selectedSymbol}
-        isZeroBalancesHidden={isZeroBalancesHidden}
-      />
-      {hiddenTokenAccountsList.length > 0 ? (
+      <TokenAccountList items={tokenAccounts} selectedSymbol={selectedSymbol} />
+      {hiddenTokenAccounts.length > 0 ? (
         <HiddenTokens onClick={handleChevronClick} className={classNames({ isOpen })}>
           <HideIconWrapper>
             <IconHide name={isOpen ? 'eye-hide' : 'eye'} className={classNames({ isOpen })} />
           </HideIconWrapper>
-          <Text>{`${hiddenTokenAccountsList.length} hidden wallet${
-            hiddenTokenAccountsList.length !== 1 ? 's' : ''
+          <Text>{`${hiddenTokenAccounts.length} hidden wallet${
+            hiddenTokenAccounts.length !== 1 ? 's' : ''
           }`}</Text>
           <ChevronWrapper className={classNames({ isOpen })}>
             <ChevronIcon name="chevron" />
@@ -189,12 +158,7 @@ export const TokensWidget: FunctionComponent<Props> = ({ selectedSymbol }) => {
         </HiddenTokens>
       ) : undefined}
       {isOpen ? (
-        <TokenAccountList
-          items={hiddenTokenAccountsList}
-          selectedSymbol={selectedSymbol}
-          isZeroBalancesHidden={isZeroBalancesHidden}
-          isHidden
-        />
+        <TokenAccountList items={hiddenTokenAccounts} selectedSymbol={selectedSymbol} isHidden />
       ) : undefined}
     </WrapperWidget>
   );

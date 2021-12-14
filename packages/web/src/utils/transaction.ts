@@ -4,10 +4,10 @@ import type { Layout } from 'buffer-layout';
 
 import { getConnection } from 'api/connection';
 import { getWallet } from 'api/wallet';
-import type { NetworkType } from 'config/constants';
+import type { NetworkObj } from 'config/constants';
 
 export const makeNewAccountInstruction = async (
-  network: NetworkType,
+  network: NetworkObj,
   newAccountKey: PublicKey,
   layout: Layout,
   programId: PublicKey,

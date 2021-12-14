@@ -148,7 +148,7 @@ const renderStates = ({
   states.push(
     <StatusItem key={DepositStates.COMPLETED}>
       <Status>
-        <StatusTitle>{`Successfully minted ${outAmount} renBtc!`}</StatusTitle>
+        <StatusTitle>{`Successfully minted ${outAmount} renBTC!`}</StatusTitle>
       </Status>
       <StatusAction>
         <StatusTitle style={{ color: '#4caf50' }}>{`+${outAmount} renBTC`}</StatusTitle>

@@ -7,10 +7,10 @@ import { NavLink } from 'react-router-dom';
 import { styled } from '@linaria/react';
 import { useUsername } from '@p2p-wallet-web/core';
 
+import { useSettings } from 'app/contexts/settings';
 import { Icon } from 'components/ui';
 import { openModal } from 'store/actions/modals';
 import { SHOW_MODAL_PROCEED_USERNAME } from 'store/constants/modalTypes';
-import { getUsernameBannerHide } from 'utils/settings';
 
 const Wrapper = styled.div`
   display: flex;
@@ -81,15 +81,16 @@ const Text = styled.div`
 
 export const UsernameBanner: FC = () => {
   const dispatch = useDispatch();
+  const location = useLocation();
   const { username } = useUsername();
+  const {
+    settings: { usernameBannerHiddenByUser },
+  } = useSettings();
 
   const [isBannerShow, setIsBannerShow] = useState<boolean>(false);
-  const location = useLocation();
 
   useEffect(() => {
-    const isHiddenByUser = getUsernameBannerHide();
-
-    if (isHiddenByUser || username) {
+    if (usernameBannerHiddenByUser || username) {
       setIsBannerShow(false);
     } else if (username !== undefined) {
       setIsBannerShow(true);

@@ -1,27 +1,19 @@
 import type { FunctionComponent } from 'react';
 import React from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { useHistory } from 'react-router';
 
 import { styled } from '@linaria/react';
-import type * as web3 from '@solana/web3.js';
+import type { PublicKey } from '@solana/web3.js';
 import { Feature } from 'flagged';
 import { rgba } from 'polished';
 
+import { useSettings, useTokenAccountIsHidden } from 'app/contexts/settings';
 import { Widget } from 'components/common/Widget';
 import { Button, Icon, Switch } from 'components/ui';
 import { FEATURE_SETTINGS_CLOSE_ACCOUNT } from 'config/featureFlags';
 import { openModal } from 'store/actions/modals';
 import { SHOW_MODAL_CLOSE_TOKEN_ACCOUNT } from 'store/constants/modalTypes';
-import type { RootState } from 'store/rootReducer';
-import { updateHiddenTokens } from 'store/slices/wallet/WalletSlice';
-import {
-  hideUnhideToken,
-  hideUnhideZeroBalanceToken,
-  loadHiddenTokens,
-  removeHiddenToken,
-  removeZeroBalanceToken,
-} from 'utils/settings';
 
 const WrapperWidget = styled(Widget)``;
 
@@ -121,7 +113,7 @@ const WarningIcon = styled(Icon)`
 `;
 
 type Props = {
-  publicKey: web3.PublicKey;
+  publicKey: PublicKey;
   tokenName: string;
   isZeroBalance: boolean;
 };
@@ -133,14 +125,8 @@ export const TokenSettingsWidget: FunctionComponent<Props> = ({
 }) => {
   const history = useHistory();
   const dispatch = useDispatch();
-
-  const { isZeroBalancesHidden } = useSelector((state: RootState) => state.wallet.settings);
-  const zeroBalanceTokens = useSelector((state: RootState) => state.wallet.zeroBalanceTokens) || [];
-
-  const hiddenTokens = loadHiddenTokens();
-  const isHidden =
-    (isZeroBalancesHidden && isZeroBalance && !zeroBalanceTokens.includes(publicKey.toBase58())) ||
-    hiddenTokens.has(publicKey.toBase58());
+  const { toggleHideTokenAccount } = useSettings();
+  const isHidden = useTokenAccountIsHidden(publicKey);
 
   const handleCloseTokenAccountClick = () => {
     void dispatch(
@@ -151,17 +137,9 @@ export const TokenSettingsWidget: FunctionComponent<Props> = ({
     );
   };
 
-  const handleHideTokenClick = (pubKey: web3.PublicKey) => () => {
+  const handleHideTokenClick = (pubKey: PublicKey) => () => {
     const tokenAddress = pubKey.toBase58();
-    if (isZeroBalancesHidden && isZeroBalance) {
-      hideUnhideZeroBalanceToken(tokenAddress);
-      removeHiddenToken(tokenAddress);
-    } else {
-      hideUnhideToken(tokenAddress);
-      removeZeroBalanceToken(tokenAddress);
-    }
-
-    dispatch(updateHiddenTokens());
+    toggleHideTokenAccount(tokenAddress, isZeroBalance);
   };
 
   const renderSettings = () => {

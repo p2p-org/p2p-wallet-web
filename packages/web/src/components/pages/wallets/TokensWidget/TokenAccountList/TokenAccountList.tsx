@@ -17,14 +17,12 @@ const Wrapper = styled.div`
 type Props = {
   items: TokenAccount[];
   selectedSymbol: string;
-  isZeroBalancesHidden?: boolean;
   isHidden?: boolean;
 };
 
 export const TokenAccountList: FunctionComponent<Props> = ({
   items = [],
   selectedSymbol,
-  isZeroBalancesHidden = true,
   isHidden = false,
 }) => {
   const { markets: rates } = useRates();
@@ -45,7 +43,6 @@ export const TokenAccountList: FunctionComponent<Props> = ({
           tokenAccount={item}
           isSelected={item.balance?.token.symbol === selectedSymbol}
           isHidden={isHidden}
-          isZeroBalancesHidden={isZeroBalancesHidden}
         />
       ))}
     </Wrapper>

@@ -7,8 +7,7 @@ import { rgba } from 'polished';
 
 import { WidgetPage } from 'components/common/WidgetPage';
 import { RadioButton } from 'components/ui';
-import type { NetworkType } from 'config/constants';
-import { networks } from 'config/constants';
+import { NETWORKS } from 'config/constants';
 import { trackEvent } from 'utils/analytics';
 
 // const URL_REGEX = new RegExp(
@@ -74,7 +73,7 @@ export const Network: FunctionComponent = () => {
   // const [customUrl, setCustomUrl] = useState('');
   const { endpoint, setEndpoints, setNetwork } = useWallet();
 
-  const handleChange = (value: NetworkType) => {
+  const handleChange = (value: NetworkObj) => {
     trackEvent('settings_network_click', { endpoint: value.endpoint });
 
     setNetwork(value.network);
@@ -85,7 +84,7 @@ export const Network: FunctionComponent = () => {
   };
 
   const renderClustersRadioButtons = () =>
-    Object.values(networks).map((networkItem) => {
+    Object.values(NETWORKS).map((networkItem) => {
       return (
         <RadioButtonItem key={networkItem.name}>
           <RadioButton

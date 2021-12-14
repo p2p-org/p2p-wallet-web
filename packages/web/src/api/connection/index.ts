@@ -2,7 +2,7 @@ import type { Commitment, SignatureResult } from '@solana/web3.js';
 import { Connection } from '@solana/web3.js';
 import { memoizeWith, toString } from 'ramda';
 
-import type { NetworkType } from 'config/constants';
+import type { NetworkObj } from 'config/constants';
 import { defaultCommitment } from 'config/constants';
 
 import { retryableProxy } from './utils/retryableProxy';
@@ -10,11 +10,11 @@ import { retryableProxy } from './utils/retryableProxy';
 // The default time to wait when confirming a transaction.
 export const DEFAULT_COMMITMENT: Commitment = defaultCommitment;
 
-let currentNetwork: NetworkType;
-let currentNetworkTransactions: NetworkType;
+let currentNetwork: NetworkObj;
+let currentNetworkTransactions: NetworkObj;
 
 // Since connection objects include state, we memoise them here per network
-const createConnection = memoizeWith(toString, (network: NetworkType): Connection => {
+const createConnection = memoizeWith(toString, (network: NetworkObj): Connection => {
   const connection = new Connection(network.endpoint, {
     wsEndpoint: network.wsEndpoint,
     httpHeaders: network.httpHeaders,
@@ -42,14 +42,14 @@ const createConnection = memoizeWith(toString, (network: NetworkType): Connectio
   return connection;
 });
 
-export const getEndpoint = (network: NetworkType): string => {
+export const getEndpoint = (network: NetworkObj): string => {
   return network.endpoint;
 };
-export const getWsEndpoint = (network: NetworkType): string | undefined => {
+export const getWsEndpoint = (network: NetworkObj): string | undefined => {
   return network.wsEndpoint;
 };
 
-export const getConnection = (network?: NetworkType): Connection => {
+export const getConnection = (network?: NetworkObj): Connection => {
   if (network) {
     currentNetwork = network;
   }
@@ -57,7 +57,7 @@ export const getConnection = (network?: NetworkType): Connection => {
   return createConnection(currentNetwork);
 };
 
-export const getConnectionTransactions = (network?: NetworkType): Connection => {
+export const getConnectionTransactions = (network?: NetworkObj): Connection => {
   if (network) {
     currentNetworkTransactions = { ...network };
 

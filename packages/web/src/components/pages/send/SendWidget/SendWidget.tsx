@@ -1,12 +1,13 @@
 import type { FunctionComponent } from 'react';
 import React, { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { useHistory } from 'react-router';
 
 import { styled } from '@linaria/react';
-import type { ResolveUsernameResponse } from '@p2p-wallet-web/core';
+import type { ResolveUsernameResponse, TokenAccount } from '@p2p-wallet-web/core';
 import {
   useNameService,
+  useSolana,
   useUserTokenAccount,
   useUserTokenAccounts,
   useWallet,
@@ -14,13 +15,13 @@ import {
 import { unwrapResult } from '@reduxjs/toolkit';
 import { Bitcoin } from '@renproject/chains-bitcoin';
 import type { RenNetwork } from '@renproject/interfaces';
+import type { Token } from '@saberhq/token-utils';
 import { PublicKey } from '@solana/web3.js';
 import classNames from 'classnames';
 import Decimal from 'decimal.js';
 import { rgba } from 'polished';
 
-import type { Token } from 'api/token/Token';
-import type { TokenAccount } from 'api/token/TokenAccount';
+import { useSettings } from 'app/contexts/settings';
 import { RateUSD } from 'components/common/RateUSD';
 import { FromToSelectInput } from 'components/pages/send/SendWidget/FromToSelectInput';
 import { Button, Icon, Select, Switch, TextField, Tooltip } from 'components/ui';
@@ -31,7 +32,6 @@ import {
   SHOW_MODAL_TRANSACTION_CONFIRM,
   SHOW_MODAL_TRANSACTION_STATUS,
 } from 'store/constants/modalTypes';
-import type { RootState } from 'store/rootReducer';
 import { getTokenAccount, transfer } from 'store/slices/wallet/WalletSlice';
 import { trackEvent } from 'utils/analytics';
 import { useRenNetwork } from 'utils/hooks/renBridge/useNetwork';
@@ -206,10 +206,18 @@ type Props = {
   publicKey: string | undefined;
 };
 
+// TODO: refactor To field to own component wit logic by hooks
 export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
   const dispatch = useDispatch();
   const history = useHistory();
   const trackEventOnce = useTrackEventOnce();
+  const { resolveUsername } = useNameService();
+  const { provider } = useSolana();
+  const { connection } = useWallet();
+  const renNetwork = useRenNetwork();
+  const tokenAccounts = useUserTokenAccounts();
+  const fromTokenAccount = useUserTokenAccount(publicKey);
+
   const [fromAmount, setFromAmount] = useState('');
   const [toTokenPublicKey, setToTokenPublicKey] = useState('');
   const [txFee, setTxFee] = useState(0);
@@ -224,19 +232,13 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
   const [isSolanaNetwork, setIsSolanaNetwork] = useState(true);
   const [resolvedNames, setResolvedNames] = useState<ResolveUsernameResponse[]>([]);
   const [isResolvingNames, setisResolvingNames] = useState(false);
-  const { resolveUsername } = useNameService();
 
-  const { connection } = useWallet();
-  const network = useRenNetwork();
   const { fees, pending: isFetchingFee } = useFetchFees(!isSolanaNetwork);
 
-  const tokenAccounts = useUserTokenAccounts();
-  const fromTokenAccount = useUserTokenAccount(publicKey);
-
-  const useFreeTransactions = useSelector(
-    (state: RootState) => state.wallet.settings.useFreeTransactions,
-  );
-  const isNetworkSourceSelectorVisible = fromTokenAccount?.balance?.token.symbol === 'RENBTC';
+  const {
+    settings: { useFreeTransactions },
+  } = useSettings();
+  const isNetworkSourceSelectorVisible = fromTokenAccount?.balance?.token.symbol === 'renBTC';
 
   useEffect(() => {
     if (destinationNetwork !== 'solana') {
@@ -244,7 +246,7 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
     } else {
       setIsSolanaNetwork(true);
     }
-    if (destinationNetwork !== 'solana' && fromTokenAccount?.balance?.token.symbol !== 'RENBTC') {
+    if (destinationNetwork !== 'solana' && fromTokenAccount?.balance?.token.symbol !== 'renBTC') {
       setIsSolanaNetwork(true);
     }
   }, [destinationNetwork, fromTokenAccount?.balance?.token.symbol]);
@@ -278,7 +280,6 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
         const resultRentFee = await connection.getMinimumBalanceForRentExemption(
           BURN_ALLOCATE_ACCOUNT_SIZE,
         );
-
         const resultRecentBlockhash = await connection.getRecentBlockhash();
 
         setRentFee(formatFee(resultRentFee));
@@ -295,21 +296,19 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
 
   useEffect(() => {
     const checkDestinationAddress = async () => {
-      const account = unwrapResult(
-        await dispatch(getTokenAccount(new PublicKey(toTokenPublicKey))),
-      );
+      const account = await provider.getAccountInfo(new PublicKey(toTokenPublicKey));
 
       if (!account) {
         setIsShowConfirmAddressSwitch(true);
       }
     };
 
-    if (isSolanaNetwork && isValidAddress(isSolanaNetwork, toTokenPublicKey, network)) {
+    if (isSolanaNetwork && isValidAddress(isSolanaNetwork, toTokenPublicKey, renNetwork)) {
       void checkDestinationAddress();
     } else {
       setIsShowConfirmAddressSwitch(false);
     }
-  }, [dispatch, isSolanaNetwork, network, toTokenPublicKey]);
+  }, [dispatch, isSolanaNetwork, renNetwork, toTokenPublicKey]);
 
   useEffect(() => {
     if (!isSolanaNetwork && !isFetchingFee) {
@@ -446,9 +445,11 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
       return;
     }
 
-    trackEvent('send_select_token_click', { tokenTicker: nextTokenAccount.mint.symbol || '' });
+    trackEvent('send_select_token_click', {
+      tokenTicker: nextTokenAccount.balance?.token.symbol || '',
+    });
 
-    history.replace(`/send/${nextTokenAccount.address.toBase58()}`);
+    history.replace(`/send/${nextTokenAccount.key.toBase58()}`);
   };
 
   const handleFromAmountChange = (minorAmount: string, type?: string) => {
@@ -483,8 +484,9 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
   const isDisabled = isExecuting;
   const destinationAddress = usernameResolvedAddress ? usernameResolvedAddress : toTokenPublicKey;
   const isValidDestinationAddress = destinationAddress.length
-    ? isValidAddress(isSolanaNetwork, destinationAddress, network)
+    ? isValidAddress(isSolanaNetwork, destinationAddress, renNetwork)
     : true;
+
   const toolTipItems = [];
   if (useFreeTransactions && !isNetworkSourceSelectorVisible) {
     toolTipItems.push(

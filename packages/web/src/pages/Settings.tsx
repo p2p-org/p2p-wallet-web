@@ -1,6 +1,5 @@
 import type { FunctionComponent } from 'react';
 import React, { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router';
 import { NavLink, useLocation } from 'react-router-dom';
 
@@ -9,6 +8,8 @@ import { useUsername, useWallet } from '@p2p-wallet-web/core';
 import classNames from 'classnames';
 import { Feature } from 'flagged';
 
+import type { WalletSettings } from 'app/contexts/settings';
+import { APPEARANCE, CURRENCIES, useSettings } from 'app/contexts/settings';
 import AppStoreBadge from 'assets/images/app-store-badge.png';
 import GooglePlayBadge from 'assets/images/google-play-badge.png';
 import { Layout } from 'components/common/Layout';
@@ -18,10 +19,7 @@ import { Accordion, Icon, Select, Switch } from 'components/ui';
 import { MenuItem } from 'components/ui/Select/MenuItem';
 import { appStorePath, playStorePath } from 'config/constants';
 import { FEATURE_SETTINGS_FREE_TRANSACTIONS, FEATURE_SETTINGS_LIST } from 'config/featureFlags';
-import { updateSettings } from 'store/slices/wallet/WalletSlice';
 import { trackEvent } from 'utils/analytics';
-import { appearance, currencies } from 'utils/settings';
-import type { WalletSettings } from 'utils/types';
 
 const Wrapper = styled.div`
   display: grid;
@@ -151,9 +149,8 @@ const Text = styled.div`
 export const Settings: FunctionComponent = () => {
   const location = useLocation<{ fromPage: string }>();
   const history = useHistory();
-  const dispatch = useDispatch();
   const { publicKey, disconnect, endpoint } = useWallet();
-  const settings = useSelector((state) => state.wallet.settings);
+  const { settings, updateSettings } = useSettings();
   const { username, domain } = useUsername();
 
   useEffect(() => {
@@ -167,9 +164,9 @@ export const Settings: FunctionComponent = () => {
   };
 
   const onItemClickHandler =
-    (option: Partial<WalletSettings> = settings) =>
+    (options: Partial<WalletSettings> = settings) =>
     () => {
-      dispatch(updateSettings(option));
+      updateSettings(options);
     };
 
   return (
@@ -183,7 +180,7 @@ export const Settings: FunctionComponent = () => {
                   <ItemTitle>Currency</ItemTitle>
                   <ItemAction>
                     <Select value={settings.currency}>
-                      {currencies.map(({ ticker, name, symbol }) => (
+                      {CURRENCIES.map(({ ticker, name, symbol }) => (
                         <MenuItem
                           key={ticker}
                           isSelected={ticker === settings.currency}
@@ -202,7 +199,7 @@ export const Settings: FunctionComponent = () => {
                   <ItemTitle>Appearance</ItemTitle>
                   <ItemAction>
                     <Select value={settings.appearance}>
-                      {appearance.map((value) => (
+                      {APPEARANCE.map((value) => (
                         <MenuItem
                           key={value}
                           isSelected={value === settings.appearance}

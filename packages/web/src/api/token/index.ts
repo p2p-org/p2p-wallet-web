@@ -9,7 +9,7 @@ import { getConnection } from 'api/connection';
 import { retryableProxy } from 'api/connection/utils/retryableProxy';
 import { getWallet, makeTransaction, sendTransaction } from 'api/wallet';
 import { SOL_MINT } from 'app/contexts/swap';
-import type { NetworkType } from 'config/constants';
+import type { NetworkObj } from 'config/constants';
 import { SYSTEM_PROGRAM_ID } from 'constants/solana/bufferLayouts';
 import { CacheTTL } from 'lib/cachettl';
 import { toDecimal } from 'utils/amount';
@@ -65,7 +65,7 @@ const transferSol = async (parameters: TransferParameters): Promise<string> => {
 };
 
 // The API is a singleton per cluster. This ensures requests can be cached
-export const APIFactory = memoizeWith(toString, (network: NetworkType): API => {
+export const APIFactory = memoizeWith(toString, (network: NetworkObj): API => {
   const connection = getConnection(network);
   const payer = new Account();
 
@@ -80,18 +80,6 @@ export const APIFactory = memoizeWith(toString, (network: NetworkType): API => {
       return null;
     }
 
-    if (
-      network.cluster === 'devnet' &&
-      address.toBase58() === 'FsaLodPu4VmSwXGr3gWfwANe4vKf8XSZcCh1CEeJ3jpD'
-    ) {
-      return {
-        chainId: 101,
-        address: 'FsaLodPu4VmSwXGr3gWfwANe4vKf8XSZcCh1CEeJ3jpD',
-        name: 'renBTC',
-        decimals: 8,
-        symbol: 'RENBTC',
-      };
-    }
     const configForToken = find(propEq('address', address.toBase58()), clusterConfig);
 
     if (!configForToken) {

@@ -1,7 +1,6 @@
+import type { Network } from '@saberhq/solana-contrib';
 import type { Commitment, HttpHeaders } from '@solana/web3.js';
 import { clusterApiUrl, PublicKey } from '@solana/web3.js';
-
-import type { ExtendedCluster } from 'utils/types';
 
 export const isDev = process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test';
 
@@ -22,9 +21,9 @@ export const defaultCommitment: Commitment =
 // in order to work around a known blockchain web3 bug
 export const postTransactionSleepMS = Number(process.env.REACT_APP_POST_TRANSACTION_SLEEP_MS);
 
-export type NetworkType = {
+export type NetworkObj = {
   name: string;
-  network: ExtendedCluster;
+  network: Network;
   endpoint: string;
   endpointLabel?: string;
   wsEndpoint?: string;
@@ -41,10 +40,10 @@ export type NetworkNameType =
 
 type NetworksByNameType = {
   // eslint-disable-next-line no-unused-vars
-  [name in NetworkNameType]: NetworkType;
+  [name in NetworkNameType]: NetworkObj;
 };
 
-export const networks: NetworksByNameType = {
+export const NETWORKS: NetworksByNameType = {
   'p2p-rpcpool': {
     name: 'p2p-rpcpool',
     network: 'mainnet-beta',
@@ -71,8 +70,6 @@ export const networks: NetworksByNameType = {
     endpoint: `${clusterApiUrl('testnet')}/`,
   },
 };
-
-export const DEFAULT_NETWORK: NetworkType = networks['p2p-rpcpool'];
 
 export const feeRelayerUrl = process.env.REACT_APP_FEE_RELAYER_URL;
 

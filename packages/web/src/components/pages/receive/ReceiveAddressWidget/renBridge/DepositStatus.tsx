@@ -163,7 +163,7 @@ const DepositStatusItem: FC<{
       return (
         <StatusItem>
           <Status>
-            <StatusTitle>{`Successfully minted ${outAmount} renBtc!`}</StatusTitle>
+            <StatusTitle>{`Successfully minted ${outAmount} renBTC!`}</StatusTitle>
             {timestamp && <StatusTimestamp>{timestamp}</StatusTimestamp>}
           </Status>
           <StatusAction>

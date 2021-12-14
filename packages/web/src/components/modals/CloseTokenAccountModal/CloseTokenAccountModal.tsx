@@ -8,7 +8,6 @@ import type { History } from 'history';
 
 import { Button, Icon } from 'components/ui';
 import { closeTokenAccount } from 'store/slices/wallet/WalletSlice';
-import { removeClosedTokenKeys } from 'utils/settings';
 
 const Wrapper = styled.div`
   position: relative;
@@ -111,7 +110,7 @@ export const CloseTokenAccountModal: FunctionComponent<Props> = ({
     try {
       setIsExecuting(true);
       await dispatch(closeTokenAccount({ publicKey }));
-      removeClosedTokenKeys(publicKey.toBase58());
+      // removeClosedTokenKeys(publicKey.toBase58());
     } catch (error) {
       console.log(error);
     } finally {

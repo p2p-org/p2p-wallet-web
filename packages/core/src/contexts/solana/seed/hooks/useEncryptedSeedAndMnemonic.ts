@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
 
-import { StorageKeys } from '../../../../internal/constants/storageKeys';
-import { useStorage } from '../../../../internal/hooks/useStorage';
+import { useStorage } from '../../../../hooks';
+import { STORAGE_KEYS } from '../../../../internal/constants/storageKeys';
 import type { SeedAndMnemonic } from '../types';
 import { generateEncryptedTextAsync } from '../utils/encryption';
 import { setUnencryptedSeedAndMnemonic } from '../utils/unencryptedSeedAndMnemonic';
@@ -12,7 +12,7 @@ export const useEncryptedSeedAndMnemonic = (): [
   (nextSeedAndMnemonic: SeedAndMnemonic, password: string, isSaveUnencrypted: boolean) => void,
 ] => {
   const [encryptedSeedAndMnemonic, isLoading, _setEncryptedSeedAndMnemonic] = useStorage(
-    StorageKeys.EncryptedSeedAndMnemonic,
+    STORAGE_KEYS.EncryptedSeedAndMnemonic,
     '',
   );
 

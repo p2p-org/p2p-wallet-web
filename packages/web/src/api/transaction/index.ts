@@ -14,7 +14,6 @@ import { getConnection, getConnectionTransactions } from 'api/connection';
 import { APIFactory as TokenAPIFactory } from 'api/token';
 import type { Token } from 'api/token/Token';
 import { TokenAccount } from 'api/token/TokenAccount';
-import type { NetworkType } from 'config/constants';
 import { SYSTEM_PROGRAM_ID } from 'constants/solana/bufferLayouts';
 import { CacheTTL } from 'lib/cachettl';
 
@@ -38,7 +37,7 @@ export interface API {
 }
 
 // The API is a singleton per cluster. This ensures requests can be cached
-export const APIFactory = memoizeWith(toString, (network: NetworkType): API => {
+export const APIFactory = memoizeWith(toString, (network: NetworkObj): API => {
   const connection = getConnection(network);
   const connectionTransactions = getConnectionTransactions(network);
   const tokenAPI = TokenAPIFactory(network);

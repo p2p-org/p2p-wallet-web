@@ -3,18 +3,19 @@ import React, { useEffect, useState } from 'react';
 
 import type { ConnectedWallet } from '@p2p-wallet-web/core';
 import {
+  NameServiceProvider,
   NETWORK_CONFIGS,
   RatesProvider,
   SeedProvider,
   SolanaProvider,
   TokenAccountsProvider,
 } from '@p2p-wallet-web/core';
-import { NameServiceProvider } from '@p2p-wallet-web/core/dist/cjs/contexts/api/nameService';
 import { SailProvider } from '@p2p-wallet-web/sail';
 import type { TokenListContainer as SPLTokenListContainer } from '@solana/spl-token-registry';
 import { TokenListProvider as SPLTokenListProvider } from '@solana/spl-token-registry';
 
 import { BlockchainProvider } from 'app/contexts/blockchain';
+import { SettingsProvider } from 'app/contexts/settings';
 import { TokenListProvider } from 'app/contexts/swap';
 import { ToastManager } from 'components/common/ToastManager';
 import { Providers as SwapProviders } from 'components/pages/swap/Providers';
@@ -70,13 +71,15 @@ export const Providers: FC = ({ children }) => {
 
   return (
     <CoreProviders>
-      <TokenListProvider initialState={{ tokenList }}>
-        <BlockchainProvider>
-          <LockAndMintProvider>
-            <SwapProviders>{children}</SwapProviders>
-          </LockAndMintProvider>
-        </BlockchainProvider>
-      </TokenListProvider>
+      <SettingsProvider>
+        <TokenListProvider initialState={{ tokenList }}>
+          <BlockchainProvider>
+            <LockAndMintProvider>
+              <SwapProviders>{children}</SwapProviders>
+            </LockAndMintProvider>
+          </BlockchainProvider>
+        </TokenListProvider>
+      </SettingsProvider>
     </CoreProviders>
   );
 };

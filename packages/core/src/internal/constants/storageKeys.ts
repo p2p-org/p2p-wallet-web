@@ -1,4 +1,3 @@
-export const StorageKeys = {
-  UnencryptedSeedAndMnemonic: 'unencryptedSeedAndMnemonic',
+export const STORAGE_KEYS = {
   EncryptedSeedAndMnemonic: 'encryptedSeedAndMnemonic',
 };

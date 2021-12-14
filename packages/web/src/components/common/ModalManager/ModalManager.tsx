@@ -69,7 +69,7 @@ const ModalBackground = styled.div`
 
 // TODO: types.ts
 const modalsMap = new Map<string, LoadableComponent<any>>([
-  // [SHOW_MODAL_ADD_COIN, loadable(() => import('components/modals/AddCoinModal'))],
+  // [SHOW_MODAL_ADD_COIN, loadable(() => import('components/modals/__AddCoinModal'))],
   [
     SHOW_MODAL_TRANSACTION_CONFIRM,
     loadable(() => import('components/modals/TransactionConfirmModal')),
