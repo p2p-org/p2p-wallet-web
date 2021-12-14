@@ -1,5 +1,4 @@
-export * from './useLockedState';
-export * from './useSeed';
+export * from './useEncryptedSeedAndMnemonic';
 export * from './useSeedAndMnemonic';
+export * from './useTryUnlockSeedAndMnemonic';
 export * from './useUnencryptedSeedAndMnemonic';
-export * from './useUnlockSeedAndMnemonic';

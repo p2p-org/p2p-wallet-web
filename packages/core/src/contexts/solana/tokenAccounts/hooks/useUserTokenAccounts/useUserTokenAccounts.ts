@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 
 import { useAccountsData } from '@p2p-wallet-web/sail';
-import { SOL } from '@saberhq/token-utils';
+import { WRAPPED_SOL } from '@saberhq/token-utils';
 
 import { useTokens } from '../../../../../hooks';
 import { useConnectedWallet, useConnectionContext } from '../../../solana';
@@ -15,7 +15,7 @@ export const useUserTokenAccounts = (): readonly TokenAccount[] => {
   const wallet = useConnectedWallet();
   const { network } = useConnectionContext();
   const nativePublicKey = wallet?.publicKey;
-  const sol = SOL[network];
+  const sol = WRAPPED_SOL[network];
 
   const accountsData = useAccountsData(userTokenAccountKeys);
 
