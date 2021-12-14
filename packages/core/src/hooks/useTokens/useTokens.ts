@@ -15,7 +15,7 @@ export const useTokens = (): {
   const { network } = useConnectionContext();
   const chainId = networkToChainId(network);
 
-  const standardTokenMap = useMemo(() => makeTokenMap(chainId), [network]);
+  const standardTokenMap = useMemo(() => makeTokenMap(chainId), [chainId]);
 
   const tokenMap = useMemo(() => {
     if (!chainId) {

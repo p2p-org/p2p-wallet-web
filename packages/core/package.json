@@ -16,6 +16,7 @@
     "@saberhq/token-utils": "^1.7.4",
     "@saberhq/use-solana": "^1.7.4",
     "@solana/spl-token": "^0.1.8",
+    "@solana/spl-token-registry": "^0.2.804",
     "bip32": "^2.0.6",
     "bs58": "^4.0.1",
     "buffer-layout": "^1.2.2",
@@ -30,7 +31,7 @@
   },
   "devDependencies": {
     "@project-serum/anchor": "^0.16.2",
-    "@solana/spl-token-registry": "^0.2.275",
+    "@solana/spl-token-registry": "^0.2.804",
     "@solana/web3.js": "^1.29.2",
     "@types/react": "^17.0.27",
     "@types/react-dom": "^17.0.9",
