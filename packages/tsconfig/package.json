@@ -1,0 +1,18 @@
+{
+  "name": "@p2p-wallet-web/tsconfig",
+  "description": "P2P Wallet TypeScript configurations.",
+  "version": "1.0.0",
+  "repository": "git@github.com:p2p-org/p2p-wallet-web.git",
+  "license": "Apache-2.0",
+  "keywords": [
+    "solana",
+    "p2p-wallet",
+    "typescript"
+  ],
+  "files": [
+    "tsconfig.*.json"
+  ],
+  "publishConfig": {
+    "access": "public"
+  }
+}

@@ -8,13 +8,13 @@
     "dist/"
   ],
   "scripts": {
-    "build": "rm -fr dist/ && tsc && tsc -P tsconfig.esm.json",
-    "watch": "rm -fr dist/ && tsc -w"
+    "build": "rm -fr dist/ && tsc && tsc -P tsconfig.cjs.json",
+    "watch": "rm -fr dist/ && tsc -P tsconfig.cjs.json -w"
   },
   "dependencies": {
     "@p2p-wallet-web/sail": "^2.8.0",
-    "@saberhq/token-utils": "^1.7.4",
-    "@saberhq/use-solana": "^1.7.4",
+    "@saberhq/token-utils": "^1.10.16",
+    "@saberhq/use-solana": "^1.10.16",
     "@solana/spl-token": "^0.1.8",
     "@solana/spl-token-registry": "^0.2.804",
     "bip32": "^2.0.6",
