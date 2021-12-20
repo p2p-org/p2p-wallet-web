@@ -1,7 +1,8 @@
-import type { PublicKey } from "@solana/web3.js";
 import { useMemo } from "react";
 
-import type { AccountDatum } from "../types";
+import type { PublicKey } from "@solana/web3.js";
+
+import type { AccountDatum } from "../internal";
 import { useAccountsData } from "./useAccountsData";
 
 export const useAccountData = (

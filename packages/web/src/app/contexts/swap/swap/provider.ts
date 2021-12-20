@@ -13,7 +13,6 @@ import Trade from 'app/contexts/swap/models/Trade';
 import { getMaxAge } from 'app/contexts/swap/utils/AsyncCache';
 import { getTradeId } from 'app/contexts/swap/utils/pools';
 import { minSolBalanceForSwap } from 'app/contexts/swap/utils/tokenAccounts';
-import { updateTransactions } from 'store/slices/transaction/TransactionSlice';
 import { Keys, useLocalStorage } from 'utils/hooks/useLocalStorage';
 import { swapNotification } from 'utils/transactionNotifications';
 
@@ -425,7 +424,7 @@ const useSwapInternal = (props: UseSwapArgs = {}): UseSwap => {
       await fetchingUserTokenAccounts;
 
       // TODO: until we made new transactions package
-      dispatch(updateTransactions(true));
+      // dispatch(updateTransactions(true));
     } catch (e) {
       console.error(e);
     }

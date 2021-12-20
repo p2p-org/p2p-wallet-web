@@ -1,3 +1,4 @@
+import { SYSTEM_PROGRAM_ID } from '@p2p-wallet-web/core';
 import { NATIVE_MINT, Token as SPLToken, TOKEN_PROGRAM_ID } from '@solana/spl-token';
 import type { TokenInfo } from '@solana/spl-token-registry';
 import type { AccountInfo, ParsedAccountData } from '@solana/web3.js';
@@ -8,7 +9,6 @@ import { find, memoizeWith, path, propEq, toString } from 'ramda';
 import { getConnection } from 'api/connection';
 import { SOL_MINT } from 'app/contexts/swap';
 import type { NetworkObj } from 'config/constants';
-import { SYSTEM_PROGRAM_ID } from 'constants/solana/bufferLayouts';
 import { CacheTTL } from 'lib/cachettl';
 import { toDecimal } from 'utils/amount';
 

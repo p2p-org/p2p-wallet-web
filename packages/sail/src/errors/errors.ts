@@ -16,9 +16,12 @@ export type SailErrorName = `Sail${
   | "RefetchAfterTX"
   | "RefetchSubscriptions"
   | "TransactionSign"
-  | "CacheRefetch"
+  | "AccountsCacheRefetch"
+  | "TransactionsCacheRefetch"
   | "AccountParse"
   | "AccountLoad"
+  | "TransactionLoad"
+  | "GetMultipleTransactions"
   | "GetMultipleAccounts"}Error`;
 
 export const ERROR_TITLES: { [N in SailErrorName]: string } = {
@@ -28,10 +31,13 @@ export const ERROR_TITLES: { [N in SailErrorName]: string } = {
   SailRefetchAfterTXError: "Error fetching changed accounts",
   SailRefetchSubscriptionsError: "Error refetching subscribed accounts",
   SailTransactionSignError: "Error signing transactions",
-  SailCacheRefetchError: "Error refetching from cache",
+  SailAccountsCacheRefetchError: "Error accounts refetching from cache",
+  SailTransactionsCacheRefetchError: "Error transactions refetching from cache",
   SailAccountParseError: "Error parsing account",
   SailAccountLoadError: "Error loading account",
+  SailTransactionLoadError: "Error loading transaction",
   SailGetMultipleAccountsError: "Error fetching multiple accounts",
+  SailGetMultipleTransactionsError: "Error fetching multiple transactions",
 };
 
 /**
@@ -196,12 +202,24 @@ export class SailTransactionSignError extends SailError {
 /**
  * Thrown if a cache refetch results in an error.
  */
-export class SailCacheRefetchError extends SailError {
+export class SailAccountsCacheRefetchError extends SailError {
   constructor(
     originalError: unknown,
     public readonly keys: readonly (PublicKey | null | undefined)[]
   ) {
-    super("SailCacheRefetchError", originalError);
+    super("SailAccountsCacheRefetchError", originalError);
+  }
+}
+
+/**
+ * Thrown if a cache refetch results in an error.
+ */
+export class SailTransactionsCacheRefetchError extends SailError {
+  constructor(
+    originalError: unknown,
+    public readonly keys: readonly (string | null | undefined)[]
+  ) {
+    super("SailTransactionsCacheRefetchError", originalError);
   }
 }
 
@@ -228,6 +246,19 @@ export class SailAccountLoadError extends SailError {
 }
 
 /**
+ * Thrown if an account could not be loaded.
+ */
+export class SailTransactionLoadError extends SailError {
+  constructor(originalError: unknown, public readonly transactionId: string) {
+    super("SailTransactionLoadError", originalError);
+  }
+
+  get userMessage(): string {
+    return `Error loading transaction ${this.transactionId}`;
+  }
+}
+
+/**
  * Callback called whenever getMultipleAccounts fails.
  */
 export class SailGetMultipleAccountsError extends SailError {
@@ -237,5 +268,18 @@ export class SailGetMultipleAccountsError extends SailError {
     originalError: unknown
   ) {
     super("SailGetMultipleAccountsError", originalError);
+  }
+}
+
+/**
+ * Callback called whenever getMultipleTransactions fails.
+ */
+export class SailGetMultipleTransactionsError extends SailError {
+  constructor(
+    public readonly keys: readonly string[],
+    public readonly commitment: Commitment,
+    originalError: unknown
+  ) {
+    super("SailGetMultipleTransactionsError", originalError);
   }
 }

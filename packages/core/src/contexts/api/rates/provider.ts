@@ -5,7 +5,7 @@ import { mergeAll, splitEvery } from 'ramda';
 import assert from 'ts-invariant';
 import { createContainer } from 'unstated-next';
 
-import { useTokens } from '../../../hooks';
+import { useAllTokens } from '../../../hooks';
 import { useConnectionContext } from '../..';
 import { BASE_CURRENCY, CRYPTO_COMPARE_API_KEY, CRYPTO_COMPARE_API_URL } from './constants';
 import type {
@@ -37,7 +37,7 @@ const useRatesInternal = (): UseRates => {
   assert(CRYPTO_COMPARE_API_KEY, 'Define crypto compare api key in .env');
 
   const { network } = useConnectionContext();
-  const { tokens } = useTokens();
+  const { tokens } = useAllTokens();
   const [candlesType, setCandlesType] = useState<CandleLimitType>('month');
   const [candles, setCandles] = useState<Candles>({});
   const [markets, setMarkets] = useState<Markets>({});

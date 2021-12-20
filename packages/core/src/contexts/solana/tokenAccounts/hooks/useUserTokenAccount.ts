@@ -6,7 +6,9 @@ import type { PublicKey } from '@solana/web3.js';
 import type { TokenAccount } from '../models';
 import { useUserTokenAccounts } from './useUserTokenAccounts';
 
-export const useUserTokenAccount = (_publicKey: PublicKey | string | null | undefined): TokenAccount | undefined => {
+export const useUserTokenAccount = (
+  _publicKey: PublicKey | string | null | undefined,
+): TokenAccount | undefined => {
   const publicKey = usePubkey(_publicKey);
   const tokenAccounts = useUserTokenAccounts();
 

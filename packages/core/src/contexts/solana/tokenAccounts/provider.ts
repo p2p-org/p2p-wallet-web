@@ -13,7 +13,9 @@ export interface UseTokenAccounts {
 
 const useTokenAccountsInternal = (): UseTokenAccounts => {
   const { connection } = useConnectionContext();
-  const { loader, accountsCache } = useSail();
+  const {
+    accounts: { loader, accountsCache },
+  } = useSail();
   const wallet = useConnectedWallet();
   const publicKey = wallet?.publicKey;
 
@@ -56,5 +58,5 @@ const useTokenAccountsInternal = (): UseTokenAccounts => {
   };
 };
 
-export const { Provider: TokenAccountsProvider, useContainer: useTokenAccounts } =
+export const { Provider: TokenAccountsProvider, useContainer: useTokenAccountsContext } =
   createContainer(useTokenAccountsInternal);

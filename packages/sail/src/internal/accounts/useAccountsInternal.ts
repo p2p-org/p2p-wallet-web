@@ -8,10 +8,10 @@ import DataLoader from "dataloader";
 
 import type { AccountFetchResult, SailError } from "../../index";
 import { SailRefetchSubscriptionsError } from "../../index";
-import type { AccountDatum } from "../../types";
 import type { CacheUpdateEvent } from "./emitter";
 import { AccountsEmitter } from "./emitter";
 import { fetchKeysUsingLoader } from "./fetchKeysUsingLoader";
+import type { AccountDatum } from "./types";
 import { getMultipleAccounts } from "./utils/getMultipleAccounts";
 
 /**
@@ -57,7 +57,7 @@ export interface UseAccountsArgs {
   onError: (err: SailError) => void;
 }
 
-export interface UseAccounts extends Required<UseAccountsArgs> {
+export interface UseAccounts extends Omit<UseAccountsArgs, "onError"> {
   /**
    * The loader. Usually should not be used directly.
    */
@@ -237,7 +237,7 @@ export const useAccountsInternal = (args: UseAccountsArgs): UseAccounts => {
   }, [onError, refetchAllSubscriptions, refreshIntervalMs]);
 
   const getDatum = useCallback(
-    (k: PublicKey | null | undefined) => {
+    (k: PublicKey | null | undefined): AccountDatum => {
       if (k) {
         const accountInfo = getCached(k);
         if (accountInfo) {
@@ -272,6 +272,5 @@ export const useAccountsInternal = (args: UseAccountsArgs): UseAccounts => {
 
     batchDurationMs,
     refreshIntervalMs,
-    onError,
   };
 };

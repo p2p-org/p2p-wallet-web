@@ -30,6 +30,7 @@
   },
   "scripts": {
     "build": "tsc && tsc --project tsconfig.cjs.json",
+    "watch": "rm -fr dist/ && tsc && tsc -P tsconfig.cjs.json -w",
     "clean": "rm -fr dist/",
     "lint": "eslint . --cache",
     "lint:ci": "eslint . --max-warnings=0",

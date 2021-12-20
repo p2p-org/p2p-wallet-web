@@ -8,9 +8,7 @@ import type { TransferParameters } from 'api/token';
 import { APIFactory as TokenAPIFactory } from 'api/token';
 import type { SerializableTokenAccount } from 'api/token/TokenAccount';
 import { TokenAccount } from 'api/token/TokenAccount';
-import { Transaction } from 'api/transaction/Transaction';
 import type { RootState } from 'store/rootReducer';
-import { addPendingTransaction } from 'store/slices/transaction/TransactionSlice';
 import { updateEntityArray } from 'store/utils';
 import { minorAmountToMajor } from 'utils/amount';
 import { transferNotification } from 'utils/transactionNotifications';
@@ -128,25 +126,25 @@ export const transfer = createAsyncThunk<string, TransferParameters>(
       resultSignature = await TokenAPI.transfer(parameters);
     }
 
-    thunkAPI.dispatch(
-      addPendingTransaction(
-        new Transaction(resultSignature, 0, null, null, null, {
-          type: 'transfer',
-          source: parameters.source,
-          sourceTokenAccount: tokenAccount || null,
-          sourceToken: tokenAccount?.mint || null,
-          destination: parameters.destination,
-          destinationTokenAccount: null,
-          destinationToken: tokenAccount?.mint || null,
-          sourceAmount: tokenAccount?.mint
-            ? minorAmountToMajor(parameters.amount, tokenAccount?.mint)
-            : new Decimal(0),
-          destinationAmount: tokenAccount?.mint
-            ? minorAmountToMajor(parameters.amount, tokenAccount?.mint)
-            : new Decimal(0),
-        }).serialize(),
-      ),
-    );
+    // thunkAPI.dispatch(
+    //   addPendingTransaction(
+    //     new Transaction(resultSignature, 0, null, null, null, {
+    //       type: 'transfer',
+    //       source: parameters.source,
+    //       sourceTokenAccount: tokenAccount || null,
+    //       sourceToken: tokenAccount?.mint || null,
+    //       destination: parameters.destination,
+    //       destinationTokenAccount: null,
+    //       destinationToken: tokenAccount?.mint || null,
+    //       sourceAmount: tokenAccount?.mint
+    //         ? minorAmountToMajor(parameters.amount, tokenAccount?.mint)
+    //         : new Decimal(0),
+    //       destinationAmount: tokenAccount?.mint
+    //         ? minorAmountToMajor(parameters.amount, tokenAccount?.mint)
+    //         : new Decimal(0),
+    //     }).serialize(),
+    //   ),
+    // );
 
     // await awaitConfirmation(resultSignature);
 

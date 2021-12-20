@@ -5,14 +5,7 @@ import type {
   PublicKey,
 } from "@solana/web3.js";
 
-import { SailGetMultipleAccountsError } from "../../../";
-
-export function chunks<T>(array: readonly T[], size: number): T[][] {
-  return Array.apply<number, T[], T[][]>(
-    0,
-    new Array(Math.ceil(array.length / size)) as T[]
-  ).map((_, index) => array.slice(index * size, (index + 1) * size));
-}
+import { chunks, SailGetMultipleAccountsError } from "../../../";
 
 const GET_MULTIPLE_ACCOUNTS_CHUNK_SIZE = 99;
 

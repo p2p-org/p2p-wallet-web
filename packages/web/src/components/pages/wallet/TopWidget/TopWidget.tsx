@@ -6,12 +6,14 @@ import { Link } from 'react-router-dom';
 
 import { styled } from '@linaria/react';
 import {
+  SYSTEM_PROGRAM_ID,
   useConnectionContext,
   useRates,
   useSolana,
-  useUserTokenAccount,
+  useTokenAccount,
 } from '@p2p-wallet-web/core';
-import { LAMPORTS_PER_SOL, SystemProgram } from '@solana/web3.js';
+import { usePubkey } from '@p2p-wallet-web/sail';
+import { LAMPORTS_PER_SOL } from '@solana/web3.js';
 import classNames from 'classnames';
 import throttle from 'lodash.throttle';
 
@@ -176,7 +178,7 @@ type Props = {
   publicKey: string;
 };
 
-export const TopWidgetOrigin: FunctionComponent<Props> = ({ publicKey }) => {
+const TopWidgetOrigin: FunctionComponent<Props> = ({ publicKey }) => {
   const dispatch = useDispatch();
   const location = useLocation();
   const { tokenConfigs } = useConfig();
@@ -186,7 +188,7 @@ export const TopWidgetOrigin: FunctionComponent<Props> = ({ publicKey }) => {
   const { providerMut } = useSolana();
 
   const { network } = useConnectionContext();
-  const tokenAccount = useUserTokenAccount(publicKey);
+  const tokenAccount = useTokenAccount(usePubkey(publicKey));
   const { candlesType, candles, markets, getRatesCandle } = useRates();
   const rate = tokenAccount?.balance?.token.symbol
     ? markets[tokenAccount.balance.token.symbol]
@@ -208,7 +210,7 @@ export const TopWidgetOrigin: FunctionComponent<Props> = ({ publicKey }) => {
     };
 
     void loadCandles();
-  }, [dispatch, isLoading, rates, tokenAccount?.balance?.token.symbol]);
+  }, [getRatesCandle, isLoading, rates, tokenAccount?.balance?.token.symbol]);
 
   const handleScroll = throttle(() => {
     if (!widgetRef.current) {
@@ -333,9 +335,7 @@ export const TopWidgetOrigin: FunctionComponent<Props> = ({ publicKey }) => {
           </ValueCurrency>
         ) : undefined}
         <BottomWrapper className={classNames({ isSticky })}>
-          <ValueOriginal>
-            {tokenAccount.balance?.toExact()} {tokenAccount.balance?.token.symbol}
-          </ValueOriginal>
+          <ValueOriginal>{tokenAccount.balance?.formatUnits()}</ValueOriginal>
           {renderDelta(isSticky)}
         </BottomWrapper>
       </PriceWrapped>
@@ -360,7 +360,7 @@ export const TopWidgetOrigin: FunctionComponent<Props> = ({ publicKey }) => {
                   {tokenAccount?.balance?.token.name || shortAddress(tokenAccount.key.toBase58())}
                 </TokenName>
               </TokenInfo>
-              {tokenAccount?.mint?.equals(SystemProgram.programId) ? undefined : (
+              {tokenAccount?.mint?.equals(SYSTEM_PROGRAM_ID) ? undefined : (
                 <TokenSettings>
                   <Link
                     to={{

@@ -3,13 +3,13 @@ import React, { useEffect } from 'react';
 import { useLocation } from 'react-router';
 import { useParams } from 'react-router-dom';
 
-import { useUserTokenAccount } from '@p2p-wallet-web/core';
+import { useTokenAccount } from '@p2p-wallet-web/core';
 import { usePubkey } from '@p2p-wallet-web/sail';
 import type { PublicKey } from '@solana/web3.js';
 
 import { Layout } from 'components/common/Layout';
 import { QRAddressWidget } from 'components/common/QRAddressWidget';
-import { ActivityWidget, TopWidget } from 'components/pages/wallet';
+import { TopWidget, TransactionsWidget } from 'components/pages/wallet';
 import { trackEvent } from 'utils/analytics';
 import { shortAddress } from 'utils/tokens';
 
@@ -18,7 +18,7 @@ export const WalletOrigin: FunctionComponent = () => {
   const { publicKey: _publicKey } = useParams<{ publicKey: string }>();
 
   const publicKey = usePubkey(_publicKey) as PublicKey;
-  const tokenAccount = useUserTokenAccount(publicKey);
+  const tokenAccount = useTokenAccount(publicKey);
 
   useEffect(() => {
     if (tokenAccount?.balance?.token.symbol) {
@@ -41,7 +41,7 @@ export const WalletOrigin: FunctionComponent = () => {
         <>
           <TopWidget publicKey={_publicKey} />
           <QRAddressWidget publicKey={_publicKey} />
-          <ActivityWidget publicKey={_publicKey} />
+          <TransactionsWidget publicKey={_publicKey} />
         </>
       }
     />

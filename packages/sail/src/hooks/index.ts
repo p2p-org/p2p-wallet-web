@@ -5,3 +5,5 @@ export * from "./useAccountData";
 export * from "./useAccountsData";
 export * from "./useNativeAccount";
 export * from "./useParsedAccountsData";
+export * from "./useTransactionData";
+export * from "./useTransactionsData";

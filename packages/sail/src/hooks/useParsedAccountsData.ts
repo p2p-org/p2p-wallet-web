@@ -8,7 +8,7 @@ import {
   SailAccountParseError,
   useSail,
 } from "../index";
-import type { ParsedAccountDatum } from "../types";
+import type { ParsedAccountDatum } from "../internal";
 import { useAccountsData } from "./useAccountsData";
 
 export type AccountParser<T> = (info: KeyedAccountInfo) => T;
@@ -75,11 +75,11 @@ export const useParsedAccountsData = <T>(
   }, [data, keys, onError, parser]);
 
   return useMemo(() => {
-    return keys.map((k) => {
-      if (!k) {
-        return k;
+    return keys.map((key) => {
+      if (!key) {
+        return key;
       }
-      return parsed[getCacheKeyOfPublicKey(k)];
+      return parsed[getCacheKeyOfPublicKey(key)];
     });
   }, [keys, parsed]);
 };

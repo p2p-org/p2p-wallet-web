@@ -1,10 +1,15 @@
-import type { PublicKey } from "@solana/web3.js";
 import { useEffect, useMemo, useState } from "react";
+
+import type { PublicKey } from "@solana/web3.js";
 import { useDebouncedCallback } from "use-debounce";
 
-import type { AccountFetchResult } from "../index";
-import { getCacheKeyOfPublicKey, SailCacheRefetchError, useSail } from "../index";
-import type { AccountDatum } from "../types";
+import type { AccountFetchResult } from "../";
+import {
+  getCacheKeyOfPublicKey,
+  SailAccountsCacheRefetchError,
+  useSail,
+} from "../";
+import type { AccountDatum } from "../internal";
 
 /**
  * Fetches data of the given accounts.
@@ -18,7 +23,10 @@ import type { AccountDatum } from "../types";
 export const useAccountsData = (
   keys: (PublicKey | null | undefined)[]
 ): readonly AccountDatum[] => {
-  const { getDatum, onCache, subscribe, fetchKeys, onError } = useSail();
+  const {
+    accounts: { getDatum, onCache, subscribe, fetchKeys },
+    onError,
+  } = useSail();
 
   const [data, setData] = useState<{ [cacheKey: string]: AccountDatum }>(() =>
     keys.reduce<{ [cacheKey: string]: AccountDatum }>((acc, key) => {
@@ -57,7 +65,7 @@ export const useAccountsData = (
   useEffect(() => {
     void (async () => {
       await fetchAndSetKeys(fetchKeys, keys)?.catch((e) => {
-        onError(new SailCacheRefetchError(e, keys));
+        onError(new SailAccountsCacheRefetchError(e, keys));
       });
     })();
   }, [keys, fetchAndSetKeys, fetchKeys, onError]);
@@ -77,7 +85,7 @@ export const useAccountsData = (
     return onCache((e) => {
       if (keys.find((key) => key?.equals(e.id))) {
         void fetchAndSetKeys(fetchKeys, keys)?.catch((e) => {
-          onError(new SailCacheRefetchError(e, keys));
+          onError(new SailAccountsCacheRefetchError(e, keys));
         });
       }
     });
@@ -92,11 +100,11 @@ export const useAccountsData = (
 
   return useMemo(() => {
     return keys.map((key) => {
-      if (key) {
-        return data[getCacheKeyOfPublicKey(key)];
+      if (!key) {
+        return key;
       }
 
-      return key;
+      return data[getCacheKeyOfPublicKey(key)];
     });
   }, [data, keys]);
 };

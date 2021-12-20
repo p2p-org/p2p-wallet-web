@@ -4,6 +4,7 @@ import type { Token } from '@saberhq/token-utils';
 import { TokenAmount } from '@saberhq/token-utils';
 import type { PublicKey } from '@solana/web3.js';
 
+import { SYSTEM_PROGRAM_ID } from '../../../../../../constants/publicKeys';
 import type { TokenMap } from '../../../../../../hooks';
 import type { TokenAccount } from '../../../models';
 
@@ -12,13 +13,11 @@ export const parseTokenAccountsInternal = ({
   tokenMap,
   userTokenAccountKeys,
   sol,
-  nativePublicKey,
 }: {
   accountsData: readonly AccountDatum[];
   tokenMap: TokenMap;
   userTokenAccountKeys: (PublicKey | null)[];
   sol: Token;
-  nativePublicKey?: PublicKey | undefined;
 }): readonly (TokenAccount | undefined)[] => {
   return accountsData.map((datum, i) => {
     const userTokenAccountKey = userTokenAccountKeys[i];
@@ -26,7 +25,7 @@ export const parseTokenAccountsInternal = ({
       return undefined;
     }
 
-    if (nativePublicKey?.equals(userTokenAccountKey)) {
+    if (datum?.accountInfo.owner.equals(SYSTEM_PROGRAM_ID)) {
       return {
         key: userTokenAccountKey,
         loading: datum === undefined,

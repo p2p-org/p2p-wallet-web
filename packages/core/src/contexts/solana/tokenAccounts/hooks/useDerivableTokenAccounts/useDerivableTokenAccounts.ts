@@ -2,7 +2,7 @@ import { useCallback, useMemo } from 'react';
 
 import type { AccountParser } from '@p2p-wallet-web/sail';
 import { useParsedAccountsData } from '@p2p-wallet-web/sail';
-import { SOL, TokenAmount } from '@saberhq/token-utils';
+import { TokenAmount, WRAPPED_SOL } from '@saberhq/token-utils';
 import { useConnectionContext } from '@saberhq/use-solana';
 import { PublicKey } from '@solana/web3.js';
 
@@ -17,7 +17,7 @@ export const useDerivableTokenAccounts = (
   derivationPath: ValueOf<typeof DERIVATION_PATH>,
 ): readonly TokenAccount[] => {
   const { network } = useConnectionContext();
-  const sol = SOL[network];
+  const sol = WRAPPED_SOL[network];
   const parser: AccountParser<TokenAmount> = useCallback(
     (data) => {
       return new TokenAmount(sol, data.accountInfo.lamports);

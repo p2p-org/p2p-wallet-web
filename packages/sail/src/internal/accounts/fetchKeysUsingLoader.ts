@@ -3,7 +3,7 @@ import zip from "lodash.zip";
 import invariant from "tiny-invariant";
 
 import { SailAccountLoadError } from "../../errors";
-import type { AccountFetchResult } from "../../types";
+import type { AccountFetchResult } from "./types";
 import type { AccountLoader } from "./useAccountsInternal";
 
 export const fetchKeysUsingLoader = async (
