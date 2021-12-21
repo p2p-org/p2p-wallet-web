@@ -1,8 +1,3 @@
-/**
- * Uses and loads a series of mints as {@link Token}s.
- * @param mints
- * @returns
- */
 import { useMemo } from 'react';
 
 import { MINT_PARSER, useParsedAccountsData } from '@p2p-wallet-web/sail';
@@ -25,6 +20,11 @@ const normalizeMint = (mint: PublicKey | null | undefined): PublicKey | null | u
   return mint;
 };
 
+/**
+ * Uses and loads a series of mints as {@link Token}s.
+ * @param mints
+ * @returns
+ */
 export const useTokens = (
   mints?: (PublicKey | null | undefined)[],
 ): (Token | null | undefined)[] => {

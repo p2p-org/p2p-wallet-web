@@ -1,6 +1,5 @@
 import { NATIVE_MINT } from '@saberhq/token-utils';
 import type { ParsedInnerInstruction } from '@solana/web3.js';
-import { PublicKey } from '@solana/web3.js';
 
 import type { ParsedConfirmedTransaction, ParsedInstruction } from '../../../../../index';
 import { instructionsData } from '../../utils/instructionsData';
@@ -117,7 +116,7 @@ export class OrcaSwapParser implements Parser {
     let destination = destinationInfo?.destination || destinationInfo?.source;
     const destinationAmount = destinationInfo?.amount ?? '0';
 
-    // For swap with WSOL. So WSOL account closed after tx
+    // For swap with WSOL. So WSOL account closed after tx and we try to find true account
     // 1. SOL/X
     // 2. X/SOL
     const closeInstruction = transactionInfo.transaction.message.instructions.find(
@@ -125,10 +124,10 @@ export class OrcaSwapParser implements Parser {
     );
     if (closeInstruction?.parsed) {
       if (closeInstruction.parsed.info.account === source) {
-        source = new PublicKey(closeInstruction.parsed.info.destination);
+        source = closeInstruction.parsed.info.destination;
       }
       if (closeInstruction.parsed.info.account === destination) {
-        destination = new PublicKey(closeInstruction.parsed.info.destination);
+        destination = closeInstruction.parsed.info.destination;
       }
     }
 

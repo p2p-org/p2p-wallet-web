@@ -331,7 +331,7 @@ const TopWidgetOrigin: FunctionComponent<Props> = ({ publicKey }) => {
       <PriceWrapped className={classNames({ isSticky })}>
         {rate && tokenAccount.balance ? (
           <ValueCurrency className={classNames({ isSticky })}>
-            <AmountUSD value={tokenAccount.balance} symbol={tokenAccount.balance?.token.symbol} />
+            <AmountUSD value={tokenAccount.balance} />
           </ValueCurrency>
         ) : undefined}
         <BottomWrapper className={classNames({ isSticky })}>

@@ -8,25 +8,25 @@ type CacheItem<T> = {
 };
 
 export class CacheTTL<T> {
-  private readonly opts?: CacheOpts;
+  private readonly _opts?: CacheOpts;
 
-  private readonly caches = new Map<string, CacheItem<T>>();
+  private readonly _caches = new Map<string, CacheItem<T>>();
 
   constructor(opts?: CacheOpts) {
-    this.opts = opts;
+    this._opts = opts;
   }
 
   set(key: string, item: T) {
-    this.caches.set(key, { timestamp: Date.now(), cachedResult: item });
+    this._caches.set(key, { timestamp: Date.now(), cachedResult: item });
   }
 
   get(key: string): T | null {
     const now = Date.now();
-    const { timestamp, cachedResult } = this.caches.get(key) || {};
+    const { timestamp, cachedResult } = this._caches.get(key) || {};
 
     if (timestamp && cachedResult) {
       // cache hit
-      if (!this.opts?.ttl || now - timestamp < this.opts.ttl) {
+      if (!this._opts?.ttl || now - timestamp < this._opts.ttl) {
         // not expired
         return cachedResult;
       }
@@ -36,6 +36,6 @@ export class CacheTTL<T> {
   }
 
   toArray() {
-    return Array.from(this.caches.values()).map((item) => item.cachedResult);
+    return Array.from(this._caches.values()).map((item) => item.cachedResult);
   }
 }

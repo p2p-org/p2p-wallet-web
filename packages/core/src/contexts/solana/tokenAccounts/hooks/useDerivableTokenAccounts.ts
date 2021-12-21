@@ -6,11 +6,10 @@ import { TokenAmount, WRAPPED_SOL } from '@saberhq/token-utils';
 import { useConnectionContext } from '@saberhq/use-solana';
 import { PublicKey } from '@solana/web3.js';
 
-import type { DERIVATION_PATH } from '../../../../../constants/common';
-import type { ValueOf } from '../../../../../types/utility-types';
-import { derivePublicKeyFromSeed } from '../../../seed';
-import type { TokenAccount } from '../../models';
-import { parseTokenAccountsInternal } from './utils/parseTokenAccountsInternal';
+import type { DERIVATION_PATH } from '../../../../constants/common';
+import type { ValueOf } from '../../../../types/utility-types';
+import { derivePublicKeyFromSeed } from '../../seed';
+import type { TokenAccount } from '../models';
 
 export const useDerivableTokenAccounts = (
   seed: string,
@@ -35,11 +34,27 @@ export const useDerivableTokenAccounts = (
 
   return useMemo(
     () =>
-      parseTokenAccountsInternal({
-        accountsData,
-        sol,
-        derivableTokenAccountKeys,
-      }).filter((t): t is TokenAccount => t !== undefined),
+      accountsData
+        .map((datum, i): TokenAccount | undefined => {
+          const derivableTokenAccountKey = derivableTokenAccountKeys[i];
+          if (!derivableTokenAccountKey) {
+            return undefined;
+          }
+
+          const parsed = datum ? datum.accountInfo.data : datum;
+
+          try {
+            return {
+              key: derivableTokenAccountKey,
+              loading: datum === undefined,
+              balance: parsed ? parsed : new TokenAmount(sol, 0),
+            };
+          } catch (e) {
+            console.warn(`Error parsing ATA ${datum?.accountId.toString() ?? '(unknown)'}`, e);
+            return undefined;
+          }
+        })
+        .filter((t): t is TokenAccount => t !== undefined),
     [accountsData, derivableTokenAccountKeys, sol],
   );
 };

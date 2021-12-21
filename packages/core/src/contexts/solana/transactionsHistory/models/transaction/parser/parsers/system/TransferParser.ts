@@ -6,25 +6,20 @@ export class TransferTransaction implements AbstractTransaction {
   constructor(
     public source: string,
     public destination: string,
-    public amount: number,
+    public amount: string,
     public wasPaidByP2POrg?: boolean,
   ) {}
 
   details(source?: string): TransactionDetails {
     const isReceiver = this.destination === source;
 
-    if (isReceiver) {
-      return {
-        type: 'receive',
-        icon: 'bottom',
-        isReceiver,
-      };
-    }
-
     return {
-      type: 'transfer',
-      icon: 'top',
+      type: isReceiver ? 'receive' : 'transfer',
+      icon: isReceiver ? 'bottom' : 'top',
       isReceiver,
+
+      amount: this.amount,
+      tokenAccount: isReceiver ? this.destination : this.source,
     };
   }
 }
@@ -55,13 +50,11 @@ export class TransferParser implements Parser {
     // get lamports
     const lamports =
       transferInstruction?.parsed?.info.lamports ??
-      Number(
-        transferInstruction?.parsed?.info.amount ??
-          transferInstruction?.parsed?.info.tokenAmount?.amount ??
-          '0',
-      );
-
+      transferInstruction?.parsed?.info.amount ??
+      transferInstruction?.parsed?.info.tokenAmount?.amount ??
+      '0';
     let result: TransferTransaction;
+
     // SOL to SOL
     if (transferInstruction?.programId.equals(SYSTEM_PROGRAM_ID)) {
       result = new TransferTransaction(source, destination, lamports);

@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 
-import { useUserTokenAccount } from '@p2p-wallet-web/core';
+import { useTokenAccount } from '@p2p-wallet-web/core';
 import { usePubkey } from '@p2p-wallet-web/sail';
 import type { PublicKey } from '@solana/web3.js';
 
@@ -12,7 +12,7 @@ export const useTokenAccountIsHidden = (_publicKey: PublicKey | string) => {
     tokenAccounts,
   } = useSettings();
   const publicKey = usePubkey(_publicKey);
-  const tokenAccount = useUserTokenAccount(_publicKey);
+  const tokenAccount = useTokenAccount(publicKey);
 
   return useMemo(() => {
     if (!publicKey) {

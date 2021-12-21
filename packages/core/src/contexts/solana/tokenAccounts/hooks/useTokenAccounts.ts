@@ -12,16 +12,20 @@ import type { TokenAccount } from '../models';
 
 export const useTokenAccounts = (
   publicKeys: (PublicKey | null | undefined)[] = [],
-): (TokenAccount | null | undefined)[] => {
+): (TokenAccount | undefined)[] => {
   const tokenAccountsData = useAccountsData(publicKeys);
 
   const mints = useMemo(() => {
     return tokenAccountsData.map((datum) => {
-      if (datum?.accountInfo.owner.equals(SYSTEM_PROGRAM_ID)) {
+      if (!datum) {
+        return datum;
+      }
+
+      if (datum.accountInfo.owner.equals(SYSTEM_PROGRAM_ID)) {
         return NATIVE_MINT;
       }
 
-      if (datum?.accountInfo.owner.equals(TOKEN_PROGRAM_ID)) {
+      if (datum.accountInfo.owner.equals(TOKEN_PROGRAM_ID)) {
         return TOKEN_ACCOUNT_PARSER(datum).mint;
       }
 
@@ -35,12 +39,20 @@ export const useTokenAccounts = (
     return zip(tokenAccountsData, tokens).map(([datum], i) => {
       const tokenAccountKey = publicKeys[i];
       if (!tokenAccountKey) {
-        return undefined;
+        return {
+          key: undefined,
+          loading: false,
+          balance: undefined,
+        };
       }
 
       const token = tokens[i];
       if (!token) {
-        return undefined;
+        return {
+          key: tokenAccountKey,
+          loading: token === undefined,
+          balance: undefined,
+        };
       }
 
       // TODO: check is it correct
@@ -49,7 +61,6 @@ export const useTokenAccounts = (
           key: tokenAccountKey,
           loading: false,
           balance: new TokenAmount(token, datum.accountInfo.lamports),
-          isInitialized: !!datum,
         };
       }
 
@@ -59,7 +70,6 @@ export const useTokenAccounts = (
           key: tokenAccountKey,
           loading: datum === undefined,
           balance: parsed ? new TokenAmount(token, parsed.amount) : new TokenAmount(token, 0),
-          isInitialized: !!datum,
         };
       } catch (e) {
         console.warn(`Error parsing ATA ${datum?.accountId.toString() ?? '(unknown)'}`, e);

@@ -3,11 +3,12 @@
  */
 import type { ParsedConfirmedTransaction } from '@solana/web3.js';
 
-import type { CustomParsedTransaction } from '.';
+import type { CustomParsedTransaction, TransactionDetails } from '.';
 
 export interface Transaction<T extends CustomParsedTransaction> {
   key: string;
   loading: boolean;
-  raw: ParsedConfirmedTransaction | undefined;
   data: T | null;
+  details: TransactionDetails;
+  raw: ParsedConfirmedTransaction | undefined;
 }

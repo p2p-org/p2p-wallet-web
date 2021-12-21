@@ -30,7 +30,7 @@ export const useTokenAccountsHidden = (): [TokenAccount[], TokenAccount[]] => {
       const notForceShow = !tokenAccounts.forceShowTokenAccounts.includes(
         tokenAccount.key.toBase58(),
       );
-      const notSOL = tokenAccount.mint && !tokenAccount.mint.equals(NATIVE_MINT);
+      const notSOL = !tokenAccount.balance?.token.mintAccount.equals(NATIVE_MINT);
 
       if (isZeroBalancesHidden && isZero && notForceShow && notSOL) {
         onlyHiddenTokenAccounts.push(tokenAccount);

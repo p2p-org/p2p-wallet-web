@@ -8,10 +8,11 @@ import type { ResolveUsernameResponse, TokenAccount } from '@p2p-wallet-web/core
 import {
   useNameService,
   useSolana,
-  useUserTokenAccount,
+  useTokenAccount,
   useUserTokenAccounts,
   useWallet,
 } from '@p2p-wallet-web/core';
+import { usePubkey } from '@p2p-wallet-web/sail';
 import { unwrapResult } from '@reduxjs/toolkit';
 import { Bitcoin } from '@renproject/chains-bitcoin';
 import type { RenNetwork } from '@renproject/interfaces';
@@ -216,7 +217,7 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
   const { connection } = useWallet();
   const renNetwork = useRenNetwork();
   const tokenAccounts = useUserTokenAccounts();
-  const fromTokenAccount = useUserTokenAccount(publicKey);
+  const fromTokenAccount = useTokenAccount(usePubkey(publicKey));
 
   const [fromAmount, setFromAmount] = useState('');
   const [toTokenPublicKey, setToTokenPublicKey] = useState('');
@@ -344,7 +345,7 @@ export const SendWidget: FunctionComponent<Props> = ({ publicKey = '' }) => {
       return;
     }
 
-    if (!fromTokenAccount || !fromTokenAccount.mint || !fromTokenAccount?.balance) {
+    if (!fromTokenAccount || !fromTokenAccount?.balance) {
       throw new Error("Didn't find token");
     }
 

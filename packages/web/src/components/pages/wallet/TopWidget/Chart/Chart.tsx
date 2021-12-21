@@ -1,11 +1,10 @@
 import type { FunctionComponent } from 'react';
 import React, { useEffect, useState } from 'react';
 import ReactHighcharts from 'react-highcharts';
-import { useDispatch } from 'react-redux';
 
 import { styled } from '@linaria/react';
 import type { CandleLimitType } from '@p2p-wallet-web/core';
-import { useRates, useUserTokenAccount, useUserTokenAccounts } from '@p2p-wallet-web/core';
+import { useRates, useTokenAccount } from '@p2p-wallet-web/core';
 import type web3 from '@solana/web3.js';
 import classNames from 'classnames';
 
@@ -87,10 +86,8 @@ type Props = {
 };
 
 export const Chart: FunctionComponent<Props> = ({ publicKey }) => {
-  const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(false);
-  const tokenAccounts = useUserTokenAccounts();
-  const tokenAccount = useUserTokenAccount(publicKey);
+  const tokenAccount = useTokenAccount(publicKey);
   const { candlesType, candles, getRatesCandle, changeCandlesType } = useRates();
   const rates = tokenAccount?.balance?.token.symbol
     ? candles[tokenAccount.balance.token.symbol]

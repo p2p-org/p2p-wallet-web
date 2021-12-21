@@ -20,7 +20,6 @@ export const globalCss = css`
     a {
       color: ${rgba('#000', 0.5)};
       font-size: 14px;
-      line-height: 140%;
       text-decoration: underline;
     }
 

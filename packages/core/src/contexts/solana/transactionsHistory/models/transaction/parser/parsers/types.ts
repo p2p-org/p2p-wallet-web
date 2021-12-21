@@ -14,13 +14,16 @@ export type CustomParsedTransaction =
   | TransferTransaction
   | null;
 
-export type TransactionDetails = {
+// additional properties if you want to show spend amount
+export type TransactionAmountDetails = {
+  amount?: string;
+  tokenAccount?: string;
+};
+
+export type TransactionDetails = TransactionAmountDetails & {
   type: string;
   icon: string;
   isReceiver?: boolean;
-
-  amount?: string;
-  tokenAccount?: string;
 };
 
 export abstract class AbstractTransaction {

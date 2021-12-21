@@ -1,5 +1,6 @@
 import type { FunctionComponent } from 'react';
 import React, { useMemo } from 'react';
+import Skeleton from 'react-loading-skeleton';
 import { Link } from 'react-router-dom';
 
 import { styled } from '@linaria/react';
@@ -157,7 +158,7 @@ export const TransactionRow: FunctionComponent<Props> = ({ signature, source }) 
   const destinationTokenAccount = useTokenAccount(usePubkey(transaction?.data?.destination));
 
   const tokenAmount = useTokenAccountAmount(
-    transaction?.details.tokenAccount,
+    usePubkey(transaction?.details.tokenAccount),
     transaction?.details.amount,
   );
 
@@ -177,47 +178,50 @@ export const TransactionRow: FunctionComponent<Props> = ({ signature, source }) 
   };
 
   const bottomLeft = useMemo(() => {
-    if (
-      transaction?.details.type === 'swap' &&
-      sourceTokenAccount?.balance?.token &&
-      destinationTokenAccount?.balance?.token
-    ) {
+    // show skeleton until all data needed in this look loaded
+    if (transaction?.loading || sourceTokenAccount?.loading || destinationTokenAccount?.loading) {
+      return <Skeleton width={70} height={16} />;
+    }
+
+    const type = transaction?.details.type;
+
+    const source = sourceTokenAccount?.key?.toBase58();
+    const destination = destinationTokenAccount?.key?.toBase58();
+    const sourceToken = sourceTokenAccount?.balance?.token;
+    const destinationToken = destinationTokenAccount?.balance?.token;
+
+    if (type === 'swap' && source && destination && sourceToken && destinationToken) {
       return (
         <>
-          <LinkStyled to={`/wallet/${sourceTokenAccount.key.toBase58()}`}>
-            {sourceTokenAccount.balance.token.symbol}
-          </LinkStyled>{' '}
-          to{' '}
-          <LinkStyled to={`/wallet/${destinationTokenAccount.key.toBase58()}`}>
-            {destinationTokenAccount.balance.token.symbol}
-          </LinkStyled>
+          <LinkStyled to={`/wallet/${source}`}>{sourceToken.symbol}</LinkStyled> to{' '}
+          <LinkStyled to={`/wallet/${destination}`}>{destinationToken.symbol}</LinkStyled>
         </>
       );
     }
 
-    if (transaction?.details.type === 'transfer') {
-      const address = destinationTokenAccount?.key?.toBase58();
+    if (type === 'transfer') {
+      const address = destination;
       if (address) {
         return `To ${shortAddress(address)}`;
       }
     }
 
-    if (transaction?.details.type === 'receive') {
-      const address = sourceTokenAccount?.key?.toBase58();
+    if (type === 'receive') {
+      const address = source;
       if (address) {
         return `From ${shortAddress(address)}`;
       }
     }
 
-    if (transaction?.details.type === 'createAccount') {
-      const symbol = destinationTokenAccount?.balance?.token?.symbol;
+    if (type === 'createAccount') {
+      const symbol = destinationToken?.symbol;
       if (symbol) {
         return `${symbol} Created`;
       }
     }
 
-    if (transaction?.details.type === 'closeAccount') {
-      const symbol = sourceTokenAccount?.balance?.token?.symbol;
+    if (type === 'closeAccount') {
+      const symbol = sourceToken?.symbol;
       if (symbol) {
         return `${symbol} Closed`;
       }
@@ -228,7 +232,15 @@ export const TransactionRow: FunctionComponent<Props> = ({ signature, source }) 
     }
 
     return null;
-  }, [destinationTokenAccount, sourceTokenAccount, transaction]);
+  }, [
+    destinationTokenAccount?.balance?.token,
+    destinationTokenAccount?.key,
+    destinationTokenAccount?.loading,
+    sourceTokenAccount?.balance?.token,
+    sourceTokenAccount?.key,
+    sourceTokenAccount?.loading,
+    transaction,
+  ]);
 
   return (
     <Wrapper>
@@ -237,20 +249,30 @@ export const TransactionRow: FunctionComponent<Props> = ({ signature, source }) 
           <SwapAvatars transaction={transaction} />
         ) : (
           <TransactionIconWrapper>
-            {transaction?.details.icon ? (
+            {transaction?.loading ? (
+              <Skeleton width={48} height={48} borderRadius={12} />
+            ) : transaction?.details.icon ? (
               <TransactionIcon name={transaction?.details.icon} />
             ) : undefined}
           </TransactionIconWrapper>
         )}
         <Content>
           <Top>
-            <Type>{titleCase(transaction?.details.type)}</Type>
+            <Type>
+              {transaction?.loading ? (
+                <Skeleton width={50} height={16} />
+              ) : (
+                titleCase(transaction?.details.type)
+              )}
+            </Type>
             <Right>
-              {tokenAmount ? (
+              {transaction?.loading || tokenAmount?.loading ? (
+                <Skeleton width={50} height={16} />
+              ) : tokenAmount.balance ? (
                 <Amount className={classNames({ isReceiver: transaction?.details.isReceiver })}>
                   <AmountUSD
                     prefix={transaction?.details.isReceiver ? '+' : '-'}
-                    value={tokenAmount}
+                    value={tokenAmount.balance}
                   />
                 </Amount>
               ) : undefined}
@@ -259,19 +281,22 @@ export const TransactionRow: FunctionComponent<Props> = ({ signature, source }) 
                   <WarningIcon name="warning" />
                 </StatusWrapper>
               ) : undefined}
-              {!transaction?.raw?.slot ? (
-                <StatusWrapper title="Transaction processing">
-                  <ClockIcon name="clock" />
-                </StatusWrapper>
-              ) : undefined}
+              {/* TODO: add pending transaction*/}
+              {/*{!transaction?.raw?.slot ? (*/}
+              {/*  <StatusWrapper title="Transaction processing">*/}
+              {/*    <ClockIcon name="clock" />*/}
+              {/*  </StatusWrapper>*/}
+              {/*) : undefined}*/}
             </Right>
           </Top>
           <Bottom>
             <div>{bottomLeft}</div>
             <div>
-              {tokenAmount ? (
+              {transaction?.loading || tokenAmount?.loading ? (
+                <Skeleton width={70} height={16} />
+              ) : tokenAmount.balance ? (
                 <>
-                  {transaction?.details.isReceiver ? '+' : '-'} {tokenAmount.formatUnits()}
+                  {transaction?.details.isReceiver ? '+' : '-'} {tokenAmount.balance.formatUnits()}
                 </>
               ) : (
                 <>#{transaction?.raw?.slot}</>

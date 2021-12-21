@@ -1,10 +1,10 @@
 import type { FC } from 'react';
 import React from 'react';
 
+import type { Transaction, TransferTransaction } from '@p2p-wallet-web/core';
 import type Decimal from 'decimal.js';
 
 import type { Token } from 'api/token/Token';
-import type { Transaction } from 'api/transaction/Transaction';
 import { AmountUSD } from 'components/common/AmountUSD';
 import {
   SendWrapper,
@@ -19,7 +19,7 @@ export type TransferParams = {
 
 interface Props {
   params: TransferParams;
-  transaction: Transaction | null;
+  transaction: Transaction<TransferTransaction> | null;
   isReceiver: boolean;
 }
 

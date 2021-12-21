@@ -11,13 +11,12 @@ const Wrapper = styled.div``;
 type Props = {
   prefix?: string;
   value: TokenAmount;
-  symbol?: string;
   style?: CSSProperties;
   className?: string;
 };
 
-export const AmountUSD: FunctionComponent<Props> = ({ prefix, value, symbol = '', ...props }) => {
-  const rate = useMarketRate(symbol.toUpperCase());
+export const AmountUSD: FunctionComponent<Props> = ({ prefix, value, ...props }) => {
+  const rate = useMarketRate(value.token.symbol.toUpperCase());
 
   if (!rate) {
     return null;

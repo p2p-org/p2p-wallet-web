@@ -188,7 +188,7 @@ export const TokenAccountRow: FunctionComponent<Props> = ({
             {loading ? (
               <Skeleton width={50} height={18} />
             ) : tokenAccount.balance ? (
-              <AmountUSD symbol={tokenAccount.balance?.token.symbol} value={tokenAccount.balance} />
+              <AmountUSD value={tokenAccount.balance} />
             ) : (
               <div />
             )}

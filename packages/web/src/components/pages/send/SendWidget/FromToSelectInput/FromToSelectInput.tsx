@@ -599,11 +599,7 @@ export const FromToSelectInput: FunctionComponent<Props> = ({
             </BalanceText>
             {token ? (
               <BalanceText>
-                ≈{' '}
-                <AmountUSDStyled
-                  value={TokenAmount.parse(token, localAmount || '0')}
-                  symbol={token?.symbol}
-                />
+                ≈ <AmountUSDStyled value={TokenAmount.parse(token, localAmount || '0')} />
               </BalanceText>
             ) : undefined}
           </BalanceWrapper>

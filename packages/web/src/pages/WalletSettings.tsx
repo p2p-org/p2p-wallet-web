@@ -3,7 +3,7 @@ import React from 'react';
 import { useLocation } from 'react-router';
 import { useParams } from 'react-router-dom';
 
-import { useUserTokenAccount } from '@p2p-wallet-web/core';
+import { useTokenAccount } from '@p2p-wallet-web/core';
 import { usePubkey } from '@p2p-wallet-web/sail';
 import type { PublicKey } from '@solana/web3.js';
 
@@ -16,7 +16,7 @@ export const WalletSettings: FunctionComponent = () => {
   const { publicKey: _publicKey } = useParams<{ publicKey: string }>();
 
   const publicKey = usePubkey(_publicKey) as PublicKey;
-  const tokenAccount = useUserTokenAccount(publicKey);
+  const tokenAccount = useTokenAccount(publicKey);
 
   const tokenName = tokenAccount?.balance?.token.symbol
     ? tokenAccount.balance.token.symbol
