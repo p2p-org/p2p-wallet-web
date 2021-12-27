@@ -1,17 +1,17 @@
-import { Token as SPLToken, TOKEN_PROGRAM_ID } from '@solana/spl-token';
+import {
+  ASSOCIATED_TOKEN_PROGRAM_ID,
+  Token as SPLToken,
+  TOKEN_PROGRAM_ID,
+} from '@solana/spl-token';
 import type { Account, SignaturePubkeyPair, TransactionInstruction } from '@solana/web3.js';
 import { PublicKey, SystemProgram, Transaction } from '@solana/web3.js';
 import bs58 from 'bs58';
 import { memoizeWith, toString } from 'ramda';
 
 import { getConnection } from 'api/connection';
-import type { TransferParameters } from 'api/token';
-import { ASSOCIATED_TOKEN_ACCOUNT_PROGRAM_ID } from 'api/token';
-import type { TokenAccount } from 'api/token/TokenAccount';
+import type { TransferParameters } from 'app/contexts';
 import type { NetworkObj } from 'config/constants';
 import { feeRelayerUrl } from 'config/constants';
-
-export const KNOWN_FEE_PAYER_PUBKEYS = new Set(['FG4Y3yX4AAchp1HvNZ7LfzFTewF2f6nDoMDCohTFrdpT']);
 
 type TransferSolParams = {
   sender_pubkey: string;
@@ -225,7 +225,7 @@ export const APIFactory = memoizeWith(toString, (network: NetworkObj): API => {
     }
 
     const associatedTokenAddress = await SPLToken.getAssociatedTokenAddress(
-      ASSOCIATED_TOKEN_ACCOUNT_PROGRAM_ID,
+      ASSOCIATED_TOKEN_PROGRAM_ID,
       TOKEN_PROGRAM_ID,
       tokenAccount.mint.address,
       parameters.destination,

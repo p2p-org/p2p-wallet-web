@@ -1,22 +1,23 @@
 import type { FC } from 'react';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
+import { QueryClient, QueryClientProvider } from 'react-query';
 
 import type { ConnectedWallet } from '@p2p-wallet-web/core';
 import {
-  NameServiceProvider,
   NETWORK_CONFIGS,
-  RatesProvider,
   SeedProvider,
   SolanaProvider,
   TokenAccountsProvider,
 } from '@p2p-wallet-web/core';
 import { SailProvider } from '@p2p-wallet-web/sail';
-import type { TokenListContainer as SPLTokenListContainer } from '@solana/spl-token-registry';
-import { TokenListProvider as SPLTokenListProvider } from '@solana/spl-token-registry';
 
-import { BlockchainProvider } from 'app/contexts/blockchain';
-import { SettingsProvider } from 'app/contexts/settings';
-import { TokenListProvider } from 'app/contexts/swap';
+import {
+  BlockchainProvider,
+  ModalsProvider,
+  NameServiceProvider,
+  RatesProvider,
+  SettingsProvider,
+} from 'app/contexts';
 import { ToastManager } from 'components/common/ToastManager';
 import { Providers as SwapProviders } from 'components/pages/swap/Providers';
 import { LockAndMintProvider } from 'utils/providers/LockAndMintProvider';
@@ -47,39 +48,33 @@ const CoreProviders: FC = ({ children }) => {
         networkConfigs={NETWORK_CONFIGS}
       >
         <SailProvider>
-          <TokenAccountsProvider>
-            <RatesProvider>
-              <NameServiceProvider>{children}</NameServiceProvider>
-            </RatesProvider>
-          </TokenAccountsProvider>
+          <TokenAccountsProvider>{children}</TokenAccountsProvider>
         </SailProvider>
       </SolanaProvider>
     </SeedProvider>
   );
 };
 
+const queryClient = new QueryClient();
+
 export const Providers: FC = ({ children }) => {
-  const [tokenList, setTokenList] = useState<SPLTokenListContainer | null>(null);
-
-  useEffect(() => {
-    void new SPLTokenListProvider().resolve().then(setTokenList);
-  }, [setTokenList]);
-
-  if (!tokenList) {
-    return null;
-  }
-
   return (
-    <CoreProviders>
-      <SettingsProvider>
-        <TokenListProvider initialState={{ tokenList }}>
-          <BlockchainProvider>
-            <LockAndMintProvider>
-              <SwapProviders>{children}</SwapProviders>
-            </LockAndMintProvider>
-          </BlockchainProvider>
-        </TokenListProvider>
-      </SettingsProvider>
-    </CoreProviders>
+    <QueryClientProvider client={queryClient}>
+      <CoreProviders>
+        <RatesProvider>
+          <NameServiceProvider>
+            <SettingsProvider>
+              <BlockchainProvider>
+                <LockAndMintProvider>
+                  <SwapProviders>
+                    <ModalsProvider>{children}</ModalsProvider>
+                  </SwapProviders>
+                </LockAndMintProvider>
+              </BlockchainProvider>
+            </SettingsProvider>
+          </NameServiceProvider>
+        </RatesProvider>
+      </CoreProviders>
+    </QueryClientProvider>
   );
 };

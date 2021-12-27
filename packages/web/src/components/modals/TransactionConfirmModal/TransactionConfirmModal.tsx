@@ -9,6 +9,7 @@ import {
   WalletType,
 } from '@p2p-wallet-web/core';
 
+import type { ModalPropsType } from 'app/contexts/general/modals/types';
 import { ErrorHint } from 'components/common/ErrorHint';
 import { Modal } from 'components/common/Modal';
 import { PasswordInput } from 'components/common/PasswordInput';
@@ -39,13 +40,14 @@ const PasswordInputStyled = styled(PasswordInput)`
   height: 46px;
 `;
 
-type Props = {
+export type TransactionConfirmModalProps = {
   type: 'send' | 'swap';
   params: TransferParams | SwapParams;
-  close: (isConfirm?: boolean) => void;
 };
 
-export const TransactionConfirmModal: FunctionComponent<Props> = ({ type, params, close }) => {
+export const TransactionConfirmModal: FunctionComponent<
+  ModalPropsType & TransactionConfirmModalProps
+> = ({ type, params, close }) => {
   const { walletProviderInfo } = useWallet();
   const tryUnlockSeedAndMnemonic = useTryUnlockSeedAndMnemonic();
 

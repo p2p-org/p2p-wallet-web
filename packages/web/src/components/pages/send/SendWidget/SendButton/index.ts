@@ -1,1 +1,1 @@
-export * from './SendButton';
+export * from './SendButtonBitcoin';

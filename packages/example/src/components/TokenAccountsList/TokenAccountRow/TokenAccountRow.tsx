@@ -15,7 +15,7 @@ export const TokenAccountRow: FC<Props> = ({ tokenAccount }) => {
     return <>Loading</>;
   }
 
-  if (tokenAccount.balance) {
+  if (tokenAccount.balance && tokenAccount.key) {
     return (
       <Wrapper>
         <img alt="" width={40} src={tokenAccount.balance.token.icon} />
@@ -26,5 +26,5 @@ export const TokenAccountRow: FC<Props> = ({ tokenAccount }) => {
     );
   }
 
-  return <Wrapper>{tokenAccount.mint?.toBase58()}</Wrapper>;
+  return <Wrapper>{tokenAccount.balance?.token.address}</Wrapper>;
 };

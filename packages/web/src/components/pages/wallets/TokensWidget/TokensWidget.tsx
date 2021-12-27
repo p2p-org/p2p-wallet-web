@@ -1,18 +1,16 @@
 import type { FunctionComponent } from 'react';
 import React, { useState } from 'react';
-import { useDispatch } from 'react-redux';
 
 import { styled } from '@linaria/react';
 import classNames from 'classnames';
 import { Feature } from 'flagged';
 import { rgba } from 'polished';
 
-import { useTokenAccountsHidden } from 'app/contexts/settings';
+import { ModalType, useModals } from 'app/contexts/general/modals';
+import { useTokenAccountsHidden } from 'app/contexts/general/settings';
 import { Widget } from 'components/common/Widget';
 import { Button, Icon } from 'components/ui';
 import { FEATURE_ADD_TOKEN_BUTTON } from 'config/featureFlags';
-import { openModal } from 'store/actions/modals';
-import { SHOW_MODAL_ADD_COIN } from 'store/constants/modalTypes';
 
 import { TokenAccountList } from './TokenAccountList';
 
@@ -120,12 +118,12 @@ type Props = {
 };
 
 export const TokensWidget: FunctionComponent<Props> = ({ selectedSymbol }) => {
-  const dispatch = useDispatch();
+  const { openModal } = useModals();
   const [isOpen, setIsOpen] = useState(false);
   const [tokenAccounts, hiddenTokenAccounts] = useTokenAccountsHidden();
 
   const handleAddCoinClick = () => {
-    void dispatch(openModal({ modalType: SHOW_MODAL_ADD_COIN }));
+    openModal(ModalType.SHOW_MODAL_ADD_COIN);
   };
 
   const handleChevronClick = () => {

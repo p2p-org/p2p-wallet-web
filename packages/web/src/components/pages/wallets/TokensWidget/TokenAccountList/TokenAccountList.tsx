@@ -1,12 +1,11 @@
 import type { FunctionComponent } from 'react';
-import React, { useMemo } from 'react';
+import React from 'react';
 
 import { styled } from '@linaria/react';
 import type { TokenAccount } from '@p2p-wallet-web/core';
-import { useRates } from '@p2p-wallet-web/core';
 
 import { LoaderBlock } from 'components/common/LoaderBlock';
-import { sortByRules } from 'utils/sort';
+import { useSortedTokens } from 'components/pages/wallets/TokensWidget/TokenAccountList/hooks/useSortedTokens';
 
 import { TokenAccountRow } from '../TokenAccountRow';
 
@@ -25,19 +24,15 @@ export const TokenAccountList: FunctionComponent<Props> = ({
   selectedSymbol,
   isHidden = false,
 }) => {
-  const { markets: rates } = useRates();
+  const tokenAccounts = useSortedTokens(items);
 
-  const tokens = useMemo(() => {
-    return items.sort(sortByRules(rates));
-  }, [items, rates]);
-
-  if (tokens.length === 0 && !isHidden) {
+  if (tokenAccounts.length === 0 && !isHidden) {
     return <LoaderBlock />;
   }
 
   return (
     <Wrapper>
-      {tokens.map((item) => (
+      {tokenAccounts.map((item) => (
         <TokenAccountRow
           key={item.key.toBase58()}
           tokenAccount={item}

@@ -3,15 +3,15 @@ import React, { useMemo } from 'react';
 import { useAsync } from 'react-async-hook';
 
 import { styled } from '@linaria/react';
+import { useSolana } from '@p2p-wallet-web/core';
 import { LAMPORTS_PER_SOL } from '@solana/web3.js';
 
-import { useConfig, usePrice, useSwap } from 'app/contexts/swap';
-import { formatBigNumber, formatNumberToUSD } from 'app/contexts/swap/utils/format';
+import { useConfig, usePrice, useSwap } from 'app/contexts/solana/swap';
+import { formatBigNumber, formatNumberToUSD } from 'app/contexts/solana/swap/utils/format';
 import { LoaderBlock } from 'components/common/LoaderBlock';
 
 import { Label, Line, Value } from './common/styled';
 import { FeesAccordion } from './FeesAccordion';
-import { useSolana } from '@p2p-wallet-web/core';
 
 // TODO: is it right?
 const ATA_ACCOUNT_CREATION_FEE = 0.00203928;
@@ -31,6 +31,7 @@ export const FeesOriginal: FC = () => {
   const { trade, intermediateTokenName, asyncStandardTokenAccounts } = useSwap();
   const { useAsyncMergedPrices } = usePrice();
   const asyncPrices = useAsyncMergedPrices();
+  const publicKey = wallet?.publicKey;
 
   const tokenNames = useMemo(() => {
     if (!asyncStandardTokenAccounts) {
@@ -111,6 +112,13 @@ export const FeesOriginal: FC = () => {
   // }, [intermediateTokenName, intermediateTokenPrice, outputTokenPrice, tokenConfigs, trade]);
 
   const transactionFee = useAsync(async () => {
+    if (!publicKey) {
+      return {
+        setupFee: 0,
+        swapFee: 0,
+      };
+    }
+
     const { feeCalculator } = await connection.getRecentBlockhash();
 
     const inputUserTokenPublicKey = asyncStandardTokenAccounts?.[trade.inputTokenName];
@@ -123,7 +131,7 @@ export const FeesOriginal: FC = () => {
       connection,
       tokenConfigs,
       programIds,
-      wallet,
+      publicKey,
       inputUserTokenPublicKey?.account,
       intermediateTokenPublicKey?.account,
       outputUserTokenAccount?.account,

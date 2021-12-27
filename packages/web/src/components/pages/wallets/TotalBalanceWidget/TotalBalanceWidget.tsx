@@ -3,8 +3,9 @@ import React, { useMemo } from 'react';
 import Skeleton from 'react-loading-skeleton';
 
 import { styled } from '@linaria/react';
-import { useRates, useUserTokenAccounts } from '@p2p-wallet-web/core';
+import { useUserTokenAccounts } from '@p2p-wallet-web/core';
 
+import { useMarketsData } from 'app/contexts';
 import { LoaderBlock } from 'components/common/LoaderBlock';
 import { Widget } from 'components/common/Widget';
 
@@ -61,7 +62,12 @@ type Props = {
 
 export const TotalBalanceWidget: FunctionComponent<Props> = ({ onSymbolChange }) => {
   const tokenAccounts = useUserTokenAccounts();
-  const { markets } = useRates();
+
+  const symbols = useMemo(() => {
+    return tokenAccounts.map((tokenAccount) => tokenAccount.balance?.token.symbol);
+  }, [tokenAccounts]);
+
+  const markets = useMarketsData(symbols);
 
   const totalBalance = useMemo(
     () =>
@@ -70,7 +76,7 @@ export const TotalBalanceWidget: FunctionComponent<Props> = ({ onSymbolChange })
           return prev;
         }
 
-        const rate = markets[tokenAccount.balance.token.symbol];
+        const rate = markets[tokenAccount?.balance?.token.symbol];
         if (rate) {
           return tokenAccount.balance.asNumber * rate + prev;
         }

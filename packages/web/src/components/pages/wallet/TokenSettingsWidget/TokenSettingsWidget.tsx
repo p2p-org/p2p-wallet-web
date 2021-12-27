@@ -1,6 +1,5 @@
 import type { FunctionComponent } from 'react';
 import React from 'react';
-import { useDispatch } from 'react-redux';
 import { useHistory } from 'react-router';
 
 import { styled } from '@linaria/react';
@@ -8,12 +7,11 @@ import type { PublicKey } from '@solana/web3.js';
 import { Feature } from 'flagged';
 import { rgba } from 'polished';
 
-import { useSettings, useTokenAccountIsHidden } from 'app/contexts/settings';
+import { ModalType, useModals } from 'app/contexts/general/modals';
+import { useSettings, useTokenAccountIsHidden } from 'app/contexts/general/settings';
 import { Widget } from 'components/common/Widget';
 import { Button, Icon, Switch } from 'components/ui';
 import { FEATURE_SETTINGS_CLOSE_ACCOUNT } from 'config/featureFlags';
-import { openModal } from 'store/actions/modals';
-import { SHOW_MODAL_CLOSE_TOKEN_ACCOUNT } from 'store/constants/modalTypes';
 
 const WrapperWidget = styled(Widget)``;
 
@@ -124,17 +122,12 @@ export const TokenSettingsWidget: FunctionComponent<Props> = ({
   isZeroBalance,
 }) => {
   const history = useHistory();
-  const dispatch = useDispatch();
+  const { openModal } = useModals();
   const { toggleHideTokenAccount } = useSettings();
   const isHidden = useTokenAccountIsHidden(publicKey);
 
   const handleCloseTokenAccountClick = () => {
-    void dispatch(
-      openModal({
-        modalType: SHOW_MODAL_CLOSE_TOKEN_ACCOUNT,
-        props: { publicKey, tokenName, history },
-      }),
-    );
+    openModal(ModalType.SHOW_MODAL_CLOSE_TOKEN_ACCOUNT, { publicKey, tokenName, history });
   };
 
   const handleHideTokenClick = (pubKey: PublicKey) => () => {

@@ -1,16 +1,14 @@
 import type { FC } from 'react';
 import React, { useEffect, useState } from 'react';
-import { useDispatch } from 'react-redux';
 import { useLocation } from 'react-router';
 import { NavLink } from 'react-router-dom';
 
 import { styled } from '@linaria/react';
-import { useUsername } from '@p2p-wallet-web/core';
 
-import { useSettings } from 'app/contexts/settings';
+import { useUsername } from 'app/contexts';
+import { ModalType, useModals } from 'app/contexts/general/modals';
+import { useSettings } from 'app/contexts/general/settings';
 import { Icon } from 'components/ui';
-import { openModal } from 'store/actions/modals';
-import { SHOW_MODAL_PROCEED_USERNAME } from 'store/constants/modalTypes';
 
 const Wrapper = styled.div`
   display: flex;
@@ -80,8 +78,8 @@ const Text = styled.div`
 `;
 
 export const UsernameBanner: FC = () => {
-  const dispatch = useDispatch();
   const location = useLocation();
+  const { openModal } = useModals();
   const { username } = useUsername();
   const {
     settings: { usernameBannerHiddenByUser },
@@ -98,13 +96,9 @@ export const UsernameBanner: FC = () => {
   }, [username]);
 
   const handleCloseClick = async () => {
-    const result = await dispatch(
-      openModal({
-        modalType: SHOW_MODAL_PROCEED_USERNAME,
-      }),
-    );
+    const result = await openModal<boolean>(ModalType.SHOW_MODAL_PROCEED_USERNAME);
 
-    if (result.payload) {
+    if (result) {
       setIsBannerShow(false);
     }
   };

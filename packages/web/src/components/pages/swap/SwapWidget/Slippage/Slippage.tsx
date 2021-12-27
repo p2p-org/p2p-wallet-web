@@ -4,8 +4,8 @@ import React, { useState } from 'react';
 import { styled } from '@linaria/react';
 import classNames from 'classnames';
 
-import { useSwap } from 'app/contexts/swap';
-import SlippageTolerance from 'app/contexts/swap/models/SlippageTolerance';
+import { useSwap } from 'app/contexts/solana/swap';
+import SlippageTolerance from 'app/contexts/solana/swap/models/SlippageTolerance';
 import { Accordion, Button, Input } from 'components/ui';
 
 const Title = styled.div`

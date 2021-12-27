@@ -2,7 +2,7 @@ import type { FunctionComponent } from 'react';
 import React, { useEffect } from 'react';
 import { useLocation, useParams } from 'react-router-dom';
 
-import { SwapProvider } from 'app/contexts/swap';
+import { SwapProvider } from 'app/contexts/solana/swap';
 import { Layout } from 'components/common/Layout';
 import { SwapWidget } from 'components/pages/swap/SwapWidget';
 import { trackEvent } from 'utils/analytics';

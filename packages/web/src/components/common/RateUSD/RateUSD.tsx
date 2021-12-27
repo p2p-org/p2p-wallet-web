@@ -1,8 +1,10 @@
 import type { FunctionComponent } from 'react';
 import React from 'react';
+import Skeleton from 'react-loading-skeleton';
 
 import { styled } from '@linaria/react';
-import { useMarketRate } from '@p2p-wallet-web/core';
+
+import { useMarketData } from 'app/contexts';
 
 const Wrapper = styled.div``;
 
@@ -11,15 +13,19 @@ type Props = {
 };
 
 export const RateUSD: FunctionComponent<Props> = ({ symbol = '', ...props }) => {
-  const rate = useMarketRate(symbol.toUpperCase());
+  const rate = useMarketData(symbol);
 
-  if (!rate) {
+  if (!rate.loading && !rate.data) {
     return null;
   }
 
   return (
     <Wrapper title="Rate in USD" {...props}>
-      {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(rate)}
+      {rate.loading ? (
+        <Skeleton width={50} />
+      ) : rate.data ? (
+        new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(rate.data)
+      ) : undefined}
     </Wrapper>
   );
 };

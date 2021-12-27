@@ -9,7 +9,7 @@ import { NATIVE_MINT } from '@saberhq/token-utils';
 import classNames from 'classnames';
 import { rgba } from 'polished';
 
-import { useSettings } from 'app/contexts/settings';
+import { useSettings } from 'app/contexts/general/settings';
 import { AmountUSD } from 'components/common/AmountUSD';
 import { TokenAvatar } from 'components/common/TokenAvatar';
 import { Menu } from 'components/ui';

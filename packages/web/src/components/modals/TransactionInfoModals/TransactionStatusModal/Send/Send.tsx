@@ -1,10 +1,11 @@
 import type { FC } from 'react';
 import React from 'react';
 
-import type { Transaction, TransferTransaction } from '@p2p-wallet-web/core';
-import type Decimal from 'decimal.js';
+import type { TokenAccount, Transaction, TransferTransaction } from '@p2p-wallet-web/core';
+import { useTokenAccountAmount } from '@p2p-wallet-web/core';
+import { usePubkey } from '@p2p-wallet-web/sail';
+import type { TokenAmount } from '@saberhq/token-utils';
 
-import type { Token } from 'api/token/Token';
 import { AmountUSD } from 'components/common/AmountUSD';
 import {
   SendWrapper,
@@ -13,30 +14,31 @@ import {
 } from 'components/modals/TransactionInfoModals/common/styled';
 
 export type TransferParams = {
-  fromToken: Token;
-  fromAmount: Decimal;
+  source: TokenAccount;
+  amount: TokenAmount;
 };
 
 interface Props {
   params: TransferParams;
-  transaction: Transaction<TransferTransaction> | null;
-  isReceiver: boolean;
+  transaction?: Transaction<TransferTransaction>;
 }
 
-export const Send: FC<Props> = ({ params: { fromToken, fromAmount }, transaction, isReceiver }) => {
+export const Send: FC<Props> = ({ params: { amount }, transaction }) => {
+  const tokenAmount = useTokenAccountAmount(
+    usePubkey(transaction?.details.tokenAccount),
+    transaction?.details.amount,
+  );
+
   return (
     <SendWrapper>
       <ValueCurrency>
-        {isReceiver ? '+' : '-'}{' '}
-        {transaction?.short.destinationAmount.toNumber() ||
-          fromToken.toMajorDenomination(fromAmount).toString()}{' '}
-        {transaction?.short.sourceToken?.symbol || fromToken.symbol}
+        {transaction?.details.isReceiver ? '+' : '-'}{' '}
+        {tokenAmount?.balance?.formatUnits() || amount.formatUnits()}
       </ValueCurrency>
       <ValueOriginal>
         <AmountUSD
-          prefix={isReceiver ? '+' : '-'}
-          symbol={transaction?.short.sourceToken?.symbol || fromToken.symbol}
-          value={transaction?.short.destinationAmount || fromToken.toMajorDenomination(fromAmount)}
+          prefix={transaction?.details.isReceiver ? '+' : '-'}
+          value={tokenAmount?.balance || amount}
         />
       </ValueOriginal>
     </SendWrapper>

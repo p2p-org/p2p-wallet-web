@@ -4,7 +4,7 @@ module.exports = {
   env: {
     browser: true,
   },
-  extends: ["@saberhq/eslint-config-react"],
+  extends: ["@p2p-wallet-web/eslint-config-react"],
   settings: { react: { version: "detect" } },
   parserOptions: {
     tsconfigRootDir: __dirname,

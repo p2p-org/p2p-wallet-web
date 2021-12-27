@@ -1,20 +1,21 @@
 import type { FunctionComponent } from 'react';
 import React, { useEffect, useState } from 'react';
-import { useDispatch } from 'react-redux';
 
 import { styled } from '@linaria/react';
-import { useConnectionContext } from '@p2p-wallet-web/core';
-import type { AsyncThunkAction } from '@reduxjs/toolkit';
-import { unwrapResult } from '@reduxjs/toolkit';
+import { useConnectionContext, useTransaction, useWallet } from '@p2p-wallet-web/core';
 import classNames from 'classnames';
 
+import type { ModalPropsType } from 'app/contexts';
 import { ToastManager } from 'components/common/ToastManager';
+import { Button } from 'components/ui';
 import { trackEvent } from 'utils/analytics';
 import { getExplorerUrl } from 'utils/connection';
 import { transferNotification } from 'utils/transactionNotifications';
 
 import {
   BlockWrapper,
+  ButtonExplorer,
+  CheckmarkIcon,
   CloseIcon,
   CloseWrapper,
   Content,
@@ -25,6 +26,7 @@ import {
   FieldWrapper,
   Footer,
   Header,
+  OtherIcon,
   ProgressWrapper,
   ShareIcon,
   ShareWrapper,
@@ -32,6 +34,7 @@ import {
   Wrapper,
 } from '../common/styled';
 import type { TransferParams } from './Send';
+import { Send } from './Send';
 import type { SwapParams } from './Swap';
 import { Swap } from './Swap';
 
@@ -57,38 +60,28 @@ const handleCopyClick = (str: string) => () => {
 
 const DEFAULT_TRANSACTION_ERROR = 'Transaction error';
 
-type SendActionType = AsyncThunkAction<string, any, any>;
+type SendActionType = () => Promise<string>;
 type SwapActionType = () => Promise<string>;
 
-type Props = {
+export type TransactionStatusModalProps = {
   type: 'send' | 'swap';
   action: SendActionType | SwapActionType;
   params: TransferParams | SwapParams;
-  close: (signature: string | null) => void;
 };
 
-export const TransactionStatusModal: FunctionComponent<Props> = ({
-  type,
-  action,
-  params,
-  close,
-}) => {
-  const dispatch = useDispatch();
+export const TransactionStatusModal: FunctionComponent<
+  ModalPropsType<string | null> & TransactionStatusModalProps
+> = ({ type, action, params, close }) => {
+  const { provider } = useWallet();
+
   const [progress, setProgress] = useState(5);
   const [isExecuting, setIsExecuting] = useState(false);
   const [signature, setSignature] = useState<string | null>(null);
-  // const transaction = useSelector(
-  //   (state) =>
-  //     (signature &&
-  //       state.transaction.items[signature] &&
-  //       Transaction.from(state.transaction.items[signature])) ||
-  //     null,
-  // );
-  // const [transactionError, setTransactionError] = useState(
-  //   transaction?.meta?.err ? DEFAULT_TRANSACTION_ERROR : '',
-  // );
+  const transaction = useTransaction(signature);
+  const [transactionError, setTransactionError] = useState(
+    transaction?.raw?.meta?.err ? DEFAULT_TRANSACTION_ERROR : '',
+  );
   const { network } = useConnectionContext();
-  // const tokenAccounts = useSelector((state) => state.wallet.tokenAccounts);
 
   useEffect(() => {
     let newProgress = INITIAL_PROGRESS;
@@ -120,15 +113,13 @@ export const TransactionStatusModal: FunctionComponent<Props> = ({
 
       switch (type) {
         case 'send': {
-          const resultSignature = unwrapResult(await dispatch(action as SendActionType));
+          const resultSignature = await (action as SendActionType)();
           setSignature(resultSignature);
 
           transferNotification({
             header: 'Sent',
-            text: `- ${(params as TransferParams).fromToken
-              .toMajorDenomination((params as TransferParams).fromAmount)
-              .toString()} ${(params as TransferParams).fromToken.symbol}`,
-            symbol: (params as TransferParams).fromToken.symbol,
+            text: `- ${(params as TransferParams).amount.formatUnits()}`,
+            symbol: (params as TransferParams).amount.token.symbol,
           });
           break;
         }
@@ -162,16 +153,18 @@ export const TransactionStatusModal: FunctionComponent<Props> = ({
       }
 
       try {
-        // const trx = unwrapResult(await dispatch(getTransaction(signature)));
-        // if (trx) {
-        //   if (trx.meta?.err) {
-        //     setTransactionError(DEFAULT_TRANSACTION_ERROR);
-        //   } else if (transactionError) {
-        //     setTransactionError('');
-        //   }
-        // } else {
-        //   setTimeout(mount, 3000);
-        // }
+        const trx = await provider.connection.getTransaction(signature, {
+          commitment: 'confirmed',
+        });
+        if (trx) {
+          if (trx.meta?.err) {
+            setTransactionError(DEFAULT_TRANSACTION_ERROR);
+          } else if (transactionError) {
+            setTransactionError('');
+          }
+        } else {
+          setTimeout(mount, 3000);
+        }
       } catch (error) {
         // setTransactionError((error as Error).message);
         ToastManager.error((error as Error).message);
@@ -183,17 +176,6 @@ export const TransactionStatusModal: FunctionComponent<Props> = ({
     void mount();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [signature]);
-
-  // const isReceiver = useMemo(() => {
-  //   if (!transaction) {
-  //     return false;
-  //   }
-  //
-  //   return !!tokenAccounts.find(
-  //     (tokenAccount) => tokenAccount.address === transaction.short.destination?.toBase58(),
-  //   );
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [transaction?.short.destination, tokenAccounts]);
 
   const handleCloseClick = () => {
     if (type === 'send') {
@@ -217,9 +199,9 @@ export const TransactionStatusModal: FunctionComponent<Props> = ({
 
   const handleRetryClick = () => {
     if (type === 'send') {
-      // trackEvent('send_try_again_click', { error: transactionError });
+      trackEvent('send_try_again_click', { error: transactionError });
     } else if (type === 'swap') {
-      // trackEvent('swap_try_again_click', { error: transactionError });
+      trackEvent('swap_try_again_click', { error: transactionError });
     }
 
     void executeAction();
@@ -227,39 +209,39 @@ export const TransactionStatusModal: FunctionComponent<Props> = ({
 
   const handleCancelClick = () => {
     if (type === 'send') {
-      // trackEvent('send_cancel_click', { error: transactionError });
+      trackEvent('send_cancel_click', { error: transactionError });
     } else if (type === 'swap') {
-      // trackEvent('swap_cancel_click', { error: transactionError });
+      trackEvent('swap_cancel_click', { error: transactionError });
     }
 
     close(signature);
   };
 
-  // const isProcessing = (!signature || !transaction) && !transactionError;
-  // const isSuccess = signature && transaction && !transactionError;
+  const isProcessing = (!signature || !transaction?.key) && !transactionError;
+  const isSuccess = signature && transaction?.key && !transactionError;
 
   const renderTitle = () => {
-    // if (isSuccess) {
-    //   return 'Success';
-    // }
+    if (isSuccess) {
+      return 'Success';
+    }
 
-    // if (transactionError) {
-    //   return 'Something went wrong';
-    // }
+    if (transactionError) {
+      return 'Something went wrong';
+    }
 
     return type === 'send' ? 'Sending...' : 'Swapping...';
   };
 
   const renderDescription = () => {
-    // if (isSuccess) {
-    //   return type === 'send'
-    //     ? `You’ve successfully sent ${(params as TransferParams).fromToken.symbol}`
-    //     : 'You’ve successfully swapped tokens';
-    // }
+    if (isSuccess) {
+      return type === 'send'
+        ? `You’ve successfully sent ${(params as TransferParams).amount.token.symbol}`
+        : 'You’ve successfully swapped tokens';
+    }
 
-    // if (transactionError) {
-    //   return type === 'send' ? 'Tokens have not been debited' : 'Tokens have not been swapped';
-    // }
+    if (transactionError) {
+      return type === 'send' ? 'Tokens have not been debited' : 'Tokens have not been swapped';
+    }
 
     return 'Transaction processing';
   };
@@ -274,30 +256,25 @@ export const TransactionStatusModal: FunctionComponent<Props> = ({
         </CloseWrapper>
         <BlockWrapper
           className={classNames({
-            // isProcessing,
-            // isSuccess,
-            // isError: Boolean(transactionError),
+            isProcessing,
+            isSuccess,
+            isError: Boolean(transactionError),
           })}
         >
-          {/*{isSuccess ? (*/}
-          {/*  <CheckmarkIcon name="checkmark" />*/}
-          {/*) : (*/}
-          {/*  <OtherIcon name={transactionError ? 'warning' : 'timer'} />*/}
-          {/*)}*/}
+          {isSuccess ? (
+            <CheckmarkIcon name="checkmark" />
+          ) : (
+            <OtherIcon name={transactionError ? 'warning' : 'timer'} />
+          )}
         </BlockWrapper>
       </Header>
       <ProgressWrapper>
         <ProgressLine style={{ width: `${progress}%` }} />
       </ProgressWrapper>
       <Content>
-        {type === 'send'
-          ? // <Send
-            //   params={params as TransferParams}
-            //   transaction={transaction}
-            //   isReceiver={isReceiver}
-            // />
-            undefined
-          : undefined}
+        {type === 'send' ? (
+          <Send params={params as TransferParams} transaction={transaction} />
+        ) : undefined}
         {type === 'swap' ? <Swap params={params as SwapParams} /> : undefined}
         {signature ? (
           <FieldsWrapper>
@@ -314,39 +291,39 @@ export const TransactionStatusModal: FunctionComponent<Props> = ({
         ) : undefined}
       </Content>
       <Footer>
-        {/*{transactionError ? (*/}
-        {/*  <>*/}
-        {/*    <Button primary disabled={isExecuting} onClick={handleRetryClick}>*/}
-        {/*      Try again*/}
-        {/*    </Button>*/}
-        {/*    <Button lightGray disabled={isExecuting} onClick={handleCancelClick}>*/}
-        {/*      Cancel*/}
-        {/*    </Button>*/}
-        {/*  </>*/}
-        {/*) : (*/}
-        {/*  <>*/}
-        {/*    <Button primary onClick={handleDoneClick}>*/}
-        {/*      Done*/}
-        {/*    </Button>*/}
-        {/*    {signature ? (*/}
-        {/*      <a*/}
-        {/*        href={getExplorerUrl('tx', signature, network)}*/}
-        {/*        target="_blank"*/}
-        {/*        rel="noopener noreferrer noindex"*/}
-        {/*        onClick={() => {*/}
-        {/*          if (type === 'send') {*/}
-        {/*            trackEvent('send_explorer_click', { transactionConfirmed: !isExecuting });*/}
-        {/*          } else if (type === 'swap') {*/}
-        {/*            trackEvent('swap_explorer_click', { transactionConfirmed: !isExecuting });*/}
-        {/*          }*/}
-        {/*        }}*/}
-        {/*        className="button"*/}
-        {/*      >*/}
-        {/*        <ButtonExplorer lightGray>View in blockchain explorer</ButtonExplorer>*/}
-        {/*      </a>*/}
-        {/*    ) : undefined}*/}
-        {/*  </>*/}
-        {/*)}*/}
+        {transactionError ? (
+          <>
+            <Button primary disabled={isExecuting} onClick={handleRetryClick}>
+              Try again
+            </Button>
+            <Button lightGray disabled={isExecuting} onClick={handleCancelClick}>
+              Cancel
+            </Button>
+          </>
+        ) : (
+          <>
+            <Button primary onClick={handleDoneClick}>
+              Done
+            </Button>
+            {signature ? (
+              <a
+                href={getExplorerUrl('tx', signature, network)}
+                target="_blank"
+                rel="noopener noreferrer noindex"
+                onClick={() => {
+                  if (type === 'send') {
+                    trackEvent('send_explorer_click', { transactionConfirmed: !isExecuting });
+                  } else if (type === 'swap') {
+                    trackEvent('swap_explorer_click', { transactionConfirmed: !isExecuting });
+                  }
+                }}
+                className="button"
+              >
+                <ButtonExplorer lightGray>View in blockchain explorer</ButtonExplorer>
+              </a>
+            ) : undefined}
+          </>
+        )}
       </Footer>
     </Wrapper>
   );

@@ -1,6 +1,5 @@
 import type { FunctionComponent } from 'react';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { useDispatch } from 'react-redux';
 import { useLocation } from 'react-router';
 import { Link } from 'react-router-dom';
 
@@ -8,7 +7,6 @@ import { styled } from '@linaria/react';
 import {
   SYSTEM_PROGRAM_ID,
   useConnectionContext,
-  useRates,
   useSolana,
   useTokenAccount,
 } from '@p2p-wallet-web/core';
@@ -17,7 +15,8 @@ import { LAMPORTS_PER_SOL } from '@solana/web3.js';
 import classNames from 'classnames';
 import throttle from 'lodash.throttle';
 
-import { useConfig } from 'app/contexts/swap';
+import { useMarketData, useRates } from 'app/contexts';
+import { useConfig } from 'app/contexts/solana/swap';
 import { AmountUSD } from 'components/common/AmountUSD';
 import { COLUMN_RIGHT_WIDTH } from 'components/common/Layout/constants';
 import { TokenAvatar } from 'components/common/TokenAvatar';
@@ -179,7 +178,6 @@ type Props = {
 };
 
 const TopWidgetOrigin: FunctionComponent<Props> = ({ publicKey }) => {
-  const dispatch = useDispatch();
   const location = useLocation();
   const { tokenConfigs } = useConfig();
   const widgetRef = useRef<HTMLDivElement>(null);
@@ -189,10 +187,8 @@ const TopWidgetOrigin: FunctionComponent<Props> = ({ publicKey }) => {
 
   const { network } = useConnectionContext();
   const tokenAccount = useTokenAccount(usePubkey(publicKey));
-  const { candlesType, candles, markets, getRatesCandle } = useRates();
-  const rate = tokenAccount?.balance?.token.symbol
-    ? markets[tokenAccount.balance.token.symbol]
-    : null;
+  const { candlesType, candles, getRatesCandle } = useRates();
+  const rate = useMarketData(tokenAccount?.balance?.token.symbol);
   const rates = tokenAccount?.balance?.token.symbol
     ? candles[tokenAccount.balance.token.symbol]
     : null;
@@ -347,20 +343,20 @@ const TopWidgetOrigin: FunctionComponent<Props> = ({ publicKey }) => {
       <WrapperWidget
         ref={widgetRef}
         title={
-          tokenAccount ? (
+          tokenAccount?.key && tokenAccount?.balance ? (
             <Header>
               <TokenAvatar
-                symbol={tokenAccount?.balance?.token.symbol}
-                address={tokenAccount?.mint?.toBase58()}
+                symbol={tokenAccount.balance?.token.symbol}
+                address={tokenAccount.balance?.token?.address}
                 size="44"
               />
               <TokenInfo>
                 <TokenSymbol>{tokenAccount.balance?.token.symbol}</TokenSymbol>
                 <TokenName title={tokenAccount.key.toBase58()}>
-                  {tokenAccount?.balance?.token.name || shortAddress(tokenAccount.key.toBase58())}
+                  {tokenAccount.balance?.token.name || shortAddress(tokenAccount.key.toBase58())}
                 </TokenName>
               </TokenInfo>
-              {tokenAccount?.mint?.equals(SYSTEM_PROGRAM_ID) ? undefined : (
+              {tokenAccount.balance?.token?.mintAccount.equals(SYSTEM_PROGRAM_ID) ? undefined : (
                 <TokenSettings>
                   <Link
                     to={{
@@ -382,14 +378,14 @@ const TopWidgetOrigin: FunctionComponent<Props> = ({ publicKey }) => {
         action={renderButtons()}
       >
         {renderContent()}
-        {tokenAccount ? <Chart publicKey={tokenAccount.key} /> : undefined}
+        {tokenAccount?.key ? <Chart publicKey={tokenAccount.key} /> : undefined}
       </WrapperWidget>
       {isShowFixed ? (
         <WrapperFixed>
           <FixedInfoWrapper>
             <TokenAvatar
               symbol={tokenAccount?.balance?.token.symbol}
-              address={tokenAccount?.mint?.toBase58()}
+              address={tokenAccount?.balance?.token.address}
               size={36}
             />
             {renderContent(true)}

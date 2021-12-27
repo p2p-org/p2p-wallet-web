@@ -39,14 +39,17 @@
     "prepare": "husky install"
   },
   "devDependencies": {
+    "@p2p-wallet-web/eslint-config-react": "^1.0.0",
     "@p2p-wallet-web/tsconfig": "^1.0.0",
+    "@project-serum/anchor": "^0.19.1-beta.1",
     "@rushstack/eslint-patch": "^1.1.0",
-    "@saberhq/eslint-config-react": "^1.10.16",
+    "@saberhq/anchor-contrib": "^1.11.3",
     "@saberhq/solana-contrib": "^1.10.16",
     "@saberhq/token-utils": "^1.10.16",
     "@saberhq/use-solana": "^1.10.16",
     "@solana/web3.js": "^1.31.0",
     "@types/lodash.chunk": "^4.2.6",
+    "@types/lodash.mapvalues": "^4.6.6",
     "@types/lodash.zip": "^4.2.6",
     "@types/node": "^16.11.9",
     "@types/react": "^17.0.36",
@@ -59,6 +62,7 @@
     "husky": "^7.0.4",
     "jsbi": "^4.1.0",
     "lint-staged": "^12.1.2",
+    "lodash.mapvalues": "^4.6.0",
     "prettier": "^2.5.1",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
@@ -66,7 +70,6 @@
     "typescript": "^4.5.4"
   },
   "dependencies": {
-    "dataloader": "^2.0.0",
     "eventemitter3": "^4.0.7",
     "lodash.chunk": "^4.2.0",
     "lodash.zip": "^4.2.0",
@@ -77,11 +80,14 @@
     "use-debounce": "^7.0.1"
   },
   "peerDependencies": {
+    "@project-serum/anchor": "*",
+    "@saberhq/anchor-contrib": "*",
     "@saberhq/solana-contrib": "^1.7.1",
     "@saberhq/token-utils": "^1.7.1",
     "@saberhq/use-solana": "^1.7.1",
     "@solana/web3.js": "^1.29.2",
     "bn.js": "^5.2.0",
+    "dataloader": "*",
     "jsbi": "^3 || ^4",
     "react": "^17.0.2",
     "react-dom": "^17.0.2"

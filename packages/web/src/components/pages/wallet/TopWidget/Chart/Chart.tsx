@@ -3,10 +3,12 @@ import React, { useEffect, useState } from 'react';
 import ReactHighcharts from 'react-highcharts';
 
 import { styled } from '@linaria/react';
-import type { CandleLimitType } from '@p2p-wallet-web/core';
-import { useRates, useTokenAccount } from '@p2p-wallet-web/core';
+import { useTokenAccount } from '@p2p-wallet-web/core';
 import type web3 from '@solana/web3.js';
 import classNames from 'classnames';
+
+import type { CandleLimitType } from 'app/contexts';
+import { useRates } from 'app/contexts';
 
 // import dayjs from 'dayjs';
 // import { rgba } from 'polished';

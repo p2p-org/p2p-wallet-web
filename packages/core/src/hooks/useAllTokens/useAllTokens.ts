@@ -3,7 +3,7 @@ import { useMemo } from 'react';
 import type { Token } from '@saberhq/token-utils';
 import { networkToChainId } from '@saberhq/token-utils';
 
-import { useConnectionContext } from '../../contexts/solana/solana';
+import { useConnectionContext } from '../../contexts/solana';
 import { makeTokenMap } from './utils/makeTokenMap';
 
 export type TokenMap = Record<string, Token>;

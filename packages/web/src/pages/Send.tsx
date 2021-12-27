@@ -4,6 +4,7 @@ import { useLocation, useParams } from 'react-router-dom';
 
 import { useWallet } from '@p2p-wallet-web/core';
 
+import { SendStateProvider } from 'app/contexts';
 import { Layout } from 'components/common/Layout';
 import { ResultWidget } from 'components/pages/send/ResultWidget';
 import { SendWidget } from 'components/pages/send/SendWidget';
@@ -20,25 +21,21 @@ export const Send: FunctionComponent = () => {
   }, []);
 
   return (
-    <Layout
-      breadcrumb={
-        status === 'result'
-          ? {
-              currentName: 'Result',
-              backTo: {
-                pathname: `/send/${publicKey || publicKeySol?.toBase58()}`,
-                state: { fromPage: location.pathname },
-              },
-            }
-          : undefined
-      }
-      rightColumn={
-        status !== 'result' ? (
-          <SendWidget publicKey={publicKey || publicKeySol?.toBase58()} />
-        ) : (
-          <ResultWidget />
-        )
-      }
-    />
+    <SendStateProvider>
+      <Layout
+        breadcrumb={
+          status === 'result'
+            ? {
+                currentName: 'Result',
+                backTo: {
+                  pathname: `/send/${publicKey || publicKeySol?.toBase58()}`,
+                  state: { fromPage: location.pathname },
+                },
+              }
+            : undefined
+        }
+        rightColumn={status !== 'result' ? <SendWidget /> : <ResultWidget />}
+      />
+    </SendStateProvider>
   );
 };

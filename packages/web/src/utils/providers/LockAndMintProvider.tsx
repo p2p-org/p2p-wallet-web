@@ -323,10 +323,12 @@ const feesCache: FeesCache = {
     release: 0,
   },
 };
+
 export const useFetchFees = (isNeedLoadFee = true) => {
   const solanaProvider = useSolana();
   const network = useRenNetwork();
   const { bitcoin, solana } = getChains(network, solanaProvider);
+
   const [fees, setFees] = useState(feesCache.fees);
   const [pending, setPending] = useState(false);
 
@@ -339,6 +341,7 @@ export const useFetchFees = (isNeedLoadFee = true) => {
         to: solana,
       });
       setPending(false);
+
       const fees = {
         mint: rates.mint,
         burn: rates.burn,
@@ -346,6 +349,7 @@ export const useFetchFees = (isNeedLoadFee = true) => {
         release: rates.release ? rates.release.toNumber() : 0,
       };
       setFees(fees);
+
       feesCache.fees = fees;
       feesCache.timestamp = Date.now();
     };

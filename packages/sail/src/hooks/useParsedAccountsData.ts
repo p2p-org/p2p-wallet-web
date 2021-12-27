@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 
+import type { AccountParsers } from "@saberhq/anchor-contrib";
 import type { KeyedAccountInfo, PublicKey } from "@solana/web3.js";
+import mapValues from "lodash.mapvalues";
 import zip from "lodash.zip";
 
 import {
@@ -12,6 +14,33 @@ import type { ParsedAccountDatum } from "../internal";
 import { useAccountsData } from "./useAccountsData";
 
 export type AccountParser<T> = (info: KeyedAccountInfo) => T;
+
+/**
+ * Makes account parsers from a coder.
+ * @param parsers
+ * @returns
+ */
+export const makeParsersFromCoder = <M>(parsers: AccountParsers<M>) => {
+  return mapValues(
+    parsers,
+    (p) => (info: KeyedAccountInfo) => p(info.accountInfo.data)
+  );
+};
+
+/**
+ * Makes hooks for parsers.
+ * @param parsers
+ * @returns
+ */
+export const makeParserHooks = <M>(parsers: AccountParsers<M>) => {
+  const sailParsers = makeParsersFromCoder(parsers);
+  return mapValues(sailParsers, (parser) => ({
+    useSingleData: (key: PublicKey | null | undefined) =>
+      useParsedAccountData(key, parser),
+    useData: (keys: (PublicKey | null | undefined)[]) =>
+      useParsedAccountsData(keys, parser),
+  }));
+};
 
 /**
  * Parses accounts with the given parser.

@@ -79,7 +79,7 @@ export const TokenAccountRow: FunctionComponent<Props> = ({
     const _name = tokenAccount.balance?.token.name;
 
     if (showAddress || !_name) {
-      return shortAddress(tokenAccount.key.toBase58());
+      return tokenAccount.key && shortAddress(tokenAccount.key.toBase58());
     }
 
     return _name;
@@ -97,12 +97,13 @@ export const TokenAccountRow: FunctionComponent<Props> = ({
         )}
         <Info>
           <Top>
-            <TokenSymbol title={tokenAccount.mint?.toBase58()}>
+            <TokenSymbol title={tokenAccount.balance?.token.address}>
               {loading ? (
                 <Skeleton width={50} height={16} />
               ) : (
                 tokenAccount.balance?.token.symbol ||
-                (tokenAccount.mint && shortAddress(tokenAccount.mint?.toBase58()))
+                (tokenAccount.balance?.token.address &&
+                  shortAddress(tokenAccount.balance?.token.address))
               )}
             </TokenSymbol>
             {loading ? (

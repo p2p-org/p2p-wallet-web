@@ -3,7 +3,7 @@ import 'sanitize.css';
 import 'styles/css/nprogress.css';
 import 'react-loading-skeleton/dist/skeleton.css';
 
-import React from 'react';
+import React, { StrictMode } from 'react';
 import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
 import { IntercomProvider } from 'react-use-intercom';
@@ -30,7 +30,7 @@ const render = () => {
   );
 
   ReactDOM.render(
-    <React.StrictMode>
+    <StrictMode>
       <Provider store={store}>
         <IntercomProvider appId={process.env.REACT_APP_INTERCOM_APP_ID} autoBoot>
           <FeatureProvider>
@@ -38,7 +38,7 @@ const render = () => {
           </FeatureProvider>
         </IntercomProvider>
       </Provider>
-    </React.StrictMode>,
+    </StrictMode>,
     document.querySelector('#root'),
   );
 };

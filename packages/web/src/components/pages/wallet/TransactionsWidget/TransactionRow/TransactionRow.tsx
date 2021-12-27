@@ -15,6 +15,7 @@ import { usePubkey } from '@p2p-wallet-web/sail';
 import classNames from 'classnames';
 import { rgba } from 'polished';
 
+import { ModalType, useModals } from 'app/contexts/general/modals';
 import { AmountUSD } from 'components/common/AmountUSD';
 import { SwapAvatars } from 'components/pages/wallet/TransactionsWidget/TransactionRow/swap/SwapAvatars';
 import { Icon } from 'components/ui';
@@ -101,13 +102,13 @@ const WarningIcon = styled(Icon)`
   color: #f43d3d;
 `;
 
-const ClockIcon = styled(Icon)`
-  width: 15px;
-  height: 15px;
-  margin-left: 9px;
-
-  color: #ffa631;
-`;
+// const ClockIcon = styled(Icon)`
+//   width: 15px;
+//   height: 15px;
+//   margin-left: 9px;
+//
+//   color: #ffa631;
+// `;
 
 const Main = styled.div`
   display: flex;
@@ -152,6 +153,7 @@ type Props = {
 };
 
 export const TransactionRow: FunctionComponent<Props> = ({ signature, source }) => {
+  const { openModal } = useModals();
   const transaction = useTransaction(signature, source);
 
   const sourceTokenAccount = useTokenAccount(usePubkey(transaction?.data?.source));
@@ -169,12 +171,7 @@ export const TransactionRow: FunctionComponent<Props> = ({ signature, source }) 
 
     trackEvent('wallet_transaction_details_open');
 
-    // void dispatch(
-    //   openModal({
-    //     modalType: SHOW_MODAL_TRANSACTION_DETAILS,
-    //     props: { signature, source },
-    //   }),
-    // );
+    openModal(ModalType.SHOW_MODAL_TRANSACTION_DETAILS, { signature, source });
   };
 
   const bottomLeft = useMemo(() => {
@@ -185,8 +182,8 @@ export const TransactionRow: FunctionComponent<Props> = ({ signature, source }) 
 
     const type = transaction?.details.type;
 
-    const source = sourceTokenAccount?.key?.toBase58();
-    const destination = destinationTokenAccount?.key?.toBase58();
+    const source = transaction?.data?.source;
+    const destination = transaction?.data?.destination;
     const sourceToken = sourceTokenAccount?.balance?.token;
     const destinationToken = destinationTokenAccount?.balance?.token;
 
@@ -234,10 +231,8 @@ export const TransactionRow: FunctionComponent<Props> = ({ signature, source }) 
     return null;
   }, [
     destinationTokenAccount?.balance?.token,
-    destinationTokenAccount?.key,
     destinationTokenAccount?.loading,
     sourceTokenAccount?.balance?.token,
-    sourceTokenAccount?.key,
     sourceTokenAccount?.loading,
     transaction,
   ]);
@@ -294,7 +289,7 @@ export const TransactionRow: FunctionComponent<Props> = ({ signature, source }) 
             <div>
               {transaction?.loading || tokenAmount?.loading ? (
                 <Skeleton width={70} height={16} />
-              ) : tokenAmount.balance ? (
+              ) : tokenAmount?.balance ? (
                 <>
                   {transaction?.details.isReceiver ? '+' : '-'} {tokenAmount.balance.formatUnits()}
                 </>

@@ -3,7 +3,7 @@ import React from 'react';
 
 import { styled } from '@linaria/react';
 
-import { useSettings } from 'app/contexts/settings';
+import { useSettings } from 'app/contexts/general/settings';
 import { Button, Icon } from 'components/ui';
 
 const Wrapper = styled.div`

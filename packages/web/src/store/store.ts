@@ -1,6 +1,5 @@
 import { configureStore } from '@reduxjs/toolkit';
 import logger from 'redux-logger';
-import { modalsMiddleware } from 'redux-modals-manager';
 
 import { isDev } from 'config/constants';
 
@@ -12,7 +11,6 @@ export const store = configureStore({
   // here: https://redux-toolkit.js.org/api/configureStore#middleware
   middleware: (getDefaultMiddleware) => [
     ...getDefaultMiddleware(),
-    modalsMiddleware, // TODO: types.ts
     logger, // Note: logger must be the last middleware in chain, otherwise it will log thunk and promise, not actual actions
   ],
   devTools: isDev,

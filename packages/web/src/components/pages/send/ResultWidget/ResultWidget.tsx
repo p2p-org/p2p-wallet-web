@@ -1,16 +1,14 @@
 import type { FunctionComponent } from 'react';
 import React, { useEffect } from 'react';
-import { useDispatch } from 'react-redux';
 import { useLocation } from 'react-router';
 
 import { styled } from '@linaria/react';
 import { rgba } from 'polished';
 
+import { ModalType, useModals } from 'app/contexts/general/modals';
 import bgImg from 'assets/images/sun.png';
 import { Card } from 'components/common/Card';
 import { Icon } from 'components/ui';
-import { openModal } from 'store/actions/modals';
-import { SHOW_MODAL_TRANSACTION_DETAILS } from 'store/constants/modalTypes';
 
 const WrapperCard = styled(Card)`
   display: flex;
@@ -88,7 +86,7 @@ const Details = styled.div`
 
 export const ResultWidget: FunctionComponent = () => {
   const { state: locationState } = useLocation<{ signature: string }>();
-  const dispatch = useDispatch();
+  const { openModal } = useModals();
   // const transaction = useSelector(
   //   (state: RootState) =>
   //     state.transaction.items[locationState.signature] &&
@@ -107,15 +105,10 @@ export const ResultWidget: FunctionComponent = () => {
       void mount();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch]);
+  }, []);
 
   const handleDetailsClick = () => {
-    void dispatch(
-      openModal({
-        modalType: SHOW_MODAL_TRANSACTION_DETAILS,
-        props: { signature: locationState?.signature },
-      }),
-    );
+    openModal(ModalType.SHOW_MODAL_TRANSACTION_DETAILS, { signature: locationState?.signature });
   };
 
   return (

@@ -3,32 +3,13 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import type { PublicKey } from '@solana/web3.js';
 import Decimal from 'decimal.js';
 
-import { APIFactory as FeeRelayerAPIFactory } from 'api/feeRelayer';
-import type { TransferParameters } from 'api/token';
 import { APIFactory as TokenAPIFactory } from 'api/token';
-import type { SerializableTokenAccount } from 'api/token/TokenAccount';
-import { TokenAccount } from 'api/token/TokenAccount';
 import type { RootState } from 'store/rootReducer';
 import { updateEntityArray } from 'store/utils';
 import { minorAmountToMajor } from 'utils/amount';
 import { transferNotification } from 'utils/transactionNotifications';
 
 export const WALLET_SLICE_NAME = 'wallet';
-
-export interface WalletsState {
-  tokenAccounts: Array<SerializableTokenAccount>;
-}
-
-export const getTokenAccount = createAsyncThunk<TokenAccount | null, PublicKey>(
-  `${WALLET_SLICE_NAME}/getTokenAccount`,
-  async (account, thunkAPI) => {
-    const state: RootState = thunkAPI.getState() as RootState;
-    const walletState = state.wallet;
-    const TokenAPI = TokenAPIFactory(walletState.network);
-
-    return TokenAPI.tokenAccountInfo(account);
-  },
-);
 
 // export const updateTokenAccountsForWallet = createAsyncThunk<SerializableTokenAccount[]>(
 //   `${WALLET_SLICE_NAME}/updateTokenAccountsForWallet`,
@@ -71,86 +52,6 @@ export const getTokenAccount = createAsyncThunk<TokenAccount | null, PublicKey>(
 //     return newTokenAccounts.map((tokenAccount) => tokenAccount.serialize());
 //   },
 // );
-
-/**
- * Async action to connect to a wallet. Creates a new wallet instance,
- * connects to it, and connects action dispatchers, when a disconnect event
- * (e.g. the user closes the wallet tab) occurs.
- *
- * The output of the action is the user's public key in Base58 form,
- * so that the user can verify it.
- */
-// export const connectWallet = createAsyncThunk<string, WalletDataType | undefined>(
-//   `${WALLET_SLICE_NAME}/connectWallet`,
-//   async (data, thunkAPI) => {
-//     const {
-//       wallet: { network, type },
-//     }: RootState = thunkAPI.getState() as RootState;
-//
-//     const wallet = await WalletAPI.connectWallet(network, type, data);
-//
-//     wallet.on(WalletEvent.DISCONNECT, () => {
-//       void thunkAPI.dispatch(disconnect());
-//       ToastManager.error('Wallet disconnected');
-//     });
-//
-//     // wallet.on(WalletEvent.CONFIRMED, ({ transactionSignature }) =>
-//     //   ToastManager.info(`Confirmed: ${transactionSignature}`),
-//     // );
-//
-//     ToastManager.info('Wallet connected');
-//
-//
-//     if (swapHostFeeAddress) {
-//       void thunkAPI.dispatch(precacheTokenAccounts(swapHostFeeAddress));
-//     }
-//
-//     return wallet.pubkey.toBase58();
-//   },
-// );
-
-export const transfer = createAsyncThunk<string, TransferParameters>(
-  `${WALLET_SLICE_NAME}/transfer`,
-  async (parameters, thunkAPI) => {
-    const state: RootState = thunkAPI.getState() as RootState;
-    const walletState = state.wallet;
-    const tokenAccounts = state.wallet.tokenAccounts.map((account) => TokenAccount.from(account));
-    const tokenAccount = tokenAccounts.find((account) => account.address.equals(parameters.source));
-
-    let resultSignature: string;
-    if (walletState.settings.useFreeTransactions) {
-      const FeeRelayerAPI = FeeRelayerAPIFactory(walletState.network);
-      resultSignature = await FeeRelayerAPI.transfer(parameters, tokenAccount);
-    } else {
-      const TokenAPI = TokenAPIFactory(walletState.network);
-      resultSignature = await TokenAPI.transfer(parameters);
-    }
-
-    // thunkAPI.dispatch(
-    //   addPendingTransaction(
-    //     new Transaction(resultSignature, 0, null, null, null, {
-    //       type: 'transfer',
-    //       source: parameters.source,
-    //       sourceTokenAccount: tokenAccount || null,
-    //       sourceToken: tokenAccount?.mint || null,
-    //       destination: parameters.destination,
-    //       destinationTokenAccount: null,
-    //       destinationToken: tokenAccount?.mint || null,
-    //       sourceAmount: tokenAccount?.mint
-    //         ? minorAmountToMajor(parameters.amount, tokenAccount?.mint)
-    //         : new Decimal(0),
-    //       destinationAmount: tokenAccount?.mint
-    //         ? minorAmountToMajor(parameters.amount, tokenAccount?.mint)
-    //         : new Decimal(0),
-    //     }).serialize(),
-    //   ),
-    // );
-
-    // await awaitConfirmation(resultSignature);
-
-    return resultSignature;
-  },
-);
 
 export const closeTokenAccount = createAsyncThunk<string, { publicKey: PublicKey }>(
   `${WALLET_SLICE_NAME}/closeAccount`,

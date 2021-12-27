@@ -4,12 +4,13 @@ import { useHistory } from 'react-router';
 import { NavLink, useLocation } from 'react-router-dom';
 
 import { styled } from '@linaria/react';
-import { useUsername, useWallet } from '@p2p-wallet-web/core';
+import { useWallet } from '@p2p-wallet-web/core';
 import classNames from 'classnames';
 import { Feature } from 'flagged';
 
-import type { WalletSettings } from 'app/contexts/settings';
-import { APPEARANCE, CURRENCIES, useSettings } from 'app/contexts/settings';
+import type { MainSettings } from 'app/contexts';
+import { useUsername } from 'app/contexts';
+import { APPEARANCE, CURRENCIES, useSettings } from 'app/contexts/general/settings';
 import AppStoreBadge from 'assets/images/app-store-badge.png';
 import GooglePlayBadge from 'assets/images/google-play-badge.png';
 import { Layout } from 'components/common/Layout';
@@ -164,7 +165,7 @@ export const Settings: FunctionComponent = () => {
   };
 
   const onItemClickHandler =
-    (options: Partial<WalletSettings> = settings) =>
+    (options: Partial<MainSettings> = settings) =>
     () => {
       updateSettings(options);
     };

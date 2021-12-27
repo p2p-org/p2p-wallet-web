@@ -1,14 +1,17 @@
 import type { FunctionComponent } from 'react';
 import React, { useEffect, useRef, useState } from 'react';
+import { useDebounce } from 'react-use';
 
 import { styled } from '@linaria/react';
 import type { ResolveUsernameResponse } from '@p2p-wallet-web/core';
 import classNames from 'classnames';
 import { rgba } from 'polished';
 
+import { useNameService, useSendState } from 'app/contexts';
 import { AddressText } from 'components/common/AddressText';
 import { Loader } from 'components/common/Loader';
 import { Icon } from 'components/ui';
+import { useTrackEventOnce } from 'utils/hooks/useTrackEventOnce';
 
 const WalletIcon = styled(Icon)`
   width: 24px;
@@ -125,7 +128,7 @@ const ResolvedNamesList = styled.ul`
 
   background: #fff;
   border-radius: 12px;
-  box-shadow: 0px 0px 12px rgb(0 0 0 / 8%);
+  box-shadow: 0 0 12px rgb(0 0 0 / 8%);
   z-index: 10;
 `;
 
@@ -172,29 +175,53 @@ const LoaderWrapper = styled.div`
   top: 8px;
 `;
 
-type Props = {
-  value: string;
-  resolvedAddress?: string | null;
-  isAddressInvalid: boolean;
-  resolvedNames: ResolveUsernameResponse[];
-  isResolvingNames: boolean;
-  onResolvedNameClick: (props: any) => void;
-  onChange: (publicKey: string) => void;
-};
-
-export const ToAddressInput: FunctionComponent<Props> = ({
-  value,
-  resolvedAddress,
-  isAddressInvalid = false,
-  resolvedNames = [],
-  isResolvingNames = false,
-  onResolvedNameClick,
-  onChange,
-}) => {
+export const ToAddressInput: FunctionComponent = () => {
   const inputRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLUListElement>(null);
+  const trackEventOnce = useTrackEventOnce();
+
+  const { resolveUsername } = useNameService();
+  const {
+    setResolvedAddress,
+    resolvedAddress,
+    setToPublicKey,
+    toPublicKey,
+    blockchain,
+    isAddressInvalid,
+  } = useSendState();
+
   const [isFocused, setIsFocused] = useState(false);
   const [isResolvedNamesListOpen, setIsResolvedNamesListOpen] = useState(false);
+  const [isResolvingNames, setIsResolvingNames] = useState(false);
+  const [resolvedNames, setResolvedNames] = useState<ResolveUsernameResponse[]>([]);
+
+  const [, cancel] = useDebounce(
+    () => {
+      const resolveName = async () => {
+        setIsResolvingNames(true);
+        const resolved = await resolveUsername(toPublicKey);
+        setIsResolvingNames(false);
+
+        setResolvedNames([]);
+        setResolvedAddress(null);
+
+        if (resolved.length === 1) {
+          setResolvedAddress(resolved[0]?.owner || null);
+        } else if (resolved.length > 1) {
+          setResolvedNames(resolved);
+        }
+      };
+
+      if (blockchain === 'solana' && toPublicKey.length > 0 && toPublicKey.length <= 40) {
+        void resolveName();
+      } else {
+        setResolvedAddress(null);
+      }
+    },
+    100,
+    [blockchain, toPublicKey, resolveUsername],
+  );
+  useEffect(() => () => cancel());
 
   useEffect(() => {
     if (resolvedNames.length > 1) {
@@ -205,7 +232,7 @@ export const ToAddressInput: FunctionComponent<Props> = ({
   }, [resolvedNames.length]);
 
   useEffect(() => {
-    const clickListener = (e: MouseEvent) => {
+    const handleAwayClick = (e: MouseEvent) => {
       if (!listRef.current?.contains(e.target as HTMLDivElement)) {
         setIsResolvedNamesListOpen(false);
       }
@@ -214,28 +241,38 @@ export const ToAddressInput: FunctionComponent<Props> = ({
       }
     };
 
-    window.addEventListener('click', clickListener);
-
+    window.addEventListener('click', handleAwayClick);
     return () => {
-      window.removeEventListener('click', clickListener);
+      window.removeEventListener('click', handleAwayClick);
     };
   }, [resolvedNames.length]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const nextValue = e.target.value.trim();
+    const nextPublicKey = e.target.value.trim();
 
-    onChange(nextValue);
+    if (!nextPublicKey) {
+      setResolvedNames([]);
+    }
+
+    setToPublicKey(nextPublicKey);
+    trackEventOnce('send_address_keydown');
   };
 
-  const handleItemClick = (params: any) => () => {
-    setIsResolvedNamesListOpen(false);
-    onResolvedNameClick(params);
-  };
+  const handleItemClick =
+    ({ owner, name }: ResolveUsernameResponse) =>
+    (e: React.MouseEvent<HTMLLIElement>) => {
+      e.preventDefault();
+
+      setIsResolvedNamesListOpen(false);
+
+      setToPublicKey(name);
+      setResolvedAddress(owner);
+    };
 
   return (
     <WrapperLabel>
       <IconWrapper className={classNames({ isFocused })}>
-        {resolvedAddress || (!isAddressInvalid && value.length > 40) ? (
+        {resolvedAddress || (!isAddressInvalid && toPublicKey.length > 40) ? (
           <WalletIcon name="home" />
         ) : (
           <SearchIcon name="search" />
@@ -243,33 +280,34 @@ export const ToAddressInput: FunctionComponent<Props> = ({
       </IconWrapper>
       <AddressWrapper>
         <ToInput
-          className={classNames({ isAddressResolved: resolvedAddress, hasError: isAddressInvalid })}
+          ref={inputRef}
           placeholder="Username / SOL address"
-          value={value}
+          value={toPublicKey}
           onChange={handleChange}
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
-          ref={inputRef}
+          className={classNames({
+            isAddressResolved: resolvedAddress,
+            hasError: isAddressInvalid,
+          })}
         />
+
         {resolvedAddress ? <AddressText address={resolvedAddress} small gray /> : undefined}
+
         {!isResolvingNames && !isResolvedNamesListOpen && isAddressInvalid ? (
           <Error>There’s no address like this</Error>
         ) : undefined}
+
         {isResolvingNames ? (
           <LoaderWrapper>
             <Loader />
           </LoaderWrapper>
         ) : undefined}
+
         {isResolvedNamesListOpen ? (
           <ResolvedNamesList ref={listRef}>
-            {resolvedNames.map((item: any) => (
-              <ResolvedNamesItem
-                key={item.name}
-                onClick={handleItemClick({
-                  address: item.owner,
-                  name: item.name,
-                })}
-              >
+            {resolvedNames.map((item: ResolveUsernameResponse) => (
+              <ResolvedNamesItem key={item.name} onClick={handleItemClick(item)}>
                 <WalletIconWrapper>
                   <WalletIcon name="home" />
                 </WalletIconWrapper>

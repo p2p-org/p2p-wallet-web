@@ -1,25 +1,14 @@
 import type { Network } from '@saberhq/solana-contrib';
 import type { Commitment, HttpHeaders } from '@solana/web3.js';
-import { clusterApiUrl, PublicKey } from '@solana/web3.js';
+import { clusterApiUrl } from '@solana/web3.js';
 
 export const isDev = process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test';
 
-// Can be used in development mode only
-export const localPrivateKey = isDev && process.env.REACT_APP_APP_LOCAL_WALLET_PRIVATE_KEY;
-
 export const localMnemonic = isDev && process.env.REACT_APP_APP_LOCAL_WALLET_MNEMONIC;
-
-export const swapHostFeeAddress = process.env.REACT_APP_SWAP_HOST_FEE_ADDRESS
-  ? new PublicKey(process.env.REACT_APP_SWAP_HOST_FEE_ADDRESS)
-  : null;
 
 // the default commitment uesd by the Solana web3 connection when checking the blockchain state
 export const defaultCommitment: Commitment =
   (process.env.REACT_APP_DEFAULT_COMMITMENT as Commitment) || 'confirmed';
-
-// the amount of time to sleep after sending a transaction
-// in order to work around a known blockchain web3 bug
-export const postTransactionSleepMS = Number(process.env.REACT_APP_POST_TRANSACTION_SLEEP_MS);
 
 export type NetworkObj = {
   name: string;

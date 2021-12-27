@@ -2,11 +2,11 @@ import type { FC } from 'react';
 import React from 'react';
 
 import { styled } from '@linaria/react';
+import { useAllTokens } from '@p2p-wallet-web/core';
 
-import { useConfig } from 'app/contexts/swap';
-import type TokenAccount from 'app/contexts/swap/models/TokenAccount';
-import { useTokenMap } from 'app/contexts/swap/tokenList';
-import { getNumber } from 'app/contexts/swap/utils/format';
+import { useConfig } from 'app/contexts/solana/swap';
+import type TokenAccount from 'app/contexts/solana/swap/models/TokenAccount';
+import { getNumber } from 'app/contexts/solana/swap/utils/format';
 import { TokenAvatar } from 'components/common/TokenAvatar';
 import { shortAddress } from 'utils/tokens';
 
@@ -67,12 +67,12 @@ type Props = {
 
 export const TokenAccountRow: FC<Props> = ({ tokenAccount, onClick, className }) => {
   const { mintToTokenName, tokenConfigs } = useConfig();
-  const tokenMap = useTokenMap();
+  const { tokenMap } = useAllTokens();
 
   const mintAddress = tokenAccount.accountInfo.mint.toBase58();
   const tokenName = mintToTokenName[mintAddress];
   const tokenNameFull =
-    tokenConfigs[tokenName].name || tokenMap.get(tokenConfigs[tokenName].mint.toBase58())?.name;
+    tokenConfigs[tokenName].name || tokenMap[tokenConfigs[tokenName].mint.toBase58()]?.name;
 
   const handleClick = () => {
     if (onClick) {

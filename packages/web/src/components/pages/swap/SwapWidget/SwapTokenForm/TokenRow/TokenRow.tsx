@@ -3,7 +3,7 @@ import React from 'react';
 
 import { styled } from '@linaria/react';
 
-import { useConfig } from 'app/contexts/swap';
+import { useConfig } from 'app/contexts/solana/swap';
 import { TokenAvatar } from 'components/common/TokenAvatar';
 import { shortAddress } from 'utils/tokens';
 
