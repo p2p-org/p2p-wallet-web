@@ -3,8 +3,8 @@ import React from 'react';
 
 import { styled } from '@linaria/react';
 
+import { useSettings } from 'app/contexts/general/settings';
 import { Button, Icon } from 'components/ui';
-import { hideUsernameBanner } from 'utils/settings';
 
 const Wrapper = styled.div`
   position: relative;
@@ -84,8 +84,10 @@ type Props = {
 };
 
 export const ProceedUsernameModal: FC<Props> = ({ close }) => {
+  const { updateSettings } = useSettings();
+
   const handleCloseButtonClick = () => {
-    hideUsernameBanner();
+    updateSettings({ usernameBannerHiddenByUser: true });
     close(true);
   };
 

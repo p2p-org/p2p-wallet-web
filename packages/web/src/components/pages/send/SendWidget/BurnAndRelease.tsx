@@ -2,14 +2,13 @@ import type { FC } from 'react';
 import React, { useMemo } from 'react';
 
 import { styled } from '@linaria/react';
+import { useSolana } from '@p2p-wallet-web/core';
 import { Bitcoin } from '@renproject/chains-bitcoin';
 import { Solana } from '@renproject/chains-solana';
 import RenJS from '@renproject/ren';
 import type { BurnSession, BurnTransaction } from '@renproject/ren-tx';
 import { BurnStates, isBurnErroring } from '@renproject/ren-tx';
 
-import { getWallet } from 'api/wallet';
-import { useSolana } from 'app/contexts/solana';
 import { LoaderBlock } from 'components/common/LoaderBlock';
 import { Accordion, Button } from 'components/ui';
 import { useBurnAndRelease } from 'utils/hooks/renBridge/useBurnAndRelease';
@@ -151,9 +150,9 @@ export const BurnAndRelease: FC<Props> = ({ destinationAddress, targetAmount }) 
         destinationAddress,
         targetAmount,
       },
-      userAddress: getWallet().pubkey.toBase58(),
+      userAddress: solanaProvider.publicKey!.toBase58(),
       from: new Solana(solanaProvider, network).Account({
-        address: getWallet().pubkey.toBase58(),
+        address: solanaProvider.publicKey!.toBase58(),
         value: amount,
         amount,
       }),
@@ -163,7 +162,10 @@ export const BurnAndRelease: FC<Props> = ({ destinationAddress, targetAmount }) 
   }, [destinationAddress, network, solanaProvider, targetAmount]);
 
   const machine = useBurnAndRelease(burnAndReleaseProps);
-  if (!machine) return null;
+
+  if (!machine) {
+    return null;
+  }
 
   return (
     <Accordion title="Receiving statuses" open>

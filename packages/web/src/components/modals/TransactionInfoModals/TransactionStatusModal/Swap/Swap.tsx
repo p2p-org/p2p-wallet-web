@@ -3,8 +3,8 @@ import React from 'react';
 
 import type { u64 } from '@solana/spl-token';
 
-import { useConfig } from 'app/contexts/swap';
-import { formatBigNumber } from 'app/contexts/swap/utils/format';
+import { useConfig } from 'app/contexts/solana/swap';
+import { formatBigNumber } from 'app/contexts/solana/swap/utils/format';
 import { TokenAvatar } from 'components/common/TokenAvatar';
 import {
   SwapAmount,

@@ -6,7 +6,7 @@ import { isNil } from 'ramda';
 
 import { useSwap } from 'app/contexts/swapSerum';
 
-// import { TooltipRow, TxName, TxValue } from 'components/common/SendSwapWidget/common/styled';
+// import { TooltipRow, TxName, TxValue } from 'components/core/SendSwapWidget/core/styled';
 // import { Tooltip } from 'components/ui';
 
 const Wrapper = styled.div`

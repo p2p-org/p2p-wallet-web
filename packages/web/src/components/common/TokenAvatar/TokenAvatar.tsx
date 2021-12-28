@@ -1,12 +1,11 @@
 import type { FunctionComponent, HTMLAttributes } from 'react';
 import React, { useMemo } from 'react';
-import { useSelector } from 'react-redux';
 
 import { styled } from '@linaria/react';
+import { useAllTokens } from '@p2p-wallet-web/core';
+import type { Token } from '@saberhq/token-utils';
 import classNames from 'classnames';
 
-import tokenList from 'api/token/token.config';
-import { useTokenMap } from 'app/contexts/swap/tokenList';
 import { Jazzicon } from 'components/common/TokenAvatar/Jazzicon';
 import { Avatar } from 'components/ui';
 
@@ -44,41 +43,49 @@ const WrappedBy = styled.div`
 `;
 
 type Props = {
-  src?: string;
   size?: string | number;
-  symbol?: string;
-  address?: string;
+  token?: Token;
+  symbol?: string; // TODO: remove
+  address?: string; // TODO: remove
 };
 
 export const TokenAvatar: FunctionComponent<Props & HTMLAttributes<HTMLDivElement>> = ({
+  token,
   symbol,
   address,
-  src,
   className,
   ...props
 }) => {
-  const cluster = useSelector((state) => state.wallet.network.cluster);
+  const { tokenMap, tokens } = useAllTokens();
 
-  // TODO: need to add cluster
-  const tokenMap = useTokenMap();
-  const tokenInfo =
-    (address && tokenMap.get(address)) ||
-    tokenList
-      .filterByClusterSlug(cluster)
-      .getList()
-      .find((token) => token.symbol === symbol || token.address === address);
+  // TODO: remove
+  const tokenInfo = useMemo(() => {
+    if (token) {
+      return null;
+    }
 
-  const isWrapped = useMemo(
-    () => tokenInfo?.tags?.find((tag) => tag.includes('wrapped')),
-    [tokenInfo],
-  );
+    return (
+      (address && tokenMap[address]) ||
+      tokens.find((token) => token.symbol === symbol || token.address === address)
+    );
+  }, [address, symbol, token, tokenMap, tokens]); // TODO: remove
+
+  const isWrapped = useMemo(() => {
+    if (token) {
+      return token.hasTag('wrapped');
+    }
+
+    return tokenInfo?.hasTag('wrapped');
+  }, [token, tokenInfo]);
 
   return (
-    <Wrapper className={classNames(className, { isNotExists: !tokenInfo })}>
-      {(!tokenInfo || !tokenInfo.logoURI) && address ? (
+    <Wrapper className={classNames(className, { isNotExists: !tokenInfo || !token })}>
+      {token ? (
+        <Avatar src={token.icon} {...props} />
+      ) : (!tokenInfo || !tokenInfo.icon) && address ? (
         <Jazzicon address={address} {...props} />
       ) : (
-        <Avatar src={tokenInfo?.logoURI || undefined} {...props} />
+        <Avatar src={tokenInfo?.icon || undefined} {...props} />
       )}
       {isWrapped ? (
         <WrappedBy

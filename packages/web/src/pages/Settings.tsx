@@ -1,14 +1,16 @@
 import type { FunctionComponent } from 'react';
 import React, { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router';
 import { NavLink, useLocation } from 'react-router-dom';
 
 import { styled } from '@linaria/react';
+import { useWallet } from '@p2p-wallet-web/core';
 import classNames from 'classnames';
 import { Feature } from 'flagged';
 
-import { forgetWallet } from 'api/wallet/ManualWallet';
+import type { MainSettings } from 'app/contexts';
+import { useUsername } from 'app/contexts';
+import { APPEARANCE, CURRENCIES, useSettings } from 'app/contexts/general/settings';
 import AppStoreBadge from 'assets/images/app-store-badge.png';
 import GooglePlayBadge from 'assets/images/google-play-badge.png';
 import { Layout } from 'components/common/Layout';
@@ -18,11 +20,7 @@ import { Accordion, Icon, Select, Switch } from 'components/ui';
 import { MenuItem } from 'components/ui/Select/MenuItem';
 import { appStorePath, playStorePath } from 'config/constants';
 import { FEATURE_SETTINGS_FREE_TRANSACTIONS, FEATURE_SETTINGS_LIST } from 'config/featureFlags';
-import { disconnect, updateSettings } from 'store/slices/wallet/WalletSlice';
 import { trackEvent } from 'utils/analytics';
-import { useUsername } from 'utils/hooks/useUsername';
-import { appearance, currencies } from 'utils/settings';
-import type { WalletSettings } from 'utils/types';
 
 const Wrapper = styled.div`
   display: grid;
@@ -152,9 +150,8 @@ const Text = styled.div`
 export const Settings: FunctionComponent = () => {
   const location = useLocation<{ fromPage: string }>();
   const history = useHistory();
-  const dispatch = useDispatch();
-  const settings = useSelector((state) => state.wallet.settings);
-  const publicKey = useSelector((state) => state.wallet.publicKey);
+  const { publicKey, disconnect, endpoint } = useWallet();
+  const { settings, updateSettings } = useSettings();
   const { username, domain } = useUsername();
 
   useEffect(() => {
@@ -164,17 +161,14 @@ export const Settings: FunctionComponent = () => {
 
   const handleLogoutClick = () => {
     trackEvent('settings_logout_click');
-    forgetWallet();
-    void dispatch(disconnect());
+    disconnect();
   };
 
   const onItemClickHandler =
-    (option: Partial<WalletSettings> = settings) =>
+    (options: Partial<MainSettings> = settings) =>
     () => {
-      dispatch(updateSettings(option));
+      updateSettings(options);
     };
-
-  const { network } = settings;
 
   return (
     <Layout
@@ -187,7 +181,7 @@ export const Settings: FunctionComponent = () => {
                   <ItemTitle>Currency</ItemTitle>
                   <ItemAction>
                     <Select value={settings.currency}>
-                      {currencies.map(({ ticker, name, symbol }) => (
+                      {CURRENCIES.map(({ ticker, name, symbol }) => (
                         <MenuItem
                           key={ticker}
                           isSelected={ticker === settings.currency}
@@ -206,7 +200,7 @@ export const Settings: FunctionComponent = () => {
                   <ItemTitle>Appearance</ItemTitle>
                   <ItemAction>
                     <Select value={settings.appearance}>
-                      {appearance.map((value) => (
+                      {APPEARANCE.map((value) => (
                         <MenuItem
                           key={value}
                           isSelected={value === settings.appearance}
@@ -238,7 +232,7 @@ export const Settings: FunctionComponent = () => {
                         even if it is not included in your wallet list.
                       </Text>
                       <UsernameAddressWidget
-                        address={publicKey || ''}
+                        address={publicKey?.toBase58() || ''}
                         username={`${username}${domain}`}
                       />
                     </>
@@ -284,7 +278,9 @@ export const Settings: FunctionComponent = () => {
                   }}
                   style={{ cursor: 'pointer' }}
                 >
-                  <Title className="overflow-ellipsis">{network.endpoint}</Title>
+                  <Title className="overflow-ellipsis" title={endpoint}>
+                    {endpoint}
+                  </Title>
                   <ChevronWrapper
                     onClick={() => {
                       history.push('/settings/network');

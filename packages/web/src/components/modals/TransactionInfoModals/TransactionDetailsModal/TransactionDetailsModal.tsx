@@ -1,18 +1,24 @@
 import type { FC } from 'react';
-import React, { useEffect, useMemo, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import React, { useState } from 'react';
+import Skeleton from 'react-loading-skeleton';
 
 import { styled } from '@linaria/react';
-import { unwrapResult } from '@reduxjs/toolkit';
+import {
+  SwapTransaction,
+  titleCase,
+  TransferTransaction,
+  useTokenAccount,
+  useTokenAccountAmount,
+  useTransaction,
+  useWallet,
+} from '@p2p-wallet-web/core';
+import { usePubkey } from '@p2p-wallet-web/sail';
 import type { TransactionSignature } from '@solana/web3.js';
 import classNames from 'classnames';
 import dayjs from 'dayjs';
 
-import { KNOWN_FEE_PAYER_PUBKEYS } from 'api/feeRelayer';
-import { Transaction } from 'api/transaction/Transaction';
 import { AmountUSD } from 'components/common/AmountUSD';
 import { TokenAvatar } from 'components/common/TokenAvatar';
-import { getTransaction } from 'store/slices/transaction/TransactionSlice';
 import { getExplorerUrl } from 'utils/connection';
 import { shortAddress } from 'utils/tokens';
 
@@ -142,130 +148,132 @@ type Props = {
 };
 
 export const TransactionDetailsModal: FC<Props> = ({ signature, source, close }) => {
-  const dispatch = useDispatch();
-  const publicKey = useSelector((state) => state.wallet.publicKey);
   const [isShowDetails, setShowDetails] = useState(false);
-  const cluster = useSelector((state) => state.wallet.network.cluster);
-  const transaction = useSelector(
-    (state) =>
-      state.transaction.items[signature] && Transaction.from(state.transaction.items[signature]),
+  const { network } = useWallet();
+  const transaction = useTransaction(signature, source);
+
+  const sourceTokenAccount = useTokenAccount(usePubkey(transaction?.data?.source));
+  const destinationTokenAccount = useTokenAccount(usePubkey(transaction?.data?.destination));
+
+  const tokenAmount = useTokenAccountAmount(
+    usePubkey(transaction?.details.tokenAccount),
+    transaction?.details.amount,
   );
-  const tokenAccounts = useSelector((state) => state.wallet.tokenAccounts);
 
-  useEffect(() => {
-    const mount = async () => {
-      const trx = unwrapResult(await dispatch(getTransaction(signature)));
+  // useEffect(() => {
+  //   const mount = async () => {
+  //     const trx = unwrapResult(await dispatch(getTransaction(signature)));
+  //
+  //     if (!trx) {
+  //       setTimeout(mount, 3000);
+  //     }
+  //   };
+  //
+  //   if (!transaction) {
+  //     void mount();
+  //   }
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [signature]);
 
-      if (!trx) {
-        setTimeout(mount, 3000);
-      }
-    };
-
-    if (!transaction) {
-      void mount();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [signature]);
-
-  const details = useMemo(() => {
-    if (!transaction) {
-      return null;
-    }
-
-    return transaction.details(
-      transaction.short.destinationTokenAccount?.owner.toBase58() === publicKey ||
-        transaction.short.destination?.toBase58() === source,
-    );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [transaction?.short.destination, publicKey, source, tokenAccounts]);
-
-  if (!details || !transaction) {
+  if (transaction?.loading) {
     return null;
   }
-
-  const isShowFeeBadge =
-    details.type === 'transfer' &&
-    KNOWN_FEE_PAYER_PUBKEYS.has(transaction.message?.accountKeys[0].pubkey.toBase58());
 
   const handleToggleShowDetailsClick = () => {
     setShowDetails((state) => !state);
   };
 
   const renderFromTo = () => {
-    if (details.type === 'swap') {
+    const type = transaction?.details.type;
+
+    const source = transaction?.data?.source;
+    const destination = transaction?.data?.destination;
+    const sourceToken = sourceTokenAccount?.balance?.token;
+    const destinationToken = destinationTokenAccount?.balance?.token;
+
+    if (type === 'swap') {
       return (
         <>
-          {details.sourceTokenAccount ? (
+          {transaction?.data?.source ? (
             <FieldWrapper>
               <FieldTitle>From</FieldTitle>
-              <FieldValue>{details.sourceTokenAccount.address.toBase58()}</FieldValue>
+              <FieldValue>{transaction.data.source}</FieldValue>
             </FieldWrapper>
           ) : undefined}
-          {details.destinationTokenAccount ? (
+          {transaction?.data?.destination ? (
             <FieldWrapper>
               <FieldTitle>To</FieldTitle>
-              <FieldValue>{details.destinationTokenAccount.address.toBase58()}</FieldValue>
+              <FieldValue>{transaction.data.destination}</FieldValue>
             </FieldWrapper>
           ) : undefined}
         </>
       );
     }
 
-    return (
-      <FieldRowWrapper>
-        {details.sourceTokenAccount ? (
-          <ColumnWrapper>
-            <FieldTitle>From</FieldTitle>
-            <FieldInfo>
-              <TokenAvatar
-                symbol={details.sourceTokenAccount.mint.symbol}
-                address={details.sourceTokenAccount.mint.address.toBase58()}
-                size={48}
-              />
-              <AddressWrapper>
-                <AddressTitle>{details.sourceTokenAccount.mint.symbol}</AddressTitle>
-                <AddressValue>
-                  {shortAddress(details.sourceTokenAccount.address.toBase58())}
-                </AddressValue>
-              </AddressWrapper>
-            </FieldInfo>
-          </ColumnWrapper>
-        ) : undefined}
-        {details.destinationTokenAccount ? (
-          <ColumnWrapper>
-            <FieldTitle>To</FieldTitle>
-            <FieldInfo>
-              <TokenAvatar
-                symbol={details.destinationTokenAccount.mint.symbol}
-                address={details.destinationTokenAccount.mint.address.toBase58()}
-                size={48}
-              />
-              <AddressWrapper>
-                <AddressTitle>{details.destinationTokenAccount.mint.symbol}</AddressTitle>
-                <AddressValue>
-                  {shortAddress(details.destinationTokenAccount.address.toBase58())}
-                </AddressValue>
-              </AddressWrapper>
-            </FieldInfo>
-          </ColumnWrapper>
-        ) : undefined}
-      </FieldRowWrapper>
-    );
+    if (type && ((source && sourceToken) || (destination && destinationToken))) {
+      return (
+        <FieldRowWrapper>
+          {source && sourceToken ? (
+            <ColumnWrapper>
+              <FieldTitle>From</FieldTitle>
+              <FieldInfo>
+                <TokenAvatar symbol={sourceToken.symbol} address={sourceToken.address} size={48} />
+                <AddressWrapper>
+                  <AddressTitle>{sourceToken.symbol}</AddressTitle>
+                  <AddressValue>{shortAddress(source)}</AddressValue>
+                </AddressWrapper>
+              </FieldInfo>
+            </ColumnWrapper>
+          ) : undefined}
+          {destination && destinationToken ? (
+            <ColumnWrapper>
+              <FieldTitle>To</FieldTitle>
+              <FieldInfo>
+                <TokenAvatar
+                  symbol={destinationToken.symbol}
+                  address={destinationToken.address}
+                  size={48}
+                />
+                <AddressWrapper>
+                  <AddressTitle>{destinationToken.symbol}</AddressTitle>
+                  <AddressValue>{shortAddress(destination)}</AddressValue>
+                </AddressWrapper>
+              </FieldInfo>
+            </ColumnWrapper>
+          ) : undefined}
+        </FieldRowWrapper>
+      );
+    }
+
+    return null;
   };
 
   const renderAmountBlock = () => {
-    if (details.type === 'swap') {
+    const type = transaction?.details.type;
+
+    const sourceToken = sourceTokenAccount?.balance?.token;
+    const destinationToken = destinationTokenAccount?.balance?.token;
+
+    if (type === 'swap') {
       return (
         <SwapWrapper>
           <SwapColumn>
             <SwapInfo>
-              <TokenAvatar
-                symbol={details.sourceToken?.symbol}
-                address={details.sourceToken?.address.toBase58()}
-                size={44}
-              />
+              {sourceTokenAccount?.loading ? (
+                <Skeleton width={44} height={44} borderRadius={12} />
+              ) : (
+                <TokenAvatar
+                  symbol={sourceToken?.symbol}
+                  address={sourceToken?.address}
+                  size={44}
+                />
+              )}
               <SwapAmount>
-                - {details.sourceAmount.toFixed()} {details.sourceToken?.symbol}
+                {sourceTokenAccount?.loading ? (
+                  <Skeleton width={50} height={16} />
+                ) : (
+                  <>- {sourceTokenAccount?.balance?.formatUnits()}</>
+                )}
               </SwapAmount>
             </SwapInfo>
           </SwapColumn>
@@ -274,13 +282,21 @@ export const TransactionDetailsModal: FC<Props> = ({ signature, source, close })
           </SwapBlock>
           <SwapColumn>
             <SwapInfo>
-              <TokenAvatar
-                symbol={details.destinationToken?.symbol}
-                address={details.destinationToken?.address.toBase58()}
-                size={44}
-              />
+              {destinationTokenAccount?.loading ? (
+                <Skeleton width={44} height={44} borderRadius={12} />
+              ) : (
+                <TokenAvatar
+                  symbol={destinationToken?.symbol}
+                  address={destinationToken?.address}
+                  size={44}
+                />
+              )}
               <SwapAmount>
-                + {details.destinationAmount.toFixed()} {details.destinationToken?.symbol}
+                {sourceTokenAccount?.loading ? (
+                  <Skeleton width={80} height={16} />
+                ) : (
+                  <>+ {destinationTokenAccount?.balance?.formatUnits()}</>
+                )}
               </SwapAmount>
             </SwapInfo>
           </SwapColumn>
@@ -288,37 +304,51 @@ export const TransactionDetailsModal: FC<Props> = ({ signature, source, close })
       );
     }
 
-    if (details.typeOriginal) {
+    if (transaction?.loading || sourceTokenAccount?.loading || tokenAmount.loading) {
+      return (
+        <SendWrapper>
+          <Skeleton width={70} height={53} />
+        </SendWrapper>
+      );
+    }
+
+    if (tokenAmount.balance) {
       return (
         <SendWrapper>
           <ValueCurrency>
-            {details.isReceiver ? '+' : '-'} {details.amount.toFixed()} {details.token?.symbol}
+            {transaction?.details.isReceiver ? '+' : '-'} {tokenAmount.balance.formatUnits()}
           </ValueCurrency>
           <ValueOriginal>
             <AmountUSD
-              prefix={details.isReceiver ? '+' : '-'}
-              symbol={details.token?.symbol}
-              value={details.amount}
+              prefix={transaction?.details.isReceiver ? '+' : '-'}
+              value={tokenAmount.balance}
             />
           </ValueOriginal>
         </SendWrapper>
       );
     }
+
+    return null;
   };
 
-  const date = transaction.timestamp
-    ? dayjs.unix(transaction.timestamp).format('LLL')
-    : `${transaction.slot} SLOT`;
+  const date = transaction?.raw?.blockTime
+    ? dayjs.unix(transaction.raw.blockTime).format('LLL')
+    : `${transaction?.raw?.slot} SLOT`;
+
+  const isShowFeeBadge =
+    transaction?.data instanceof TransferTransaction && transaction.data.wasPaidByP2POrg;
 
   return (
     <Wrapper>
       <Header>
-        <Title>{details.type}</Title>
-        <Desc title={`${transaction.slot} SLOT`}>{date}</Desc>
+        <Title>{titleCase(transaction?.details.type)}</Title>
+        <Desc title={`${transaction?.raw?.slot} SLOT`}>{date}</Desc>
         <CloseWrapper onClick={close}>
           <CloseIcon name="close" />
         </CloseWrapper>
-        <BlockWrapper>{details.icon ? <OtherIcon name={details.icon} /> : undefined}</BlockWrapper>
+        <BlockWrapper>
+          {transaction?.details.icon ? <OtherIcon name={transaction.details.icon} /> : undefined}
+        </BlockWrapper>
       </Header>
       <ProgressWrapper />
       <Content>
@@ -337,56 +367,63 @@ export const TransactionDetailsModal: FC<Props> = ({ signature, source, close })
         {/*    </ValueOriginal> */}
         {/*  </SendWrapper> */}
         {/* ) : undefined} */}
+
         {renderAmountBlock()}
         <StatusWrapper>
           <Status>
             <StatusIndicator
               className={classNames({
-                error: !!transaction.meta?.err,
-                processing: !transaction.slot,
+                error: !!transaction?.raw?.meta?.err,
+                // processing: !transaction?.raw?.slot,
               })}
             />{' '}
-            {transaction.meta?.err ? 'Failed' : !transaction.slot ? 'Pending' : 'Completed'}
+            {transaction?.raw?.meta?.err
+              ? 'Failed'
+              : !transaction?.raw?.slot
+              ? 'Pending'
+              : 'Completed'}
           </Status>
         </StatusWrapper>
         <FieldsWrapper>
           {isShowDetails ? (
             <>
               {renderFromTo()}
-
-              <FieldWrapper>
-                <FieldTitle>Amount</FieldTitle>
-                <FieldValue>
-                  {details.type === 'swap' ? (
-                    <>
-                      {details.sourceAmount.toFixed()} {details.sourceToken?.symbol} to{' '}
-                      {details.destinationAmount.toFixed()} {details.destinationToken?.symbol}
-                    </>
-                  ) : (
-                    <>
-                      {details.amount.toFixed()} {details.token?.symbol}
-                    </>
-                  )}
-                </FieldValue>
-              </FieldWrapper>
-              <FieldWrapper>
-                <FieldTitle>Value</FieldTitle>
-                <FieldValue>
-                  <AmountUSD symbol={details.token?.symbol} value={details.amount} />
-                </FieldValue>
-              </FieldWrapper>
-              {transaction.meta ? (
+              {(sourceTokenAccount?.balance && destinationTokenAccount?.balance) ||
+              tokenAmount?.balance ? (
+                <FieldWrapper>
+                  <FieldTitle>Amount</FieldTitle>
+                  <FieldValue>
+                    {transaction?.data instanceof SwapTransaction ? (
+                      <>
+                        {sourceTokenAccount?.balance?.formatUnits()} to{' '}
+                        {destinationTokenAccount?.balance?.formatUnits()}
+                      </>
+                    ) : (
+                      <>{tokenAmount?.balance?.formatUnits()}</>
+                    )}
+                  </FieldValue>
+                </FieldWrapper>
+              ) : undefined}
+              {tokenAmount.balance ? (
+                <FieldWrapper>
+                  <FieldTitle>Value</FieldTitle>
+                  <FieldValue>
+                    <AmountUSD value={tokenAmount.balance} />
+                  </FieldValue>
+                </FieldWrapper>
+              ) : undefined}
+              {transaction?.raw?.meta ? (
                 <FieldWrapper>
                   <FieldTitleWrapper>
                     <FieldTitle>Transaction fee</FieldTitle>
                     {isShowFeeBadge ? <PaidByBadge>Paid by p2p.org</PaidByBadge> : undefined}
                   </FieldTitleWrapper>
-                  <FieldValue>{transaction.meta.fee} lamports</FieldValue>
+                  <FieldValue>{transaction.raw.meta?.fee} lamports</FieldValue>
                 </FieldWrapper>
               ) : null}
               <FieldWrapper>
                 <FieldTitle>Block number</FieldTitle>
-                <FieldValue>#{transaction.slot}</FieldValue>
+                <FieldValue>#{transaction?.raw?.slot}</FieldValue>
               </FieldWrapper>
             </>
           ) : undefined}
@@ -395,7 +432,7 @@ export const TransactionDetailsModal: FC<Props> = ({ signature, source, close })
             <FieldValue>
               {signature}{' '}
               <a
-                href={getExplorerUrl('tx', signature, cluster)}
+                href={getExplorerUrl('tx', signature, network)}
                 target="_blank"
                 rel="noopener noreferrer noindex"
                 className="button"

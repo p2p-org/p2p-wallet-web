@@ -3,7 +3,7 @@ import React from 'react';
 
 import { styled } from '@linaria/react';
 
-import { useSwap } from 'app/contexts/swap';
+import { useSwap } from 'app/contexts/solana/swap';
 import { Icon } from 'components/ui';
 
 const Wrapper = styled.div`

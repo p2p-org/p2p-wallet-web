@@ -1,32 +1,80 @@
 import type { FC } from 'react';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
+import { QueryClient, QueryClientProvider } from 'react-query';
 
-import type { TokenListContainer as SPLTokenListContainer } from '@solana/spl-token-registry';
-import { TokenListProvider as SPLTokenListProvider } from '@solana/spl-token-registry';
+import type { ConnectedWallet } from '@p2p-wallet-web/core';
+import {
+  NETWORK_CONFIGS,
+  SeedProvider,
+  SolanaProvider,
+  TokenAccountsProvider,
+} from '@p2p-wallet-web/core';
+import { SailProvider } from '@p2p-wallet-web/sail';
 
-import { SolanaProvider } from 'app/contexts/solana';
-import { TokenListProvider } from 'app/contexts/swap';
+import {
+  BlockchainProvider,
+  ModalsProvider,
+  NameServiceProvider,
+  RatesProvider,
+  SettingsProvider,
+} from 'app/contexts';
+import { ToastManager } from 'components/common/ToastManager';
 import { Providers as SwapProviders } from 'components/pages/swap/Providers';
 import { LockAndMintProvider } from 'utils/providers/LockAndMintProvider';
 
-export const Providers: FC = ({ children }) => {
-  const [tokenList, setTokenList] = useState<SPLTokenListContainer | null>(null);
+const onConnect = (wallet: ConnectedWallet) => {
+  const walletPublicKey = wallet.publicKey.toBase58();
+  const keyToDisplay =
+    walletPublicKey.length > 20
+      ? `${walletPublicKey.substring(0, 7)}.....${walletPublicKey.substring(
+          walletPublicKey.length - 7,
+          walletPublicKey.length,
+        )}`
+      : walletPublicKey;
 
-  useEffect(() => {
-    void new SPLTokenListProvider().resolve().then(setTokenList);
-  }, [setTokenList]);
+  ToastManager.info('Wallet update', 'Connected to wallet ' + keyToDisplay);
+};
 
-  if (!tokenList) {
-    return null;
-  }
+const onDisconnect = () => {
+  ToastManager.info('Wallet disconnected');
+};
 
+const CoreProviders: FC = ({ children }) => {
   return (
-    <TokenListProvider initialState={{ tokenList }}>
-      <SolanaProvider>
-        <LockAndMintProvider>
-          <SwapProviders>{children}</SwapProviders>
-        </LockAndMintProvider>
+    <SeedProvider>
+      <SolanaProvider
+        onConnect={onConnect}
+        onDisconnect={onDisconnect}
+        networkConfigs={NETWORK_CONFIGS}
+      >
+        <SailProvider>
+          <TokenAccountsProvider>{children}</TokenAccountsProvider>
+        </SailProvider>
       </SolanaProvider>
-    </TokenListProvider>
+    </SeedProvider>
+  );
+};
+
+const queryClient = new QueryClient();
+
+export const Providers: FC = ({ children }) => {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <CoreProviders>
+        <RatesProvider>
+          <NameServiceProvider>
+            <SettingsProvider>
+              <BlockchainProvider>
+                <LockAndMintProvider>
+                  <SwapProviders>
+                    <ModalsProvider>{children}</ModalsProvider>
+                  </SwapProviders>
+                </LockAndMintProvider>
+              </BlockchainProvider>
+            </SettingsProvider>
+          </NameServiceProvider>
+        </RatesProvider>
+      </CoreProviders>
+    </QueryClientProvider>
   );
 };

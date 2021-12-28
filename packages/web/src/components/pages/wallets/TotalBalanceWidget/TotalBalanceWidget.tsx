@@ -1,16 +1,17 @@
 import type { FunctionComponent } from 'react';
 import React, { useMemo } from 'react';
-import { useSelector } from 'react-redux';
+import Skeleton from 'react-loading-skeleton';
 
 import { styled } from '@linaria/react';
+import { useUserTokenAccounts } from '@p2p-wallet-web/core';
 
-import { TokenAccount } from 'api/token/TokenAccount';
+import { useMarketsData } from 'app/contexts';
 import { LoaderBlock } from 'components/common/LoaderBlock';
 import { Widget } from 'components/common/Widget';
-import { rateSelector } from 'store/selectors/rates';
 
 import type { DonutChartData } from '../DonutChart';
 import { DonutChart } from '../DonutChart';
+import colors from './colors.config';
 
 const CHART_SIZE = 110;
 
@@ -60,32 +61,31 @@ type Props = {
 };
 
 export const TotalBalanceWidget: FunctionComponent<Props> = ({ onSymbolChange }) => {
-  const tokenAccounts = useSelector((state) =>
-    state.wallet.tokenAccounts.map((account) => TokenAccount.from(account)),
-  );
-  const state = useSelector((currentState) => currentState);
+  const tokenAccounts = useUserTokenAccounts();
+
+  const symbols = useMemo(() => {
+    return tokenAccounts.map((tokenAccount) => tokenAccount.balance?.token.symbol);
+  }, [tokenAccounts]);
+
+  const markets = useMarketsData(symbols);
 
   const totalBalance = useMemo(
     () =>
       tokenAccounts.reduce((prev, tokenAccount) => {
-        const rate = rateSelector(tokenAccount.mint.symbol)(state);
+        if (!tokenAccount?.balance?.token.symbol) {
+          return prev;
+        }
+
+        const rate = markets[tokenAccount?.balance?.token.symbol];
         if (rate) {
-          return tokenAccount.mint
-            .toMajorDenomination(tokenAccount.balance)
-            .times(rate)
-            .plus(prev)
-            .toNumber();
+          return tokenAccount.balance.asNumber * rate + prev;
         }
 
         // Same as USD
-        if (tokenAccount.mint.symbol) {
-          return tokenAccount.mint.toMajorDenomination(tokenAccount.balance).plus(prev).toNumber();
-        }
-
-        return prev;
+        return tokenAccount.balance.asNumber + prev;
       }, 0),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [tokenAccounts, state.rate.markets],
+    [tokenAccounts, markets],
   );
 
   const hours = new Date().getHours();
@@ -113,34 +113,35 @@ export const TotalBalanceWidget: FunctionComponent<Props> = ({ onSymbolChange })
     const data: DonutChartData = [];
 
     tokenAccounts.forEach((tokenAccount) => {
-      if (!tokenAccount.mint.symbol || tokenAccount.balance.lte(0)) {
+      if (!tokenAccount.balance?.token.symbol || tokenAccount.balance.toU64().lten(0)) {
         return;
       }
 
-      const rate = rateSelector(tokenAccount.mint.symbol)(state);
+      const rate = markets[tokenAccount.balance.token.symbol];
       if (!rate) {
         return;
       }
 
-      const balance = tokenAccount.mint
-        .toMajorDenomination(tokenAccount.balance)
-        .times(rate)
-        .toNumber();
+      const balance = tokenAccount.balance.asNumber * rate;
       const balanceUSD = new Intl.NumberFormat('en-US', {
         style: 'currency',
         currency: 'USD',
       }).format(balance);
 
       data.push({
-        symbol: tokenAccount.mint.symbol,
+        symbol: tokenAccount.balance.token.symbol,
         amount: balance,
         amountUSD: balanceUSD,
-        color: tokenAccount.mint.color,
+        color: colors[tokenAccount.balance.token.symbol],
       });
     });
 
     return data;
     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tokenAccounts]);
+
+  const isLoading = useMemo(() => {
+    return tokenAccounts.some((tokenAccount) => tokenAccount.loading);
   }, [tokenAccounts]);
 
   return (
@@ -149,14 +150,18 @@ export const TotalBalanceWidget: FunctionComponent<Props> = ({ onSymbolChange })
         <PriceWrapper>
           <TotalText>Total balance</TotalText>
           <Price>
-            {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(
-              totalBalance,
+            {isLoading ? (
+              <Skeleton width={100} height={30} />
+            ) : (
+              new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(
+                totalBalance,
+              )
             )}
           </Price>
           <AllTokensText>All tokens</AllTokensText>
         </PriceWrapper>
         <ChartWrapper>
-          {tokenAccounts.length === 0 ? (
+          {donutData.length === 0 ? (
             <LoaderBlock />
           ) : (
             <DonutChart size={CHART_SIZE} data={donutData} onSymbolChange={onSymbolChange} />

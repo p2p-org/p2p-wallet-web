@@ -1,16 +1,15 @@
 import type { FC } from 'react';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 
 import { styled } from '@linaria/react';
+import { mnemonicToSeed } from '@p2p-wallet-web/core';
 
-import { mnemonicToSeed, STORAGE_KEY_LOCKED } from 'api/wallet/ManualWallet';
 import { Back } from 'components/pages/home/Auth/common/Back';
 import { DerivableAccounts } from 'components/pages/home/Auth/Login/DerivableAccounts';
 
 import { Password } from '../common/Password';
 import type { DataType } from '../types';
 import { Main } from './Main';
-import { Restore } from './Restore';
 
 const Wrapper = styled.div`
   position: relative;
@@ -62,11 +61,11 @@ export const Login: FC<Props> = ({ setIsLoading, next }) => {
   const [password, setPassword] = useState('');
   const [page, setPage] = useState<PageTypes | 'ready'>('main');
 
-  useEffect(() => {
-    if (localStorage.getItem(STORAGE_KEY_LOCKED)) {
-      setPage('restore');
-    }
-  }, []);
+  // useEffect(() => {
+  //   if (localStorage.getItem(STORAGE_KEY_LOCKED)) {
+  //     setPage('restore');
+  //   }
+  // }, []);
 
   const handleBackClick = () => {
     setPage((state) => backToPage[state as PageTypes]);
@@ -96,9 +95,9 @@ export const Login: FC<Props> = ({ setIsLoading, next }) => {
   };
 
   const render = () => {
-    if (page === 'restore') {
-      return <Restore setIsLoading={setIsLoading} back={handleBackClick} />;
-    }
+    // if (page === 'restore') {
+    //   return <Restore setIsLoading={setIsLoading} back={handleBackClick} />;
+    // }
 
     return (
       <>

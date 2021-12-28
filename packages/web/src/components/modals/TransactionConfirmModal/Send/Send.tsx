@@ -1,9 +1,10 @@
 import type { FC } from 'react';
 import React from 'react';
 
-import { Decimal } from 'decimal.js';
+import type { TokenAccount } from '@p2p-wallet-web/core';
+import type { TokenAmount } from '@saberhq/token-utils';
+import type { PublicKey } from '@solana/web3.js';
 
-import type { TokenAccount } from 'api/token/TokenAccount';
 import { AddressText } from 'components/common/AddressText';
 import { TokenAvatar } from 'components/common/TokenAvatar';
 
@@ -20,9 +21,9 @@ import {
 
 export type TransferParams = {
   source: TokenAccount;
-  destination: string;
+  destination: PublicKey;
+  amount: TokenAmount;
   username?: string;
-  amount: number;
 };
 
 interface Props {
@@ -34,15 +35,13 @@ export const Send: FC<Props> = ({ params }) => {
     <Section className="send">
       <FieldInfo>
         <TokenAvatar
-          symbol={params.source.mint.symbol}
-          address={params.source.mint.address.toBase58()}
+          symbol={params.source.balance?.token.symbol}
+          address={params.source.balance?.token.address}
           size={44}
         />
         <InfoWrapper>
           <InfoTitle>Check the amount</InfoTitle>
-          <InfoValue>
-            {new Decimal(params.amount).toFixed()} {params.source.mint.symbol}
-          </InfoValue>
+          <InfoValue>{params.amount.formatUnits()}</InfoValue>
         </InfoWrapper>
       </FieldInfo>
       <FieldInfo>
@@ -56,7 +55,7 @@ export const Send: FC<Props> = ({ params }) => {
             <InfoTitle>Check recepient’s address</InfoTitle>
           )}
           <InfoValue>
-            <AddressText address={params.destination} medium />
+            <AddressText address={params.destination.toBase58()} medium />
           </InfoValue>
         </InfoWrapper>
       </FieldInfo>

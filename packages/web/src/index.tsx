@@ -1,17 +1,16 @@
 import './wdyr';
 import 'sanitize.css';
 import 'styles/css/nprogress.css';
+import 'react-loading-skeleton/dist/skeleton.css';
 
-import React from 'react';
+import React, { StrictMode } from 'react';
 import ReactDOM from 'react-dom';
-import { Provider } from 'react-redux';
 import { IntercomProvider } from 'react-use-intercom';
 
 import assert from 'ts-invariant';
 
-import { FeatureProvider } from 'components/common/FeatureProvider';
+import { FeatureFlagsProvider } from 'app/contexts';
 import { isDev } from 'config/constants';
-import { store } from 'store';
 import { globalCss } from 'styles/global';
 import { initAmplitude } from 'utils/analytics';
 
@@ -29,15 +28,13 @@ const render = () => {
   );
 
   ReactDOM.render(
-    <React.StrictMode>
-      <Provider store={store}>
-        <IntercomProvider appId={process.env.REACT_APP_INTERCOM_APP_ID} autoBoot>
-          <FeatureProvider>
-            <App />
-          </FeatureProvider>
-        </IntercomProvider>
-      </Provider>
-    </React.StrictMode>,
+    <StrictMode>
+      <IntercomProvider appId={process.env.REACT_APP_INTERCOM_APP_ID} autoBoot>
+        <FeatureFlagsProvider>
+          <App />
+        </FeatureFlagsProvider>
+      </IntercomProvider>
+    </StrictMode>,
     document.querySelector('#root'),
   );
 };

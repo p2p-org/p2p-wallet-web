@@ -1,22 +1,19 @@
 import type { FunctionComponent } from 'react';
-import React, { useState } from 'react';
-import { batch, useDispatch, useSelector } from 'react-redux';
+import React from 'react';
 
 import { styled } from '@linaria/react';
+import { useWallet } from '@p2p-wallet-web/core';
 import { rgba } from 'polished';
-import { mergeDeepRight } from 'ramda';
 
 import { WidgetPage } from 'components/common/WidgetPage';
-import { Button, Input, RadioButton } from 'components/ui';
-import type { NetworkType } from 'config/constants';
-import { networks } from 'config/constants';
-import { wipeAction } from 'store/slices/GlobalSlice';
-import { autoConnect, selectNetwork, updateSettings } from 'store/slices/wallet/WalletSlice';
+import { RadioButton } from 'components/ui';
+import type { NetworkObj } from 'config/constants';
+import { NETWORKS } from 'config/constants';
 import { trackEvent } from 'utils/analytics';
 
-const URL_REGEX = new RegExp(
-  /https?:\/\/(?:w{1,3}\.)?[^\s.]+(?:\.[a-z]+)*(?::\d+)?((?:\/\w+)|(?:-\w+))*\/?(?![^<]*(?:<\/\w+>|\/?>))/,
-);
+// const URL_REGEX = new RegExp(
+//   /https?:\/\/(?:w{1,3}\.)?[^\s.]+(?:\.[a-z]+)*(?::\d+)?((?:\/\w+)|(?:-\w+))*\/?(?![^<]*(?:<\/\w+>|\/?>))/,
+// );
 
 const RadioButtonsWrapper = styled.div`
   position: relative;
@@ -50,55 +47,51 @@ const RadioButtonItem = styled.div`
   }
 `;
 
-const AddCustomUrlWrapper = styled.div`
-  padding: 20px;
-`;
-
-const AddUrlWrapper = styled.div``;
-
-const Text = styled.div`
-  margin-bottom: 16px;
-
-  color: #a3a5ba;
-  font-weight: 600;
-  font-size: 16px;
-`;
-
-const Buttons = styled.div`
-  padding: 24px 0 0;
-
-  button:first-child {
-    margin-right: 10px;
-  }
-`;
+// const AddCustomUrlWrapper = styled.div`
+//   padding: 20px;
+// `;
+//
+// const AddUrlWrapper = styled.div``;
+//
+// const Text = styled.div`
+//   margin-bottom: 16px;
+//
+//   color: #a3a5ba;
+//   font-weight: 600;
+//   font-size: 16px;
+// `;
+//
+// const Buttons = styled.div`
+//   padding: 24px 0 0;
+//
+//   button:first-child {
+//     margin-right: 10px;
+//   }
+// `;
 
 export const Network: FunctionComponent = () => {
-  const dispatch = useDispatch();
-  const [isOpenAddUrl, setIsOpenAddUrl] = useState(false);
-  const [customUrl, setCustomUrl] = useState('');
+  // const [isOpenAddUrl, setIsOpenAddUrl] = useState(false);
+  // const [customUrl, setCustomUrl] = useState('');
+  const { endpoint, setEndpoints, setNetwork } = useWallet();
 
-  const { network } = useSelector((state) => state.wallet.settings);
-
-  const handleChange = (value: NetworkType) => {
+  const handleChange = (value: NetworkObj) => {
     trackEvent('settings_network_click', { endpoint: value.endpoint });
 
-    dispatch(updateSettings({ network: value }));
-
-    batch(async () => {
-      dispatch(selectNetwork(value));
-      dispatch(wipeAction());
-      await dispatch(autoConnect());
+    setNetwork(value.network);
+    setEndpoints({
+      endpoint: value.endpoint,
+      endpointWs: value.wsEndpoint,
     });
   };
 
   const renderClustersRadioButtons = () =>
-    Object.values(networks).map((networkItem) => {
+    Object.values(NETWORKS).map((networkItem) => {
       return (
         <RadioButtonItem key={networkItem.name}>
           <RadioButton
             label={networkItem.endpointLabel || networkItem.endpoint}
             value={networkItem}
-            checked={networkItem.name === network.name}
+            checked={networkItem.endpoint === endpoint}
             onChange={handleChange}
           />
         </RadioButtonItem>
@@ -127,28 +120,28 @@ export const Network: FunctionComponent = () => {
   //   });
   // };
 
-  const handleOpenAddUrl = () => {
-    setIsOpenAddUrl(!isOpenAddUrl);
-  };
+  // const handleOpenAddUrl = () => {
+  //   setIsOpenAddUrl(!isOpenAddUrl);
+  // };
+  //
+  // const handleCustomUrl = (value: string) => {
+  //   setCustomUrl(value);
+  // };
 
-  const handleCustomUrl = (value: string) => {
-    setCustomUrl(value);
-  };
+  // const handleSaveButtonClick = () => {
+  //   const newSettings = mergeDeepRight(network, {
+  //     custom: { [`custom-${new Date().getTime()}`]: customUrl },
+  //   });
+  //
+  //   dispatch(updateSettings({ network: newSettings }));
+  //   setCustomUrl('');
+  //   setIsOpenAddUrl(!isOpenAddUrl);
+  // };
 
-  const handleSaveButtonClick = () => {
-    const newSettings = mergeDeepRight(network, {
-      custom: { [`custom-${new Date().getTime()}`]: customUrl },
-    });
-
-    dispatch(updateSettings({ network: newSettings }));
-    setCustomUrl('');
-    setIsOpenAddUrl(!isOpenAddUrl);
-  };
-
-  const handleCloseButton = () => {
-    setCustomUrl('');
-    setIsOpenAddUrl(!isOpenAddUrl);
-  };
+  // const handleCloseButton = () => {
+  //   setCustomUrl('');
+  //   setIsOpenAddUrl(!isOpenAddUrl);
+  // };
 
   return (
     <WidgetPage icon="branch" title="Network">
@@ -158,29 +151,29 @@ export const Network: FunctionComponent = () => {
           {/* {renderCustomClustersRadioButtons()} */}
         </>
       </RadioButtonsWrapper>
-      <AddCustomUrlWrapper>
-        {isOpenAddUrl ? (
-          <AddUrlWrapper>
-            <Text>
-              If you are a developer you can add your node address for test or as a main working
-              node in a wallet.
-            </Text>
-            <Input name="customUrl" value={customUrl} onChange={handleCustomUrl} />
-            <Buttons>
-              <Button primary disabled={!URL_REGEX.test(customUrl)} onClick={handleSaveButtonClick}>
-                Save
-              </Button>
-              <Button light onClick={handleCloseButton}>
-                Cancel
-              </Button>
-            </Buttons>
-          </AddUrlWrapper>
-        ) : (
-          <Button light onClick={handleOpenAddUrl} style={{ display: 'none' }}>
-            + Add custom URL
-          </Button>
-        )}
-      </AddCustomUrlWrapper>
+      {/*<AddCustomUrlWrapper>*/}
+      {/*  {isOpenAddUrl ? (*/}
+      {/*    <AddUrlWrapper>*/}
+      {/*      <Text>*/}
+      {/*        If you are a developer you can add your node address for test or as a main working*/}
+      {/*        node in a wallet.*/}
+      {/*      </Text>*/}
+      {/*      <Input name="customUrl" value={customUrl} onChange={handleCustomUrl} />*/}
+      {/*      <Buttons>*/}
+      {/*        <Button primary disabled={!URL_REGEX.test(customUrl)} onClick={handleSaveButtonClick}>*/}
+      {/*          Save*/}
+      {/*        </Button>*/}
+      {/*        <Button light onClick={handleCloseButton}>*/}
+      {/*          Cancel*/}
+      {/*        </Button>*/}
+      {/*      </Buttons>*/}
+      {/*    </AddUrlWrapper>*/}
+      {/*  ) : (*/}
+      {/*    <Button light onClick={handleOpenAddUrl}>*/}
+      {/*      + Add custom URL*/}
+      {/*    </Button>*/}
+      {/*  )}*/}
+      {/*</AddCustomUrlWrapper>*/}
     </WidgetPage>
   );
 };

@@ -1,8 +1,12 @@
 import type { FC } from 'react';
 import React, { useState } from 'react';
+import { useHistory } from 'react-router';
 import { NavLink, Route, Switch, useLocation } from 'react-router-dom';
 
 import { styled } from '@linaria/react';
+import { useWallet } from '@p2p-wallet-web/core';
+
+import { useUpdateEffect } from 'utils/hooks/useUpdateEffect';
 
 import { LoaderWide } from './common/LoaderWide';
 import { Login } from './Login';
@@ -71,7 +75,9 @@ const NavLinkStyled = styled(NavLink)`
 `;
 
 export const Auth: FC = () => {
+  const history = useHistory();
   const location = useLocation<{ from?: string }>();
+  const { connected } = useWallet();
 
   const [isLoading, setIsLoading] = useState(false);
   const [data, setData] = useState<DataType>({
@@ -81,6 +87,12 @@ export const Auth: FC = () => {
     derivationPath: '',
     password: '',
   });
+
+  useUpdateEffect(() => {
+    if (connected) {
+      history.push('/wallets');
+    }
+  }, [connected]);
 
   const next = (nextData: DataType) => {
     setData(nextData);

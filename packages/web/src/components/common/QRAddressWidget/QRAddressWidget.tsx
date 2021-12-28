@@ -1,13 +1,13 @@
 import type { FunctionComponent } from 'react';
-import React, { useEffect, useMemo, useState } from 'react';
-import { useSelector } from 'react-redux';
+import React, { useEffect, useState } from 'react';
 
 import { styled } from '@linaria/react';
+import { useConnectionContext, useTokenAccount, useWallet } from '@p2p-wallet-web/core';
+import { usePubkey } from '@p2p-wallet-web/sail';
 import classNames from 'classnames';
 import { rgba } from 'polished';
 import QRCode from 'qrcode.react';
 
-import { TokenAccount } from 'api/token/TokenAccount';
 import { Card } from 'components/common/Card';
 import { ToastManager } from 'components/common/ToastManager';
 import { Button, Icon } from 'components/ui';
@@ -233,18 +233,10 @@ export const QRAddressWidgetOrigin: FunctionComponent<Props> = ({ publicKey, cla
   const [isShowDetails, setIsShowDetails] = useState(false);
   const [isImageCopyAvailable, setIsImageCopyAvailable] = useState(false);
   const [isImageCopied, setIsImageCopied] = useState(false);
-  const cluster = useSelector((state) => state.wallet.network.cluster);
-  const solPublicKey = useSelector((state) => state.wallet.publicKey);
+  const { network } = useConnectionContext();
+  const { publicKey: solPublicKey } = useWallet();
 
-  const tokenAccounts = useSelector((state) => state.wallet.tokenAccounts);
-  const tokenAccount = useMemo(() => {
-    const foundToken = tokenAccounts.find((account) => account.address === publicKey);
-    return foundToken && TokenAccount.from(foundToken);
-  }, [tokenAccounts, publicKey]);
-  const solAccount = useMemo(() => {
-    const foundToken = tokenAccounts.find((account) => account.address === solPublicKey);
-    return foundToken && TokenAccount.from(foundToken);
-  }, [tokenAccounts, solPublicKey]);
+  const tokenAccount = useTokenAccount(usePubkey(publicKey));
 
   useEffect(() => {
     askClipboardWritePermission()
@@ -310,7 +302,7 @@ export const QRAddressWidgetOrigin: FunctionComponent<Props> = ({ publicKey, cla
     setIsShowDetails((state) => !state);
   };
 
-  if (!solAccount) {
+  if (!solPublicKey) {
     return null;
   }
 
@@ -323,8 +315,8 @@ export const QRAddressWidgetOrigin: FunctionComponent<Props> = ({ publicKey, cla
           ) : (
             <TokenName>Wallet Address</TokenName>
           )}
-          <TokenAddress onClick={handleCopyClick('sol', solAccount.address.toBase58())}>
-            {solAccount.address.toBase58()}
+          <TokenAddress onClick={handleCopyClick('sol', solPublicKey.toBase58())}>
+            {solPublicKey.toBase58()}
           </TokenAddress>
         </TokenWrapper>
         <ExpandWrapper onClick={handleExpandClick}>
@@ -344,48 +336,56 @@ export const QRAddressWidgetOrigin: FunctionComponent<Props> = ({ publicKey, cla
                   <QRCopied>Copied</QRCopied>
                 </QRCopiedWrapper>
               ) : undefined}
-              <QRCode id="qrcode" value={solAccount.address.toBase58()} size={150} />
+              <QRCode id="qrcode" value={solPublicKey.toBase58()} size={150} />
             </QRCodeWrapper>
           </Content>
           {isShowDetails ? (
             <Details>
               <DetailRow>
                 <FieldGroup>
-                  <FieldTitle>Direct {tokenAccount.mint.symbol} Address</FieldTitle>
-                  <FieldValue onClick={handleCopyClick('token', tokenAccount.address.toBase58())}>
-                    {tokenAccount.address.toBase58()}
-                  </FieldValue>
+                  <FieldTitle>Direct {tokenAccount.balance?.token.symbol} Address</FieldTitle>
+                  {tokenAccount.key ? (
+                    <FieldValue onClick={handleCopyClick('token', tokenAccount.key.toBase58())}>
+                      {tokenAccount.key.toBase58()}
+                    </FieldValue>
+                  ) : undefined}
                 </FieldGroup>
-                <a
-                  href={getExplorerUrl('address', tokenAccount.address.toBase58(), cluster)}
-                  target="_blank"
-                  rel="noopener noreferrer noindex"
-                  className="button"
-                >
-                  <ShareWrapper>
-                    <ShareIcon name="external-link" />
-                  </ShareWrapper>
-                </a>
+                {tokenAccount.key ? (
+                  <a
+                    href={getExplorerUrl('address', tokenAccount?.key.toBase58(), network)}
+                    target="_blank"
+                    rel="noopener noreferrer noindex"
+                    className="button"
+                  >
+                    <ShareWrapper>
+                      <ShareIcon name="external-link" />
+                    </ShareWrapper>
+                  </a>
+                ) : undefined}
               </DetailRow>
               <DetailRow>
                 <FieldGroup>
-                  <FieldTitle>{tokenAccount.mint.symbol} Mint Address</FieldTitle>
-                  <FieldValue
-                    onClick={handleCopyClick('mint', tokenAccount.mint.address.toBase58())}
-                  >
-                    {tokenAccount.mint.address.toBase58()}
-                  </FieldValue>
+                  <FieldTitle>{tokenAccount.balance?.token.symbol} Mint Address</FieldTitle>
+                  {tokenAccount.balance ? (
+                    <FieldValue
+                      onClick={handleCopyClick('mint', tokenAccount.balance?.token.address)}
+                    >
+                      {tokenAccount.balance?.token.address}
+                    </FieldValue>
+                  ) : undefined}
                 </FieldGroup>
-                <a
-                  href={getExplorerUrl('address', tokenAccount.mint.address.toBase58(), cluster)}
-                  target="_blank"
-                  rel="noopener noreferrer noindex"
-                  className="button"
-                >
-                  <ShareWrapper>
-                    <ShareIcon name="external-link" />
-                  </ShareWrapper>
-                </a>
+                {tokenAccount.balance ? (
+                  <a
+                    href={getExplorerUrl('address', tokenAccount.balance?.token.address, network)}
+                    target="_blank"
+                    rel="noopener noreferrer noindex"
+                    className="button"
+                  >
+                    <ShareWrapper>
+                      <ShareIcon name="external-link" />
+                    </ShareWrapper>
+                  </a>
+                ) : undefined}
               </DetailRow>
             </Details>
           ) : undefined}

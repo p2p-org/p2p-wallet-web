@@ -1,12 +1,15 @@
 import type { FunctionComponent } from 'react';
 import React, { useState } from 'react';
-import { useSelector } from 'react-redux';
 
 import { styled } from '@linaria/react';
+import {
+  useTryUnlockSeedAndMnemonic,
+  useWallet,
+  WALLET_PROVIDERS,
+  WalletType,
+} from '@p2p-wallet-web/core';
 
-import { WalletType } from 'api/wallet';
-import { loadMnemonicAndSeed } from 'api/wallet/ManualWallet';
-import { ERROR_WRONG_PASSWORD } from 'api/wallet/ManualWallet/errors';
+import type { ModalPropsType } from 'app/contexts/general/modals/types';
 import { ErrorHint } from 'components/common/ErrorHint';
 import { Modal } from 'components/common/Modal';
 import { PasswordInput } from 'components/common/PasswordInput';
@@ -37,25 +40,26 @@ const PasswordInputStyled = styled(PasswordInput)`
   height: 46px;
 `;
 
-type Props = {
+export type TransactionConfirmModalProps = {
   type: 'send' | 'swap';
   params: TransferParams | SwapParams;
-  close: (isConfirm?: boolean) => void;
 };
 
-export const TransactionConfirmModal: FunctionComponent<Props> = ({ type, params, close }) => {
+export const TransactionConfirmModal: FunctionComponent<
+  ModalPropsType & TransactionConfirmModalProps
+> = ({ type, params, close }) => {
+  const { walletProviderInfo } = useWallet();
+  const tryUnlockSeedAndMnemonic = useTryUnlockSeedAndMnemonic();
+
   const [password, setPassword] = useState('');
   const [hasError, setHasError] = useState(false);
-  const walletType = useSelector((state) => state.wallet.type);
 
-  const validatePassword = async (value: string) => {
+  const validatePassword = async (password: string) => {
     try {
-      await loadMnemonicAndSeed(value);
+      await tryUnlockSeedAndMnemonic(password);
       setHasError(false);
     } catch (error) {
-      if ((error as Error).message === ERROR_WRONG_PASSWORD) {
-        setHasError(true);
-      }
+      setHasError(true);
     }
   };
 
@@ -75,7 +79,9 @@ export const TransactionConfirmModal: FunctionComponent<Props> = ({ type, params
     close(false);
   };
 
-  const isDisabled = walletType === WalletType.MANUAL && (!password || hasError);
+  const isSecretKeyWallet =
+    walletProviderInfo?.name === WALLET_PROVIDERS[WalletType.SecretKey].name;
+  const isDisabled = isSecretKeyWallet && (!password || hasError);
 
   const renderDescription = () => {
     switch (type) {
@@ -123,7 +129,7 @@ export const TransactionConfirmModal: FunctionComponent<Props> = ({ type, params
       {type === 'send' ? <Send params={params as TransferParams} /> : undefined}
       {type === 'swap' ? <Swap params={params as SwapParams} /> : undefined}
 
-      {walletType === WalletType.MANUAL ? (
+      {isSecretKeyWallet ? (
         <Section>
           <SubTitle>Enter password to confirm</SubTitle>
           <PasswordInputStyled value={password} onChange={handlePasswordChange} />

@@ -1,16 +1,13 @@
 import type { FunctionComponent } from 'react';
-import React, { useEffect, useMemo, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import React, { useEffect, useState } from 'react';
 
 import { styled } from '@linaria/react';
-import type { AsyncThunkAction } from '@reduxjs/toolkit';
-import { unwrapResult } from '@reduxjs/toolkit';
+import { useConnectionContext, useTransaction, useWallet } from '@p2p-wallet-web/core';
 import classNames from 'classnames';
 
-import { Transaction } from 'api/transaction/Transaction';
+import type { ModalPropsType } from 'app/contexts';
 import { ToastManager } from 'components/common/ToastManager';
 import { Button } from 'components/ui';
-import { getTransaction } from 'store/slices/transaction/TransactionSlice';
 import { trackEvent } from 'utils/analytics';
 import { getExplorerUrl } from 'utils/connection';
 import { transferNotification } from 'utils/transactionNotifications';
@@ -63,38 +60,28 @@ const handleCopyClick = (str: string) => () => {
 
 const DEFAULT_TRANSACTION_ERROR = 'Transaction error';
 
-type SendActionType = AsyncThunkAction<string, any, any>;
+type SendActionType = () => Promise<string>;
 type SwapActionType = () => Promise<string>;
 
-type Props = {
+export type TransactionStatusModalProps = {
   type: 'send' | 'swap';
   action: SendActionType | SwapActionType;
   params: TransferParams | SwapParams;
-  close: (signature: string | null) => void;
 };
 
-export const TransactionStatusModal: FunctionComponent<Props> = ({
-  type,
-  action,
-  params,
-  close,
-}) => {
-  const dispatch = useDispatch();
+export const TransactionStatusModal: FunctionComponent<
+  ModalPropsType<string | null> & TransactionStatusModalProps
+> = ({ type, action, params, close }) => {
+  const { provider } = useWallet();
+
   const [progress, setProgress] = useState(5);
   const [isExecuting, setIsExecuting] = useState(false);
   const [signature, setSignature] = useState<string | null>(null);
-  const transaction = useSelector(
-    (state) =>
-      (signature &&
-        state.transaction.items[signature] &&
-        Transaction.from(state.transaction.items[signature])) ||
-      null,
-  );
+  const transaction = useTransaction(signature);
   const [transactionError, setTransactionError] = useState(
-    transaction?.meta?.err ? DEFAULT_TRANSACTION_ERROR : '',
+    transaction?.raw?.meta?.err ? DEFAULT_TRANSACTION_ERROR : '',
   );
-  const cluster = useSelector((state) => state.wallet.network.cluster);
-  const tokenAccounts = useSelector((state) => state.wallet.tokenAccounts);
+  const { network } = useConnectionContext();
 
   useEffect(() => {
     let newProgress = INITIAL_PROGRESS;
@@ -126,15 +113,13 @@ export const TransactionStatusModal: FunctionComponent<Props> = ({
 
       switch (type) {
         case 'send': {
-          const resultSignature = unwrapResult(await dispatch(action as SendActionType));
+          const resultSignature = await (action as SendActionType)();
           setSignature(resultSignature);
 
           transferNotification({
             header: 'Sent',
-            text: `- ${(params as TransferParams).fromToken
-              .toMajorDenomination((params as TransferParams).fromAmount)
-              .toFixed()} ${(params as TransferParams).fromToken.symbol}`,
-            symbol: (params as TransferParams).fromToken.symbol,
+            text: `- ${(params as TransferParams).amount.formatUnits()}`,
+            symbol: (params as TransferParams).amount.token.symbol,
           });
           break;
         }
@@ -147,7 +132,7 @@ export const TransactionStatusModal: FunctionComponent<Props> = ({
           throw new Error('Wrong type');
       }
     } catch (error) {
-      setTransactionError((error as Error).message);
+      // setTransactionError((error as Error).message);
       setIsExecuting(false);
 
       if (type === 'send') {
@@ -168,8 +153,9 @@ export const TransactionStatusModal: FunctionComponent<Props> = ({
       }
 
       try {
-        const trx = unwrapResult(await dispatch(getTransaction(signature)));
-
+        const trx = await provider.connection.getTransaction(signature, {
+          commitment: 'confirmed',
+        });
         if (trx) {
           if (trx.meta?.err) {
             setTransactionError(DEFAULT_TRANSACTION_ERROR);
@@ -180,7 +166,7 @@ export const TransactionStatusModal: FunctionComponent<Props> = ({
           setTimeout(mount, 3000);
         }
       } catch (error) {
-        setTransactionError((error as Error).message);
+        // setTransactionError((error as Error).message);
         ToastManager.error((error as Error).message);
       } finally {
         setIsExecuting(false);
@@ -190,17 +176,6 @@ export const TransactionStatusModal: FunctionComponent<Props> = ({
     void mount();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [signature]);
-
-  const isReceiver = useMemo(() => {
-    if (!transaction) {
-      return false;
-    }
-
-    return !!tokenAccounts.find(
-      (tokenAccount) => tokenAccount.address === transaction.short.destination?.toBase58(),
-    );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [transaction?.short.destination, tokenAccounts]);
 
   const handleCloseClick = () => {
     if (type === 'send') {
@@ -242,8 +217,8 @@ export const TransactionStatusModal: FunctionComponent<Props> = ({
     close(signature);
   };
 
-  const isProcessing = (!signature || !transaction) && !transactionError;
-  const isSuccess = signature && transaction && !transactionError;
+  const isProcessing = (!signature || !transaction?.key) && !transactionError;
+  const isSuccess = signature && transaction?.key && !transactionError;
 
   const renderTitle = () => {
     if (isSuccess) {
@@ -260,7 +235,7 @@ export const TransactionStatusModal: FunctionComponent<Props> = ({
   const renderDescription = () => {
     if (isSuccess) {
       return type === 'send'
-        ? `You’ve successfully sent ${(params as TransferParams).fromToken.symbol}`
+        ? `You’ve successfully sent ${(params as TransferParams).amount.token.symbol}`
         : 'You’ve successfully swapped tokens';
     }
 
@@ -298,11 +273,7 @@ export const TransactionStatusModal: FunctionComponent<Props> = ({
       </ProgressWrapper>
       <Content>
         {type === 'send' ? (
-          <Send
-            params={params as TransferParams}
-            transaction={transaction}
-            isReceiver={isReceiver}
-          />
+          <Send params={params as TransferParams} transaction={transaction} />
         ) : undefined}
         {type === 'swap' ? <Swap params={params as SwapParams} /> : undefined}
         {signature ? (
@@ -311,7 +282,7 @@ export const TransactionStatusModal: FunctionComponent<Props> = ({
               <FieldTitle>Transaction ID</FieldTitle>
               <FieldValue>
                 {signature}{' '}
-                <ShareWrapper onClick={handleCopyClick(getExplorerUrl('tx', signature, cluster))}>
+                <ShareWrapper onClick={handleCopyClick(getExplorerUrl('tx', signature, network))}>
                   <ShareIcon name="copy" />
                 </ShareWrapper>
               </FieldValue>
@@ -336,7 +307,7 @@ export const TransactionStatusModal: FunctionComponent<Props> = ({
             </Button>
             {signature ? (
               <a
-                href={getExplorerUrl('tx', signature, cluster)}
+                href={getExplorerUrl('tx', signature, network)}
                 target="_blank"
                 rel="noopener noreferrer noindex"
                 onClick={() => {

@@ -1,0 +1,8 @@
+{
+  "extends": "./tsconfig.lib.json",
+  "display": "P2P Wallet React TSConfig",
+  "compilerOptions": {
+    "lib": ["DOM", "DOM.Iterable", "ESNext", "ES2019"],
+    "jsx": "react-jsx"
+  }
+}

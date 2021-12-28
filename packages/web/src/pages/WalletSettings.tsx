@@ -1,45 +1,40 @@
 import type { FunctionComponent } from 'react';
-import React, { useMemo } from 'react';
-import { useSelector } from 'react-redux';
+import React from 'react';
 import { useLocation } from 'react-router';
 import { useParams } from 'react-router-dom';
 
-import { PublicKey } from '@solana/web3.js';
+import { useTokenAccount } from '@p2p-wallet-web/core';
+import { usePubkey } from '@p2p-wallet-web/sail';
+import type { PublicKey } from '@solana/web3.js';
 
-import { TokenAccount } from 'api/token/TokenAccount';
 import { Layout } from 'components/common/Layout';
 import { TokenSettingsWidget } from 'components/pages/wallet';
-import type { RootState } from 'store/rootReducer';
 import { shortAddress } from 'utils/tokens';
 
 export const WalletSettings: FunctionComponent = () => {
   const location = useLocation();
-  const { publicKey } = useParams<{ publicKey: string }>();
+  const { publicKey: _publicKey } = useParams<{ publicKey: string }>();
 
-  const tokenAccounts = useSelector((state: RootState) =>
-    state.wallet.tokenAccounts.map((account) => TokenAccount.from(account)),
-  );
-  const tokenPublicKey = useMemo(() => new PublicKey(publicKey), [publicKey]);
-  const tokenAccount = useMemo(
-    () => tokenAccounts.find((account) => account.address.equals(tokenPublicKey)),
-    [tokenAccounts, tokenPublicKey],
-  );
+  const publicKey = usePubkey(_publicKey) as PublicKey;
+  const tokenAccount = useTokenAccount(publicKey);
 
-  const tokenName = tokenAccount?.mint.symbol ? tokenAccount.mint.symbol : shortAddress(publicKey);
-  const isZeroBalance = Boolean(tokenAccount?.balance.lte(0));
+  const tokenName = tokenAccount?.balance?.token.symbol
+    ? tokenAccount.balance.token.symbol
+    : shortAddress(_publicKey);
+  const isZeroBalance = Boolean(tokenAccount?.balance?.toU64().lten(0));
 
   return (
     <Layout
       breadcrumb={{
         currentName: `${tokenName} Wallet`,
         backTo: {
-          pathname: `/wallet/${publicKey}`,
+          pathname: `/wallet/${_publicKey}`,
           state: { fromPage: location.pathname },
         },
       }}
       rightColumn={
         <TokenSettingsWidget
-          publicKey={tokenPublicKey}
+          publicKey={publicKey}
           tokenName={tokenName}
           isZeroBalance={isZeroBalance}
         />

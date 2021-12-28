@@ -1,22 +1,13 @@
 {
+  "extends": "@p2p-wallet-web/tsconfig/tsconfig.lib.json",
   "compilerOptions": {
-    "lib": ["es2015", "DOM"],
-    "target": "es6",
-    "module": "commonjs",
-    "moduleResolution": "node",
-    "strict": true,
-    "noUncheckedIndexedAccess": true,
-    "esModuleInterop": true,
-    "skipLibCheck": true,
-    "preserveConstEnums": true,
-    "jsx": "react-jsx",
-    "sourceMap": true,
-    "declaration": true,
-    "declarationMap": true,
-    "rootDir": "./src",
-    "outDir": "dist/",
-    "typeRoots": ["../../node_modules/@types"]
+    "lib": ["ES2015", "DOM"],
+    "outDir": "dist/esm/",
+    "rootDir": "src/",
+    "noEmit": false,
+
+    "jsx": "react-jsx"
   },
-  "include": ["src/"],
-  "exclude": ["**/node_modules"]
+  "include": ["./src"],
+  "exclude": ["**/_*/"]
 }

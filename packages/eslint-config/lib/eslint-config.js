@@ -30,7 +30,7 @@ module.exports = {
           ['^react'], // react
           ['^[^\\.]'], // non-local imports
           [
-            '^constants|^config|^lib|^utils|^types|^store|^api|^app|^pages|^components|^styles|^assets',
+            '^constants|^config|^lib|^utils|^types.ts|^store|^api|^app|^pages|^components|^styles|^assets',
           ], // internal
           ['^\\.'], // local imports
         ],
@@ -49,6 +49,17 @@ module.exports = {
         argsIgnorePattern: "^_",
       },
     ],
+    // Enforce that private members are prefixed with an underscore
+    "@typescript-eslint/naming-convention": [
+      "error",
+      {
+        selector: "memberLike",
+        modifiers: ["private"],
+        format: ["camelCase"],
+        leadingUnderscore: "require",
+      },
+    ],
+
     "@typescript-eslint/ban-ts-comment": "warn",
     "@typescript-eslint/no-unsafe-argument": "warn",
     "@typescript-eslint/no-unsafe-assignment": "warn",

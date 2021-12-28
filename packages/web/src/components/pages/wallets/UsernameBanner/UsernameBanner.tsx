@@ -1,16 +1,14 @@
 import type { FC } from 'react';
 import React, { useEffect, useState } from 'react';
-import { useDispatch } from 'react-redux';
 import { useLocation } from 'react-router';
 import { NavLink } from 'react-router-dom';
 
 import { styled } from '@linaria/react';
 
+import { useUsername } from 'app/contexts';
+import { ModalType, useModals } from 'app/contexts/general/modals';
+import { useSettings } from 'app/contexts/general/settings';
 import { Icon } from 'components/ui';
-import { openModal } from 'store/actions/modals';
-import { SHOW_MODAL_PROCEED_USERNAME } from 'store/constants/modalTypes';
-import { useUsername } from 'utils/hooks/useUsername';
-import { isUsernameBannerDisplayed } from 'utils/settings';
 
 const Wrapper = styled.div`
   display: flex;
@@ -20,7 +18,7 @@ const Wrapper = styled.div`
   background: url('./background.png') no-repeat center center;
   border: 1px solid #a5beff;
 
-  box-shadow: 0px 4px 4px #f6f6f9;
+  box-shadow: 0 4px 4px #f6f6f9;
   border-radius: 12px;
 `;
 
@@ -80,33 +78,36 @@ const Text = styled.div`
 `;
 
 export const UsernameBanner: FC = () => {
-  const dispatch = useDispatch();
-  const [isBannerDisplayed, setIsBannerDisplayed] = useState<boolean>(true);
+  const location = useLocation();
+  const { openModal } = useModals();
   const { username } = useUsername();
+  const {
+    settings: { usernameBannerHiddenByUser },
+  } = useSettings();
+
+  const [isBannerShow, setIsBannerShow] = useState<boolean>(false);
 
   useEffect(() => {
-    if (username) {
-      setIsBannerDisplayed(false);
-    } else {
-      setIsBannerDisplayed(isUsernameBannerDisplayed());
+    if (usernameBannerHiddenByUser || username) {
+      setIsBannerShow(false);
+    } else if (username !== undefined) {
+      setIsBannerShow(true);
     }
-  }, [setIsBannerDisplayed, username]);
+  }, [username]);
 
-  const onClose = async () => {
-    const result = await dispatch(
-      openModal({
-        modalType: SHOW_MODAL_PROCEED_USERNAME,
-      }),
-    );
+  const handleCloseClick = async () => {
+    const result = await openModal<boolean>(ModalType.SHOW_MODAL_PROCEED_USERNAME);
 
-    if (result.payload) {
-      setIsBannerDisplayed(false);
+    if (result) {
+      setIsBannerShow(false);
     }
   };
 
-  const location = useLocation();
+  if (!isBannerShow) {
+    return null;
+  }
 
-  return isBannerDisplayed ? (
+  return (
     <Wrapper>
       <WrapperLink
         to={{
@@ -119,9 +120,9 @@ export const UsernameBanner: FC = () => {
           Any token can be received using username regardless of whether it is in your wallets list
         </Text>
       </WrapperLink>
-      <CloseButton type="button" onClick={onClose}>
+      <CloseButton type="button" onClick={handleCloseClick}>
         <CloseIcon name="close" />
       </CloseButton>
     </Wrapper>
-  ) : null;
+  );
 };

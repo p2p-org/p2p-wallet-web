@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { styled } from '@linaria/react';
 import Decimal from 'decimal.js';
 
-import { useSwap } from 'app/contexts/swap';
+import { useSwap } from 'app/contexts/solana/swap';
 import { Icon } from 'components/ui';
 
 const Wrapper = styled.div`

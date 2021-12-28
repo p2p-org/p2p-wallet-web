@@ -1,7 +1,7 @@
 import type { FC } from 'react';
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
-import { useSelector } from 'react-redux';
 
+import { useConnectedWallet, useSolana } from '@p2p-wallet-web/core';
 import { Bitcoin } from '@renproject/chains-bitcoin';
 import type { SolanaProvider } from '@renproject/chains-solana';
 import { Solana } from '@renproject/chains-solana';
@@ -12,8 +12,6 @@ import type { GatewaySession, GatewayTransaction, OpenedGatewaySession } from '@
 import { DepositStates, isAccepted } from '@renproject/ren-tx';
 import { isNil } from 'ramda';
 
-import { getWallet } from 'api/wallet';
-import { useSolana } from 'app/contexts/solana';
 import { NotifyToast } from 'components/common/NotifyToast';
 import { ToastManager } from 'components/common/ToastManager';
 import { Button } from 'components/ui';
@@ -173,7 +171,7 @@ const LockAndMintSession: FC<{
       mintParams: {
         sourceAsset: Bitcoin.asset,
         network,
-        destAddress: getWallet().pubkey.toBase58(),
+        destAddress: solanaProvider.publicKey!.toBase58(),
         nonce: nonce,
       },
       from: bitcoin,
@@ -219,17 +217,18 @@ const LockAndMintSession: FC<{
 };
 
 export const LockAndMintProvider: FC = ({ children }) => {
-  const publicKey = useSelector((state) => state.wallet.publicKey);
+  const wallet = useConnectedWallet();
   const [config, setConfig] = useState<MintConfig | null>(null);
   const [gatewayAddress, setGatewayAddress] = useState<string>('');
   const [deposits, setDeposits] = useState<Deposits>({});
+  const publicKey = wallet?.publicKey;
 
   useEffect(() => {
     if (!publicKey) {
       return;
     }
 
-    setConfig(loadAndDeleteExpired(publicKey));
+    setConfig(loadAndDeleteExpired(publicKey.toBase58()));
   }, [publicKey]);
 
   const initializeConfig = useCallback(() => {
@@ -237,7 +236,7 @@ export const LockAndMintProvider: FC = ({ children }) => {
       return;
     }
     setTimeout(() => {
-      setConfig(initConfig(publicKey));
+      setConfig(initConfig(publicKey.toBase58()));
     }, 0);
   }, [publicKey]);
 
@@ -324,10 +323,12 @@ const feesCache: FeesCache = {
     release: 0,
   },
 };
+
 export const useFetchFees = (isNeedLoadFee = true) => {
   const solanaProvider = useSolana();
   const network = useRenNetwork();
   const { bitcoin, solana } = getChains(network, solanaProvider);
+
   const [fees, setFees] = useState(feesCache.fees);
   const [pending, setPending] = useState(false);
 
@@ -340,6 +341,7 @@ export const useFetchFees = (isNeedLoadFee = true) => {
         to: solana,
       });
       setPending(false);
+
       const fees = {
         mint: rates.mint,
         burn: rates.burn,
@@ -347,6 +349,7 @@ export const useFetchFees = (isNeedLoadFee = true) => {
         release: rates.release ? rates.release.toNumber() : 0,
       };
       setFees(fees);
+
       feesCache.fees = fees;
       feesCache.timestamp = Date.now();
     };

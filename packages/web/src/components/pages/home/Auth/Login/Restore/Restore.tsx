@@ -1,23 +1,16 @@
 import type { FC } from 'react';
 import React, { useEffect, useState } from 'react';
-import { batch, useDispatch } from 'react-redux';
-import { useHistory } from 'react-router';
+import { batch } from 'react-redux';
 
 import { styled } from '@linaria/react';
-import { unwrapResult } from '@reduxjs/toolkit';
+import { deriveSecretKeyFromSeed, useWallet } from '@p2p-wallet-web/core';
 
-import { WalletType } from 'api/wallet';
-import type { LockedType } from 'api/wallet/ManualWallet';
-import { loadMnemonicAndSeed, STORAGE_KEY_LOCKED } from 'api/wallet/ManualWallet';
-import { ERROR_WRONG_PASSWORD } from 'api/wallet/ManualWallet/errors';
 import LogoImg from 'assets/images/big-logo.png';
 import { ErrorHint } from 'components/common/ErrorHint';
 import { PasswordInput } from 'components/common/PasswordInput';
 import { ToastManager } from 'components/common/ToastManager';
 import { SelectorAccountItem } from 'components/pages/home/Auth/Login/Restore/SelectorAccountItem';
-import { connectWallet, selectType } from 'store/slices/wallet/WalletSlice';
 import { trackEvent } from 'utils/analytics';
-import { sleep } from 'utils/common';
 import { useTrackEventOnce } from 'utils/hooks/useTrackEventOnce';
 
 import { Button } from '../../common/Button';
@@ -78,9 +71,8 @@ interface Props {
 }
 
 export const Restore: FC<Props> = ({ setIsLoading, back }) => {
-  const history = useHistory();
-  const dispatch = useDispatch();
   const trackEventOnce = useTrackEventOnce();
+  const { activate } = useWallet();
   const [password, setPassword] = useState('');
   const [accounts, setAccounts] = useState<SelectorItemType[]>([]);
   const [hasError, setHasError] = useState(false);
@@ -127,21 +119,18 @@ export const Restore: FC<Props> = ({ setIsLoading, back }) => {
 
         if (seed && derivationPath) {
           setIsLoading(true);
-          dispatch(selectType(WalletType.MANUAL));
-          unwrapResult(
-            await dispatch(
-              connectWallet({
-                seed,
-                password,
-                derivationPath,
-              }),
-            ),
+          const secretKey = Array.from(deriveSecretKeyFromSeed(seed, 0, derivationPath));
+          activate(WalletType.SecretKey, { secretKey });
+          setEncryptedSeedAndMnemonic(
+            {
+              seed: data.seed,
+              mnemonic: data.mnemonic,
+            },
+            data.password,
+            isSave,
           );
 
           trackEvent('restore_access_wallet_click');
-
-          await sleep(100);
-          history.push('/wallets');
         } else {
           throw new Error(`Can't restore wallet`);
         }

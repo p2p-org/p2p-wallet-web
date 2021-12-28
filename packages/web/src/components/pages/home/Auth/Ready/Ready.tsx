@@ -1,20 +1,20 @@
 import type { FC } from 'react';
 import React, { useEffect, useState } from 'react';
-import { batch, useDispatch } from 'react-redux';
-import { useHistory } from 'react-router';
+import { batch } from 'react-redux';
 
 import { styled } from '@linaria/react';
-import { unwrapResult } from '@reduxjs/toolkit';
+import {
+  deriveSecretKeyFromSeed,
+  useSeedAndMnemonic,
+  useWallet,
+  WalletType,
+} from '@p2p-wallet-web/core';
 
-import { WalletType } from 'api/wallet';
-import { storeMnemonicAndSeed } from 'api/wallet/ManualWallet';
 import LogoImg from 'assets/images/big-logo.png';
 import { ToastManager } from 'components/common/ToastManager';
 import type { DataType } from 'components/pages/home/Auth/types';
 import { Switch } from 'components/ui';
-import { connectWallet, selectType } from 'store/slices/wallet/WalletSlice';
 import { trackEvent } from 'utils/analytics';
-import { sleep } from 'utils/common';
 
 import { Button } from '../common/Button';
 import { OffPasswordModal } from './OffPasswordModal';
@@ -91,8 +91,9 @@ interface Props {
 }
 
 export const Ready: FC<Props> = ({ setIsLoading, data }) => {
-  const history = useHistory();
-  const dispatch = useDispatch();
+  const { activate } = useWallet();
+  const { setEncryptedSeedAndMnemonic } = useSeedAndMnemonic();
+
   const [isSave, setIsSave] = useState(true);
   const [isShowModal, setIsShowModal] = useState(false);
 
@@ -120,22 +121,15 @@ export const Ready: FC<Props> = ({ setIsLoading, data }) => {
 
   const handleFinishClick = () => {
     batch(async () => {
+      setIsLoading(true);
       try {
-        setIsLoading(true);
-        dispatch(selectType(WalletType.MANUAL));
-        unwrapResult(
-          await dispatch(
-            connectWallet({
-              seed: data.seed,
-              password: data.password,
-              derivationPath: data.derivationPath,
-            }),
-          ),
-        );
-        await storeMnemonicAndSeed(
-          data.mnemonic,
-          data.seed,
-          data.derivationPath,
+        const secretKey = Array.from(deriveSecretKeyFromSeed(data.seed, 0, data.derivationPath));
+        activate(WalletType.SecretKey, { secretKey });
+        setEncryptedSeedAndMnemonic(
+          {
+            seed: data.seed,
+            mnemonic: data.mnemonic,
+          },
           data.password,
           isSave,
         );
@@ -145,9 +139,6 @@ export const Ready: FC<Props> = ({ setIsLoading, data }) => {
         } else if (data.type === 'signup') {
           trackEvent('signup_finish_setup_click', { fastEnter: isSave });
         }
-
-        await sleep(100);
-        history.push('/wallets');
       } catch (error) {
         ToastManager.error((error as Error).message);
       } finally {

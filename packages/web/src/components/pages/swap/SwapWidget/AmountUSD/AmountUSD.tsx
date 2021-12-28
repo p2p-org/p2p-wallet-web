@@ -6,8 +6,8 @@ import { styled } from '@linaria/react';
 import { ZERO } from '@orca-so/sdk';
 import { u64 } from '@solana/spl-token';
 
-import { useConfig, usePrice } from 'app/contexts/swap';
-import { formatNumberToUSD, getUSDValue } from 'app/contexts/swap/utils/format';
+import { useConfig, usePrice } from 'app/contexts/solana/swap';
+import { formatNumberToUSD, getUSDValue } from 'app/contexts/solana/swap/utils/format';
 
 const Wrapper = styled.div``;
 

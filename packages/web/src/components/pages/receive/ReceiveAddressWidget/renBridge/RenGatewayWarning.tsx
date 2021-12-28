@@ -2,10 +2,10 @@ import type { FC } from 'react';
 import React, { useCallback, useEffect, useState } from 'react';
 
 import { styled } from '@linaria/react';
+import { useSolana } from '@p2p-wallet-web/core';
 import { Bitcoin } from '@renproject/chains-bitcoin';
 import { Solana } from '@renproject/chains-solana';
 
-import { useSolana } from 'app/contexts/solana';
 import { LoaderBlock } from 'components/common/LoaderBlock';
 import { ToastManager } from 'components/common/ToastManager';
 import { Button, Icon, Switch } from 'components/ui';

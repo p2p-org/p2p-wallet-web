@@ -1,1 +1,0 @@
-export { FeatureProvider } from './FeatureProvider';

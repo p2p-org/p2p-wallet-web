@@ -1,43 +1,37 @@
 import type { FunctionComponent } from 'react';
-import React, { useEffect, useMemo } from 'react';
-import { useSelector } from 'react-redux';
+import React, { useEffect } from 'react';
 import { useLocation } from 'react-router';
 import { useParams } from 'react-router-dom';
 
-import { PublicKey } from '@solana/web3.js';
+import { useTokenAccount } from '@p2p-wallet-web/core';
+import { usePubkey } from '@p2p-wallet-web/sail';
+import type { PublicKey } from '@solana/web3.js';
 
-import { TokenAccount } from 'api/token/TokenAccount';
 import { Layout } from 'components/common/Layout';
 import { QRAddressWidget } from 'components/common/QRAddressWidget';
-import { ActivityWidget, TopWidget } from 'components/pages/wallet';
+import { TopWidget, TransactionsWidget } from 'components/pages/wallet';
 import { trackEvent } from 'utils/analytics';
 import { shortAddress } from 'utils/tokens';
 
 export const WalletOrigin: FunctionComponent = () => {
   const location = useLocation();
-  const { publicKey } = useParams<{ publicKey: string }>();
+  const { publicKey: _publicKey } = useParams<{ publicKey: string }>();
 
-  const tokenAccounts = useSelector((state) =>
-    state.wallet.tokenAccounts.map((account) => TokenAccount.from(account)),
-  );
-  const tokenPublicKey = useMemo(() => new PublicKey(publicKey), [publicKey]);
-  const tokenAccount = useMemo(
-    () => tokenAccounts.find((account) => account.address.equals(tokenPublicKey)),
-    [tokenAccounts, tokenPublicKey],
-  );
+  const publicKey = usePubkey(_publicKey) as PublicKey;
+  const tokenAccount = useTokenAccount(publicKey);
 
   useEffect(() => {
-    if (tokenAccount?.mint.symbol) {
-      trackEvent('wallet_open', { tokenTicker: tokenAccount.mint.symbol });
+    if (tokenAccount?.balance?.token.symbol) {
+      trackEvent('wallet_open', { tokenTicker: tokenAccount.balance.token.symbol });
     }
-  }, [tokenAccount?.mint.symbol]);
+  }, [tokenAccount?.balance?.token.symbol]);
 
   return (
     <Layout
       breadcrumb={{
-        currentName: tokenAccount?.mint.symbol
-          ? `${tokenAccount.mint.symbol} Wallet`
-          : `${shortAddress(publicKey)} Wallet`,
+        currentName: tokenAccount?.balance?.token.symbol
+          ? `${tokenAccount.balance.token.symbol} Wallet`
+          : `${shortAddress(_publicKey)} Wallet`,
         backTo: {
           pathname: `/wallets`,
           state: { fromPage: location.pathname },
@@ -45,9 +39,9 @@ export const WalletOrigin: FunctionComponent = () => {
       }}
       rightColumn={
         <>
-          <TopWidget publicKey={publicKey} />
-          <QRAddressWidget publicKey={publicKey} />
-          <ActivityWidget publicKey={publicKey} />
+          <TopWidget publicKey={_publicKey} />
+          <QRAddressWidget publicKey={_publicKey} />
+          <TransactionsWidget publicKey={_publicKey} />
         </>
       }
     />

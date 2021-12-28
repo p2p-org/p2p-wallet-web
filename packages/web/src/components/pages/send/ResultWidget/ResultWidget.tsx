@@ -1,21 +1,14 @@
 import type { FunctionComponent } from 'react';
 import React, { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 import { useLocation } from 'react-router';
-import { Link } from 'react-router-dom';
 
 import { styled } from '@linaria/react';
-import { unwrapResult } from '@reduxjs/toolkit';
 import { rgba } from 'polished';
 
-import { Transaction } from 'api/transaction/Transaction';
+import { ModalType, useModals } from 'app/contexts/general/modals';
 import bgImg from 'assets/images/sun.png';
 import { Card } from 'components/common/Card';
-import { Button, Icon } from 'components/ui';
-import { openModal } from 'store/actions/modals';
-import { SHOW_MODAL_TRANSACTION_DETAILS } from 'store/constants/modalTypes';
-import type { RootState } from 'store/rootReducer';
-import { getTransaction } from 'store/slices/transaction/TransactionSlice';
+import { Icon } from 'components/ui';
 
 const WrapperCard = styled(Card)`
   display: flex;
@@ -93,35 +86,29 @@ const Details = styled.div`
 
 export const ResultWidget: FunctionComponent = () => {
   const { state: locationState } = useLocation<{ signature: string }>();
-  const dispatch = useDispatch();
-  const transaction = useSelector(
-    (state: RootState) =>
-      state.transaction.items[locationState.signature] &&
-      Transaction.from(state.transaction.items[locationState.signature]),
-  );
+  const { openModal } = useModals();
+  // const transaction = useSelector(
+  //   (state: RootState) =>
+  //     state.transaction.items[locationState.signature] &&
+  //     Transaction.from(state.transaction.items[locationState.signature]),
+  // );
 
   useEffect(() => {
     const mount = async () => {
-      const trx = unwrapResult(await dispatch(getTransaction(locationState.signature)));
-
-      if (!trx) {
-        setTimeout(mount, 3000);
-      }
+      // const trx = unwrapResult(await dispatch(getTransaction(locationState.signature)));
+      // if (!trx) {
+      //   setTimeout(mount, 3000);
+      // }
     };
 
     if (locationState.signature) {
       void mount();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch]);
+  }, []);
 
   const handleDetailsClick = () => {
-    void dispatch(
-      openModal({
-        modalType: SHOW_MODAL_TRANSACTION_DETAILS,
-        props: { signature: locationState?.signature },
-      }),
-    );
+    openModal(ModalType.SHOW_MODAL_TRANSACTION_DETAILS, { signature: locationState?.signature });
   };
 
   return (
@@ -130,25 +117,25 @@ export const ResultWidget: FunctionComponent = () => {
       <CircleWrapper>
         <BottomIcon name="bottom" />
       </CircleWrapper>
-      <InfoWrapper>
-        {transaction ? (
-          <Value>
-            {transaction.short.destinationAmount.toNumber()}{' '}
-            {transaction.short.sourceTokenAccount?.mint.symbol}
-          </Value>
-        ) : undefined}
-        <Status>{transaction ? 'Processed' : 'Processing'}</Status>
-        {transaction ? (
-          <Details onClick={handleDetailsClick}>Transaction details</Details>
-        ) : undefined}
-      </InfoWrapper>
-      {transaction?.short.source ? (
-        <Link to={`/wallet/${transaction.short.source.toBase58()}`} className="button">
-          <Button primary big full>
-            Go back to wallet
-          </Button>
-        </Link>
-      ) : undefined}
+      {/*<InfoWrapper>*/}
+      {/*  {transaction ? (*/}
+      {/*    <Value>*/}
+      {/*      {transaction.short.destinationAmount.toNumber()}{' '}*/}
+      {/*      {transaction.short.sourceTokenAccount?.mint.symbol}*/}
+      {/*    </Value>*/}
+      {/*  ) : undefined}*/}
+      {/*  <Status>{transaction ? 'Processed' : 'Processing'}</Status>*/}
+      {/*  {transaction ? (*/}
+      {/*    <Details onClick={handleDetailsClick}>Transaction details</Details>*/}
+      {/*  ) : undefined}*/}
+      {/*</InfoWrapper>*/}
+      {/*{transaction?.short.source ? (*/}
+      {/*  <Link to={`/wallet/${transaction.short.source.toBase58()}`} className="button">*/}
+      {/*    <Button primary big full>*/}
+      {/*      Go back to wallet*/}
+      {/*    </Button>*/}
+      {/*  </Link>*/}
+      {/*) : undefined}*/}
     </WrapperCard>
   );
 };

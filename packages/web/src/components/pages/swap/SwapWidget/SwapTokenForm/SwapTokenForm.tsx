@@ -7,11 +7,11 @@ import classNames from 'classnames';
 import throttle from 'lodash.throttle';
 import { isNil } from 'ramda';
 
-import type { UserTokenAccountMap } from 'app/contexts/swap';
-import { useConfig, usePrice, useSwap } from 'app/contexts/swap';
-import type TokenAccount from 'app/contexts/swap/models/TokenAccount';
-import type Trade from 'app/contexts/swap/models/Trade';
-import { formatBigNumber, getUSDValue, parseString } from 'app/contexts/swap/utils/format';
+import type { UserTokenAccountMap } from 'app/contexts/solana/swap';
+import { useConfig, usePrice, useSwap } from 'app/contexts/solana/swap';
+import type TokenAccount from 'app/contexts/solana/swap/models/TokenAccount';
+import type Trade from 'app/contexts/solana/swap/models/Trade';
+import { formatBigNumber, getUSDValue, parseString } from 'app/contexts/solana/swap/utils/format';
 import { Empty } from 'components/common/Empty';
 import { SlideContainer } from 'components/common/SlideContainer';
 import { TokenAvatar } from 'components/common/TokenAvatar';

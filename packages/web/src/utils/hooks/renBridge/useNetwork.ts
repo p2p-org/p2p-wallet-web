@@ -1,11 +1,12 @@
 import { useMemo } from 'react';
-import { useSelector } from 'react-redux';
 
+import { useConnectionContext } from '@p2p-wallet-web/core';
 import { RenNetwork } from '@renproject/interfaces';
 
 export const useRenNetwork = (): RenNetwork => {
-  const cluster = useSelector((state) => state.wallet.network.cluster);
+  const { network } = useConnectionContext();
+
   return useMemo(() => {
-    return cluster === 'mainnet-beta' ? RenNetwork.Mainnet : RenNetwork.Testnet;
-  }, [cluster]);
+    return network === 'mainnet-beta' ? RenNetwork.Mainnet : RenNetwork.Testnet;
+  }, [network]);
 };

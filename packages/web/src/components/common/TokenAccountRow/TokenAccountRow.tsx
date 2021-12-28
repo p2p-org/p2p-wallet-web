@@ -1,12 +1,12 @@
 import type { FunctionComponent } from 'react';
-import React from 'react';
+import React, { useMemo } from 'react';
+import Skeleton from 'react-loading-skeleton';
 
 import { styled } from '@linaria/react';
+import type { TokenAccount } from '@p2p-wallet-web/core';
 
-import type { TokenAccount } from 'api/token/TokenAccount';
 import { AmountUSD } from 'components/common/AmountUSD';
 import { TokenAvatar } from 'components/common/TokenAvatar';
-import { formatAccountBalance } from 'utils/amount';
 import { shortAddress } from 'utils/tokens';
 
 const Wrapper = styled.div`
@@ -58,39 +58,70 @@ const Bottom = styled.div`
 
 type Props = {
   tokenAccount: TokenAccount;
+  showAddress?: boolean;
   onClick?: (tokenAccount: TokenAccount) => void;
   className?: string;
 };
 
-export const TokenAccountRow: FunctionComponent<Props> = ({ tokenAccount, onClick, className }) => {
+export const TokenAccountRow: FunctionComponent<Props> = ({
+  tokenAccount,
+  showAddress,
+  onClick,
+  className,
+}) => {
   const handleClick = () => {
     if (onClick) {
       onClick(tokenAccount);
     }
   };
 
+  const tokenNameOrAddress = useMemo(() => {
+    const _name = tokenAccount.balance?.token.name;
+
+    if (showAddress || !_name) {
+      return tokenAccount.key && shortAddress(tokenAccount.key.toBase58());
+    }
+
+    return _name;
+  }, [showAddress, tokenAccount.balance?.token.name, tokenAccount.key]);
+
+  const { loading } = tokenAccount;
+
   return (
     <Wrapper onClick={handleClick} className={className}>
       <ItemWrapper>
-        <TokenAvatar
-          symbol={tokenAccount.mint.symbol}
-          address={tokenAccount.mint.address.toBase58()}
-          size={44}
-        />
+        {loading ? (
+          <Skeleton width={44} height={44} borderRadius={12} />
+        ) : (
+          <TokenAvatar size={44} token={tokenAccount.balance?.token} />
+        )}
         <Info>
           <Top>
-            <TokenSymbol title={tokenAccount.mint.address.toBase58()}>
-              {tokenAccount.mint.symbol || shortAddress(tokenAccount.mint.address.toBase58())}
+            <TokenSymbol title={tokenAccount.balance?.token.address}>
+              {loading ? (
+                <Skeleton width={50} height={16} />
+              ) : (
+                tokenAccount.balance?.token.symbol ||
+                (tokenAccount.balance?.token.address &&
+                  shortAddress(tokenAccount.balance?.token.address))
+              )}
             </TokenSymbol>
-            <AmountUSD
-              symbol={tokenAccount.mint.symbol}
-              value={tokenAccount.mint.toMajorDenomination(tokenAccount.balance)}
-            />
+            {loading ? (
+              <Skeleton width={50} height={16} />
+            ) : tokenAccount.balance ? (
+              <AmountUSD value={tokenAccount.balance} />
+            ) : (
+              <div />
+            )}
           </Top>
           <Bottom>
-            <div>{tokenAccount.mint.name}</div>
+            <div>{loading ? <Skeleton width={100} height={14} /> : tokenNameOrAddress}</div>
             <div>
-              {formatAccountBalance(tokenAccount)} {tokenAccount.mint.symbol}
+              {loading ? (
+                <Skeleton width={100} height={16} />
+              ) : (
+                <>{tokenAccount.balance?.formatUnits()}</>
+              )}
             </div>
           </Bottom>
         </Info>
