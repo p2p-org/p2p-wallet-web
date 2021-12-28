@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { useSail } from '@p2p-wallet-web/sail';
 import { useWallet } from '@saberhq/use-solana';
@@ -11,6 +11,7 @@ import { precacheUserTokenAccounts } from './utils/precacheUserTokenAccounts';
 
 export interface UseTokenAccounts {
   userTokenAccountKeys: PublicKey[];
+  updateUserTokenAccountKeys: () => void;
 }
 
 const useTokenAccountsInternal = (): UseTokenAccounts => {
@@ -24,18 +25,12 @@ const useTokenAccountsInternal = (): UseTokenAccounts => {
   const theKey = useMemo(() => (publicKey ? [publicKey] : []), [publicKey?.toBase58()]);
   const [userTokenAccountKeys, setUserTokenAccountKeys] = useState<PublicKey[]>(theKey);
 
-  useEffect(() => {
+  const updateUserTokenAccountKeys = useCallback(() => {
     if (!connection || !publicKey) {
       setUserTokenAccountKeys([]);
       return;
     }
 
-    // First query of useAccountsData or useParsedAccountsData set data which will update only after new fetch
-    // so we need to give userTokenAccountKeys to useUserTokenAccounts already with publicKey of user to instant show
-    // this key in list
-    setUserTokenAccountKeys((keys) => uniqBy((a) => a.toBase58(), [publicKey, ...keys]));
-
-    const controller = new AbortController();
     void precacheUserTokenAccounts(connection, loader, accountsCache, publicKey).then(
       ({ keys, ownerPublicKey }) => {
         // if user wallet publicKey already changed - ignore
@@ -50,14 +45,32 @@ const useTokenAccountsInternal = (): UseTokenAccounts => {
         }
       },
     );
+  }, [accountsCache, connection, loader, publicKey]);
 
-    return () => {
-      controller.abort();
-    };
-  }, [accountsCache, connection, loader, publicKey, setUserTokenAccountKeys]);
+  useEffect(() => {
+    if (!connection || !publicKey) {
+      setUserTokenAccountKeys([]);
+      return;
+    }
+
+    // First query of useAccountsData or useParsedAccountsData set data which will update only after new fetch
+    // so we need to give userTokenAccountKeys to useUserTokenAccounts already with publicKey of user to instant show
+    // this key in list
+    setUserTokenAccountKeys((keys) => uniqBy((a) => a.toBase58(), [publicKey, ...keys]));
+
+    updateUserTokenAccountKeys();
+  }, [
+    accountsCache,
+    connection,
+    loader,
+    publicKey,
+    setUserTokenAccountKeys,
+    updateUserTokenAccountKeys,
+  ]);
 
   return {
     userTokenAccountKeys,
+    updateUserTokenAccountKeys,
   };
 };
 
