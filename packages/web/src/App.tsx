@@ -35,7 +35,7 @@ const App: React.FC = () => {
             <Route path="/:type(signup|login)" component={Home} exact />
             <AuthRequiredRoute path="/wallets" component={Wallets} />
             <AuthRequiredRoute path="/wallet/:publicKey/settings" component={WalletSettings} />
-            <AuthRequiredRoute path="/wallet/:publicKey" component={Wallet} />
+            <AuthRequiredRoute path="/wallet/:publicKey" exact component={Wallet} />
             <AuthRequiredRoute path="/receive" component={Receive} />
             <AuthRequiredRoute path="/send/:publicKey/:status(result)" component={Send} />
             <AuthRequiredRoute path="/send/:publicKey?" component={Send} />
