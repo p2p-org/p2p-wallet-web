@@ -8,10 +8,9 @@ import { setUnencryptedSeedAndMnemonic } from '../utils/unencryptedSeedAndMnemon
 
 export const useEncryptedSeedAndMnemonic = (): [
   string,
-  boolean,
   (nextSeedAndMnemonic: SeedAndMnemonic, password: string, isSaveUnencrypted: boolean) => void,
 ] => {
-  const [encryptedSeedAndMnemonic, isLoading, _setEncryptedSeedAndMnemonic] = useStorage(
+  const [encryptedSeedAndMnemonic, _setEncryptedSeedAndMnemonic] = useStorage(
     STORAGE_KEYS.EncryptedSeedAndMnemonic,
     '',
   );
@@ -29,5 +28,5 @@ export const useEncryptedSeedAndMnemonic = (): [
     [],
   );
 
-  return [encryptedSeedAndMnemonic, isLoading, setEncryptedSeedAndMnemonic];
+  return [encryptedSeedAndMnemonic, setEncryptedSeedAndMnemonic];
 };

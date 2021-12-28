@@ -9,13 +9,10 @@ import {
 
 export const useUnencryptedSeedAndMnemonic = (): [
   SeedAndMnemonic,
-  boolean,
   (nextSeedAndMnemonic: SeedAndMnemonic) => void,
 ] => {
   const [seedAndMnemonic, _setSeedAndMnemonic] =
     useState<SeedAndMnemonic>(DEFAULT_SEED_AND_MNEMONIC);
-  // TODO: can be async in future
-  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     try {
@@ -23,8 +20,6 @@ export const useUnencryptedSeedAndMnemonic = (): [
       _setSeedAndMnemonic(unencryptedSeedAndMnemonic || DEFAULT_SEED_AND_MNEMONIC);
     } catch (r) {
       console.error(r);
-    } finally {
-      setIsLoading(false);
     }
   }, []);
 
@@ -36,5 +31,5 @@ export const useUnencryptedSeedAndMnemonic = (): [
     [_setSeedAndMnemonic],
   );
 
-  return [seedAndMnemonic, isLoading, _setUnencryptedSeedAndMnemonic];
+  return [seedAndMnemonic, _setUnencryptedSeedAndMnemonic];
 };

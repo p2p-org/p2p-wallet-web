@@ -7,20 +7,16 @@ export const useStorage = <T>(
   key: string,
   defaultValue: T,
   ms?: number,
-): [T, boolean, SetStorageValue<T>] => {
+): [T, SetStorageValue<T>] => {
   const [value, _setValue] = useState<T | null>(defaultValue);
   // TODO: can be async in future
-  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    setIsLoading(true);
     try {
       const _value = getStorageValue<T>(key);
       _setValue(_value);
     } catch (err) {
       console.error(err);
-    } finally {
-      setIsLoading(false);
     }
   }, [key]);
 
@@ -38,5 +34,5 @@ export const useStorage = <T>(
     [key, ms],
   );
 
-  return [value || defaultValue, isLoading, setValue];
+  return [value || defaultValue, setValue];
 };

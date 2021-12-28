@@ -3,8 +3,7 @@ import React, { createContext, useCallback, useEffect } from 'react';
 
 import { NOOP, NOOP_ASYNC } from '../../internal/utils/noop';
 import { DEFAULT_SEED_AND_MNEMONIC } from './constants';
-import { useUnencryptedSeedAndMnemonic } from './hooks';
-import { useEncryptedSeedAndMnemonic } from './hooks/useEncryptedSeedAndMnemonic';
+import { useEncryptedSeedAndMnemonic, useUnencryptedSeedAndMnemonic } from './hooks';
 import type { SeedAndMnemonic } from './types';
 import { decryptSeedAndMnemonic } from './utils/encryption';
 
@@ -39,13 +38,9 @@ type Props = {
 };
 
 export const SeedProvider: FC<Props> = ({ children }) => {
-  const [encryptedSeedAndMnemonic, isLoadingEncryptedSeedAndMnemonic, setEncryptedSeedAndMnemonic] =
-    useEncryptedSeedAndMnemonic();
-  const [
-    unencryptedSeedAndMnemonic,
-    isLoadingUnencryptedSeedAndMnemonic,
-    setUnencryptedSeedAndMnemonic,
-  ] = useUnencryptedSeedAndMnemonic();
+  const [encryptedSeedAndMnemonic, setEncryptedSeedAndMnemonic] = useEncryptedSeedAndMnemonic();
+  const [unencryptedSeedAndMnemonic, setUnencryptedSeedAndMnemonic] =
+    useUnencryptedSeedAndMnemonic();
 
   useEffect(() => {
     if (unencryptedSeedAndMnemonic.mnemonic && unencryptedSeedAndMnemonic.seed) {
@@ -61,10 +56,6 @@ export const SeedProvider: FC<Props> = ({ children }) => {
     },
     [encryptedSeedAndMnemonic, setUnencryptedSeedAndMnemonic],
   );
-
-  if (isLoadingEncryptedSeedAndMnemonic || isLoadingUnencryptedSeedAndMnemonic) {
-    return null;
-  }
 
   return (
     <SetSeedAndMnemonicContext.Provider
