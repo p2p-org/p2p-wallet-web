@@ -9,7 +9,11 @@ import {
 import type { PublicKey } from '@solana/web3.js';
 import { SystemProgram } from '@solana/web3.js';
 
-import type { TransferParameters } from '../../contexts/solana/send/sendState/hooks';
+export type TransferParameters = {
+  source: PublicKey;
+  destination: PublicKey;
+  amount: TokenAmount;
+};
 
 const transferBetweenSplTokenAccounts = (
   provider: AugmentedProvider,

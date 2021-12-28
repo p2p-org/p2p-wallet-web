@@ -2,17 +2,10 @@ import { useCallback } from 'react';
 
 import { useSolana, useWallet } from '@p2p-wallet-web/core';
 import { useSail } from '@p2p-wallet-web/sail';
-import type { TokenAmount } from '@saberhq/token-utils';
-import type { PublicKey } from '@solana/web3.js';
 
 import { useSettings } from 'app/contexts';
+import type { TransferParameters } from 'app/instructions';
 import { transfer } from 'app/instructions';
-
-export type TransferParameters = {
-  source: PublicKey;
-  destination: PublicKey;
-  amount: TokenAmount;
-};
 
 export const useTransferAction = () => {
   const {
