@@ -6,8 +6,7 @@ import type { TokenAmount } from '@saberhq/token-utils';
 import type { PublicKey } from '@solana/web3.js';
 
 import { useSettings } from 'app/contexts';
-
-import { transfer } from './transfer';
+import { transfer } from 'app/instructions';
 
 export type TransferParameters = {
   source: PublicKey;

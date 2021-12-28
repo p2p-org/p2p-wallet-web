@@ -1,13 +1,12 @@
 import type { FunctionComponent } from 'react';
 import React, { useState } from 'react';
-import { useDispatch } from 'react-redux';
 
 import { styled } from '@linaria/react';
 import type * as web3 from '@solana/web3.js';
 import type { History } from 'history';
 
+import { useCloseTokenAccount } from 'app/hooks';
 import { Button, Icon } from 'components/ui';
-import { closeTokenAccount } from 'store/slices/wallet/WalletSlice';
 
 const Wrapper = styled.div`
   position: relative;
@@ -99,7 +98,7 @@ export const CloseTokenAccountModal: FunctionComponent<Props> = ({
   history,
   close,
 }) => {
-  const dispatch = useDispatch();
+  const closeTokenAccount = useCloseTokenAccount();
   const [isExecuting, setIsExecuting] = useState(false);
 
   const handleCloseButtonClick = () => {
@@ -109,8 +108,7 @@ export const CloseTokenAccountModal: FunctionComponent<Props> = ({
   const handleCloseTokenAButtonClick = async () => {
     try {
       setIsExecuting(true);
-      await dispatch(closeTokenAccount({ publicKey }));
-      // removeClosedTokenKeys(publicKey.toBase58());
+      await closeTokenAccount({ publicKey });
     } catch (error) {
       console.log(error);
     } finally {
