@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useDispatch } from 'react-redux';
 
 import { ZERO } from '@orca-so/sdk';
 import { useSolana } from '@p2p-wallet-web/core';
@@ -95,7 +94,6 @@ export type UseSwapArgs = {
 };
 
 const useSwapInternal = (props: UseSwapArgs = {}): UseSwap => {
-  const dispatch = useDispatch();
   const { wallet, connection } = useSolana();
   const { programIds, tokenConfigs, routeConfigs } = useConfig();
   const [inputTokenName, _setInputTokenName] = useState(props.inputTokenName ?? 'SOL');
@@ -447,7 +445,6 @@ const useSwapInternal = (props: UseSwapArgs = {}): UseSwap => {
     refreshStandardTokenAccounts,
     tokenConfigs,
     trade,
-    dispatch,
     wallet,
   ]);
 

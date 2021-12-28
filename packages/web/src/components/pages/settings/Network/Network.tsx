@@ -7,6 +7,7 @@ import { rgba } from 'polished';
 
 import { WidgetPage } from 'components/common/WidgetPage';
 import { RadioButton } from 'components/ui';
+import type { NetworkObj } from 'config/constants';
 import { NETWORKS } from 'config/constants';
 import { trackEvent } from 'utils/analytics';
 

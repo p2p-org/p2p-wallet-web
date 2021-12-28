@@ -127,7 +127,7 @@ export const TokenSettingsWidget: FunctionComponent<Props> = ({
   const isHidden = useTokenAccountIsHidden(publicKey);
 
   const handleCloseTokenAccountClick = () => {
-    openModal(ModalType.SHOW_MODAL_CLOSE_TOKEN_ACCOUNT, { publicKey, tokenName, history });
+    void openModal(ModalType.SHOW_MODAL_CLOSE_TOKEN_ACCOUNT, { publicKey, tokenName, history });
   };
 
   const handleHideTokenClick = (pubKey: PublicKey) => () => {

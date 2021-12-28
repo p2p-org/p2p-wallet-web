@@ -1,10 +1,9 @@
 import type { FC } from 'react';
 import React, { memo, useEffect, useRef, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 
 import { styled } from '@linaria/react';
 
-import { setFeatureFlagsAction, STORAGE_KEY_FEATURES_FLAGS } from 'store/slices/GlobalSlice';
+import { useFeatureFlags } from 'app/contexts';
 
 import { Card } from '../Card';
 
@@ -43,10 +42,9 @@ const Input = styled.input`
 `;
 
 export const FeaturesToggle: FC = memo(() => {
-  const dispatch = useDispatch();
   const cardRef = useRef<HTMLDivElement>(null);
+  const { featureFlagsEnabled, setFeatureFlagsEnabled } = useFeatureFlags();
   const [isShow, setShow] = useState(false);
-  const featureFlagsEnabled = useSelector((state) => state.global.featureFlagsEnabled);
 
   const handleOnKeyUp = (e: KeyboardEvent) => {
     // Ctrl + I
@@ -76,8 +74,7 @@ export const FeaturesToggle: FC = memo(() => {
   }
 
   const handleToggleFeatures = () => {
-    localStorage.setItem(STORAGE_KEY_FEATURES_FLAGS, String(!featureFlagsEnabled));
-    dispatch(setFeatureFlagsAction(!featureFlagsEnabled));
+    setFeatureFlagsEnabled(!featureFlagsEnabled);
   };
 
   return (
