@@ -13,9 +13,9 @@
     "test": "echo \"Error: run tests from root\" && exit 1"
   },
   "dependencies": {
-    "@saberhq/eslint-config": "^1.7.1",
+    "@p2p-wallet-web/eslint-config": "^1.0.0",
     "eslint-plugin-jsx-a11y": "^6.5.1",
-    "eslint-plugin-react": "^7.27.0",
+    "eslint-plugin-react": "^7.28.0",
     "eslint-plugin-react-hooks": "^4.3.0"
   },
   "peerDependencies": {

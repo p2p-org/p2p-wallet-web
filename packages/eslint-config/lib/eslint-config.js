@@ -21,29 +21,11 @@ module.exports = {
       { accessibility: "no-public" },
     ],
     "import/order": "off",
-    // "simple-import-sort/imports": "warn",
     "simple-import-sort/exports": "warn",
     "import/first": "warn",
     "import/newline-after-import": "warn",
     "import/no-duplicates": "warn",
-    // 'sort-imports': 'off',
-    'simple-import-sort/imports': [
-      'warn',
-      {
-        groups: [
-          ['^\\u0000'], // bare imports
-          ['^react'], // react
-          ['^[^\\.]'], // non-local imports
-          [
-            '^constants|^config|^lib|^utils|^types.ts|^store|^api|^app|^pages|^components|^styles|^assets',
-          ], // internal
-          ['^\\.'], // local imports
-        ],
-      },
-    ],
-
     "unused-imports/no-unused-imports": "warn",
-
     "@typescript-eslint/consistent-type-imports": "error",
     "@typescript-eslint/no-unused-vars": [
       "warn",
@@ -62,6 +44,21 @@ module.exports = {
         modifiers: ["private"],
         format: ["camelCase"],
         leadingUnderscore: "require",
+      },
+    ],
+
+    'simple-import-sort/imports': [
+      'warn',
+      {
+        groups: [
+          ['^\\u0000'], // bare imports
+          ['^react'], // react
+          ['^[^\\.]'], // non-local imports
+          [
+            '^constants|^config|^lib|^utils|^types.ts|^store|^api|^app|^pages|^components|^styles|^assets',
+          ], // internal
+          ['^\\.'], // local imports
+        ],
       },
     ],
 
