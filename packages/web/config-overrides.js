@@ -25,10 +25,6 @@ module.exports = override(
         staticDir: path.join(__dirname, 'build'),
       }),
     ),
-  addWebpackAlias({
-    ['react']: path.resolve(__dirname, './../../node_modules/react'),
-    ['react-dom']: path.resolve(__dirname, './../../node_modules/react-dom'),
-  }),
   addWebpackModuleRule({
     test: /\.tsx?$/,
     exclude: /node_modules/,

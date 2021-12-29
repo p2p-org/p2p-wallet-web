@@ -7,9 +7,7 @@ import { TokenAccountRow } from './TokenAccountRow';
 
 const Wrapper = styled.div``;
 
-interface Props {}
-
-export const TokenAccountsList: FC<Props> = (props) => {
+export const TokenAccountsList: FC = () => {
   const tokenAccounts = useUserTokenAccounts();
 
   if (!tokenAccounts) {
@@ -32,7 +30,7 @@ export const TokenAccountsList: FC<Props> = (props) => {
           return 0;
         })
         .map((tokenAccount) => (
-          <TokenAccountRow key={tokenAccount.key.toBase58()} tokenAccount={tokenAccount} />
+          <TokenAccountRow key={tokenAccount.key?.toBase58()} tokenAccount={tokenAccount} />
         ))}
     </Wrapper>
   );
