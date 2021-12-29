@@ -1,9 +1,9 @@
 import type { FC } from 'react';
 import React, { useEffect, useRef, useState } from 'react';
-import { batch } from 'react-redux';
+import { unstable_batchedUpdates as batch } from 'react-dom';
 
 import { styled } from '@linaria/react';
-import { useWallet, WalletType } from '@p2p-wallet-web/core';
+import { DefaultWalletType, useWallet } from '@p2p-wallet-web/core';
 import * as bip39 from 'bip39';
 import classNames from 'classnames';
 import throttle from 'lodash.throttle';
@@ -165,17 +165,17 @@ export const Main: FC<Props> = ({ setIsLoading, next }) => {
     }
   }, [mnemonic]);
 
-  const handleConnectByClick = (walletType: WalletType) => () => {
+  const handleConnectByClick = (walletType: DefaultWalletType) => () => {
     batch(async () => {
       setIsLoading(true);
       try {
         await activate(walletType);
 
-        if (walletType === WalletType.Sollet) {
+        if (walletType === DefaultWalletType.Sollet) {
           trackEventOnce('login_solletio_click');
-        } else if (walletType === WalletType.SolletExtension) {
+        } else if (walletType === DefaultWalletType.SolletExtension) {
           trackEventOnce('login_sollet_extension_click');
-        } else if (walletType === WalletType.Phantom) {
+        } else if (walletType === DefaultWalletType.Phantom) {
           trackEventOnce('login_phantom_click');
         }
       } catch (error) {
@@ -227,17 +227,17 @@ export const Main: FC<Props> = ({ setIsLoading, next }) => {
   return (
     <Wrapper>
       <ButtonsWrapper>
-        <SocialButton onClick={handleConnectByClick(WalletType.Sollet)}>
+        <SocialButton onClick={handleConnectByClick(DefaultWalletType.Sollet)}>
           <WalletIcon className="sollet" />
           Sollet.io
           <ArrowIcon />
         </SocialButton>
-        <SocialButton onClick={handleConnectByClick(WalletType.SolletExtension)}>
+        <SocialButton onClick={handleConnectByClick(DefaultWalletType.SolletExtension)}>
           <WalletIcon className="sollet" />
           Sollet Extension
           <ArrowIcon />
         </SocialButton>
-        <SocialButton onClick={handleConnectByClick(WalletType.Phantom)}>
+        <SocialButton onClick={handleConnectByClick(DefaultWalletType.Phantom)}>
           <WalletIcon className="phantom" />
           Phantom
           <ArrowIcon />

@@ -6,8 +6,8 @@ import type { AccountInfo } from "@solana/web3.js";
 import { PublicKey } from "@solana/web3.js";
 import DataLoader from "dataloader";
 
-import type { AccountFetchResult, SailError } from "../../index";
-import { SailRefetchSubscriptionsError } from "../../index";
+import type { AccountFetchResult, SailError } from "../../";
+import { SailRefetchSubscriptionsError } from "../../";
 import type { CacheUpdateEvent } from "./emitter";
 import { AccountsEmitter } from "./emitter";
 import { fetchKeysUsingLoader } from "./fetchKeysUsingLoader";

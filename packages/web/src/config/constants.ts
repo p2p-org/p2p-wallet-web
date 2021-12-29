@@ -1,14 +1,10 @@
 import type { Network } from '@saberhq/solana-contrib';
-import type { Commitment, HttpHeaders } from '@solana/web3.js';
+import type { HttpHeaders } from '@solana/web3.js';
 import { clusterApiUrl } from '@solana/web3.js';
 
 export const isDev = process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test';
 
 export const localMnemonic = isDev && process.env.REACT_APP_APP_LOCAL_WALLET_MNEMONIC;
-
-// the default commitment uesd by the Solana web3 connection when checking the blockchain state
-export const defaultCommitment: Commitment =
-  (process.env.REACT_APP_DEFAULT_COMMITMENT as Commitment) || 'confirmed';
 
 export type NetworkObj = {
   name: string;

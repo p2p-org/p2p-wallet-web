@@ -3,10 +3,10 @@ import React, { useState } from 'react';
 
 import { styled } from '@linaria/react';
 import {
+  DEFAULT_WALLET_PROVIDERS,
+  DefaultWalletType,
   useTryUnlockSeedAndMnemonic,
   useWallet,
-  WALLET_PROVIDERS,
-  WalletType,
 } from '@p2p-wallet-web/core';
 
 import type { ModalPropsType } from 'app/contexts/general/modals/types';
@@ -80,7 +80,7 @@ export const TransactionConfirmModal: FunctionComponent<
   };
 
   const isSecretKeyWallet =
-    walletProviderInfo?.name === WALLET_PROVIDERS[WalletType.SecretKey].name;
+    walletProviderInfo?.name === DEFAULT_WALLET_PROVIDERS[DefaultWalletType.SecretKey].name;
   const isDisabled = isSecretKeyWallet && (!password || hasError);
 
   const renderDescription = () => {

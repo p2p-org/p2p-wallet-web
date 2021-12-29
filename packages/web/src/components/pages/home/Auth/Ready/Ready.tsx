@@ -1,13 +1,13 @@
 import type { FC } from 'react';
 import React, { useEffect, useState } from 'react';
-import { batch } from 'react-redux';
+import { unstable_batchedUpdates as batch } from 'react-dom';
 
 import { styled } from '@linaria/react';
 import {
+  DefaultWalletType,
   deriveSecretKeyFromSeed,
   useSeedAndMnemonic,
   useWallet,
-  WalletType,
 } from '@p2p-wallet-web/core';
 
 import LogoImg from 'assets/images/big-logo.png';
@@ -124,7 +124,7 @@ export const Ready: FC<Props> = ({ setIsLoading, data }) => {
       setIsLoading(true);
       try {
         const secretKey = Array.from(deriveSecretKeyFromSeed(data.seed, 0, data.derivationPath));
-        activate(WalletType.SecretKey, { secretKey });
+        activate(DefaultWalletType.SecretKey, { secretKey });
         setEncryptedSeedAndMnemonic(
           {
             seed: data.seed,

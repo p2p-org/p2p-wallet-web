@@ -1,6 +1,6 @@
 import type { FC } from 'react';
 import React, { useEffect, useState } from 'react';
-import { batch } from 'react-redux';
+import { unstable_batchedUpdates as batch } from 'react-dom';
 
 import { styled } from '@linaria/react';
 import { deriveSecretKeyFromSeed, useWallet } from '@p2p-wallet-web/core';

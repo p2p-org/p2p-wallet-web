@@ -35,8 +35,7 @@
     "lint": "eslint . --cache",
     "lint:ci": "eslint . --max-warnings=0",
     "lint:fix": "eslint . --fix",
-    "docs:generate": "typedoc --excludePrivate --includeVersion --out site/ts/ src/index.ts",
-    "prepare": "husky install"
+    "docs:generate": "typedoc --excludePrivate --includeVersion --out site/ts/ src/index.ts"
   },
   "devDependencies": {
     "@p2p-wallet-web/eslint-config-react": "^1.0.0",
@@ -46,7 +45,7 @@
     "@saberhq/anchor-contrib": "^1.11.3",
     "@saberhq/solana-contrib": "^1.10.16",
     "@saberhq/token-utils": "^1.10.16",
-    "@saberhq/use-solana": "^1.10.16",
+    "@saberhq/use-solana": "^1.12.7",
     "@solana/web3.js": "^1.31.0",
     "@types/lodash.chunk": "^4.2.6",
     "@types/lodash.mapvalues": "^4.6.6",
@@ -59,7 +58,6 @@
     "eslint": "^8.4.1",
     "eslint-import-resolver-node": "^0.3.6",
     "eslint-plugin-import": "^2.25.3",
-    "husky": "^7.0.4",
     "jsbi": "^4.1.0",
     "lint-staged": "^12.1.2",
     "lodash.mapvalues": "^4.6.0",
@@ -91,10 +89,5 @@
     "jsbi": "^3 || ^4",
     "react": "^17.0.2",
     "react-dom": "^17.0.2"
-  },
-  "packageManager": "yarn@3.1.0",
-  "lint-staged": {
-    "*.{ts,tsx}": "eslint --cache --fix",
-    "*.{json,js,jsx,html,css,md,yml,yaml}": "prettier --write"
   }
 }
