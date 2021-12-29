@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { ZERO } from '@orca-so/sdk';
-import { useSolana } from '@p2p-wallet-web/core';
+import { useSolana, useStorage } from '@p2p-wallet-web/core';
 import { u64 } from '@solana/spl-token';
 import { createContainer } from 'unstated-next';
 
@@ -12,7 +12,6 @@ import Trade from 'app/contexts/solana/swap/models/Trade';
 import { getMaxAge } from 'app/contexts/solana/swap/utils/AsyncCache';
 import { getTradeId } from 'app/contexts/solana/swap/utils/pools';
 import { minSolBalanceForSwap } from 'app/contexts/solana/swap/utils/tokenAccounts';
-import { Keys, useLocalStorage } from 'utils/hooks/useLocalStorage';
 import { swapNotification } from 'utils/transactionNotifications';
 
 export const defaultSelectedTokens = {
@@ -20,6 +19,7 @@ export const defaultSelectedTokens = {
   output: 'SOL',
 };
 
+const STORAGE_SLIPPAGE_TOLERANCE_KEY = 'slippage_tolerance';
 const DEFAULT_SLIPPAGE_TOLERANCE_STATE = { numerator: '10', denominator: '1000' };
 
 export enum ButtonState {
@@ -103,10 +103,10 @@ const useSwapInternal = (props: UseSwapArgs = {}): UseSwap => {
     ? 'SOL'
     : 'USDC';
   const [outputTokenName, _setOutputTokenName] = useState(_outputTokenName);
-  const [slippageToleranceState, setSlippageToleranceState] = useLocalStorage<{
+  const [slippageToleranceState, setSlippageToleranceState] = useStorage<{
     numerator: string;
     denominator: string;
-  }>(Keys.SLIPPAGE_TOLERANCE, DEFAULT_SLIPPAGE_TOLERANCE_STATE);
+  }>(STORAGE_SLIPPAGE_TOLERANCE_KEY, DEFAULT_SLIPPAGE_TOLERANCE_STATE);
   const [buttonState, setButtonState] = useState(ButtonState.ConnectWallet);
   // const [isFairnessIndicatorCollapsed, setIsFairnessIndicatorCollapsed] = useState(true);
 
