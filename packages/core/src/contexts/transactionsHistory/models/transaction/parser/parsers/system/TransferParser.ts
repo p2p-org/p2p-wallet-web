@@ -45,7 +45,7 @@ export class TransferParser implements Parser {
     const source = transferInstruction?.parsed?.info.source;
     const destination = transferInstruction?.parsed?.info.destination;
 
-    // get lamportsx
+    // get lamports
     const amount =
       transferInstruction?.parsed?.info.lamports ??
       transferInstruction?.parsed?.info.amount ??
