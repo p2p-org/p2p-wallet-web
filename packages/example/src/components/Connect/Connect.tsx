@@ -1,7 +1,7 @@
 import type { FC } from 'react';
 import React from 'react';
 
-import { useWallet, WalletType } from '@p2p-wallet-web/core';
+import { useWallet, DefaultWalletType } from '@p2p-wallet-web/core';
 
 export const Connect: FC = () => {
   const { publicKey, activate } = useWallet();
@@ -10,5 +10,5 @@ export const Connect: FC = () => {
     return <>{publicKey.toBase58()}</>;
   }
 
-  return <button onClick={() => activate(WalletType.Phantom)}>Connect</button>;
+  return <button onClick={() => activate(DefaultWalletType.Phantom)}>Connect</button>;
 };
