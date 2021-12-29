@@ -1,5 +1,5 @@
 import type { FunctionComponent } from 'react';
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { useLocation } from 'react-router';
 
 import { styled } from '@linaria/react';

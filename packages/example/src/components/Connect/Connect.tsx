@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-import React from 'react';
 
 import { useWallet, DefaultWalletType } from '@p2p-wallet-web/core';
 

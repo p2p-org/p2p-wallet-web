@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-import React from 'react';
 
 import type { TokenAccount, Transaction, TransferTransaction } from '@p2p-wallet-web/core';
 import { useTokenAccountAmount } from '@p2p-wallet-web/core';

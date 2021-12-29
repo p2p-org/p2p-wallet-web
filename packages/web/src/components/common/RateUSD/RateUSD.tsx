@@ -1,5 +1,4 @@
 import type { FunctionComponent } from 'react';
-import React from 'react';
 import Skeleton from 'react-loading-skeleton';
 
 import { styled } from '@linaria/react';

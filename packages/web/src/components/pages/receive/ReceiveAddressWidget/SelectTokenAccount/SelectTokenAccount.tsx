@@ -1,5 +1,5 @@
 import type { FunctionComponent } from 'react';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { styled } from '@linaria/react';
 import classNames from 'classnames';

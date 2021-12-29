@@ -1,4 +1,5 @@
-import React, { Suspense, useCallback, useContext, useMemo, useState } from 'react';
+import { Suspense, useCallback, useContext, useMemo, useState } from 'react';
+import * as React from 'react';
 
 import { styled } from '@linaria/react';
 import type { LoadableComponent } from '@loadable/component';

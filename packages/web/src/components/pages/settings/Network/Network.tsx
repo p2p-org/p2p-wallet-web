@@ -1,5 +1,4 @@
 import type { FunctionComponent } from 'react';
-import React from 'react';
 
 import { styled } from '@linaria/react';
 import { useWallet } from '@p2p-wallet-web/core';

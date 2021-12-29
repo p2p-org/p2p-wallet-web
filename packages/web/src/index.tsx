@@ -3,7 +3,8 @@ import 'sanitize.css';
 import 'styles/css/nprogress.css';
 import 'react-loading-skeleton/dist/skeleton.css';
 
-import React, { StrictMode } from 'react';
+import { StrictMode } from 'react';
+import * as React from 'react';
 import ReactDOM from 'react-dom';
 import { IntercomProvider } from 'react-use-intercom';
 

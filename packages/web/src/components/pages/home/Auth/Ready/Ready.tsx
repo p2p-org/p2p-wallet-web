@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { unstable_batchedUpdates as batch } from 'react-dom';
 
 import { styled } from '@linaria/react';

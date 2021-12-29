@@ -1,5 +1,5 @@
 import type { FunctionComponent } from 'react';
-import React, { useEffect } from 'react';
+import { memo, useEffect } from 'react';
 import { useLocation } from 'react-router';
 import { useParams } from 'react-router-dom';
 
@@ -48,4 +48,4 @@ export const WalletOrigin: FunctionComponent = () => {
   );
 };
 
-export const Wallet = React.memo(WalletOrigin);
+export const Wallet = memo(WalletOrigin);

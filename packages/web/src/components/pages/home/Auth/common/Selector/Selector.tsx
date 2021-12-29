@@ -1,5 +1,5 @@
 import type { FC, ReactNode } from 'react';
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { styled } from '@linaria/react';
 import type { DERIVATION_PATH, ValueOf } from '@p2p-wallet-web/core';

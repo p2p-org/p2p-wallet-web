@@ -1,5 +1,4 @@
 import type { FunctionComponent, HTMLAttributes } from 'react';
-import React from 'react';
 
 import { styled } from '@linaria/react';
 

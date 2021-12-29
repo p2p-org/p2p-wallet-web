@@ -1,5 +1,6 @@
 import type { FunctionComponent } from 'react';
-import React, { memo, useMemo, useState } from 'react';
+import { memo, useMemo, useState } from 'react';
+import * as React from 'react';
 import isEqual from 'react-fast-compare';
 
 import { styled } from '@linaria/react';

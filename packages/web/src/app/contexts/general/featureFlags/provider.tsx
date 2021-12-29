@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import React, { useContext, useMemo } from 'react';
+import { createContext, useContext, useMemo } from 'react';
 
 import type { SetStorageValue } from '@p2p-wallet-web/core';
 import { useStorage } from '@p2p-wallet-web/core';
@@ -10,7 +10,7 @@ import { featureFlags as defaultFeatureFlags } from 'config/featureFlags';
 
 const STORAGE_KEY_FEATURES_FLAGS = 'all_features';
 
-const FeatureFlagsContext = React.createContext<{
+const FeatureFlagsContext = createContext<{
   featureFlagsEnabled: boolean;
   setFeatureFlagsEnabled: SetStorageValue<boolean>;
 }>({

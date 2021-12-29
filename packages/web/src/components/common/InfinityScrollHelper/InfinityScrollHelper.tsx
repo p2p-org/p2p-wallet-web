@@ -1,4 +1,4 @@
-import React, { Component, createRef } from 'react';
+import { Component, createRef } from 'react';
 
 import { styled } from '@linaria/react';
 import throttle from 'lodash.throttle';

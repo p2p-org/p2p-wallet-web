@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import React, { memo, useEffect, useRef, useState } from 'react';
+import { memo, useEffect, useRef, useState } from 'react';
 
 import { styled } from '@linaria/react';
 

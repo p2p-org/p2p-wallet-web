@@ -1,5 +1,6 @@
 import type { FC } from 'react';
-import React, { createContext, useCallback, useEffect } from 'react';
+import { createContext, useCallback, useEffect } from 'react';
+import * as React from 'react';
 
 import { NOOP, NOOP_ASYNC } from '../../internal/utils/noop';
 import { DEFAULT_SEED_AND_MNEMONIC } from './constants';

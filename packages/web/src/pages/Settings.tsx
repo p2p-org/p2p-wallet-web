@@ -1,5 +1,5 @@
 import type { FunctionComponent } from 'react';
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { useHistory } from 'react-router';
 import { NavLink, useLocation } from 'react-router-dom';
 

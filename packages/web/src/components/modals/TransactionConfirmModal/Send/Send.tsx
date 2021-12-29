@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-import React from 'react';
 
 import type { TokenAccount } from '@p2p-wallet-web/core';
 import type { TokenAmount } from '@saberhq/token-utils';

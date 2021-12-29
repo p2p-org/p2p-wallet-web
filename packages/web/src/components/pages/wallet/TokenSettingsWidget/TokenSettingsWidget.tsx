@@ -1,5 +1,4 @@
 import type { FunctionComponent } from 'react';
-import React from 'react';
 import { useHistory } from 'react-router';
 
 import { styled } from '@linaria/react';

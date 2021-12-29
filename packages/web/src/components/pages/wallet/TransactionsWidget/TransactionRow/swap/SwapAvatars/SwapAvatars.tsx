@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-import React from 'react';
 
 import { styled } from '@linaria/react';
 import type { SwapTransaction, Transaction } from '@p2p-wallet-web/core';

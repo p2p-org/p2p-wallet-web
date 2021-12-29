@@ -1,5 +1,5 @@
 import type { FunctionComponent } from 'react';
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 
 import { styled } from '@linaria/react';
 import { useTransactionSignatures } from '@p2p-wallet-web/core';

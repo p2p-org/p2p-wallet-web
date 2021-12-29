@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 import { useAsync } from 'react-async-hook';
 
 import { styled } from '@linaria/react';

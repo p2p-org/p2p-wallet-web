@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-import React from 'react';
 import { QueryClient, QueryClientProvider } from 'react-query';
 
 import type { ConnectedWallet } from '@p2p-wallet-web/core';

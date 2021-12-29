@@ -1,5 +1,6 @@
 import type { FC } from 'react';
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import * as React from 'react';
 
 import { styled } from '@linaria/react';
 import classNames from 'classnames';

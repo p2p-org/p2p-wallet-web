@@ -1,5 +1,6 @@
 import type { FC } from 'react';
-import React, { useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
+import * as React from 'react';
 
 import { styled } from '@linaria/react';
 import { Bitcoin } from '@renproject/chains-bitcoin';

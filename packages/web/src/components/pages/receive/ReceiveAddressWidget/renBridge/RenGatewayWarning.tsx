@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import React, { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import { styled } from '@linaria/react';
 import { useSolana } from '@p2p-wallet-web/core';

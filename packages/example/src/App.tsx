@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-import React from 'react';
 
 import { SolanaProvider, TokenAccountsProvider } from '@p2p-wallet-web/core';
 import { SailProvider } from '@p2p-wallet-web/sail';

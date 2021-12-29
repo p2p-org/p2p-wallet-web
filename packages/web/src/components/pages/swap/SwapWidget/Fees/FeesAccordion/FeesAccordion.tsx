@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-import React from 'react';
 import type { UseAsyncReturn } from 'react-async-hook';
 
 import { LoaderBlock } from 'components/common/LoaderBlock';

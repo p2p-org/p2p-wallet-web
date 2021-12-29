@@ -1,5 +1,5 @@
 import type { FunctionComponent } from 'react';
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { useLocation, useParams } from 'react-router-dom';
 
 import { SwapProvider } from 'app/contexts/solana/swap';

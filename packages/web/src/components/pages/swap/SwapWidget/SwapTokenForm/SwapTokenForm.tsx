@@ -1,5 +1,6 @@
 import type { FC } from 'react';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import * as React from 'react';
 
 import { styled } from '@linaria/react';
 import { u64 } from '@solana/spl-token';

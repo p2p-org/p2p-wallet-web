@@ -1,5 +1,4 @@
 import type { FunctionComponent } from 'react';
-import React from 'react';
 import Skeleton from 'react-loading-skeleton';
 
 import type { CSSProperties } from '@linaria/core';

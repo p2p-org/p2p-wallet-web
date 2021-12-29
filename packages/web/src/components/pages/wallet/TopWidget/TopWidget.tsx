@@ -1,5 +1,5 @@
 import type { FunctionComponent } from 'react';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation } from 'react-router';
 import { Link } from 'react-router-dom';
 
@@ -397,4 +397,4 @@ const TopWidgetOrigin: FunctionComponent<Props> = ({ publicKey }) => {
   );
 };
 
-export const TopWidget = React.memo(TopWidgetOrigin);
+export const TopWidget = memo(TopWidgetOrigin);

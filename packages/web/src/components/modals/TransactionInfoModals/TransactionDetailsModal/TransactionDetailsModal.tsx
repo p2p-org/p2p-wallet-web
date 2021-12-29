@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import Skeleton from 'react-loading-skeleton';
 
 import { styled } from '@linaria/react';

@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { NotifyToast } from 'components/common/NotifyToast';
 import { ToastManager } from 'components/common/ToastManager';
 

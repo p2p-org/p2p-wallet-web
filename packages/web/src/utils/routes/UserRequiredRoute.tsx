@@ -1,5 +1,4 @@
 import type { FunctionComponent } from 'react';
-import React from 'react';
 import type { RouteProps } from 'react-router';
 import { Redirect, Route, useLocation } from 'react-router-dom';
 

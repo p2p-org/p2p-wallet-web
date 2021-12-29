@@ -1,5 +1,5 @@
 import type { FunctionComponent } from 'react';
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 
 import { styled } from '@linaria/react';
 import type { ConfirmedSignatureInfo } from '@solana/web3.js';

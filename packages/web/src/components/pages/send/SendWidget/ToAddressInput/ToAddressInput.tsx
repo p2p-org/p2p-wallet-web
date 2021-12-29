@@ -1,5 +1,6 @@
 import type { FunctionComponent } from 'react';
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import * as React from 'react';
 import { useDebounce } from 'react-use';
 
 import { styled } from '@linaria/react';

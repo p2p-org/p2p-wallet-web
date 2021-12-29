@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-import React from 'react';
 
 import { ModalType, useModals } from 'app/contexts/general/modals';
 import { ButtonState, useSwap } from 'app/contexts/solana/swap';

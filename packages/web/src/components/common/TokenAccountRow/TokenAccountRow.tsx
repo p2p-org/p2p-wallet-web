@@ -1,5 +1,5 @@
 import type { FunctionComponent } from 'react';
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 import Skeleton from 'react-loading-skeleton';
 
 import { styled } from '@linaria/react';

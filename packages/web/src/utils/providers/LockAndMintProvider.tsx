@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
 import { useConnectedWallet, useSolana } from '@p2p-wallet-web/core';
 import { Bitcoin } from '@renproject/chains-bitcoin';

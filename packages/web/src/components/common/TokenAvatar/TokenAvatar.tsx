@@ -1,5 +1,5 @@
 import type { FunctionComponent, HTMLAttributes } from 'react';
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 
 import { styled } from '@linaria/react';
 import { useAllTokens } from '@p2p-wallet-web/core';

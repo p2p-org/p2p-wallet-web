@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-import React from 'react';
 
 import { styled } from '@linaria/react';
 import { useAllTokens } from '@p2p-wallet-web/core';

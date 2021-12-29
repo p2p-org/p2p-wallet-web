@@ -1,5 +1,5 @@
 import type { FunctionComponent } from 'react';
-import React, { useEffect, useState } from 'react';
+import { memo, useEffect, useState } from 'react';
 
 import { styled } from '@linaria/react';
 import { useConnectionContext, useTokenAccount, useWallet } from '@p2p-wallet-web/core';
@@ -400,4 +400,4 @@ export const QRAddressWidgetOrigin: FunctionComponent<Props> = ({ publicKey, cla
   );
 };
 
-export const QRAddressWidget = React.memo(QRAddressWidgetOrigin);
+export const QRAddressWidget = memo(QRAddressWidgetOrigin);

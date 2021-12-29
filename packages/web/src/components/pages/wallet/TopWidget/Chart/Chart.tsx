@@ -1,5 +1,5 @@
 import type { FunctionComponent } from 'react';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import ReactHighcharts from 'react-highcharts';
 
 import { styled } from '@linaria/react';

@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-import React from 'react';
 
 import isPropValid from '@emotion/is-prop-valid';
 import type { CSSProperties } from '@linaria/core';

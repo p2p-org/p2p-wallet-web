@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 import { styled } from '@linaria/react';
 import { mnemonicToSeed } from '@p2p-wallet-web/core';

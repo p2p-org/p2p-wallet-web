@@ -1,5 +1,4 @@
 import type { FunctionComponent } from 'react';
-import React from 'react';
 
 import { css } from '@linaria/core';
 import { styled } from '@linaria/react';

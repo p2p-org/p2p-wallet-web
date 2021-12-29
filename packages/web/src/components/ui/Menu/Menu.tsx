@@ -1,5 +1,5 @@
 import type { FunctionComponent } from 'react';
-import React, { useEffect, useRef, useState } from 'react';
+import { Children, isValidElement, cloneElement, useEffect, useRef, useState } from 'react';
 
 import { styled } from '@linaria/react';
 import classNames from 'classnames';
@@ -79,9 +79,9 @@ export const Menu: FunctionComponent<Props> = ({ children, vertical }) => {
     setIsOpen(!isOpen);
   };
 
-  const items = React.Children.map(children, (child) => {
-    if (React.isValidElement(child)) {
-      return React.cloneElement(child, { close: handleMenuClick });
+  const items = Children.map(children, (child) => {
+    if (isValidElement(child)) {
+      return cloneElement(child, { close: handleMenuClick });
     }
     return child;
   });
