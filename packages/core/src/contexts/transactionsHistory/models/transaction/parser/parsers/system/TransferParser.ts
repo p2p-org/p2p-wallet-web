@@ -1,4 +1,4 @@
-import { FEE_PAYER_PUBKEYS, SYSTEM_PROGRAM_ID } from '../../../../../../../constants/publicKeys';
+import { FEE_PAYER_PUBKEYS } from '../../../../../../../constants/publicKeys';
 import type { ParsedConfirmedTransaction, ParsedInstruction } from '../../../../../types';
 import type { AbstractTransaction, Parser, TransactionDetails } from '../types';
 
@@ -28,15 +28,15 @@ export class TransferParser implements Parser {
   /**
    Check if transaction is transfer transaction
    */
-  public static can(instructions: ParsedInstruction[]) {
+  static can(instructions: ParsedInstruction[]) {
     return (
       (instructions.length === 1 || instructions.length === 4 || instructions.length === 2) &&
-      (instructions.at(-1)?.parsed?.type == 'transfer' ||
-        instructions.at(-1)?.parsed?.type == 'transferChecked')
+      (instructions.at(-1)?.parsed?.type === 'transfer' ||
+        instructions.at(-1)?.parsed?.type === 'transferChecked')
     );
   }
 
-  public static parse(transactionInfo: ParsedConfirmedTransaction): TransferTransaction {
+  static parse(transactionInfo: ParsedConfirmedTransaction): TransferTransaction {
     const instructions = transactionInfo.transaction.message.instructions;
     const accountKeys = transactionInfo.transaction.message.accountKeys;
 
@@ -45,23 +45,16 @@ export class TransferParser implements Parser {
     const source = transferInstruction?.parsed?.info.source;
     const destination = transferInstruction?.parsed?.info.destination;
 
-    // get lamports
+    // get lamportsx
     const amount =
       transferInstruction?.parsed?.info.lamports ??
       transferInstruction?.parsed?.info.amount ??
       transferInstruction?.parsed?.info.tokenAmount?.amount ??
       '0';
-    let result: TransferTransaction;
 
     // SOL to SOL
-    if (transferInstruction?.programId.equals(SYSTEM_PROGRAM_ID)) {
-      result = new TransferTransaction(source, destination, amount);
-    }
     // SPL to SPL token
-    else {
-      // TODO: check we need authority or not
-      result = new TransferTransaction(source, destination, amount);
-    }
+    const result = new TransferTransaction(source, destination, amount);
 
     // define if transaction was paid by p2p.org
     const payer = accountKeys[0]?.pubkey?.toBase58();

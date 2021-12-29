@@ -217,8 +217,8 @@ export const TransactionStatusModal: FunctionComponent<
     close(signature);
   };
 
-  const isProcessing = (!signature || !transaction?.key) && !transactionError;
-  const isSuccess = signature && transaction?.key && !transactionError;
+  const isProcessing = (!signature || !transaction?.data) && !transactionError;
+  const isSuccess = signature && transaction?.data && !transactionError;
 
   const renderTitle = () => {
     if (isSuccess) {

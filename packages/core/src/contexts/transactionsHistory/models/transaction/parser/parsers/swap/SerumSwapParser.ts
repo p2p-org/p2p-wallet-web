@@ -22,7 +22,7 @@ export class SerumSwapParser implements Parser {
    Check if transaction is a serum swap transaction
    - Parameter instructions: instructions in transaction
    */
-  public static can(instructions: ParsedInstruction[]) {
+  static can(instructions: ParsedInstruction[]) {
     return this._getSerumSwapInstructionIndex(instructions) !== -1;
   }
 
@@ -30,7 +30,7 @@ export class SerumSwapParser implements Parser {
     return USDC_MINT.toBase58() === mint || USDT_MINT.toBase58() === mint;
   }
 
-  public static parse(transactionInfo: ParsedConfirmedTransaction): SwapTransaction | null {
+  static parse(transactionInfo: ParsedConfirmedTransaction): SwapTransaction | null {
     const instructions = transactionInfo.transaction.message.instructions;
     const preTokenBalances = transactionInfo.meta?.preTokenBalances;
 

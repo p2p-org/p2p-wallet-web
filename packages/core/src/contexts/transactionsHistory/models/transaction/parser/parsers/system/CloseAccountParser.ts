@@ -22,16 +22,16 @@ export class CloseAccountParser implements Parser {
   /**
    Check if transaction is close account transaction
    */
-  public static can(instructions: ParsedInstruction[]) {
+  static can(instructions: ParsedInstruction[]) {
     switch (instructions.length) {
       case 1:
-        return instructions[0]?.parsed?.type == 'closeAccount';
+        return instructions[0]?.parsed?.type === 'closeAccount';
       default:
         return false;
     }
   }
 
-  public static parse(transactionInfo: ParsedConfirmedTransaction): CloseAccountTransaction {
+  static parse(transactionInfo: ParsedConfirmedTransaction): CloseAccountTransaction {
     const instructions = transactionInfo.transaction.message.instructions;
     const closedAccount = instructions[0]?.parsed?.info.account;
     const preBalances = transactionInfo.meta?.preBalances;
