@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 
 import { TOKEN_ACCOUNT_PARSER, useAccountsData } from '@p2p-wallet-web/sail';
-import { NATIVE_MINT, TokenAmount } from '@saberhq/token-utils';
+import { RAW_SOL_MINT, TokenAmount } from '@saberhq/token-utils';
 import { TOKEN_PROGRAM_ID } from '@solana/spl-token';
 import type { PublicKey } from '@solana/web3.js';
 import { zip } from 'ramda';
@@ -21,8 +21,9 @@ export const useTokenAccounts = (
         return datum;
       }
 
+      // Native SOL
       if (datum.accountInfo.owner.equals(SYSTEM_PROGRAM_ID)) {
-        return NATIVE_MINT;
+        return RAW_SOL_MINT;
       }
 
       if (datum.accountInfo.owner.equals(TOKEN_PROGRAM_ID)) {
@@ -55,7 +56,7 @@ export const useTokenAccounts = (
         };
       }
 
-      // TODO: check is it correct
+      // Native SOL
       if (datum?.accountInfo.owner.equals(SYSTEM_PROGRAM_ID)) {
         return {
           key: tokenAccountKey,

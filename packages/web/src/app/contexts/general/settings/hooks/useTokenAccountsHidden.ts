@@ -2,7 +2,6 @@ import { useMemo } from 'react';
 
 import type { TokenAccount } from '@p2p-wallet-web/core';
 import { useUserTokenAccounts } from '@p2p-wallet-web/core';
-import { NATIVE_MINT } from '@solana/spl-token';
 
 import { useSettings } from 'app/contexts/general/settings';
 
@@ -18,7 +17,9 @@ export const useTokenAccountsHidden = (): [TokenAccount[], TokenAccount[]] => {
     const onlyHiddenTokenAccounts: TokenAccount[] = [];
 
     for (const tokenAccount of userTokenAccounts) {
-      const isHidden = tokenAccounts.hiddenTokenAccounts.includes(tokenAccount.key.toBase58());
+      const isHidden = tokenAccount.key
+        ? tokenAccounts.hiddenTokenAccounts.includes(tokenAccount.key.toBase58())
+        : false;
 
       if (isHidden) {
         onlyHiddenTokenAccounts.push(tokenAccount);
@@ -27,10 +28,10 @@ export const useTokenAccountsHidden = (): [TokenAccount[], TokenAccount[]] => {
       }
 
       const isZero = !tokenAccount.balance || tokenAccount.balance.equalTo(0);
-      const notForceShow = !tokenAccounts.forceShowTokenAccounts.includes(
-        tokenAccount.key.toBase58(),
-      );
-      const notSOL = !tokenAccount.balance?.token.mintAccount.equals(NATIVE_MINT);
+      const notForceShow = tokenAccount.key
+        ? !tokenAccounts.forceShowTokenAccounts.includes(tokenAccount.key.toBase58())
+        : false;
+      const notSOL = !tokenAccount.balance?.token.isRawSOL;
 
       if (isZeroBalancesHidden && isZero && notForceShow && notSOL) {
         onlyHiddenTokenAccounts.push(tokenAccount);

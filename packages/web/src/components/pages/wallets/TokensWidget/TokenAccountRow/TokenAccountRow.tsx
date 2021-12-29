@@ -4,7 +4,6 @@ import { Link } from 'react-router-dom';
 
 import { styled } from '@linaria/react';
 import type { TokenAccount } from '@p2p-wallet-web/core';
-import { NATIVE_MINT } from '@saberhq/token-utils';
 import classNames from 'classnames';
 import { rgba } from 'polished';
 
@@ -144,44 +143,36 @@ export const TokenAccountRow: FunctionComponent<Props> = ({
   const { toggleHideTokenAccount } = useSettings();
 
   const handleMenuItemClick = () => {
-    const tokenAddress = tokenAccount.key.toBase58();
-    const isZero = !tokenAccount.balance || tokenAccount.balance.equalTo(0);
-    toggleHideTokenAccount(tokenAddress, isZero);
-  };
-
-  const isSOL = tokenAccount.mint && tokenAccount.mint.equals(NATIVE_MINT);
-
-  // TODO: refactor
-  const renderTokenName = () => {
-    if (isSOL) {
-      return 'Solana';
+    const tokenAddress = tokenAccount.key?.toBase58();
+    if (tokenAddress) {
+      const isZero = !tokenAccount.balance || tokenAccount.balance.equalTo(0);
+      toggleHideTokenAccount(tokenAddress, isZero);
     }
-
-    return tokenAccount?.balance?.token.name;
   };
 
   const { loading } = tokenAccount;
 
   return (
     <Wrapper className={classNames({ isHidden, isSelected })}>
-      <WrapperLink to={`/wallet/${tokenAccount.key.toBase58()}`}>
+      <WrapperLink to={`/wallet/${tokenAccount.key?.toBase58()}`}>
         {loading ? (
           <Skeleton height={48} width={48} borderRadius={12} />
         ) : (
           <TokenAvatarStyled
             symbol={tokenAccount?.balance?.token.symbol}
-            address={tokenAccount?.mint?.toBase58()}
+            address={tokenAccount?.balance?.token.address}
             size={48}
           />
         )}
         <Content>
           <Top>
-            <TokenSymbol title={tokenAccount.mint?.toBase58()}>
+            <TokenSymbol title={tokenAccount.balance?.token.address}>
               {loading ? (
                 <Skeleton width={50} height={18} />
               ) : (
                 tokenAccount.balance?.token.symbol ||
-                (tokenAccount.mint && shortAddress(tokenAccount.mint?.toBase58()))
+                (tokenAccount.balance?.token.address &&
+                  shortAddress(tokenAccount.balance?.token.address))
               )}
             </TokenSymbol>
             {loading ? (
@@ -193,8 +184,8 @@ export const TokenAccountRow: FunctionComponent<Props> = ({
             )}
           </Top>
           <Bottom>
-            <div title={tokenAccount.mint?.toBase58()}>
-              {loading ? <Skeleton width={100} height={14} /> : renderTokenName()}
+            <div title={tokenAccount.balance?.token.address}>
+              {loading ? <Skeleton width={100} height={14} /> : tokenAccount.balance?.token.name}
             </div>
             <div>
               {loading ? (
@@ -206,7 +197,7 @@ export const TokenAccountRow: FunctionComponent<Props> = ({
           </Bottom>
         </Content>
       </WrapperLink>
-      {!isSOL ? (
+      {!tokenAccount.balance?.token.isRawSOL ? (
         <MenuWrapper>
           <Menu vertical>
             <MenuItem onItemClick={handleMenuItemClick} icon={isHidden ? 'eye' : 'eye-hide'}>

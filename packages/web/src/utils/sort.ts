@@ -1,14 +1,14 @@
 import type { TokenAccount } from '@p2p-wallet-web/core';
-import { NATIVE_MINT } from '@solana/spl-token';
+import { RAW_SOL_MINT } from '@saberhq/token-utils';
 
 import type { Markets } from 'app/contexts';
 
 export const sortByRules = (rates: Markets) => (a: TokenAccount, b: TokenAccount) => {
   if (
-    a.balance?.token.mintAccount?.equals(NATIVE_MINT) ||
-    b.balance?.token.mintAccount?.equals(NATIVE_MINT)
+    a.balance?.token.mintAccount?.equals(RAW_SOL_MINT) ||
+    b.balance?.token.mintAccount?.equals(RAW_SOL_MINT)
   ) {
-    return a.balance?.token.mintAccount?.equals(NATIVE_MINT) ? -1 : 1;
+    return a.balance?.token.mintAccount?.equals(RAW_SOL_MINT) ? -1 : 1;
   }
 
   if (!a.balance || !b.balance) {

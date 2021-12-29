@@ -647,7 +647,9 @@ export const SwapTokenForm: FC<Props> = ({
               className={classNames({ isOpen })}
             >
               <TokenName title={tokenInfo?.mint.toString()}>
-                {tokenName || shortAddress(tokenInfo?.mint.toString()) || <EmptyName>—</EmptyName>}
+                {tokenName || (tokenInfo?.mint && shortAddress(tokenInfo.mint.toString())) || (
+                  <EmptyName>—</EmptyName>
+                )}
               </TokenName>
               <ChevronWrapper>
                 <ChevronIcon name="arrow-triangle" />
