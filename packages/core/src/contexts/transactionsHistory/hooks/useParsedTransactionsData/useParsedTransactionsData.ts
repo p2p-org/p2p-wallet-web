@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 
-import { useSail, useTransactionsData } from '@p2p-wallet-web/sail';
+import { SailTransactionParseError, useSail, useTransactionsData } from '@p2p-wallet-web/sail';
 import { zip } from 'ramda';
 
 import type { ParsedTransactionDatum } from '../../models';
@@ -53,7 +53,7 @@ export const useParsedTransactionsData = (
               raw: datum.transactionInfo,
             };
           } catch (e) {
-            // onError(new SailAccountParseError(e, datum));
+            onError(new SailTransactionParseError(e, datum));
             nextParsed[key] = null;
             return;
           }
