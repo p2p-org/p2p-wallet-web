@@ -28,7 +28,7 @@ export const ProtectedRoute: FunctionComponent<
 };
 
 // ProtectedRoute is used to create specific types.ts of protected routes like this...
-export const AuthRequiredRoute: FunctionComponent<RouteProps> = ({ children, ...props }) => {
+export const AuthRequiredRoute: FunctionComponent<RouteProps> = ({ ...props }) => {
   const { connected } = useWallet();
   return <ProtectedRoute allow={connected} redirect="/login" {...props} />;
 };

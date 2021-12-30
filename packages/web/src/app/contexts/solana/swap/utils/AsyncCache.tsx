@@ -60,7 +60,7 @@ export function getMaxAge(isRefreshRateIncreased: boolean) {
 }
 
 export default class AsyncCache<T> {
-  private cache: Map<string, CacheValue<T>> = new Map();
+  private _cache: Map<string, CacheValue<T>> = new Map();
 
   useAsync(
     cacheKey: string,
@@ -144,15 +144,15 @@ export default class AsyncCache<T> {
   }
 
   getLastUpdate(cacheKey: string): number | undefined {
-    return this.cache.get(cacheKey)?.lastUpdate;
+    return this._cache.get(cacheKey)?.lastUpdate;
   }
 
   getResult(cacheKey: string): AsyncResult<T> | undefined {
-    return this.cache.get(cacheKey)?.result;
+    return this._cache.get(cacheKey)?.result;
   }
 
   refreshCache(cacheKey: string): Promise<T> | undefined {
-    const cache = this.cache.get(cacheKey);
+    const cache = this._cache.get(cacheKey);
     if (!cache) {
       return undefined;
     }
@@ -193,7 +193,7 @@ export default class AsyncCache<T> {
   }
 
   _save(cacheKey: string, asyncFn: () => Promise<T>): CacheValue<T> {
-    let cache = this.cache.get(cacheKey);
+    let cache = this._cache.get(cacheKey);
 
     if (!cache) {
       cache = {
@@ -203,7 +203,7 @@ export default class AsyncCache<T> {
         renderQueue: [],
       };
 
-      this.cache.set(cacheKey, cache);
+      this._cache.set(cacheKey, cache);
     } else {
       cache.asyncFn = asyncFn;
     }

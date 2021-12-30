@@ -93,7 +93,7 @@ export const UsernameBanner: FC = () => {
     } else if (username !== undefined) {
       setIsBannerShow(true);
     }
-  }, [username]);
+  }, [username, usernameBannerHiddenByUser]);
 
   const handleCloseClick = async () => {
     const result = await openModal<boolean>(ModalType.SHOW_MODAL_PROCEED_USERNAME);

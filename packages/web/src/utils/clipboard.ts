@@ -5,7 +5,6 @@ export const askClipboardWritePermission = async () => {
   try {
     // The clipboard-write permission is granted automatically to pages
     // when they are the active tab. So it's not required, but it's more safe.
-    // @ts-ignore
     const { state } = await navigator.permissions.query({ name: 'clipboard-write' });
     return state === 'granted';
   } catch {
@@ -23,9 +22,7 @@ export const setToClipboard = async (blob: Blob | null) => {
   }
 
   try {
-    // @ts-ignore
     const data = [new ClipboardItem({ [blob.type]: blob })];
-    // @ts-ignore
     await navigator.clipboard.write(data);
   } catch (error) {
     ToastManager.error((error as Error).message);

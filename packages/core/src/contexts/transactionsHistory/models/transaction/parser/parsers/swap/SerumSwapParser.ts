@@ -6,7 +6,7 @@ import type {
   ParsedInnerInstruction,
   ParsedInstruction,
 } from '../../../../../types';
-import type { Parser } from '../index';
+import type { Parser } from '../';
 import { SwapTransaction } from './types';
 
 export class SerumSwapParser implements Parser {
