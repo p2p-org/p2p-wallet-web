@@ -87,7 +87,7 @@ const promises = new Map();
 let modalId = 0;
 
 const ModalsContext = React.createContext<{
-  openModal: <T, S>(modalType: ModalType, props?: S) => Promise<T>;
+  openModal: <T, S = any>(modalType: ModalType, props?: S) => Promise<T>;
   closeModal: (modalId: number) => void;
   closeTopModal: () => void;
 }>({

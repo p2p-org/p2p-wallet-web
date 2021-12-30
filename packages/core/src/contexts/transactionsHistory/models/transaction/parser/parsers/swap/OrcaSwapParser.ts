@@ -1,9 +1,9 @@
 import { NATIVE_MINT } from '@saberhq/token-utils';
 import type { ParsedInnerInstruction } from '@solana/web3.js';
 
-import type { ParsedConfirmedTransaction, ParsedInstruction } from '../../../../../index';
+import type { ParsedConfirmedTransaction, ParsedInstruction } from '../../../../../';
 import { instructionsData } from '../../utils/instructionsData';
-import type { Parser } from '../index';
+import type { Parser } from '../';
 import { SwapTransaction } from './types';
 
 // Example transaction for parsing:

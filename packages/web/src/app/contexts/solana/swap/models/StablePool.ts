@@ -11,10 +11,10 @@ import type OrcaPoolInterface from './OrcaPoolInterface';
 import { OutputTooHighError } from './TradeablePoolInterface';
 
 export default class StablePool extends OrcaPool implements OrcaPoolInterface {
-  getOutputAmount(inputAmount: u64, inputTokenName: string): u64 {
+  override getOutputAmount(inputAmount: u64, inputTokenName: string): u64 {
     const [poolInputAmount, poolOutputAmount] = this.getTokenAmountsFromInput(inputTokenName);
 
-    const inputAmountLessFees = inputAmount.sub(this.computeFees(inputAmount));
+    const inputAmountLessFees = inputAmount.sub(this._computeFees(inputAmount));
 
     if (!this.poolConfig.amp) {
       throw new Error('amp does not exist in poolConfig');
@@ -33,7 +33,7 @@ export default class StablePool extends OrcaPool implements OrcaPoolInterface {
   getBaseOutputAmount(inputAmount: u64, inputTokenName: string) {
     const [poolInputAmount, poolOutputAmount] = this.getTokenAmountsFromInput(inputTokenName);
 
-    const inputAmountLessFees = inputAmount.sub(this.computeFees(inputAmount));
+    const inputAmountLessFees = inputAmount.sub(this._computeFees(inputAmount));
 
     if (!this.poolConfig.amp) {
       throw new Error('amp does not exist in poolConfig');
@@ -75,7 +75,7 @@ export default class StablePool extends OrcaPool implements OrcaPoolInterface {
   calculateFees(inputAmount: u64, inputTokenName: string): u64 {
     const [poolInputAmount, poolOutputAmount] = this.getTokenAmountsFromInput(inputTokenName);
 
-    const inputFees = this.computeFees(inputAmount);
+    const inputFees = this._computeFees(inputAmount);
 
     if (!this.poolConfig.amp) {
       throw new Error('amp does not exist in poolConfig');
@@ -84,13 +84,13 @@ export default class StablePool extends OrcaPool implements OrcaPoolInterface {
     return computeOutputAmount(inputFees, poolInputAmount, poolOutputAmount, this.poolConfig.amp);
   }
 
-  private computeFees(inputAmount: u64): u64 {
-    const tradingFees = this.computeFee(
+  private _computeFees(inputAmount: u64): u64 {
+    const tradingFees = this._computeFee(
       inputAmount,
       this.poolConfig.feeNumerator,
       this.poolConfig.feeDenominator,
     );
-    const ownerFees = this.computeFee(
+    const ownerFees = this._computeFee(
       inputAmount,
       this.poolConfig.ownerTradeFeeNumerator,
       this.poolConfig.ownerTradeFeeDenominator,
@@ -99,7 +99,7 @@ export default class StablePool extends OrcaPool implements OrcaPoolInterface {
     return tradingFees.add(ownerFees);
   }
 
-  private computeFee(baseAmount: u64, feeNumerator: u64, feeDenominator: u64): u64 {
+  private _computeFee(baseAmount: u64, feeNumerator: u64, feeDenominator: u64): u64 {
     if (feeNumerator.eq(ZERO)) {
       return ZERO;
     }
