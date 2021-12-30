@@ -22,7 +22,7 @@ export const useTransactionSignatures = (
   const [signatures, setSignatures] = useState<ConfirmedSignatureInfo[]>([]);
 
   const fetchTransactionSignatures = useCallback(
-    async (isPaging?: boolean) => {
+    async (isPaging: boolean | undefined) => {
       if (!publicKey) {
         throw new Error('Missing publickey');
       }

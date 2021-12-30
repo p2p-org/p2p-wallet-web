@@ -20,21 +20,21 @@ export class CreateAccountParser implements Parser {
   /**
    Check if transaction is create account transaction
    */
-  public static can(instructions: ParsedInstruction[]) {
+  static can(instructions: ParsedInstruction[]) {
     switch (instructions.length) {
       case 1:
-        return instructions[0]?.program == 'spl-associated-token-account';
+        return instructions[0]?.program === 'spl-associated-token-account';
       case 2:
         return (
-          instructions[0]?.parsed?.type == 'createAccount' &&
-          instructions.at(-1)?.parsed?.type == 'initializeAccount'
+          instructions[0]?.parsed?.type === 'createAccount' &&
+          instructions.at(-1)?.parsed?.type === 'initializeAccount'
         );
       default:
         return false;
     }
   }
 
-  public static parse(transactionInfo: ParsedConfirmedTransaction): CreateAccountTransaction {
+  static parse(transactionInfo: ParsedConfirmedTransaction): CreateAccountTransaction {
     const instructions = transactionInfo.transaction.message.instructions;
 
     const program = getFirstProgram(instructions, 'spl-associated-token-account');

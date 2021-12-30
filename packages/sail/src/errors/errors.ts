@@ -276,8 +276,8 @@ export class SailGetMultipleAccountsError extends SailError {
  */
 export class SailGetMultipleTransactionsError extends SailError {
   constructor(
-    public readonly keys: readonly string[],
-    public readonly commitment: Commitment,
+    readonly keys: readonly string[],
+    readonly commitment: Commitment,
     originalError: unknown
   ) {
     super("SailGetMultipleTransactionsError", originalError);

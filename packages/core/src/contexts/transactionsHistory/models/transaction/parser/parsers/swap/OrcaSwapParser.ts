@@ -20,7 +20,7 @@ export class OrcaSwapParser implements Parser {
   /**
    Check instruction can be parsed
    */
-  public static can(instructions: ParsedInstruction[]) {
+  static can(instructions: ParsedInstruction[]) {
     return instructions.some((inst) =>
       this._supportedProgramId.includes(inst.programId.toBase58()),
     );
@@ -35,9 +35,9 @@ export class OrcaSwapParser implements Parser {
     switch (instructions?.length) {
       case 3:
         return (
-          instructions[0]?.parsed?.type == 'transfer' &&
-          instructions[1]?.parsed?.type == 'transfer' &&
-          instructions[2]?.parsed?.type == 'mintTo'
+          instructions[0]?.parsed?.type === 'transfer' &&
+          instructions[1]?.parsed?.type === 'transfer' &&
+          instructions[2]?.parsed?.type === 'mintTo'
         );
       default:
         return false;
@@ -53,10 +53,10 @@ export class OrcaSwapParser implements Parser {
     switch (instructions?.length) {
       case 3:
         return (
-          instructions?.length == 3 &&
-          instructions[0]?.parsed?.type == 'burn' &&
-          instructions[1]?.parsed?.type == 'transfer' &&
-          instructions[2]?.parsed?.type == 'transfer'
+          instructions?.length === 3 &&
+          instructions[0]?.parsed?.type === 'burn' &&
+          instructions[1]?.parsed?.type === 'transfer' &&
+          instructions[2]?.parsed?.type === 'transfer'
         );
       default:
         return false;
@@ -134,7 +134,7 @@ export class OrcaSwapParser implements Parser {
     return new SwapTransaction(source, sourceAmount, destination, destinationAmount);
   }
 
-  public static parse(transactionInfo: ParsedConfirmedTransaction): SwapTransaction | null {
+  static parse(transactionInfo: ParsedConfirmedTransaction): SwapTransaction | null {
     const innerInstructions = transactionInfo.meta?.innerInstructions;
 
     switch (true) {
