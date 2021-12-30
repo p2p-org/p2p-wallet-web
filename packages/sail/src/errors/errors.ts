@@ -6,6 +6,7 @@ import type {
   TransactionSignature,
 } from "@solana/web3.js";
 
+import type { KeyedTransactionInfo } from "../internal";
 import type { TransactionErrorType } from "./categorizeTransactionError";
 import { categorizeTransactionError } from "./categorizeTransactionError";
 
@@ -20,6 +21,7 @@ export type SailErrorName = `Sail${
   | "TransactionsCacheRefetch"
   | "AccountParse"
   | "AccountLoad"
+  | "TransactionParse"
   | "TransactionLoad"
   | "GetMultipleTransactions"
   | "GetMultipleAccounts"}Error`;
@@ -35,6 +37,7 @@ export const ERROR_TITLES: { [N in SailErrorName]: string } = {
   SailTransactionsCacheRefetchError: "Error transactions refetching from cache",
   SailAccountParseError: "Error parsing account",
   SailAccountLoadError: "Error loading account",
+  SailTransactionParseError: "Error parsing transaction",
   SailTransactionLoadError: "Error loading transaction",
   SailGetMultipleAccountsError: "Error fetching multiple accounts",
   SailGetMultipleTransactionsError: "Error fetching multiple transactions",
@@ -229,6 +232,15 @@ export class SailTransactionsCacheRefetchError extends SailError {
 export class SailAccountParseError extends SailError {
   constructor(originalError: unknown, readonly data: KeyedAccountInfo) {
     super("SailAccountParseError", originalError);
+  }
+}
+
+/**
+ * Thrown if there is an error parsing an account.
+ */
+export class SailTransactionParseError extends SailError {
+  constructor(originalError: unknown, readonly data: KeyedTransactionInfo) {
+    super("SailTransactionParseError", originalError);
   }
 }
 

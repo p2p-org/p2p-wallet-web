@@ -1,3 +1,5 @@
+import './polyfills';
+
 export * from './constants/common';
 export * from './constants/publicKeys';
 export * from './contexts';
