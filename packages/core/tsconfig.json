@@ -6,7 +6,8 @@
     "rootDir": "src/",
     "noEmit": false,
 
-    "jsx": "react-jsx"
+    "jsx": "react-jsx",
+    "allowJs": true
   },
   "include": ["./src"],
   "exclude": ["**/_*/"]
