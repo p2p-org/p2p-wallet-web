@@ -9,6 +9,7 @@ import classNames from 'classnames';
 
 import type { CandleLimitType } from 'app/contexts';
 import { useRates } from 'app/contexts';
+import { ToastManager } from 'components/common/ToastManager';
 
 // import dayjs from 'dayjs';
 // import { rgba } from 'polished';
@@ -100,9 +101,14 @@ export const Chart: FunctionComponent<Props> = ({ publicKey }) => {
       return;
     }
 
-    setIsLoading(true);
-    await getRatesCandle(tokenAccount?.balance.token.symbol, nextType);
-    setIsLoading(false);
+    try {
+      setIsLoading(true);
+      await getRatesCandle(tokenAccount?.balance.token.symbol, nextType);
+    } catch (err) {
+      ToastManager.error((err as Error).message);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   useEffect(() => {

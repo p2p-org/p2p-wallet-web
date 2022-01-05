@@ -115,7 +115,7 @@ const useRatesInternal = (): UseRates => {
   // }, [network, tokenSymbols]);
 
   useEffect(() => {
-    void getRatesCandle('SOL', 'month');
+    void getRatesCandle('SOL', 'month').catch(() => {});
   }, [getRatesCandle]);
 
   return {
