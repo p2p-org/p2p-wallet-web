@@ -19,6 +19,7 @@ import { useMarketData, useRates } from 'app/contexts';
 import { useConfig } from 'app/contexts/solana/swap';
 import { AmountUSD } from 'components/common/AmountUSD';
 import { COLUMN_RIGHT_WIDTH } from 'components/common/Layout/constants';
+import { ToastManager } from 'components/common/ToastManager';
 import { TokenAvatar } from 'components/common/TokenAvatar';
 import { Widget } from 'components/common/Widget';
 import { Button, Icon } from 'components/ui';
@@ -200,9 +201,15 @@ const TopWidgetOrigin: FunctionComponent<Props> = ({ publicKey }) => {
         return;
       }
 
-      setIsLoading(true);
-      await getRatesCandle(tokenAccount.balance.token.symbol, 'month');
-      setIsLoading(false);
+      try {
+        setIsLoading(true);
+
+        await getRatesCandle(tokenAccount.balance.token.symbol, 'month');
+      } catch (err) {
+        ToastManager.error((err as Error).message);
+      } finally {
+        setIsLoading(false);
+      }
     };
 
     void loadCandles();
