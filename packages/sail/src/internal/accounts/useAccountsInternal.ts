@@ -108,7 +108,10 @@ export interface UseAccounts extends Omit<UseAccountsArgs, "onError"> {
    */
   getCached: (key: PublicKey) => AccountInfo<Buffer> | null | undefined;
   /**
-   * Gets an AccountDatum from a key.
+   * Gets an AccountDatum from the cache.
+   *
+   * If the AccountInfo has never been fetched, this returns undefined.
+   * If the AccountInfo has been fetched but wasn't found, this returns null.
    */
   getDatum: (key: PublicKey | null | undefined) => AccountDatum;
 }
@@ -237,21 +240,18 @@ export const useAccountsInternal = (args: UseAccountsArgs): UseAccounts => {
   }, [onError, refetchAllSubscriptions, refreshIntervalMs]);
 
   const getDatum = useCallback(
-    (k: PublicKey | null | undefined): AccountDatum => {
-      if (k) {
-        const accountInfo = getCached(k);
-        if (accountInfo) {
-          return {
-            accountId: k,
-            accountInfo,
-          };
-        }
-        if (accountInfo === null) {
-          // Cache hit but null entry in cache
-          return null;
-        }
+    (k: PublicKey | null | undefined) => {
+      if (!k) {
+        return k;
       }
-      return undefined; // k === undefined ? undefined : null
+      const accountInfo = getCached(k);
+      if (accountInfo) {
+        return {
+          accountId: k,
+          accountInfo,
+        };
+      }
+      return accountInfo;
     },
     [getCached]
   );
