@@ -161,7 +161,7 @@ export const TotalBalanceWidget: FunctionComponent<Props> = ({ onSymbolChange })
           <AllTokensText>All tokens</AllTokensText>
         </PriceWrapper>
         <ChartWrapper>
-          {donutData.length === 0 ? (
+          {isLoading ? (
             <LoaderBlock />
           ) : (
             <DonutChart size={CHART_SIZE} data={donutData} onSymbolChange={onSymbolChange} />
