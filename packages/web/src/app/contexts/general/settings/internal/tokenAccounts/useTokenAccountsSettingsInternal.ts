@@ -23,7 +23,7 @@ export interface UseTokenAccountsSettings {
 export const useTokenAccountsSettingsInternal = ({
   isZeroBalancesHidden,
 }: UseTokenAccountsSettingsArgs): UseTokenAccountsSettings => {
-  const [tokenAccounts, isSettingsLoading, setSettings] = useStorage<TokenAccountsSettings>(
+  const [tokenAccounts, setSettings] = useStorage<TokenAccountsSettings>(
     STORAGE_KEYS.tokenAccounts,
     DEFAULT_TOKEN_ACCOUNTS_SETTINGS,
   );
