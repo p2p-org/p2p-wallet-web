@@ -16,25 +16,26 @@
   },
   "dependencies": {
     "@emotion/is-prop-valid": "^0.8.8",
+    "@jup-ag/math": "^1.0.0-beta.4",
     "@linaria/babel-preset": "^3.0.0-beta.15",
     "@linaria/core": "^3.0.0-beta.15",
     "@linaria/react": "^3.0.0-beta.15",
     "@linaria/shaker": "^3.0.0-beta.15",
     "@loadable/component": "^5.14.1",
-    "@orca-so/sdk": "^1.1.6",
+    "@orca-so/sdk": "^1.2.15",
     "@orca-so/stablecurve": "^1.0.5",
     "@p2p-wallet-web/core": "^1.0.0",
     "@p2p-wallet-web/sail": "^2.8.0",
-    "@project-serum/anchor": "^0.16.2",
+    "@project-serum/anchor": "^0.20.1",
     "@project-serum/serum": "^0.13.60",
     "@renproject/chains-bitcoin": "^2.5.1",
     "@renproject/chains-solana": "^2.5.1",
     "@renproject/interfaces": "^2.5.1",
     "@renproject/ren": "^2.5.1",
     "@renproject/ren-tx": "^2.5.1",
-    "@saberhq/solana-contrib": "^1.10.15",
-    "@saberhq/token-utils": "^1.10.15",
-    "@saberhq/use-solana": "^1.12.7",
+    "@saberhq/solana-contrib": "^1.12.27",
+    "@saberhq/token-utils": "^1.12.27",
+    "@saberhq/use-solana": "^1.12.27",
     "@solana/spl-token": "^0.1.8",
     "@solana/spl-token-registry": "^0.2.804",
     "@solana/web3.js": "^1.31.0",
@@ -124,6 +125,9 @@
     "stylelint-prettier": "^1.1.2",
     "svg-sprite-loader": "^6.0.11",
     "svgo-loader": "^3.0.0"
+  },
+  "resolutions": {
+    "react-error-overlay": "6.0.9"
   },
   "browserslist": {
     "production": [
