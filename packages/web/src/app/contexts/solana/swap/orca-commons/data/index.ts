@@ -1,7 +1,3 @@
-export * from './Aquafarm';
-export { default as devnetAquafarms } from './json/aquafarms/devnet.json';
-export { default as mainnetAquafarms } from './json/aquafarms/mainnet.json';
-export { default as testnetAquafarms } from './json/aquafarms/testnet.json';
 export { default as devnetPools } from './json/pools/devnet.json';
 export { default as mainnetPools } from './json/pools/mainnet.json';
 export { default as testnetPools } from './json/pools/testnet.json';

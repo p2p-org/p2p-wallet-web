@@ -4,7 +4,6 @@ import { PublicKey } from '@solana/web3.js';
 import { createContainer } from 'unstated-next';
 
 import type {
-  AquafarmJSONS,
   PoolConfig,
   PoolConfigs,
   PoolJSON,
@@ -13,18 +12,14 @@ import type {
   TokenJSONS,
 } from '../orca-commons';
 import {
-  createAquafarmConfig,
   createPoolConfig,
   createTokenConfig,
-  devnetAquafarms,
   devnetPools,
   devnetProgramIds,
   devnetTokens,
-  mainnetAquafarms,
   mainnetPools,
   mainnetProgramIds,
   mainnetTokens,
-  testnetAquafarms,
   testnetPools,
   testnetProgramIds,
   testnetTokens,
@@ -55,14 +50,6 @@ const programIDS: {
   mainnet: mainnetProgramIds,
 };
 
-const aquafarms: {
-  [cluster: string]: AquafarmJSONS;
-} = {
-  devnet: devnetAquafarms,
-  testnet: testnetAquafarms,
-  mainnet: mainnetAquafarms,
-};
-
 export type MintToTokenName = {
   [key: string]: string;
 };
@@ -70,7 +57,9 @@ export type MintToTokenName = {
 export type Route = string[];
 export type RouteConfigs = { [key: string]: Route[] };
 
-export type ProgramIds = { [key: string]: PublicKey };
+export type ProgramIds = {
+  [key in 'serumTokenSwap' | 'tokenSwapV2' | 'tokenSwap' | 'token']: PublicKey;
+};
 
 export interface UseConfig {
   routeConfigs: RouteConfigs;
@@ -86,15 +75,9 @@ const useConfigInternal = (): UseConfig => {
 
   const tokenConfigs = createTokenConfig(tokens[network]);
 
-  const aquafarmConfigs = Object.fromEntries(
-    Object.entries(aquafarms[network]).map(([poolAddress, obj]) => {
-      return [poolAddress, createAquafarmConfig(obj)];
-    }),
-  );
   const orcaConfigs = Object.entries(pools[network]).map(
     ([poolName, obj]: [string, PoolJSON]): [string, PoolConfig] => {
-      const aquafarmConfig = aquafarmConfigs[obj.account] || null;
-      return [poolName, createPoolConfig(obj, aquafarmConfig)];
+      return [poolName, createPoolConfig(obj)];
     },
   );
   const poolConfigs = Object.fromEntries(orcaConfigs);
@@ -106,7 +89,6 @@ const useConfigInternal = (): UseConfig => {
     tokenSwapV2: new PublicKey(programIDS[network].tokenSwapV2),
     tokenSwap: new PublicKey(programIDS[network].tokenSwap),
     token: new PublicKey(programIDS[network].token),
-    aquafarm: new PublicKey(programIDS[network].aquafarm),
   };
 
   const mintToTokenName = Object.entries({

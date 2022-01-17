@@ -1,7 +1,7 @@
 import { u64 } from '@solana/spl-token';
 import { PublicKey } from '@solana/web3.js';
 
-import type { AquafarmConfig, PoolConfig, PoolJSON } from '../types';
+import type { PoolConfig, PoolJSON } from '../types';
 
 export enum CurveType {
   // eslint-disable-next-line no-unused-vars
@@ -14,7 +14,7 @@ export enum CurveType {
   Offset = 3,
 }
 
-export function createPoolConfig(obj: PoolJSON, aquafarmConfig: AquafarmConfig): PoolConfig {
+export function createPoolConfig(obj: PoolJSON): PoolConfig {
   return {
     ...obj,
     account: new PublicKey(obj.account),
@@ -45,7 +45,6 @@ export function createPoolConfig(obj: PoolJSON, aquafarmConfig: AquafarmConfig):
           return CurveType.Offset;
       }
     })(),
-    aquafarmConfig: aquafarmConfig,
     amp: obj.amp ? new u64(obj.amp) : undefined,
     deprecated: obj.deprecated || false,
     programVersion: obj.programVersion || 1,

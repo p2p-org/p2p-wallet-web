@@ -3,36 +3,6 @@ import type { PublicKey } from '@solana/web3.js';
 
 import type { CurveType } from 'app/contexts/solana/swap/orca-commons/data';
 
-// Aquafarms
-export type AquafarmJSON = {
-  account: string;
-  nonce: number;
-  tokenProgramId: string;
-  emissionsAuthority: string;
-  removeRewardsAuthority: string;
-  baseTokenMint: string;
-  baseTokenVault: string;
-  rewardTokenMint: string;
-  rewardTokenVault: string;
-  farmTokenMint: string;
-};
-
-export type AquafarmJSONS = {
-  [poolId: string]: AquafarmJSON;
-};
-
-export type AquafarmConfig = AquafarmJSON & {
-  account: PublicKey;
-  tokenProgramId: PublicKey;
-  emissionsAuthority: PublicKey;
-  removeRewardsAuthority: PublicKey;
-  baseTokenMint: PublicKey;
-  baseTokenVault: PublicKey;
-  rewardTokenMint: PublicKey;
-  rewardTokenVault: PublicKey;
-  farmTokenMint: PublicKey;
-};
-
 // Pools
 export type PoolJSON = {
   account: string;
@@ -80,7 +50,6 @@ export type PoolConfig = Pick<PoolJSON, 'tokenAName' | 'tokenBName'> & {
   hostFeeNumerator: u64;
   hostFeeDenominator: u64;
   curveType: CurveType;
-  aquafarmConfig: AquafarmConfig;
   amp: u64 | undefined;
   deprecated: boolean;
   programVersion: number;
