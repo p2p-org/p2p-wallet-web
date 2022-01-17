@@ -8,4 +8,5 @@ export interface TokenAccount {
   key?: PublicKey;
   loading: boolean;
   balance?: TokenAmount;
+  isInitialized?: boolean;
 }
