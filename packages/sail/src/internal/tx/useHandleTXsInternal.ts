@@ -1,15 +1,21 @@
+import { useCallback } from "react";
+
 import type {
   Network,
   PendingTransaction,
   TransactionEnvelope,
 } from "@saberhq/solana-contrib";
+import { generateUncheckedInspectLink } from "@saberhq/solana-contrib";
 import { useSolana } from "@saberhq/use-solana";
-import type { ConfirmOptions, Finality, Transaction } from "@solana/web3.js";
-import { useCallback } from "react";
+import type {
+  ConfirmOptions,
+  Finality,
+  PublicKey,
+  Transaction,
+} from "@solana/web3.js";
 import type { OperationOptions } from "retry";
 import invariant from "tiny-invariant";
 
-import type { UseAccounts } from "../../index";
 import {
   extractErrorMessage,
   InsufficientSOLError,
@@ -19,6 +25,12 @@ import {
   SailTransactionSignError,
   SailUnknownTXFailError,
 } from "../../errors";
+import type { UseAccounts } from "../../index";
+
+const DEBUG_MODE =
+  !!process.env.REACT_APP_LOCAL_PUBKEY ||
+  !!process.env.LOCAL_PUBKEY ||
+  !!process.env.DEBUG_MODE;
 
 export interface HandleTXResponse {
   success: boolean;
@@ -69,6 +81,10 @@ export interface HandleTXOptions extends ConfirmOptions {
      */
     refetchDelayMs?: number;
   };
+  /**
+   * Fee payer
+   */
+  feePayer?: PublicKey;
 }
 
 export interface UseHandleTXsInternal {
@@ -110,15 +126,29 @@ export const useHandleTXsInternal = ({
         };
       }
 
+      if (DEBUG_MODE) {
+        const txTable = await Promise.all(
+          txs.map(async (tx) => {
+            return await tx.simulateTable({ verifySigners: false, ...options });
+          })
+        );
+        txs.forEach((tx, i) => {
+          const table = txTable[i];
+          if (network !== "localnet") {
+            console.debug(generateUncheckedInspectLink(network, tx.build()));
+          }
+          console.debug(table);
+        });
+      }
       try {
         const firstTX = txs[0];
         invariant(firstTX, "firstTX");
         const provider = firstTX.provider;
 
-        // TODO(igm): when we support other accounts being the payer,
-        // we need to alter this check
         const nativeBalance = (
-          await provider.getAccountInfo(provider.wallet.publicKey)
+          await provider.getAccountInfo(
+            options?.feePayer || provider.wallet.publicKey
+          )
         )?.accountInfo.lamports;
         if (!nativeBalance || nativeBalance === 0) {
           const error = new InsufficientSOLError(nativeBalance);
@@ -133,7 +163,10 @@ export const useHandleTXsInternal = ({
         let signedTXs: Transaction[];
         try {
           signedTXs = await provider.signer.signAll(
-            txs.map((tx) => ({ tx: tx.build(), signers: tx.signers })),
+            txs.map((tx) => ({
+              tx: tx.build(options?.feePayer),
+              signers: tx.signers,
+            })),
             options
           );
         } catch (e) {
