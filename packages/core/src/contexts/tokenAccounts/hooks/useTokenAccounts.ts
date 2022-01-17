@@ -44,6 +44,7 @@ export const useTokenAccounts = (
           key: undefined,
           loading: false,
           balance: undefined,
+          isInitialized: !!datum,
         };
       }
 
@@ -53,6 +54,7 @@ export const useTokenAccounts = (
           key: tokenAccountKey,
           loading: token === undefined,
           balance: undefined,
+          isInitialized: !!datum,
         };
       }
 
@@ -62,6 +64,7 @@ export const useTokenAccounts = (
           key: tokenAccountKey,
           loading: false,
           balance: new TokenAmount(token, datum.accountInfo.lamports),
+          isInitialized: true,
         };
       }
 
@@ -71,6 +74,7 @@ export const useTokenAccounts = (
           key: tokenAccountKey,
           loading: datum === undefined,
           balance: parsed ? new TokenAmount(token, parsed.amount) : new TokenAmount(token, 0),
+          isInitialized: !!datum,
         };
       } catch (e) {
         console.warn(`Error parsing ATA ${datum?.accountId.toString() ?? '(unknown)'}`, e);
