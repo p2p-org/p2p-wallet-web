@@ -66,11 +66,6 @@ export const SwapWidget: FC = () => {
   //   }
   // }, [trade]);
 
-  // const highPriceDescription =
-  //   "Your trade is large compared to the size of the pool. If you're unsure what to do, read more about price impact <ExternalLinkWrapper href='https://docs.orca.so/#what-is-price-impact'>here</ExternalLinkWrapper>.";
-  // const walletConfirmationFailure = 'Click approve in your wallet to continue.';
-  // const ExternalLinkWrapper = reactComponentWrapper(ExternalLink);
-
   return (
     <div>
       <WrapperWidgetPage

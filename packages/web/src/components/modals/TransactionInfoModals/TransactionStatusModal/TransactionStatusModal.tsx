@@ -121,11 +121,13 @@ export const TransactionStatusModal: FunctionComponent<
             text: `- ${(params as TransferParams).amount.formatUnits()}`,
             symbol: (params as TransferParams).amount.token.symbol,
           });
+
           break;
         }
         case 'swap': {
           const resultSignature = await (action as SwapActionType)();
           setSignature(resultSignature);
+
           break;
         }
         default:
@@ -217,8 +219,8 @@ export const TransactionStatusModal: FunctionComponent<
     close(signature);
   };
 
-  const isProcessing = (!signature || !transaction?.data) && !transactionError;
-  const isSuccess = signature && transaction?.data && !transactionError;
+  const isProcessing = (!signature || !transaction?.key) && !transactionError;
+  const isSuccess = signature && transaction?.key && !transactionError;
 
   const renderTitle = () => {
     if (isSuccess) {

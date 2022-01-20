@@ -248,7 +248,6 @@ export default class Trade {
 
       await pool.constructExchange(
         walletPublicKey,
-        tokenConfigs,
         programIds,
         this.inputTokenName,
         this.outputTokenName,
@@ -266,7 +265,6 @@ export default class Trade {
 
       const result0 = await pool0.constructExchange(
         walletPublicKey,
-        tokenConfigs,
         programIds,
         this.inputTokenName,
         doubleHopFields.intermediateTokenName,
@@ -283,7 +281,6 @@ export default class Trade {
       const pool1 = this.pools[this.derivedFields.selectedRoute[1]];
       await pool1.constructExchange(
         walletPublicKey,
-        tokenConfigs,
         programIds,
         doubleHopFields.intermediateTokenName,
         this.outputTokenName,

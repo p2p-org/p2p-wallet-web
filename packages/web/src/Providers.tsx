@@ -46,11 +46,19 @@ const CoreProviders: FC = ({ children }) => {
         onDisconnect={onDisconnect}
         networkConfigs={NETWORK_CONFIGS}
       >
-        <SailProvider>
+        <SailProvider initialState={{ waitForConfirmation: true }}>
           <TokenAccountsProvider>{children}</TokenAccountsProvider>
         </SailProvider>
       </SolanaProvider>
     </SeedProvider>
+  );
+};
+
+const ApiProviders: FC = ({ children }) => {
+  return (
+    <RatesProvider>
+      <NameServiceProvider>{children}</NameServiceProvider>
+    </RatesProvider>
   );
 };
 
@@ -60,19 +68,17 @@ export const Providers: FC = ({ children }) => {
   return (
     <QueryClientProvider client={queryClient}>
       <CoreProviders>
-        <RatesProvider>
-          <NameServiceProvider>
-            <SettingsProvider>
-              <BlockchainProvider>
-                <LockAndMintProvider>
-                  <SwapProviders>
-                    <ModalsProvider>{children}</ModalsProvider>
-                  </SwapProviders>
-                </LockAndMintProvider>
-              </BlockchainProvider>
-            </SettingsProvider>
-          </NameServiceProvider>
-        </RatesProvider>
+        <ApiProviders>
+          <SettingsProvider>
+            <BlockchainProvider>
+              <LockAndMintProvider>
+                <SwapProviders>
+                  <ModalsProvider>{children}</ModalsProvider>
+                </SwapProviders>
+              </LockAndMintProvider>
+            </BlockchainProvider>
+          </SettingsProvider>
+        </ApiProviders>
       </CoreProviders>
     </QueryClientProvider>
   );

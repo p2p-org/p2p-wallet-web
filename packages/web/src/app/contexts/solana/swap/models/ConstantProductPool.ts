@@ -19,7 +19,7 @@ export default class ConstantProductPool extends OrcaPool implements OrcaPoolInt
     return new u64(outputAmount.toString());
   }
 
-  getOutputAmount(inputAmount: u64, inputTokenName: string): u64 {
+  override getOutputAmount(inputAmount: u64, inputTokenName: string): u64 {
     const fees = this._getFeeFromInput(inputAmount);
     const inputAmountLessFees = inputAmount.sub(fees);
 

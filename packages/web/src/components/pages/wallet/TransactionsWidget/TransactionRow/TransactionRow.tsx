@@ -264,7 +264,7 @@ export const TransactionRow: FunctionComponent<Props> = ({ signature, source }) 
             <Right>
               {transaction?.loading || tokenAmount?.loading ? (
                 <Skeleton width={50} height={16} />
-              ) : tokenAmount.balance ? (
+              ) : tokenAmount?.balance ? (
                 <Amount className={classNames({ isReceiver: transaction?.details.isReceiver })}>
                   <AmountUSD
                     prefix={transaction?.details.isReceiver ? '+' : '-'}

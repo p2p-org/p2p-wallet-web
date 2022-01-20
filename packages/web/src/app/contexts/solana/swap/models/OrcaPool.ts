@@ -1,10 +1,9 @@
 import { ZERO } from '@orca-so/sdk';
-import { u64 } from '@solana/spl-token';
+import { NATIVE_MINT, u64 } from '@solana/spl-token';
 import type { PublicKey } from '@solana/web3.js';
-import { Account } from '@solana/web3.js';
 
 import type { ProgramIds } from '../config';
-import type { PoolConfig, TokenConfigs } from '../orca-commons';
+import type { PoolConfig } from '../orca-commons';
 import { CurveType } from '../orca-commons';
 import { swapInstruction } from '../utils/web3/instructions/pool-instructions';
 import type TransactionBuilder from '../utils/web3/TransactionBuilder';
@@ -38,10 +37,6 @@ export default class OrcaPool {
 
     if (this.poolConfig.curveType === CurveType.Stable) {
       poolId += '[stable]';
-    }
-
-    if (this.poolConfig.aquafarmConfig) {
-      poolId += '[aquafarm]';
     }
 
     return poolId;
@@ -81,7 +76,7 @@ export default class OrcaPool {
 
   // getOutputAmount is a placeholder function that's implemented
   // by classes the extend OrcaPool
-  getOutputAmount(inputAmount: u64, inputTokenName: string): u64 {
+  getOutputAmount(_inputAmount: u64, _inputTokenName: string): u64 {
     return ZERO;
   }
 
@@ -100,7 +95,6 @@ export default class OrcaPool {
 
   async constructExchange(
     walletPublicKey: PublicKey,
-    tokenConfigs: TokenConfigs,
     programIds: ProgramIds,
     inputTokenName: string,
     outputTokenName: string,
@@ -119,7 +113,7 @@ export default class OrcaPool {
         inputAmount,
         accountRentExempt,
         programIds.token,
-        tokenConfigs['SOL'].mint,
+        NATIVE_MINT,
       );
       inputUserTokenPublicKey = account.publicKey;
     } else if (!inputUserTokenPublicKey) {
@@ -132,23 +126,12 @@ export default class OrcaPool {
         ZERO,
         accountRentExempt,
         programIds.token,
-        tokenConfigs['SOL'].mint,
+        NATIVE_MINT,
       );
       outputUserTokenPublicKey = account.publicKey;
     } else if (!outputUserTokenPublicKey) {
       throw new Error('outputUserTokenPublicKey must be defined if inputTokenName is not SOL');
     }
-
-    const userTransferAuthority = new Account();
-    transactionBuilder.createApproveInstruction(
-      inputUserTokenPublicKey,
-      userTransferAuthority,
-      walletPublicKey,
-      programIds.token,
-      inputAmount,
-    );
-
-    transactionBuilder.signers.push(userTransferAuthority);
 
     // Create swap instruction
     const [inputPoolTokenPublicKey, outputPoolTokenPublicKey] =
@@ -165,7 +148,7 @@ export default class OrcaPool {
         outputUserTokenPublicKey,
         inputPoolTokenPublicKey,
         outputPoolTokenPublicKey,
-        userTransferAuthority.publicKey,
+        walletPublicKey,
         this.poolConfig.hostFeeAccount,
       ),
     );

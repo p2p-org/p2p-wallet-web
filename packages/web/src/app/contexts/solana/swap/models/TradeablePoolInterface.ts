@@ -4,7 +4,6 @@ import type { u64 } from '@solana/spl-token';
 import type { PublicKey } from '@solana/web3.js';
 
 import type { ProgramIds } from '../config';
-import type { TokenConfigs } from '../orca-commons';
 import type TransactionBuilder from '../utils/web3/TransactionBuilder';
 import type SlippageTolerance from './SlippageTolerance';
 
@@ -27,7 +26,6 @@ export default interface TradeablePoolInterface {
   ): u64;
   constructExchange(
     walletPublicKey: PublicKey,
-    tokenConfigs: TokenConfigs,
     programIds: ProgramIds,
     inputTokenName: string,
     outputTokenName: string,
