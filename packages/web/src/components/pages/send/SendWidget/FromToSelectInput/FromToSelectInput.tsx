@@ -19,8 +19,7 @@ import { TokenAccountRow } from 'components/common/TokenAccountRow';
 import { TokenAvatar } from 'components/common/TokenAvatar';
 import { Icon } from 'components/ui';
 import { SearchInput } from 'components/ui/SearchInput';
-import { sortByRules } from 'utils/sort';
-import { shortAddress } from 'utils/tokens';
+import { matchesFilter, shortAddress, sortByRules } from 'utils/tokens';
 
 const Wrapper = styled.div``;
 
@@ -328,6 +327,7 @@ export const FromToSelectInput: FunctionComponent<Props> = ({
   const selectorRef = useRef<HTMLDivElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
+
   const [filter, setFilter] = useState('');
   const [localAmount, setLocalAmount] = useState(String(amount));
   const [isOpen, setIsOpen] = useState(false);
@@ -512,14 +512,12 @@ export const FromToSelectInput: FunctionComponent<Props> = ({
       filteredWithBalance = tokenAccounts.filter((account) => account.balance?.greaterThan(0));
     }
 
-    const filterLower = filter.toLowerCase();
     return filteredWithBalance
       .filter(
         (account) =>
-          !filterLower ||
-          (account.balance &&
-            (account.balance.token.symbol?.toLowerCase().includes(filterLower) ||
-              account.balance.token.name?.toLowerCase().includes(filterLower))),
+          account.balance &&
+          (matchesFilter(account.balance.token.symbol, filter) ||
+            matchesFilter(account.balance.token.name, filter)),
       )
       .sort(sortByRules(markets));
   }, [tokenAccounts, direction, filter, markets]);
@@ -633,13 +631,16 @@ export const FromToSelectInput: FunctionComponent<Props> = ({
             {filteredTokenAccounts?.length ? (
               <>
                 {direction === 'to' ? <YourTokens>Your tokens</YourTokens> : undefined}
-                {filteredTokenAccounts.map((account) => (
-                  <TokenAccountRow
-                    key={account.key.toBase58()}
-                    tokenAccount={account}
-                    onClick={handleTokenAccountClick}
-                  />
-                ))}
+                {filteredTokenAccounts.map(
+                  (account) =>
+                    account.key && (
+                      <TokenAccountRow
+                        key={account.key.toBase58()}
+                        tokenAccount={account}
+                        onClick={handleTokenAccountClick}
+                      />
+                    ),
+                )}
               </>
             ) : undefined}
             {!filteredTokenAccounts?.length ? <Empty type="search" /> : undefined}

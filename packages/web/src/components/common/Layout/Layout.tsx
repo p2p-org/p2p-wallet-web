@@ -97,10 +97,6 @@ export const LayoutOrigin: FunctionComponent<Props> = ({
   //   }
   // }, [loading]);
 
-  // useIntervalHook(() => {
-  //   void dispatch(updateTokenAccountsForWallet());
-  // }, 5000);
-
   return (
     <>
       <Helmet>

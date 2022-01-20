@@ -15,7 +15,7 @@ const FeatureFlagsContext = createContext<{
   setFeatureFlagsEnabled: SetStorageValue<boolean>;
 }>({
   featureFlagsEnabled: false,
-  setFeatureFlagsEnabled: () => {},
+  setFeatureFlagsEnabled: () => undefined,
 });
 
 export const FeatureFlagsProvider: FC = ({ children }) => {

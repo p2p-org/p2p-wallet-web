@@ -3,7 +3,7 @@ import { useMemo } from 'react';
 import type { TokenAccount } from '@p2p-wallet-web/core';
 
 import { useMarketsData } from 'app/contexts';
-import { sortByRules } from 'utils/sort';
+import { sortByRules } from 'utils/tokens';
 
 export const useSortedTokens = (tokenAccounts: TokenAccount[]): TokenAccount[] => {
   const symbols = useMemo(() => {
