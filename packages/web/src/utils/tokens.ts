@@ -1,5 +1,4 @@
 import type { TokenAccount } from '@p2p-wallet-web/core';
-import { RAW_SOL_MINT } from '@saberhq/token-utils';
 
 import type { Markets } from 'app/contexts';
 
@@ -17,11 +16,8 @@ export const sortByRules =
       return !a ? 1 : -1;
     }
 
-    if (
-      a.balance?.token.mintAccount?.equals(RAW_SOL_MINT) ||
-      b.balance?.token.mintAccount?.equals(RAW_SOL_MINT)
-    ) {
-      return a.balance?.token.mintAccount?.equals(RAW_SOL_MINT) ? -1 : 1;
+    if (a.balance?.token.isRawSOL || b.balance?.token.isRawSOL) {
+      return a.balance?.token.isRawSOL ? -1 : 1;
     }
 
     if (!a.balance || !b.balance) {
