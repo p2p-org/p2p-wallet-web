@@ -5,7 +5,7 @@ import { useTokenAccount } from '@p2p-wallet-web/core';
 import { usePubkey } from '@p2p-wallet-web/sail';
 import { PublicKey } from '@solana/web3.js';
 
-import { ModalType, useModals, useSendState, useTransferAction } from 'app/contexts';
+import { ModalType, useModals, useSendFees, useSendState, useTransferAction } from 'app/contexts';
 import type { TransactionConfirmModalProps } from 'components/modals/TransactionConfirmModal/TransactionConfirmModal';
 import type { TransactionStatusModalProps } from 'components/modals/TransactionInfoModals/TransactionStatusModal/TransactionStatusModal';
 import { Button, Icon } from 'components/ui';
@@ -31,8 +31,10 @@ export const SendButtonSolana: FC<Props> = ({ primary, disabled }) => {
     destinationAddress,
     setIsExecuting,
     parsedAmount,
+    destinationAccount,
   } = useSendState();
   const transferAction = useTransferAction();
+  const { feeToken, compensation } = useSendFees();
 
   const destinationTokenAccount = useTokenAccount(usePubkey(destinationAddress));
 
@@ -45,11 +47,16 @@ export const SendButtonSolana: FC<Props> = ({ primary, disabled }) => {
       throw new Error('Invalid amount');
     }
 
+    if (!destinationAccount) {
+      throw new Error('Invalid destination');
+    }
+
     const destination = new PublicKey(destinationAddress);
 
     if (parsedAmount.token.symbol !== 'SOL') {
       if (
         destinationTokenAccount &&
+        destinationTokenAccount.balance && // FIXME
         destinationTokenAccount.balance?.token.symbol !== 'SOL' &&
         !destinationTokenAccount.balance?.token.mintAccount.equals(parsedAmount.token.mintAccount)
       ) {
@@ -83,9 +90,11 @@ export const SendButtonSolana: FC<Props> = ({ primary, disabled }) => {
       setIsExecuting(true);
 
       const action = transferAction({
-        source: fromTokenAccount.key,
-        destination,
+        fromTokenAccount,
+        destinationAccount,
         amount: parsedAmount,
+        feeToken,
+        compensation,
       });
 
       trackEvent('send_send_click', {

@@ -1,100 +1,57 @@
 import type { FC } from 'react';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect } from 'react';
 
-import { styled } from '@linaria/react';
-import { useWallet } from '@p2p-wallet-web/core';
-import classNames from 'classnames';
-import Decimal from 'decimal.js';
+import type { TokenAccount } from '@p2p-wallet-web/core';
+import type { TokenAmount } from '@saberhq/token-utils';
 
-import { useSendState, useSettings } from 'app/contexts';
-import { Icon, Tooltip } from 'components/ui';
+import { useSendFees, useSendState } from 'app/contexts';
+import { FeeTokenSelector } from 'components/common/FeeTokenSelector';
+import { useCompensationSwap } from 'utils/hooks/compensation/useCompensationSwap';
 
-import { TextFieldTXStyled, TooltipRow, TxName, TxValue } from '../common/styled';
-
-const InfoIcon = styled(Icon)`
-  width: 24px;
-  height: 24px;
-
-  margin-left: 10px;
-
-  color: #a3a5ba;
-`;
-
-const BURN_ALLOCATE_ACCOUNT_SIZE = 97;
-
-const formatFee = (amount: number): number =>
-  new Decimal(amount)
-    .div(10 ** 9)
-    .toDecimalPlaces(9)
-    .toNumber();
-
-export const TransferFee: FC = () => {
-  const {
-    settings: { useFreeTransactions },
-  } = useSettings();
-  const { fromTokenAccount, blockchain } = useSendState();
-  const { connection } = useWallet();
-
-  const [txFee, setTxFee] = useState(0);
-  const [rentFee, setRentFee] = useState(0);
-
-  const isNetworkSourceSelectorVisible = fromTokenAccount?.balance?.token.symbol === 'renBTC';
+const CompensationSwap: FC<{
+  solTokenAmount: TokenAmount;
+  feeToken: TokenAccount;
+}> = ({ solTokenAmount, feeToken }) => {
+  const { setCompensationSwapData, setFeeAmountInToken } = useSendFees();
+  const { inputAmount, swapData } = useCompensationSwap(solTokenAmount, feeToken);
 
   useEffect(() => {
-    const mount = async () => {
-      try {
-        const resultRentFee = await connection.getMinimumBalanceForRentExemption(
-          BURN_ALLOCATE_ACCOUNT_SIZE,
-        );
-        const resultRecentBlockhash = await connection.getRecentBlockhash();
-
-        setRentFee(formatFee(resultRentFee));
-        setTxFee(formatFee(resultRecentBlockhash.feeCalculator.lamportsPerSignature));
-      } catch (error) {
-        console.log(error);
-      }
-    };
-
-    if (!useFreeTransactions || isNetworkSourceSelectorVisible) {
-      void mount();
+    if (swapData) {
+      setCompensationSwapData(swapData);
     }
-  }, [useFreeTransactions, isNetworkSourceSelectorVisible, connection]);
+  }, [setCompensationSwapData, swapData]);
 
-  const toolTipItems = useMemo(() => {
-    const _toolTipItems = [];
-
-    if (useFreeTransactions && !isNetworkSourceSelectorVisible) {
-      _toolTipItems.push(
-        <TooltipRow key="tooltip-row-1">Paid by p2p.org.</TooltipRow>,
-        <TooltipRow key="tooltip-row-2">We take care of all transfers costs ✌.</TooltipRow>,
-      );
-    } else {
-      _toolTipItems.push(
-        <TooltipRow key="tooltip-row-3">
-          <TxName>Transaction:</TxName>
-          <TxValue>{`${txFee} SOL`}</TxValue>
-        </TooltipRow>,
-      );
-
-      if (blockchain === 'bitcoin') {
-        _toolTipItems.push(
-          <TooltipRow key="tooltip-row-4">
-            <TxName>Fee:</TxName>
-            <TxValue>{`${rentFee} SOL`}</TxValue>
-          </TooltipRow>,
-        );
-      }
+  useEffect(() => {
+    if (inputAmount) {
+      setFeeAmountInToken(inputAmount);
     }
+  }, [setFeeAmountInToken, inputAmount]);
 
-    return _toolTipItems;
-  }, [blockchain, isNetworkSourceSelectorVisible, rentFee, txFee, useFreeTransactions]);
+  return null;
+};
+
+export const TransferFee: FC = () => {
+  const { fromTokenAccount, destinationAccount } = useSendState();
+  const { feeToken, setFeeToken, solTokenAmount, feeTokenAmount, feeTokenAccounts } = useSendFees();
 
   return (
-    <TextFieldTXStyled
-      label="Transfer fee"
-      value={blockchain === 'solana' ? 'Free' : `${txFee + rentFee} SOL`}
-      icon={<Tooltip title={<InfoIcon name="info" />}>{toolTipItems}</Tooltip>}
-      className={classNames({ isFree: blockchain === 'solana' })}
-    />
+    <>
+      {!fromTokenAccount?.balance?.token.isRawSOL &&
+      solTokenAmount &&
+      solTokenAmount.greaterThan(0) ? (
+        <FeeTokenSelector
+          feeTokenAccounts={feeTokenAccounts}
+          txType="send"
+          solFeeAmount={solTokenAmount}
+          feeTokenAmount={feeTokenAmount}
+          onSelectToken={setFeeToken}
+          value={feeToken}
+          destinationAccountSymbol={destinationAccount?.symbol}
+        />
+      ) : undefined}
+      {feeToken && !feeToken.balance?.token.isRawSOL && solTokenAmount?.greaterThan(0) ? (
+        <CompensationSwap solTokenAmount={solTokenAmount} feeToken={feeToken} />
+      ) : undefined}
+    </>
   );
 };
