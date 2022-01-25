@@ -3,5 +3,10 @@
   "compilerOptions": {
     "jsx": "react",
     "types": ["jest"]
-  }
+  },
+  "references": [
+    { "path": "packages/core" },
+    { "path": "packages/sail" },
+    { "path": "packages/ui" }
+  ]
 }

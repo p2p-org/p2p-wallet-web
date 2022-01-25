@@ -3,6 +3,7 @@ import { forwardRef } from 'react';
 import * as React from 'react';
 
 import { styled } from '@linaria/react';
+import { borders, shadows, up } from '@p2p-wallet-web/ui';
 import classNames from 'classnames';
 
 const Wrapper = styled.div`
@@ -11,27 +12,26 @@ const Wrapper = styled.div`
   background: #fff;
   border-radius: 12px;
 
-  &.withShadow {
-    box-shadow: 0 4px 4px #f6f6f9;
+  ${up.tablet} {
+    ${borders.primary}
+    ${shadows.light}
   }
 `;
 
 type Props = {
   forwardedRef?: React.Ref<HTMLDivElement>;
-  withShadow?: boolean;
   children?: React.ReactNode;
   className?: string;
 };
 
 const CardOriginal: FunctionComponent<Props> = ({
   forwardedRef,
-  withShadow,
   children,
   className,
   ...props
 }) => {
   return (
-    <Wrapper ref={forwardedRef} {...props} className={classNames(className, { withShadow })}>
+    <Wrapper ref={forwardedRef} {...props} className={classNames(className)}>
       {children}
     </Wrapper>
   );

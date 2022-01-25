@@ -3,6 +3,7 @@ import { forwardRef } from 'react';
 import * as React from 'react';
 
 import { styled } from '@linaria/react';
+import { shadows } from '@p2p-wallet-web/ui';
 import { rgba } from 'polished';
 
 import { Card } from '../Card';
@@ -10,7 +11,7 @@ import { Card } from '../Card';
 const Wrapper = styled(Card)`
   padding: 0;
 
-  box-shadow: 0 4px 4px #f6f6f9;
+  ${shadows.light}
 `;
 
 const Header = styled.div`

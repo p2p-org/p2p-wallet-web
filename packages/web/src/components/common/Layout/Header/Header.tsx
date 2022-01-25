@@ -3,13 +3,14 @@ import { Link, NavLink } from 'react-router-dom';
 
 import { styled } from '@linaria/react';
 import { useWallet } from '@p2p-wallet-web/core';
+import { useIsMobile } from '@p2p-wallet-web/ui';
 import type * as H from 'history';
 
 import Logo from 'assets/images/logo.png';
 import { COLUMN_LEFT_WIDTH, COLUMNS_GRID_GUTTER } from 'components/common/Layout/constants';
 import { Icon } from 'components/ui';
 
-import { ScrollFix } from '../ScollFix';
+import { ScrollFix } from '../../ScollFix';
 import { HEADER_HEIGHT } from './constants';
 
 const Wrapper = styled.header`
@@ -124,30 +125,35 @@ type Props = {
 
 export const Header: FunctionComponent<Props> = ({ breadcrumb }) => {
   const { connected } = useWallet();
+  const isMobile = useIsMobile();
+
+  const headerContent = () => {
+    return (
+      <ScrollFixContainer>
+        <MainContainer>
+          <Content>
+            <LogoLink to={connected ? '/wallets' : '/'}>
+              <LogoImg src={Logo} />
+            </LogoLink>
+            {breadcrumb ? (
+              <BreadcrumbWrapper>
+                {breadcrumb.backTo ? (
+                  <BackLink to={breadcrumb.backTo}>
+                    <BackIcon name="chevron" />
+                  </BackLink>
+                ) : undefined}
+                {breadcrumb.currentName}
+              </BreadcrumbWrapper>
+            ) : undefined}
+          </Content>
+        </MainContainer>
+      </ScrollFixContainer>
+    );
+  };
 
   return (
     <Wrapper>
-      <FixedContainer>
-        <ScrollFixContainer>
-          <MainContainer>
-            <Content>
-              <LogoLink to={connected ? '/wallets' : '/'}>
-                <LogoImg src={Logo} />
-              </LogoLink>
-              {breadcrumb ? (
-                <BreadcrumbWrapper>
-                  {breadcrumb.backTo ? (
-                    <BackLink to={breadcrumb.backTo}>
-                      <BackIcon name="chevron" />
-                    </BackLink>
-                  ) : undefined}
-                  {breadcrumb.currentName}
-                </BreadcrumbWrapper>
-              ) : undefined}
-            </Content>
-          </MainContainer>
-        </ScrollFixContainer>
-      </FixedContainer>
+      {isMobile ? headerContent() : <FixedContainer>{headerContent()}</FixedContainer>}
     </Wrapper>
   );
 };

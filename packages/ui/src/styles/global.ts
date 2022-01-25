@@ -1,6 +1,9 @@
 import { css } from '@linaria/core';
 import { rgba } from 'polished';
 
+import { up } from './breakpoints';
+import { dark, light, theme } from './themes';
+
 export const globalCss = css`
   :global() {
     html,
@@ -10,11 +13,27 @@ export const globalCss = css`
     }
 
     body {
-      font-family: 'Titillium Web', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto',
-        'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+      ${light}
+    }
 
-      background: #fbfbfd;
+    // body[data-theme='light'] {
+    //   ${light}
+    // }
+
+    // body[data-theme='dark'] {
+    //   ${dark}
+    // }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+        'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+
+      background: ${theme.colors.bg.primary};
       -webkit-font-smoothing: antialiased;
+
+      ${up.tablet} {
+        background: ${theme.colors.bg.app};
+      }
     }
 
     a {
