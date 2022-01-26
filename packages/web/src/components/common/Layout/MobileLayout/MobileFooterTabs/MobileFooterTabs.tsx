@@ -4,7 +4,7 @@ import { NavLink } from 'react-router-dom';
 import { styled } from '@linaria/react';
 import { theme } from '@p2p-wallet-web/ui';
 
-import { MOBILE_FOOTER_TABS_HEIGHT } from 'components/common/Layout/MobileFooterTabs/constants';
+import { MOBILE_FOOTER_TABS_HEIGHT } from 'components/common/Layout/MobileLayout/MobileFooterTabs/constants';
 import { Icon } from 'components/ui';
 
 const Wrapper = styled.div`

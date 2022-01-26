@@ -10,8 +10,8 @@ import {
   COLUMN_LEFT_WIDTH_MOBILE,
   CONTAINER_PADDING_TOP,
 } from 'components/common/Layout';
-import { ProfileWidget } from 'components/common/Layout/ColumnLeft/ProfileWidget';
-import { HEADER_HEIGHT } from 'components/common/Layout/Header';
+import { ProfileWidget } from 'components/common/Layout/DesktopLayout/ColumnLeft/ProfileWidget';
+import { HEADER_HEIGHT } from 'components/common/Layout/DesktopLayout/Header';
 
 import { LeftNavMenu } from './LeftNavMenu';
 

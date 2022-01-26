@@ -4,9 +4,9 @@ import * as React from 'react';
 import { styled } from '@linaria/react';
 import { useWallet } from '@p2p-wallet-web/core';
 
+import type { BreadcrumbType } from 'components/common/Layout/types';
 import { ScrollFix } from 'components/common/ScollFix';
 
-import type { BreadcrumbType } from './Header';
 import { MOBILE_FOOTER_TABS_HEIGHT, MobileFooterTabs } from './MobileFooterTabs';
 import { MobileHeader } from './MobileHeader';
 

@@ -6,16 +6,16 @@ import { useWallet } from '@p2p-wallet-web/core';
 import { up, useIsDesktop, useIsTablet } from '@p2p-wallet-web/ui';
 import classNames from 'classnames';
 
-import { ScrollFix } from '../ScollFix';
-import { ColumnLeft } from './ColumnLeft';
+import { ScrollFix } from '../../ScollFix';
 import {
   COLUMN_LEFT_WIDTH,
   COLUMN_LEFT_WIDTH_MOBILE,
   COLUMN_RIGHT_WIDTH,
   COLUMNS_GRID_GUTTER,
   CONTAINER_PADDING_TOP,
-} from './constants';
-import type { BreadcrumbType } from './Header';
+} from '../constants';
+import type { BreadcrumbType } from '../types';
+import { ColumnLeft } from './ColumnLeft';
 import { Header } from './Header';
 import { HEADER_HEIGHT } from './Header/constants';
 
