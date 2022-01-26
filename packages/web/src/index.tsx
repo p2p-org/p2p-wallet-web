@@ -1,6 +1,6 @@
 import './wdyr';
 import 'sanitize.css';
-import 'styles/css/nprogress.css';
+import '@p2p-wallet-web/ui/css/nprogress.css';
 import 'react-loading-skeleton/dist/skeleton.css';
 
 import { StrictMode } from 'react';
@@ -8,11 +8,11 @@ import * as React from 'react';
 import ReactDOM from 'react-dom';
 import { IntercomProvider } from 'react-use-intercom';
 
+import { globalCss } from '@p2p-wallet-web/ui';
 import assert from 'ts-invariant';
 
 import { FeatureFlagsProvider } from 'app/contexts';
 import { isDev } from 'config/constants';
-import { globalCss } from 'styles/global';
 import { initAmplitude } from 'utils/analytics';
 
 initAmplitude();

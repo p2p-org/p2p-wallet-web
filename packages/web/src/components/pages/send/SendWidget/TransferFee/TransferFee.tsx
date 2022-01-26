@@ -7,9 +7,9 @@ import classNames from 'classnames';
 import Decimal from 'decimal.js';
 
 import { useSendState, useSettings } from 'app/contexts';
-import { Icon, Tooltip } from 'components/ui';
+import { Icon, TextField, Tooltip } from 'components/ui';
 
-import { TextFieldTXStyled, TooltipRow, TxName, TxValue } from '../common/styled';
+import { TooltipRow, TxName, TxValue } from '../common/styled';
 
 const InfoIcon = styled(Icon)`
   width: 24px;
@@ -18,6 +18,12 @@ const InfoIcon = styled(Icon)`
   margin-left: 10px;
 
   color: #a3a5ba;
+`;
+
+const TextFieldTXStyled = styled(TextField)`
+  &.isFree {
+    color: #2db533;
+  }
 `;
 
 const BURN_ALLOCATE_ACCOUNT_SIZE = 97;

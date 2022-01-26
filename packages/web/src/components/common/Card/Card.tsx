@@ -1,9 +1,9 @@
 import type { FunctionComponent } from 'react';
-import { forwardRef } from 'react';
 import * as React from 'react';
+import { forwardRef } from 'react';
 
 import { styled } from '@linaria/react';
-import classNames from 'classnames';
+import { borders, shadows, up } from '@p2p-wallet-web/ui';
 
 const Wrapper = styled.div`
   padding: 20px;
@@ -11,27 +11,24 @@ const Wrapper = styled.div`
   background: #fff;
   border-radius: 12px;
 
-  &.withShadow {
-    box-shadow: 0 4px 4px #f6f6f9;
+  ${up.tablet} {
+    ${borders.primary}
+    ${shadows.light}
   }
 `;
 
-type Props = {
+interface Props extends React.HTMLAttributes<HTMLDivElement> {
   forwardedRef?: React.Ref<HTMLDivElement>;
-  withShadow?: boolean;
-  children?: React.ReactNode;
-  className?: string;
-};
+}
 
 const CardOriginal: FunctionComponent<Props> = ({
   forwardedRef,
-  withShadow,
   children,
   className,
   ...props
 }) => {
   return (
-    <Wrapper ref={forwardedRef} {...props} className={classNames(className, { withShadow })}>
+    <Wrapper ref={forwardedRef} {...props} className={className}>
       {children}
     </Wrapper>
   );

@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 
 import { styled } from '@linaria/react';
 import type { TokenAccount } from '@p2p-wallet-web/core';
+import { useIsTablet } from '@p2p-wallet-web/ui';
 import classNames from 'classnames';
 import { rgba } from 'polished';
 
@@ -141,6 +142,7 @@ export const TokenAccountRow: FunctionComponent<Props> = ({
   isHidden = false,
 }) => {
   const { toggleHideTokenAccount } = useSettings();
+  const isTablet = useIsTablet();
 
   const handleMenuItemClick = () => {
     const tokenAddress = tokenAccount.key?.toBase58();
@@ -197,7 +199,7 @@ export const TokenAccountRow: FunctionComponent<Props> = ({
           </Bottom>
         </Content>
       </WrapperLink>
-      {!tokenAccount.balance?.token.isRawSOL ? (
+      {isTablet && !tokenAccount.balance?.token.isRawSOL ? (
         <MenuWrapper>
           <Menu vertical>
             <MenuItem onItemClick={handleMenuItemClick} icon={isHidden ? 'eye' : 'eye-hide'}>

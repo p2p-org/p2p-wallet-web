@@ -1,93 +1,22 @@
 import type { FunctionComponent } from 'react';
 import * as React from 'react';
 import { Helmet } from 'react-helmet';
-import Sticky from 'react-stickynode';
 
-import { styled } from '@linaria/react';
-import { useWallet } from '@p2p-wallet-web/core';
-import NProgress from 'nprogress';
+import { useIsMobile } from '@p2p-wallet-web/ui';
 
-import type { BreadcrumbType } from '../Header';
-import { Header } from '../Header';
-import { HEADER_HEIGHT } from '../Header/constants';
-import { ScrollFix } from '../ScollFix';
-import {
-  COLUMN_LEFT_WIDTH,
-  COLUMN_RIGHT_WIDTH,
-  COLUMNS_GRID_GUTTER,
-  CONTAINER_PADDING_TOP,
-} from './constants';
-// import { Download } from './Download';
-import { LeftNavMenu } from './LeftNavMenu';
-import { ProfileWidget } from './ProfileWidget';
+import { DesktopLayout } from './DesktopLayout';
+import type { BreadcrumbType } from './DesktopLayout/Header';
+import { MobileLayout } from './MobileLayout';
 
-const Wrapper = styled(ScrollFix)``;
-
-const MainScrollFix = styled.div`
-  padding: 0 20px 170px;
-`;
-
-const Container = styled.div`
-  width: 100%;
-  max-width: 796px;
-  min-height: calc(100vh - ${CONTAINER_PADDING_TOP}px - ${HEADER_HEIGHT}px);
-  margin: 0 auto;
-  padding-top: ${CONTAINER_PADDING_TOP}px;
-`;
-
-const Content = styled.div``;
-
-const ColumnsWrapper = styled.div`
-  display: grid;
-  grid-auto-flow: column;
-  grid-gap: ${COLUMNS_GRID_GUTTER}px;
-`;
-
-const ColumnLeftSticky = styled(Sticky)`
-  width: ${COLUMN_LEFT_WIDTH}px;
-  height: fit-content;
-`;
-
-const ColumnLeft = styled.div`
-  display: grid;
-  grid-gap: 16px;
-  grid-template-rows: min-content;
-`;
-
-const ColumnRightWrapper = styled.div`
-  width: ${COLUMN_RIGHT_WIDTH}px;
-  height: fit-content;
-`;
-
-const ColumnRight = styled.div`
-  display: grid;
-  grid-gap: 24px;
-  grid-template-rows: min-content;
-`;
-
-const CenteredWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-`;
-
-NProgress.configure({ showSpinner: false, parent: '#container' });
+// NProgress.configure({ showSpinner: false, parent: '#container' });
 
 type Props = {
   breadcrumb?: BreadcrumbType;
-  leftColumn?: React.ReactNode;
-  rightColumn?: React.ReactNode;
-  centered?: React.ReactNode;
+  children: React.ReactNode;
 };
 
-export const LayoutOrigin: FunctionComponent<Props> = ({
-  breadcrumb,
-  leftColumn,
-  rightColumn,
-  centered,
-  children,
-}) => {
-  const { connected } = useWallet();
+export const LayoutOrigin: FunctionComponent<Props> = ({ breadcrumb, children }) => {
+  const isMobile = useIsMobile();
 
   // useEffect(() => {
   //   if (loading) {
@@ -102,39 +31,11 @@ export const LayoutOrigin: FunctionComponent<Props> = ({
       <Helmet>
         <body className="" />
       </Helmet>
-      <Wrapper>
-        <Header breadcrumb={breadcrumb} />
-        <MainScrollFix id="container">
-          <Container>
-            {connected ? (
-              <Content>
-                {rightColumn ? (
-                  <ColumnsWrapper>
-                    <ColumnLeftSticky top={HEADER_HEIGHT + CONTAINER_PADDING_TOP}>
-                      <ColumnLeft>
-                        {leftColumn || (
-                          <>
-                            <ProfileWidget />
-                            <LeftNavMenu />
-                            {/* <Download /> */}
-                          </>
-                        )}
-                      </ColumnLeft>
-                    </ColumnLeftSticky>
-                    <ColumnRightWrapper>
-                      <ColumnRight>{rightColumn}</ColumnRight>
-                    </ColumnRightWrapper>
-                  </ColumnsWrapper>
-                ) : centered ? (
-                  <CenteredWrapper>{centered}</CenteredWrapper>
-                ) : (
-                  children
-                )}
-              </Content>
-            ) : undefined}
-          </Container>
-        </MainScrollFix>
-      </Wrapper>
+      {isMobile ? (
+        <MobileLayout breadcrumb={breadcrumb}>{children}</MobileLayout>
+      ) : (
+        <DesktopLayout breadcrumb={breadcrumb}>{children}</DesktopLayout>
+      )}
     </>
   );
 };

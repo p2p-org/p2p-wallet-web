@@ -171,163 +171,157 @@ export const Settings: FunctionComponent = () => {
     };
 
   return (
-    <Layout
-      rightColumn={
-        <Wrapper>
-          <WidgetPage icon="gear" title="Settings">
-            <ItemsWrapper>
-              <Feature name={FEATURE_SETTINGS_LIST}>
-                <Item>
-                  <ItemTitle>Currency</ItemTitle>
-                  <ItemAction>
-                    <Select value={settings.currency}>
-                      {CURRENCIES.map(({ ticker, name, symbol }) => (
-                        <MenuItem
-                          key={ticker}
-                          isSelected={ticker === settings.currency}
-                          onItemClick={onItemClickHandler({ currency: ticker })}
-                        >
-                          <CurrencyItem>
-                            {name}
-                            <Symbol>{`(${symbol})`}</Symbol>
-                          </CurrencyItem>
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </ItemAction>
-                </Item>
-                <Item>
-                  <ItemTitle>Appearance</ItemTitle>
-                  <ItemAction>
-                    <Select value={settings.appearance}>
-                      {APPEARANCE.map((value) => (
-                        <MenuItem
-                          key={value}
-                          isSelected={value === settings.appearance}
-                          onItemClick={onItemClickHandler({ appearance: value })}
-                        >
-                          <Capitalize>{value}</Capitalize>
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </ItemAction>
-                </Item>
-              </Feature>
-              <AccordionItem>
-                <Accordion
-                  open={(location.state as any)?.isUsernameActive}
-                  title={
-                    <AccordionTitle>
-                      <AccordionTitlePrimary>Username</AccordionTitlePrimary>
-                      <AccordionTitleSecondary className={classNames({ warning: !username })}>
-                        {username ? `${username}${domain}` : 'Not yet reserved'}
-                      </AccordionTitleSecondary>
-                    </AccordionTitle>
-                  }
-                >
-                  {username ? (
-                    <>
-                      <Text>
-                        Your P2P username allows you to receive any token within the Solana network
-                        even if it is not included in your wallet list.
-                      </Text>
-                      <UsernameAddressWidget
-                        address={publicKey?.toBase58() || ''}
-                        username={`${username}${domain}`}
-                      />
-                    </>
-                  ) : (
-                    <>
-                      <Text>
-                        You can receive and send tokens using your P2P username or link. Also,
-                        users, who know your URL or username can send you any token, even if you
-                        don’t have it in your wallets list.
-                      </Text>
-                      <div>You can access the feature in the app</div>
-                      <MobileButtons>
-                        <NavLink
-                          to={{ pathname: playStorePath }}
-                          target="_blank"
-                          className="button"
-                        >
-                          <img
-                            src={GooglePlayBadge}
-                            width="135"
-                            height="40"
-                            alt="Download P2P Wallet at the Google Play Store"
-                          />
-                        </NavLink>
-                        <NavLink to={{ pathname: appStorePath }} target="_blank" className="button">
-                          <img
-                            src={AppStoreBadge}
-                            width="120"
-                            height="40"
-                            alt="Download P2P Wallet from the App Store"
-                          />
-                        </NavLink>
-                      </MobileButtons>
-                    </>
-                  )}
-                </Accordion>
-              </AccordionItem>
+    <Layout>
+      <Wrapper>
+        <WidgetPage icon="gear" title="Settings">
+          <ItemsWrapper>
+            <Feature name={FEATURE_SETTINGS_LIST}>
               <Item>
-                <ItemTitle>Network</ItemTitle>
-                <ItemAction
+                <ItemTitle>Currency</ItemTitle>
+                <ItemAction>
+                  <Select value={settings.currency}>
+                    {CURRENCIES.map(({ ticker, name, symbol }) => (
+                      <MenuItem
+                        key={ticker}
+                        isSelected={ticker === settings.currency}
+                        onItemClick={onItemClickHandler({ currency: ticker })}
+                      >
+                        <CurrencyItem>
+                          {name}
+                          <Symbol>{`(${symbol})`}</Symbol>
+                        </CurrencyItem>
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </ItemAction>
+              </Item>
+              <Item>
+                <ItemTitle>Appearance</ItemTitle>
+                <ItemAction>
+                  <Select value={settings.appearance}>
+                    {APPEARANCE.map((value) => (
+                      <MenuItem
+                        key={value}
+                        isSelected={value === settings.appearance}
+                        onItemClick={onItemClickHandler({ appearance: value })}
+                      >
+                        <Capitalize>{value}</Capitalize>
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </ItemAction>
+              </Item>
+            </Feature>
+            <AccordionItem>
+              <Accordion
+                open={(location.state as any)?.isUsernameActive}
+                title={
+                  <AccordionTitle>
+                    <AccordionTitlePrimary>Username</AccordionTitlePrimary>
+                    <AccordionTitleSecondary className={classNames({ warning: !username })}>
+                      {username ? `${username}${domain}` : 'Not yet reserved'}
+                    </AccordionTitleSecondary>
+                  </AccordionTitle>
+                }
+              >
+                {username ? (
+                  <>
+                    <Text>
+                      Your P2P username allows you to receive any token within the Solana network
+                      even if it is not included in your wallet list.
+                    </Text>
+                    <UsernameAddressWidget
+                      address={publicKey?.toBase58() || ''}
+                      username={`${username}${domain}`}
+                    />
+                  </>
+                ) : (
+                  <>
+                    <Text>
+                      You can receive and send tokens using your P2P username or link. Also, users,
+                      who know your URL or username can send you any token, even if you don’t have
+                      it in your wallets list.
+                    </Text>
+                    <div>You can access the feature in the app</div>
+                    <MobileButtons>
+                      <NavLink to={{ pathname: playStorePath }} target="_blank" className="button">
+                        <img
+                          src={GooglePlayBadge}
+                          width="135"
+                          height="40"
+                          alt="Download P2P Wallet at the Google Play Store"
+                        />
+                      </NavLink>
+                      <NavLink to={{ pathname: appStorePath }} target="_blank" className="button">
+                        <img
+                          src={AppStoreBadge}
+                          width="120"
+                          height="40"
+                          alt="Download P2P Wallet from the App Store"
+                        />
+                      </NavLink>
+                    </MobileButtons>
+                  </>
+                )}
+              </Accordion>
+            </AccordionItem>
+            <Item>
+              <ItemTitle>Network</ItemTitle>
+              <ItemAction
+                onClick={() => {
+                  history.push('/settings/network');
+                }}
+                style={{ cursor: 'pointer' }}
+              >
+                <Title className="overflow-ellipsis" title={endpoint}>
+                  {endpoint}
+                </Title>
+                <ChevronWrapper
                   onClick={() => {
                     history.push('/settings/network');
                   }}
-                  style={{ cursor: 'pointer' }}
                 >
-                  <Title className="overflow-ellipsis" title={endpoint}>
-                    {endpoint}
-                  </Title>
-                  <ChevronWrapper
-                    onClick={() => {
-                      history.push('/settings/network');
-                    }}
-                  >
-                    <ChevronIcon name="chevron" />
-                  </ChevronWrapper>
-                </ItemAction>
-              </Item>
+                  <ChevronIcon name="chevron" />
+                </ChevronWrapper>
+              </ItemAction>
+            </Item>
+            <Item>
+              <ItemTitle>Hide zero balances</ItemTitle>
+              <ItemAction>
+                <Switch
+                  checked={settings.isZeroBalancesHidden}
+                  onChange={(checked) => {
+                    trackEvent('settings_hide_zero_balances_click', {
+                      hide: checked,
+                    });
+                    onItemClickHandler({
+                      isZeroBalancesHidden: checked,
+                    })();
+                  }}
+                />
+              </ItemAction>
+            </Item>
+            <Feature name={FEATURE_SETTINGS_FREE_TRANSACTIONS}>
               <Item>
-                <ItemTitle>Hide zero balances</ItemTitle>
+                <ItemTitle>Use free transactions</ItemTitle>
                 <ItemAction>
                   <Switch
-                    checked={settings.isZeroBalancesHidden}
-                    onChange={(checked) => {
-                      trackEvent('settings_hide_zero_balances_click', {
-                        hide: checked,
-                      });
+                    checked={settings.useFreeTransactions}
+                    onChange={(checked) =>
                       onItemClickHandler({
-                        isZeroBalancesHidden: checked,
-                      })();
-                    }}
+                        useFreeTransactions: checked,
+                      })()
+                    }
                   />
                 </ItemAction>
               </Item>
-              <Feature name={FEATURE_SETTINGS_FREE_TRANSACTIONS}>
-                <Item>
-                  <ItemTitle>Use free transactions</ItemTitle>
-                  <ItemAction>
-                    <Switch
-                      checked={settings.useFreeTransactions}
-                      onChange={(checked) =>
-                        onItemClickHandler({
-                          useFreeTransactions: checked,
-                        })()
-                      }
-                    />
-                  </ItemAction>
-                </Item>
-              </Feature>
-            </ItemsWrapper>
-            <LogoutWrapper>
-              <Logout onClick={handleLogoutClick}>Logout now</Logout>
-            </LogoutWrapper>
-          </WidgetPage>
-        </Wrapper>
-      }
-    />
+            </Feature>
+          </ItemsWrapper>
+          <LogoutWrapper>
+            <Logout onClick={handleLogoutClick}>Logout now</Logout>
+          </LogoutWrapper>
+        </WidgetPage>
+      </Wrapper>
+    </Layout>
   );
 };

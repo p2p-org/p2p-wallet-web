@@ -1,7 +1,6 @@
 import { styled } from '@linaria/react';
 
 import { WidgetPage } from 'components/common/WidgetPage';
-import { TextField } from 'components/ui';
 
 export const WrapperWidgetPage = styled(WidgetPage)``;
 
@@ -45,16 +44,6 @@ export const FeeRight = styled.div`
   align-items: center;
 `;
 
-export const BottomWrapper = styled.div`
-  padding: 24px 0;
-
-  &:not(:has(div:only-child)) {
-    padding: 20px;
-  }
-`;
-
-export const ButtonWrapper = styled.div``;
-
 export const TooltipRow = styled.div`
   display: flex;
 
@@ -71,12 +60,4 @@ export const TxName = styled.div`
 
 export const TxValue = styled.div`
   font-weight: 600;
-`;
-
-export const TextFieldTXStyled = styled(TextField)`
-  margin-bottom: 8px;
-
-  &.isFree {
-    color: #2db533;
-  }
 `;
