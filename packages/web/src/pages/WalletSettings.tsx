@@ -31,13 +31,12 @@ export const WalletSettings: FunctionComponent = () => {
           state: { fromPage: location.pathname },
         },
       }}
-      rightColumn={
-        <TokenSettingsWidget
-          publicKey={publicKey}
-          tokenName={tokenName}
-          isZeroBalance={isZeroBalance}
-        />
-      }
-    />
+    >
+      <TokenSettingsWidget
+        publicKey={publicKey}
+        tokenName={tokenName}
+        isZeroBalance={isZeroBalance}
+      />
+    </Layout>
   );
 };

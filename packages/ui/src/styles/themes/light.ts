@@ -16,7 +16,7 @@ const theme = {
     },
     stroke: {
       primary: '#D3D4DE',
-      Secondary: '#F2F2F7',
+      secondary: '#F2F2F7',
       tertiary: '#F6F6F8',
       // 'chart-red': '',
       // 'chart-green': '',

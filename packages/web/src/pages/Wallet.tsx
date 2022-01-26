@@ -37,14 +37,11 @@ export const WalletOrigin: FunctionComponent = () => {
           state: { fromPage: location.pathname },
         },
       }}
-      rightColumn={
-        <>
-          <TopWidget publicKey={_publicKey} />
-          <QRAddressWidget publicKey={_publicKey} />
-          <TransactionsWidget publicKey={_publicKey} />
-        </>
-      }
-    />
+    >
+      <TopWidget publicKey={_publicKey} />
+      <QRAddressWidget publicKey={_publicKey} />
+      <TransactionsWidget publicKey={_publicKey} />
+    </Layout>
   );
 };
 

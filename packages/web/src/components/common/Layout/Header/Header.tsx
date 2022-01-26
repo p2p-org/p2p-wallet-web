@@ -3,24 +3,18 @@ import { Link, NavLink } from 'react-router-dom';
 
 import { styled } from '@linaria/react';
 import { useWallet } from '@p2p-wallet-web/core';
-import { useIsMobile } from '@p2p-wallet-web/ui';
 import type * as H from 'history';
 
 import Logo from 'assets/images/logo.png';
-import { COLUMN_LEFT_WIDTH, COLUMNS_GRID_GUTTER } from 'components/common/Layout/constants';
+import { COLUMN_LEFT_WIDTH, COLUMNS_GRID_GUTTER } from 'components/common/Layout';
 import { Icon } from 'components/ui';
 
 import { ScrollFix } from '../../ScollFix';
 import { HEADER_HEIGHT } from './constants';
 
 const Wrapper = styled.header`
-  position: relative;
-
-  height: ${HEADER_HEIGHT}px;
-`;
-
-const FixedContainer = styled.div`
-  position: fixed;
+  position: sticky;
+  top: 0;
   z-index: 1;
 
   width: 100%;
@@ -125,10 +119,9 @@ type Props = {
 
 export const Header: FunctionComponent<Props> = ({ breadcrumb }) => {
   const { connected } = useWallet();
-  const isMobile = useIsMobile();
 
-  const headerContent = () => {
-    return (
+  return (
+    <Wrapper>
       <ScrollFixContainer>
         <MainContainer>
           <Content>
@@ -148,12 +141,6 @@ export const Header: FunctionComponent<Props> = ({ breadcrumb }) => {
           </Content>
         </MainContainer>
       </ScrollFixContainer>
-    );
-  };
-
-  return (
-    <Wrapper>
-      {isMobile ? headerContent() : <FixedContainer>{headerContent()}</FixedContainer>}
     </Wrapper>
   );
 };

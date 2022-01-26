@@ -4,17 +4,16 @@ import { NavLink } from 'react-router-dom';
 import { styled } from '@linaria/react';
 import { theme } from '@p2p-wallet-web/ui';
 
+import { MOBILE_FOOTER_TABS_HEIGHT } from 'components/common/Layout/MobileFooterTabs/constants';
 import { Icon } from 'components/ui';
 
 const Wrapper = styled.div`
-  position: fixed;
-  bottom: 0;
   z-index: 1;
 
   display: flex;
   align-content: center;
   width: 100%;
-  height: 56px;
+  height: ${MOBILE_FOOTER_TABS_HEIGHT}px;
 
   background: ${theme.colors.bg.activeSecondary};
   box-shadow: 0 -2px 8px rgba(56, 60, 71, 0.05);

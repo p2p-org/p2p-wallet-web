@@ -1,10 +1,9 @@
 import type { FunctionComponent } from 'react';
-import { forwardRef } from 'react';
 import * as React from 'react';
+import { forwardRef } from 'react';
 
 import { styled } from '@linaria/react';
 import { borders, shadows, up } from '@p2p-wallet-web/ui';
-import classNames from 'classnames';
 
 const Wrapper = styled.div`
   padding: 20px;
@@ -18,11 +17,9 @@ const Wrapper = styled.div`
   }
 `;
 
-type Props = {
+interface Props extends React.HTMLAttributes<HTMLDivElement> {
   forwardedRef?: React.Ref<HTMLDivElement>;
-  children?: React.ReactNode;
-  className?: string;
-};
+}
 
 const CardOriginal: FunctionComponent<Props> = ({
   forwardedRef,
@@ -31,7 +28,7 @@ const CardOriginal: FunctionComponent<Props> = ({
   ...props
 }) => {
   return (
-    <Wrapper ref={forwardedRef} {...props} className={classNames(className)}>
+    <Wrapper ref={forwardedRef} {...props} className={className}>
       {children}
     </Wrapper>
   );

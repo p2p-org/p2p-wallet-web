@@ -17,12 +17,10 @@ export const Swap: FunctionComponent = () => {
   }, []);
 
   return (
-    <Layout
-      rightColumn={
-        <SwapProvider initialState={{ inputTokenName: symbol }}>
-          <SwapWidget />
-        </SwapProvider>
-      }
-    />
+    <Layout>
+      <SwapProvider initialState={{ inputTokenName: symbol }}>
+        <SwapWidget />
+      </SwapProvider>
+    </Layout>
   );
 };

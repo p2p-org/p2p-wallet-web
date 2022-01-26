@@ -34,23 +34,13 @@ const Wrapper = styled.div`
   grid-template-rows: min-content;
 `;
 
-interface Props {
-  leftColumn?: React.ReactNode;
-}
-
-export const ColumnLeft: FC<Props> = ({ leftColumn }) => {
+export const ColumnLeft: FC = () => {
   return (
     <ColumnLeftSticky top={HEADER_HEIGHT + CONTAINER_PADDING_TOP}>
       <Wrapper>
-        {leftColumn ? (
-          leftColumn
-        ) : (
-          <>
-            <ProfileWidget />
-            <LeftNavMenu />
-            {/* <Download /> */}
-          </>
-        )}
+        <ProfileWidget />
+        <LeftNavMenu />
+        {/* <Download /> */}
       </Wrapper>
     </ColumnLeftSticky>
   );
