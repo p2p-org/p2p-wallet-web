@@ -4,7 +4,7 @@ import { useLocation, useParams } from 'react-router-dom';
 
 import { useWallet } from '@p2p-wallet-web/core';
 
-import { SendFeesProvider, SendStateProvider } from 'app/contexts';
+import { FeeCompensationProvider, SendStateProvider } from 'app/contexts';
 import { Layout } from 'components/common/Layout';
 import { ResultWidget } from 'components/pages/send/ResultWidget';
 import { SendWidget } from 'components/pages/send/SendWidget';
@@ -21,8 +21,8 @@ export const Send: FunctionComponent = () => {
   }, []);
 
   return (
-    <SendStateProvider>
-      <SendFeesProvider>
+    <FeeCompensationProvider>
+      <SendStateProvider>
         <Layout
           breadcrumb={
             status === 'result'
@@ -37,7 +37,7 @@ export const Send: FunctionComponent = () => {
           }
           rightColumn={status !== 'result' ? <SendWidget /> : <ResultWidget />}
         />
-      </SendFeesProvider>
-    </SendStateProvider>
+      </SendStateProvider>
+    </FeeCompensationProvider>
   );
 };
