@@ -90,8 +90,8 @@ export const Auth: FC = () => {
 
   useUpdateEffect(() => {
     if (connected) {
-      history.push(location.state.fromPage || '/wallets', {
-        fromPage: location.state.fromPage || location.pathname,
+      history.push(location.state?.fromPage || '/wallets', {
+        fromPage: location.state?.fromPage || location.pathname,
       });
     }
   }, [connected]);
