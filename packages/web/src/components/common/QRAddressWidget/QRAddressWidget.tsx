@@ -307,7 +307,7 @@ export const QRAddressWidgetOrigin: FunctionComponent<Props> = ({ publicKey, cla
   }
 
   return (
-    <WrapperCard className={className} withShadow>
+    <WrapperCard className={className}>
       <HeaderWrapper>
         <TokenWrapper>
           {copied ? (

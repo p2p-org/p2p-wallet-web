@@ -22,7 +22,7 @@ export interface UseMainSettings {
 }
 
 export const useMainSettingsInternal = (): UseMainSettings => {
-  const [settings, _isSettingsLoading, setSettings] = useStorage<MainSettings>(
+  const [settings, setSettings] = useStorage<MainSettings>(
     STORAGE_KEYS.settings,
     DEFAULT_MAIN_SETTINGS,
   );

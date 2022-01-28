@@ -35,8 +35,9 @@ export const Send: FunctionComponent = () => {
                 }
               : undefined
           }
-          rightColumn={status !== 'result' ? <SendWidget /> : <ResultWidget />}
-        />
+        >
+          {status !== 'result' ? <SendWidget /> : <ResultWidget />}
+        </Layout>
       </SendStateProvider>
     </FeeCompensationProvider>
   );

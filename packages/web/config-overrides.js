@@ -7,6 +7,7 @@ const {
   setWebpackPublicPath,
   disableChunk,
   addWebpackAlias,
+  removeModuleScopePlugin,
 } = require('customize-cra');
 const SpritePlugin = require('svg-sprite-loader/plugin');
 const PrerenderSPAPlugin = require('prerender-spa-plugin');
@@ -17,6 +18,10 @@ module.exports = override(
   useBabelRc(),
   setWebpackPublicPath(process.env.REACT_APP_BASENAME || '/'),
   addWebpackPlugin(new SpritePlugin()),
+  removeModuleScopePlugin(),
+  addWebpackAlias({
+    '@p2p-wallet-web/ui': path.resolve(__dirname, './../ui'),
+  }),
   isDev && disableChunk(),
   !isDev &&
     addWebpackPlugin(

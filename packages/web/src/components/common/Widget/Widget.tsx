@@ -3,37 +3,46 @@ import { forwardRef } from 'react';
 import * as React from 'react';
 
 import { styled } from '@linaria/react';
-import { rgba } from 'polished';
+import { shadows, theme, up } from '@p2p-wallet-web/ui';
 
 import { Card } from '../Card';
 
 const Wrapper = styled(Card)`
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+
   padding: 0;
 
-  box-shadow: 0 4px 4px #f6f6f9;
+  ${up.tablet} {
+    ${shadows.light}
+  }
 `;
 
 const Header = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 18px 20px;
-
-  &:not(:last-child) {
-    border-bottom: 1px solid ${rgba(0, 0, 0, 0.05)};
-  }
+  height: 60px;
+  margin-top: 8px;
+  padding: 8px 20px;
 `;
 
 const Title = styled.div`
-  color: #000;
-  font-weight: 600;
+  color: ${theme.colors.textIcon.primary};
+  font-weight: 500;
   font-size: 24px;
   line-height: 140%;
+  letter-spacing: 0.01em;
 `;
 
 const Action = styled.div``;
 
-const Content = styled.div``;
+const Content = styled.div`
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+`;
 
 type Props = {
   forwardedRef?: React.Ref<HTMLDivElement>;

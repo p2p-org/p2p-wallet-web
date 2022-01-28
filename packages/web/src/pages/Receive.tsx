@@ -17,14 +17,10 @@ export const Receive: FunctionComponent = () => {
   }, []);
 
   return (
-    <Layout
-      rightColumn={
-        <>
-          <ReceiveAddressWidget />
-          {/* <ReceiveWalletsWidget /> */}
-          {/* <ReceiveNewWidget /> */}
-        </>
-      }
-    />
+    <Layout>
+      <ReceiveAddressWidget />
+      {/* <ReceiveWalletsWidget /> */}
+      {/* <ReceiveNewWidget /> */}
+    </Layout>
   );
 };

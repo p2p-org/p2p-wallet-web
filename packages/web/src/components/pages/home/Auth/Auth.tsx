@@ -76,7 +76,7 @@ const NavLinkStyled = styled(NavLink)`
 
 export const Auth: FC = () => {
   const history = useHistory();
-  const location = useLocation<{ from?: string }>();
+  const location = useLocation<{ fromPage?: string }>();
   const { connected } = useWallet();
 
   const [isLoading, setIsLoading] = useState(false);
@@ -90,7 +90,9 @@ export const Auth: FC = () => {
 
   useUpdateEffect(() => {
     if (connected) {
-      history.push('/wallets');
+      history.push(location.state.fromPage || '/wallets', {
+        fromPage: location.state.fromPage || location.pathname,
+      });
     }
   }, [connected]);
 

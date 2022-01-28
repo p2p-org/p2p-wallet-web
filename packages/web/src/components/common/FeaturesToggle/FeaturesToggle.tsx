@@ -78,7 +78,7 @@ export const FeaturesToggle: FC = memo(() => {
   };
 
   return (
-    <WrapperCard ref={cardRef} withShadow>
+    <WrapperCard ref={cardRef}>
       <Label>
         Turn on all{' '}
         <Input type="checkbox" checked={featureFlagsEnabled} onChange={handleToggleFeatures} />

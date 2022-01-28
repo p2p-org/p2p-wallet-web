@@ -3,23 +3,18 @@ import { Link, NavLink } from 'react-router-dom';
 
 import { styled } from '@linaria/react';
 import { useWallet } from '@p2p-wallet-web/core';
-import type * as H from 'history';
 
-import Logo from 'assets/images/logo.png';
-import { COLUMN_LEFT_WIDTH, COLUMNS_GRID_GUTTER } from 'components/common/Layout/constants';
+import logo from 'assets/images/logo.png';
+import { COLUMN_LEFT_WIDTH, COLUMNS_GRID_GUTTER } from 'components/common/Layout';
 import { Icon } from 'components/ui';
 
-import { ScrollFix } from '../ScollFix';
+import { ScrollFix } from '../../../ScollFix';
+import type { BreadcrumbType } from '../../types';
 import { HEADER_HEIGHT } from './constants';
 
 const Wrapper = styled.header`
-  position: relative;
-
-  height: ${HEADER_HEIGHT}px;
-`;
-
-const FixedContainer = styled.div`
-  position: fixed;
+  position: sticky;
+  top: 0;
   z-index: 1;
 
   width: 100%;
@@ -113,11 +108,6 @@ const BackLink = styled(NavLink)`
   }
 `;
 
-export type BreadcrumbType = {
-  currentName: string;
-  backTo?: string | Partial<H.Location<any>>;
-};
-
 type Props = {
   breadcrumb?: BreadcrumbType;
 };
@@ -127,27 +117,25 @@ export const Header: FunctionComponent<Props> = ({ breadcrumb }) => {
 
   return (
     <Wrapper>
-      <FixedContainer>
-        <ScrollFixContainer>
-          <MainContainer>
-            <Content>
-              <LogoLink to={connected ? '/wallets' : '/'}>
-                <LogoImg src={Logo} />
-              </LogoLink>
-              {breadcrumb ? (
-                <BreadcrumbWrapper>
-                  {breadcrumb.backTo ? (
-                    <BackLink to={breadcrumb.backTo}>
-                      <BackIcon name="chevron" />
-                    </BackLink>
-                  ) : undefined}
-                  {breadcrumb.currentName}
-                </BreadcrumbWrapper>
-              ) : undefined}
-            </Content>
-          </MainContainer>
-        </ScrollFixContainer>
-      </FixedContainer>
+      <ScrollFixContainer>
+        <MainContainer>
+          <Content>
+            <LogoLink to={connected ? '/wallets' : '/'}>
+              <LogoImg src={logo} />
+            </LogoLink>
+            {breadcrumb ? (
+              <BreadcrumbWrapper>
+                {breadcrumb.backTo ? (
+                  <BackLink to={breadcrumb.backTo}>
+                    <BackIcon name="chevron" />
+                  </BackLink>
+                ) : undefined}
+                {breadcrumb.currentName}
+              </BreadcrumbWrapper>
+            ) : undefined}
+          </Content>
+        </MainContainer>
+      </ScrollFixContainer>
     </Wrapper>
   );
 };

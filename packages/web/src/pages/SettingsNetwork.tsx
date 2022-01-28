@@ -13,7 +13,8 @@ export const SettingsNetwork: FunctionComponent = () => {
         currentName: 'Network',
         backTo: { pathname: '/settings', state: { fromPage: location.pathname } },
       }}
-      rightColumn={<Network />}
-    />
+    >
+      <Network />
+    </Layout>
   );
 };

@@ -5,10 +5,10 @@ import { useHistory } from 'react-router';
 import { styled } from '@linaria/react';
 import type { TokenAccount } from '@p2p-wallet-web/core';
 import { useSolana, useUserTokenAccounts } from '@p2p-wallet-web/core';
+import { theme, up } from '@p2p-wallet-web/ui';
 import type { Token } from '@saberhq/token-utils';
 import { PublicKey } from '@solana/web3.js';
 import classNames from 'classnames';
-import { rgba } from 'polished';
 
 import { isValidAddress, useSendState } from 'app/contexts';
 import { CompensationFee } from 'components/common/CompensationFee';
@@ -19,15 +19,29 @@ import { SendButtonSolana } from 'components/pages/send/SendWidget/SendButton/Se
 import { Switch, TextField } from 'components/ui';
 import { trackEvent } from 'utils/analytics';
 
-import { Hint } from '../../../common/Hint';
-import { BurnAndRelease } from './BurnAndRelease';
-import { BottomWrapper, ButtonWrapper, FromWrapper, WrapperWidgetPage } from './common/styled';
+import { BurnAndRelease } from './BurnAndRelease/BurnAndRelease';
+import { FromWrapper, WrapperWidgetPage } from './common/styled';
 import { NetworkSelect } from './NetworkSelect';
 import { ToAddressInput } from './ToAddressInput';
 
 const Wrapper = styled.div`
-  margin-top: 16px;
-  padding: 8px 20px;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: space-between;
+
+  ${up.tablet} {
+    flex: initial;
+    justify-content: initial;
+  }
+`;
+
+const MainWrapper = styled.div`
+  padding: 16px;
+
+  ${up.tablet} {
+    padding: 16px 20px;
+  }
 `;
 
 const ToSendWrapper = styled(FromWrapper)``;
@@ -68,20 +82,19 @@ const ConfirmTextSecondary = styled.div`
   font-size: 16px;
 `;
 
-const HintWrapper = styled.div`
-  padding: 12px 0;
-
-  color: #a3a5ba;
-  font-size: 14px;
-  line-height: 21px;
-  text-align: center;
-
-  border-top: 1px solid ${rgba('#000', 0.05)};
-`;
-
 const TextFieldStyled = styled(TextField)`
   margin-bottom: 8px;
 `;
+
+const BottomWrapper = styled.div`
+  padding: 16px;
+
+  ${up.tablet} {
+    border-top: 1px solid ${theme.colors.stroke.tertiary};
+  }
+`;
+
+const ButtonWrapper = styled.div``;
 
 const isValidAmount = (amount: string): boolean => {
   const amountValue = Number.parseFloat(amount);
@@ -168,9 +181,9 @@ export const SendWidget: FunctionComponent = () => {
     (isShowConfirmAddressSwitch && !isConfirmCorrectAddress);
 
   return (
-    <div>
-      <WrapperWidgetPage title="Send" icon="top">
-        <Wrapper>
+    <WrapperWidgetPage title="Send" icon="top">
+      <Wrapper>
+        <MainWrapper>
           <FromWrapper>
             <FromToSelectInput
               tokenAccounts={tokenAccounts}
@@ -216,27 +229,25 @@ export const SendWidget: FunctionComponent = () => {
             isShow={!fromTokenAccount?.balance?.token.isRawSOL}
             accountSymbol={destinationAccount?.symbol || ''}
           />
+        </MainWrapper>
 
-          <BottomWrapper>
-            <ButtonWrapper>
-              {blockchain === 'bitcoin' ? (
-                <SendButtonBitcoin
-                  primary={!isDisabled}
-                  disabled={isDisabledButton}
-                  onInitBurnAndRelease={() => setIsInitBurnAndRelease(true)}
-                />
-              ) : (
-                <SendButtonSolana primary={!isDisabled} disabled={isDisabledButton} />
-              )}
-            </ButtonWrapper>
-          </BottomWrapper>
-          <HintWrapper>Send SOL or any SPL Tokens on one address</HintWrapper>
-          {isInitBurnAndRelease ? (
-            <BurnAndRelease destinationAddress={toPublicKey} targetAmount={fromAmount} />
-          ) : undefined}
-        </Wrapper>
-      </WrapperWidgetPage>
-      <Hint />
-    </div>
+        <BottomWrapper>
+          <ButtonWrapper>
+            {blockchain === 'bitcoin' ? (
+              <SendButtonBitcoin
+                primary={!isDisabled}
+                disabled={isDisabledButton}
+                onInitBurnAndRelease={() => setIsInitBurnAndRelease(true)}
+              />
+            ) : (
+              <SendButtonSolana primary={!isDisabled} disabled={isDisabledButton} />
+            )}
+          </ButtonWrapper>
+        </BottomWrapper>
+        {isInitBurnAndRelease ? (
+          <BurnAndRelease destinationAddress={toPublicKey} targetAmount={fromAmount} />
+        ) : undefined}
+      </Wrapper>
+    </WrapperWidgetPage>
   );
 };

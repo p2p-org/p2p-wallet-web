@@ -30,14 +30,12 @@ export const Wallets: FunctionComponent = () => {
   };
 
   return (
-    <Layout
-      rightColumn={
-        <WrapperTemp>
-          <UsernameBanner />
-          <TotalBalanceWidget onSymbolChange={handleSymbolChange} />
-          <TokensWidget selectedSymbol={selectedSymbol} />
-        </WrapperTemp>
-      }
-    />
+    <Layout>
+      <WrapperTemp>
+        <UsernameBanner />
+        <TotalBalanceWidget onSymbolChange={handleSymbolChange} />
+        <TokensWidget selectedSymbol={selectedSymbol} />
+      </WrapperTemp>
+    </Layout>
   );
 };

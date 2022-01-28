@@ -3,6 +3,7 @@ import { useLocation } from 'react-router';
 import { NavLink } from 'react-router-dom';
 
 import { styled } from '@linaria/react';
+import { borders, shadows, theme, up } from '@p2p-wallet-web/ui';
 import { Feature } from 'flagged';
 
 import { Icon } from 'components/ui';
@@ -18,15 +19,26 @@ const NavButton = styled.div`
   display: flex;
   align-items: center;
   height: 52px;
-  padding: 10px 20px;
 
-  color: #000;
+  color: ${theme.colors.textIcon.primary};
   font-weight: 600;
   font-size: 16px;
   line-height: 140%;
+  letter-spacing: 0.01em;
 
-  background: #fff;
+  background: ${theme.colors.bg.primary};
+
   border-radius: 12px;
+
+  ${up.tablet} {
+    padding: 10px 10px;
+    ${borders.primary};
+    ${shadows.light}
+  }
+
+  ${up.desktop} {
+    padding: 10px 16px;
+  }
 `;
 
 const IconBlock = styled.div`
@@ -35,17 +47,24 @@ const IconBlock = styled.div`
   justify-content: center;
   width: 32px;
   height: 32px;
-  margin-right: 20px;
-
-  background: #f6f6f8;
-  border-radius: 12px;
 `;
 
 const NavIcon = styled(Icon)`
   width: 20px;
   height: 20px;
 
-  color: #a3a5ba;
+  color: ${theme.colors.textIcon.secondary};
+`;
+
+const Name = styled.span`
+  ${up.tablet} {
+    display: none;
+  }
+
+  ${up.desktop} {
+    display: block;
+    margin-left: 20px;
+  }
 `;
 
 const NavLinkMenu = styled(NavLink)`
@@ -53,16 +72,13 @@ const NavLinkMenu = styled(NavLink)`
     ${NavButton} {
       color: #5887ff;
 
-      background: #eff3ff;
+      background: ${theme.colors.bg.activePrimary};
 
       ${IconBlock} {
-        color: #5887ff;
-
-        background: #fff !important;
-        border: 1px solid #5887ff;
+        color: ${theme.colors.textIcon.secondary};
 
         ${NavIcon} {
-          color: #5887ff;
+          color: ${theme.colors.textIcon.active};
         }
       }
     }
@@ -75,16 +91,13 @@ const NavLinkMenu = styled(NavLink)`
 
   &:hover {
     ${NavButton} {
-      color: #5887ff;
+      color: ${theme.colors.textIcon.active};
 
       ${IconBlock} {
-        color: #5887ff;
-
-        background: #eff3ff;
-        border: 1px solid #5887ff;
+        color: ${theme.colors.textIcon.active};
 
         ${NavIcon} {
-          color: #5887ff;
+          color: ${theme.colors.textIcon.active};
         }
       }
     }
@@ -125,7 +138,7 @@ export const LeftNavMenu: FunctionComponent = () => {
           <IconBlock>
             <NavIcon name="home" />
           </IconBlock>
-          Wallets
+          <Name>Wallets</Name>
         </NavButton>
       </NavLinkMenu>
 
@@ -138,7 +151,7 @@ export const LeftNavMenu: FunctionComponent = () => {
             <IconBlock>
               <NavIcon name="plus" />
             </IconBlock>
-            Buy
+            <Name>Buy</Name>
           </NavButton>
         </NavLinkMenu>
       </Feature>
@@ -151,7 +164,7 @@ export const LeftNavMenu: FunctionComponent = () => {
           <IconBlock>
             <NavIcon name="bottom" />
           </IconBlock>
-          Receive
+          <Name>Receive</Name>
         </NavButton>
       </NavLinkMenu>
       <NavLinkMenu
@@ -162,7 +175,7 @@ export const LeftNavMenu: FunctionComponent = () => {
           <IconBlock>
             <NavIcon name="top" />
           </IconBlock>
-          Send
+          <Name>Send</Name>
         </NavButton>
       </NavLinkMenu>
       <NavLinkMenu
@@ -173,7 +186,7 @@ export const LeftNavMenu: FunctionComponent = () => {
           <IconBlock>
             <NavIcon name="swap" />
           </IconBlock>
-          Swap
+          <Name>Swap</Name>
         </NavButton>
       </NavLinkMenu>
       <NavLinkMenu
@@ -184,7 +197,7 @@ export const LeftNavMenu: FunctionComponent = () => {
           <IconBlock>
             <NavIcon name="gear" />
           </IconBlock>
-          Settings
+          <Name>Settings</Name>
         </NavButton>
       </NavLinkMenu>
       <Separator>
@@ -195,7 +208,7 @@ export const LeftNavMenu: FunctionComponent = () => {
           <IconBlock>
             <NavIcon name="app-store" />
           </IconBlock>
-          App Store
+          <Name>App Store</Name>
         </NavButton>
       </NavLinkMenu>
       <NavLinkMenu to={{ pathname: playStorePath }} target="_blank" className="button">
@@ -203,7 +216,7 @@ export const LeftNavMenu: FunctionComponent = () => {
           <IconBlock>
             <NavIcon name="google-play" />
           </IconBlock>
-          Google Play
+          <Name>Google Play</Name>
         </NavButton>
       </NavLinkMenu>
     </Wrapper>

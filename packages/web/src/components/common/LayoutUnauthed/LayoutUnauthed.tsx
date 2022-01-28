@@ -2,7 +2,7 @@ import type { FC } from 'react';
 
 import { styled } from '@linaria/react';
 
-import { Header } from 'components/common/Header';
+import { Header } from 'components/common/Layout/DesktopLayout/Header';
 
 const Wrapper = styled.div`
   display: flex;
