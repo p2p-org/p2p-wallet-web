@@ -11,11 +11,11 @@ import { PublicKey } from '@solana/web3.js';
 import classNames from 'classnames';
 
 import { isValidAddress, useSendState } from 'app/contexts';
+import { CompensationFee } from 'components/common/CompensationFee';
 import { RateUSD } from 'components/common/RateUSD';
 import { FromToSelectInput } from 'components/pages/send/SendWidget/FromToSelectInput';
 import { SendButtonBitcoin } from 'components/pages/send/SendWidget/SendButton';
 import { SendButtonSolana } from 'components/pages/send/SendWidget/SendButton/SendButtonSolana';
-import { TransferFee } from 'components/pages/send/SendWidget/TransferFee';
 import { Switch, TextField } from 'components/ui';
 import { trackEvent } from 'utils/analytics';
 
@@ -118,6 +118,7 @@ export const SendWidget: FunctionComponent = () => {
     isExecuting,
     isAddressInvalid,
     isRenBTC,
+    destinationAccount,
   } = useSendState();
   const tokenAccounts = useUserTokenAccounts();
 
@@ -223,7 +224,11 @@ export const SendWidget: FunctionComponent = () => {
               </>
             }
           />
-          <TransferFee />
+          <CompensationFee
+            type="send"
+            isShow={!fromTokenAccount?.balance?.token.isRawSOL}
+            accountSymbol={destinationAccount?.symbol || ''}
+          />
         </MainWrapper>
 
         <BottomWrapper>

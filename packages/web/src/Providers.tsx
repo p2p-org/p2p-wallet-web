@@ -12,6 +12,7 @@ import { SailProvider } from '@p2p-wallet-web/sail';
 
 import {
   BlockchainProvider,
+  FeeRelayerProvider,
   ModalsProvider,
   NameServiceProvider,
   RatesProvider,
@@ -72,9 +73,11 @@ export const Providers: FC = ({ children }) => {
           <SettingsProvider>
             <BlockchainProvider>
               <LockAndMintProvider>
-                <SwapProviders>
-                  <ModalsProvider>{children}</ModalsProvider>
-                </SwapProviders>
+                <FeeRelayerProvider>
+                  <SwapProviders>
+                    <ModalsProvider>{children}</ModalsProvider>
+                  </SwapProviders>
+                </FeeRelayerProvider>
               </LockAndMintProvider>
             </BlockchainProvider>
           </SettingsProvider>

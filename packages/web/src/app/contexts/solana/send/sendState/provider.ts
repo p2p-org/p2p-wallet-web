@@ -6,10 +6,14 @@ import { tryParseTokenAmount, useTokenAccount, useWallet } from '@p2p-wallet-web
 import { usePubkey } from '@p2p-wallet-web/sail';
 import type { RenNetwork } from '@renproject/interfaces';
 import type { TokenAmount } from '@saberhq/token-utils';
+import { PublicKey } from '@solana/web3.js';
 import { createContainer } from 'unstated-next';
 
+import { useFeeCompensation } from 'app/contexts';
+import type { DestinationAccount } from 'app/contexts/api/feeRelayer/types';
 import { useRenNetwork } from 'utils/hooks/renBridge/useNetwork';
 
+import { useResolveAddress } from './hooks/useResolveAddress';
 import { isValidAddress } from './utils';
 
 export type Blockchain = 'solana' | 'bitcoin';
@@ -42,11 +46,16 @@ export interface UseSendState {
   isAddressInvalid: boolean;
 
   isRenBTC: boolean;
+
+  destinationAccount: DestinationAccount | null;
+  isResolvingAddress: boolean;
 }
 
 const useSendStateInternal = (): UseSendState => {
   const { publicKey } = useParams<{ publicKey: string }>();
   const { publicKey: publicKeySol } = useWallet();
+  const { resolveAddress } = useResolveAddress();
+  const { setFromToken, setAccountsCount } = useFeeCompensation();
 
   const tokenAccount = useTokenAccount(usePubkey(publicKey ?? publicKeySol));
   const [fromTokenAccount, setFromTokenAccount] = useState<TokenAccount | null | undefined>(null);
@@ -59,6 +68,7 @@ const useSendStateInternal = (): UseSendState => {
 
   const [toPublicKey, setToPublicKey] = useState('');
   const [resolvedAddress, setResolvedAddress] = useState<string | null>(null);
+  const [isResolvingAddress, setIsResolvingAddress] = useState(false);
 
   const [blockchain, setBlockchain] = useState<Blockchain>(BLOCKCHAINS[0]!);
 
@@ -66,11 +76,14 @@ const useSendStateInternal = (): UseSendState => {
 
   const [isExecuting, setIsExecuting] = useState(false);
 
+  const [destinationAccount, setDestinationAccount] = useState<DestinationAccount | null>(null);
+
   useEffect(() => {
     if (tokenAccount?.balance) {
       setFromTokenAccount(tokenAccount);
+      setFromToken(tokenAccount);
     }
-  }, [tokenAccount]);
+  }, [setFromToken, tokenAccount]);
 
   const destinationAddress = resolvedAddress || toPublicKey;
 
@@ -81,6 +94,42 @@ const useSendStateInternal = (): UseSendState => {
 
     return false;
   }, [blockchain, destinationAddress, renNetwork]);
+
+  useEffect(() => {
+    const resolve = async () => {
+      if (destinationAddress && fromTokenAccount && fromTokenAccount.balance) {
+        const isSOL = fromTokenAccount.balance.token.isRawSOL;
+
+        if (!isSOL) {
+          setIsResolvingAddress(true);
+
+          const { address, owner, needCreateATA } = await resolveAddress(
+            new PublicKey(destinationAddress),
+            fromTokenAccount.balance.token,
+          );
+
+          setIsResolvingAddress(true);
+          setDestinationAccount({
+            address,
+            owner,
+            isNeedCreate: needCreateATA,
+            symbol: fromTokenAccount.balance.token.symbol,
+          });
+        } else {
+          setDestinationAccount({
+            address: new PublicKey(destinationAddress),
+          });
+        }
+      }
+    };
+    if (!isAddressInvalid) {
+      void resolve();
+    }
+  }, [destinationAddress, fromTokenAccount, isAddressInvalid, resolveAddress]);
+
+  useEffect(() => {
+    setAccountsCount(destinationAccount?.isNeedCreate ? 1 : 0);
+  }, [destinationAccount?.isNeedCreate, setAccountsCount]);
 
   const isRenBTC = fromTokenAccount?.balance?.token.symbol === 'renBTC';
 
@@ -102,6 +151,8 @@ const useSendStateInternal = (): UseSendState => {
     setIsExecuting,
     isAddressInvalid,
     isRenBTC,
+    destinationAccount,
+    isResolvingAddress,
   };
 };
 
