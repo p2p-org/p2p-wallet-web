@@ -9,6 +9,8 @@ import type { PublicKey } from '@solana/web3.js';
 import { SystemProgram, SYSVAR_RENT_PUBKEY, TransactionInstruction } from '@solana/web3.js';
 import BufferLayout from 'buffer-layout';
 
+import type { RelayTransferParams } from './types';
+
 export const createTransferSOLInstruction = (
   source: PublicKey,
   destination: PublicKey,
@@ -283,4 +285,57 @@ export const closeTokenAccountInstruction = (
   authority: PublicKey,
 ): TransactionInstruction => {
   return Token.createCloseAccountInstruction(TOKEN_PROGRAM_ID, account, dectination, authority, []);
+};
+
+export const createTransferInstructions = (
+  params: RelayTransferParams,
+  authority: PublicKey,
+  payer: PublicKey,
+): TransactionInstruction[] => {
+  const { fromTokenAccount, destinationAccount, amount } = params;
+  const instructions: TransactionInstruction[] = [];
+
+  if (!fromTokenAccount.key) {
+    throw new Error('This should never happen');
+  }
+
+  if (fromTokenAccount.balance?.token.isRawSOL) {
+    instructions.push(
+      createTransferSOLInstruction(
+        fromTokenAccount.key,
+        destinationAccount.address,
+        amount.toU64().toNumber(),
+      ),
+    );
+
+    return instructions;
+  }
+
+  if (destinationAccount.isNeedCreate) {
+    if (!destinationAccount.owner) {
+      throw new Error('This should never happen');
+    }
+
+    instructions.push(
+      createAssociatedTokenAccountInstruction(
+        destinationAccount.address,
+        destinationAccount.owner,
+        amount.token.mintAccount,
+        payer,
+      ),
+    );
+  }
+
+  instructions.push(
+    createTransferTokenInstruction(
+      fromTokenAccount.key,
+      destinationAccount.address,
+      amount.toU64().toNumber(),
+      amount.token.mintAccount,
+      authority,
+      amount.token.decimals,
+    ),
+  );
+
+  return instructions;
 };

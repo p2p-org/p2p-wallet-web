@@ -105,9 +105,9 @@ type Props = {
   txType: 'send' | 'swap';
   feeTokenAccounts: TokenAccount[];
   value: TokenAccount | null | undefined;
-  solFeeAmount: TokenAmount | undefined;
+  feeAmountInSol: TokenAmount | undefined;
   feeTokenAmount: TokenAmount | undefined;
-  destinationAccountSymbol?: string | undefined;
+  accountSymbol?: string | undefined;
   onSelectToken: (token: TokenAccount) => void;
   className?: string;
 };
@@ -116,9 +116,9 @@ export const FeeTokenSelector: FC<Props> = ({
   txType,
   value,
   feeTokenAccounts,
-  solFeeAmount,
+  feeAmountInSol,
   feeTokenAmount,
-  destinationAccountSymbol,
+  accountSymbol,
   onSelectToken,
   className,
 }) => {
@@ -128,7 +128,7 @@ export const FeeTokenSelector: FC<Props> = ({
 
   const isSend = txType === 'send';
   const selectedTokenSymbol = value?.balance?.token.symbol || '';
-  const feeAmount = selectedTokenSymbol === 'SOL' ? solFeeAmount : feeTokenAmount;
+  const feeAmount = selectedTokenSymbol === 'SOL' ? feeAmountInSol : feeTokenAmount;
 
   return (
     <Wrapper className={className}>
@@ -144,7 +144,7 @@ export const FeeTokenSelector: FC<Props> = ({
               <Top>
                 <Label>
                   {isSend
-                    ? `${destinationAccountSymbol as string} account creation:`
+                    ? `${accountSymbol as string} account creation:`
                     : `Pay swap fees with:  ${selectedTokenSymbol}`}
                 </Label>
                 {isSend && feeAmount ? (

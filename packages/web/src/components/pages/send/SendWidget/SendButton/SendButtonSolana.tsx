@@ -5,7 +5,13 @@ import { useTokenAccount } from '@p2p-wallet-web/core';
 import { usePubkey } from '@p2p-wallet-web/sail';
 import { PublicKey } from '@solana/web3.js';
 
-import { ModalType, useModals, useSendFees, useSendState, useTransferAction } from 'app/contexts';
+import {
+  ModalType,
+  useFeeCompensation,
+  useModals,
+  useSendState,
+  useTransferAction,
+} from 'app/contexts';
 import type { TransactionConfirmModalProps } from 'components/modals/TransactionConfirmModal/TransactionConfirmModal';
 import type { TransactionStatusModalProps } from 'components/modals/TransactionInfoModals/TransactionStatusModal/TransactionStatusModal';
 import { Button, Icon } from 'components/ui';
@@ -34,7 +40,7 @@ export const SendButtonSolana: FC<Props> = ({ primary, disabled }) => {
     destinationAccount,
   } = useSendState();
   const transferAction = useTransferAction();
-  const { feeToken, compensation } = useSendFees();
+  const { compensationParams } = useFeeCompensation();
 
   const destinationTokenAccount = useTokenAccount(usePubkey(destinationAddress));
 
@@ -93,8 +99,7 @@ export const SendButtonSolana: FC<Props> = ({ primary, disabled }) => {
         fromTokenAccount,
         destinationAccount,
         amount: parsedAmount,
-        feeToken,
-        compensation,
+        compensationParams,
       });
 
       trackEvent('send_send_click', {

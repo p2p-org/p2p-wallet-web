@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { ZERO } from '@orca-so/sdk';
 import type { TokenAccount } from '@p2p-wallet-web/core';
@@ -8,16 +8,15 @@ import { useConnectionContext } from '@saberhq/use-solana';
 import { AccountLayout, u64 } from '@solana/spl-token';
 import { createContainer } from 'unstated-next';
 
-import { RELAY_ACCOUNT_RENT_EXEMPTION, useFeeRelayer, useSendState } from 'app/contexts';
-import type { CompensationSwapParams, UserRelayAccount } from 'app/contexts/api/feeRelayer/types';
+import { useFeeRelayer } from 'app/contexts';
+import type {
+  CompensationParams,
+  CompensationSwapParams,
+  UserRelayAccount,
+} from 'app/contexts/api/feeRelayer/types';
+import { RELAY_ACCOUNT_RENT_EXEMPTION } from 'app/contexts/api/feeRelayer/utils';
 
-export type SendFees = {
-  accountCreationFee: u64;
-  networkFee: u64;
-  userRelayAccountCreation: u64;
-};
-
-export type NetworkFees = {
+type NetworkFees = {
   accountRentExemption: number;
   lamportsPerSignature: number;
 };
@@ -27,11 +26,23 @@ const networkFeesCache: NetworkFees = {
   lamportsPerSignature: 0,
 };
 
-const useSendFeesInternal = () => {
-  const { fromTokenAccount, destinationAccount } = useSendState();
+export type EstimatedFeeAmount = {
+  accountsCreation: {
+    lamports: u64;
+    sol: TokenAmount | undefined;
+    feeToken: TokenAmount | undefined;
+  };
+  totalLamports: u64;
+};
+
+const useFeeCompensationInternal = () => {
   const { connection } = useConnectionContext();
   const userTokenAccounts = useUserTokenAccounts();
   const { getUserRelayAccount } = useFeeRelayer();
+
+  const [fromTokenAccount, setFromTokenAccount] = useState<TokenAccount | null | undefined>(null);
+
+  const [accountsCount, setAccountsCount] = useState(0);
 
   const [feeToken, setFeeToken] = useState<TokenAccount | null | undefined>(null);
   const [feeAmountInToken, setFeeAmountInToken] = useState<u64>(ZERO);
@@ -58,6 +69,13 @@ const useSendFeesInternal = () => {
       void getAccountRentExemption();
     }
   }, [connection]);
+
+  const setFromToken = useCallback(
+    (token: TokenAccount) => {
+      setFromTokenAccount(token);
+    },
+    [setFromTokenAccount],
+  );
 
   useEffect(() => {
     const checkUserRelayAccount = async () => {
@@ -103,75 +121,79 @@ const useSendFeesInternal = () => {
     }
   }, [feeToken, fromTokenAccount, hasFeeToken]);
 
-  const sendFees = useMemo(
-    () => ({
-      accountCreationFee: destinationAccount?.isNeedCreate
-        ? new u64(networkFeesCache.accountRentExemption)
-        : ZERO,
-      networkFee: ZERO,
-    }),
-    [destinationAccount?.isNeedCreate],
-  );
+  const isPayInSol = feeToken?.balance?.token.isRawSOL;
 
-  const solTokenAmount = useMemo(() => {
-    if (!(solTokenAccount && solTokenAccount.balance)) {
-      return undefined;
+  const accountsCreationLamports = useMemo(() => {
+    let total = ZERO;
+
+    if (accountsCount > 0) {
+      total = new u64(networkFeesCache.accountRentExemption).mul(new u64(accountsCount));
     }
-    let total = sendFees.accountCreationFee.add(sendFees.networkFee);
 
-    if (!feeToken?.balance?.token.isRawSOL && !userRelayAccount?.exist) {
+    if (!isPayInSol && userRelayAccount && !userRelayAccount.exist) {
       total = total.add(RELAY_ACCOUNT_RENT_EXEMPTION as u64);
     }
 
-    // if (
-    //   !feeToken?.balance?.token.isRawSOL &&
-    //   compensationSwapData &&
-    //   (compensationSwapData as SwapTransitiveParams).SplTransitive
-    // ) {
-    //   total = total.add(sendFees.accountCreationFee);
-    // }
+    return new u64(total.toArray());
+  }, [accountsCount, isPayInSol, userRelayAccount]);
 
-    return new TokenAmount(solTokenAccount.balance?.token, total);
-  }, [
-    // compensationSwapData,
-    feeToken?.balance?.token.isRawSOL,
-    sendFees.accountCreationFee,
-    sendFees.networkFee,
-    solTokenAccount,
-    userRelayAccount,
-  ]);
+  const accountsCreationSolAmount = useMemo(() => {
+    if (!(solTokenAccount && solTokenAccount.balance)) {
+      return undefined;
+    }
+    return new TokenAmount(solTokenAccount.balance.token, accountsCreationLamports);
+  }, [accountsCreationLamports, solTokenAccount]);
 
-  const feeTokenAmount = useMemo(() => {
+  const accountsCreationFeeTokenAmount = useMemo(() => {
     if (!(feeToken && feeToken.balance)) {
       return undefined;
     }
 
-    return new TokenAmount(feeToken.balance?.token, feeAmountInToken);
+    return new TokenAmount(feeToken.balance.token, feeAmountInToken);
   }, [feeToken, feeAmountInToken]);
 
-  const compensation = useMemo(() => {
+  const compensationParams: CompensationParams = useMemo(() => {
     return {
       feeToken,
-      compensationAmount: solTokenAmount?.toU64(),
-      sourceAmount: feeTokenAmount?.toU64(),
-      needCreateUserRalayAccount: !userRelayAccount?.exist,
+      feeAmount: accountsCreationLamports,
+      feeAmountInToken,
+      isRelayAccountExist: !!userRelayAccount?.exist,
+      accountRentExemption: new u64(networkFeesCache.accountRentExemption),
       topUpParams: compensationSwapData,
     };
-  }, [compensationSwapData, feeToken, feeTokenAmount, solTokenAmount, userRelayAccount]);
+  }, [
+    accountsCreationLamports,
+    compensationSwapData,
+    feeAmountInToken,
+    feeToken,
+    userRelayAccount?.exist,
+  ]);
+
+  const estimatedFeeAmount: EstimatedFeeAmount = useMemo(() => {
+    return {
+      accountsCreation: {
+        lamports: accountsCreationLamports,
+        sol: accountsCreationSolAmount,
+        feeToken: accountsCreationFeeTokenAmount,
+      },
+      totalLamports: accountsCreationLamports,
+    };
+  }, [accountsCreationLamports, accountsCreationSolAmount, accountsCreationFeeTokenAmount]);
 
   return {
     feeToken,
     setFeeToken,
     feeTokenAccounts,
-    solTokenAmount,
-    feeTokenAmount,
     setFeeAmountInToken,
     compensationSwapData,
     setCompensationSwapData,
     userRelayAccount,
-    compensation,
+    compensationParams,
+    setFromToken,
+    setAccountsCount,
+    estimatedFeeAmount,
   };
 };
 
-export const { Provider: SendFeesProvider, useContainer: useSendFees } =
-  createContainer(useSendFeesInternal);
+export const { Provider: FeeCompensationProvider, useContainer: useFeeCompensation } =
+  createContainer(useFeeCompensationInternal);

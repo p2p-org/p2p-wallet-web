@@ -73,11 +73,11 @@ export const Providers: FC = ({ children }) => {
           <SettingsProvider>
             <BlockchainProvider>
               <LockAndMintProvider>
-                <SwapProviders>
-                  <FeeRelayerProvider>
+                <FeeRelayerProvider>
+                  <SwapProviders>
                     <ModalsProvider>{children}</ModalsProvider>
-                  </FeeRelayerProvider>
-                </SwapProviders>
+                  </SwapProviders>
+                </FeeRelayerProvider>
               </LockAndMintProvider>
             </BlockchainProvider>
           </SettingsProvider>

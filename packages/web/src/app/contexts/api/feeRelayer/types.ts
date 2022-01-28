@@ -21,21 +21,21 @@ export type SwapArgs = {
   minimum_amount_out: number;
 };
 
-export type SplData = {
+export type SplDirectArgs = {
   Spl: SwapArgs;
 };
 
-export type SplTransitiveData = {
+export type SplTransitiveArgs = {
   SplTransitive: { from: SwapArgs; to: SwapArgs; transit_token_mint_pubkey: string };
 };
 
-export type TopUpSwapData = SplData | SplTransitiveData;
+export type TopUpSwapArgs = SplDirectArgs | SplTransitiveArgs;
 
 export type RelayTopUpWithSwap = {
   user_source_token_account_pubkey: string;
   source_token_mint_pubkey: string;
   user_authority_pubkey: string;
-  top_up_swap: TopUpSwapData;
+  top_up_swap: TopUpSwapArgs;
   fee_amount: number;
   signatures: UserSwapTransactionSignatures;
 };
@@ -93,12 +93,14 @@ export type SwapDirectParams = {
   Spl: SwapParams;
 };
 
+export type SwapTransitiveData = {
+  from: SwapParams;
+  to: SwapParams;
+  transitTokenMintPubkey: PublicKey;
+};
+
 export type SwapTransitiveParams = {
-  SplTransitive: {
-    from: SwapParams;
-    to: SwapParams;
-    transitTokenMintPubkey: PublicKey;
-  };
+  SplTransitive: SwapTransitiveData;
 };
 
 export type CompensationSwapParams = SwapDirectParams | SwapTransitiveParams;
@@ -110,18 +112,18 @@ export type DestinationAccount = {
   symbol?: string;
 };
 
-export type CompensationArgs = {
-  feeToken: TokenAccount;
-  compensationAmount: u64;
-  sourceAmount: u64;
-  needCreateUserRalayAccount: boolean;
-  topUpParams: CompensationSwapParams;
+export type CompensationParams = {
+  feeToken: TokenAccount | null | undefined;
+  feeAmount: u64;
+  feeAmountInToken: u64;
+  isRelayAccountExist: boolean;
+  accountRentExemption: u64;
+  topUpParams: CompensationSwapParams | null;
 };
 
 export type RelayTransferParams = {
   fromTokenAccount: TokenAccount;
   destinationAccount: DestinationAccount;
   amount: TokenAmount;
-  feeToken?: TokenAccount | null | undefined;
-  compensation?: CompensationArgs;
+  compensationParams?: CompensationParams;
 };

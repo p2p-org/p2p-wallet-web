@@ -9,10 +9,11 @@ import type { TokenAmount } from '@saberhq/token-utils';
 import { PublicKey } from '@solana/web3.js';
 import { createContainer } from 'unstated-next';
 
+import { useFeeCompensation } from 'app/contexts';
 import type { DestinationAccount } from 'app/contexts/api/feeRelayer/types';
 import { useRenNetwork } from 'utils/hooks/renBridge/useNetwork';
-import { useResolveAddress } from 'utils/hooks/useResolveAddress';
 
+import { useResolveAddress } from './hooks/useResolveAddress';
 import { isValidAddress } from './utils';
 
 export type Blockchain = 'solana' | 'bitcoin';
@@ -54,6 +55,7 @@ const useSendStateInternal = (): UseSendState => {
   const { publicKey } = useParams<{ publicKey: string }>();
   const { publicKey: publicKeySol } = useWallet();
   const { resolveAddress } = useResolveAddress();
+  const { setFromToken, setAccountsCount } = useFeeCompensation();
 
   const tokenAccount = useTokenAccount(usePubkey(publicKey ?? publicKeySol));
   const [fromTokenAccount, setFromTokenAccount] = useState<TokenAccount | null | undefined>(null);
@@ -79,8 +81,9 @@ const useSendStateInternal = (): UseSendState => {
   useEffect(() => {
     if (tokenAccount?.balance) {
       setFromTokenAccount(tokenAccount);
+      setFromToken(tokenAccount);
     }
-  }, [tokenAccount]);
+  }, [setFromToken, tokenAccount]);
 
   const destinationAddress = resolvedAddress || toPublicKey;
 
@@ -123,6 +126,10 @@ const useSendStateInternal = (): UseSendState => {
       void resolve();
     }
   }, [destinationAddress, fromTokenAccount, isAddressInvalid, resolveAddress]);
+
+  useEffect(() => {
+    setAccountsCount(destinationAccount?.isNeedCreate ? 1 : 0);
+  }, [destinationAccount?.isNeedCreate, setAccountsCount]);
 
   const isRenBTC = fromTokenAccount?.balance?.token.symbol === 'renBTC';
 

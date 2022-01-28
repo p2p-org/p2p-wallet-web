@@ -37,8 +37,9 @@ export const useTransferAction = () => {
 
       // return result.pending.signature;
       // }
-      if (params.compensation) {
-        await relayTopUpWithSwap(params.compensation);
+
+      if (params.compensationParams?.topUpParams) {
+        await relayTopUpWithSwap(params.compensationParams);
       }
 
       const signature = await transfer(params);
