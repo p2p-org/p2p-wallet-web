@@ -28,10 +28,9 @@ export const PurchaseDetails: FC = () => {
             id: 1,
             titleClassName: 'gray',
             title: 'ETH purchase cost',
-            value: `$${(buyQuote
-              ? buyQuote.quoteCurrencyPrice * buyQuote.quoteCurrencyAmount
-              : 0
-            ).toFixed(2)}`,
+            value: `$${
+              buyQuote ? (buyQuote.quoteCurrencyPrice * buyQuote.quoteCurrencyAmount).toFixed(2) : 0
+            }`,
           },
           {
             id: 2,
