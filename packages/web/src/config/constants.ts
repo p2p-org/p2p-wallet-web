@@ -60,6 +60,3 @@ export const feeRelayerUrl = process.env.REACT_APP_FEE_RELAYER_URL;
 
 export const appStorePath = 'https://testflight.apple.com/join/hxaQVX0E';
 export const playStorePath = 'https://play.google.com/store/apps/details?id=org.p2p.wallet';
-
-export const moonpayWidgetUrl = process.env.REACT_APP_MOONPAY_WIDGET_URL;
-export const moonpayApiKey = process.env.REACT_APP_MOONPAY_API_KEY;

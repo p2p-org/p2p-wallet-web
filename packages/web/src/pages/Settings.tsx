@@ -51,8 +51,8 @@ const ItemTitle = styled.div`
   display: flex;
   flex-grow: 1;
 
-  font-size: 16px;
   font-weight: 600;
+  font-size: 16px;
 `;
 
 const ItemAction = styled.div`

@@ -4,11 +4,12 @@ import { NavLink } from 'react-router-dom';
 import { styled } from '@linaria/react';
 import { theme } from '@p2p-wallet-web/ui';
 
-import { MOBILE_FOOTER_TABS_HEIGHT } from 'components/common/Layout/MobileLayout/MobileFooterTabs/constants';
 import { Icon } from 'components/ui';
 
+import { MOBILE_FOOTER_TABS_HEIGHT } from './constants';
+
 const Wrapper = styled.div`
-  z-index: 1;
+  z-index: 31;
 
   display: flex;
   align-content: center;
@@ -98,7 +99,7 @@ export const MobileFooterTabs: FC = () => {
       >
         <NavButton>
           <IconBlock>
-            <NavIcon name="home" />
+            <NavIcon name="wallet" />
           </IconBlock>
           <Name>Wallets</Name>
         </NavButton>
@@ -109,7 +110,7 @@ export const MobileFooterTabs: FC = () => {
       >
         <NavButton>
           <IconBlock>
-            <NavIcon name="home" />
+            <NavIcon name="wallet" />
           </IconBlock>
           <Name>Actions</Name>
         </NavButton>
@@ -120,7 +121,7 @@ export const MobileFooterTabs: FC = () => {
       >
         <NavButton>
           <IconBlock>
-            <NavIcon name="home" />
+            <NavIcon name="wallet" />
           </IconBlock>
           <Name>Feedback</Name>
         </NavButton>

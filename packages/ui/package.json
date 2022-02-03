@@ -12,14 +12,15 @@
   "devDependencies": {
     "@babel/core": "^7.16.0",
     "@p2p-wallet-web/tsconfig": "^1.0.0",
-    "@storybook/addon-actions": "^6.3.12",
-    "@storybook/addon-essentials": "^6.3.12",
-    "@storybook/addon-links": "^6.3.12",
-    "@storybook/react": "^6.3.12",
+    "@storybook/addon-actions": "^6.4.14",
+    "@storybook/addon-essentials": "^6.4.14",
+    "@storybook/addon-links": "^6.4.14",
+    "@storybook/react": "^6.4.14",
     "babel-loader": "8.1.0"
   },
   "dependencies": {
     "@linaria/core": "^3.0.0-beta.15",
+    "polished": "^4.1.4",
     "react-responsive": "^9.0.0-beta.6"
   }
 }

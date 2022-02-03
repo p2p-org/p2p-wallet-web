@@ -8,8 +8,6 @@ import { theme, useIsTablet } from '@p2p-wallet-web/ui';
 import { Widget } from 'components/common/Widget';
 import { Icon } from 'components/ui';
 
-const WrapperWidget = styled(Widget)``;
-
 export const TitleWrapper = styled.div`
   display: flex;
   align-items: center;
@@ -61,7 +59,7 @@ const WidgetPageOriginal: FunctionComponent<Props> = ({
   const isTable = useIsTablet();
 
   return (
-    <WrapperWidget
+    <Widget
       ref={forwardedRef}
       title={
         isTable ? (
@@ -78,7 +76,7 @@ const WidgetPageOriginal: FunctionComponent<Props> = ({
       {...props}
     >
       {children}
-    </WrapperWidget>
+    </Widget>
   );
 };
 

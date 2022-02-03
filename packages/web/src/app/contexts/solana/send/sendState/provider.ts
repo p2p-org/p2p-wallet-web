@@ -42,6 +42,15 @@ export interface UseSendState {
   isAddressInvalid: boolean;
 
   isRenBTC: boolean;
+
+  isConfirmCorrectAddress: boolean;
+  setIsConfirmCorrectAddress: (v: boolean) => void;
+
+  isShowConfirmAddressSwitch: boolean;
+  setIsShowConfirmAddressSwitch: (v: boolean) => void;
+
+  isInitBurnAndRelease: boolean;
+  setIsInitBurnAndRelease: (v: boolean) => void;
 }
 
 const useSendStateInternal = (): UseSendState => {
@@ -65,6 +74,11 @@ const useSendStateInternal = (): UseSendState => {
   const renNetwork = useRenNetwork();
 
   const [isExecuting, setIsExecuting] = useState(false);
+
+  const [isConfirmCorrectAddress, setIsConfirmCorrectAddress] = useState(false);
+
+  const [isShowConfirmAddressSwitch, setIsShowConfirmAddressSwitch] = useState(false);
+  const [isInitBurnAndRelease, setIsInitBurnAndRelease] = useState(false);
 
   useEffect(() => {
     if (tokenAccount?.balance) {
@@ -102,6 +116,12 @@ const useSendStateInternal = (): UseSendState => {
     setIsExecuting,
     isAddressInvalid,
     isRenBTC,
+    isConfirmCorrectAddress,
+    setIsConfirmCorrectAddress,
+    isShowConfirmAddressSwitch,
+    setIsShowConfirmAddressSwitch,
+    isInitBurnAndRelease,
+    setIsInitBurnAndRelease,
   };
 };
 

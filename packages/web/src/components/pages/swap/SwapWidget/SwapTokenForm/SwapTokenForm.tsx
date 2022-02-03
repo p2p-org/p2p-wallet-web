@@ -1,12 +1,11 @@
 import type { FC } from 'react';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import * as React from 'react';
 
 import { styled } from '@linaria/react';
 import { u64 } from '@solana/spl-token';
 import classNames from 'classnames';
 import throttle from 'lodash.throttle';
-import { isNil } from 'ramda';
 
 import type { UserTokenAccountMap } from 'app/contexts/solana/swap';
 import { useConfig, usePrice, useSwap } from 'app/contexts/solana/swap';
@@ -17,8 +16,8 @@ import { Empty } from 'components/common/Empty';
 import { SlideContainer } from 'components/common/SlideContainer';
 import { TokenAvatar } from 'components/common/TokenAvatar';
 import { Icon } from 'components/ui';
+import { InputAmount } from 'components/ui/InputAmount';
 import { SearchInput } from 'components/ui/SearchInput';
-import { usePreviousValueHook } from 'utils/hooks/usePreviousValueHook';
 import { shortAddress } from 'utils/tokens';
 
 import { AmountUSD } from '../AmountUSD/AmountUSD';
@@ -164,31 +163,6 @@ const TokenWrapper = styled.div`
     ${TokenName}, ${ChevronIcon} {
       color: #5887ff;
     }
-  }
-`;
-
-const AmountInput = styled.input`
-  max-width: 200px;
-
-  color: #000;
-  font-weight: 600;
-  font-size: 28px;
-  line-height: 120%;
-  text-align: right;
-
-  background: transparent;
-  border: 0;
-
-  outline: none;
-
-  appearance: none;
-
-  &::placeholder {
-    color: #a3a5ba;
-  }
-
-  &.error {
-    color: #f43d3d;
   }
 `;
 
@@ -366,10 +340,8 @@ export const SwapTokenForm: FC<Props> = ({
   const { tokenConfigs, mintToTokenName } = useConfig();
   const { asyncStandardTokenAccounts } = useSwap();
   const [isOpen, setIsOpen] = useState(false);
-  const [amountString, setAmountString] = useState(String(amount));
   const [filter, setFilter] = useState('');
   const [scrollTop, setScrollTop] = useState(0);
-  const previousTrade = usePreviousValueHook(trade);
 
   const { useAsyncMergedPrices } = usePrice();
   const asyncPrices = useAsyncMergedPrices();
@@ -377,20 +349,6 @@ export const SwapTokenForm: FC<Props> = ({
   const hasAsyncStandardTokenAccounts = !!asyncStandardTokenAccounts;
 
   const tokenInfo = tokenConfigs[tokenName];
-
-  // Update the input value if the trade object provides a new amount
-  useEffect(() => {
-    if (trade === previousTrade) {
-      return;
-    }
-
-    const decimals = tokenConfigs[tokenName].decimals;
-    if (parseString(amountString, decimals).eq(amount)) {
-      return;
-    }
-
-    setAmountString(formatBigNumber(amount, decimals));
-  }, [trade, previousTrade, amount, amountString, tokenConfigs, tokenName]);
 
   const boxShadow = useMemo(() => {
     return `0 5px 10px rgba(56, 60, 71, ${
@@ -450,34 +408,10 @@ export const SwapTokenForm: FC<Props> = ({
     setIsOpen(!isOpen);
   };
 
-  const handleAmountFocus = (e: React.ChangeEvent<HTMLInputElement>) => {
-    let nextAmount = e.target.value;
-
-    if (Number(nextAmount) === 0) {
-      nextAmount = '';
-      setAmountString(nextAmount);
-      setAmount(new u64(0));
-    }
-  };
-
-  const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    let nextAmount = e.target.value
-      .replace(',', '.')
-      .replace(/[^\d.,]/g, '')
-      .replace(/^0(\d+)/g, '$1')
-      .replace(/^(\d*\.?)|(\d*)\.?/g, '$1$2');
-
-    if (nextAmount === '.') {
-      nextAmount = '0.';
-    }
-
-    setAmountString(nextAmount);
-
-    if (!isNil(Number(nextAmount))) {
-      const tokenConfig = tokenConfigs[tokenName];
-      const maxDecimals = tokenConfig.decimals;
-      setAmount(parseString(nextAmount, maxDecimals));
-    }
+  const handleAmountChange = (nextAmount: string) => {
+    const tokenConfig = tokenConfigs[tokenName];
+    const maxDecimals = tokenConfig.decimals;
+    setAmount(parseString(nextAmount, maxDecimals));
   };
 
   const handleFilterChange = (value: string) => {
@@ -494,10 +428,13 @@ export const SwapTokenForm: FC<Props> = ({
     setTokenName(tokenName);
   };
 
-  const handleTokenClick = (tokenName: string) => {
-    setIsOpen(false);
-    setTokenName(tokenName);
-  };
+  const handleTokenClick = useCallback(
+    (tokenName: string) => {
+      setIsOpen(false);
+      setTokenName(tokenName);
+    },
+    [setTokenName],
+  );
 
   const filteredTokenAccounts = useMemo((): TokenAccount[] => {
     if (!asyncStandardTokenAccounts) {
@@ -655,10 +592,9 @@ export const SwapTokenForm: FC<Props> = ({
                 <ChevronIcon name="arrow-triangle" />
               </ChevronWrapper>
             </TokenWrapper>
-            <AmountInput
+            <InputAmount
               placeholder={Number(0).toFixed(tokenInfo?.decimals || 0)}
-              value={amountString === '0' && !isInput ? '' : amountString}
-              onFocus={handleAmountFocus}
+              value={formatBigNumber(amount, tokenInfo?.decimals || 0)}
               onChange={handleAmountChange}
               disabled={disabled || disabledInput}
             />

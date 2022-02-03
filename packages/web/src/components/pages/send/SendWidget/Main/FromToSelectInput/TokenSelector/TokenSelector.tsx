@@ -1,18 +1,15 @@
-import type { FunctionComponent } from 'react';
+import type { FC } from 'react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import * as React from 'react';
 
 import { styled } from '@linaria/react';
 import type { TokenAccount } from '@p2p-wallet-web/core';
+import { theme } from '@p2p-wallet-web/ui';
 import type { Token } from '@saberhq/token-utils';
-import { TokenAmount } from '@saberhq/token-utils';
 import classNames from 'classnames';
-import JSBI from 'jsbi';
 import throttle from 'lodash.throttle';
-import { isNil } from 'ramda';
 
 import { useMarketsData } from 'app/contexts';
-import { AmountUSD } from 'components/common/AmountUSD';
 import { Empty } from 'components/common/Empty';
 import { SlideContainer } from 'components/common/SlideContainer';
 import { TokenAccountRow } from 'components/common/TokenAccountRow';
@@ -23,38 +20,8 @@ import { matchesFilter, shortAddress, sortByRules } from 'utils/tokens';
 
 const Wrapper = styled.div``;
 
-const TopWrapper = styled.div`
+const SelectorWrapper = styled.div`
   display: flex;
-  justify-content: space-between;
-`;
-
-const FromTitle = styled.div`
-  color: #000;
-  font-weight: 600;
-  font-size: 16px;
-  line-height: 24px;
-`;
-
-const AllBalance = styled.div`
-  color: #5887ff;
-
-  cursor: pointer;
-
-  &.disabled {
-    cursor: auto;
-
-    pointer-events: none;
-  }
-
-  &.error {
-    color: #f43d3d;
-  }
-`;
-
-const MainWrapper = styled.div`
-  display: flex;
-
-  margin-top: 20px;
 `;
 
 const WalletIcon = styled(Icon)`
@@ -83,56 +50,36 @@ const TokenAvatarWrapper = styled.div`
   }
 `;
 
-const InfoWrapper = styled.div`
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  min-width: 0;
-
-  margin-left: 20px;
-`;
-
-const SpecifyTokenWrapper = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  height: 44px;
-`;
-
 const TokenName = styled.div`
   max-width: 200px;
   overflow: hidden;
 
-  color: #000;
-  font-weight: 600;
-  font-size: 24px;
-  line-height: 140%;
+  color: ${theme.colors.textIcon.primary};
+  font-weight: 500;
+  font-size: 20px;
+  line-height: 100%;
 
   white-space: nowrap;
   text-overflow: ellipsis;
-`;
-
-const EmptyName = styled.div`
-  color: #a3a5ba;
 `;
 
 const ChevronWrapper = styled.div`
   display: flex;
   align-items: center;
 
-  margin-left: 26px;
+  width: 24px;
+  height: 24px;
+  margin-left: 4px;
 `;
 
 const ChevronIcon = styled(Icon)`
-  width: 24px;
-  height: 24px;
-
-  color: #000;
+  color: ${theme.colors.textIcon.secondary};
 `;
 
 const TokenWrapper = styled.div`
   display: flex;
-  min-width: 0;
+  align-items: center;
+  margin-left: 8px;
 
   cursor: pointer;
 
@@ -143,48 +90,13 @@ const TokenWrapper = styled.div`
   }
 `;
 
-const AmountInput = styled.input`
-  max-width: 200px;
-
-  color: #000;
-  font-weight: 600;
-  font-size: 28px;
-  line-height: 120%;
-  text-align: right;
-
-  background: transparent;
-  border: 0;
-
-  outline: none;
-
-  appearance: none;
-
-  &::placeholder {
-    color: #a3a5ba;
-  }
-`;
-
-const BalanceWrapper = styled.div`
-  display: flex;
-  justify-content: space-between;
-  margin-top: 3px;
-
+const EmptyName = styled.div`
   color: #a3a5ba;
-  font-weight: 600;
-  font-size: 16px;
-  line-height: 24px;
-`;
-
-const BalanceText = styled.div`
-  display: flex;
-`;
-
-const AmountUSDStyled = styled(AmountUSD)`
-  margin-left: 3px;
 `;
 
 const DropDownListContainer = styled.div`
   position: absolute;
+  top: 100%;
   right: 0;
   left: 0;
   z-index: 1;
@@ -293,58 +205,39 @@ const YourTokens = styled(TitleTokens)`
   height: 32px;
 `;
 
-const AllTokens = styled(TitleTokens)`
-  height: 44px;
-`;
-
 const SCROLL_THRESHOLD = 15;
 
-type Props = {
-  direction?: 'from' | 'to';
+interface Props {
   tokenAccounts: readonly TokenAccount[];
   tokenAccount?: TokenAccount | null;
-  amount?: string;
-  feeAmount?: string;
+  direction?: 'from' | 'to';
   onTokenAccountChange: (token: Token, tokenAccount: TokenAccount | null) => void;
-  onAmountChange: (minorAmount: string, type?: 'available') => void;
-  disabled?: boolean;
-  disabledInput?: boolean;
-  className?: string;
-};
+}
 
-export const FromToSelectInput: FunctionComponent<Props> = ({
-  direction = 'from',
+export const TokenSelector: FC<Props> = ({
   tokenAccounts,
   tokenAccount,
-  amount,
-  feeAmount: feeAmountString,
+  direction,
   onTokenAccountChange,
-  onAmountChange,
-  disabled,
-  disabledInput,
-  className,
 }) => {
   const selectorRef = useRef<HTMLDivElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
 
-  const [filter, setFilter] = useState('');
-  const [localAmount, setLocalAmount] = useState(String(amount));
   const [isOpen, setIsOpen] = useState(false);
+  const [filter, setFilter] = useState('');
   const [scrollTop, setScrollTop] = useState(0);
 
   const symbols = useMemo(() => {
     return tokenAccounts.map((tokenAccount) => tokenAccount.balance?.token.symbol);
   }, [tokenAccounts]);
-
   const markets = useMarketsData(symbols);
 
-  useEffect(() => {
-    if (!isNil(amount) && amount !== localAmount) {
-      setLocalAmount(amount);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [amount]);
+  const boxShadow = useMemo(() => {
+    return `0 5px 10px rgba(56, 60, 71, ${
+      scrollTop >= SCROLL_THRESHOLD ? '0.05' : 0.003 * scrollTop
+    }`;
+  }, [scrollTop]);
 
   const handleScroll = throttle(() => {
     if (!listRef.current) {
@@ -357,12 +250,6 @@ export const FromToSelectInput: FunctionComponent<Props> = ({
       setScrollTop(SCROLL_THRESHOLD);
     }
   }, 100);
-
-  const boxShadow = useMemo(() => {
-    return `0 5px 10px rgba(56, 60, 71, ${
-      scrollTop >= SCROLL_THRESHOLD ? '0.05' : 0.003 * scrollTop
-    }`;
-  }, [scrollTop]);
 
   const handleAwayClick = (e: MouseEvent) => {
     if (
@@ -408,97 +295,10 @@ export const FromToSelectInput: FunctionComponent<Props> = ({
     setIsOpen(!isOpen);
   };
 
-  const handleTokenAccountClick = (nextTokenAccount: TokenAccount) => {
-    if (!nextTokenAccount.balance) {
-      return;
-    }
-
-    setIsOpen(false);
-    onTokenAccountChange(nextTokenAccount.balance?.token, nextTokenAccount);
-  };
-
-  // const handleTokenClick = (nextToken: Token) => {
-  //   setIsOpen(false);
-  //   onTokenAccountChange(nextToken, null);
-  // };
-
-  const handleAllBalanceClick = () => {
-    if (!tokenAccount?.balance) {
-      return;
-    }
-
-    let tokenAccountBalance = tokenAccount.balance;
-
-    if (feeAmountString) {
-      const [feeAmount, symbol] = feeAmountString.split(' ');
-
-      if (feeAmount && tokenAccount?.balance?.token.symbol === symbol) {
-        const fee = new TokenAmount(tokenAccount.balance.token, JSBI.BigInt(feeAmount));
-        const balanceSubstractFee = tokenAccount.balance.subtract(fee);
-
-        tokenAccountBalance = balanceSubstractFee.greaterThan(0)
-          ? balanceSubstractFee
-          : new TokenAmount(tokenAccount.balance.token, 0);
-      }
-    }
-
-    onAmountChange(tokenAccountBalance.toExact(), 'available');
-  };
-
-  const handleAmountFocus = (e: React.ChangeEvent<HTMLInputElement>) => {
-    let nextAmount = e.target.value;
-
-    if (Number(nextAmount) === 0) {
-      nextAmount = '';
-      setLocalAmount(nextAmount);
-      onAmountChange(nextAmount);
-    }
-  };
-
-  const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    let nextAmount = e.target.value
-      .replace(',', '.')
-      .replace(/[^\d.]/g, '')
-      .replace(/^(\d*\.?)|(\d*)\.?/g, '$1$2');
-
-    if (nextAmount === '.') {
-      nextAmount = '0.';
-    }
-
-    setLocalAmount(nextAmount);
-
-    if (!isNil(Number(nextAmount))) {
-      onAmountChange(nextAmount);
-    }
-  };
-
   const handleFilterChange = (value: string) => {
     const nextFilter = value.trim();
 
     setFilter(nextFilter);
-  };
-
-  const renderBalance = () => {
-    if (!tokenAccount?.balance) {
-      return null;
-    }
-
-    if (feeAmountString) {
-      const [feeAmount, symbol] = feeAmountString.split(' ');
-
-      if (feeAmount && tokenAccount?.balance?.token.symbol === symbol) {
-        const fee = new TokenAmount(tokenAccount.balance.token, JSBI.BigInt(feeAmount));
-        const balanceSubstractFee = tokenAccount.balance.subtract(fee);
-
-        const tokenAccountBalance = balanceSubstractFee.greaterThan(0)
-          ? balanceSubstractFee
-          : new TokenAmount(tokenAccount.balance.token, 0);
-
-        return tokenAccountBalance.formatUnits();
-      }
-    }
-
-    return tokenAccount.balance.formatUnits();
   };
 
   const filteredTokenAccounts = useMemo(() => {
@@ -522,16 +322,23 @@ export const FromToSelectInput: FunctionComponent<Props> = ({
       .sort(sortByRules(markets));
   }, [tokenAccounts, direction, filter, markets]);
 
-  const hasBalance = tokenAccount?.balance
-    ? tokenAccount.balance.asNumber >= Number(localAmount)
-    : false;
+  // const handleTokenClick = (nextToken: Token) => {
+  //   setIsOpen(false);
+  //   onTokenAccountChange(nextToken, null);
+  // };
+
+  const handleTokenAccountClick = (nextTokenAccount: TokenAccount) => {
+    if (!nextTokenAccount.balance) {
+      return;
+    }
+
+    setIsOpen(false);
+    onTokenAccountChange(nextTokenAccount.balance?.token, nextTokenAccount);
+  };
 
   return (
-    <Wrapper className={className}>
-      <TopWrapper>
-        <FromTitle>{direction === 'from' ? 'From' : 'To'}</FromTitle>
-      </TopWrapper>
-      <MainWrapper>
+    <Wrapper>
+      <SelectorWrapper>
         <TokenAvatarWrapper className={classNames({ isOpen: isOpen && !tokenAccount?.key })}>
           {tokenAccount?.balance?.token ? (
             <TokenAvatar
@@ -543,62 +350,22 @@ export const FromToSelectInput: FunctionComponent<Props> = ({
             <WalletIcon name="wallet" />
           )}
         </TokenAvatarWrapper>
-        <InfoWrapper>
-          <SpecifyTokenWrapper>
-            <TokenWrapper
-              ref={selectorRef}
-              onClick={handleSelectorClick}
-              className={classNames({ isOpen })}
-            >
-              <TokenName title={tokenAccount?.balance?.token.address}>
-                {tokenAccount?.balance?.token.symbol ||
-                  (tokenAccount?.key && shortAddress(tokenAccount.key.toBase58())) || (
-                    <EmptyName>—</EmptyName>
-                  )}
-              </TokenName>
-              <ChevronWrapper>
-                <ChevronIcon name="arrow-triangle" />
-              </ChevronWrapper>
-            </TokenWrapper>
-            <AmountInput
-              placeholder={
-                (tokenAccount?.balance?.token &&
-                  TokenAmount.parse(tokenAccount.balance.token, '0').toExact()) ||
-                '0'
-              }
-              value={localAmount}
-              onFocus={handleAmountFocus}
-              onChange={handleAmountChange}
-              disabled={disabled || disabledInput}
-            />
-          </SpecifyTokenWrapper>
-          <BalanceWrapper>
-            <BalanceText>
-              {tokenAccount ? (
-                direction === 'from' && !disabled ? (
-                  <AllBalance
-                    onClick={handleAllBalanceClick}
-                    className={classNames({ disabled, error: !hasBalance })}
-                  >
-                    Available: {renderBalance()}
-                  </AllBalance>
-                ) : (
-                  <>Balance: {renderBalance()}</>
-                )
-              ) : undefined}
-              {!tokenAccount?.key ? 'Select currency' : undefined}
-            </BalanceText>
-            {tokenAccount?.balance?.token ? (
-              <BalanceText>
-                ≈{' '}
-                <AmountUSDStyled
-                  value={TokenAmount.parse(tokenAccount.balance.token, localAmount || '0')}
-                />
-              </BalanceText>
-            ) : undefined}
-          </BalanceWrapper>
-        </InfoWrapper>
-      </MainWrapper>
+        <TokenWrapper
+          ref={selectorRef}
+          onClick={handleSelectorClick}
+          className={classNames({ isOpen })}
+        >
+          <TokenName title={tokenAccount?.balance?.token.address}>
+            {tokenAccount?.balance?.token.symbol ||
+              (tokenAccount?.key && shortAddress(tokenAccount.key.toBase58())) || (
+                <EmptyName>—</EmptyName>
+              )}
+          </TokenName>
+          <ChevronWrapper>
+            <ChevronIcon name="arrow-triangle" />
+          </ChevronWrapper>
+        </TokenWrapper>
+      </SelectorWrapper>
       {isOpen ? (
         <DropDownListContainer ref={dropdownRef}>
           <DropDownHeader

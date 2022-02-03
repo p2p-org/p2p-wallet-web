@@ -3,6 +3,7 @@ import { useState } from 'react';
 import * as React from 'react';
 
 import { styled } from '@linaria/react';
+import { theme } from '@p2p-wallet-web/ui';
 import classNames from 'classnames';
 
 import { Icon } from 'components/ui';
@@ -13,7 +14,7 @@ const Wrapper = styled.div`
 
   width: 100%;
 
-  border: 1px solid #f6f6f8;
+  border: 1px solid ${theme.colors.stroke.secondary};
   border-radius: 12px;
 `;
 
@@ -21,12 +22,12 @@ const TitleWrapper = styled.div`
   display: flex;
   align-items: center;
 
-  padding: 20px;
+  padding: 12px 20px;
 
   cursor: pointer;
 
   &.isOpen {
-    border-bottom: 1px solid #f6f6f8;
+    border-bottom: 1px solid ${theme.colors.stroke.secondary};
   }
 `;
 
@@ -52,7 +53,7 @@ const ChevronIcon = styled(Icon)`
   width: 20px;
   height: 20px;
 
-  color: #a3a5ba;
+  color: ${theme.colors.textIcon.secondary};
 
   &.isOpen {
     transform: rotate(180deg);

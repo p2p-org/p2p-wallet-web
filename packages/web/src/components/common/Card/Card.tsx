@@ -9,10 +9,9 @@ const Wrapper = styled.div`
   padding: 20px;
 
   background: #fff;
-  border-radius: 12px;
 
   ${up.tablet} {
-    ${borders.primary}
+    ${borders.primaryRGBA}
     ${shadows.light}
   }
 `;

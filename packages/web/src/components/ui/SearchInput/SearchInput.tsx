@@ -3,6 +3,7 @@ import { forwardRef, useState } from 'react';
 import * as React from 'react';
 
 import { styled } from '@linaria/react';
+import { theme } from '@p2p-wallet-web/ui';
 import classNames from 'classnames';
 
 import { Icon } from 'components/ui';
@@ -11,27 +12,28 @@ const SearchIconWrapper = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 34px;
-  height: 34px;
-  margin: 0 4px;
+  width: 24px;
+  height: 24px;
+  margin-left: 16px;
 `;
 
 const SearchIcon = styled(Icon)`
-  width: 34px;
-  height: 34px;
+  width: 24px;
+  height: 24px;
 
-  color: #a3a5ba;
+  color: ${theme.colors.textIcon.secondary};
 `;
 
 const Wrapper = styled.label`
   display: flex;
   flex: 1;
   align-items: center;
-  height: 42px;
+  height: 48px;
+  padding: 12px 0;
 
-  background: #f6f6f8;
-  border: 1px solid transparent;
-  border-radius: 10px;
+  background: ${theme.colors.bg.primary};
+  border: 1px solid ${theme.colors.stroke.primary};
+  border-radius: 12px;
   cursor: text;
 
   &.isFocused {
@@ -51,11 +53,12 @@ const Content = styled.div`
 `;
 
 const InputElement = styled.input`
+  margin-left: 8px;
   padding: 0;
 
-  font-weight: 600;
-  font-size: 14px;
-  font-family: unset;
+  font-weight: 500;
+  font-size: 16px;
+  font-family: inherit;
   line-height: 140%;
 
   background: transparent;
@@ -66,7 +69,7 @@ const InputElement = styled.input`
   appearance: none;
 
   &::placeholder {
-    color: #a3a5ba;
+    color: ${theme.colors.textIcon.tertiary};
   }
 `;
 

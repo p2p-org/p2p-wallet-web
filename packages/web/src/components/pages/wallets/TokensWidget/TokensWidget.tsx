@@ -14,8 +14,6 @@ import { FEATURE_ADD_TOKEN_BUTTON } from 'config/featureFlags';
 
 import { TokenAccountList } from './TokenAccountList';
 
-const WrapperWidget = styled(Widget)``;
-
 const AddButton = styled(Button)`
   color: #5887ff !important;
 
@@ -131,7 +129,7 @@ export const TokensWidget: FunctionComponent<Props> = ({ selectedSymbol }) => {
   };
 
   return (
-    <WrapperWidget
+    <Widget
       title="Wallets"
       action={
         <Feature name={FEATURE_ADD_TOKEN_BUTTON}>
@@ -158,6 +156,6 @@ export const TokensWidget: FunctionComponent<Props> = ({ selectedSymbol }) => {
       {isOpen ? (
         <TokenAccountList items={hiddenTokenAccounts} selectedSymbol={selectedSymbol} isHidden />
       ) : undefined}
-    </WrapperWidget>
+    </Widget>
   );
 };

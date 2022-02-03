@@ -3,7 +3,6 @@ import { useState } from 'react';
 
 import { styled } from '@linaria/react';
 
-import { Hint } from 'components/common/Hint';
 import { WidgetPage } from 'components/common/WidgetPage';
 import { Select } from 'components/ui';
 import { MenuItem } from 'components/ui/Select/MenuItem';
@@ -11,8 +10,6 @@ import { MenuItem } from 'components/ui/Select/MenuItem';
 import { ReceiveSolana } from './ReceiveSolana';
 import { LockAndMintBtc } from './renBridge/LockAndMintBtc';
 import { RenGatewayWarning } from './renBridge/RenGatewayWarning';
-
-const WrapperWidgetPage = styled(WidgetPage)``;
 
 const NetworkSelectWrapper = styled.div`
   padding: 12px 24px 0;
@@ -59,27 +56,24 @@ export const ReceiveAddressWidget: FC = () => {
   };
 
   return (
-    <div>
-      <WrapperWidgetPage title="Receive" icon="bottom">
-        <NetworkSelectWrapper>
-          <NetworkSelect>
-            <NetworkSelectText>Network</NetworkSelectText>
-            <Select value={sourceNetwork}>
-              {SOURCE_NETWORKS.map((network) => (
-                <MenuItem
-                  key={network}
-                  isSelected={network === sourceNetwork}
-                  onItemClick={() => handleSourceNetworkClick(network)}
-                >
-                  {network}
-                </MenuItem>
-              ))}
-            </Select>
-          </NetworkSelect>
-        </NetworkSelectWrapper>
-        {renderSourceNetworkReceivePanel()}
-      </WrapperWidgetPage>
-      <Hint />
-    </div>
+    <WidgetPage title="Receive" icon="bottom">
+      <NetworkSelectWrapper>
+        <NetworkSelect>
+          <NetworkSelectText>Network</NetworkSelectText>
+          <Select value={sourceNetwork}>
+            {SOURCE_NETWORKS.map((network) => (
+              <MenuItem
+                key={network}
+                isSelected={network === sourceNetwork}
+                onItemClick={() => handleSourceNetworkClick(network)}
+              >
+                {network}
+              </MenuItem>
+            ))}
+          </Select>
+        </NetworkSelect>
+      </NetworkSelectWrapper>
+      {renderSourceNetworkReceivePanel()}
+    </WidgetPage>
   );
 };

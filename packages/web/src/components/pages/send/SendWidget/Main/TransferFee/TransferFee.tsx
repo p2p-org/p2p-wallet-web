@@ -9,8 +9,6 @@ import Decimal from 'decimal.js';
 import { useSendState, useSettings } from 'app/contexts';
 import { Icon, TextField, Tooltip } from 'components/ui';
 
-import { TooltipRow, TxName, TxValue } from '../common/styled';
-
 const InfoIcon = styled(Icon)`
   width: 24px;
   height: 24px;
@@ -24,6 +22,24 @@ const TextFieldTXStyled = styled(TextField)`
   &.isFree {
     color: #2db533;
   }
+`;
+
+const TooltipRow = styled.div`
+  display: flex;
+
+  font-size: 14px;
+`;
+
+const TxName = styled.div`
+  flex-grow: 1;
+
+  margin-right: 5px;
+
+  font-weight: normal;
+`;
+
+const TxValue = styled.div`
+  font-weight: 600;
 `;
 
 const BURN_ALLOCATE_ACCOUNT_SIZE = 97;

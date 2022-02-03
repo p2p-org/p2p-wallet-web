@@ -15,8 +15,6 @@ import colors from './colors.config';
 
 const CHART_SIZE = 110;
 
-const WrapperWidget = styled(Widget)``;
-
 const TotalWrapper = styled.div`
   display: flex;
   justify-content: space-between;
@@ -145,7 +143,7 @@ export const TotalBalanceWidget: FunctionComponent<Props> = ({ onSymbolChange })
   }, [tokenAccounts]);
 
   return (
-    <WrapperWidget title={`${greeting} 👋`}>
+    <Widget title={`${greeting} 👋`}>
       <TotalWrapper>
         <PriceWrapper>
           <TotalText>Total balance</TotalText>
@@ -168,6 +166,6 @@ export const TotalBalanceWidget: FunctionComponent<Props> = ({ onSymbolChange })
           )}
         </ChartWrapper>
       </TotalWrapper>
-    </WrapperWidget>
+    </Widget>
   );
 };

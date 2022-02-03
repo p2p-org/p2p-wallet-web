@@ -21,7 +21,7 @@ const NavButton = styled.div`
   height: 52px;
 
   color: ${theme.colors.textIcon.primary};
-  font-weight: 600;
+  font-weight: 500;
   font-size: 16px;
   line-height: 140%;
   letter-spacing: 0.01em;
@@ -32,7 +32,7 @@ const NavButton = styled.div`
 
   ${up.tablet} {
     padding: 10px 10px;
-    ${borders.primary};
+    ${borders.primaryRGBA};
     ${shadows.light}
   }
 
@@ -70,7 +70,9 @@ const Name = styled.span`
 const NavLinkMenu = styled(NavLink)`
   &.active {
     ${NavButton} {
-      color: #5887ff;
+      color: ${theme.colors.textIcon.active};
+      font-weight: bold;
+      letter-spacing: 0.03em;
 
       background: ${theme.colors.bg.activePrimary};
 
@@ -106,23 +108,23 @@ const NavLinkMenu = styled(NavLink)`
 
 const Separator = styled.div`
   display: flex;
-  align-items: center;
-  padding: 0px;
-  margin: 8px 0px;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
+  margin: 8px 0;
+  padding: 0;
 `;
 
 const Line = styled.hr`
   flex: none;
+  flex-grow: 0;
+  align-self: stretch;
   order: 0;
   height: 2px;
-  align-self: stretch;
-  border: none;
-  flex-grow: 0;
-  margin: 0px 0px;
+  margin: 0 0;
+
   background: #f6f6f8;
+  border: none;
 `;
 
 export const LeftNavMenu: FunctionComponent = () => {
@@ -136,7 +138,7 @@ export const LeftNavMenu: FunctionComponent = () => {
       >
         <NavButton>
           <IconBlock>
-            <NavIcon name="home" />
+            <NavIcon name="wallet" />
           </IconBlock>
           <Name>Wallets</Name>
         </NavButton>
