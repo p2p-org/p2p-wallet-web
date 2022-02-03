@@ -12,20 +12,21 @@ import type {
 } from './types';
 import { buildParams } from './utils';
 
-export interface UseMoonpay {
-  getBuyQuote: (
-    amount: string | number,
-  ) => Promise<MoonpayGetBuyQuoteResponse | MoonpayErrorResponse>;
-}
-
 const baseParams: MoonpayBaseParams = {
   apiKey: MOONPAY_API_KEY!,
 };
 
+export interface UseMoonpay {
+  getBuyQuote: (
+    amount: string | number,
+    controller: AbortController,
+  ) => Promise<MoonpayGetBuyQuoteResponse | MoonpayErrorResponse>;
+}
+
 const useMoonpayInternal = (): UseMoonpay => {
   assert(MOONPAY_API_KEY, 'Define moonpay api key in .env');
 
-  const getBuyQuote = useCallback(async (amount: string | number) => {
+  const getBuyQuote = useCallback(async (amount: string | number, controller: AbortController) => {
     const params: MoonpayGetBuyQuoteParams = {
       ...baseParams,
       baseCurrencyAmount: amount || 0,
@@ -34,7 +35,9 @@ const useMoonpayInternal = (): UseMoonpay => {
     };
 
     try {
-      const res = await fetch(`${MOONPAY_API_URL}buy_quote?${buildParams(params)}`);
+      const res = await fetch(`${MOONPAY_API_URL}buy_quote?${buildParams(params)}`, {
+        signal: controller.signal,
+      });
 
       if (!res.ok && res.status !== 400) {
         throw new Error('getBuyQuote something wrong');

@@ -14,6 +14,8 @@ export interface UseBuyState {
 
   error: string;
   buyQuote: null | MoonpayGetBuyQuoteResponse;
+
+  isLoading: boolean;
 }
 
 const useBuyStateInternal = (): UseBuyState => {
@@ -23,20 +25,34 @@ const useBuyStateInternal = (): UseBuyState => {
   const [amount, setAmount] = useState('');
   const [error, setError] = useState('');
   const [buyQuote, setBuyQuote] = useState<null | MoonpayGetBuyQuoteResponse>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
+    const controller = new AbortController();
+
     void (async () => {
-      const result = await getBuyQuote(amount);
+      setIsLoading(true);
+      try {
+        setError('');
+        const result = await getBuyQuote(amount, controller);
 
-      if ((result as MoonpayErrorResponse).type === MoonpayErrorResponseType.BadRequestError) {
-        setError((result as MoonpayErrorResponse).message);
-        setBuyQuote(null);
-        return;
+        if ((result as MoonpayErrorResponse).type === MoonpayErrorResponseType.BadRequestError) {
+          setError((result as MoonpayErrorResponse).message);
+          setBuyQuote(null);
+          return;
+        }
+
+        setBuyQuote(result as MoonpayGetBuyQuoteResponse);
+      } catch (err) {
+        console.error(error);
+      } finally {
+        setIsLoading(false);
       }
-
-      setError('');
-      setBuyQuote(result as MoonpayGetBuyQuoteResponse);
     })();
+
+    return () => {
+      controller.abort();
+    };
   }, [amount, getBuyQuote]);
 
   return {
@@ -46,6 +62,7 @@ const useBuyStateInternal = (): UseBuyState => {
     setAmount,
     error,
     buyQuote,
+    isLoading,
   };
 };
 
