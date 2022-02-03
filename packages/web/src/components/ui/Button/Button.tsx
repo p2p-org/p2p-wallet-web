@@ -2,6 +2,7 @@ import type { FunctionComponent } from 'react';
 import * as React from 'react';
 
 import { styled } from '@linaria/react';
+import { theme } from '@p2p-wallet-web/ui';
 import classNames from 'classnames';
 import { rgba } from 'polished';
 
@@ -9,18 +10,18 @@ const Wrapper = styled.button`
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  height: 48px;
+  height: 56px;
   padding: 0 15px;
 
-  color: #000;
-  font-weight: 600;
+  color: ${theme.colors.textIcon.primary};
+  font-weight: bold;
   font-size: 16px;
   font-family: unset;
   line-height: 140%;
-  white-space: nowrap;
+  white-space: initial;
   text-decoration: none;
 
-  background: #fff;
+  background: ${theme.colors.bg.primary};
   border: 0;
   border-radius: 12px;
 
@@ -30,9 +31,9 @@ const Wrapper = styled.button`
   appearance: none;
 
   &.primary {
-    color: #fff;
+    color: ${theme.colors.textIcon.buttonPrimary};
 
-    background: #5887ff;
+    background: ${theme.colors.bg.buttonPrimary};
 
     &:hover {
       background: #82a5ff;
@@ -76,10 +77,8 @@ const Wrapper = styled.button`
   }
 
   &.hollow {
-    color: #5887ff;
-
-    background: #fff;
-    border: 1px solid #5887ff;
+    background: ${theme.colors.bg.primary};
+    border: 1px solid ${theme.colors.stroke.primary};
   }
 
   &.link {
@@ -90,6 +89,14 @@ const Wrapper = styled.button`
     text-decoration: underline;
 
     background: transparent;
+  }
+
+  &.error {
+    color: ${theme.colors.system.errorMain};
+
+    &:hover {
+      color: ${theme.colors.system.errorMain};
+    }
   }
 
   &.small {
@@ -109,12 +116,13 @@ const Wrapper = styled.button`
   }
 
   &:disabled {
-    color: #fff;
+    color: ${theme.colors.textIcon.buttonPrimary};
 
-    background: #a3a5ba;
+    background: ${theme.colors.bg.buttonDisabled};
+    cursor: not-allowed;
 
     &:hover {
-      background: #a3a5ba;
+      background: ${theme.colors.bg.buttonDisabled};
     }
   }
 `;
@@ -129,6 +137,7 @@ type Props = {
   lightBlue?: boolean;
   hollow?: boolean;
   link?: boolean;
+  error?: boolean;
   small?: boolean;
   medium?: boolean;
   big?: boolean;
@@ -145,6 +154,7 @@ export const Button: FunctionComponent<Props & React.ButtonHTMLAttributes<HTMLBu
   lightGray,
   lightBlue,
   link,
+  error,
   hollow,
   small,
   medium,
@@ -169,6 +179,7 @@ export const Button: FunctionComponent<Props & React.ButtonHTMLAttributes<HTMLBu
         lightGray,
         lightBlue,
         link,
+        error,
         hollow,
         small,
         medium,

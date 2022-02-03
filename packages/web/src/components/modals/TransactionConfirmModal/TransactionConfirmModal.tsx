@@ -8,12 +8,13 @@ import {
   useTryUnlockSeedAndMnemonic,
   useWallet,
 } from '@p2p-wallet-web/core';
+import { theme } from '@p2p-wallet-web/ui';
 
 import type { ModalPropsType } from 'app/contexts/general/modals/types';
 import { ErrorHint } from 'components/common/ErrorHint';
-import { Modal } from 'components/common/Modal';
 import { PasswordInput } from 'components/common/PasswordInput';
-import { Button } from 'components/ui';
+import { Button, Icon } from 'components/ui';
+import { Modal } from 'components/ui/Modal';
 
 import { Section } from './common/styled';
 import type { TransferParams } from './Send';
@@ -22,22 +23,44 @@ import type { SwapParams } from './Swap';
 import { Swap } from './Swap';
 
 const WrapperModal = styled(Modal)`
-  flex-basis: 588px;
+  flex-basis: 524px;
 `;
 
 const SubTitle = styled.span`
   display: flex;
+  margin-bottom: 8px;
 
-  margin-bottom: 12px;
-
-  color: #000;
-  font-weight: 600;
+  color: ${theme.colors.textIcon.primary};
+  font-weight: 500;
   font-size: 16px;
   line-height: 140%;
+  letter-spacing: 0.01em;
+`;
+
+const ActionTitle = styled.div`
+  padding: 16px 0 0 16px;
+
+  color: ${theme.colors.textIcon.primary};
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 140%;
+  letter-spacing: 0.01em;
 `;
 
 const PasswordInputStyled = styled(PasswordInput)`
   height: 46px;
+`;
+
+const SendIcon = styled(Icon)`
+  width: 24px;
+  height: 24px;
+  margin-right: 12px;
+`;
+
+const CancelIcon = styled(Icon)`
+  width: 24px;
+  height: 24px;
+  margin-right: 8px;
 `;
 
 export type TransactionConfirmModalProps = {
@@ -83,14 +106,21 @@ export const TransactionConfirmModal: FunctionComponent<
     walletProviderInfo?.name === DEFAULT_WALLET_PROVIDERS[DefaultWalletType.SecretKey].name;
   const isDisabled = isSecretKeyWallet && (!password || hasError);
 
+  const renderTitle = () => {
+    switch (type) {
+      case 'send':
+        return <>Confirm sending {(params as TransferParams).source.balance?.token.symbol}</>;
+      default:
+        return 'Double check and confirm';
+    }
+  };
+
   const renderDescription = () => {
     switch (type) {
       case 'swap':
         return 'Swap transaction';
-      case 'send':
-        return 'Send transaction';
       default:
-        return 'Transaction';
+        return null;
     }
   };
 
@@ -99,11 +129,16 @@ export const TransactionConfirmModal: FunctionComponent<
 
     switch (type) {
       case 'swap':
-        action = 'Confirm and swap';
+        action = 'Confirm and send';
         break;
       case 'send':
       default:
-        action = 'Confirm and send';
+        action = (
+          <>
+            <SendIcon name="top" />
+            Send {(params as TransferParams).amount.formatUnits()}
+          </>
+        );
         break;
     }
 
@@ -112,7 +147,8 @@ export const TransactionConfirmModal: FunctionComponent<
         <Button primary disabled={isDisabled} onClick={handleConfirmClick}>
           {action}
         </Button>
-        <Button lightGray onClick={handleCloseClick}>
+        <Button hollow error onClick={handleCloseClick}>
+          <CancelIcon name="cross" />
           Cancel
         </Button>
       </>
@@ -121,16 +157,17 @@ export const TransactionConfirmModal: FunctionComponent<
 
   return (
     <WrapperModal
-      title="Double check and confirm"
+      title={renderTitle()}
       description={renderDescription()}
       close={handleCloseClick}
       footer={renderButtons()}
     >
+      {type === 'send' ? <ActionTitle>You are going to send</ActionTitle> : undefined}
       {type === 'send' ? <Send params={params as TransferParams} /> : undefined}
       {type === 'swap' ? <Swap params={params as SwapParams} /> : undefined}
 
       {isSecretKeyWallet ? (
-        <Section>
+        <Section className="password">
           <SubTitle>Enter password to confirm</SubTitle>
           <PasswordInputStyled value={password} onChange={handlePasswordChange} />
           {hasError ? <ErrorHint error="Incorrect password, try again" noIcon /> : undefined}

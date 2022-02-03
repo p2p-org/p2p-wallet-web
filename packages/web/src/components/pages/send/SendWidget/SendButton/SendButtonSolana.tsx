@@ -1,4 +1,5 @@
 import type { FC } from 'react';
+import { useMemo } from 'react';
 
 import { styled } from '@linaria/react';
 import { useTokenAccount } from '@p2p-wallet-web/core';
@@ -31,6 +32,7 @@ interface Props {
 export const SendButtonSolana: FC<Props> = ({ primary, disabled }) => {
   const { openModal } = useModals();
   const {
+    fromAmount,
     fromTokenAccount,
     resolvedAddress,
     toPublicKey,
@@ -120,10 +122,34 @@ export const SendButtonSolana: FC<Props> = ({ primary, disabled }) => {
     }
   };
 
+  const hasBalance = fromTokenAccount?.balance
+    ? fromTokenAccount.balance?.asNumber >= Number(fromAmount)
+    : false;
+
+  const text = useMemo(() => {
+    if (!Number(fromAmount)) {
+      return 'Enter the amount';
+    }
+
+    if (!hasBalance) {
+      return <>There is not enough {fromTokenAccount?.balance?.token.symbol} balance</>;
+    }
+
+    if (!destinationAddress) {
+      return 'Choose the recipient';
+    }
+
+    return (
+      <>
+        <SendIcon name="top" />
+        Send {fromTokenAccount?.balance?.formatUnits()}
+      </>
+    );
+  }, [destinationAddress, fromAmount, fromTokenAccount?.balance]);
+
   return (
     <Button primary={primary} disabled={disabled} big full onClick={handleSubmit}>
-      <SendIcon name="top" />
-      Send now
+      {text}
     </Button>
   );
 };

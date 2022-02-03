@@ -10,8 +10,6 @@ import { Widget } from 'components/common/Widget';
 import { Avatar, Icon } from 'components/ui';
 import { FEATURE_LEFT_NAV_MENU_POFILE } from 'config/featureFlags';
 
-const WrapperWidget = styled(Widget)``;
-
 const Top = styled.div`
   display: flex;
   align-items: center;
@@ -101,7 +99,7 @@ export const ProfileWidget: FunctionComponent = () => {
 
   return (
     <Feature name={FEATURE_LEFT_NAV_MENU_POFILE}>
-      <WrapperWidget>
+      <Widget>
         <Top>
           <Avatar src="https://i.pravatar.cc/100" size={36} />
           <Username>@{username}</Username>
@@ -112,7 +110,7 @@ export const ProfileWidget: FunctionComponent = () => {
             <CopyIcon name="copy" />
           </CopyWrapper>
         </Bottom>
-      </WrapperWidget>
+      </Widget>
     </Feature>
   );
 };

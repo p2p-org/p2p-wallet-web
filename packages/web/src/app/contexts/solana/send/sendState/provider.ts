@@ -47,6 +47,15 @@ export interface UseSendState {
 
   isRenBTC: boolean;
 
+  isConfirmCorrectAddress: boolean;
+  setIsConfirmCorrectAddress: (v: boolean) => void;
+
+  isShowConfirmAddressSwitch: boolean;
+  setIsShowConfirmAddressSwitch: (v: boolean) => void;
+
+  isInitBurnAndRelease: boolean;
+  setIsInitBurnAndRelease: (v: boolean) => void;
+
   destinationAccount: DestinationAccount | null;
   isResolvingAddress: boolean;
 }
@@ -75,6 +84,11 @@ const useSendStateInternal = (): UseSendState => {
   const renNetwork = useRenNetwork();
 
   const [isExecuting, setIsExecuting] = useState(false);
+
+  const [isConfirmCorrectAddress, setIsConfirmCorrectAddress] = useState(false);
+
+  const [isShowConfirmAddressSwitch, setIsShowConfirmAddressSwitch] = useState(false);
+  const [isInitBurnAndRelease, setIsInitBurnAndRelease] = useState(false);
 
   const [destinationAccount, setDestinationAccount] = useState<DestinationAccount | null>(null);
 
@@ -151,6 +165,12 @@ const useSendStateInternal = (): UseSendState => {
     setIsExecuting,
     isAddressInvalid,
     isRenBTC,
+    isConfirmCorrectAddress,
+    setIsConfirmCorrectAddress,
+    isShowConfirmAddressSwitch,
+    setIsShowConfirmAddressSwitch,
+    isInitBurnAndRelease,
+    setIsInitBurnAndRelease,
     destinationAccount,
     isResolvingAddress,
   };

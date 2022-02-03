@@ -24,32 +24,36 @@ import lock from './assets/lock-icon.svg';
 import logout from './assets/logout-icon.svg';
 import more from './assets/more-icon.svg';
 import appStore from './assets/new/app-store-icon.svg';
+import arrowDown from './assets/new/arrow-down-icon.svg';
 import bottom from './assets/new/bottom-icon.svg';
 import chevron from './assets/new/chevron-icon.svg';
 import clockTransparent from './assets/new/clock-transparent-icon.svg';
 import copy from './assets/new/copy-icon.svg';
+import cross from './assets/new/cross-icon.svg';
 import externalLink from './assets/new/external-link-icon.svg';
 import eyeHide from './assets/new/eye-hide-icon.svg';
 import eye from './assets/new/eye-icon.svg';
 import gear from './assets/new/gear-icon.svg';
 import googlePlay from './assets/new/google-play-icon.svg';
-import home from './assets/new/home-icon.svg';
 import info from './assets/new/info-icon.svg';
 import pen from './assets/new/pen-icon.svg';
 import plus from './assets/new/plus-icon.svg';
 import qr from './assets/new/qr-icon.svg';
+import roundStop from './assets/new/round-stop-icon.svg';
+import search from './assets/new/search-icon.svg';
 import swap from './assets/new/swap-icon.svg';
 import top from './assets/new/top-icon.svg';
+import wallet from './assets/new/wallet-icon.svg';
 import warningTransparent from './assets/new/warning-transparent-icon.svg';
 import plug from './assets/plug-icon.svg';
 import questionCircle from './assets/question-circle-icon.svg';
 import reload from './assets/reload-icon.svg';
-import search from './assets/search-icon.svg';
+import searchOld from './assets/search-icon.svg';
 import settings from './assets/settings-icon.svg';
 import success from './assets/success-icon.svg';
 import sun from './assets/sun-icon.svg';
 import timer from './assets/timer-icon.svg';
-import wallet from './assets/wallet-icon.svg';
+import walletOld from './assets/wallet-icon.svg';
 import warning from './assets/warning-icon.svg';
 
 const iconsMap = new Map<string, string>([
@@ -67,32 +71,36 @@ const iconsMap = new Map<string, string>([
   ['chevron-rounded', chevronRounded],
   ['close', close],
   ['copy', copy],
+  ['cross', cross],
   ['currency', currency],
   ['db', db],
   ['bucket', bucket],
   ['gear', gear],
   ['google-play', googlePlay],
   ['more', more],
+  ['arrow-down', arrowDown],
   ['eye-hide', eyeHide],
   ['eye', eye],
   ['external-link', externalLink],
   ['search', search],
+  ['search-old', searchOld],
   ['settings', settings],
   ['success', success],
   ['sun', sun],
   ['swap', swap],
   ['timer', timer],
-  ['home', home],
+  ['wallet', wallet],
   ['lock', lock],
   ['logout', logout],
   ['pen', pen],
   ['plug', plug],
   ['plus', plus],
   ['qr', qr],
+  ['round-stop', roundStop],
   ['question-circle', questionCircle],
   ['reload', reload],
   ['top', top],
-  ['wallet', wallet],
+  ['wallet-old', walletOld],
   ['warning', warning],
   ['error', error],
   ['attention', attention],

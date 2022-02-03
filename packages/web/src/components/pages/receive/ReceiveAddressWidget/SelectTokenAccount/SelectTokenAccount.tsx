@@ -1,5 +1,5 @@
 import type { FunctionComponent } from 'react';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { styled } from '@linaria/react';
 import classNames from 'classnames';
@@ -275,10 +275,13 @@ export const SelectTokenAccount: FunctionComponent<Props> = ({
     onTokenAccountChange(nextTokenAccount.mint, nextTokenAccount);
   };
 
-  const handleTokenClick = (nextToken: Token) => {
-    setIsOpen(false);
-    onTokenAccountChange(nextToken, null);
-  };
+  const handleTokenClick = useCallback(
+    (nextToken: Token) => {
+      setIsOpen(false);
+      onTokenAccountChange(nextToken, null);
+    },
+    [onTokenAccountChange],
+  );
 
   const handleFilterChange = (value: string) => {
     const nextFilter = value.trim();

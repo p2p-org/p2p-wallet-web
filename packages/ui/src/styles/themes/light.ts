@@ -1,4 +1,4 @@
-import { generate } from './utils';
+import { generate, toRGB } from './utils';
 
 const theme = {
   colors: {
@@ -16,6 +16,7 @@ const theme = {
     },
     stroke: {
       primary: '#D3D4DE',
+      primaryRGB: toRGB('#D3D4DE'),
       secondary: '#F2F2F7',
       tertiary: '#F6F6F8',
       // 'chart-red': '',

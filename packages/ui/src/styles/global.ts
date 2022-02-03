@@ -2,6 +2,7 @@ import { css } from '@linaria/core';
 import { rgba } from 'polished';
 
 import { up } from './breakpoints';
+import { fonts } from './helpers';
 import { dark, light, theme } from './themes';
 
 export const globalCss = css`
@@ -25,8 +26,7 @@ export const globalCss = css`
     // }
 
     body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-        'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+      font-family: ${fonts.sansSerif};
 
       background: ${theme.colors.bg.primary};
       -webkit-font-smoothing: antialiased;

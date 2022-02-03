@@ -1,20 +1,23 @@
 import { styled } from '@linaria/react';
+import { theme } from '@p2p-wallet-web/ui';
 
 import { Icon } from 'components/ui';
 
 export const Section = styled.div`
-  padding: 20px;
+  display: grid;
+  padding: 20px 0;
 
   &.swap {
-    padding: 20px 20px 0;
+    padding: 20px 0 0;
   }
 
   &.send {
-    padding: 0 20px;
+    grid-gap: 16px;
+    padding: 16px 0;
   }
 
-  &:not(:last-child) {
-    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  &.password {
+    padding: 8px 0 24px;
   }
 `;
 
@@ -27,18 +30,18 @@ export const SectionTitle = styled.div`
 
 export const FieldInfo = styled.div`
   display: flex;
-  padding: 20px 0;
+  align-items: center;
+  padding: 12px 20px;
 
-  &:not(:last-child) {
-    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-  }
+  border: 1px solid ${theme.colors.stroke.secondary};
+  border-radius: 12px;
 `;
 
 export const WalletIcon = styled(Icon)`
   width: 24px;
   height: 24px;
 
-  color: #a3a5ba;
+  color: ${theme.colors.textIcon.secondary};
 `;
 
 export const IconWrapper = styled.div`
@@ -48,7 +51,7 @@ export const IconWrapper = styled.div`
   width: 44px;
   height: 44px;
 
-  background: #f6f6f8;
+  background: ${theme.colors.bg.secondary};
   border-radius: 12px;
 `;
 
@@ -61,12 +64,16 @@ export const InfoWrapper = styled.div`
 `;
 
 export const InfoTitle = styled.div`
-  margin-bottom: 2px;
+  color: ${theme.colors.textIcon.primary};
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 140%;
 
-  color: #a3a5ba;
-  font-weight: 600;
-  font-size: 14px;
-  line-height: 24px;
+  &.secondary {
+    color: ${theme.colors.textIcon.secondary};
+    font-size: 14px;
+    line-height: 120%;
+  }
 `;
 
 export const Username = styled(InfoTitle)`
@@ -75,8 +82,11 @@ export const Username = styled(InfoTitle)`
 `;
 
 export const InfoValue = styled.div`
-  color: #000;
-  font-weight: 600;
-  font-size: 16px;
-  line-height: 16px;
+  margin-top: 4px;
+
+  color: ${theme.colors.textIcon.secondary};
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 120%;
+  letter-spacing: 0.01em;
 `;

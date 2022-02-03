@@ -12,8 +12,6 @@ import { Widget } from 'components/common/Widget';
 import { Button, Icon, Switch } from 'components/ui';
 import { FEATURE_SETTINGS_CLOSE_ACCOUNT } from 'config/featureFlags';
 
-const WrapperWidget = styled(Widget)``;
-
 const TitleWrapper = styled.div`
   display: flex;
   align-items: center;
@@ -170,7 +168,7 @@ export const TokenSettingsWidget: FunctionComponent<Props> = ({
   };
 
   return (
-    <WrapperWidget
+    <Widget
       title={
         <TitleWrapper>
           <TokenSettingsIconWrapper>
@@ -181,6 +179,6 @@ export const TokenSettingsWidget: FunctionComponent<Props> = ({
       }
     >
       <Settings>{renderSettings()}</Settings>
-    </WrapperWidget>
+    </Widget>
   );
 };

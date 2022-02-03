@@ -1,130 +1,26 @@
 import type { FunctionComponent } from 'react';
-import { useEffect, useState } from 'react';
-import { useHistory } from 'react-router';
+import { useEffect } from 'react';
 
-import { styled } from '@linaria/react';
-import type { TokenAccount } from '@p2p-wallet-web/core';
-import { useSolana, useUserTokenAccounts } from '@p2p-wallet-web/core';
-import { theme, up } from '@p2p-wallet-web/ui';
-import type { Token } from '@saberhq/token-utils';
+import { useSolana } from '@p2p-wallet-web/core';
 import { PublicKey } from '@solana/web3.js';
-import classNames from 'classnames';
 
 import { isValidAddress, useSendState } from 'app/contexts';
-import { CompensationFee } from 'components/common/CompensationFee';
-import { RateUSD } from 'components/common/RateUSD';
-import { FromToSelectInput } from 'components/pages/send/SendWidget/FromToSelectInput';
-import { SendButtonBitcoin } from 'components/pages/send/SendWidget/SendButton';
-import { SendButtonSolana } from 'components/pages/send/SendWidget/SendButton/SendButtonSolana';
-import { Switch, TextField } from 'components/ui';
-import { trackEvent } from 'utils/analytics';
+import { WidgetPageWithBottom } from 'components/common/WidgetPageWithBottom';
+import { Main } from 'components/pages/send/SendWidget/Main';
+import { SendButton } from 'components/pages/send/SendWidget/SendButton';
 
 import { BurnAndRelease } from './BurnAndRelease/BurnAndRelease';
-import { FromWrapper, WrapperWidgetPage } from './common/styled';
-import { NetworkSelect } from './NetworkSelect';
-import { ToAddressInput } from './ToAddressInput';
 
-const Wrapper = styled.div`
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  justify-content: space-between;
-
-  ${up.tablet} {
-    flex: initial;
-    justify-content: initial;
-  }
-`;
-
-const MainWrapper = styled.div`
-  padding: 16px;
-
-  ${up.tablet} {
-    padding: 16px 20px;
-  }
-`;
-
-const ToSendWrapper = styled(FromWrapper)``;
-
-const FromTitle = styled.div`
-  margin-bottom: 8px;
-
-  color: #000;
-  font-weight: 600;
-  font-size: 16px;
-  line-height: 24px;
-`;
-
-const ConfirmWrapper = styled.div`
-  display: flex;
-  align-items: center;
-  margin-top: 20px;
-  padding: 20px 0 0;
-
-  &.isShowConfirmAddressSwitch {
-    border-top: 1px solid #f6f6f8;
-  }
-`;
-
-const ConfirmTextWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  flex-grow: 1;
-`;
-
-const ConfirmTextPrimary = styled.div`
-  color: #a3a5ba;
-  font-weight: 600;
-  font-size: 14px;
-`;
-const ConfirmTextSecondary = styled.div`
-  font-weight: 600;
-  font-size: 16px;
-`;
-
-const TextFieldStyled = styled(TextField)`
-  margin-bottom: 8px;
-`;
-
-const BottomWrapper = styled.div`
-  padding: 16px;
-
-  ${up.tablet} {
-    border-top: 1px solid ${theme.colors.stroke.tertiary};
-  }
-`;
-
-const ButtonWrapper = styled.div``;
-
-const isValidAmount = (amount: string): boolean => {
-  const amountValue = Number.parseFloat(amount);
-
-  return amount === '' || amountValue === 0;
-};
-
-// TODO: refactor To field to own component wit logic by hooks
 export const SendWidget: FunctionComponent = () => {
-  const history = useHistory();
-
   const { provider } = useSolana();
   const {
-    fromTokenAccount,
-    setFromTokenAccount,
     fromAmount,
-    setFromAmount,
     toPublicKey,
     blockchain,
     renNetwork,
-    isExecuting,
-    isAddressInvalid,
-    isRenBTC,
-    destinationAccount,
+    isInitBurnAndRelease,
+    setIsShowConfirmAddressSwitch,
   } = useSendState();
-  const tokenAccounts = useUserTokenAccounts();
-
-  const [isShowConfirmAddressSwitch, setIsShowConfirmAddressSwitch] = useState(false);
-  const [isConfirmCorrectAddress, setIsConfirmCorrectAddress] = useState(false);
-  const [isInitBurnAndRelease, setIsInitBurnAndRelease] = useState(false);
 
   useEffect(() => {
     const checkDestinationAddress = async () => {
@@ -140,114 +36,15 @@ export const SendWidget: FunctionComponent = () => {
     } else {
       setIsShowConfirmAddressSwitch(false);
     }
-  }, [blockchain, renNetwork, toPublicKey, provider]);
-
-  const handleFromTokenAccountChange = (
-    _nextToken: Token,
-    nextTokenAccount: TokenAccount | null,
-  ) => {
-    if (!nextTokenAccount?.key) {
-      return;
-    }
-
-    trackEvent('send_select_token_click', {
-      tokenTicker: nextTokenAccount.balance?.token.symbol || '',
-    });
-
-    setFromTokenAccount(nextTokenAccount);
-    history.replace(`/send/${nextTokenAccount.key.toBase58()}`);
-  };
-
-  const handleFromAmountChange = (minorAmount: string, type?: string) => {
-    setFromAmount(minorAmount);
-
-    if (type === 'available') {
-      trackEvent('send_available_click', { sum: Number(minorAmount) });
-    } else {
-      trackEvent('send_amount_keydown', { sum: Number(minorAmount) });
-    }
-  };
-
-  const hasBalance = fromTokenAccount?.balance
-    ? fromTokenAccount.balance?.asNumber >= Number(fromAmount)
-    : false;
-
-  const isDisabled = isExecuting;
-  const isDisabledButton =
-    isDisabled ||
-    isValidAmount(fromAmount) ||
-    isAddressInvalid ||
-    !hasBalance ||
-    (isShowConfirmAddressSwitch && !isConfirmCorrectAddress);
+  }, [blockchain, renNetwork, toPublicKey, provider, setIsShowConfirmAddressSwitch]);
 
   return (
-    <WrapperWidgetPage title="Send" icon="top">
-      <Wrapper>
-        <MainWrapper>
-          <FromWrapper>
-            <FromToSelectInput
-              tokenAccounts={tokenAccounts}
-              tokenAccount={fromTokenAccount}
-              onTokenAccountChange={handleFromTokenAccountChange}
-              amount={fromAmount}
-              onAmountChange={handleFromAmountChange}
-              disabled={isDisabled}
-            />
-          </FromWrapper>
-          <ToSendWrapper>
-            <FromTitle>To</FromTitle>
-            <ToAddressInput />
-            {isShowConfirmAddressSwitch ? (
-              <ConfirmWrapper className={classNames({ isShowConfirmAddressSwitch })}>
-                <ConfirmTextWrapper>
-                  <ConfirmTextPrimary>
-                    Is this address correct? It doesn’t have funds.
-                  </ConfirmTextPrimary>
-                  <ConfirmTextSecondary>I’m sure, It’s correct</ConfirmTextSecondary>
-                </ConfirmTextWrapper>
-                <Switch
-                  checked={isConfirmCorrectAddress}
-                  onChange={() => setIsConfirmCorrectAddress(!isConfirmCorrectAddress)}
-                />
-              </ConfirmWrapper>
-            ) : undefined}
-          </ToSendWrapper>
+    <WidgetPageWithBottom title="Send" icon="top" bottom={<SendButton />}>
+      <Main />
 
-          {isRenBTC ? <NetworkSelect /> : undefined}
-
-          <TextFieldStyled
-            label="Current price"
-            value={
-              <>
-                <RateUSD symbol={fromTokenAccount?.balance?.token.symbol} />{' '}
-                <span>&nbsp;per {fromTokenAccount?.balance?.token.symbol} </span>
-              </>
-            }
-          />
-          <CompensationFee
-            type="send"
-            isShow={!fromTokenAccount?.balance?.token.isRawSOL}
-            accountSymbol={destinationAccount?.symbol || ''}
-          />
-        </MainWrapper>
-
-        <BottomWrapper>
-          <ButtonWrapper>
-            {blockchain === 'bitcoin' ? (
-              <SendButtonBitcoin
-                primary={!isDisabled}
-                disabled={isDisabledButton}
-                onInitBurnAndRelease={() => setIsInitBurnAndRelease(true)}
-              />
-            ) : (
-              <SendButtonSolana primary={!isDisabled} disabled={isDisabledButton} />
-            )}
-          </ButtonWrapper>
-        </BottomWrapper>
-        {isInitBurnAndRelease ? (
-          <BurnAndRelease destinationAddress={toPublicKey} targetAmount={fromAmount} />
-        ) : undefined}
-      </Wrapper>
-    </WrapperWidgetPage>
+      {isInitBurnAndRelease ? (
+        <BurnAndRelease destinationAddress={toPublicKey} targetAmount={fromAmount} />
+      ) : undefined}
+    </WidgetPageWithBottom>
   );
 };

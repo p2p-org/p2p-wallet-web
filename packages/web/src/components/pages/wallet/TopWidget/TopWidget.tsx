@@ -28,8 +28,6 @@ import { shortAddress } from 'utils/tokens';
 
 import { Chart } from './Chart';
 
-const WrapperWidget = styled(Widget)``;
-
 const Header = styled.div`
   display: flex;
   align-items: center;
@@ -347,7 +345,7 @@ const TopWidgetOrigin: FunctionComponent<Props> = ({ publicKey }) => {
 
   return (
     <>
-      <WrapperWidget
+      <Widget
         ref={widgetRef}
         title={
           tokenAccount?.key && tokenAccount?.balance ? (
@@ -386,7 +384,7 @@ const TopWidgetOrigin: FunctionComponent<Props> = ({ publicKey }) => {
       >
         {renderContent()}
         {tokenAccount?.key ? <Chart publicKey={tokenAccount.key} /> : undefined}
-      </WrapperWidget>
+      </Widget>
       {isShowFixed ? (
         <WrapperFixed>
           <FixedInfoWrapper>

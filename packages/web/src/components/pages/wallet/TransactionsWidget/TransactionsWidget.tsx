@@ -1,7 +1,6 @@
 import type { FunctionComponent } from 'react';
 import { useEffect } from 'react';
 
-import { styled } from '@linaria/react';
 import { useTransactionSignatures } from '@p2p-wallet-web/core';
 
 import { Empty } from 'components/common/Empty';
@@ -11,8 +10,6 @@ import { ToastManager } from 'components/common/ToastManager';
 import { Widget } from 'components/common/Widget';
 import { TransactionList } from 'components/pages/wallet/TransactionsWidget/TransactionList';
 import { trackEvent } from 'utils/analytics';
-
-const WrapperWidget = styled(Widget)``;
 
 const TRANSACTIONS_LIMIT = 10;
 
@@ -51,7 +48,7 @@ export const TransactionsWidget: FunctionComponent<Props> = ({ publicKey }) => {
   };
 
   return (
-    <WrapperWidget title="Activity">
+    <Widget title="Activity">
       <InfinityScrollHelper disabled={isLoading || isEnd} onNeedLoadMore={handleNeedLoadMore}>
         <TransactionList signatures={signatures} source={publicKey} />
         {isLoading ? <LoaderBlock /> : undefined}
@@ -63,6 +60,6 @@ export const TransactionsWidget: FunctionComponent<Props> = ({ publicKey }) => {
           />
         ) : undefined}
       </InfinityScrollHelper>
-    </WrapperWidget>
+    </Widget>
   );
 };

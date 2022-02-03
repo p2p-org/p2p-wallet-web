@@ -3,6 +3,7 @@ import { forwardRef, useState } from 'react';
 import * as React from 'react';
 
 import { styled } from '@linaria/react';
+import { theme } from '@p2p-wallet-web/ui';
 import classNames from 'classnames';
 
 import { Icon } from 'components/ui';
@@ -10,15 +11,15 @@ import { Icon } from 'components/ui';
 const Wrapper = styled.label`
   display: flex;
   align-items: center;
-  height: 42px;
+  height: 48px;
 
-  background: #f6f6f8;
-  border: 1px solid transparent;
+  background: ${theme.colors.bg.primary};
+  border: 1px solid ${theme.colors.stroke.primary};
   border-radius: 12px;
   cursor: text;
 
   &.isFocused {
-    border: 1px solid rgba(163, 165, 186, 0.5);
+    border: 1px solid ${theme.colors.textIcon.active};
   }
 `;
 

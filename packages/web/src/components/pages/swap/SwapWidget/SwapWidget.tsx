@@ -3,7 +3,6 @@ import type { FC } from 'react';
 import { styled } from '@linaria/react';
 import { rgba } from 'polished';
 
-import { Hint } from 'components/common/Hint';
 import { WidgetPage } from 'components/common/WidgetPage';
 
 import { CurrentPrice } from './CurrentPrice';
@@ -24,8 +23,6 @@ import { SwapToForm } from './SwapToForm';
 //     margin-right: 10px;
 //   }
 // `;
-
-const WrapperWidgetPage = styled(WidgetPage)``;
 
 const Wrapper = styled.div`
   padding: 24px 20px;
@@ -67,38 +64,35 @@ export const SwapWidget: FC = () => {
   // }, [trade]);
 
   return (
-    <div>
-      <WrapperWidgetPage
-        title="Swap"
-        icon="swap"
-        // action={
-        //   <ActionsWrapper>
-        //     <SettingsAction />
-        //   </ActionsWrapper>
-        // }
-      >
-        <Wrapper>
-          <SwapFromForm />
-          <Reverse />
-          <SwapToForm />
-          <Lines>
-            <CurrentPrice />
-            {/*/!*<PriceImpact />*!/*/}
-            <Slippage />
-            <Fees />
-          </Lines>
-          <BottomWrapper>
-            <SwapButton />
-          </BottomWrapper>
-        </Wrapper>
-        <PoweredByBannerWrapper>
-          <PoweredBy>Powered by </PoweredBy>
-          <a href="https://www.orca.so/" target="_blank" rel="noopener noreferrer noindex">
-            <img src={orcaLogo} alt="Orca" />
-          </a>
-        </PoweredByBannerWrapper>
-      </WrapperWidgetPage>
-      <Hint />
-    </div>
+    <WidgetPage
+      title="Swap"
+      icon="swap"
+      // action={
+      //   <ActionsWrapper>
+      //     <SettingsAction />
+      //   </ActionsWrapper>
+      // }
+    >
+      <Wrapper>
+        <SwapFromForm />
+        <Reverse />
+        <SwapToForm />
+        <Lines>
+          <CurrentPrice />
+          {/*/!*<PriceImpact />*!/*/}
+          <Slippage />
+          <Fees />
+        </Lines>
+        <BottomWrapper>
+          <SwapButton />
+        </BottomWrapper>
+      </Wrapper>
+      <PoweredByBannerWrapper>
+        <PoweredBy>Powered by </PoweredBy>
+        <a href="https://www.orca.so/" target="_blank" rel="noopener noreferrer noindex">
+          <img src={orcaLogo} alt="Orca" />
+        </a>
+      </PoweredByBannerWrapper>
+    </WidgetPage>
   );
 };

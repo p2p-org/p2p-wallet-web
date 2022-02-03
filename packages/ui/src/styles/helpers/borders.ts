@@ -1,10 +1,14 @@
 import { theme } from '../themes';
 
-const primary = `
-  border: 0.5px solid ${theme.colors.stroke.primary};
-  border-width: 0.5px;
+const primaryRGBA = `
+  border: 1px solid rgba(${theme.colors.stroke.primaryRGB}, 0.3);
+`;
+
+const secondary = `
+  border: 1px solid ${theme.colors.stroke.secondary};
 `;
 
 export const borders = {
-  primary,
+  primaryRGBA,
+  secondary,
 };
