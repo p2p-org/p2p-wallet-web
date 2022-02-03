@@ -35,6 +35,7 @@ export interface MoonpayGetBuyQuoteParams extends MoonpayBaseParams {
 }
 
 export type MoonpayGetBuyQuoteResponse = {
+  baseCurrencyAmount: number;
   quoteCurrencyAmount: number;
   quoteCurrencyPrice: number;
   quoteCurrencyCode: string;
