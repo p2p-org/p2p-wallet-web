@@ -1,5 +1,5 @@
 import type { FunctionComponent } from 'react';
-import { Children, isValidElement, cloneElement, useEffect, useRef, useState } from 'react';
+import { Children, cloneElement, isValidElement, useEffect, useRef, useState } from 'react';
 
 import { styled } from '@linaria/react';
 import classNames from 'classnames';
@@ -18,8 +18,8 @@ const PlugIcon = styled(Icon)`
 `;
 
 const Value = styled.div`
-  max-width: 83px;
-  margin: 0 6px 0 8px;
+  display: inline-block;
+  flex-grow: 1;
   overflow: hidden;
 
   color: #202020;
@@ -28,22 +28,22 @@ const Value = styled.div`
   line-height: 140%;
   white-space: nowrap;
 
-  text-transform: capitalize;
   text-overflow: ellipsis;
+
+  &:first-letter {
+    text-transform: capitalize;
+  }
 `;
 
 const Selector = styled.div`
   display: flex;
   align-items: center;
-  max-width: 153px;
-  margin: 4px;
 
   cursor: pointer;
 
   &.isOpen,
   &:hover {
-    ${PlugIcon},
-    ${Value} {
+    ${PlugIcon} {
       color: #5887ff;
     }
   }
@@ -66,6 +66,7 @@ const DropDownList = styled.div`
   z-index: 1;
 
   min-width: 204px;
+  width: 100%;
   margin-top: 8px;
   padding: 8px;
 
@@ -75,7 +76,7 @@ const DropDownList = styled.div`
 `;
 
 type Props = {
-  value: string;
+  value: string | React.ReactNode;
 };
 
 export const Select: FunctionComponent<Props> = ({ children, value }) => {

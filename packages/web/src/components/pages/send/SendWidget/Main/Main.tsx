@@ -9,6 +9,7 @@ import classNames from 'classnames';
 import { Feature } from 'flagged';
 
 import { useSendState } from 'app/contexts';
+import { CompensationFee } from 'components/common/CompensationFee';
 import { TransactionDetails } from 'components/common/TransactionDetails';
 import { Switch, TextField } from 'components/ui';
 import { FEATURE_PAY_BY, FEATURE_TRANSACTION_DETAILS_ACCORDION } from 'config/featureFlags';
@@ -85,6 +86,7 @@ export const Main: FC = () => {
     isShowConfirmAddressSwitch,
     isConfirmCorrectAddress,
     setIsConfirmCorrectAddress,
+    destinationAccount,
   } = useSendState();
 
   const tokenAccounts = useUserTokenAccounts();
@@ -161,6 +163,12 @@ export const Main: FC = () => {
       </ToWrapper>
 
       {isRenBTC ? <NetworkSelect /> : undefined}
+
+      <CompensationFee
+        type="send"
+        isShow={!fromTokenAccount?.balance?.token.isRawSOL}
+        accountSymbol={destinationAccount?.symbol || ''}
+      />
 
       <Feature name={FEATURE_PAY_BY}>
         <FeePay tokenAccounts={tokenAccounts} onTokenAccountChange={handleFeeTokenAccountChange} />
