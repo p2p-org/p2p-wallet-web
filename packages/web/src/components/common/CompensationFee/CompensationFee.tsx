@@ -37,7 +37,8 @@ export const CompensationFee: FC<{
   isShow?: boolean;
   accountSymbol?: string;
 }> = ({ type, isShow = true, accountSymbol }) => {
-  const { feeToken, setFeeToken, feeTokenAccounts, estimatedFeeAmount } = useFeeCompensation();
+  const { feeToken, setFeeToken, feeTokenAccounts, estimatedFeeAmount, isNeedCompensationSwap } =
+    useFeeCompensation();
 
   const hasFee = estimatedFeeAmount.totalLamports.gt(ZERO);
 
@@ -56,7 +57,7 @@ export const CompensationFee: FC<{
         value={feeToken}
         accountSymbol={accountSymbol}
       />
-      {feeToken && !feeToken.balance?.token.isRawSOL ? (
+      {isNeedCompensationSwap && feeToken && !feeToken.balance?.token.isRawSOL ? (
         <CompensationSwap
           compensationAmount={estimatedFeeAmount.totalLamports}
           feeToken={feeToken}

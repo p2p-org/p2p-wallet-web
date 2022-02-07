@@ -78,15 +78,21 @@ const useFeeCompensationInternal = () => {
   );
 
   useEffect(() => {
+    if (feeToken && feeToken.balance?.token.isRawSOL) {
+      setCompensationSwapData(null);
+    }
+  }, [feeToken]);
+
+  useEffect(() => {
     const checkUserRelayAccount = async () => {
       const account = await getUserRelayAccount();
       setUserRelayAccount(account);
     };
 
-    if (!userRelayAccount) {
+    if (!userRelayAccount && accountsCount > 0) {
       void checkUserRelayAccount();
     }
-  }, [getUserRelayAccount, userRelayAccount]);
+  }, [accountsCount, getUserRelayAccount, userRelayAccount]);
 
   const feeTokenAccounts = useMemo(() => {
     const tokens: TokenAccount[] = [];
@@ -144,13 +150,24 @@ const useFeeCompensationInternal = () => {
     return new TokenAmount(solTokenAccount.balance.token, accountsCreationLamports);
   }, [accountsCreationLamports, solTokenAccount]);
 
+  const isNeedCompensationSwap = useMemo(() => {
+    if (userRelayAccount && userRelayAccount.exist && userRelayAccount.balance) {
+      return new u64(userRelayAccount.balance).sub(accountsCreationLamports).lte(ZERO);
+    }
+
+    return false;
+  }, [accountsCreationLamports, userRelayAccount]);
+
   const accountsCreationFeeTokenAmount = useMemo(() => {
     if (!(feeToken && feeToken.balance)) {
       return undefined;
     }
 
-    return new TokenAmount(feeToken.balance.token, feeAmountInToken);
-  }, [feeToken, feeAmountInToken]);
+    return new TokenAmount(
+      feeToken.balance.token,
+      isNeedCompensationSwap ? feeAmountInToken : ZERO,
+    );
+  }, [feeToken, isNeedCompensationSwap, feeAmountInToken]);
 
   const compensationParams: CompensationParams = useMemo(() => {
     return {
@@ -159,6 +176,7 @@ const useFeeCompensationInternal = () => {
       feeAmountInToken,
       isRelayAccountExist: !!userRelayAccount?.exist,
       accountRentExemption: new u64(networkFeesCache.accountRentExemption),
+      isNeedCompensationSwap,
       topUpParams: compensationSwapData,
     };
   }, [
@@ -166,7 +184,8 @@ const useFeeCompensationInternal = () => {
     compensationSwapData,
     feeAmountInToken,
     feeToken,
-    userRelayAccount?.exist,
+    isNeedCompensationSwap,
+    userRelayAccount,
   ]);
 
   const estimatedFeeAmount: EstimatedFeeAmount = useMemo(() => {
@@ -192,6 +211,7 @@ const useFeeCompensationInternal = () => {
     setFromToken,
     setAccountsCount,
     estimatedFeeAmount,
+    isNeedCompensationSwap,
   };
 };
 

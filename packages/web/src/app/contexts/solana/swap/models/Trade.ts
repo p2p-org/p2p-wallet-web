@@ -1,4 +1,4 @@
-import { ZERO } from '@orca-so/sdk';
+import { deriveAssociatedTokenAddress, ZERO } from '@orca-so/sdk';
 import type { ConnectedWallet } from '@saberhq/use-solana';
 import type { u64 } from '@solana/spl-token';
 import { AccountLayout } from '@solana/spl-token';
@@ -307,6 +307,133 @@ export default class Trade {
       swapTransaction,
     };
   }
+
+  prepareExchangeTransactionsArgs = async (
+    connection: Connection,
+    tokenConfigs: TokenConfigs,
+    programIds: ProgramIds,
+    walletPublicKey: PublicKey,
+    inputUserTokenPublicKey: PublicKey,
+    intermediateUserTokenPublicKey: PublicKey | undefined,
+    outputUserTokenPublicKey: PublicKey | undefined,
+  ) => {
+    if (!this.pools || !this.derivedFields) {
+      throw new Error('Can not initiate an exchange before retrieving the loader');
+    }
+
+    let setupSwapArgs;
+
+    const intermediateTokenName = this.getIntermediateTokenName();
+    if (
+      intermediateTokenName &&
+      intermediateTokenName !== 'SOL' &&
+      !intermediateUserTokenPublicKey
+    ) {
+      const intermediateUserTokenAta = await deriveAssociatedTokenAddress(
+        walletPublicKey,
+        tokenConfigs[intermediateTokenName].mint,
+      );
+
+      setupSwapArgs = {
+        type: 'intermediateToken',
+        associatedTokenAddress: intermediateUserTokenAta,
+        mint: tokenConfigs[intermediateTokenName].mint,
+        owner: walletPublicKey,
+      };
+
+      intermediateUserTokenPublicKey = intermediateUserTokenAta;
+    }
+
+    if (this.outputTokenName !== 'SOL' && !outputUserTokenPublicKey) {
+      const outputUserTokenAta = await deriveAssociatedTokenAddress(
+        walletPublicKey,
+        tokenConfigs[this.outputTokenName].mint,
+      );
+
+      setupSwapArgs = {
+        type: 'outputUserToken',
+        associatedTokenAddress: outputUserTokenAta,
+        mint: tokenConfigs[this.outputTokenName].mint,
+        owner: walletPublicKey,
+      };
+      outputUserTokenPublicKey = outputUserTokenAta;
+    }
+
+    const accountRentExempt = await connection.getMinimumBalanceForRentExemption(
+      AccountLayout.span,
+    );
+
+    let userSwapArgs;
+
+    const doubleHopFields = this.derivedFields.doubleHopFields;
+    if (!doubleHopFields) {
+      const pool = this.pools[this.derivedFields.selectedRoute[0]];
+
+      const exchangeData = pool.constructExchangeParams(
+        walletPublicKey,
+        programIds,
+        this.inputTokenName,
+        this.outputTokenName,
+        this.getInputAmount(),
+        this.derivedFields.minimumOutputAmount,
+        accountRentExempt,
+        this.inputTokenName === 'SOL' ? undefined : inputUserTokenPublicKey,
+        outputUserTokenPublicKey,
+      );
+
+      userSwapArgs = {
+        type: 'direct',
+        exchangeData: exchangeData,
+        amount: this.getInputAmount(),
+        userSourceTokenAccount: inputUserTokenPublicKey,
+        userDestinationTokenAccount: outputUserTokenPublicKey,
+      };
+    } else {
+      const pool0 = this.pools[this.derivedFields.selectedRoute[0]];
+
+      const exchangeData1 = pool0.constructExchangeParams(
+        walletPublicKey,
+        programIds,
+        this.inputTokenName,
+        doubleHopFields.intermediateTokenName,
+        this.getInputAmount(),
+        doubleHopFields.minimumIntermediateOutputAmount,
+        accountRentExempt,
+        this.inputTokenName === 'SOL' ? undefined : inputUserTokenPublicKey,
+        intermediateUserTokenPublicKey,
+      );
+
+      const pool1 = this.pools[this.derivedFields.selectedRoute[1]];
+      const exchangeData2 = pool1.constructExchangeParams(
+        walletPublicKey,
+        programIds,
+        doubleHopFields.intermediateTokenName,
+        this.outputTokenName,
+        doubleHopFields.intermediateOutputAmount,
+        this.derivedFields.minimumOutputAmount,
+        accountRentExempt,
+        intermediateUserTokenPublicKey,
+        outputUserTokenPublicKey,
+      );
+
+      userSwapArgs = {
+        type: 'transitive',
+        exchangeData: {
+          swapParams: {
+            from: exchangeData1.swapParams,
+            to: exchangeData2.swapParams,
+            intermediateTokenAccount: intermediateUserTokenPublicKey,
+          },
+          wsolAccountParams: exchangeData1.wsolAccountParams || exchangeData2.wsolAccountParams,
+        },
+        amount: this.getInputAmount(),
+        userSourceTokenAccount: inputUserTokenPublicKey,
+        userDestinationTokenAccount: outputUserTokenPublicKey,
+      };
+    }
+
+    return { userSwapArgs, setupSwapArgs };
+  };
 
   async confirmExchange(
     connection: Connection,
