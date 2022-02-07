@@ -1,13 +1,21 @@
 import type { u64 } from '@solana/spl-token';
 import {
+  AccountLayout,
   ASSOCIATED_TOKEN_PROGRAM_ID,
   NATIVE_MINT,
   Token,
   TOKEN_PROGRAM_ID,
 } from '@solana/spl-token';
 import type { PublicKey } from '@solana/web3.js';
-import { SystemProgram, SYSVAR_RENT_PUBKEY, TransactionInstruction } from '@solana/web3.js';
+import {
+  Account,
+  SystemProgram,
+  SYSVAR_RENT_PUBKEY,
+  TransactionInstruction,
+} from '@solana/web3.js';
 import BufferLayout from 'buffer-layout';
+
+import { swapInstruction } from 'app/contexts/solana/swap/utils/web3/instructions/pool-instructions';
 
 import type { RelayTransferParams } from './types';
 
@@ -339,3 +347,73 @@ export const createTransferInstructions = (
 
   return instructions;
 };
+
+export const createWSOLAccountInstructions = (
+  accountCreationPayer: PublicKey,
+  owner: PublicKey,
+  amount: u64,
+  accountRentExempt: number,
+) => {
+  const account = new Account();
+  const instructions: TransactionInstruction[] = [];
+
+  instructions.push(
+    SystemProgram.createAccount({
+      fromPubkey: accountCreationPayer,
+      newAccountPubkey: account.publicKey,
+      lamports: amount.toNumber() + accountRentExempt,
+      space: AccountLayout.span,
+      programId: TOKEN_PROGRAM_ID,
+    }),
+  );
+
+  instructions.push(
+    Token.createInitAccountInstruction(TOKEN_PROGRAM_ID, NATIVE_MINT, account.publicKey, owner),
+  );
+
+  return {
+    instructions,
+    cleanupInstructions: [
+      Token.createCloseAccountInstruction(
+        TOKEN_PROGRAM_ID,
+        account.publicKey,
+        owner,
+        accountCreationPayer,
+        [],
+      ),
+    ],
+    account,
+  };
+};
+
+export const createUserSwapInstruction = (
+  userTransferAuthority: PublicKey,
+  userSourceTokenAccount: PublicKey,
+  userDestinationTokenAccount: PublicKey,
+  hostFeeAccountPublicKey: PublicKey | null,
+  swapProgramId: PublicKey,
+  swapAccount: PublicKey,
+  swapAuthority: PublicKey,
+  swapSource: PublicKey,
+  swapDestination: PublicKey,
+  poolTokenMint: PublicKey,
+  poolFeeAccount: PublicKey,
+  amountIn: u64,
+  minimumAmountOut: u64,
+): TransactionInstruction =>
+  swapInstruction(
+    swapAccount,
+    swapAuthority,
+    userTransferAuthority,
+    userSourceTokenAccount,
+    swapSource,
+    swapDestination,
+    userDestinationTokenAccount,
+    poolTokenMint,
+    poolFeeAccount,
+    hostFeeAccountPublicKey,
+    swapProgramId,
+    TOKEN_PROGRAM_ID,
+    amountIn,
+    minimumAmountOut,
+  );

@@ -15,6 +15,7 @@ export const FeesAccordion: FC<Props> = ({ totalFee, children }) => {
       right={totalFee.loading ? <LoaderBlock /> : totalFee.result}
       hideRightIfOpen
       noContentPadding
+      open // FIXME after redesign
     >
       {children}
     </Accordion>
