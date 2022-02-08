@@ -24,12 +24,14 @@ export const PurchaseDetails: FC = () => {
       {
         id: 2,
         rows: [
-          // {
-          //   id: 1,
-          //   titleClassName: 'gray',
-          //   title: 'ETH purchase cost',
-          //   value: `$${buyQuote?.quoteCurrencyPrice.toFixed(2) || 0}`,
-          // },
+          {
+            id: 1,
+            titleClassName: 'gray',
+            title: 'ETH purchase cost',
+            value: `$${
+              buyQuote ? (buyQuote.quoteCurrencyPrice * buyQuote.quoteCurrencyAmount).toFixed(2) : 0
+            }`,
+          },
           {
             id: 2,
             titleClassName: 'gray',
