@@ -183,10 +183,9 @@ export const FeesOriginal: FC = () => {
       setupFee = (1 * feeCalculator.lamportsPerSignature) / LAMPORTS_PER_SOL;
     }
 
-    // TODO uncomment after account creation fix
-    // if (userSwapArgs?.exchangeData?.wsolAccountParams) {
-    //   newAccountCount += 1;
-    // }
+    if (userSwapArgs?.exchangeData?.wsolAccountParams) {
+      newAccountCount += 1;
+    }
 
     setAccountsCount(newAccountCount);
     // const swapFee =
