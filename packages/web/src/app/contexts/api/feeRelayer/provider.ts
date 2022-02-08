@@ -1,5 +1,6 @@
 import { useCallback } from 'react';
 
+import { ZERO } from '@orca-so/sdk';
 import { useSolana } from '@p2p-wallet-web/core';
 import { useConnectionContext } from '@saberhq/use-solana';
 import { u64 } from '@solana/spl-token';
@@ -115,8 +116,9 @@ const useFeeRelayerInternal = (): FeeRelayerService => {
       }
 
       const feePayer = await getFeePayerPubkey(feeRelayerURL);
-
-      const isPayInSol = params.compensationParams?.feeToken?.balance?.token.isRawSOL;
+      const isNeedCompensation = params.compensationParams?.feeAmount.gt(ZERO);
+      const isPayInSol =
+        isNeedCompensation && params.compensationParams?.feeToken?.balance?.token.isRawSOL;
       const accountCreationPayer = isPayInSol ? wallet.publicKey : feePayer;
 
       const instructions = createTransferInstructions(
@@ -125,7 +127,7 @@ const useFeeRelayerInternal = (): FeeRelayerService => {
         accountCreationPayer,
       );
 
-      if (!isPayInSol) {
+      if (isNeedCompensation && !isPayInSol) {
         const userRelayAddress = await getUserRelayAddress(wallet.publicKey);
 
         instructions.unshift(
