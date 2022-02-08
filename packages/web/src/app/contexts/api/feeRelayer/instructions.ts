@@ -374,13 +374,7 @@ export const createWSOLAccountInstructions = (
   return {
     instructions,
     cleanupInstructions: [
-      Token.createCloseAccountInstruction(
-        TOKEN_PROGRAM_ID,
-        account.publicKey,
-        owner,
-        accountCreationPayer,
-        [],
-      ),
+      Token.createCloseAccountInstruction(TOKEN_PROGRAM_ID, account.publicKey, owner, owner, []),
     ],
     account,
   };

@@ -54,7 +54,7 @@ export interface FeeRelayerService {
   getUserRelayAccount: () => Promise<UserRelayAccount | null>;
   relayTopUpWithSwap: (params: CompensationParams) => Promise<string>;
   userSetupSwap: (params: UserSetupSwap) => Promise<string>;
-  userSwap: (params: UserSwap) => Promise<string>;
+  userSwap: (params: UserSwap, compensationParams: CompensationParams) => Promise<string>;
 }
 
 const useFeeRelayerInternal = (): FeeRelayerService => {
@@ -358,7 +358,7 @@ const useFeeRelayerInternal = (): FeeRelayerService => {
   );
 
   const userSwap = useCallback(
-    async (params: UserSwap) => {
+    async (params: UserSwap, compensationParams?: CompensationParams) => {
       if (!wallet?.publicKey) {
         throw new Error('Wallet not ready');
       }
@@ -368,7 +368,8 @@ const useFeeRelayerInternal = (): FeeRelayerService => {
       const signers: Account[] = [];
 
       const feePayer = await getFeePayerPubkey(feeRelayerURL);
-      const accountCreationPayer = wallet.publicKey;
+      const isPayInSol = compensationParams?.feeToken?.balance?.token.isRawSOL;
+      const accountCreationPayer = isPayInSol ? wallet.publicKey : feePayer;
       const userTransferAuthorityPublicKey = wallet.publicKey;
 
       let inputUserTokenPublicKey = params.userSourceTokenAccount;
@@ -402,6 +403,19 @@ const useFeeRelayerInternal = (): FeeRelayerService => {
           inputUserTokenPublicKey = account.publicKey;
         } else {
           outputUserTokenPublicKey = account.publicKey;
+          if (accountCreationPayer.equals(feePayer)) {
+            const userRalayAccount = await getUserRelayAddress(wallet.publicKey);
+
+            instructions.push(
+              createRelayTransferSolInstruction(
+                RELAY_PROGRAM_ID,
+                wallet.publicKey,
+                userRalayAccount,
+                feePayer,
+                compensationParams?.accountRentExemption || new u64(2039280),
+              ),
+            );
+          }
         }
       }
 
