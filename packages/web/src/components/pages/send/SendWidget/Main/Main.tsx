@@ -87,6 +87,7 @@ export const Main: FC = () => {
     isConfirmCorrectAddress,
     setIsConfirmCorrectAddress,
     destinationAccount,
+    feeAmount,
   } = useSendState();
 
   const tokenAccounts = useUserTokenAccounts();
@@ -138,6 +139,7 @@ export const Main: FC = () => {
           amount={fromAmount}
           onAmountChange={handleFromAmountChange}
           disabled={isDisabled}
+          feeAmount={feeAmount}
         />
       </FromWrapper>
 

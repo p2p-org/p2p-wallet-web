@@ -84,6 +84,8 @@ export interface UseSwap {
   intermediateTokenPrice: number | undefined;
   buttonState: ButtonState;
   onSwap: () => Promise<string | undefined>;
+
+  feeAmount: u64 | undefined;
 }
 
 export type UseSwapArgs = {
@@ -98,7 +100,7 @@ const useSwapInternal = (props: UseSwapArgs = {}): UseSwap => {
   const { wallet, connection } = useSolana();
   const { programIds, tokenConfigs, routeConfigs } = useConfig();
   const { relayTopUpWithSwap, userSetupSwap, userSwap } = useFeeRelayer();
-  const { compensationParams } = useFeeCompensation();
+  const { compensationParams, estimatedFeeAmount } = useFeeCompensation();
 
   const [inputTokenName, _setInputTokenName] = useState(props.inputTokenName ?? 'SOL');
   const _outputTokenName = props.outputTokenName
@@ -232,6 +234,18 @@ const useSwapInternal = (props: UseSwapArgs = {}): UseSwap => {
     setTrade((trade) => trade.updateSlippageTolerance(slippageTolerance));
   }, [slippageTolerance]);
 
+  const feeAmount: u64 | undefined = useMemo(() => {
+    if (estimatedFeeAmount.totalLamports.eq(ZERO)) {
+      return;
+    }
+
+    if (!estimatedFeeAmount.accountsCreation.feeToken?.token.isRawSOL) {
+      return estimatedFeeAmount.accountsCreation.feeToken?.toU64();
+    } else if (inputTokenName === 'SOL') {
+      return estimatedFeeAmount.accountsCreation.sol?.toU64();
+    }
+  }, [estimatedFeeAmount, inputTokenName]);
+
   useEffect(() => {
     if (
       buttonState === ButtonState.ConfirmWallet ||
@@ -256,11 +270,17 @@ const useSwapInternal = (props: UseSwapArgs = {}): UseSwap => {
           : solRemainingForFees.sub(inputAmount);
       }
 
+      let balanceSubstractFee = inputUserTokenAccount?.getAmount();
+      if (feeAmount) {
+        balanceSubstractFee = balanceSubstractFee?.sub(feeAmount);
+        balanceSubstractFee = balanceSubstractFee?.gt(ZERO) ? balanceSubstractFee : ZERO;
+      }
+
       if (inputAmount.eq(ZERO)) {
         setButtonState(ButtonState.ZeroInputValue);
       } else if (solRemainingForFees.lt(minSolBalanceRequired)) {
         setButtonState(ButtonState.NotEnoughSOL);
-      } else if (!inputUserTokenAccount || inputUserTokenAccount.getAmount().lt(inputAmount)) {
+      } else if (!balanceSubstractFee || balanceSubstractFee.lt(inputAmount)) {
         setButtonState(ButtonState.InsufficientBalance);
       } else {
         if (trade.isPriceImpactHigh()) {
@@ -282,6 +302,7 @@ const useSwapInternal = (props: UseSwapArgs = {}): UseSwap => {
     outputUserTokenAccount,
     solUserTokenAccount,
     minSolBalanceRequired,
+    feeAmount,
   ]);
 
   useEffect(() => {
@@ -517,6 +538,7 @@ const useSwapInternal = (props: UseSwapArgs = {}): UseSwap => {
     intermediateTokenPrice,
     buttonState,
     onSwap,
+    feeAmount,
   };
 };
 

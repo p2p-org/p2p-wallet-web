@@ -40,6 +40,7 @@ export const SendButtonSolana: FC<Props> = ({ primary, disabled }) => {
     setIsExecuting,
     parsedAmount,
     destinationAccount,
+    hasBalance,
   } = useSendState();
   const transferAction = useTransferAction();
   const { compensationParams } = useFeeCompensation();
@@ -122,10 +123,6 @@ export const SendButtonSolana: FC<Props> = ({ primary, disabled }) => {
     }
   };
 
-  const hasBalance = fromTokenAccount?.balance
-    ? fromTokenAccount.balance?.asNumber >= Number(fromAmount)
-    : false;
-
   const text = useMemo(() => {
     if (!Number(fromAmount)) {
       return 'Enter the amount';
@@ -145,7 +142,7 @@ export const SendButtonSolana: FC<Props> = ({ primary, disabled }) => {
         Send {fromTokenAccount?.balance?.formatUnits()}
       </>
     );
-  }, [destinationAddress, fromAmount, fromTokenAccount?.balance]);
+  }, [destinationAddress, fromAmount, fromTokenAccount?.balance, hasBalance]);
 
   return (
     <Button primary={primary} disabled={disabled} big full onClick={handleSubmit}>

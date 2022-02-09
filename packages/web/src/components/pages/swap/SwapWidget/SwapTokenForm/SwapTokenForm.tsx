@@ -12,6 +12,7 @@ import { useConfig, usePrice, useSwap } from 'app/contexts/solana/swap';
 import type TokenAccount from 'app/contexts/solana/swap/models/TokenAccount';
 import type Trade from 'app/contexts/solana/swap/models/Trade';
 import { formatBigNumber, getUSDValue, parseString } from 'app/contexts/solana/swap/utils/format';
+import { AccountCreationFeeTooltip } from 'components/common/AccountCreationFeeTooltip';
 import { Empty } from 'components/common/Empty';
 import { SlideContainer } from 'components/common/SlideContainer';
 import { TokenAvatar } from 'components/common/TokenAvatar';
@@ -300,6 +301,10 @@ const AllTokens = styled(TitleTokens)`
   height: 44px;
 `;
 
+const InputWrapper = styled.div`
+  display: flex;
+`;
+
 const SCROLL_THRESHOLD = 15;
 
 function matchesFilter(str: string, filter: string) {
@@ -317,6 +322,7 @@ interface Props {
   maxAmount?: u64 | undefined;
   disabled?: boolean;
   disabledInput?: boolean;
+  isFeeSubtracted?: boolean;
   className?: string;
 }
 
@@ -331,6 +337,7 @@ export const SwapTokenForm: FC<Props> = ({
   maxAmount,
   disabled,
   disabledInput,
+  isFeeSubtracted,
   className,
 }) => {
   const selectorRef = useRef<HTMLDivElement>(null);
@@ -592,12 +599,15 @@ export const SwapTokenForm: FC<Props> = ({
                 <ChevronIcon name="arrow-triangle" />
               </ChevronWrapper>
             </TokenWrapper>
-            <InputAmount
-              placeholder={Number(0).toFixed(tokenInfo?.decimals || 0)}
-              value={formatBigNumber(amount, tokenInfo?.decimals || 0)}
-              onChange={handleAmountChange}
-              disabled={disabled || disabledInput}
-            />
+            <InputWrapper>
+              <InputAmount
+                placeholder={Number(0).toFixed(tokenInfo?.decimals || 0)}
+                value={formatBigNumber(amount, tokenInfo?.decimals || 0)}
+                onChange={handleAmountChange}
+                disabled={disabled || disabledInput}
+              />
+              {isFeeSubtracted ? <AccountCreationFeeTooltip /> : undefined}
+            </InputWrapper>
           </SpecifyTokenWrapper>
           <BalanceWrapper>
             {!amount.eqn(0) ? (
