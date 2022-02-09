@@ -30,7 +30,7 @@ export type MoonpayErrorResponse = {
 export interface MoonpayGetBuyQuoteParams extends MoonpayBaseParams {
   baseCurrencyAmount: number | string;
   baseCurrencyCode: 'usd';
-  paymentMethod: 'credit_debit_card';
+  paymentMethod?: 'credit_debit_card';
   extraFeePercentage?: number;
 }
 
