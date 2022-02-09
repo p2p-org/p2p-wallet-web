@@ -31,7 +31,6 @@ const useMoonpayInternal = (): UseMoonpay => {
       ...baseParams,
       baseCurrencyAmount: amount || 0,
       baseCurrencyCode: 'usd',
-      paymentMethod: 'credit_debit_card',
     };
 
     try {
