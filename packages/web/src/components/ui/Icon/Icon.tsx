@@ -111,7 +111,7 @@ const iconsMap = new Map<string, string>([
   ['info', info],
 ]);
 
-interface Props extends HTMLAttributes<HTMLDivElement> {
+interface Props extends HTMLAttributes<HTMLOrSVGElement> {
   name: string;
   size?: string | number;
   height?: string | number;
