@@ -35,6 +35,7 @@ const theme = {
       secondary: '#8E8E93',
       tertiary: '#D2D4E5',
       links: '#82A5FF',
+      linksRGB: toRGB('#82A5FF'),
       active: '#5887FF',
       buttonPrimary: '#FFFFFF',
       buttonSecondary: '#8E8E93',

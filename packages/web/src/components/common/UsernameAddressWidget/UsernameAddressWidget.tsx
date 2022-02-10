@@ -2,6 +2,7 @@ import type { FC } from 'react';
 import { useEffect, useState } from 'react';
 
 import { styled } from '@linaria/react';
+import { borders, shadows, theme, up, useIsMobile } from '@p2p-wallet-web/ui';
 import QRCode from 'qrcode.react';
 
 import Logo from 'assets/images/logo.png';
@@ -10,15 +11,19 @@ import { ToastManager } from 'components/common/ToastManager';
 import { Button } from 'components/ui';
 import { askClipboardWritePermission, setToClipboard } from 'utils/clipboard';
 
-const Wrapper = styled.div``;
+const Wrapper = styled.div`
+  display: grid;
+  grid-gap: 16px;
+`;
 
 const UsernameAddressWrapper = styled.div`
   display: flex;
-  margin-bottom: 16px;
-  padding: 32px;
+  align-items: center;
+  padding: 30px;
 
-  box-shadow: 0px 1px 8px rgba(0, 0, 0, 0.05);
   border-radius: 12px;
+  ${borders.primaryRGBA}
+  ${shadows.card};
 `;
 
 const QRCodeWrapper = styled.div`
@@ -26,35 +31,31 @@ const QRCodeWrapper = styled.div`
 `;
 
 const UsernameAddress = styled.div`
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-gap: 16px;
 `;
 
 const Username = styled.div`
-  margin-bottom: 16px;
-
+  color: ${theme.colors.textIcon.primary};
   font-weight: 600;
-  font-size: 20px;
+  font-size: 16px;
+  line-height: 140%;
 `;
 
 const LogoImg = styled.img`
-  width: 108px;
-  height: 38px;
+  width: auto;
+  height: 30px;
 `;
 
 const ButtonsWrapper = styled.div`
-  display: flex;
-  justify-content: center;
-`;
+  display: grid;
+  grid-auto-flow: dense;
+  grid-gap: 8px;
 
-const ButtonStyled = styled(Button)`
-  margin-right: 8px;
+  ${up.tablet} {
+    grid-auto-flow: column;
+  }
 `;
-
-type Props = {
-  address: string;
-  username?: string;
-};
 
 const copy = (value: string, text: string) => {
   try {
@@ -69,8 +70,16 @@ const handleCopyClick = (value: string, text: string) => () => {
   return copy(value, text);
 };
 
+type Props = {
+  address: string;
+  username?: string;
+};
+
 export const UsernameAddressWidget: FC<Props> = ({ address, username }) => {
+  const isMobile = useIsMobile();
+
   const [isImageCopyAvailable, setIsImageCopyAvailable] = useState(false);
+
   useEffect(() => {
     askClipboardWritePermission()
       .then((state) => setIsImageCopyAvailable(state))
@@ -95,26 +104,41 @@ export const UsernameAddressWidget: FC<Props> = ({ address, username }) => {
     <Wrapper>
       <UsernameAddressWrapper>
         <QRCodeWrapper>
-          <QRCode id="qrcode" value={address} size={150} />
+          <QRCode id="qrcode" value={address} size={122} />
         </QRCodeWrapper>
         <UsernameAddress>
           {username ? <Username>{username}</Username> : undefined}
-          <AddressText address={address} medium />
+          <AddressText address={address} small />
           <LogoImg src={Logo} />
         </UsernameAddress>
       </UsernameAddressWrapper>
       <ButtonsWrapper>
         {username ? (
-          <ButtonStyled hollow onClick={handleCopyClick(username, 'Username')}>
+          <Button
+            small={!isMobile}
+            medium={isMobile}
+            hollow
+            onClick={handleCopyClick(username, 'Username')}
+          >
             Copy username
-          </ButtonStyled>
+          </Button>
         ) : undefined}
-        <ButtonStyled hollow onClick={handleCopyClick(address, 'Address')}>
+        <Button
+          small={!isMobile}
+          medium={isMobile}
+          hollow
+          onClick={handleCopyClick(address, 'Address')}
+        >
           Copy address
-        </ButtonStyled>
-        <ButtonStyled hollow onClick={isImageCopyAvailable ? handleImageCopyClick : undefined}>
+        </Button>
+        <Button
+          small={!isMobile}
+          medium={isMobile}
+          hollow
+          onClick={isImageCopyAvailable ? handleImageCopyClick : undefined}
+        >
           Copy QR code
-        </ButtonStyled>
+        </Button>
       </ButtonsWrapper>
     </Wrapper>
   );

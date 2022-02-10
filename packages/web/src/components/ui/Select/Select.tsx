@@ -2,27 +2,24 @@ import type { FunctionComponent } from 'react';
 import { Children, cloneElement, isValidElement, useEffect, useRef, useState } from 'react';
 
 import { styled } from '@linaria/react';
+import { shadows, theme } from '@p2p-wallet-web/ui';
 import classNames from 'classnames';
 
+import { Loader } from 'components/common/Loader';
 import { Icon } from 'components/ui';
 
 const Wrapper = styled.div`
   position: relative;
-`;
 
-const PlugIcon = styled(Icon)`
-  width: 15px;
-  height: 15px;
-
-  color: #a3a5ba;
+  flex: 1;
 `;
 
 const Value = styled.div`
-  display: inline-block;
+  display: flex;
   flex-grow: 1;
   overflow: hidden;
 
-  color: #202020;
+  color: ${theme.colors.textIcon.primary};
   font-weight: 600;
   font-size: 14px;
   line-height: 140%;
@@ -30,34 +27,46 @@ const Value = styled.div`
 
   text-overflow: ellipsis;
 
-  &:first-letter {
+  &::first-letter {
     text-transform: capitalize;
   }
+`;
+
+const CaretIcon = styled(Icon)`
+  width: 24px;
+  height: 24px;
+
+  color: ${theme.colors.textIcon.secondary};
 `;
 
 const Selector = styled.div`
   display: flex;
   align-items: center;
+  padding: 12px 20px;
+
+  border: 1px solid ${theme.colors.stroke.secondary};
+  border-radius: 12px;
 
   cursor: pointer;
 
   &.isOpen,
   &:hover {
-    ${PlugIcon} {
-      color: #5887ff;
+    ${CaretIcon} {
+      color: ${theme.colors.textIcon.active};
+    }
+  }
+
+  &.isOpen {
+    border-color: ${theme.colors.textIcon.active};
+
+    ${CaretIcon} {
+      transform: rotate(180deg);
     }
   }
 `;
 
-const ArrowWrapper = styled.div`
+const CaretWrapper = styled.div`
   margin-right: 4px;
-`;
-
-const ArrowIcon = styled(Icon)`
-  width: 16px;
-  height: 16px;
-
-  color: #a3a5ba;
 `;
 
 const DropDownList = styled.div`
@@ -65,21 +74,21 @@ const DropDownList = styled.div`
   right: 0;
   z-index: 1;
 
-  min-width: 204px;
   width: 100%;
-  margin-top: 8px;
+  min-width: 204px;
   padding: 8px;
 
-  background: #fff;
+  background: ${theme.colors.bg.primary};
   border-radius: 12px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  ${shadows.notification};
 `;
 
 type Props = {
   value: string | React.ReactNode;
+  isLoading?: boolean;
 };
 
-export const Select: FunctionComponent<Props> = ({ children, value }) => {
+export const Select: FunctionComponent<Props> = ({ value, isLoading, children }) => {
   const selectorRef = useRef<HTMLDivElement>(null);
   const [isOpen, setIsOpen] = useState(false);
 
@@ -98,6 +107,10 @@ export const Select: FunctionComponent<Props> = ({ children, value }) => {
   }, []);
 
   const handleSelectorClick = () => {
+    if (isLoading) {
+      return;
+    }
+
     setIsOpen(!isOpen);
   };
 
@@ -112,9 +125,7 @@ export const Select: FunctionComponent<Props> = ({ children, value }) => {
     <Wrapper ref={selectorRef}>
       <Selector onClick={handleSelectorClick} className={classNames({ isOpen })}>
         <Value>{value}</Value>
-        <ArrowWrapper>
-          <ArrowIcon name="arrow-triangle" />
-        </ArrowWrapper>
+        <CaretWrapper>{isLoading ? <Loader size="24" /> : <CaretIcon name="caret" />}</CaretWrapper>
       </Selector>
       {isOpen ? <DropDownList>{items}</DropDownList> : undefined}
     </Wrapper>

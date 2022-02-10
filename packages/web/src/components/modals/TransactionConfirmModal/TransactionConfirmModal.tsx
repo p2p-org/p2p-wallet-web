@@ -13,7 +13,7 @@ import { theme } from '@p2p-wallet-web/ui';
 import type { ModalPropsType } from 'app/contexts/general/modals/types';
 import { ErrorHint } from 'components/common/ErrorHint';
 import { PasswordInput } from 'components/common/PasswordInput';
-import { Button, Icon } from 'components/ui';
+import { Button, ButtonCancel, Icon } from 'components/ui';
 import { Modal } from 'components/ui/Modal';
 
 import { Section } from './common/styled';
@@ -55,12 +55,6 @@ const SendIcon = styled(Icon)`
   width: 24px;
   height: 24px;
   margin-right: 12px;
-`;
-
-const CancelIcon = styled(Icon)`
-  width: 24px;
-  height: 24px;
-  margin-right: 8px;
 `;
 
 export type TransactionConfirmModalProps = {
@@ -147,10 +141,7 @@ export const TransactionConfirmModal: FunctionComponent<
         <Button primary disabled={isDisabled} onClick={handleConfirmClick}>
           {action}
         </Button>
-        <Button hollow error onClick={handleCloseClick}>
-          <CancelIcon name="cross" />
-          Cancel
-        </Button>
+        <ButtonCancel onClick={handleCloseClick} />
       </>
     );
   };

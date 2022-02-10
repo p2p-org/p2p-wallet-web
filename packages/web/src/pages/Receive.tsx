@@ -1,14 +1,15 @@
 import type { FunctionComponent } from 'react';
 import { useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import { Route, useRouteMatch } from 'react-router';
+import { Switch, useLocation } from 'react-router-dom';
 
+import { ReceiveStateProvider } from 'app/contexts';
 import { Layout } from 'components/common/Layout';
-import { ReceiveAddressWidget } from 'components/pages/receive/ReceiveAddressWidget';
+import { ReceiveTokensWidget, ReceiveWidget } from 'components/pages/receive';
 import { trackEvent } from 'utils/analytics';
-// import { ReceiveNewWidget } from 'components/pages/receive/ReceiveNewWidget';
-// import { ReceiveWalletsWidget } from 'components/pages/receive/ReceiveWalletsWidget';
 
 export const Receive: FunctionComponent = () => {
+  const match = useRouteMatch();
   const location = useLocation<{ fromPage: string }>();
 
   useEffect(() => {
@@ -17,10 +18,17 @@ export const Receive: FunctionComponent = () => {
   }, []);
 
   return (
-    <Layout>
-      <ReceiveAddressWidget />
-      {/* <ReceiveWalletsWidget /> */}
-      {/* <ReceiveNewWidget /> */}
-    </Layout>
+    <ReceiveStateProvider>
+      <Layout>
+        <Switch>
+          <Route path={`${match.path}/tokens`}>
+            <ReceiveTokensWidget />
+          </Route>
+          <Route path={match.path} exact>
+            <ReceiveWidget />
+          </Route>
+        </Switch>
+      </Layout>
+    </ReceiveStateProvider>
   );
 };

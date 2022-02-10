@@ -58,6 +58,7 @@
     "dayjs": "^1.9.5",
     "decimal.js": "^10.2.1",
     "flagged": "^2.0.1",
+    "fuse.js": "^6.5.3",
     "highcharts": "^9.0.0",
     "history": "^5.0.0",
     "jsbi": "^4.1.0",
@@ -81,10 +82,12 @@
     "react-stickynode": "^3.1.0",
     "react-use": "^17.3.1",
     "react-use-intercom": "^1.2.0",
+    "react-virtual": "^2.10.4",
     "sanitize.css": "^12.0.1",
     "ts-invariant": "^0.5.1",
     "tslib": "^2.3.1",
     "unstated-next": "^1.1.0",
+    "use-debounce": "^7.0.1",
     "xstate": "^4.23.1"
   },
   "devDependencies": {

@@ -10,13 +10,13 @@ import { Feature } from 'flagged';
 
 import { useSendState } from 'app/contexts';
 import { CompensationFee } from 'components/common/CompensationFee';
+import { FeePaySelector } from 'components/common/FeePaySelector';
 import { TransactionDetails } from 'components/common/TransactionDetails';
 import { Switch, TextField } from 'components/ui';
 import { FEATURE_PAY_BY, FEATURE_TRANSACTION_DETAILS_ACCORDION } from 'config/featureFlags';
 import { trackEvent } from 'utils/analytics';
 
 import { FromToTitle, TopWrapper } from './common/styled';
-import { FeePay } from './FeePay';
 import { FromToSelectInput } from './FromToSelectInput';
 import { NetworkSelect } from './NetworkSelect';
 import { ToAddressInput } from './ToAddressInput';
@@ -173,7 +173,10 @@ export const Main: FC = () => {
       />
 
       <Feature name={FEATURE_PAY_BY}>
-        <FeePay tokenAccounts={tokenAccounts} onTokenAccountChange={handleFeeTokenAccountChange} />
+        <FeePaySelector
+          tokenAccounts={tokenAccounts}
+          onTokenAccountChange={handleFeeTokenAccountChange}
+        />
       </Feature>
 
       <Feature name={FEATURE_TRANSACTION_DETAILS_ACCORDION}>

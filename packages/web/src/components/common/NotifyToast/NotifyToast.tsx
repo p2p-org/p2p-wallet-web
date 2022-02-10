@@ -205,10 +205,10 @@ export const NotifyToast: FunctionComponent<Props> = ({
       statusIcon = <StatusIcon name="warning" style={{ color: '#ff5959' }} />;
       break;
     case 'confirmingDeposit':
-      statusIcon = <StatusIcon name="clock-transparent" style={{ color: '#a3a5ba' }} />;
+      statusIcon = <StatusIcon name="clock" style={{ color: '#a3a5ba' }} />;
       break;
     case 'confirmedDeposit':
-      statusIcon = <StatusIcon name="clock-transparent" />;
+      statusIcon = <StatusIcon name="clock" />;
       break;
     default:
       statusIcon = null;

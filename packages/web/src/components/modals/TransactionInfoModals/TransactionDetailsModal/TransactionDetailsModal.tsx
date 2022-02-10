@@ -438,7 +438,7 @@ export const TransactionDetailsModal: FC<Props> = ({ signature, source, close })
                 className="button"
               >
                 <ShareWrapper>
-                  <ShareIcon name="external-link" />
+                  <ShareIcon name="external" />
                 </ShareWrapper>
               </a>
             </FieldValue>

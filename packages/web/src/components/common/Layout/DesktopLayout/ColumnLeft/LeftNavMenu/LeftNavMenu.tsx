@@ -33,7 +33,7 @@ const NavButton = styled.div`
   ${up.tablet} {
     padding: 10px 10px;
     ${borders.primaryRGBA};
-    ${shadows.light}
+    ${shadows.card}
   }
 
   ${up.desktop} {

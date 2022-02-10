@@ -18,6 +18,7 @@ const Wrapper = styled.button`
   font-size: 16px;
   font-family: unset;
   line-height: 140%;
+  letter-spacing: 0.04em;
   white-space: initial;
   text-decoration: none;
 
@@ -101,10 +102,21 @@ const Wrapper = styled.button`
 
   &.small {
     height: 36px;
+
+    font-weight: 500;
+    font-size: 14px;
+    letter-spacing: 0.01em;
+
+    border-radius: 8px;
   }
 
   &.medium {
     height: 46px;
+
+    font-weight: 500;
+    letter-spacing: 0.01em;
+
+    border-radius: 8px;
   }
 
   &.big {

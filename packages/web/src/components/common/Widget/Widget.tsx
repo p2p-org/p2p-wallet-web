@@ -15,7 +15,7 @@ const Wrapper = styled(Card)`
   padding: 0;
 
   ${up.tablet} {
-    ${shadows.light}
+    ${shadows.card}
   }
 `;
 

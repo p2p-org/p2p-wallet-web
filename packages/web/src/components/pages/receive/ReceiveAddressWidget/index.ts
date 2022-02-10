@@ -1,1 +1,0 @@
-export { ReceiveAddressWidget } from './ReceiveAddressWidget';

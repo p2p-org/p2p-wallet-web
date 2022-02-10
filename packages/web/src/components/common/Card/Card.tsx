@@ -13,7 +13,7 @@ const Wrapper = styled.div`
 
   ${up.tablet} {
     ${borders.primaryRGBA}
-    ${shadows.light}
+    ${shadows.card}
   }
 `;
 
