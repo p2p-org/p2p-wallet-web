@@ -8,8 +8,8 @@
     "runtime-main.js": "https://p2p-org.github.io/p2p-wallet-web/static/js/runtime-main.7408dd70.js",
     "runtime-main.js.map": "https://p2p-org.github.io/p2p-wallet-web/static/js/runtime-main.7408dd70.js.map",
     "static/css/3.59b48f64.chunk.css": "https://p2p-org.github.io/p2p-wallet-web/static/css/3.59b48f64.chunk.css",
-    "static/js/3.7e98ca93.chunk.js": "https://p2p-org.github.io/p2p-wallet-web/static/js/3.7e98ca93.chunk.js",
-    "static/js/3.7e98ca93.chunk.js.map": "https://p2p-org.github.io/p2p-wallet-web/static/js/3.7e98ca93.chunk.js.map",
+    "static/js/3.5c173ac5.chunk.js": "https://p2p-org.github.io/p2p-wallet-web/static/js/3.5c173ac5.chunk.js",
+    "static/js/3.5c173ac5.chunk.js.map": "https://p2p-org.github.io/p2p-wallet-web/static/js/3.5c173ac5.chunk.js.map",
     "static/css/4.09720a83.chunk.css": "https://p2p-org.github.io/p2p-wallet-web/static/css/4.09720a83.chunk.css",
     "static/js/4.110152a6.chunk.js": "https://p2p-org.github.io/p2p-wallet-web/static/js/4.110152a6.chunk.js",
     "static/js/4.110152a6.chunk.js.map": "https://p2p-org.github.io/p2p-wallet-web/static/js/4.110152a6.chunk.js.map",
@@ -43,7 +43,7 @@
     "static/css/8.84216bd4.chunk.css.map": "https://p2p-org.github.io/p2p-wallet-web/static/css/8.84216bd4.chunk.css.map",
     "static/css/9.bf83d437.chunk.css.map": "https://p2p-org.github.io/p2p-wallet-web/static/css/9.bf83d437.chunk.css.map",
     "static/css/main.e474f1b2.chunk.css.map": "https://p2p-org.github.io/p2p-wallet-web/static/css/main.e474f1b2.chunk.css.map",
-    "static/js/3.7e98ca93.chunk.js.LICENSE.txt": "https://p2p-org.github.io/p2p-wallet-web/static/js/3.7e98ca93.chunk.js.LICENSE.txt",
+    "static/js/3.5c173ac5.chunk.js.LICENSE.txt": "https://p2p-org.github.io/p2p-wallet-web/static/js/3.5c173ac5.chunk.js.LICENSE.txt",
     "static/media/Landing.tsx": "https://p2p-org.github.io/p2p-wallet-web/static/media/GT-Super-Text-Bold.24a70721.woff2",
     "static/media/app.8ce2c870.png": "https://p2p-org.github.io/p2p-wallet-web/static/media/app.8ce2c870.png",
     "static/media/Main.tsx": "https://p2p-org.github.io/p2p-wallet-web/static/media/sollet.2cb9aa36.svg",
@@ -71,7 +71,7 @@
   "entrypoints": [
     "static/js/runtime-main.7408dd70.js",
     "static/css/3.59b48f64.chunk.css",
-    "static/js/3.7e98ca93.chunk.js",
+    "static/js/3.5c173ac5.chunk.js",
     "static/css/main.e474f1b2.chunk.css",
     "static/js/main.2b89f924.chunk.js"
   ]
