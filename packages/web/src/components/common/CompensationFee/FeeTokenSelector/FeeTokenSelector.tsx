@@ -8,17 +8,6 @@ import { AmountUSD } from 'components/common/AmountUSD';
 import { TokenAvatar } from 'components/common/TokenAvatar';
 import { Select } from 'components/ui';
 
-const Wrapper = styled.div`
-  padding: 13px 20px;
-
-  font-size: 14px;
-
-  border: 1px solid #f6f6f8;
-  border-radius: 12px;
-
-  cursor: pointer;
-`;
-
 const SelectorValue = styled.div`
   display: flex;
   align-items: center;
