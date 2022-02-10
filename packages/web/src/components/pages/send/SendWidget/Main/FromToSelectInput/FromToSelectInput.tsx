@@ -1,14 +1,15 @@
-import type { FunctionComponent } from 'react';
-import * as React from 'react';
+import type { FC } from 'react';
+import { useMemo } from 'react';
 
 import { styled } from '@linaria/react';
+import { ZERO } from '@orca-so/sdk';
 import type { TokenAccount } from '@p2p-wallet-web/core';
 import { theme } from '@p2p-wallet-web/ui';
 import type { Token } from '@saberhq/token-utils';
 import { TokenAmount } from '@saberhq/token-utils';
 import classNames from 'classnames';
-import JSBI from 'jsbi';
 
+import { AccountCreationFeeTooltip } from 'components/common/AccountCreationFeeTooltip';
 import { AmountUSD } from 'components/common/AmountUSD';
 import { Icon } from 'components/ui';
 import { InputAmount } from 'components/ui/InputAmount';
@@ -84,12 +85,16 @@ const AmountUSDStyled = styled(AmountUSD)`
   margin-left: 3px;
 `;
 
+const InputWrapper = styled.div`
+  display: flex;
+`;
+
 type Props = {
   direction?: 'from' | 'to';
   tokenAccounts: readonly TokenAccount[];
   tokenAccount?: TokenAccount | null;
   amount?: string;
-  feeAmount?: string;
+  feeAmount?: TokenAmount | null;
   onTokenAccountChange: (token: Token, tokenAccount: TokenAccount | null) => void;
   onAmountChange: (minorAmount: string, type?: 'available') => void;
   disabled?: boolean;
@@ -97,36 +102,40 @@ type Props = {
   className?: string;
 };
 
-export const FromToSelectInput: FunctionComponent<Props> = ({
+export const FromToSelectInput: FC<Props> = ({
   direction = 'from',
   tokenAccounts,
   tokenAccount,
   amount,
-  feeAmount: feeAmountString,
+  feeAmount,
   onTokenAccountChange,
   onAmountChange,
   disabled,
   disabledInput,
   className,
 }) => {
-  const handleAllBalanceClick = () => {
+  const tokenAccountBalance = useMemo(() => {
     if (!tokenAccount?.balance) {
-      return;
+      return null;
     }
 
     let tokenAccountBalance = tokenAccount.balance;
 
-    if (feeAmountString) {
-      const [feeAmount, symbol] = feeAmountString.split(' ');
+    if (feeAmount) {
+      const balanceSubstractFee = tokenAccount.balance.toU64().sub(feeAmount.toU64());
 
-      if (feeAmount && tokenAccount?.balance?.token.symbol === symbol) {
-        const fee = new TokenAmount(tokenAccount.balance.token, JSBI.BigInt(feeAmount));
-        const balanceSubstractFee = tokenAccount.balance.subtract(fee);
+      tokenAccountBalance = balanceSubstractFee.gt(ZERO)
+        ? new TokenAmount(tokenAccount.balance.token, balanceSubstractFee)
+        : new TokenAmount(tokenAccount.balance.token, 0);
+      return tokenAccountBalance;
+    }
 
-        tokenAccountBalance = balanceSubstractFee.greaterThan(0)
-          ? balanceSubstractFee
-          : new TokenAmount(tokenAccount.balance.token, 0);
-      }
+    return tokenAccountBalance;
+  }, [feeAmount, tokenAccount]);
+
+  const handleAllBalanceClick = () => {
+    if (!tokenAccountBalance) {
+      return;
     }
 
     onAmountChange(tokenAccountBalance.toExact(), 'available');
@@ -137,31 +146,14 @@ export const FromToSelectInput: FunctionComponent<Props> = ({
   };
 
   const renderBalance = () => {
-    if (!tokenAccount?.balance) {
-      return null;
+    if (!tokenAccountBalance) {
+      return;
     }
 
-    if (feeAmountString) {
-      const [feeAmount, symbol] = feeAmountString.split(' ');
-
-      if (feeAmount && tokenAccount?.balance?.token.symbol === symbol) {
-        const fee = new TokenAmount(tokenAccount.balance.token, JSBI.BigInt(feeAmount));
-        const balanceSubstractFee = tokenAccount.balance.subtract(fee);
-
-        const tokenAccountBalance = balanceSubstractFee.greaterThan(0)
-          ? balanceSubstractFee
-          : new TokenAmount(tokenAccount.balance.token, 0);
-
-        return tokenAccountBalance.toExact();
-      }
-    }
-
-    return tokenAccount.balance.toExact();
+    return tokenAccountBalance.toExact();
   };
 
-  const hasBalance = tokenAccount?.balance
-    ? tokenAccount.balance.asNumber >= Number(amount)
-    : false;
+  const hasBalance = tokenAccountBalance ? tokenAccountBalance.asNumber >= Number(amount) : false;
 
   return (
     <Wrapper className={className}>
@@ -192,16 +184,19 @@ export const FromToSelectInput: FunctionComponent<Props> = ({
           direction={direction}
           onTokenAccountChange={onTokenAccountChange}
         />
-        <InputAmount
-          placeholder={
-            (tokenAccount?.balance?.token &&
-              TokenAmount.parse(tokenAccount.balance.token, '0').toExact()) ||
-            '0'
-          }
-          value={amount}
-          onChange={handleAmountChange}
-          disabled={disabled || disabledInput}
-        />
+        <InputWrapper>
+          <InputAmount
+            placeholder={
+              (tokenAccount?.balance?.token &&
+                TokenAmount.parse(tokenAccount.balance.token, '0').toExact()) ||
+              '0'
+            }
+            value={amount}
+            onChange={handleAmountChange}
+            disabled={disabled || disabledInput}
+          />
+          {feeAmount ? <AccountCreationFeeTooltip /> : undefined}
+        </InputWrapper>
         {/*<BalanceWrapper>*/}
         {/*  {tokenAccount?.balance?.token ? (*/}
         {/*    <BalanceText>*/}
