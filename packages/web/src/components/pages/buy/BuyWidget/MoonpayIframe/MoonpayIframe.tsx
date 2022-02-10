@@ -24,16 +24,16 @@ const baseParams: MoonpayIframeParams = {
 
 export const MoonpayIframe: FC = () => {
   const { publicKey } = useWallet();
-  const { amount } = useBuyState();
+  const { buyQuote } = useBuyState();
 
   const urlWithParams = useMemo(
     () =>
       `${MOONPAY_SIGNER_URL}?${buildParams<MoonpayIframeParams>({
         ...baseParams,
-        baseCurrencyAmount: amount,
+        baseCurrencyAmount: buyQuote?.totalAmount || 0,
         // walletAddress: publicKey?.toBase58(),
       })}`,
-    [amount],
+    [buyQuote?.totalAmount],
   );
 
   return (

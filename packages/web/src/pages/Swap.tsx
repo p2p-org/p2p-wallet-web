@@ -2,6 +2,7 @@ import type { FunctionComponent } from 'react';
 import { useEffect } from 'react';
 import { useLocation, useParams } from 'react-router-dom';
 
+import { FeeCompensationProvider } from 'app/contexts';
 import { SwapProvider } from 'app/contexts/solana/swap';
 import { Layout } from 'components/common/Layout';
 import { SwapWidget } from 'components/pages/swap/SwapWidget';
@@ -18,9 +19,11 @@ export const Swap: FunctionComponent = () => {
 
   return (
     <Layout>
-      <SwapProvider initialState={{ inputTokenName: symbol }}>
-        <SwapWidget />
-      </SwapProvider>
+      <FeeCompensationProvider>
+        <SwapProvider initialState={{ inputTokenName: symbol }}>
+          <SwapWidget />
+        </SwapProvider>
+      </FeeCompensationProvider>
     </Layout>
   );
 };

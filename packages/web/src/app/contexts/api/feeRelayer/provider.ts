@@ -1,10 +1,11 @@
 import { useCallback } from 'react';
 
+import { ZERO } from '@orca-so/sdk';
 import { useSolana } from '@p2p-wallet-web/core';
 import { useConnectionContext } from '@saberhq/use-solana';
 import { u64 } from '@solana/spl-token';
-import type { PublicKey, TransactionInstruction } from '@solana/web3.js';
-import { Account, Transaction } from '@solana/web3.js';
+import type { Account, PublicKey, TransactionInstruction } from '@solana/web3.js';
+import { Transaction } from '@solana/web3.js';
 import bs58 from 'bs58';
 import { createContainer } from 'unstated-next';
 
@@ -12,13 +13,16 @@ import { feeRelayerUrl } from 'config/constants';
 
 import {
   closeTokenAccountInstruction,
-  createApproveInstruction,
+  // createApproveInstruction,
+  createAssociatedTokenAccountInstruction,
   createRelayTopUpSwapDirectInstruction,
   createRelayTopUpSwapTransitiveInstruction,
   createRelayTransferSolInstruction,
   createTransferInstructions,
   createTransferSOLInstruction,
   createTransitTokenAccount,
+  createUserSwapInstruction,
+  createWSOLAccountInstructions,
 } from './instructions';
 import type {
   CompensationParams,
@@ -28,6 +32,10 @@ import type {
   SwapTransitiveParams,
   TransactionSignatures,
   UserRelayAccount,
+  UserSetupSwap,
+  UserSwap,
+  UserSwapParams,
+  UserSwapTransitiveParams,
 } from './types';
 import {
   buildSwapDirectArgs,
@@ -46,6 +54,8 @@ export interface FeeRelayerService {
   transfer: (params: RelayTransferParams) => Promise<string>;
   getUserRelayAccount: () => Promise<UserRelayAccount | null>;
   relayTopUpWithSwap: (params: CompensationParams) => Promise<string>;
+  userSetupSwap: (params: UserSetupSwap) => Promise<string>;
+  userSwap: (params: UserSwap, compensationParams: CompensationParams) => Promise<string>;
 }
 
 const useFeeRelayerInternal = (): FeeRelayerService => {
@@ -106,8 +116,9 @@ const useFeeRelayerInternal = (): FeeRelayerService => {
       }
 
       const feePayer = await getFeePayerPubkey(feeRelayerURL);
-
-      const isPayInSol = params.compensationParams?.feeToken?.balance?.token.isRawSOL;
+      const isNeedCompensation = params.compensationParams?.feeAmount.gt(ZERO);
+      const isPayInSol =
+        isNeedCompensation && params.compensationParams?.feeToken?.balance?.token.isRawSOL;
       const accountCreationPayer = isPayInSol ? wallet.publicKey : feePayer;
 
       const instructions = createTransferInstructions(
@@ -116,7 +127,7 @@ const useFeeRelayerInternal = (): FeeRelayerService => {
         accountCreationPayer,
       );
 
-      if (!isPayInSol) {
+      if (isNeedCompensation && !isPayInSol) {
         const userRelayAddress = await getUserRelayAddress(wallet.publicKey);
 
         instructions.unshift(
@@ -169,8 +180,8 @@ const useFeeRelayerInternal = (): FeeRelayerService => {
 
       const instructions: TransactionInstruction[] = [];
 
-      const userTransferAuthority = new Account();
-      const userTransferAuthorityPublicKey = userTransferAuthority.publicKey;
+      // const userTransferAuthority = new Account();
+      const userTransferAuthorityPublicKey = wallet.publicKey; // userTransferAuthority.publicKey;
       const userRalayAccount = await getUserRelayAddress(wallet.publicKey);
       const userTemporaryWsolAccount = await getUserTemporaryWsolAccount(wallet.publicKey);
 
@@ -190,14 +201,14 @@ const useFeeRelayerInternal = (): FeeRelayerService => {
         );
       }
 
-      instructions.push(
-        createApproveInstruction(
-          userSourceTokenAccount,
-          userTransferAuthorityPublicKey,
-          wallet.publicKey,
-          args.feeAmountInToken,
-        ),
-      );
+      // instructions.push(
+      //   createApproveInstruction(
+      //     userSourceTokenAccount,
+      //     userTransferAuthorityPublicKey,
+      //     wallet.publicKey,
+      //     args.feeAmountInToken,
+      //   ),
+      // );
 
       let topUpSwapArgs;
       if ((args.topUpParams as SwapDirectParams).Spl) {
@@ -292,7 +303,7 @@ const useFeeRelayerInternal = (): FeeRelayerService => {
       const { signedTransaction, signatures } = await createAndSignTransaction(
         feePayer,
         instructions,
-        [userTransferAuthority],
+        // [userTransferAuthority],
       );
 
       const user_authority_signature = signatures[wallet.publicKey.toBase58()];
@@ -318,10 +329,177 @@ const useFeeRelayerInternal = (): FeeRelayerService => {
     [createAndSignTransaction, feeRelayerURL, wallet],
   );
 
+  const userSetupSwap = useCallback(
+    async (params: UserSetupSwap, compensationParams?: CompensationParams) => {
+      if (!wallet?.publicKey) {
+        throw new Error('Wallet not ready');
+      }
+      const instructions: TransactionInstruction[] = [];
+
+      const feePayer = await getFeePayerPubkey(feeRelayerURL);
+      const isPayInSol = compensationParams?.feeToken?.balance?.token.isRawSOL;
+      const accountCreationPayer = isPayInSol ? wallet.publicKey : feePayer;
+
+      instructions.push(
+        createAssociatedTokenAccountInstruction(
+          params.associatedTokenAddress,
+          params.owner,
+          params.mint,
+          accountCreationPayer,
+        ),
+      );
+      const { signedTransaction } = await createAndSignTransaction(feePayer, instructions);
+
+      return sendTransaction(
+        feeRelayerURL,
+        '/relay_transaction',
+        serializeToRelayTransaction(signedTransaction),
+      );
+    },
+    [createAndSignTransaction, feeRelayerURL, wallet],
+  );
+
+  const userSwap = useCallback(
+    async (params: UserSwap, compensationParams?: CompensationParams) => {
+      if (!wallet?.publicKey) {
+        throw new Error('Wallet not ready');
+      }
+
+      const instructions: TransactionInstruction[] = [];
+      const cleanupInstructions: TransactionInstruction[] = [];
+      const signers: Account[] = [];
+
+      const feePayer = await getFeePayerPubkey(feeRelayerURL);
+      const isPayInSol = compensationParams?.feeToken?.balance?.token.isRawSOL;
+      const accountCreationPayer = isPayInSol ? wallet.publicKey : feePayer;
+      const userTransferAuthorityPublicKey = wallet.publicKey;
+
+      let inputUserTokenPublicKey = params.userSourceTokenAccount;
+      let outputUserTokenPublicKey = params.userDestinationTokenAccount;
+
+      if (!outputUserTokenPublicKey) {
+        throw new Error('outputUserTokenPublicKey must be set');
+      }
+
+      if (params.exchangeData.wsolAccountParams) {
+        const { amount, accountRentExempt } = params.exchangeData.wsolAccountParams;
+        const isInput = params.exchangeData.wsolAccountParams.direction === 'input';
+
+        const {
+          instructions: wsolInstructions,
+          cleanupInstructions: wsolCleanupInstructions,
+          account,
+        } = createWSOLAccountInstructions(
+          accountCreationPayer,
+          wallet.publicKey,
+          amount,
+          accountRentExempt,
+        );
+
+        signers.push(account);
+
+        instructions.push(...wsolInstructions);
+        cleanupInstructions.push(...wsolCleanupInstructions);
+
+        if (isInput) {
+          inputUserTokenPublicKey = account.publicKey;
+        } else {
+          outputUserTokenPublicKey = account.publicKey;
+          if (accountCreationPayer.equals(feePayer)) {
+            const userRalayAccount = await getUserRelayAddress(wallet.publicKey);
+
+            instructions.push(
+              createRelayTransferSolInstruction(
+                RELAY_PROGRAM_ID,
+                wallet.publicKey,
+                userRalayAccount,
+                feePayer,
+                compensationParams?.accountRentExemption || new u64(2039280),
+              ),
+            );
+          }
+        }
+      }
+
+      if (params.type === 'direct') {
+        const data = params.exchangeData.swapParams as UserSwapParams;
+        instructions.push(
+          createUserSwapInstruction(
+            userTransferAuthorityPublicKey,
+            inputUserTokenPublicKey,
+            outputUserTokenPublicKey,
+            wallet.publicKey,
+            data.swapProgramId,
+            data.swapAccount,
+            data.swapAuthority,
+            data.swapSource,
+            data.swapDestination,
+            data.poolTokenMint,
+            data.poolFeeAccount,
+            data.amountIn,
+            data.minimumAmountOut,
+          ),
+        );
+      } else {
+        const data = params.exchangeData.swapParams as UserSwapTransitiveParams;
+        instructions.push(
+          createUserSwapInstruction(
+            userTransferAuthorityPublicKey,
+            inputUserTokenPublicKey,
+            data.intermediateTokenAccount,
+            null,
+            data.from.swapProgramId,
+            data.from.swapAccount,
+            data.from.swapAuthority,
+            data.from.swapSource,
+            data.from.swapDestination,
+            data.from.poolTokenMint,
+            data.from.poolFeeAccount,
+            data.from.amountIn,
+            data.from.minimumAmountOut,
+          ),
+        );
+
+        instructions.push(
+          createUserSwapInstruction(
+            userTransferAuthorityPublicKey,
+            data.intermediateTokenAccount,
+            outputUserTokenPublicKey,
+            null,
+            data.to.swapProgramId,
+            data.to.swapAccount,
+            data.to.swapAuthority,
+            data.to.swapSource,
+            data.to.swapDestination,
+            data.to.poolTokenMint,
+            data.to.poolFeeAccount,
+            data.to.amountIn,
+            data.to.minimumAmountOut,
+          ),
+        );
+      }
+
+      if (cleanupInstructions.length > 0) {
+        instructions.push(...cleanupInstructions);
+      }
+
+      const { signedTransaction } = await createAndSignTransaction(feePayer, instructions, signers);
+
+      return sendTransaction(
+        feeRelayerURL,
+        '/relay_transaction',
+        serializeToRelayTransaction(signedTransaction),
+      );
+    },
+    [createAndSignTransaction, feeRelayerURL, wallet],
+  );
+
   return {
     transfer,
     getUserRelayAccount,
     relayTopUpWithSwap,
+    userSetupSwap,
+    userSwap,
   };
 };
 

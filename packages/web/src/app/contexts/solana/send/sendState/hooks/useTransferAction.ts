@@ -38,7 +38,10 @@ export const useTransferAction = () => {
       // return result.pending.signature;
       // }
 
-      if (params.compensationParams?.topUpParams) {
+      if (
+        params.compensationParams?.isNeedCompensationSwap &&
+        params.compensationParams?.topUpParams
+      ) {
         await relayTopUpWithSwap(params.compensationParams);
       }
 

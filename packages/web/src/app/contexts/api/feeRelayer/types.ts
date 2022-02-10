@@ -118,6 +118,7 @@ export type CompensationParams = {
   feeAmountInToken: u64;
   isRelayAccountExist: boolean;
   accountRentExemption: u64;
+  isNeedCompensationSwap: boolean;
   topUpParams: CompensationSwapParams | null;
 };
 
@@ -126,4 +127,39 @@ export type RelayTransferParams = {
   destinationAccount: DestinationAccount;
   amount: TokenAmount;
   compensationParams?: CompensationParams;
+};
+
+export type WSOLAccountParams = {
+  owner: PublicKey;
+  amount: u64;
+  accountRentExempt: number;
+  direction: 'input' | 'output';
+};
+
+export type UserSwapParams = SwapParams;
+
+export type UserSwapTransitiveParams = {
+  from: SwapParams;
+  to: SwapParams;
+  intermediateTokenAccount: PublicKey;
+};
+
+export type ExchangeData = {
+  wsolAccountParams?: WSOLAccountParams;
+  swapParams: UserSwapParams | UserSwapTransitiveParams;
+};
+
+export type UserSwap = {
+  type: 'direct' | 'transitive';
+  exchangeData: ExchangeData;
+  userSourceTokenAccount: PublicKey;
+  userDestinationTokenAccount?: PublicKey;
+  amount: u64;
+};
+
+export type UserSetupSwap = {
+  type: 'intermediateToken' | 'outputUserToken';
+  associatedTokenAddress: PublicKey;
+  mint: PublicKey;
+  owner: PublicKey;
 };

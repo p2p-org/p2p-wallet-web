@@ -9,6 +9,31 @@ import { swapInstruction } from '../utils/web3/instructions/pool-instructions';
 import type TransactionBuilder from '../utils/web3/TransactionBuilder';
 import type SlippageTolerance from './SlippageTolerance';
 
+const makeSplData = (
+  pool,
+  programIds: ProgramIds,
+  outputTokenName: string,
+  amountIn: u64,
+  minimumAmountOut: u64,
+) => {
+  const [inputPoolTokenPublicKey, outputPoolTokenPublicKey] =
+    pool.poolConfig.tokenAName === outputTokenName
+      ? [pool.poolConfig.tokenAccountB, pool.poolConfig.tokenAccountA]
+      : [pool.poolConfig.tokenAccountA, pool.poolConfig.tokenAccountB];
+
+  return {
+    swapProgramId: pool.getSwapProgramId(programIds),
+    swapAccount: pool.poolConfig.account,
+    swapAuthority: pool.poolConfig.authority,
+    swapSource: inputPoolTokenPublicKey,
+    swapDestination: outputPoolTokenPublicKey,
+    poolTokenMint: pool.poolConfig.poolTokenMint,
+    poolFeeAccount: pool.poolConfig.feeAccount,
+    amountIn,
+    minimumAmountOut,
+  };
+};
+
 export default class OrcaPool {
   poolConfig: PoolConfig;
   tokenAAmount: u64;
@@ -156,6 +181,52 @@ export default class OrcaPool {
     return {
       outputUserTokenPublicKey,
     };
+  }
+
+  constructExchangeParams(
+    walletPublicKey: PublicKey,
+    programIds: ProgramIds,
+    inputTokenName: string,
+    outputTokenName: string,
+    inputAmount: u64,
+    minimumOutputAmount: u64,
+    accountRentExempt: number,
+    inputUserTokenPublicKey: PublicKey | undefined,
+    outputUserTokenPublicKey: PublicKey | undefined,
+  ) {
+    const exchangeData = {};
+    // Only create a wrapped SOL account if `inputUserTokenPublicKey`
+    // Otherwise, assume that the WSOL account contains the correct balance
+    if (inputTokenName === 'SOL' && !inputUserTokenPublicKey) {
+      exchangeData.wsolAccountParams = {
+        owner: walletPublicKey,
+        amount: inputAmount,
+        accountRentExempt,
+        direction: 'input',
+      };
+    } else if (!inputUserTokenPublicKey) {
+      throw new Error('inputUserTokenPublicKey must be defined if inputTokenName is not SOL');
+    }
+
+    if (outputTokenName === 'SOL') {
+      exchangeData.wsolAccountParams = {
+        owner: walletPublicKey,
+        amount: ZERO,
+        accountRentExempt,
+        direction: 'output',
+      };
+    } else if (!outputUserTokenPublicKey) {
+      throw new Error('outputUserTokenPublicKey must be defined if inputTokenName is not SOL');
+    }
+
+    exchangeData.swapParams = makeSplData(
+      this,
+      programIds,
+      outputTokenName,
+      inputAmount,
+      minimumOutputAmount,
+    );
+    return exchangeData;
   }
 
   getSwapProgramId(programIds: ProgramIds) {

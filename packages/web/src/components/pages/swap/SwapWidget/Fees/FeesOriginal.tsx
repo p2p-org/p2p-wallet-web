@@ -1,13 +1,16 @@
 import type { FC } from 'react';
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useAsync } from 'react-async-hook';
 
 import { styled } from '@linaria/react';
-import { useSolana } from '@p2p-wallet-web/core';
+import { useSolana, useTokenAccount, useUserTokenAccounts } from '@p2p-wallet-web/core';
+import { usePubkey } from '@p2p-wallet-web/sail';
 import { LAMPORTS_PER_SOL } from '@solana/web3.js';
 
+import { useFeeCompensation } from 'app/contexts';
 import { useConfig, usePrice, useSwap } from 'app/contexts/solana/swap';
 import { formatBigNumber, formatNumberToUSD } from 'app/contexts/solana/swap/utils/format';
+import { CompensationFee } from 'components/common/CompensationFee';
 import { LoaderBlock } from 'components/common/LoaderBlock';
 
 import { Label, Line, Value } from './common/styled';
@@ -30,8 +33,29 @@ export const FeesOriginal: FC = () => {
   const { programIds, tokenConfigs } = useConfig();
   const { trade, intermediateTokenName, asyncStandardTokenAccounts } = useSwap();
   const { useAsyncMergedPrices } = usePrice();
+  const userTokenAccounts = useUserTokenAccounts();
   const asyncPrices = useAsyncMergedPrices();
+  const { setFromToken, setAccountsCount } = useFeeCompensation();
+
+  const [solTokenAccount] = useMemo(
+    () => userTokenAccounts.filter((token) => token.balance?.token.isRawSOL),
+    [userTokenAccounts],
+  );
+  const inputUserTokenAccount = useMemo(() => {
+    return asyncStandardTokenAccounts?.[trade.inputTokenName];
+  }, [asyncStandardTokenAccounts, trade.inputTokenName]);
+
+  const fromTokenAccount = useTokenAccount(usePubkey(inputUserTokenAccount?.account));
+
   const publicKey = wallet?.publicKey;
+
+  useEffect(() => {
+    if (fromTokenAccount?.balance) {
+      setFromToken(fromTokenAccount);
+    } else {
+      setFromToken(solTokenAccount);
+    }
+  }, [fromTokenAccount, setFromToken, trade]);
 
   const tokenNames = useMemo(() => {
     if (!asyncStandardTokenAccounts) {
@@ -127,7 +151,17 @@ export const FeesOriginal: FC = () => {
       : undefined;
     const outputUserTokenAccount = asyncStandardTokenAccounts?.[trade.outputTokenName];
 
-    const { setupTransaction, swapTransaction } = await trade.prepareExchangeTransactions(
+    // const { setupTransaction, swapTransaction } = await trade.prepareExchangeTransactions(
+    //   connection,
+    //   tokenConfigs,
+    //   programIds,
+    //   publicKey,
+    //   inputUserTokenPublicKey?.account,
+    //   intermediateTokenPublicKey?.account,
+    //   outputUserTokenAccount?.account,
+    // );
+
+    const { userSwapArgs, setupSwapArgs } = await trade.prepareExchangeTransactionsArgs(
       connection,
       tokenConfigs,
       programIds,
@@ -138,14 +172,26 @@ export const FeesOriginal: FC = () => {
     );
 
     let setupFee;
-    if (setupTransaction) {
-      setupFee =
-        (setupTransaction.signatures.length * feeCalculator.lamportsPerSignature) /
-        LAMPORTS_PER_SOL;
+    // if (setupTransaction) {
+    //   setupFee =
+    //     (setupTransaction.signatures.length * feeCalculator.lamportsPerSignature) /
+    //     LAMPORTS_PER_SOL;
+    // }
+    let newAccountCount = 0;
+    if (setupSwapArgs) {
+      newAccountCount += 1;
+      setupFee = (1 * feeCalculator.lamportsPerSignature) / LAMPORTS_PER_SOL;
     }
 
-    const swapFee =
-      (swapTransaction.signatures.length * feeCalculator.lamportsPerSignature) / LAMPORTS_PER_SOL;
+    if (userSwapArgs?.exchangeData?.wsolAccountParams) {
+      newAccountCount += 1;
+    }
+
+    setAccountsCount(newAccountCount);
+    // const swapFee =
+    //   (swapTransaction.signatures.length * feeCalculator.lamportsPerSignature) / LAMPORTS_PER_SOL;
+
+    const swapFee = 0;
 
     return { setupFee, swapFee };
   }, [connection, tokenNames, programIds, tokenConfigs, trade, wallet]);
@@ -208,6 +254,7 @@ export const FeesOriginal: FC = () => {
 
   return (
     <FeesAccordion totalFee={totalFee}>
+      <CompensationFee type="swap" isShow={trade.inputTokenName !== 'SOL'} />
       {tokenNames.map((tokenName) => (
         <Line key={tokenName}>
           <Label>{tokenName} Account creation</Label>
