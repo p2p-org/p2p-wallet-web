@@ -1,4 +1,4 @@
-import type { FC } from 'react';
+import type { FC, HTMLAttributes } from 'react';
 
 import isPropValid from '@emotion/is-prop-valid';
 import type { CSSProperties } from '@linaria/core';
@@ -14,7 +14,6 @@ import change from './assets/change-icon.svg';
 import checkmark from './assets/checkmark-icon.svg';
 import chevron1 from './assets/chevron-1-icon.svg';
 import chevronRounded from './assets/chevron-rounded-icon.svg';
-import clock from './assets/clock-icon.svg';
 import close from './assets/close-icon.svg';
 import currency from './assets/currency-icon.svg';
 import db from './assets/db-icon.svg';
@@ -26,11 +25,13 @@ import more from './assets/more-icon.svg';
 import appStore from './assets/new/app-store-icon.svg';
 import arrowDown from './assets/new/arrow-down-icon.svg';
 import bottom from './assets/new/bottom-icon.svg';
+import caret from './assets/new/caret-icon.svg';
+import check from './assets/new/check-icon.svg';
 import chevron from './assets/new/chevron-icon.svg';
-import clockTransparent from './assets/new/clock-transparent-icon.svg';
+import clock from './assets/new/clock-icon.svg';
 import copy from './assets/new/copy-icon.svg';
 import cross from './assets/new/cross-icon.svg';
-import externalLink from './assets/new/external-link-icon.svg';
+import external from './assets/new/external-icon.svg';
 import eyeHide from './assets/new/eye-hide-icon.svg';
 import eye from './assets/new/eye-icon.svg';
 import gear from './assets/new/gear-icon.svg';
@@ -44,7 +45,7 @@ import search from './assets/new/search-icon.svg';
 import swap from './assets/new/swap-icon.svg';
 import top from './assets/new/top-icon.svg';
 import wallet from './assets/new/wallet-icon.svg';
-import warningTransparent from './assets/new/warning-transparent-icon.svg';
+import warning from './assets/new/warning-icon.svg';
 import plug from './assets/plug-icon.svg';
 import questionCircle from './assets/question-circle-icon.svg';
 import reload from './assets/reload-icon.svg';
@@ -54,13 +55,14 @@ import success from './assets/success-icon.svg';
 import sun from './assets/sun-icon.svg';
 import timer from './assets/timer-icon.svg';
 import walletOld from './assets/wallet-icon.svg';
-import warning from './assets/warning-icon.svg';
 
 const iconsMap = new Map<string, string>([
   ['arrow', arrow],
   ['app-store', appStore],
   ['arrow-triangle', arrowTriangle],
   ['bottom', bottom],
+  ['caret', caret],
+  ['check', check],
   ['branch', branch],
   ['card', card],
   ['chain', chain],
@@ -81,7 +83,7 @@ const iconsMap = new Map<string, string>([
   ['arrow-down', arrowDown],
   ['eye-hide', eyeHide],
   ['eye', eye],
-  ['external-link', externalLink],
+  ['external', external],
   ['search', search],
   ['search-old', searchOld],
   ['settings', settings],
@@ -107,18 +109,16 @@ const iconsMap = new Map<string, string>([
   ['clock', clock],
   ['free-tx', freeTx],
   ['info', info],
-  ['warning-transparent', warningTransparent],
-  ['clock-transparent', clockTransparent],
 ]);
 
-export type Props = {
+interface Props extends HTMLAttributes<HTMLDivElement> {
   name: string;
   size?: string | number;
   height?: string | number;
   width?: string | number;
   style?: CSSProperties;
   className?: string;
-};
+}
 
 export const Icon: FC<Props> = ({ name, size, height, width, ...props }) => {
   const validProps: {

@@ -61,6 +61,10 @@ type ModalState = { modalType: ModalType; modalId: number; props: any };
 const modalsMap = new Map<ModalType, LoadableComponent<ModalPropsType & any>>([
   // [SHOW_MODAL_ADD_COIN, loadable(() => import('components/modals/__AddCoinModal'))],
   [
+    ModalType.SHOW_MODAL_RECEIVE_BITCOIN,
+    loadable(() => import('components/modals/ReceiveBitcoinModal')),
+  ],
+  [
     ModalType.SHOW_MODAL_TRANSACTION_CONFIRM,
     loadable(() => import('components/modals/TransactionConfirmModal')),
   ],

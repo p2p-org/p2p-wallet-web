@@ -39,6 +39,7 @@ const Bottom = styled.div``;
 
 const Label = styled.span`
   margin-right: 4px;
+
   color: #8e8e93;
 `;
 
@@ -50,8 +51,8 @@ const FeeTokenItemWrapper = styled.div`
   padding: 10px;
 
   font-size: 16px;
-  border-radius: 12px;
 
+  border-radius: 12px;
   cursor: pointer;
 
   &:not(:last-child) {
@@ -102,71 +103,67 @@ const FeeTokenItem: FC<{
 };
 
 type Props = {
-  txType: 'send' | 'swap';
+  type: 'send' | 'swap';
   feeTokenAccounts: TokenAccount[];
   value: TokenAccount | null | undefined;
   feeAmountInSol: TokenAmount | undefined;
   feeTokenAmount: TokenAmount | undefined;
   accountSymbol?: string | undefined;
   onSelectToken: (token: TokenAccount) => void;
-  className?: string;
 };
 
 export const FeeTokenSelector: FC<Props> = ({
-  txType,
+  type,
   value,
   feeTokenAccounts,
   feeAmountInSol,
   feeTokenAmount,
   accountSymbol,
   onSelectToken,
-  className,
 }) => {
   const onItemClick = (item: TokenAccount) => () => {
     onSelectToken(item);
   };
 
-  const isSend = txType === 'send';
+  const isSend = type === 'send';
   const selectedTokenSymbol = value?.balance?.token.symbol || '';
   const feeAmount = selectedTokenSymbol === 'SOL' ? feeAmountInSol : feeTokenAmount;
 
   return (
-    <Wrapper className={className}>
-      <Select
-        value={
-          <SelectorValue>
-            <TokenAvatarStyled
-              symbol={selectedTokenSymbol}
-              address={value?.balance?.token.address}
-              size={40}
-            />
-            <Fees>
-              <Top>
-                <Label>
-                  {isSend
-                    ? `${accountSymbol as string} account creation:`
-                    : `Pay swap fees with:  ${selectedTokenSymbol}`}
-                </Label>
-                {isSend && feeAmount ? (
-                  <Amount>
-                    <AmountUSDStyled value={feeAmount} />
-                  </Amount>
-                ) : undefined}
-              </Top>
+    <Select
+      value={
+        <SelectorValue>
+          <TokenAvatarStyled
+            symbol={selectedTokenSymbol}
+            address={value?.balance?.token.address}
+            size={40}
+          />
+          <Fees>
+            <Top>
+              <Label>
+                {isSend
+                  ? `${accountSymbol as string} account creation:`
+                  : `Pay swap fees with:  ${selectedTokenSymbol}`}
+              </Label>
               {isSend && feeAmount ? (
-                <Bottom>
-                  <Label>Pay with:</Label>
-                  <Amount>{`${feeAmount.formatUnits()}`}</Amount>
-                </Bottom>
+                <Amount>
+                  <AmountUSDStyled value={feeAmount} />
+                </Amount>
               ) : undefined}
-            </Fees>
-          </SelectorValue>
-        }
-      >
-        {feeTokenAccounts.map((item: TokenAccount) => (
-          <FeeTokenItem key={item.key?.toBase58()} item={item} onItemClick={onItemClick(item)} />
-        ))}
-      </Select>
-    </Wrapper>
+            </Top>
+            {isSend && feeAmount ? (
+              <Bottom>
+                <Label>Pay with:</Label>
+                <Amount>{`${feeAmount.formatUnits()}`}</Amount>
+              </Bottom>
+            ) : undefined}
+          </Fees>
+        </SelectorValue>
+      }
+    >
+      {feeTokenAccounts.map((item: TokenAccount) => (
+        <FeeTokenItem key={item.key?.toBase58()} item={item} onItemClick={onItemClick(item)} />
+      ))}
+    </Select>
   );
 };

@@ -358,7 +358,7 @@ export const QRAddressWidgetOrigin: FunctionComponent<Props> = ({ publicKey, cla
                     className="button"
                   >
                     <ShareWrapper>
-                      <ShareIcon name="external-link" />
+                      <ShareIcon name="external" />
                     </ShareWrapper>
                   </a>
                 ) : undefined}
@@ -382,7 +382,7 @@ export const QRAddressWidgetOrigin: FunctionComponent<Props> = ({ publicKey, cla
                     className="button"
                   >
                     <ShareWrapper>
-                      <ShareIcon name="external-link" />
+                      <ShareIcon name="external" />
                     </ShareWrapper>
                   </a>
                 ) : undefined}

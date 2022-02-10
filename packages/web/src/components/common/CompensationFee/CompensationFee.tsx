@@ -48,8 +48,8 @@ export const CompensationFee: FC<{
   return (
     <>
       <FeeTokenSelector
+        type={type}
         feeTokenAccounts={feeTokenAccounts}
-        txType={type}
         feeAmountInSol={estimatedFeeAmount.accountsCreation.sol}
         feeTokenAmount={estimatedFeeAmount.accountsCreation.feeToken}
         onSelectToken={setFeeToken}

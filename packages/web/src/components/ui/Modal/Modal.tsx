@@ -8,6 +8,7 @@ import { theme, up, useIsMobile } from '@p2p-wallet-web/ui';
 import { DialogContent } from '@reach/dialog';
 import { useDrag } from '@use-gesture/react';
 import BezierEasing from 'bezier-easing';
+import classNames from 'classnames';
 
 import { MOBILE_FOOTER_TABS_HEIGHT } from 'components/common/Layout';
 import { Icon } from 'components/ui';
@@ -59,12 +60,72 @@ const Header = styled.div`
   position: relative;
 
   display: inline-flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
 
   min-height: 74px;
+`;
 
-  border-bottom: 1px solid ${theme.colors.stroke.secondary};
+const Delimiter = styled.div`
+  position: relative;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &.hasIcon {
+    height: 44px;
+
+    ${up.tablet} {
+      height: 56px;
+    }
+  }
+
+  &::before {
+    position: absolute;
+
+    width: 100%;
+    height: 1px;
+
+    background: ${theme.colors.stroke.secondary};
+
+    content: '';
+  }
+`;
+
+const IconWrapper = styled.div`
+  z-index: 1;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 44px;
+  height: 44px;
+
+  border-radius: 12px;
+
+  ${up.tablet} {
+    width: 56px;
+    height: 56px;
+  }
+
+  &.warning {
+    background: ${theme.colors.system.warningMain};
+  }
+`;
+
+const IconStyled = styled(Icon)`
+  width: 24px;
+  height: 24px;
+
+  color: ${theme.colors.textIcon.buttonPrimary};
+
+  ${up.tablet} {
+    width: 32px;
+    height: 32px;
+  }
 `;
 
 const Title = styled.div`
@@ -76,31 +137,24 @@ const Title = styled.div`
 `;
 
 const Description = styled.div`
-  color: #a3a5ba;
-  font-weight: 600;
-  font-size: 16px;
-  line-height: 100%;
+  color: ${theme.colors.textIcon.secondary};
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 120%;
+  letter-spacing: 0.01em;
 `;
 
-const CloseWrapper = styled.div`
+const CloseIcon = styled(Icon)`
   position: absolute;
   top: 25px;
   right: 20px;
 
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 24px;
-  height: 24px;
-
-  cursor: pointer;
-`;
-
-const CloseIcon = styled(Icon)`
   width: 24px;
   height: 24px;
 
   color: ${theme.colors.textIcon.active};
+
+  cursor: pointer;
 `;
 
 const Content = styled.div`
@@ -128,6 +182,8 @@ type Props = {
   title?: React.ReactNode;
   description?: React.ReactNode;
   footer?: React.ReactNode;
+  iconName?: string;
+  iconBgClassName?: string;
   close: () => void;
   className?: string;
 };
@@ -136,6 +192,9 @@ export const Modal: FunctionComponent<Props> = ({
   title,
   description,
   footer,
+  iconName,
+  iconBgClassName,
+
   close,
   children,
   className,
@@ -205,12 +264,15 @@ export const Modal: FunctionComponent<Props> = ({
               <Header>
                 {title ? <Title>{title}</Title> : undefined}
                 {description ? <Description>{description}</Description> : undefined}
-                {!isMobile ? (
-                  <CloseWrapper onClick={close}>
-                    <CloseIcon name="cross" />
-                  </CloseWrapper>
-                ) : undefined}
+                {!isMobile ? <CloseIcon name="cross" onClick={close} /> : undefined}
               </Header>
+              <Delimiter className={classNames({ hasIcon: Boolean(iconName) })}>
+                {iconName ? (
+                  <IconWrapper className={iconBgClassName}>
+                    <IconStyled name={iconName} />
+                  </IconWrapper>
+                ) : undefined}
+              </Delimiter>
               {children ? <Content>{children}</Content> : undefined}
               {footer ? <Footer>{footer}</Footer> : undefined}
             </StyledDialogContent>

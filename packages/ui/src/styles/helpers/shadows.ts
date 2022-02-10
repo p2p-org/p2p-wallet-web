@@ -1,4 +1,4 @@
-const light = `
+const card = `
   box-shadow: 0px 4px 4px #F6F6F9;
 `;
 
@@ -7,6 +7,6 @@ const notification = `
 `;
 
 export const shadows = {
-  light,
+  card,
   notification,
 };

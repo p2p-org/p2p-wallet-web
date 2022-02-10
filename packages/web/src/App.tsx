@@ -29,15 +29,15 @@ dayjs.extend(localizedFormat);
 const App: React.FC = () => {
   return (
     <>
-      <Providers>
-        <Router basename={process.env.REACT_APP_BASENAME}>
+      <Router basename={process.env.REACT_APP_BASENAME}>
+        <Providers>
           <Switch>
             <Route path="/" component={Landing} exact />
             <Route path="/:type(signup|login)" component={Home} exact />
             <AuthRequiredRoute path="/wallets" component={Wallets} />
             <AuthRequiredRoute path="/wallet/:publicKey/settings" component={WalletSettings} />
             <AuthRequiredRoute path="/wallet/:publicKey" exact component={Wallet} />
-            <AuthRequiredRoute path="/receive" component={Receive} />
+            <AuthRequiredRoute path="/receive/(tokens)?" component={Receive} />
             <AuthRequiredRoute path="/send/:publicKey/:status(result)" component={Send} />
             <AuthRequiredRoute path="/send/:publicKey?" component={Send} />
             <AuthRequiredRoute path="/swap/:symbol?" component={Swap} />
@@ -48,9 +48,9 @@ const App: React.FC = () => {
           </Switch>
           <Intercom />
           <FeaturesToggle />
-        </Router>
-        <ToastManager anchor="left" renderToast={(props) => <NotifyToast {...props} />} />
-      </Providers>
+        </Providers>
+      </Router>
+      <ToastManager anchor="left" renderToast={(props) => <NotifyToast {...props} />} />
     </>
   );
 };
