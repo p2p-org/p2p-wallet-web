@@ -3734,10 +3734,10 @@
   dependencies:
     buffer "~6.0.3"
 
-"@solana/spl-token-registry@^0.2.1085", "@solana/spl-token-registry@^0.2.804":
-  version "0.2.1118"
-  resolved "https://registry.yarnpkg.com/@solana/spl-token-registry/-/spl-token-registry-0.2.1118.tgz#56e89fb44b5c9668aed5b465cca5e6fec914f876"
-  integrity sha512-DjWAHeTm5AZ0+AYsN05YkFa4/GMkLk5twW7s6MT/U/+80z9nkL02oGLkXDR4VrqO+lJWDyq2hzQs24EDl3yfLQ==
+"@solana/spl-token-registry@^0.2.2153":
+  version "0.2.2153"
+  resolved "https://registry.yarnpkg.com/@solana/spl-token-registry/-/spl-token-registry-0.2.2153.tgz#eb446151f7d4fe19b4da7d44d2d58879ecda5ac5"
+  integrity sha512-5EPQYBhzJ/W0ZyhWa/NBmUohFgpF08AqqsGaC/vuWxI32HqVenI0uVF7i5Ugx4VvGzE6UD+mj38Mt7BU9qUl2Q==
   dependencies:
     cross-fetch "3.0.6"
 
@@ -17458,7 +17458,7 @@ react-element-to-jsx-string@^14.3.4:
     is-plain-object "5.0.0"
     react-is "17.0.2"
 
-react-error-overlay@6.0.9, react-error-overlay@^6.0.9:
+react-error-overlay@^6.0.9:
   version "6.0.9"
   resolved "https://registry.yarnpkg.com/react-error-overlay/-/react-error-overlay-6.0.9.tgz#3c743010c9359608c375ecd6bc76f35d93995b0a"
   integrity sha512-nQTTcUu+ATDbrSD1BZHr5kgSD4oF8OFjxun8uAaL8RwPBacGBNPf/yAuVVdx17N8XNzRDMrZ9XcKZHCjPW+9ew==
