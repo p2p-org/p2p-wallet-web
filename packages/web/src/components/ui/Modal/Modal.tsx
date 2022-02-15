@@ -29,7 +29,7 @@ const StyledDialogContent = styled(({ ...props }) => <AnimatedDialogContent {...
     flex-direction: column;
     align-self: flex-end;
     width: 100vw;
-    height: 80vh;
+    max-height: 80vh;
     margin: 0;
     padding: 0;
     overflow-x: hidden;
@@ -53,6 +53,26 @@ const StyledDialogContent = styled(({ ...props }) => <AnimatedDialogContent {...
 
       border-radius: 12px;
     }
+  }
+`;
+
+const Handle = styled.div`
+  position: relative;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 16px;
+
+  &::before {
+    position: absolute;
+
+    width: 31px;
+    height: 4px;
+
+    background: ${theme.colors.textIcon.buttonDisabled};
+
+    content: '';
   }
 `;
 
@@ -184,6 +204,8 @@ type Props = {
   footer?: React.ReactNode;
   iconName?: string;
   iconBgClassName?: string;
+
+  noDelimiter: boolean;
   close: () => void;
   className?: string;
 };
@@ -195,9 +217,11 @@ export const Modal: FunctionComponent<Props> = ({
   iconName,
   iconBgClassName,
 
+  noDelimiter,
   close,
-  children,
   className,
+
+  children,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const isMobile = useIsMobile();
@@ -261,18 +285,23 @@ export const Modal: FunctionComponent<Props> = ({
               aria-label="dialog"
               className={className}
             >
-              <Header>
-                {title ? <Title>{title}</Title> : undefined}
-                {description ? <Description>{description}</Description> : undefined}
-                {!isMobile ? <CloseIcon name="cross" onClick={close} /> : undefined}
-              </Header>
-              <Delimiter className={classNames({ hasIcon: Boolean(iconName) })}>
-                {iconName ? (
-                  <IconWrapper className={iconBgClassName}>
-                    <IconStyled name={iconName} />
-                  </IconWrapper>
-                ) : undefined}
-              </Delimiter>
+              {isMobile ? <Handle /> : undefined}
+              {title || description ? (
+                <Header>
+                  {title ? <Title>{title}</Title> : undefined}
+                  {description ? <Description>{description}</Description> : undefined}
+                  {!isMobile ? <CloseIcon name="cross" onClick={close} /> : undefined}
+                </Header>
+              ) : undefined}
+              {!noDelimiter ? (
+                <Delimiter className={classNames({ hasIcon: Boolean(iconName) })}>
+                  {iconName ? (
+                    <IconWrapper className={iconBgClassName}>
+                      <IconStyled name={iconName} />
+                    </IconWrapper>
+                  ) : undefined}
+                </Delimiter>
+              ) : undefined}
               {children ? <Content>{children}</Content> : undefined}
               {footer ? <Footer>{footer}</Footer> : undefined}
             </StyledDialogContent>

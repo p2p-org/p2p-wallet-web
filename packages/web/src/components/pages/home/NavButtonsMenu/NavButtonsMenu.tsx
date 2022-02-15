@@ -62,15 +62,15 @@ export const NavButtonsMenu: FC<Props> = () => {
           {!stuck ? <NavButtonIcon name="plus" /> : undefined} Buy
         </NavButton>
         <NavButton onClick={handleButtonClick('/receive')}>
-          {!stuck ? <NavButtonIcon name="top" /> : undefined}
+          {!stuck ? <NavButtonIcon name="bottom" /> : undefined}
           Receive
         </NavButton>
         <NavButton onClick={handleButtonClick('/send')}>
-          {!stuck ? <NavButtonIcon name="swap" /> : undefined}
+          {!stuck ? <NavButtonIcon name="top" /> : undefined}
           Send
         </NavButton>
         <NavButton onClick={handleButtonClick('/swap')}>
-          {!stuck ? <NavButtonIcon name="bottom" /> : undefined}
+          {!stuck ? <NavButtonIcon name="swap" /> : undefined}
           Swap
         </NavButton>
       </NavButtonsMenuStyled>

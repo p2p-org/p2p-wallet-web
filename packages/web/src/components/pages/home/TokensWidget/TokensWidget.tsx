@@ -16,6 +16,8 @@ const Wrapper = styled.div`
 
   ${up.tablet} {
     grid-gap: 16px;
+
+    margin: 0 18px 0 24px;
   }
 `;
 
@@ -23,6 +25,7 @@ const Title = styled.div`
   position: relative;
 
   display: flex;
+  margin-left: 16px;
   padding: 16px 0 0 12px;
 
   color: ${theme.colors.textIcon.secondary};
@@ -34,6 +37,7 @@ const Title = styled.div`
   cursor: pointer;
 
   ${up.tablet} {
+    margin-left: initial;
     padding-left: 8px;
   }
 `;

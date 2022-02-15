@@ -7,17 +7,24 @@ import type { PublicKey } from '@solana/web3.js';
 import { zip } from 'ramda';
 
 import { SYSTEM_PROGRAM_ID } from '../../../constants/publicKeys';
-import { useTokens } from "../../../hooks";
+import { useTokens } from '../../../hooks';
 import type { TokenAccount } from '../models';
+import { useWallet } from '@saberhq/use-solana';
 
 export const useTokenAccounts = (
   publicKeys: (PublicKey | null | undefined)[] = [],
 ): (TokenAccount | undefined)[] => {
+  const { publicKey } = useWallet();
   const tokenAccountsData = useAccountsData(publicKeys);
 
   const mints = useMemo(() => {
-    return tokenAccountsData.map((datum) => {
+    return tokenAccountsData.map((datum, i) => {
       if (!datum) {
+        // Use wallet Native SOL if its zero
+        if (publicKey && publicKeys[i] && publicKey.equals(publicKeys[i]!)) {
+          return RAW_SOL_MINT;
+        }
+
         return datum;
       }
 

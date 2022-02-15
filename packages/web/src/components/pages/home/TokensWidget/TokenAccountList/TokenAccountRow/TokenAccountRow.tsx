@@ -20,8 +20,6 @@ import { MenuStyled, TokenMenu } from './TokenMenu';
 const IconStyled = styled(Icon)`
   width: 24px;
   height: 24px;
-
-  color: ${theme.colors.textIcon.secondary};
 `;
 
 const TokenAvatarStyled = styled(TokenAvatar)``;
@@ -29,13 +27,15 @@ const TokenAvatarStyled = styled(TokenAvatar)``;
 const WrapperLink = styled(Link)`
   display: flex;
   align-items: center;
-  padding: 12px 8px;
+  padding: 12px 24px;
 
   text-decoration: none;
 
   background: ${theme.colors.bg.primary};
 
   ${up.tablet} {
+    padding: 12px 8px;
+
     border: 1px solid transparent;
     border-radius: 12px;
     cursor: pointer;
@@ -60,7 +60,7 @@ const Content = styled.div`
   flex: 1;
   flex-direction: column;
   justify-content: center;
-  margin: 0 8px 0 12px;
+  margin-left: 12px;
 `;
 
 const Top = styled.div`
@@ -97,6 +97,10 @@ const Bottom = styled.div`
   font-weight: 500;
   font-size: 14px;
   line-height: 140%;
+`;
+
+const TokenMenuStyled = styled(TokenMenu)`
+  margin-left: 8px;
 `;
 
 type Props = {
@@ -181,7 +185,7 @@ export const TokenAccountRow: FunctionComponent<Props> = ({ tokenAccount, isHidd
             )}
           </Bottom>
         </Content>
-        {isTablet ? <TokenMenu tokenAccount={tokenAccount} isHidden={isHidden} /> : undefined}
+        {isTablet ? <TokenMenuStyled tokenAccount={tokenAccount} isHidden={isHidden} /> : undefined}
       </WrapperLink>
     </StickyOrFragment>
   );

@@ -1,4 +1,4 @@
-import type { FC } from 'react';
+import type { FC, HTMLAttributes } from 'react';
 import { useCallback } from 'react';
 import { useHistory, useLocation } from 'react-router';
 
@@ -16,12 +16,12 @@ const Wrapper = styled.div`
 // export for styling on hover in TokenAcountRow
 export const MenuStyled = styled(Menu)``;
 
-interface Props {
+interface Props extends HTMLAttributes<HTMLDivElement> {
   tokenAccount: TokenAccount;
   isHidden?: boolean;
 }
 
-export const TokenMenu: FC<Props> = ({ tokenAccount, isHidden = false }) => {
+export const TokenMenu: FC<Props> = ({ tokenAccount, isHidden = false, className }) => {
   const history = useHistory();
   const location = useLocation();
   const { tokenConfigs } = useConfig();
@@ -43,7 +43,7 @@ export const TokenMenu: FC<Props> = ({ tokenAccount, isHidden = false }) => {
   }, [toggleHideTokenAccount, tokenAccount.balance, tokenAccount.key]);
 
   return (
-    <Wrapper>
+    <Wrapper className={className}>
       <MenuStyled vertical>
         <MenuItem icon="plus" onItemClick={handleButtonClick('/buy')}>
           Buy {tokenAccount.balance?.token.symbol}

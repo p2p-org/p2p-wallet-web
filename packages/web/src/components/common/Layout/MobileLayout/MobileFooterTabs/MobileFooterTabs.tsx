@@ -1,9 +1,11 @@
 import type { FC } from 'react';
 import { NavLink } from 'react-router-dom';
+import { useIntercom } from 'react-use-intercom';
 
 import { styled } from '@linaria/react';
 import { theme } from '@p2p-wallet-web/ui';
 
+import { ModalType, useModals } from 'app/contexts';
 import { Icon } from 'components/ui';
 
 import { MOBILE_FOOTER_TABS_HEIGHT } from './constants';
@@ -27,7 +29,6 @@ const NavButton = styled.div`
   align-items: center;
   justify-content: center;
 
-  color: ${theme.colors.textIcon.secondary};
   font-weight: 600;
   font-size: 12px;
   line-height: 120%;
@@ -46,54 +47,46 @@ const IconBlock = styled.div`
 const NavIcon = styled(Icon)`
   width: 24px;
   height: 24px;
-
-  color: #a3a5ba;
 `;
 
 const Name = styled.span``;
 
-const NavLinkMenu = styled(NavLink)`
+const NavLinkMenu = styled.div`
   display: flex;
   flex: 1;
 
-  &.active {
-    ${NavButton} {
-      color: ${theme.colors.textIcon.active};
-
-      ${IconBlock} {
-        color: ${theme.colors.textIcon.secondary};
-
-        ${NavIcon} {
-          color: ${theme.colors.textIcon.active};
-        }
-      }
-    }
-  }
+  color: ${theme.colors.textIcon.secondary};
 
   /* TODO: temp, delete after release recieve and settings */
   &.disabled {
     pointer-events: none;
   }
 
+  &.active,
   &:hover {
-    ${NavButton} {
-      color: ${theme.colors.textIcon.active};
-
-      ${IconBlock} {
-        color: ${theme.colors.textIcon.active};
-
-        ${NavIcon} {
-          color: ${theme.colors.textIcon.active};
-        }
-      }
-    }
+    color: ${theme.colors.textIcon.active};
   }
 `;
 
 export const MobileFooterTabs: FC = () => {
+  const { openModal } = useModals();
+  const { showMessages } = useIntercom();
+
+  const handleActionsClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    openModal(ModalType.SHOW_MODAL_ACTIONS_MOBILE_MODAL);
+  };
+
+  const handleFeedbackClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    e.preventDefault();
+
+    showMessages();
+  };
+
   return (
     <Wrapper>
       <NavLinkMenu
+        as={NavLink}
         to={{ pathname: '/wallets', state: { fromPage: location.pathname } }}
         className="button"
       >
@@ -104,29 +97,24 @@ export const MobileFooterTabs: FC = () => {
           <Name>Wallets</Name>
         </NavButton>
       </NavLinkMenu>
-      <NavLinkMenu
-        to={{ pathname: '#', state: { fromPage: location.pathname } }}
-        className="button"
-      >
+      <NavLinkMenu as={NavLink} to="/actions" onClick={handleActionsClick} className="button">
         <NavButton>
           <IconBlock>
-            <NavIcon name="wallet" />
+            <NavIcon name="info" />
           </IconBlock>
           <Name>Actions</Name>
         </NavButton>
       </NavLinkMenu>
-      <NavLinkMenu
-        to={{ pathname: '#', state: { fromPage: location.pathname } }}
-        className="button"
-      >
+      <NavLinkMenu as={NavLink} to="/feedback" onClick={handleFeedbackClick} className="button">
         <NavButton>
           <IconBlock>
-            <NavIcon name="wallet" />
+            <NavIcon name="send-message" />
           </IconBlock>
           <Name>Feedback</Name>
         </NavButton>
       </NavLinkMenu>
       <NavLinkMenu
+        as={NavLink}
         to={{ pathname: '/settings', state: { fromPage: location.pathname } }}
         className="button"
       >

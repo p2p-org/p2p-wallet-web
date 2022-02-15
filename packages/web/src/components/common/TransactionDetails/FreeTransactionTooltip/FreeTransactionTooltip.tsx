@@ -17,7 +17,7 @@ const TooltipContent = styled.div`
 
 export const FreeTransactionTooltip: FC = () => {
   return (
-    <Tooltip title={<InfoIcon name="info" />}>
+    <Tooltip title={<InfoIcon name="question" />}>
       <TooltipContent>
         On the Solana network, the first 100 transactions in a day are paid by P2P.org. You have 100
         free transactions left for today. <br />

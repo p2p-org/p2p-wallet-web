@@ -1,5 +1,6 @@
 import type { FC } from 'react';
 import { QueryClient, QueryClientProvider } from 'react-query';
+import { IntercomProvider } from 'react-use-intercom';
 
 import type { ConnectedWallet } from '@p2p-wallet-web/core';
 import {
@@ -9,9 +10,11 @@ import {
   TokenAccountsProvider,
 } from '@p2p-wallet-web/core';
 import { SailProvider } from '@p2p-wallet-web/sail';
+import assert from 'ts-invariant';
 
 import {
   BlockchainProvider,
+  FeatureFlagsProvider,
   FeeRelayerProvider,
   ModalsProvider,
   NameServiceProvider,
@@ -66,23 +69,36 @@ const ApiProviders: FC = ({ children }) => {
 const queryClient = new QueryClient();
 
 export const Providers: FC = ({ children }) => {
+  assert(
+    process.env.REACT_APP_INTERCOM_APP_ID,
+    "REACT_APP_INTERCOM_APP_ID doesn't set in environment",
+  );
+
   return (
-    <QueryClientProvider client={queryClient}>
-      <CoreProviders>
-        <ApiProviders>
-          <SettingsProvider>
-            <BlockchainProvider>
-              <LockAndMintProvider>
-                <FeeRelayerProvider>
-                  <SwapProviders>
-                    <ModalsProvider>{children}</ModalsProvider>
-                  </SwapProviders>
-                </FeeRelayerProvider>
-              </LockAndMintProvider>
-            </BlockchainProvider>
-          </SettingsProvider>
-        </ApiProviders>
-      </CoreProviders>
-    </QueryClientProvider>
+    <IntercomProvider
+      appId={process.env.REACT_APP_INTERCOM_APP_ID}
+      autoBoot
+      autoBootProps={{ hideDefaultLauncher: true }}
+    >
+      <FeatureFlagsProvider>
+        <QueryClientProvider client={queryClient}>
+          <CoreProviders>
+            <ApiProviders>
+              <SettingsProvider>
+                <BlockchainProvider>
+                  <LockAndMintProvider>
+                    <FeeRelayerProvider>
+                      <SwapProviders>
+                        <ModalsProvider>{children}</ModalsProvider>
+                      </SwapProviders>
+                    </FeeRelayerProvider>
+                  </LockAndMintProvider>
+                </BlockchainProvider>
+              </SettingsProvider>
+            </ApiProviders>
+          </CoreProviders>
+        </QueryClientProvider>
+      </FeatureFlagsProvider>
+    </IntercomProvider>
   );
 };
