@@ -11,7 +11,7 @@ import type { PublicKey } from '@solana/web3.js';
 import type { ReceiveSourceNetworkType } from 'app/contexts';
 import { ModalType, RECEIVE_SOURCE_NETWORKS, useModals, useReceiveState } from 'app/contexts';
 import { TokenAvatar } from 'components/common/TokenAvatar';
-import { MenuItem, Select } from 'components/ui';
+import { Select, SelectItem } from 'components/ui';
 import { useRenNetwork } from 'utils/hooks/renBridge/useNetwork';
 
 const InfoWrapper = styled.div`
@@ -115,14 +115,14 @@ export const NetworkSelect: FC<Props> = () => {
       }
     >
       {RECEIVE_SOURCE_NETWORKS.map((network) => (
-        <MenuItem
+        <SelectItem
           key={network}
           isSelected={network === sourceNetwork}
           onItemClick={handleSourceNetworkClick(network)}
         >
           <TokenAvatar symbol={SYMBOLS[network]} size={44} />
           <Network>{network} network</Network>
-        </MenuItem>
+        </SelectItem>
       ))}
     </Select>
   );

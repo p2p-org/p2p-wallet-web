@@ -8,6 +8,7 @@ import { FeaturesToggle } from 'components/common/FeaturesToggle';
 import { Intercom } from 'components/common/Intercom';
 import { NotifyToast } from 'components/common/NotifyToast';
 import { ToastManager } from 'components/common/ToastManager';
+import { Auth } from 'pages/Auth';
 import { Buy } from 'pages/Buy';
 import { Home } from 'pages/Home';
 import { Landing } from 'pages/Landing';
@@ -18,7 +19,6 @@ import { SettingsNetwork } from 'pages/SettingsNetwork';
 import { Swap } from 'pages/Swap';
 // import { SwapNew } from 'pages/SwapNew';
 import { Wallet } from 'pages/Wallet';
-import { Wallets } from 'pages/Wallets';
 import { WalletSettings } from 'pages/WalletSettings';
 import { AuthRequiredRoute } from 'utils/routes/UserRequiredRoute';
 
@@ -33,8 +33,8 @@ const App: React.FC = () => {
         <Providers>
           <Switch>
             <Route path="/" component={Landing} exact />
-            <Route path="/:type(signup|login)" component={Home} exact />
-            <AuthRequiredRoute path="/wallets" component={Wallets} />
+            <Route path="/:type(signup|login)" component={Auth} exact />
+            <AuthRequiredRoute path="/wallets" component={Home} />
             <AuthRequiredRoute path="/wallet/:publicKey/settings" component={WalletSettings} />
             <AuthRequiredRoute path="/wallet/:publicKey" exact component={Wallet} />
             <AuthRequiredRoute path="/receive/(tokens)?" component={Receive} />

@@ -5,8 +5,8 @@ import { Helmet } from 'react-helmet';
 import { useIsMobile } from '@p2p-wallet-web/ui';
 
 import { DesktopLayout } from './DesktopLayout';
-import type { BreadcrumbType } from './DesktopLayout/Header';
 import { MobileLayout } from './MobileLayout';
+import type { BreadcrumbType } from './types';
 
 // NProgress.configure({ showSpinner: false, parent: '#container' });
 

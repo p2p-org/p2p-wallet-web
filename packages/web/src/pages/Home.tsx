@@ -1,81 +1,37 @@
 import type { FunctionComponent } from 'react';
+import { useEffect } from 'react';
 
-import { css } from '@linaria/core';
-import { styled } from '@linaria/react';
+import { useUserTokenAccounts } from '@p2p-wallet-web/core';
+import { useIsMobile } from '@p2p-wallet-web/ui';
 
-import app from 'components/pages/home/app.png';
-import { Auth } from 'components/pages/home/Auth';
-import logo from 'components/pages/home/logo.svg';
-import { fonts } from 'components/pages/landing/styles/fonts';
-
-const Wrapper = styled.div`
-  display: flex;
-  min-height: 100%;
-`;
-
-const Left = styled.div`
-  position: relative;
-
-  flex: 1;
-  padding: 20px 50px 50px;
-  overflow: hidden;
-
-  background: #f5f7fe;
-`;
-
-const Logo = styled.div`
-  width: 32px;
-  height: 24px;
-
-  background: url(${logo}) no-repeat 50%;
-`;
-
-const Title = styled.span`
-  display: inline-block;
-  margin-top: 67px;
-
-  color: #161616;
-  font-size: 32px;
-  font-family: 'GT Super Ds Trial', sans-serif;
-  line-height: 40px;
-`;
-
-const TitleBold = styled.strong`
-  display: block;
-
-  font-weight: 900;
-`;
-
-const AppImg = styled.img`
-  position: absolute;
-  z-index: 0;
-
-  display: block;
-
-  width: 110%;
-  min-width: 820px;
-  margin-top: 50px;
-
-  filter: drop-shadow(-34px 42px 100px rgba(0, 0, 0, 0.05));
-`;
-
-export const global = css`
-  :global() {
-    ${fonts}
-  }
-`;
+import { Layout } from 'components/common/Layout';
+import { WidgetPageWithBottom } from 'components/common/WidgetPageWithBottom';
+import { NavButtonsMenu, TokensWidget, UsernameBanner } from 'components/pages/home';
+import { EmptyWalletWidget } from 'components/pages/home/EmptyWalletWidget';
+import { TopWithBalance } from 'components/pages/home/TopWithBalance';
+import { trackEvent } from 'utils/analytics';
 
 export const Home: FunctionComponent = () => {
+  const isMobile = useIsMobile();
+  const userTokenAccounts = useUserTokenAccounts();
+
+  useEffect(() => {
+    trackEvent('wallets_open');
+  }, []);
+
   return (
-    <Wrapper>
-      <Left>
-        <Logo />
-        <Title>
-          Your crypto <TitleBold>is starting here</TitleBold>
-        </Title>
-        <AppImg src={app} />
-      </Left>
-      <Auth />
-    </Wrapper>
+    <Layout>
+      <UsernameBanner />
+      {userTokenAccounts.length ? (
+        <WidgetPageWithBottom title="Wallets" icon="wallet">
+          <TopWithBalance />
+          {isMobile ? <NavButtonsMenu /> : undefined}
+
+          <TokensWidget />
+        </WidgetPageWithBottom>
+      ) : (
+        <EmptyWalletWidget />
+      )}
+    </Layout>
   );
 };

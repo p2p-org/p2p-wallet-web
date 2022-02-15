@@ -1,20 +1,21 @@
-import type { FunctionComponent } from 'react';
-import { Children, isValidElement, cloneElement, useEffect, useRef, useState } from 'react';
+import type { FunctionComponent, HTMLAttributes } from 'react';
+import { Children, cloneElement, isValidElement, useEffect, useRef, useState } from 'react';
 
 import { styled } from '@linaria/react';
+import { borders, shadows, theme } from '@p2p-wallet-web/ui';
 import classNames from 'classnames';
 
 import { Icon } from 'components/ui';
 
 const Wrapper = styled.div`
   position: relative;
+
+  color: ${theme.colors.textIcon.tertiary};
 `;
 
 const MoreIcon = styled(Icon)`
   width: 24px;
   height: 24px;
-
-  color: #a3a5ba;
 `;
 
 const MoreIconWrapper = styled.div`
@@ -22,16 +23,20 @@ const MoreIconWrapper = styled.div`
   align-items: center;
   justify-content: center;
 
-  width: 36px;
-  height: 36px;
+  width: 32px;
+  height: 32px;
 
+  border: 1px solid transparent;
+  border-radius: 4px;
   cursor: pointer;
 
   &.isOpen,
   &:hover {
     ${MoreIcon} {
-      color: #5887ff;
+      color: ${theme.colors.textIcon.active};
     }
+
+    ${borders.linksRGBA}
   }
 
   &.vertical {
@@ -41,23 +46,23 @@ const MoreIconWrapper = styled.div`
 
 const DropDownList = styled.div`
   position: absolute;
-  left: 0;
+  right: 0;
   z-index: 1;
 
-  min-width: 150px;
+  min-width: 170px;
   margin-top: 4px;
-  padding: 10px;
+  padding: 8px;
 
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  background: ${theme.colors.bg.primary};
+  border-radius: 8px;
+  ${shadows.notification}
 `;
 
-type Props = {
+interface Props extends HTMLAttributes<HTMLDivElement> {
   vertical?: boolean;
-};
+}
 
-export const Menu: FunctionComponent<Props> = ({ children, vertical }) => {
+export const Menu: FunctionComponent<Props> = ({ children, vertical, className }) => {
   const selectorRef = useRef<HTMLDivElement>(null);
   const [isOpen, setIsOpen] = useState(false);
 
@@ -75,7 +80,9 @@ export const Menu: FunctionComponent<Props> = ({ children, vertical }) => {
     };
   }, []);
 
-  const handleMenuClick = () => {
+  const handleMenuClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    e?.preventDefault();
+
     setIsOpen(!isOpen);
   };
 
@@ -87,7 +94,7 @@ export const Menu: FunctionComponent<Props> = ({ children, vertical }) => {
   });
 
   return (
-    <Wrapper ref={selectorRef}>
+    <Wrapper ref={selectorRef} className={className}>
       <MoreIconWrapper onClick={handleMenuClick} className={classNames({ isOpen, vertical })}>
         <MoreIcon name="more" />
       </MoreIconWrapper>

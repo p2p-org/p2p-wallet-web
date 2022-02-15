@@ -1,1 +1,0 @@
-export { TotalBalanceWidget } from './TotalBalanceWidget';

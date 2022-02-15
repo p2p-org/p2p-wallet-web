@@ -27,6 +27,7 @@ export const globalCss = css`
 
     body {
       font-family: ${fonts.sansSerif};
+      line-height: 140%;
 
       background: ${theme.colors.bg.primary};
       -webkit-font-smoothing: antialiased;
@@ -48,6 +49,7 @@ export const globalCss = css`
 
     button {
       white-space: nowrap;
+      user-select: none;
 
       border: none;
       cursor: pointer;

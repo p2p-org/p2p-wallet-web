@@ -17,7 +17,7 @@ import { Layout } from 'components/common/Layout';
 import { UsernameAddressWidget } from 'components/common/UsernameAddressWidget';
 import { WidgetPage } from 'components/common/WidgetPage';
 import { Accordion, Icon, Select, Switch } from 'components/ui';
-import { MenuItem } from 'components/ui/Select/MenuItem';
+import { SelectItem } from 'components/ui/Select/SelectItem';
 import { appStorePath, playStorePath } from 'config/constants';
 import { FEATURE_SETTINGS_FREE_TRANSACTIONS, FEATURE_SETTINGS_LIST } from 'config/featureFlags';
 import { trackEvent } from 'utils/analytics';
@@ -181,7 +181,7 @@ export const Settings: FunctionComponent = () => {
                 <ItemAction>
                   <Select value={settings.currency}>
                     {CURRENCIES.map(({ ticker, name, symbol }) => (
-                      <MenuItem
+                      <SelectItem
                         key={ticker}
                         isSelected={ticker === settings.currency}
                         onItemClick={onItemClickHandler({ currency: ticker })}
@@ -190,7 +190,7 @@ export const Settings: FunctionComponent = () => {
                           {name}
                           <Symbol>{`(${symbol})`}</Symbol>
                         </CurrencyItem>
-                      </MenuItem>
+                      </SelectItem>
                     ))}
                   </Select>
                 </ItemAction>
@@ -200,13 +200,13 @@ export const Settings: FunctionComponent = () => {
                 <ItemAction>
                   <Select value={settings.appearance}>
                     {APPEARANCE.map((value) => (
-                      <MenuItem
+                      <SelectItem
                         key={value}
                         isSelected={value === settings.appearance}
                         onItemClick={onItemClickHandler({ appearance: value })}
                       >
                         <Capitalize>{value}</Capitalize>
-                      </MenuItem>
+                      </SelectItem>
                     ))}
                   </Select>
                 </ItemAction>
