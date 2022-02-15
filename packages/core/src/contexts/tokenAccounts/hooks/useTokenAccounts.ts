@@ -7,7 +7,7 @@ import type { PublicKey } from '@solana/web3.js';
 import { zip } from 'ramda';
 
 import { SYSTEM_PROGRAM_ID } from '../../../constants/publicKeys';
-import { useTokens } from '../../../hooks/useTokens';
+import { useTokens } from "../../../hooks";
 import type { TokenAccount } from '../models';
 
 export const useTokenAccounts = (

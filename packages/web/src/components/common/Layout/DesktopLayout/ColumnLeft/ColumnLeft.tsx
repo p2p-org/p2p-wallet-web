@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-import * as React from 'react';
 import Sticky from 'react-stickynode';
 
 import { styled } from '@linaria/react';

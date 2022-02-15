@@ -3,7 +3,7 @@ import type { FC } from 'react';
 import { styled } from '@linaria/react';
 
 import { BLOCKCHAINS, useSendState } from 'app/contexts';
-import { MenuItem, Select } from 'components/ui';
+import { Select, SelectItem } from 'components/ui';
 
 const Wrapper = styled.div`
   display: flex;
@@ -32,13 +32,13 @@ export const NetworkSelect: FC = () => {
       <NetworkSelectText>Network</NetworkSelectText>
       <Select value={blockchain}>
         {BLOCKCHAINS.map((itemBlockchain) => (
-          <MenuItem
+          <SelectItem
             key={itemBlockchain}
             isSelected={itemBlockchain === blockchain}
             onItemClick={() => setBlockchain(itemBlockchain)}
           >
             {itemBlockchain}
-          </MenuItem>
+          </SelectItem>
         ))}
       </Select>
     </Wrapper>

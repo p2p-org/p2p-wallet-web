@@ -105,7 +105,7 @@ export const MobileFooterTabs: FC = () => {
         </NavButton>
       </NavLinkMenu>
       <NavLinkMenu
-        to={{ pathname: '/#', state: { fromPage: location.pathname } }}
+        to={{ pathname: '#', state: { fromPage: location.pathname } }}
         className="button"
       >
         <NavButton>
@@ -116,7 +116,7 @@ export const MobileFooterTabs: FC = () => {
         </NavButton>
       </NavLinkMenu>
       <NavLinkMenu
-        to={{ pathname: '/#', state: { fromPage: location.pathname } }}
+        to={{ pathname: '#', state: { fromPage: location.pathname } }}
         className="button"
       >
         <NavButton>

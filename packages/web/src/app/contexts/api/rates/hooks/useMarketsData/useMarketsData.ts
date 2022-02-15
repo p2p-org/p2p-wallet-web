@@ -21,6 +21,7 @@ export const useMarketsData = (keys: (string | null | undefined)[]): Markets => 
       if (key) {
         acc[key.toUpperCase()] = market.data ?? null;
       }
+
       return acc;
     }, <Markets>{});
   }, [keys, markets]);

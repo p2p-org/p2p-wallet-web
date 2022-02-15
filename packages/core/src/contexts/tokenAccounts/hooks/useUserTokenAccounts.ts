@@ -8,5 +8,9 @@ export const useUserTokenAccounts = (): readonly TokenAccount[] => {
   const { userTokenAccountKeys } = useTokenAccountsContext();
   const accountsData = useTokenAccounts(userTokenAccountKeys);
 
-  return useMemo(() => accountsData.filter((t): t is TokenAccount => Boolean(t)), [accountsData]);
+  // only loaded with account exists
+  return useMemo(
+    () => accountsData.filter((t): t is TokenAccount => Boolean(t) && Boolean(!t?.loading && t?.balance)),
+    [accountsData],
+  );
 };

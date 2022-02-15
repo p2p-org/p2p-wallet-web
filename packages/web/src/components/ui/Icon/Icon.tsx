@@ -37,6 +37,7 @@ import eye from './assets/new/eye-icon.svg';
 import gear from './assets/new/gear-icon.svg';
 import googlePlay from './assets/new/google-play-icon.svg';
 import info from './assets/new/info-icon.svg';
+import kebab from './assets/new/kebab-icon.svg';
 import pen from './assets/new/pen-icon.svg';
 import plus from './assets/new/plus-icon.svg';
 import qr from './assets/new/qr-icon.svg';
@@ -109,6 +110,7 @@ const iconsMap = new Map<string, string>([
   ['clock', clock],
   ['free-tx', freeTx],
   ['info', info],
+  ['kebab', kebab],
 ]);
 
 interface Props extends HTMLAttributes<HTMLOrSVGElement> {

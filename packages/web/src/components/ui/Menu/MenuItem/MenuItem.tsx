@@ -1,43 +1,41 @@
 import type { FunctionComponent } from 'react';
 
 import { styled } from '@linaria/react';
+import { borders, theme } from '@p2p-wallet-web/ui';
 
 import { Icon } from 'components/ui';
 
 const IconStyled = styled(Icon)`
-  width: 24px;
-  height: 24px;
+  width: 16px;
+  height: 16px;
 
-  color: #a3a5ba;
+  color: ${theme.colors.textIcon.secondary};
 `;
 
 const Wrapper = styled.div`
   display: flex;
   align-items: center;
-  height: 44px;
+  height: 36px;
   padding: 8px;
 
-  color: #000;
-  font-weight: 600;
+  color: ${theme.colors.textIcon.primary};
+  font-weight: 500;
   font-size: 14px;
   line-height: 140%;
+  letter-spacing: 0.01em;
 
-  border-radius: 8px;
+  border: 1px solid transparent;
+  border-radius: 4px;
   cursor: pointer;
 
   &:hover {
-    color: #5887ff;
-
-    background: #f6f6f8;
-
-    ${IconStyled} {
-      color: #5887ff;
-    }
+    background: ${theme.colors.bg.activePrimary};
+    ${borders.linksRGBA}
   }
 `;
 
 const IconWrapper = styled.div`
-  margin-right: 10px;
+  margin-right: 8px;
 `;
 
 type Props = {
@@ -52,7 +50,9 @@ export const MenuItem: FunctionComponent<Props> = ({
   onItemClick,
   close = () => {},
 }) => {
-  const handleItemClick = () => {
+  const handleItemClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    e.preventDefault();
+
     onItemClick();
     close();
   };
