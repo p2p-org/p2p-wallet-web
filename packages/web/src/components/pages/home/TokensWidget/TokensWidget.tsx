@@ -1,4 +1,4 @@
-import type { FunctionComponent } from 'react';
+import type { FunctionComponent, HTMLAttributes } from 'react';
 import { useState } from 'react';
 
 import { styled } from '@linaria/react';
@@ -68,7 +68,9 @@ const ChevronWrapper = styled.div`
 
 type Props = {};
 
-export const TokensWidget: FunctionComponent<Props> = () => {
+export const TokensWidget: FunctionComponent<Props & HTMLAttributes<HTMLDivElement>> = ({
+  className,
+}) => {
   const [isOpen, setIsOpen] = useState(false);
   const [tokenAccounts, hiddenTokenAccounts] = useTokenAccountsHidden();
 
@@ -77,7 +79,7 @@ export const TokensWidget: FunctionComponent<Props> = () => {
   };
 
   return (
-    <Wrapper>
+    <Wrapper className={className}>
       <Title>Tokens</Title>
       <TokenAccountList items={tokenAccounts} />
 

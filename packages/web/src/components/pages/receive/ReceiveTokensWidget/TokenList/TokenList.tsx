@@ -3,13 +3,18 @@ import { useCallback, useRef } from 'react';
 import { useVirtual } from 'react-virtual';
 
 import { styled } from '@linaria/react';
+import { up } from '@p2p-wallet-web/ui';
 import type { Token } from '@saberhq/token-utils';
 
 import { TOKEN_ROW_HEIGHT, TokenRow } from './TokenRow';
 
 const Wrapper = styled.div`
-  height: 300px;
+  height: 600px;
   overflow-y: auto;
+
+  ${up.tablet} {
+    height: 300px;
+  }
 `;
 
 const Container = styled.div``;

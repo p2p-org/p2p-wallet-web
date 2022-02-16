@@ -15,6 +15,7 @@ import { TokenList } from './TokenList';
 const Content = styled.div`
   display: grid;
   grid-gap: 8px;
+  grid-template-rows: auto auto 1fr;
   padding: 16px 16px 0;
 `;
 
@@ -69,6 +70,7 @@ export const ReceiveTokensWidget: FC<Props> = () => {
           If a token is not on this list,{' '}
           <strong>we do not recommend sending it to this address</strong>.
         </Hint>
+
         <TokenList tokens={results} />
       </Content>
     </WidgetPage>
