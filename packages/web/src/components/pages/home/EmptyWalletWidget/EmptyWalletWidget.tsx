@@ -6,8 +6,8 @@ import { theme, up } from '@p2p-wallet-web/ui';
 import classNames from 'classnames';
 
 import { Card } from 'components/common/Card';
+import { LoaderWide } from 'components/common/LoaderWide';
 import { NavButton, NavButtonIcon, NavButtons } from 'components/common/NavButtons';
-import { LoaderWide } from 'components/pages/auth/AuthSide/common/LoaderWide';
 
 import rocketImg from './rocket.png';
 
