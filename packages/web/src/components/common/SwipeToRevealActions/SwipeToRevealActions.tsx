@@ -69,15 +69,9 @@ export const SwipeToRevealActions: FC<Props> = ({ actions, children }) => {
       if (e.dir === 'Left' && !isExpanded) {
         // LEFT SWIPE...
         setIsExpanded(true);
-        // if (onOpen) {
-        //   onOpen();
-        // }
       } else if (e.dir === 'Right' && isExpanded) {
         // RIGHT SWIPE...
         setIsExpanded(false);
-        // if (onClose) {
-        //   onClose();
-        // }
       }
     }
   }

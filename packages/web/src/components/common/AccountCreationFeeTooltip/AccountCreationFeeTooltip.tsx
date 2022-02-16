@@ -19,7 +19,7 @@ const TooltipContent = styled.div`
 `;
 
 export const AccountCreationFeeTooltip: FC = () => (
-  <Tooltip title={<QustionIcon name="info" />}>
+  <Tooltip title={<QustionIcon name="question" />}>
     <TooltipContent>
       This value is calculated by subtracting the account creation fee from your balance
     </TooltipContent>

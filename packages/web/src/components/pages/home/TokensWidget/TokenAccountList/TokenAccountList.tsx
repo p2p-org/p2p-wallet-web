@@ -15,6 +15,7 @@ const Wrapper = styled.div`
 
   ${up.tablet} {
     grid-gap: 16px;
+    margin: initial;
   }
 `;
 

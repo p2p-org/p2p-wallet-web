@@ -2,6 +2,7 @@ import type { FunctionComponent } from 'react';
 
 import { css } from '@linaria/core';
 import { styled } from '@linaria/react';
+import { useIsDesktop } from '@p2p-wallet-web/ui';
 
 import app from 'components/pages/auth/app.png';
 import { AuthSide } from 'components/pages/auth/AuthSide';
@@ -66,15 +67,19 @@ export const global = css`
 `;
 
 export const Auth: FunctionComponent = () => {
+  const isDesktop = useIsDesktop();
+
   return (
     <Wrapper>
-      <Left>
-        <Logo />
-        <Title>
-          Your crypto <TitleBold>is starting here</TitleBold>
-        </Title>
-        <AppImg src={app} />
-      </Left>
+      {isDesktop ? (
+        <Left>
+          <Logo />
+          <Title>
+            Your crypto <TitleBold>is starting here</TitleBold>
+          </Title>
+          <AppImg src={app} />
+        </Left>
+      ) : undefined}
       <AuthSide />
     </Wrapper>
   );

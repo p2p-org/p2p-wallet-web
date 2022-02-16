@@ -41,8 +41,10 @@ import kebab from './assets/new/kebab-icon.svg';
 import pen from './assets/new/pen-icon.svg';
 import plus from './assets/new/plus-icon.svg';
 import qr from './assets/new/qr-icon.svg';
+import question from './assets/new/question-icon.svg';
 import roundStop from './assets/new/round-stop-icon.svg';
 import search from './assets/new/search-icon.svg';
+import sendMessage from './assets/new/send-message-icon.svg';
 import swap from './assets/new/swap-icon.svg';
 import top from './assets/new/top-icon.svg';
 import wallet from './assets/new/wallet-icon.svg';
@@ -80,12 +82,14 @@ const iconsMap = new Map<string, string>([
   ['bucket', bucket],
   ['gear', gear],
   ['google-play', googlePlay],
+  ['info', info],
   ['more', more],
   ['arrow-down', arrowDown],
   ['eye-hide', eyeHide],
   ['eye', eye],
   ['external', external],
   ['search', search],
+  ['send-message', sendMessage],
   ['search-old', searchOld],
   ['settings', settings],
   ['success', success],
@@ -99,6 +103,7 @@ const iconsMap = new Map<string, string>([
   ['plug', plug],
   ['plus', plus],
   ['qr', qr],
+  ['question', question],
   ['round-stop', roundStop],
   ['question-circle', questionCircle],
   ['reload', reload],
@@ -109,7 +114,6 @@ const iconsMap = new Map<string, string>([
   ['attention', attention],
   ['clock', clock],
   ['free-tx', freeTx],
-  ['info', info],
   ['kebab', kebab],
 ]);
 
