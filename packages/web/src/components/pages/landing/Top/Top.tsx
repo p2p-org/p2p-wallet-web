@@ -6,7 +6,7 @@ import LogoImg from 'assets/images/big-logo.png';
 import { ButtonIOS, ButtonWeb } from 'components/pages/landing/common/Button/Button';
 import { trackEvent } from 'utils/analytics';
 
-import { up, useBreakpoint } from '../styles/breakpoints';
+import { up } from '../styles/breakpoints';
 
 const Wrapper = styled.div`
   z-index: 2;
@@ -142,8 +142,6 @@ const ButtonsWrapper = styled.div`
 `;
 
 export const Top: FC = () => {
-  const isTablet = useBreakpoint(up.tablet);
-
   return (
     <Wrapper>
       <Logo />
@@ -155,9 +153,7 @@ export const Top: FC = () => {
         can send money with free transactions and without hidden fees.{' '}
       </Description>
       <ButtonsWrapper>
-        {isTablet ? (
-          <ButtonWeb glow onClick={() => trackEvent('landing_go_to_web_wallet_1_click')} />
-        ) : undefined}
+        <ButtonWeb glow onClick={() => trackEvent('landing_go_to_web_wallet_1_click')} />
         <ButtonIOS glow onClick={() => trackEvent('landing_download_for_ios_1_click')} />
       </ButtonsWrapper>
     </Wrapper>

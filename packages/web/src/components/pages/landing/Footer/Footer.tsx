@@ -6,7 +6,7 @@ import LogoImg from 'assets/images/big-logo.png';
 import { ButtonIOS, ButtonWeb } from 'components/pages/landing/common/Button/Button';
 import { trackEvent } from 'utils/analytics';
 
-import { up, useBreakpoint } from '../styles/breakpoints';
+import { up } from '../styles/breakpoints';
 import LogoP2PImg from './logo.png';
 
 const Wrapper = styled.div`
@@ -339,10 +339,6 @@ const Bottom = styled.div`
 `;
 
 export const Footer: FC = () => {
-  // const isDesktop = useBreakpoint(up.desktop);
-  const isTablet = useBreakpoint(up.tablet);
-  // const isMobileLandscape = useBreakpoint(up.mobileLandscape);
-
   return (
     <Wrapper>
       <FooterWrapper>
@@ -350,9 +346,7 @@ export const Footer: FC = () => {
           <Logo />
           <Title>Carefully crafted for people from people in and around the world</Title>
           <ButtonWrapper>
-            {isTablet ? (
-              <ButtonWeb glow onClick={() => trackEvent('landing_go_to_web_wallet_3_click')} />
-            ) : undefined}
+            <ButtonWeb glow onClick={() => trackEvent('landing_go_to_web_wallet_3_click')} />
             <ButtonIOS glow onClick={() => trackEvent('landing_download_for_ios_4_click')} />
           </ButtonWrapper>
         </Top>
