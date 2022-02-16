@@ -4,6 +4,7 @@ import { useLocation } from 'react-router';
 import { NavLink } from 'react-router-dom';
 
 import { styled } from '@linaria/react';
+import { shadows, up } from '@p2p-wallet-web/ui';
 
 import { useUsername } from 'app/contexts';
 import { ModalType, useModals } from 'app/contexts/general/modals';
@@ -11,19 +12,28 @@ import { useSettings } from 'app/contexts/general/settings';
 import { Icon } from 'components/ui';
 
 const Wrapper = styled.div`
+  position: relative;
+
   display: flex;
   flex-direction: column;
-  position: relative;
+  margin: 16px 16px 0;
   padding: 20px;
-  background: url('./background.png') no-repeat center center;
+
+  background: url('./background.png') no-repeat 100% center;
+  background-size: cover;
   border: 1px solid #a5beff;
 
-  box-shadow: 0 4px 4px #f6f6f9;
   border-radius: 12px;
+  ${shadows.notification}
+
+  ${up.tablet} {
+    margin: unset;
+  }
 `;
 
 const WrapperLink = styled(NavLink)`
   text-decoration: none;
+
   cursor: pointer;
 `;
 
@@ -60,21 +70,19 @@ const CloseIcon = styled(Icon)`
 const Header = styled.div`
   padding-bottom: 16px;
 
+  color: #202020;
   font-weight: 600;
   font-size: 24px;
   line-height: 100%;
-
-  color: #202020;
 `;
 
 const Text = styled.div`
+  max-width: 339px;
   padding-bottom: 17px;
-  width: 339px;
-
-  font-size: 16px;
-  line-height: 140%;
 
   color: #202020;
+  font-size: 16px;
+  line-height: 140%;
 `;
 
 export const UsernameBanner: FC = () => {

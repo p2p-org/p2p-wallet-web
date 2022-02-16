@@ -1,5 +1,5 @@
 import type { FunctionComponent } from 'react';
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 
 import { styled } from '@linaria/react';
 import { useUserTokenAccounts } from '@p2p-wallet-web/core';
@@ -28,10 +28,14 @@ export const Home: FunctionComponent = () => {
     trackEvent('wallets_open');
   }, []);
 
+  const hasSomeBalance = useMemo(() => {
+    return userTokenAccounts.some((value) => value.balance?.greaterThan(0));
+  }, [userTokenAccounts]);
+
   return (
     <Layout>
       <UsernameBanner />
-      {userTokenAccounts.length ? (
+      {hasSomeBalance ? (
         <WidgetPage title="Wallets" icon="wallet">
           <Content>
             <TopWithBalance />
@@ -41,7 +45,7 @@ export const Home: FunctionComponent = () => {
           <TokensWidget />
         </WidgetPage>
       ) : (
-        <EmptyWalletWidget />
+        <EmptyWalletWidget isLoading={!userTokenAccounts.length} />
       )}
     </Layout>
   );

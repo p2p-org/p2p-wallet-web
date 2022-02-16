@@ -13,11 +13,12 @@ import { TokenAccountList } from './TokenAccountList';
 const Wrapper = styled.div`
   display: grid;
   grid-gap: 8px;
+  margin-bottom: 16px;
 
   ${up.tablet} {
     grid-gap: 16px;
 
-    margin: 0 18px 0 24px;
+    margin: 0 18px 16px 24px;
   }
 `;
 
