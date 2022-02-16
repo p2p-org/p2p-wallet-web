@@ -3,15 +3,25 @@ import { useHistory, useLocation } from 'react-router';
 
 import { styled } from '@linaria/react';
 import { theme, up } from '@p2p-wallet-web/ui';
+import classNames from 'classnames';
 
 import { Card } from 'components/common/Card';
+import { LoaderWide } from 'components/common/LoaderWide';
 import { NavButton, NavButtonIcon, NavButtons } from 'components/common/NavButtons';
 
 import rocketImg from './rocket.png';
 
 const WrapperCard = styled(Card)`
+  position: relative;
+
   display: grid;
   grid-gap: 8px;
+`;
+
+const Main = styled.div`
+  &.isLoading {
+    visibility: hidden;
+  }
 `;
 
 const Content = styled.div`
@@ -61,9 +71,11 @@ const NavButtonStyled = styled(NavButton)`
   font-size: 20px;
 `;
 
-interface Props {}
+interface Props {
+  isLoading: boolean;
+}
 
-export const EmptyWalletWidget: FC<Props> = () => {
+export const EmptyWalletWidget: FC<Props> = ({ isLoading }) => {
   const history = useHistory();
   const location = useLocation();
 
@@ -73,21 +85,24 @@ export const EmptyWalletWidget: FC<Props> = () => {
 
   return (
     <WrapperCard>
-      <Content>
-        <RocketImg src={rocketImg} />
-        <Title>Top up your account to get started</Title>
-        <Description>Make your first deposit or buy with your credit card</Description>
-      </Content>
-      <ButtonsWrapper>
-        <NavButtonsStyled>
-          <NavButtonStyled onClick={handleButtonClick('/buy')}>
-            <NavButtonIcon name="plus" /> Buy
-          </NavButtonStyled>
-          <NavButtonStyled onClick={handleButtonClick('/receive')}>
-            <NavButtonIcon name="bottom" /> Receive
-          </NavButtonStyled>
-        </NavButtonsStyled>
-      </ButtonsWrapper>
+      {isLoading ? <LoaderWide /> : undefined}
+      <Main className={classNames({ isLoading })}>
+        <Content>
+          <RocketImg src={rocketImg} />
+          <Title>Top up your account to get started</Title>
+          <Description>Make your first deposit or buy with your credit card</Description>
+        </Content>
+        <ButtonsWrapper>
+          <NavButtonsStyled>
+            <NavButtonStyled onClick={handleButtonClick('/buy')}>
+              <NavButtonIcon name="plus" /> Buy
+            </NavButtonStyled>
+            <NavButtonStyled onClick={handleButtonClick('/receive')}>
+              <NavButtonIcon name="bottom" /> Receive
+            </NavButtonStyled>
+          </NavButtonsStyled>
+        </ButtonsWrapper>
+      </Main>
     </WrapperCard>
   );
 };

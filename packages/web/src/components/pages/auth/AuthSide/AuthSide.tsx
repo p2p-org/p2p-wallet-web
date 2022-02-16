@@ -8,7 +8,7 @@ import { useWallet } from '@p2p-wallet-web/core';
 
 import { useUpdateEffect } from 'utils/hooks/useUpdateEffect';
 
-import { LoaderWide } from './common/LoaderWide';
+import { LoaderWide } from '../../../common/LoaderWide';
 import { Login } from './Login';
 import { Ready } from './Ready';
 import { Signup } from './Signup';

@@ -35,7 +35,7 @@ const Logo = styled.div`
   width: 44px;
   height: 44px;
 
-  background: url('./logo-loader.svg') no-repeat 50%;
+  background: url('logo-loader.svg') no-repeat 50%;
   background-size: 44px 44px;
 `;
 
