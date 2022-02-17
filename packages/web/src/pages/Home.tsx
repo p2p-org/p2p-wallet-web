@@ -20,6 +20,10 @@ const Content = styled.div`
   }
 `;
 
+const TokensWidgetStyled = styled(TokensWidget)`
+  margin: 0 -16px;
+`;
+
 export const Home: FunctionComponent = () => {
   const isMobile = useIsMobile();
   const userTokenAccounts = useUserTokenAccounts();
@@ -40,9 +44,8 @@ export const Home: FunctionComponent = () => {
           <Content>
             <TopWithBalance />
             {isMobile ? <NavButtonsMenu /> : undefined}
+            <TokensWidgetStyled />
           </Content>
-
-          <TokensWidget />
         </WidgetPage>
       ) : (
         <EmptyWalletWidget isLoading={!userTokenAccounts.length} />

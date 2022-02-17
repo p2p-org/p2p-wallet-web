@@ -23,8 +23,8 @@ const Wrapper = styled.div`
 `;
 
 const Container = styled.div`
-  ${fullHeight}
   overflow-y: auto;
+  ${fullHeight}
 `;
 
 const ScrollFixStyled = styled(ScrollFix)`
