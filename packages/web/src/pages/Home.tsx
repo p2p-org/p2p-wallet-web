@@ -21,7 +21,12 @@ const Content = styled.div`
 `;
 
 const TokensWidgetStyled = styled(TokensWidget)`
-  margin: 0 -16px;
+  margin-right: -16px;
+  margin-left: -16px;
+
+  ${up.tablet} {
+    margin: inherit;
+  }
 `;
 
 export const Home: FunctionComponent = () => {

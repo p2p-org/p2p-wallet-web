@@ -161,7 +161,7 @@ export const FromToSelectInput: FC<Props> = ({
         <FromToTitle>{direction === 'from' ? 'From' : 'To'}</FromToTitle>
         <BalanceText>
           {tokenAccount ? (
-            direction === 'from' && !disabled ? (
+            direction === 'from' ? (
               <AllBalance
                 className={classNames({
                   disabled,
