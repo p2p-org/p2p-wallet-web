@@ -4,27 +4,16 @@ import { ZERO } from '@orca-so/sdk';
 import type { TokenAccount } from '@p2p-wallet-web/core';
 import { useUserTokenAccounts } from '@p2p-wallet-web/core';
 import { TokenAmount } from '@saberhq/token-utils';
-import { useConnectionContext } from '@saberhq/use-solana';
-import { AccountLayout, u64 } from '@solana/spl-token';
+import { u64 } from '@solana/spl-token';
 import { createContainer } from 'unstated-next';
 
-import { useFeeRelayer } from 'app/contexts';
+import { useFeeRelayer, useFreeFeeLimits, useNetworkFees } from 'app/contexts';
 import type {
   CompensationParams,
   CompensationSwapParams,
   UserRelayAccount,
 } from 'app/contexts/api/feeRelayer/types';
 import { RELAY_ACCOUNT_RENT_EXEMPTION } from 'app/contexts/api/feeRelayer/utils';
-
-type NetworkFees = {
-  accountRentExemption: number;
-  lamportsPerSignature: number;
-};
-
-const networkFeesCache: NetworkFees = {
-  accountRentExemption: 0,
-  lamportsPerSignature: 0,
-};
 
 export type EstimatedFeeAmount = {
   accountsCreation: {
@@ -35,14 +24,33 @@ export type EstimatedFeeAmount = {
   totalLamports: u64;
 };
 
+export type SEND_TRANSACTION_METHOD = 'feeRelayer' | 'blockchain';
+
+export type FeeCompensationState = {
+  totalFee: u64;
+  topUpCompensationFee: u64;
+  nextTransactionFee: u64;
+  estimatedFee: {
+    accountRent: u64;
+    transactionFee: u64;
+    relayAccountRent: u64;
+    nextTransactionFee: u64;
+  };
+  needTopUp: boolean;
+  needCreateRelayAccount: boolean;
+  sendMethod: SEND_TRANSACTION_METHOD;
+};
+
 const useFeeCompensationInternal = () => {
-  const { connection } = useConnectionContext();
   const userTokenAccounts = useUserTokenAccounts();
   const { getUserRelayAccount } = useFeeRelayer();
+  const networkFees = useNetworkFees();
+  const { userFreeFeeLimits } = useFreeFeeLimits();
 
   const [fromTokenAccount, setFromTokenAccount] = useState<TokenAccount | null | undefined>(null);
 
   const [accountsCount, setAccountsCount] = useState(0);
+  const [signaturesCount, setSignaturesCount] = useState(0);
 
   const [feeToken, setFeeToken] = useState<TokenAccount | null | undefined>(null);
   const [feeAmountInToken, setFeeAmountInToken] = useState<u64>(ZERO);
@@ -57,18 +65,6 @@ const useFeeCompensationInternal = () => {
     () => userTokenAccounts.filter((token) => token.balance?.token.isRawSOL),
     [userTokenAccounts],
   );
-
-  useEffect(() => {
-    const getAccountRentExemption = async () => {
-      networkFeesCache.accountRentExemption = await connection.getMinimumBalanceForRentExemption(
-        AccountLayout.span,
-      );
-    };
-
-    if (!networkFeesCache.accountRentExemption) {
-      void getAccountRentExemption();
-    }
-  }, [connection]);
 
   const setFromToken = useCallback(
     (token: TokenAccount) => {
@@ -133,7 +129,7 @@ const useFeeCompensationInternal = () => {
     let total = ZERO;
 
     if (accountsCount > 0) {
-      total = new u64(networkFeesCache.accountRentExemption).mul(new u64(accountsCount));
+      total = networkFees.accountRentExemption.mul(new u64(accountsCount));
     }
 
     if (!isPayInSol && userRelayAccount && !userRelayAccount.exist) {
@@ -175,7 +171,7 @@ const useFeeCompensationInternal = () => {
       feeAmount: accountsCreationLamports,
       feeAmountInToken,
       isRelayAccountExist: !!userRelayAccount?.exist,
-      accountRentExemption: new u64(networkFeesCache.accountRentExemption),
+      accountRentExemption: networkFees.accountRentExemption,
       isNeedCompensationSwap,
       topUpParams: compensationSwapData,
     };
@@ -185,6 +181,7 @@ const useFeeCompensationInternal = () => {
     feeAmountInToken,
     feeToken,
     isNeedCompensationSwap,
+    networkFees,
     userRelayAccount,
   ]);
 
@@ -199,11 +196,100 @@ const useFeeCompensationInternal = () => {
     };
   }, [accountsCreationLamports, accountsCreationSolAmount, accountsCreationFeeTokenAmount]);
 
+  const compensationState: FeeCompensationState = useMemo(() => {
+    const state = {
+      totalFee: ZERO,
+      topUpCompensationFee: ZERO,
+      nextTransactionFee: ZERO,
+      estimatedFee: {
+        accountRent: ZERO,
+        transactionFee: ZERO,
+        relayAccountRent: ZERO,
+        nextTransactionFee: ZERO,
+      },
+      needTopUp: false,
+      needCreateRelayAccount: false,
+      sendMethod: 'feeRelayer' as SEND_TRANSACTION_METHOD,
+    };
+
+    let topUpSignaturesCount = 1; // user signature
+
+    if (!feeToken?.balance?.token.isRawSOL) {
+      state.needTopUp = true;
+      topUpSignaturesCount += 1; // feeRelayer signature
+      state.topUpCompensationFee = state.topUpCompensationFee.add(networkFees.accountRentExemption);
+    }
+
+    if (accountsCount > 0) {
+      const accountRent: u64 = networkFees.accountRentExemption.mul(new u64(accountsCount));
+      state.totalFee = state.totalFee.add(accountRent);
+      state.estimatedFee.accountRent = accountRent;
+
+      state.nextTransactionFee = state.nextTransactionFee.add(accountRent);
+    }
+
+    if (!userFreeFeeLimits.hasFreeTransactions) {
+      const transactionFee: u64 = networkFees.lamportsPerSignature.mul(
+        new u64(topUpSignaturesCount),
+      );
+      state.totalFee = state.totalFee.add(transactionFee);
+      state.estimatedFee.transactionFee = transactionFee;
+      state.topUpCompensationFee = state.topUpCompensationFee.add(transactionFee);
+
+      if (signaturesCount > 0) {
+        const nextTransactionFee: u64 = networkFees.lamportsPerSignature.mul(
+          new u64(signaturesCount),
+        );
+        state.totalFee = state.totalFee.add(nextTransactionFee);
+        state.estimatedFee.nextTransactionFee = nextTransactionFee;
+        state.nextTransactionFee = state.nextTransactionFee.add(nextTransactionFee);
+      }
+    }
+
+    if (userRelayAccount && !userRelayAccount.exist) {
+      state.totalFee = state.totalFee.add(RELAY_ACCOUNT_RENT_EXEMPTION as u64);
+      state.estimatedFee.relayAccountRent = RELAY_ACCOUNT_RENT_EXEMPTION;
+      state.needCreateRelayAccount = true;
+      state.topUpCompensationFee = state.topUpCompensationFee.add(RELAY_ACCOUNT_RENT_EXEMPTION);
+    }
+
+    if (userRelayAccount && userRelayAccount.exist && userRelayAccount.balance) {
+      if (new u64(userRelayAccount.balance).sub(state.totalFee).gte(ZERO)) {
+        state.needTopUp = false;
+        state.topUpCompensationFee = ZERO;
+      }
+    }
+
+    if (
+      (!userFreeFeeLimits.hasFreeTransactions &&
+        accountsCount === 0 &&
+        feeToken?.balance?.token.isRawSOL) ||
+      (!userFreeFeeLimits.hasFreeTransactions && feeToken?.balance?.token.isRawSOL)
+    ) {
+      state.sendMethod = 'blockchain' as SEND_TRANSACTION_METHOD;
+      state.nextTransactionFee = ZERO;
+    }
+
+    return {
+      ...state,
+      totalFee: new u64(state.totalFee.toArray()),
+      topUpCompensationFee: new u64(state.topUpCompensationFee.toArray()),
+      nextTransactionFee: new u64(state.nextTransactionFee.toArray()),
+      estimatedFee: {
+        accountRent: new u64(state.estimatedFee.accountRent.toArray()),
+        transactionFee: new u64(state.estimatedFee.transactionFee.toArray()),
+        relayAccountRent: new u64(state.estimatedFee.relayAccountRent.toArray()),
+        nextTransactionFee: new u64(state.estimatedFee.nextTransactionFee.toArray()),
+      },
+    };
+  }, [accountsCount, feeToken, networkFees, signaturesCount, userFreeFeeLimits, userRelayAccount]);
+
   return {
     feeToken,
     setFeeToken,
     feeTokenAccounts,
     setFeeAmountInToken,
+    feeAmountInToken,
     compensationSwapData,
     setCompensationSwapData,
     userRelayAccount,
@@ -212,6 +298,8 @@ const useFeeCompensationInternal = () => {
     setAccountsCount,
     estimatedFeeAmount,
     isNeedCompensationSwap,
+    compensationState,
+    setSignaturesCount,
   };
 };
 

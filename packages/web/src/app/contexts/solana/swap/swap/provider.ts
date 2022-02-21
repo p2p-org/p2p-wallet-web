@@ -100,7 +100,14 @@ const useSwapInternal = (props: UseSwapArgs = {}): UseSwap => {
   const { wallet, connection } = useSolana();
   const { programIds, tokenConfigs, routeConfigs } = useConfig();
   const { relayTopUpWithSwap, userSetupSwap, userSwap } = useFeeRelayer();
-  const { compensationParams, estimatedFeeAmount } = useFeeCompensation();
+  const {
+    compensationParams,
+    estimatedFeeAmount,
+    compensationState,
+    compensationSwapData,
+    feeAmountInToken,
+    feeToken,
+  } = useFeeCompensation();
 
   const [inputTokenName, _setInputTokenName] = useState(props.inputTokenName ?? 'SOL');
   const _outputTokenName = props.outputTokenName
@@ -385,11 +392,18 @@ const useSwapInternal = (props: UseSwapArgs = {}): UseSwap => {
         );
 
         if (setupSwapArgs) {
-          executeSetup = async () => await userSetupSwap(setupSwapArgs, compensationParams);
+          executeSetup = async () =>
+            await userSetupSwap(setupSwapArgs, {
+              feeAmount: compensationState?.nextTransactionFee,
+              feeToken,
+            });
         }
 
         executeSwap = async () => {
-          txSignatureSwap = await userSwap(userSwapArgs, compensationParams);
+          txSignatureSwap = await userSwap(userSwapArgs, {
+            feeAmount: compensationState?.nextTransactionFee,
+            feeToken,
+          });
         };
       }
 
@@ -411,13 +425,15 @@ const useSwapInternal = (props: UseSwapArgs = {}): UseSwap => {
 
     setButtonState(() => ButtonState.SendingTransaction);
 
-    if (
-      isFreeTransactions &&
-      compensationParams?.isNeedCompensationSwap &&
-      compensationParams.topUpParams
-    ) {
+    if (compensationState.needTopUp && feeToken) {
       try {
-        await relayTopUpWithSwap(compensationParams);
+        await relayTopUpWithSwap({
+          feeAmount: compensationState.topUpCompensationFee,
+          feeToken,
+          feeAmountInToken,
+          needCreateRelayAccount: compensationState.needCreateRelayAccount,
+          topUpParams: compensationSwapData,
+        });
       } catch (e) {
         console.error(e);
         setButtonState(ButtonState.Retry);

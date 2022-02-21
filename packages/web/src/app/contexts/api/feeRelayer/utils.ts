@@ -4,6 +4,7 @@ import { PublicKey } from '@solana/web3.js';
 import bs58 from 'bs58';
 
 import type {
+  FreeFeeLimitsResponce,
   RelaySignatures,
   RelayTopUpWithSwap,
   RelayTransaction,
@@ -16,6 +17,11 @@ import type {
 
 export const RELAY_ACCOUNT_RENT_EXEMPTION = new u64(890880);
 export const RELAY_PROGRAM_ID = new PublicKey('12YKFL4mnZz6CBEGePrf293mEzueQM3h8VLPUJsKpGs9');
+export const INITIAL_USER_FREE_FEE_LIMITS = {
+  currentTransactionCount: 100,
+  maxTransactionCount: 0,
+  hasFreeTransactions: true,
+};
 
 const findAddress = async (owner: PublicKey, key: string) => {
   const [address] = await PublicKey.findProgramAddress(
@@ -55,6 +61,25 @@ export const getFeePayerPubkey = async (feeRelayerURL: string): Promise<PublicKe
   } catch (error) {
     console.error(error);
     throw new Error("Can't get fee payer pubkey:");
+  }
+};
+
+export const getFreeFeeLimits = async (
+  feeRelayerURL: string,
+  authority: PublicKey,
+): Promise<FreeFeeLimitsResponce> => {
+  try {
+    const res = await fetch(`${feeRelayerURL}/free_fee_limits/${authority.toBase58()}`);
+
+    if (!res.ok) {
+      const err = await res.json();
+      throw err;
+    }
+
+    return (await res.json()) as FreeFeeLimitsResponce;
+  } catch (error) {
+    console.error(error);
+    throw new Error("Can't get free fee limits");
   }
 };
 
@@ -155,6 +180,7 @@ export const buildSwapDirectArgs = (
 export const buildSwapTransitiveArgs = (
   data: SwapTransitiveData,
   userTransferAuthorityPublicKey: PublicKey,
+  needsCreateTransitTokenAccount: boolean,
 ): SplTransitiveArgs => ({
   SplTransitive: {
     from: {
@@ -182,5 +208,6 @@ export const buildSwapTransitiveArgs = (
       minimum_amount_out: data.to.minimumAmountOut.toNumber(),
     },
     transit_token_mint_pubkey: data.transitTokenMintPubkey.toBase58(),
+    needs_create_transit_token_account: needsCreateTransitTokenAccount,
   },
 });

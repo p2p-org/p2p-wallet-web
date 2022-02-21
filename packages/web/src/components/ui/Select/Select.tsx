@@ -63,6 +63,11 @@ const Selector = styled.div`
       transform: rotate(180deg);
     }
   }
+
+  &.flat {
+    padding: 12px 0;
+    border: none;
+  }
 `;
 
 const CaretWrapper = styled.div`
@@ -86,9 +91,17 @@ const DropDownList = styled.div`
 type Props = {
   value: string | React.ReactNode;
   isLoading?: boolean;
+  className?: string;
+  flat?: boolean;
 };
 
-export const Select: FunctionComponent<Props> = ({ value, isLoading, children }) => {
+export const Select: FunctionComponent<Props> = ({
+  value,
+  isLoading,
+  children,
+  className,
+  flat,
+}) => {
   const selectorRef = useRef<HTMLDivElement>(null);
   const [isOpen, setIsOpen] = useState(false);
 
@@ -122,8 +135,8 @@ export const Select: FunctionComponent<Props> = ({ value, isLoading, children })
   });
 
   return (
-    <Wrapper ref={selectorRef}>
-      <Selector onClick={handleSelectorClick} className={classNames({ isOpen })}>
+    <Wrapper ref={selectorRef} className={className}>
+      <Selector onClick={handleSelectorClick} className={classNames({ isOpen, flat })}>
         <Value>{value}</Value>
         <CaretWrapper>{isLoading ? <Loader size="24" /> : <CaretIcon name="caret" />}</CaretWrapper>
       </Selector>
