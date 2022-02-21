@@ -120,6 +120,7 @@ export const FeeTokenSelector: FC<Props> = ({
 
   return (
     <Select
+      flat
       value={
         <SelectorValue>
           <TokenAvatarStyled

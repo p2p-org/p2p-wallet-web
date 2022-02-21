@@ -3,6 +3,29 @@ import type { TokenAmount } from '@saberhq/token-utils';
 import type { u64 } from '@solana/spl-token';
 import type { PublicKey, Transaction } from '@solana/web3.js';
 
+export type FreeFeeLimitsResponce = {
+  authority: number[];
+  limits: {
+    use_free_fee: boolean;
+    max_amount: number;
+    max_count: number;
+    period: {
+      secs: number;
+      nanos: number;
+    };
+  };
+  processed_fee: {
+    total_amount: number;
+    count: number;
+  };
+};
+
+export type UserFreeFeeLimits = {
+  maxTransactionCount: number;
+  currentTransactionCount: number;
+  hasFreeTransactions: boolean;
+};
+
 export type UserSwapTransactionSignatures = {
   user_authority_signature: string;
   transfer_authority_signature: string;
@@ -26,7 +49,12 @@ export type SplDirectArgs = {
 };
 
 export type SplTransitiveArgs = {
-  SplTransitive: { from: SwapArgs; to: SwapArgs; transit_token_mint_pubkey: string };
+  SplTransitive: {
+    from: SwapArgs;
+    to: SwapArgs;
+    transit_token_mint_pubkey: string;
+    needs_create_transit_token_account: boolean;
+  };
 };
 
 export type TopUpSwapArgs = SplDirectArgs | SplTransitiveArgs;
@@ -122,11 +150,23 @@ export type CompensationParams = {
   topUpParams: CompensationSwapParams | null;
 };
 
+export type NextTransactionCompensation = {
+  feeAmount: u64;
+  feeToken: TokenAccount;
+};
+
+export type RelayTopUpWithSwapArgs = {
+  feeAmount: u64;
+  feeToken: TokenAccount;
+  feeAmountInToken: u64;
+  needCreateRelayAccount: boolean;
+  topUpParams: CompensationSwapParams | null;
+};
+
 export type RelayTransferParams = {
   fromTokenAccount: TokenAccount;
   destinationAccount: DestinationAccount;
   amount: TokenAmount;
-  compensationParams?: CompensationParams;
 };
 
 export type WSOLAccountParams = {

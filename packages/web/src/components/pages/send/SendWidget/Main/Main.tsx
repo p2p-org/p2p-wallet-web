@@ -9,17 +9,16 @@ import classNames from 'classnames';
 import { Feature } from 'flagged';
 
 import { useSendState } from 'app/contexts';
-import { CompensationFee } from 'components/common/CompensationFee';
 import { FeePaySelector } from 'components/common/FeePaySelector';
-import { TransactionDetails } from 'components/common/TransactionDetails';
-import { Switch, TextField } from 'components/ui';
-import { FEATURE_PAY_BY, FEATURE_TRANSACTION_DETAILS_ACCORDION } from 'config/featureFlags';
+import { Switch } from 'components/ui';
+import { FEATURE_PAY_BY } from 'config/featureFlags';
 import { trackEvent } from 'utils/analytics';
 
 import { FromToTitle, TopWrapper } from './common/styled';
 import { FromToSelectInput } from './FromToSelectInput';
 import { NetworkSelect } from './NetworkSelect';
 import { ToAddressInput } from './ToAddressInput';
+import { TransactionDetails } from './TransactionDetails';
 
 const FromWrapper = styled.div`
   position: relative;
@@ -69,10 +68,6 @@ const ConfirmTextSecondary = styled.div`
   font-size: 16px;
 `;
 
-const TextFieldStyled = styled(TextField)`
-  margin-bottom: 8px;
-`;
-
 export const Main: FC = () => {
   const history = useHistory();
 
@@ -86,7 +81,6 @@ export const Main: FC = () => {
     isShowConfirmAddressSwitch,
     isConfirmCorrectAddress,
     setIsConfirmCorrectAddress,
-    destinationAccount,
     feeAmount,
   } = useSendState();
 
@@ -166,12 +160,6 @@ export const Main: FC = () => {
 
       {isRenBTC ? <NetworkSelect /> : undefined}
 
-      <CompensationFee
-        type="send"
-        isShow={!fromTokenAccount?.balance?.token.isRawSOL}
-        accountSymbol={destinationAccount?.symbol || ''}
-      />
-
       <Feature name={FEATURE_PAY_BY}>
         <FeePaySelector
           tokenAccounts={tokenAccounts}
@@ -179,9 +167,7 @@ export const Main: FC = () => {
         />
       </Feature>
 
-      <Feature name={FEATURE_TRANSACTION_DETAILS_ACCORDION}>
-        <TransactionDetails />
-      </Feature>
+      <TransactionDetails />
 
       {/*<TextFieldStyled*/}
       {/*  label="Current price"*/}
