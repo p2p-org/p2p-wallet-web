@@ -11,7 +11,7 @@ export interface MoonpayIframeParams extends MoonpayBaseParams {
   baseCurrencyAmount: number | string;
   baseCurrencyCode: 'usd';
   lockAmount: boolean;
-  walletAddress: string;
+  walletAddress?: string;
 }
 
 // Errors

@@ -15,11 +15,10 @@ const Wrapper = styled.div`
 
 const baseParams: MoonpayIframeParams = {
   apiKey: MOONPAY_API_KEY!,
-  currencyCode: 'eth',
+  currencyCode: 'sol',
   baseCurrencyAmount: 100,
   baseCurrencyCode: 'usd',
   lockAmount: false,
-  walletAddress: '0xde0b295669a9fd93d5f28d9ec85e40f4cb697bae',
 };
 
 export const MoonpayIframe: FC = () => {
@@ -31,9 +30,9 @@ export const MoonpayIframe: FC = () => {
       `${MOONPAY_SIGNER_URL}?${buildParams<MoonpayIframeParams>({
         ...baseParams,
         baseCurrencyAmount: buyQuote?.totalAmount || 0,
-        // walletAddress: publicKey?.toBase58(),
+        walletAddress: publicKey?.toBase58(),
       })}`,
-    [buyQuote?.totalAmount],
+    [buyQuote?.totalAmount, publicKey],
   );
 
   return (
