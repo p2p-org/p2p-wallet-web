@@ -517,8 +517,11 @@ const useSwapInternal = (props: UseSwapArgs = {}): UseSwap => {
   }, [
     asyncPools.value,
     asyncStandardTokenAccounts.value,
-    compensationParams,
+    compensationState,
+    compensationSwapData,
     connection,
+    feeAmountInToken,
+    feeToken,
     fetchPool,
     inputTokenName,
     inputUserTokenAccount,
