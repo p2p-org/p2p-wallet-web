@@ -90,7 +90,7 @@ export const OffPasswordModal: FunctionComponent<Props> = ({ close }) => {
       <Wrapper>
         <Header>Do you really want to turn off login with password?</Header>
         <Description>
-          The seed phrare will not be saved on your device in future. On every login you’ll need to
+          The seed phrase will not be saved on your device in future. On every login you’ll need to
           enter your private seed phrase. You can manage this function in settings.
         </Description>
         <Buttons>

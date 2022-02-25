@@ -19,7 +19,7 @@ export const TopUp: FC<Props> = ({ close }) => {
   return (
     <WrapperModal
       title="Receiving via Bitcoin network"
-      description="Make sure you understand the aspects"
+      description="Make sure you understand these aspects"
       iconName="clock"
       iconBgClassName="warning"
       close={() => close(false)}

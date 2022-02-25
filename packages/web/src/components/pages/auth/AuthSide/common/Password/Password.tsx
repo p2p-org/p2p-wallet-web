@@ -223,8 +223,8 @@ export const Password: FC<Props> = ({ type, next }) => {
     <Wrapper>
       <CreatePassword>Create password</CreatePassword>
       <CreatePasswordHint>
-        Create password to protect your wallet. It’s will be used for security actions confirmations
-        and for editing your profile info.
+        Create a password to protect your wallet. It will be used for security actions,
+        confirmations and for editing your profile info.
       </CreatePasswordHint>
       <PasswordInput
         placeholder="Create new password"

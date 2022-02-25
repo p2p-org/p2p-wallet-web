@@ -148,7 +148,7 @@ export const Main: FC = () => {
               <ConfirmTextPrimary>
                 Is this address correct? It doesn’t have funds.
               </ConfirmTextPrimary>
-              <ConfirmTextSecondary>I’m sure, It’s correct</ConfirmTextSecondary>
+              <ConfirmTextSecondary>I’m sure, it’s correct</ConfirmTextSecondary>
             </ConfirmTextWrapper>
             <Switch
               checked={isConfirmCorrectAddress}

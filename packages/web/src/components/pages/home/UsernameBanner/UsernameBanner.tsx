@@ -125,7 +125,8 @@ export const UsernameBanner: FC = () => {
       >
         <Header>Reserve your P2P username now</Header>
         <Text>
-          Any token can be received using username regardless of whether it is in your wallets list
+          Any token can be received using your username regardless of whether it is in your wallet's
+          list
         </Text>
       </WrapperLink>
       <CloseButton type="button" onClick={handleCloseClick}>
