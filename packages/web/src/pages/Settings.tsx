@@ -1,5 +1,4 @@
 import type { FunctionComponent } from 'react';
-import { useEffect } from 'react';
 import { useHistory } from 'react-router';
 import { NavLink, useLocation } from 'react-router-dom';
 
@@ -154,13 +153,8 @@ export const Settings: FunctionComponent = () => {
   const { settings, updateSettings } = useSettings();
   const { username, domain } = useUsername();
 
-  useEffect(() => {
-    trackEvent('settings_open', { fromPage: location.state.fromPage });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   const handleLogoutClick = () => {
-    trackEvent('settings_logout_click');
+    trackEvent('Sign_Out');
     disconnect();
   };
 

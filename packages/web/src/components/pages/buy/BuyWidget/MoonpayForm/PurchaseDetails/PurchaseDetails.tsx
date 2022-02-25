@@ -60,12 +60,7 @@ export const PurchaseDetails: FC = () => {
     ];
 
     return lists;
-  }, [
-    buyQuote?.feeAmount,
-    buyQuote?.networkFeeAmount,
-    buyQuote?.quoteCurrencyPrice,
-    buyQuote?.totalAmount,
-  ]);
+  }, [buyQuote]);
 
   return (
     <AccordionDetails

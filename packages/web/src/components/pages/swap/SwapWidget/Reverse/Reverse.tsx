@@ -4,6 +4,7 @@ import { styled } from '@linaria/react';
 
 import { useSwap } from 'app/contexts/solana/swap';
 import { Icon } from 'components/ui';
+import { trackEvent } from 'utils/analytics';
 
 const Wrapper = styled.div`
   position: relative;
@@ -41,6 +42,8 @@ export const Reverse: FC = () => {
 
   const handleReverseClick = () => {
     switchTokens();
+
+    trackEvent('Swap_Reversing');
   };
 
   return (

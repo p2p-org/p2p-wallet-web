@@ -19,6 +19,8 @@ export const SwapFromForm: FC<Props> = ({ className }) => {
     maxAmout = balanceSubstractFee?.gt(ZERO) ? balanceSubstractFee : ZERO;
   }
 
+  console.log(111, trade.inputTokenName, trade.outputTokenName);
+
   return (
     <SwapTokenForm
       trade={trade}

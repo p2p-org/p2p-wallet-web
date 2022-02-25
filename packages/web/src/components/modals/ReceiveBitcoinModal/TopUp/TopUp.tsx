@@ -3,6 +3,7 @@ import { useHistory } from 'react-router';
 
 import type { ModalPropsType } from 'app/contexts';
 import { Button, ButtonCancel } from 'components/ui';
+import { trackEvent } from 'utils/analytics';
 
 import { List, Row, Section, WrapperModal } from '../common/styled';
 
@@ -12,6 +13,8 @@ export const TopUp: FC<Props> = ({ close }) => {
   const history = useHistory();
 
   const handleTopUpClick = () => {
+    trackEvent('Receive_Topping_Up');
+
     close(false);
     history.push('/buy');
   };
