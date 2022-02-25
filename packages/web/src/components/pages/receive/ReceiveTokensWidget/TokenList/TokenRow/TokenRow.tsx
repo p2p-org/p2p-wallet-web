@@ -1,4 +1,6 @@
 import type { FC, HTMLAttributes } from 'react';
+import { forwardRef } from 'react';
+import * as React from 'react';
 
 import { styled } from '@linaria/react';
 import { theme } from '@p2p-wallet-web/ui';
@@ -35,14 +37,19 @@ const Symbol = styled.div`
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
   token: Token;
+  forwardedRef?: React.Ref<HTMLDivElement>;
 }
 
-export const TokenRow: FC<Props> = ({ token, style }) => {
+const TokenRowOrigin: FC<Props> = ({ forwardedRef, token, style }) => {
   return (
-    <Wrapper style={style}>
+    <Wrapper ref={forwardedRef} style={style}>
       <TokenAvatar token={token} size="32" />
       <Name>{token.name}</Name>
       <Symbol>{token.symbol}</Symbol>
     </Wrapper>
   );
 };
+
+export const TokenRow = forwardRef<HTMLDivElement, Props>(
+  (props, ref: React.Ref<HTMLDivElement>) => <TokenRowOrigin {...props} forwardedRef={ref} />,
+);
