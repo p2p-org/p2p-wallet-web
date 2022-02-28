@@ -2,7 +2,7 @@ import type { FC } from 'react';
 import { useEffect, useState } from 'react';
 
 import { styled } from '@linaria/react';
-import { borders, shadows, theme, up, useIsMobile } from '@p2p-wallet-web/ui';
+import { borders, shadows, theme, up, useIsMobile, useIsTablet } from '@p2p-wallet-web/ui';
 import QRCode from 'qrcode.react';
 
 import Logo from 'assets/images/logo.png';
@@ -19,21 +19,42 @@ const Wrapper = styled.div`
 
 const UsernameAddressWrapper = styled.div`
   display: flex;
+  flex-direction: column;
+  grid-gap: 8px;
   align-items: center;
-  padding: 30px;
+  padding: 24px 16px 16px;
+
+  text-align: center;
 
   border-radius: 12px;
   ${borders.primaryRGBA}
   ${shadows.card};
+
+  ${up.tablet} {
+    flex-direction: row;
+    padding: 16px 30px 16px 16px;
+
+    text-align: left;
+  }
 `;
 
 const QRCodeWrapper = styled.div`
-  margin-right: 30px;
+  padding: 15px;
 `;
 
-const UsernameAddress = styled.div`
-  display: grid;
-  grid-gap: 16px;
+const AddressWrapper = styled.div`
+  ${up.tablet} {
+    display: grid;
+    grid-gap: 16px;
+  }
+`;
+
+const AddressTextStyled = styled(AddressText)`
+  padding: 12px 26px;
+
+  ${up.tablet} {
+    padding: 0;
+  }
 `;
 
 const Username = styled.div`
@@ -92,6 +113,7 @@ type Props = {
 
 export const UsernameAddressWidget: FC<Props> = ({ type, address, username }) => {
   const isMobile = useIsMobile();
+  const isTablet = useIsTablet();
 
   const [isImageCopyAvailable, setIsImageCopyAvailable] = useState(false);
 
@@ -120,14 +142,15 @@ export const UsernameAddressWidget: FC<Props> = ({ type, address, username }) =>
   return (
     <Wrapper>
       <UsernameAddressWrapper>
+        {isMobile && username ? <Username>{username}</Username> : undefined}
         <QRCodeWrapper>
-          <QRCode id="qrcode" value={address} size={122} />
+          <QRCode id="qrcode" value={address} size={isMobile ? 237 : 122} />
         </QRCodeWrapper>
-        <UsernameAddress>
-          {username ? <Username>{username}</Username> : undefined}
-          <AddressText address={address} small />
-          <LogoImg src={Logo} />
-        </UsernameAddress>
+        <AddressWrapper>
+          {isTablet && username ? <Username>{username}</Username> : undefined}
+          <AddressTextStyled address={address} small />
+          {isTablet ? <LogoImg src={Logo} /> : undefined}
+        </AddressWrapper>
       </UsernameAddressWrapper>
       <ButtonsWrapper>
         {username ? (

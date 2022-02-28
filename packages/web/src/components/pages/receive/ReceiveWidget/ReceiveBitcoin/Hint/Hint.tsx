@@ -3,6 +3,7 @@ import type { FC } from 'react';
 import { styled } from '@linaria/react';
 import { borders, theme } from '@p2p-wallet-web/ui';
 import { Bitcoin } from '@renproject/chains-bitcoin';
+import classNames from 'classnames';
 
 import { HMSCountdown } from 'components/common/HMSCountdown';
 import { Loader } from 'components/common/Loader';
@@ -35,6 +36,10 @@ const Row = styled.li`
 
 const MinimumTxAmount = styled.div`
   display: flex;
+
+  &.inline {
+    display: inline;
+  }
 `;
 
 interface Props {
@@ -57,7 +62,7 @@ export const Hint: FC<Props> = ({ expiryTime }) => {
           You will receive <strong>renBTC</strong>.
         </Row>
         <Row>
-          <MinimumTxAmount>
+          <MinimumTxAmount className={classNames({ inline: isFetchingFee })}>
             Minimum transaction amount of &nbsp;
             {isFetchingFee ? (
               <Loader />
