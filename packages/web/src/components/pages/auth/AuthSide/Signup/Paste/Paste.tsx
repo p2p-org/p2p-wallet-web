@@ -127,8 +127,8 @@ export const Paste: FC<Props> = ({ mnemonic, next }) => {
     <Wrapper>
       <PasteMnemonic>Paste your seed phrase</PasteMnemonic>
       <PasteMnemonicHint>
-        Paste or enter your seed phrase to confirm, that you’ve stored it on your side. If you’ll
-        lose it you will lost access to your wallet.
+        Paste or enter your seed phrase to confirm that you’ve stored it safely. If you lose it you
+        will lost access to your wallet.
       </PasteMnemonicHint>
       <MnemonicWrapper>
         <MnemonicTextarea
