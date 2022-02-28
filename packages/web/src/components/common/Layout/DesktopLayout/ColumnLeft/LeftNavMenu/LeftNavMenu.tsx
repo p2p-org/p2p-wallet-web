@@ -1,6 +1,6 @@
 import type { FunctionComponent } from 'react';
 import { useLocation } from 'react-router';
-import { NavLink } from 'react-router-dom';
+import { Link, NavLink } from 'react-router-dom';
 
 import { styled } from '@linaria/react';
 import { borders, shadows, theme, up } from '@p2p-wallet-web/ui';
@@ -216,6 +216,7 @@ export const LeftNavMenu: FunctionComponent = () => {
       </Separator>
       <NavLinkMenu
         to={{ pathname: appStorePath }}
+        as={Link}
         target="_blank"
         className="button"
         onClick={handleAppLinkClick('app_store')}
@@ -229,6 +230,7 @@ export const LeftNavMenu: FunctionComponent = () => {
       </NavLinkMenu>
       <NavLinkMenu
         to={{ pathname: playStorePath }}
+        as={Link}
         target="_blank"
         className="button"
         onClick={handleAppLinkClick('google_play')}

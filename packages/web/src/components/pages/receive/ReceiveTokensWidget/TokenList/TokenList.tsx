@@ -1,12 +1,15 @@
 import type { FC } from 'react';
-import { useCallback, useRef } from 'react';
+import { useRef } from 'react';
+import type { VirtualItem } from 'react-virtual';
 import { useVirtual } from 'react-virtual';
 
 import { styled } from '@linaria/react';
-import { up } from '@p2p-wallet-web/ui';
+import { up, useIsMobile } from '@p2p-wallet-web/ui';
 import type { Token } from '@saberhq/token-utils';
 
-import { TOKEN_ROW_HEIGHT, TokenRow } from './TokenRow';
+import { Hint } from 'components/pages/receive/ReceiveTokensWidget/common/Hint';
+
+import { TokenRow } from './TokenRow';
 
 const Wrapper = styled.div`
   height: 600px;
@@ -19,23 +22,55 @@ const Wrapper = styled.div`
 
 const Container = styled.div``;
 
-const TOKEN_ROW_MARGIN = 8;
-
 interface Props {
   tokens: readonly Token[];
 }
 
 export const TokenList: FC<Props> = ({ tokens }) => {
   const parentRef = useRef<HTMLDivElement>(null);
+  const isMobile = useIsMobile();
 
   const rowVirtualizer = useVirtual({
     paddingStart: 0,
     paddingEnd: 8,
     size: tokens.length,
     parentRef,
-    estimateSize: useCallback(() => TOKEN_ROW_HEIGHT + TOKEN_ROW_MARGIN, []),
     overscan: 6,
   });
+
+  const renderRow = (virtualRow: VirtualItem) => {
+    if (isMobile && virtualRow.index === 0) {
+      return (
+        <Hint
+          ref={virtualRow.measureRef}
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            transform: `translateY(${virtualRow.start}px)`,
+          }}
+        />
+      );
+    }
+
+    const index = isMobile ? virtualRow.index - 1 : virtualRow.index;
+
+    return (
+      <TokenRow
+        ref={virtualRow.measureRef}
+        key={index}
+        token={tokens[index]!}
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: '100%',
+          transform: `translateY(${virtualRow.start}px)`,
+        }}
+      />
+    );
+  };
 
   return (
     <Wrapper ref={parentRef}>
@@ -43,23 +78,10 @@ export const TokenList: FC<Props> = ({ tokens }) => {
         style={{
           position: 'relative',
           width: '100%',
-          height: `${rowVirtualizer.totalSize}px`,
+          height: rowVirtualizer.totalSize,
         }}
       >
-        {rowVirtualizer.virtualItems.map((virtualRow) => (
-          <TokenRow
-            key={virtualRow.index}
-            token={tokens[virtualRow.index]!}
-            style={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              width: '100%',
-              height: `${virtualRow.size}px`,
-              transform: `translateY(${virtualRow.start}px)`,
-            }}
-          />
-        ))}
+        {rowVirtualizer.virtualItems.map(renderRow)}
       </Container>
     </Wrapper>
   );

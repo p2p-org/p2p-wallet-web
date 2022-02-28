@@ -232,9 +232,9 @@ export const Settings: FunctionComponent = () => {
                 ) : (
                   <>
                     <Text>
-                      You can receive and send tokens using your P2P username or link. Also, users,
-                      who know your URL or username can send you any token, even if you don’t have
-                      it in your wallets list.
+                      You can receive and send tokens using your P2P username or link. Users who
+                      know your URL or username can also send you any token, even if you don’t have
+                      it in your wallet's list.
                     </Text>
                     <div>You can access the feature in the app</div>
                     <MobileButtons>

@@ -155,8 +155,8 @@ export const Ready: FC<Props> = ({ setIsLoading, data }) => {
         <Logo />
         <Title>{data.type === 'login' ? 'Welcome back!' : 'Your wallet is ready!'}</Title>
         <Desc>
-          You can turn on a quick enter via password. Only you have access to your keys, not
-          government, not us, not anyone else. it’s 100% stored on your devices.
+          You can turn on a quick enter via password. Only you have access to your keys, not the
+          government, not us, not anyone else. It’s 100% stored on your devices.
         </Desc>
       </TopWrapper>
       <SwitcherLabel>
