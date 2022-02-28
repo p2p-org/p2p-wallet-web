@@ -3,12 +3,15 @@ import type { FC } from 'react';
 import { ModalType, useModals } from 'app/contexts/general/modals';
 import { ButtonState, useSwap } from 'app/contexts/solana/swap';
 import { Button } from 'components/ui';
+import { trackEvent } from 'utils/analytics';
 
 export const SwapButtonOriginal: FC = () => {
   const { openModal } = useModals();
   const { buttonState, trade, onSwap } = useSwap();
 
   const handleSwapClick = async () => {
+    trackEvent('Swap_Verification_Invoked');
+
     const result = await openModal<boolean>(ModalType.SHOW_MODAL_TRANSACTION_CONFIRM, {
       type: 'swap',
       params: {

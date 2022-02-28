@@ -1,21 +1,16 @@
 import type { FunctionComponent } from 'react';
-import { useEffect } from 'react';
-import { useLocation, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 
 import { FeeCompensationProvider } from 'app/contexts';
 import { SwapProvider } from 'app/contexts/solana/swap';
+import { useTrackEventOpen } from 'app/hooks/metrics';
 import { Layout } from 'components/common/Layout';
 import { SwapWidget } from 'components/pages/swap/SwapWidget';
-import { trackEvent } from 'utils/analytics';
 
 export const Swap: FunctionComponent = () => {
-  const location = useLocation<{ fromPage: string }>();
-  const { symbol } = useParams<{ symbol?: string }>();
+  useTrackEventOpen('Swap_Viewed');
 
-  useEffect(() => {
-    trackEvent('swap_open', { fromPage: location.state.fromPage });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const { symbol } = useParams<{ symbol?: string }>();
 
   return (
     <Layout>

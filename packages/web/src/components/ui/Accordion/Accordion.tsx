@@ -72,6 +72,7 @@ type Props = {
   open?: boolean;
   hideRightIfOpen?: boolean;
   noContentPadding?: boolean;
+  onToggle?: (isOpen: boolean) => void;
   className?: string;
 };
 
@@ -81,14 +82,23 @@ export const Accordion: FC<Props> = ({
   open = false,
   hideRightIfOpen,
   noContentPadding,
+  onToggle,
   children,
   className,
 }) => {
   const [isOpen, setIsOpen] = useState(open);
 
+  const handleToggle = () => {
+    setIsOpen(!isOpen);
+
+    if (onToggle) {
+      onToggle(!isOpen);
+    }
+  };
+
   return (
     <Wrapper className={className}>
-      <TitleWrapper onClick={() => setIsOpen(!isOpen)} className={classNames({ isOpen })}>
+      <TitleWrapper onClick={handleToggle} className={classNames({ isOpen })}>
         <Title>
           <Left>{title}</Left>
           {right ? hideRightIfOpen && isOpen ? undefined : <Right>{right}</Right> : undefined}

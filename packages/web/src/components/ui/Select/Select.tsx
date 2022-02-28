@@ -91,6 +91,7 @@ const DropDownList = styled.div`
 type Props = {
   value: string | React.ReactNode;
   isLoading?: boolean;
+  onToggle?: (isOpen: boolean) => void;
   className?: string;
   flat?: boolean;
 };
@@ -99,6 +100,7 @@ export const Select: FunctionComponent<Props> = ({
   value,
   isLoading,
   children,
+  onToggle,
   className,
   flat,
 }) => {
@@ -125,6 +127,9 @@ export const Select: FunctionComponent<Props> = ({
     }
 
     setIsOpen(!isOpen);
+    if (onToggle) {
+      onToggle(!isOpen);
+    }
   };
 
   const items = Children.map(children, (child) => {

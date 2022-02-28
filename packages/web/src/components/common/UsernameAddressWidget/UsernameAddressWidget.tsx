@@ -9,6 +9,7 @@ import Logo from 'assets/images/logo.png';
 import { AddressText } from 'components/common/AddressText';
 import { ToastManager } from 'components/common/ToastManager';
 import { Button } from 'components/ui';
+import { trackEvent } from 'utils/analytics';
 import { askClipboardWritePermission, setToClipboard } from 'utils/clipboard';
 
 const Wrapper = styled.div`
@@ -60,22 +61,36 @@ const ButtonsWrapper = styled.div`
 const copy = (value: string, text: string) => {
   try {
     void navigator.clipboard.writeText(value);
-    ToastManager.info(`${text} Copied!`);
+    ToastManager.info(`${text} copied!`);
   } catch (error) {
     console.error(error);
   }
 };
 
-const handleCopyClick = (value: string, text: string) => () => {
+type Type = 'receive';
+type CopyType = 'Username' | 'Address';
+
+const handleCopyClick = (type: Type, value: string, text: CopyType) => () => {
+  if (type === 'receive') {
+    switch (text) {
+      case 'Username':
+        trackEvent('Receive_Username_Copied');
+        break;
+      case 'Address':
+        trackEvent('Receive_Address_Copied');
+    }
+  }
+
   return copy(value, text);
 };
 
 type Props = {
+  type: Type;
   address: string;
   username?: string;
 };
 
-export const UsernameAddressWidget: FC<Props> = ({ address, username }) => {
+export const UsernameAddressWidget: FC<Props> = ({ type, address, username }) => {
   const isMobile = useIsMobile();
 
   const [isImageCopyAvailable, setIsImageCopyAvailable] = useState(false);
@@ -95,6 +110,8 @@ export const UsernameAddressWidget: FC<Props> = ({ address, username }) => {
     try {
       qrElement.toBlob((blob: Blob | null) => setToClipboard(blob));
       ToastManager.info('QR code Copied!');
+
+      trackEvent('Receive_QR_Saved');
     } catch (error) {
       console.error(error);
     }
@@ -118,7 +135,7 @@ export const UsernameAddressWidget: FC<Props> = ({ address, username }) => {
             small={!isMobile}
             medium={isMobile}
             hollow
-            onClick={handleCopyClick(username, 'Username')}
+            onClick={handleCopyClick(type, username, 'Username')}
           >
             Copy username
           </Button>
@@ -127,7 +144,7 @@ export const UsernameAddressWidget: FC<Props> = ({ address, username }) => {
           small={!isMobile}
           medium={isMobile}
           hollow
-          onClick={handleCopyClick(address, 'Address')}
+          onClick={handleCopyClick(type, address, 'Address')}
         >
           Copy address
         </Button>

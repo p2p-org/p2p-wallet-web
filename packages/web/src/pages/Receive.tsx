@@ -1,21 +1,16 @@
 import type { FunctionComponent } from 'react';
-import { useEffect } from 'react';
 import { Route, useRouteMatch } from 'react-router';
-import { Switch, useLocation } from 'react-router-dom';
+import { Switch } from 'react-router-dom';
 
 import { ReceiveStateProvider } from 'app/contexts';
+import { useTrackEventOpen } from 'app/hooks/metrics';
 import { Layout } from 'components/common/Layout';
 import { ReceiveTokensWidget, ReceiveWidget } from 'components/pages/receive';
-import { trackEvent } from 'utils/analytics';
 
 export const Receive: FunctionComponent = () => {
-  const match = useRouteMatch();
-  const location = useLocation<{ fromPage: string }>();
+  useTrackEventOpen('Receive_Viewed');
 
-  useEffect(() => {
-    trackEvent('receive_open', { fromPage: location.state.fromPage });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const match = useRouteMatch();
 
   return (
     <ReceiveStateProvider>

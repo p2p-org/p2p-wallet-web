@@ -12,6 +12,7 @@ import type { ReceiveSourceNetworkType } from 'app/contexts';
 import { ModalType, RECEIVE_SOURCE_NETWORKS, useModals, useReceiveState } from 'app/contexts';
 import { TokenAvatar } from 'components/common/TokenAvatar';
 import { Select, SelectItem } from 'components/ui';
+import { trackEvent } from 'utils/analytics';
 import { useRenNetwork } from 'utils/hooks/renBridge/useNetwork';
 
 const InfoWrapper = styled.div`
@@ -93,13 +94,21 @@ export const NetworkSelect: FC<Props> = () => {
       }
 
       setSourceNetwork(source);
+      trackEvent('Receive_Network_Changed', { Receive_Network: source });
     },
     [hasBTCTokenAccount, openModal, setSourceNetwork],
   );
 
+  const handleToggleClick = (isOpen: boolean) => {
+    if (isOpen) {
+      trackEvent('Receive_Changing_Network');
+    }
+  };
+
   return (
     <Select
       isLoading={isBTCTokenLoading}
+      onToggle={handleToggleClick}
       value={
         <>
           <TokenAvatar symbol={SYMBOLS[sourceNetwork]} size={44} />

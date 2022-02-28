@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Skeleton from 'react-loading-skeleton';
 
 import { styled } from '@linaria/react';
@@ -19,6 +19,7 @@ import dayjs from 'dayjs';
 
 import { AmountUSD } from 'components/common/AmountUSD';
 import { TokenAvatar } from 'components/common/TokenAvatar';
+import { trackEvent } from 'utils/analytics';
 import { getExplorerUrl } from 'utils/connection';
 import { shortAddress } from 'utils/tokens';
 
@@ -133,6 +134,7 @@ const FieldTitleWrapper = styled.div`
 
 const PaidByBadge = styled.div`
   padding: 1px 8px;
+
   color: #5887ff;
   font-weight: 600;
   font-size: 12px;
@@ -159,6 +161,16 @@ export const TransactionDetailsModal: FC<Props> = ({ signature, source, close })
     usePubkey(transaction?.details.tokenAccount),
     transaction?.details.amount,
   );
+
+  useEffect(() => {
+    const type = transaction?.details.type;
+
+    if (type === 'send') {
+      trackEvent('Send_Process_Shown');
+    } else if (type === 'swap') {
+      trackEvent('Swap_Process_Shown');
+    }
+  }, [transaction?.details.type]);
 
   // useEffect(() => {
   //   const mount = async () => {

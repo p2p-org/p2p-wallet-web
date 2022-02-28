@@ -6,6 +6,7 @@ import { useWallet } from '@p2p-wallet-web/core';
 
 import type { MoonpayIframeParams } from 'app/contexts';
 import { buildParams, MOONPAY_API_KEY, MOONPAY_SIGNER_URL, useBuyState } from 'app/contexts';
+import { useTrackEventOpen } from 'app/hooks/metrics';
 
 import { WidgetPageBuy } from '../WidgetPageBuy';
 
@@ -22,6 +23,8 @@ const baseParams: MoonpayIframeParams = {
 };
 
 export const MoonpayIframe: FC = () => {
+  useTrackEventOpen('Buy_Provider_Step_Viewed');
+
   const { publicKey } = useWallet();
   const { buyQuote } = useBuyState();
 
