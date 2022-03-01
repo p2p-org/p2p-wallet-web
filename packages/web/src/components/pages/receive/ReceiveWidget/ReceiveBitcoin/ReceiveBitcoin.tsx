@@ -1,15 +1,66 @@
 import type { FC } from 'react';
-import { useState } from 'react';
+import { useMemo } from 'react';
 
-import { LockAndMintBtc } from './LockAndMintBtc';
-import { RenGatewayWarning } from './RenGatewayWarning';
+import { getRenNetworkDetails } from '@renproject/interfaces';
+
+import { LoaderBlock } from 'components/common/LoaderBlock';
+import { UsernameAddressWidget } from 'components/common/UsernameAddressWidget';
+import { trackEvent } from 'utils/analytics';
+import { useRenNetwork } from 'utils/hooks/renBridge/useNetwork';
+import { useLockAndMintProvider } from 'utils/providers/LockAndMintProvider';
+
+import { BottomWrapper, Content, ExplorerA, ShareIcon } from '../common/styled';
+import { DepositStatus } from './DepositStatus';
+import { Hint } from './Hint';
 
 export const ReceiveBitcoin: FC = () => {
-  const [isShowGatewayAddress, setIsShowGatewayAddress] = useState(false); // false
+  const network = useRenNetwork();
+  const targetConfirmationsCount = useMemo(
+    () => (getRenNetworkDetails(network).isTestnet ? 1 : 6),
+    [network],
+  );
 
-  if (isShowGatewayAddress) {
-    return <LockAndMintBtc />;
+  const handleExplorerClick = () => {
+    trackEvent('Receive_Viewing_Explorer', { Receive_Network: 'bitcoin' });
+  };
+
+  const lockAndMintProvider = useLockAndMintProvider();
+
+  if (!lockAndMintProvider.isConfigInitialized) {
+    lockAndMintProvider.initializeConfig();
   }
 
-  return <RenGatewayWarning onShowButtonClick={() => setIsShowGatewayAddress(true)} />;
+  if (!lockAndMintProvider.gatewayAddress) {
+    return <LoaderBlock />;
+  }
+
+  return (
+    <>
+      <Content className="noTopPadding">
+        <Hint expiryTime={lockAndMintProvider.expiryTime} />
+        <UsernameAddressWidget address={lockAndMintProvider.gatewayAddress} />
+        <div>
+          {Object.keys(lockAndMintProvider.deposits).map((depositId) => (
+            <DepositStatus
+              key={depositId}
+              {...lockAndMintProvider.deposits[depositId]}
+              targetConfirmationsCount={targetConfirmationsCount}
+            />
+          ))}
+        </div>
+      </Content>
+      <BottomWrapper>
+        <ExplorerA
+          href={`https://btc.com/btc/address/${lockAndMintProvider.gatewayAddress}`}
+          target="_blank"
+          rel="noopener noreferrer noindex"
+          onClick={handleExplorerClick}
+          className="button"
+        >
+          <ShareIcon name="external" />
+          View in Bitcoin explorer
+        </ExplorerA>
+      </BottomWrapper>
+    </>
+  );
 };
