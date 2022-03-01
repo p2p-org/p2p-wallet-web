@@ -10,6 +10,7 @@ import { useDebounce } from 'use-debounce';
 import { WidgetPage } from 'components/common/WidgetPage';
 import { SearchInput } from 'components/ui';
 
+import { EmptyError } from './common/EmptyError';
 import { Hint } from './common/Hint';
 import { TokenList } from './TokenList';
 
@@ -52,8 +53,11 @@ export const ReceiveTokensWidget: FC<Props> = () => {
           onChange={(value) => setSearchQuery(value)}
         />
         {isTablet ? <Hint /> : undefined}
+        {isTablet && searchQueryDebounced && results.length === 0 ? (
+          <EmptyError searchText={searchQueryDebounced} />
+        ) : undefined}
 
-        <TokenList tokens={results} />
+        <TokenList tokens={results} searchText={searchQueryDebounced} />
       </Content>
     </WidgetPage>
   );

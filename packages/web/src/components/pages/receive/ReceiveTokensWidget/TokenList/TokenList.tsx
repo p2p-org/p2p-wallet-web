@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import { useRef } from 'react';
+import { useMemo, useRef } from 'react';
 import type { VirtualItem } from 'react-virtual';
 import { useVirtual } from 'react-virtual';
 
@@ -7,8 +7,9 @@ import { styled } from '@linaria/react';
 import { up, useIsMobile } from '@p2p-wallet-web/ui';
 import type { Token } from '@saberhq/token-utils';
 
-import { Hint } from 'components/pages/receive/ReceiveTokensWidget/common/Hint';
+import { EmptyError } from 'components/pages/receive/ReceiveTokensWidget/common/EmptyError';
 
+import { Hint } from '../common/Hint';
 import { TokenRow } from './TokenRow';
 
 const Wrapper = styled.div`
@@ -22,24 +23,41 @@ const Wrapper = styled.div`
 
 const Container = styled.div``;
 
+const ROW_MARGIN = 8;
+
 interface Props {
   tokens: readonly Token[];
+  searchText: string;
 }
 
-export const TokenList: FC<Props> = ({ tokens }) => {
+export const TokenList: FC<Props> = ({ tokens, searchText }) => {
   const parentRef = useRef<HTMLDivElement>(null);
   const isMobile = useIsMobile();
+
+  const items = useMemo(() => {
+    const newItems: (Token | string)[] = tokens.slice(0);
+
+    if (isMobile) {
+      if (searchText && tokens.length === 0) {
+        newItems.unshift('error');
+      }
+
+      newItems.unshift('hint');
+    }
+
+    return newItems;
+  }, [isMobile, searchText, tokens]);
 
   const rowVirtualizer = useVirtual({
     paddingStart: 0,
     paddingEnd: 8,
-    size: tokens.length,
+    size: items.length,
     parentRef,
     overscan: 6,
   });
 
   const renderRow = (virtualRow: VirtualItem) => {
-    if (isMobile && virtualRow.index === 0) {
+    if (items[virtualRow.index] === 'hint') {
       return (
         <Hint
           ref={virtualRow.measureRef}
@@ -54,19 +72,33 @@ export const TokenList: FC<Props> = ({ tokens }) => {
       );
     }
 
-    const index = isMobile ? virtualRow.index - 1 : virtualRow.index;
+    if (items[virtualRow.index] === 'error') {
+      return (
+        <EmptyError
+          ref={virtualRow.measureRef}
+          searchText={searchText}
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            transform: `translateY(${virtualRow.start + ROW_MARGIN}px)`,
+          }}
+        />
+      );
+    }
 
     return (
       <TokenRow
         ref={virtualRow.measureRef}
-        key={index}
-        token={tokens[index]!}
+        key={virtualRow.index}
+        token={items[virtualRow.index] as Token}
         style={{
           position: 'absolute',
           top: 0,
           left: 0,
           width: '100%',
-          transform: `translateY(${virtualRow.start}px)`,
+          transform: `translateY(${virtualRow.start + ROW_MARGIN}px)`,
         }}
       />
     );
