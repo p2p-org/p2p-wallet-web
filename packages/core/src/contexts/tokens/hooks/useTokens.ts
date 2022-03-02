@@ -5,8 +5,7 @@ import { networkToChainId, Token } from '@saberhq/token-utils';
 import { useSolana } from '@saberhq/use-solana';
 import { PublicKey } from '@solana/web3.js';
 import { zip } from 'ramda';
-
-import { useAllTokens } from './useAllTokens';
+import { useTokensContext } from "../provider";
 
 const normalizeMint = (mint: PublicKey | null | undefined): PublicKey | null | undefined => {
   if (!mint) {
@@ -29,7 +28,7 @@ export const useTokens = (
   mints?: (PublicKey | null | undefined)[],
 ): (Token | null | undefined)[] => {
   const { network } = useSolana();
-  const { tokenMap } = useAllTokens();
+  const { tokenMap } = useTokensContext();
 
   const { normalizedMints, mintsToLoad } = useMemo(() => {
     const normalizedMints = mints?.map(normalizeMint) ?? [];

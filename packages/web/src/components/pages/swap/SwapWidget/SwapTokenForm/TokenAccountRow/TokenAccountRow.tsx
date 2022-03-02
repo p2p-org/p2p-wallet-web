@@ -1,7 +1,7 @@
 import type { FC } from 'react';
 
 import { styled } from '@linaria/react';
-import { useAllTokens } from '@p2p-wallet-web/core';
+import { useTokensContext } from '@p2p-wallet-web/core';
 
 import { useConfig } from 'app/contexts/solana/swap';
 import type TokenAccount from 'app/contexts/solana/swap/models/TokenAccount';
@@ -66,7 +66,7 @@ type Props = {
 
 export const TokenAccountRow: FC<Props> = ({ tokenAccount, onClick, className }) => {
   const { mintToTokenName, tokenConfigs } = useConfig();
-  const { tokenMap } = useAllTokens();
+  const { tokenMap } = useTokensContext();
 
   const mintAddress = tokenAccount.accountInfo.mint.toBase58();
   const tokenName = mintToTokenName[mintAddress];

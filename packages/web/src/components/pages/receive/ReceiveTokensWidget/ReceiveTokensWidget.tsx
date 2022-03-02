@@ -2,7 +2,7 @@ import type { FC } from 'react';
 import { useMemo, useState } from 'react';
 
 import { styled } from '@linaria/react';
-import { useAllTokens } from '@p2p-wallet-web/core';
+import { useTokensContext } from '@p2p-wallet-web/core';
 import { useIsTablet } from '@p2p-wallet-web/ui';
 import Fuse from 'fuse.js';
 import { useDebounce } from 'use-debounce';
@@ -24,7 +24,7 @@ const Content = styled.div`
 interface Props {}
 
 export const ReceiveTokensWidget: FC<Props> = () => {
-  const { tokens } = useAllTokens();
+  const { tokens } = useTokensContext();
   const isTablet = useIsTablet();
 
   const [searchQuery, setSearchQuery] = useState('');
