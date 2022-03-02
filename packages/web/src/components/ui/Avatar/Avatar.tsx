@@ -1,4 +1,5 @@
 import type { FunctionComponent, HTMLAttributes } from 'react';
+import { useState } from 'react';
 
 import { styled } from '@linaria/react';
 
@@ -14,6 +15,8 @@ const Wrapper = styled.img<{ size: string | number | undefined }>`
   }
 `;
 
+const BAD_SRCS: { [src: string]: true } = {};
+
 type Props = {
   src?: string;
   size?: string | number;
@@ -24,5 +27,21 @@ export const Avatar: FunctionComponent<Props & HTMLAttributes<HTMLDivElement>> =
   size,
   ...props
 }) => {
-  return <Wrapper src={src} size={size} {...props} />;
+  const [, refresh] = useState<number>(0);
+
+  const _src: string | undefined = src && !BAD_SRCS[src] ? src : undefined;
+
+  return (
+    <Wrapper
+      src={_src}
+      size={size}
+      {...props}
+      onError={() => {
+        if (src) {
+          BAD_SRCS[src] = true;
+        }
+        refresh((i) => i + 1);
+      }}
+    />
+  );
 };
