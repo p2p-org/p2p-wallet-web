@@ -7,9 +7,9 @@ import type { PublicKey } from '@solana/web3.js';
 import { zip } from 'ramda';
 
 import { SYSTEM_PROGRAM_ID } from '../../../constants/publicKeys';
-import { useTokens } from '../../../hooks';
 import type { TokenAccount } from '../models';
 import { useWallet } from '@saberhq/use-solana';
+import { useTokens } from '../../tokens';
 
 export const useTokenAccounts = (
   publicKeys: (PublicKey | null | undefined)[] = [],

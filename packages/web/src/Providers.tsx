@@ -8,6 +8,7 @@ import {
   SeedProvider,
   SolanaProvider,
   TokenAccountsProvider,
+  TokensProvider,
 } from '@p2p-wallet-web/core';
 import { SailProvider } from '@p2p-wallet-web/sail';
 import assert from 'ts-invariant';
@@ -51,7 +52,9 @@ const CoreProviders: FC = ({ children }) => {
         networkConfigs={NETWORK_CONFIGS}
       >
         <SailProvider initialState={{ waitForConfirmation: true }}>
-          <TokenAccountsProvider>{children}</TokenAccountsProvider>
+          <TokensProvider>
+            <TokenAccountsProvider>{children}</TokenAccountsProvider>
+          </TokensProvider>
         </SailProvider>
       </SolanaProvider>
     </SeedProvider>

@@ -2,7 +2,7 @@ import type { FunctionComponent, HTMLAttributes } from 'react';
 import { useMemo } from 'react';
 
 import { styled } from '@linaria/react';
-import { useAllTokens } from '@p2p-wallet-web/core';
+import { useTokensContext } from '@p2p-wallet-web/core';
 import type { Token } from '@saberhq/token-utils';
 import classNames from 'classnames';
 
@@ -56,7 +56,7 @@ export const TokenAvatar: FunctionComponent<Props & HTMLAttributes<HTMLDivElemen
   className,
   ...props
 }) => {
-  const { tokenMap, tokens } = useAllTokens();
+  const { tokenMap, tokens } = useTokensContext();
 
   // TODO: remove
   const tokenInfo = useMemo(() => {
