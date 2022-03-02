@@ -45,9 +45,11 @@ export const TokenMenu: FC<Props> = ({ tokenAccount, isHidden = false, className
   return (
     <Wrapper className={className}>
       <MenuStyled vertical>
-        <MenuItem icon="plus" onItemClick={handleButtonClick('/buy')}>
-          Buy {tokenAccount.balance?.token.symbol}
-        </MenuItem>
+        {tokenAccount.balance?.token.isRawSOL ? (
+          <MenuItem icon="plus" onItemClick={handleButtonClick('/buy')}>
+            Buy {tokenAccount.balance?.token.symbol}
+          </MenuItem>
+        ) : undefined}
         <MenuItem
           icon="top"
           onItemClick={handleButtonClick(`/send/${tokenAccount.key?.toBase58()}`)}

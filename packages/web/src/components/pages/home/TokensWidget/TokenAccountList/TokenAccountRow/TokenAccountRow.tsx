@@ -134,10 +134,10 @@ export const TokenAccountRow: FunctionComponent<Props> = ({ tokenAccount, isHidd
     [handleToggleHideClick, isHidden],
   );
 
-  const StickyOrFragment = isMobile ? SwipeToRevealActions : React.Fragment;
+  const SwipeOrFragment = isMobile ? SwipeToRevealActions : React.Fragment;
 
   return (
-    <StickyOrFragment {...(isMobile ? { actions } : {})}>
+    <SwipeOrFragment {...(isMobile ? { actions } : {})}>
       <WrapperLink to={`/wallet/${tokenAccount.key?.toBase58()}`}>
         {loading ? (
           <Skeleton height={avatarSize} width={avatarSize} borderRadius={12} />
@@ -187,6 +187,6 @@ export const TokenAccountRow: FunctionComponent<Props> = ({ tokenAccount, isHidd
         </Content>
         {isTablet ? <TokenMenuStyled tokenAccount={tokenAccount} isHidden={isHidden} /> : undefined}
       </WrapperLink>
-    </StickyOrFragment>
+    </SwipeOrFragment>
   );
 };

@@ -23,7 +23,6 @@ import { ToastManager } from 'components/common/ToastManager';
 import { TokenAvatar } from 'components/common/TokenAvatar';
 import { Widget } from 'components/common/Widget';
 import { Button, Icon } from 'components/ui';
-import { trackEvent } from 'utils/analytics';
 import { shortAddress } from 'utils/tokens';
 
 import { Chart } from './Chart';
@@ -263,7 +262,6 @@ const TopWidgetOrigin: FunctionComponent<Props> = ({ publicKey }) => {
         <Link
           to={{ pathname: `/send/${publicKey}`, state: { fromPage: location.pathname } }}
           title="Send"
-          onClick={() => trackEvent('wallet_send_click')}
           className="button"
         >
           <ButtonStyled primary small>
@@ -277,7 +275,6 @@ const TopWidgetOrigin: FunctionComponent<Props> = ({ publicKey }) => {
               state: { fromPage: location.pathname },
             }}
             title="Swap"
-            onClick={() => trackEvent('wallet_swap_click')}
             className="button"
           >
             <ButtonStyled primary small>
