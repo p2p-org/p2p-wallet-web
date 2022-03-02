@@ -1,5 +1,5 @@
 import type { FunctionComponent } from 'react';
-import { memo, useEffect } from 'react';
+import { memo } from 'react';
 import { useLocation } from 'react-router';
 import { useParams } from 'react-router-dom';
 
@@ -10,7 +10,6 @@ import type { PublicKey } from '@solana/web3.js';
 import { Layout } from 'components/common/Layout';
 import { QRAddressWidget } from 'components/common/QRAddressWidget';
 import { TopWidget, TransactionsWidget } from 'components/pages/wallet';
-import { trackEvent } from 'utils/analytics';
 import { shortAddress } from 'utils/tokens';
 
 export const WalletOrigin: FunctionComponent = () => {
@@ -19,12 +18,6 @@ export const WalletOrigin: FunctionComponent = () => {
 
   const publicKey = usePubkey(_publicKey) as PublicKey;
   const tokenAccount = useTokenAccount(publicKey);
-
-  useEffect(() => {
-    if (tokenAccount?.balance?.token.symbol) {
-      trackEvent('wallet_open', { tokenTicker: tokenAccount.balance.token.symbol });
-    }
-  }, [tokenAccount?.balance?.token.symbol]);
 
   return (
     <Layout
