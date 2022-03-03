@@ -9,9 +9,10 @@ import type { Token } from '@saberhq/token-utils';
 import { Feature } from 'flagged';
 
 import type { ModalPropsType } from 'app/contexts';
+import { ButtonCancel } from 'components/common/ButtonCancel';
 import { FeePaySelector } from 'components/common/FeePaySelector';
 import { ToastManager } from 'components/common/ToastManager';
-import { Button, ButtonCancel } from 'components/ui';
+import { Button } from 'components/ui';
 import { FEATURE_PAY_BY } from 'config/featureFlags';
 import { useRenNetwork } from 'utils/hooks/renBridge/useNetwork';
 

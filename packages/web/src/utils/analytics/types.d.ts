@@ -2,7 +2,7 @@ export type TrackEventType = {
   /*
     Send
    */
-  (event: 'Send_Viewed', data: { Last_Screen: string }): void;
+  (event: 'Send_Viewed'): void;
   (event: 'Send_Max_Info_Showed'): void;
   (event: 'Send_Verification_Invoked'): void;
   (event: 'Send_Reviewing'): void;
@@ -19,14 +19,14 @@ export type TrackEventType = {
   /*
     Buy
    */
-  (event: 'Buy_Viewed', data: { Last_Screen: string }): void;
+  (event: 'Buy_Viewed'): void;
   (event: 'Buy_Fees_Showed'): void;
   (event: 'Buy_Provider_Step_Viewed'): void;
 
   /*
     Receive
    */
-  (event: 'Receive_Viewed', data: { Last_Screen: string }): void;
+  (event: 'Receive_Viewed'): void;
   (event: 'Receive_Username_Copied'): void;
   (event: 'Receive_Address_Copied'): void;
   (event: 'Receive_QR_Saved'): void;

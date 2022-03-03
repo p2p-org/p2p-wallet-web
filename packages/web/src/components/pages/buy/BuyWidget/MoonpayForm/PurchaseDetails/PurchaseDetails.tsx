@@ -6,7 +6,7 @@ import type { Accordion } from 'components/ui/AccordionDetails';
 import { AccordionDetails } from 'components/ui/AccordionDetails';
 
 export const PurchaseDetails: FC = () => {
-  const { buyQuote } = useBuyState();
+  const { buyQuote, currency } = useBuyState();
 
   const accordion = useMemo(() => {
     const lists: Accordion = [
@@ -16,7 +16,7 @@ export const PurchaseDetails: FC = () => {
           {
             id: 1,
             titleClassName: 'gray',
-            title: `1 SOL price`,
+            title: `1 ${currency.symbol} price`,
             value: `$${buyQuote?.quoteCurrencyPrice.toFixed(2) || 0}`,
           },
         ],
@@ -27,7 +27,7 @@ export const PurchaseDetails: FC = () => {
           {
             id: 1,
             titleClassName: 'gray',
-            title: 'SOL purchase cost',
+            title: `${currency.symbol} purchase cost`,
             value: `$${
               buyQuote ? (buyQuote.quoteCurrencyPrice * buyQuote.quoteCurrencyAmount).toFixed(2) : 0
             }`,
@@ -60,7 +60,7 @@ export const PurchaseDetails: FC = () => {
     ];
 
     return lists;
-  }, [buyQuote]);
+  }, [buyQuote, currency.symbol]);
 
   return (
     <AccordionDetails

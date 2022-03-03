@@ -4,6 +4,7 @@ import { useHistory, useLocation } from 'react-router';
 
 import { styled } from '@linaria/react';
 import type { TokenAccount } from '@p2p-wallet-web/core';
+import { USDC_MINT } from '@p2p-wallet-web/core';
 
 import { useConfig, useSettings } from 'app/contexts';
 import { Menu, MenuItem } from 'components/ui';
@@ -45,9 +46,13 @@ export const TokenMenu: FC<Props> = ({ tokenAccount, isHidden = false, className
   return (
     <Wrapper className={className}>
       <MenuStyled vertical>
-        {tokenAccount.balance?.token.isRawSOL ? (
-          <MenuItem icon="plus" onItemClick={handleButtonClick('/buy')}>
-            Buy {tokenAccount.balance?.token.symbol}
+        {tokenAccount.balance?.token.isRawSOL ||
+        tokenAccount.balance?.token.mintAccount.equals(USDC_MINT) ? (
+          <MenuItem
+            icon="plus"
+            onItemClick={handleButtonClick(`/buy/${tokenAccount.balance.token.symbol}`)}
+          >
+            Buy {tokenAccount.balance.token.symbol}
           </MenuItem>
         ) : undefined}
         <MenuItem
@@ -61,7 +66,7 @@ export const TokenMenu: FC<Props> = ({ tokenAccount, isHidden = false, className
             icon="swap"
             onItemClick={handleButtonClick(`/swap/${tokenAccount.balance.token.symbol}`)}
           >
-            Swap {tokenAccount.balance?.token.symbol}
+            Swap {tokenAccount.balance.token.symbol}
           </MenuItem>
         ) : undefined}
         <MenuItem icon="bottom" onItemClick={handleButtonClick('/receive')}>

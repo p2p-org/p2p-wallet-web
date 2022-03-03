@@ -1,14 +1,15 @@
 import type { FC } from 'react';
 
-import { MoonpayButton } from 'components/pages/buy/BuyWidget/MoonpayForm/MoonpayButton';
-import { WidgetPageBuy } from 'components/pages/buy/BuyWidget/WidgetPageBuy';
-
+import { WidgetPageBuy } from '../WidgetPageBuy';
+import { CurrencySelect } from './CurrencySelect';
 import { Inputs } from './Inputs';
+import { MoonpayButton } from './MoonpayButton';
 import { PurchaseDetails } from './PurchaseDetails';
 
 export const MoonpayForm: FC = () => {
   return (
     <WidgetPageBuy bottom={<MoonpayButton />}>
+      <CurrencySelect />
       <Inputs />
       <PurchaseDetails />
     </WidgetPageBuy>

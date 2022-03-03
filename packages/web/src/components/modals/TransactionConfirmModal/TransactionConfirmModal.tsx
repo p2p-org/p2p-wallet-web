@@ -11,9 +11,10 @@ import {
 import { theme } from '@p2p-wallet-web/ui';
 
 import type { ModalPropsType } from 'app/contexts/general/modals/types';
+import { ButtonCancel } from 'components/common/ButtonCancel';
 import { ErrorHint } from 'components/common/ErrorHint';
 import { PasswordInput } from 'components/common/PasswordInput';
-import { Button, ButtonCancel, Icon } from 'components/ui';
+import { Button, Icon } from 'components/ui';
 import { Modal } from 'components/ui/Modal';
 import { trackEvent } from 'utils/analytics';
 
