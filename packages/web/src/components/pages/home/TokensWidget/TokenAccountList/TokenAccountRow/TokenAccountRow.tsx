@@ -134,7 +134,9 @@ export const TokenAccountRow: FunctionComponent<Props> = ({ tokenAccount, isHidd
     [handleToggleHideClick, isHidden],
   );
 
-  const SwipeOrFragment = isMobile ? SwipeToRevealActions : React.Fragment;
+  // Mobile and not SOL
+  const SwipeOrFragment =
+    isMobile && !tokenAccount.balance?.token.isRawSOL ? SwipeToRevealActions : React.Fragment;
 
   return (
     <SwipeOrFragment {...(isMobile ? { actions } : {})}>
