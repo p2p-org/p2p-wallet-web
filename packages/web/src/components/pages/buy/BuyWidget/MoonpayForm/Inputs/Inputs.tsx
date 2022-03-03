@@ -42,7 +42,8 @@ export const Inputs: FC = () => {
       <InputWrapper>
         <Title>You get</Title>
         <div>
-          {buyQuote?.quoteCurrencyAmount || 0} {buyQuote?.quoteCurrencyCode.toUpperCase()}
+          {buyQuote?.quoteCurrencyAmount || 0}{' '}
+          {buyQuote?.quoteCurrencyCode.toUpperCase().replace(/_(.*)$/, '')}
         </div>
       </InputWrapper>
     </Wrapper>

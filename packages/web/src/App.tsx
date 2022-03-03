@@ -44,7 +44,7 @@ const App: React.FC = () => {
             {/*<AuthRequiredRoute path="/swap/:publicKey?" component={SwapNew} />*/}
             <AuthRequiredRoute path="/settings/network" component={SettingsNetwork} />
             <AuthRequiredRoute path="/settings" component={Settings} />
-            <AuthRequiredRoute path="/buy" component={Buy} />
+            <AuthRequiredRoute path="/buy/:symbol?" component={Buy} />
           </Switch>
           <Intercom />
           <FeaturesToggle />
