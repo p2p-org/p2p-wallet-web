@@ -18,9 +18,10 @@ const Wrapper = styled.div`
   flex-direction: column;
   margin: 16px 16px 0;
   padding: 20px;
+  overflow: hidden;
 
-  background: url('./background.png') no-repeat 100% center;
-  background-size: cover;
+  background: url('./logo.png') no-repeat 100% 100%;
+  background-size: 160px 110px;
   border: 1px solid #a5beff;
 
   border-radius: 12px;
@@ -28,6 +29,20 @@ const Wrapper = styled.div`
 
   ${up.tablet} {
     margin: unset;
+  }
+
+  &::before {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: -1;
+
+    width: 100%;
+    height: 100%;
+
+    background: linear-gradient(90.79deg, #c2fed3 0.55%, #dbeaff 99.4%);
+
+    content: '';
   }
 `;
 
@@ -111,9 +126,9 @@ export const UsernameBanner: FC = () => {
     }
   };
 
-  if (!isBannerShow) {
-    return null;
-  }
+  // if (!isBannerShow) {
+  //   return null;
+  // }
 
   return (
     <Wrapper>
