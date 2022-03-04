@@ -126,9 +126,9 @@ export const UsernameBanner: FC = () => {
     }
   };
 
-  // if (!isBannerShow) {
-  //   return null;
-  // }
+  if (!isBannerShow) {
+    return null;
+  }
 
   return (
     <Wrapper>
