@@ -154,6 +154,7 @@ export const FromToSelectInput: FC<Props> = ({
   };
 
   const hasBalance = tokenAccountBalance ? tokenAccountBalance.asNumber >= Number(amount) : false;
+  const isAmountEqualMaxBalance = tokenAccountBalance?.toExact() === amount;
 
   return (
     <Wrapper className={className}>
@@ -171,7 +172,9 @@ export const FromToSelectInput: FC<Props> = ({
               >
                 <WalletBalanceIcon name="wallet" />
                 {renderBalance()}
-                <Max onClick={handleAllBalanceClick}>MAX</Max>
+                {!isAmountEqualMaxBalance ? (
+                  <Max onClick={handleAllBalanceClick}>MAX</Max>
+                ) : undefined}
               </AllBalance>
             ) : undefined
           ) : undefined}
