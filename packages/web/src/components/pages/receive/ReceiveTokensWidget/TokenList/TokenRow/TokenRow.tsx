@@ -41,10 +41,18 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
 }
 
 const TokenRowOrigin: FC<Props> = ({ forwardedRef, token, style }) => {
+  const renderName = (token: Token) => {
+    if (token.symbol === 'SOL') {
+      return 'Solana';
+    }
+
+    return token.name;
+  };
+
   return (
     <Wrapper ref={forwardedRef} style={style}>
       <TokenAvatar token={token} size="32" />
-      <Name>{token.name}</Name>
+      <Name>{renderName(token)}</Name>
       <Symbol>{token.symbol}</Symbol>
     </Wrapper>
   );
