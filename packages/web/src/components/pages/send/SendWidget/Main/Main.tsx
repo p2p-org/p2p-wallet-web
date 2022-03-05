@@ -4,13 +4,12 @@ import { useHistory } from 'react-router';
 import { styled } from '@linaria/react';
 import type { TokenAccount } from '@p2p-wallet-web/core';
 import { useUserTokenAccounts } from '@p2p-wallet-web/core';
+import { theme } from '@p2p-wallet-web/ui';
 import type { Token } from '@saberhq/token-utils';
-import classNames from 'classnames';
 import { Feature } from 'flagged';
 
 import { useSendState } from 'app/contexts';
 import { FeePaySelector } from 'components/common/FeePaySelector';
-import { Switch } from 'components/ui';
 import { FEATURE_PAY_BY } from 'config/featureFlags';
 import { trackEvent } from 'utils/analytics';
 
@@ -42,30 +41,16 @@ const TopWrapperStyled = styled(TopWrapper)`
 `;
 
 const ConfirmWrapper = styled.div`
-  display: flex;
-  align-items: center;
-  margin-top: 20px;
-  padding: 20px 0 0;
+  padding: 16px 20px;
 
-  &.isShowConfirmAddressSwitch {
-    border-top: 1px solid #f6f6f8;
-  }
-`;
-
-const ConfirmTextWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  flex-grow: 1;
-`;
-
-const ConfirmTextPrimary = styled.div`
-  color: #a3a5ba;
-  font-weight: 600;
+  color: ${theme.colors.textIcon.primary};
   font-size: 14px;
-`;
-const ConfirmTextSecondary = styled.div`
-  font-weight: 600;
-  font-size: 16px;
+  line-height: 160%;
+  letter-spacing: 0.01em;
+
+  background: ${theme.colors.system.warningBg};
+  border: 0.5px solid ${theme.colors.system.warningMain};
+  border-radius: 0 0 12px 12px;
 `;
 
 export const Main: FC = () => {
@@ -79,8 +64,6 @@ export const Main: FC = () => {
     isExecuting,
     isRenBTC,
     isShowConfirmAddressSwitch,
-    isConfirmCorrectAddress,
-    setIsConfirmCorrectAddress,
     feeAmount,
   } = useSendState();
 
@@ -143,17 +126,9 @@ export const Main: FC = () => {
         </TopWrapperStyled>
         <ToAddressInput />
         {isShowConfirmAddressSwitch ? (
-          <ConfirmWrapper className={classNames({ isShowConfirmAddressSwitch })}>
-            <ConfirmTextWrapper>
-              <ConfirmTextPrimary>
-                Is this address correct? It doesn’t have funds.
-              </ConfirmTextPrimary>
-              <ConfirmTextSecondary>I’m sure, it’s correct</ConfirmTextSecondary>
-            </ConfirmTextWrapper>
-            <Switch
-              checked={isConfirmCorrectAddress}
-              onChange={() => setIsConfirmCorrectAddress(!isConfirmCorrectAddress)}
-            />
+          <ConfirmWrapper>
+            This address does not appear to have a USDC account. You have to pay one-time fee to
+            create a USDC account for this address. You can choose which currency to pay in below.
           </ConfirmWrapper>
         ) : undefined}
       </ToWrapper>
