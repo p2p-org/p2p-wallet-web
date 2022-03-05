@@ -34,8 +34,15 @@ const AddressWrapper = styled.div`
 
   display: flex;
   flex: 1;
-  flex-direction: column;
+  grid-gap: 16px;
+  align-items: center;
   margin-left: 12px;
+`;
+
+const ToInputWrapper = styled.div`
+  display: flex;
+  flex: 1;
+  flex-direction: column;
 `;
 
 const ToInput = styled.input`
@@ -72,6 +79,27 @@ const ToInput = styled.input`
 
     opacity: 1;
   }
+`;
+
+const ClearWrapper = styled.div`
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+
+  background: ${theme.colors.bg.primary};
+  border: 1px solid #d3d4de;
+  border-radius: 8px;
+  cursor: pointer;
+`;
+
+const ClearIcon = styled(Icon)`
+  width: 24px;
+  height: 24px;
+
+  color: ${theme.colors.textIcon.active};
 `;
 
 const BottomWrapper = styled.div`
@@ -129,6 +157,7 @@ const ResolvedNamesList = styled.div`
   grid-gap: 20px;
 `;
 
+// TODO: needs to refactor, logic is weird
 export const ToAddressInput: FunctionComponent = () => {
   const inputRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
@@ -152,8 +181,16 @@ export const ToAddressInput: FunctionComponent = () => {
   const [, cancel] = useDebounce(
     () => {
       const resolveName = async () => {
+        const prevToPublicKey = toPublicKey;
+
         setIsResolvingNames(true);
         const resolved = await resolveUsername(toPublicKey);
+
+        // all changes during request. skip
+        if (prevToPublicKey !== toPublicKey) {
+          return null;
+        }
+
         setIsResolvingNames(false);
 
         setResolvedNames([]);
@@ -172,7 +209,7 @@ export const ToAddressInput: FunctionComponent = () => {
         setResolvedAddress(null);
       }
     },
-    100,
+    300,
     [blockchain, toPublicKey, resolveUsername],
   );
   useEffect(() => () => cancel());
@@ -210,6 +247,12 @@ export const ToAddressInput: FunctionComponent = () => {
 
     setToPublicKey(nextPublicKey);
     trackEventOnce('send_address_keydown');
+  };
+
+  const handleClear = () => {
+    setResolvedNames([]);
+    setResolvedAddress(null);
+    setToPublicKey('');
   };
 
   const handleItemClick = useCallback(
@@ -269,19 +312,26 @@ export const ToAddressInput: FunctionComponent = () => {
           )}
         </IconWrapper>
         <AddressWrapper>
-          <ToInput
-            ref={inputRef}
-            placeholder="Username / SOL address"
-            value={toPublicKey}
-            onChange={handleChange}
-            onFocus={() => setIsFocused(true)}
-            onBlur={() => setIsFocused(false)}
-            className={classNames({
-              isAddressResolved: resolvedAddress,
-              hasError: isAddressInvalid,
-            })}
-          />
-          {resolvedAddress ? <AddressText address={resolvedAddress} small /> : undefined}
+          <ToInputWrapper>
+            <ToInput
+              ref={inputRef}
+              placeholder="Username / SOL address"
+              value={toPublicKey}
+              onChange={handleChange}
+              onFocus={() => setIsFocused(true)}
+              onBlur={() => setIsFocused(false)}
+              className={classNames({
+                isAddressResolved: resolvedAddress,
+                hasError: isAddressInvalid,
+              })}
+            />
+            {resolvedAddress ? <AddressText address={resolvedAddress} small /> : undefined}
+          </ToInputWrapper>
+          {toPublicKey ? (
+            <ClearWrapper onClick={handleClear}>
+              <ClearIcon name="cross" />
+            </ClearWrapper>
+          ) : undefined}
         </AddressWrapper>
       </WrapperLabel>
       {bottom ? <BottomWrapper>{bottom}</BottomWrapper> : undefined}
