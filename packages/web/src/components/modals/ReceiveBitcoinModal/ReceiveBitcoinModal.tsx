@@ -1,4 +1,5 @@
 import type { FC } from 'react';
+import { useMemo } from 'react';
 
 import { useUserTokenAccounts } from '@p2p-wallet-web/core';
 
@@ -10,7 +11,11 @@ import { TopUp } from './TopUp';
 export const ReceiveBitcoinModal: FC<ModalPropsType> = ({ close }) => {
   const tokenAccounts = useUserTokenAccounts();
 
-  if (tokenAccounts.length) {
+  const hasSomeBalance = useMemo(() => {
+    return tokenAccounts.some((value) => value.balance?.greaterThan(0));
+  }, [tokenAccounts]);
+
+  if (hasSomeBalance) {
     return <Create close={close} />;
   }
 
