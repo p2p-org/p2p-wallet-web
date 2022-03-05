@@ -19,7 +19,6 @@ export const SendButton: FC = () => {
     destinationAddress,
     isExecuting,
     isAddressInvalid,
-    isConfirmCorrectAddress,
     isShowConfirmAddressSwitch,
     setIsInitBurnAndRelease,
   } = useSendState();
@@ -34,7 +33,7 @@ export const SendButton: FC = () => {
     isValidAmount(fromAmount) ||
     isAddressInvalid ||
     !hasBalance ||
-    (isShowConfirmAddressSwitch && !isConfirmCorrectAddress);
+    isShowConfirmAddressSwitch;
 
   if (blockchain === 'bitcoin') {
     return (
