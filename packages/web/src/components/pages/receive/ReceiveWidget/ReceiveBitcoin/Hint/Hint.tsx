@@ -59,9 +59,6 @@ export const Hint: FC<Props> = ({ expiryTime }) => {
           coin.
         </Row>
         <Row>
-          You will receive <strong>renBTC</strong>.
-        </Row>
-        <Row>
           <MinimumTxAmount className={classNames({ inline: isFetchingFee })}>
             Minimum transaction amount of &nbsp;
             {isFetchingFee ? (
