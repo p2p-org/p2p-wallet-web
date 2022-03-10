@@ -36,9 +36,8 @@ If you'd rather build the application yourself, please ensure you have nodejs/np
 git clone https://github.com/p2p-org/p2p-wallet-web.git
 cd p2p-wallet-web
 yarn
+yarn build
 yarn start // to start a development
-yarn build // to create a production build
-yarn deploy // to deploy a production build
 ```
 
 # Development
