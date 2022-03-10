@@ -37,8 +37,8 @@ export const ReceiveBitcoin: FC = () => {
   return (
     <>
       <Content className="noTopPadding">
-        <Hint expiryTime={lockAndMintProvider.expiryTime} />
         <UsernameAddressWidget address={lockAndMintProvider.gatewayAddress} />
+        <Hint expiryTime={lockAndMintProvider.expiryTime} />
         <div>
           {Object.keys(lockAndMintProvider.deposits).map((depositId) => (
             <DepositStatus
