@@ -30,10 +30,10 @@ P2P Wallet Prototype supports a number features such as:
 
 # Project overview
 
-We use `lerna` to manage packages which are residing under the `packages` directory. To lint and format our code, sush tools as `eslint` and `prettier` are used.
+We use `lerna` to manage packages which are residing under the `packages` directory. To lint and format our code, such tools as `eslint` and `prettier` are used.
 ```
 p2p-wallet-web
-├── .gihub
+├── .github
 ├── .husky
 ├── node_modules
 ├── src
@@ -49,7 +49,7 @@ p2p-wallet-web
 ```
 
 Packages bear the following purposes:
-- `core`          : all general-purpose logic, uncluding type defenitions, app-wide context providers, etc.
+- `core`          : all general-purpose logic, including type definitions, app-wide context providers, etc.
 - `eslint-config` : `eslint` general configuration
 - `eslint-config-react` : `eslint` configuration for React-specific code
 - `sail`     : a collection of custom hooks and other application-wide logic
@@ -75,7 +75,7 @@ cd p2p-wallet-web
 yarn
 ```
 
-- Project uses `lerna` for package management. You will need to build the packages first tbefore starting development.
+- Project uses `lerna` for package management. You will need to build the packages first before starting development.
 
 ```
 yarn build
@@ -109,7 +109,7 @@ Install the following extensions in your code editor for linting and ease of wor
 
 - eslint
 - prettier
-- stylint
+- stylelint
 - linaria
 
 # Contributing
