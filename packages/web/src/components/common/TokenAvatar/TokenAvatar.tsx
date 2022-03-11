@@ -1,5 +1,5 @@
 import type { FunctionComponent, HTMLAttributes } from 'react';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 
 import { styled } from '@linaria/react';
 import { useTokensContext } from '@p2p-wallet-web/core';
@@ -57,6 +57,7 @@ export const TokenAvatar: FunctionComponent<Props & HTMLAttributes<HTMLDivElemen
   ...props
 }) => {
   const { tokenMap, tokens } = useTokensContext();
+  const [isDead, setIsDead] = useState<boolean>(false);
 
   // TODO: remove
   const tokenInfo = useMemo(() => {
@@ -78,15 +79,21 @@ export const TokenAvatar: FunctionComponent<Props & HTMLAttributes<HTMLDivElemen
     return tokenInfo?.hasTag('wrapped');
   }, [token, tokenInfo]);
 
+  const elAvatar = () => {
+    if (isDead) {
+      return <Jazzicon address="" {...props} />;
+    }
+
+    if (token) {
+      return <Avatar src={token.icon} onError={() => setIsDead(true)} {...props} />;
+    }
+
+    return <Avatar src={tokenInfo?.icon} onError={() => setIsDead(true)} {...props} />;
+  };
+
   return (
     <Wrapper className={classNames(className, { isNotExists: !tokenInfo || !token })}>
-      {token ? (
-        <Avatar src={token.icon} {...props} />
-      ) : (!tokenInfo || !tokenInfo.icon) && address ? (
-        <Jazzicon address={address} {...props} />
-      ) : (
-        <Avatar src={tokenInfo?.icon || undefined} {...props} />
-      )}
+      {elAvatar()}
       {isWrapped ? (
         <WrappedBy
           className={classNames({

@@ -1,5 +1,4 @@
-import type { FunctionComponent, HTMLAttributes } from 'react';
-import { useState } from 'react';
+import type { FunctionComponent, HTMLAttributes, SyntheticEvent } from 'react';
 
 import { styled } from '@linaria/react';
 
@@ -15,11 +14,10 @@ const Wrapper = styled.img<{ size: string | number | undefined }>`
   }
 `;
 
-const BAD_SRCS: { [src: string]: true } = {};
-
 type Props = {
   src?: string;
   size?: string | number;
+  onError?: (e: SyntheticEvent<HTMLDivElement>) => void;
 };
 
 export const Avatar: FunctionComponent<Props & HTMLAttributes<HTMLDivElement>> = ({
@@ -27,21 +25,5 @@ export const Avatar: FunctionComponent<Props & HTMLAttributes<HTMLDivElement>> =
   size,
   ...props
 }) => {
-  const [, refresh] = useState<number>(0);
-
-  const _src: string | undefined = src && !BAD_SRCS[src] ? src : undefined;
-
-  return (
-    <Wrapper
-      src={_src}
-      size={size}
-      {...props}
-      onError={() => {
-        if (src) {
-          BAD_SRCS[src] = true;
-        }
-        refresh((i) => i + 1);
-      }}
-    />
-  );
+  return <Wrapper src={src} size={size} {...props} />;
 };
