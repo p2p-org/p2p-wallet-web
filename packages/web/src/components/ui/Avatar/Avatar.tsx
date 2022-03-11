@@ -1,4 +1,4 @@
-import type { FunctionComponent, HTMLAttributes, SyntheticEvent } from 'react';
+import type { FunctionComponent, HTMLAttributes } from 'react';
 
 import { styled } from '@linaria/react';
 
@@ -17,7 +17,6 @@ const Wrapper = styled.img<{ size: string | number | undefined }>`
 type Props = {
   src?: string;
   size?: string | number;
-  onError?: (e: SyntheticEvent<HTMLDivElement>) => void;
 };
 
 export const Avatar: FunctionComponent<Props & HTMLAttributes<HTMLDivElement>> = ({

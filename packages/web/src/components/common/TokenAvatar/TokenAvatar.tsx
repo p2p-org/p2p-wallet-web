@@ -80,15 +80,19 @@ export const TokenAvatar: FunctionComponent<Props & HTMLAttributes<HTMLDivElemen
   }, [token, tokenInfo]);
 
   const elAvatar = () => {
-    if (isDead) {
-      return <Jazzicon address="" {...props} />;
+    const commonAttr = {
+      onError: () => setIsDead(true),
+    };
+
+    if (token && !isDead) {
+      return <Avatar src={token.icon} {...commonAttr} {...props} />;
     }
 
-    if (token) {
-      return <Avatar src={token.icon} onError={() => setIsDead(true)} {...props} />;
+    if (tokenInfo?.icon) {
+      return <Avatar src={tokenInfo?.icon} {...commonAttr} {...props} />;
     }
 
-    return <Avatar src={tokenInfo?.icon} onError={() => setIsDead(true)} {...props} />;
+    return <Jazzicon address="" {...props} />;
   };
 
   return (
