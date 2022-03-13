@@ -1,5 +1,5 @@
 import type { FunctionComponent, HTMLAttributes } from 'react';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import { styled } from '@linaria/react';
 import { useTokensContext } from '@p2p-wallet-web/core';
@@ -59,6 +59,10 @@ export const TokenAvatar: FunctionComponent<Props & HTMLAttributes<HTMLDivElemen
   const { tokenMap, tokens } = useTokensContext();
   const [isDead, setIsDead] = useState<boolean>(false);
 
+  useEffect(() => {
+    setIsDead(false);
+  }, [token?.icon]);
+
   // TODO: remove
   const tokenInfo = useMemo(() => {
     if (token) {
@@ -85,14 +89,18 @@ export const TokenAvatar: FunctionComponent<Props & HTMLAttributes<HTMLDivElemen
     };
 
     if (token && !isDead) {
-      return <Avatar src={token.icon} {...commonAttr} {...props} />;
+      return <Avatar src={token.icon} {...props} {...commonAttr} />;
     }
 
-    if (tokenInfo?.icon) {
-      return <Avatar src={tokenInfo?.icon} {...commonAttr} {...props} />;
+    if (token && isDead) {
+      return <Jazzicon address={address || ''} {...props} />;
     }
 
-    return <Jazzicon address="" {...props} />;
+    if ((!tokenInfo || !tokenInfo.icon) && address) {
+      return <Jazzicon address={address} {...props} />;
+    }
+
+    return <Avatar src={tokenInfo?.icon || undefined} {...props} {...commonAttr} />;
   };
 
   return (
