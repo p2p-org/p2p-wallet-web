@@ -105,6 +105,7 @@ export const Main: FC = () => {
   };
 
   const isDisabled = isExecuting;
+  const tokenSymbol = fromTokenAccount?.balance?.token?.symbol;
 
   return (
     <>
@@ -127,8 +128,9 @@ export const Main: FC = () => {
         <ToAddressInput />
         {isShowConfirmAddressSwitch ? (
           <ConfirmWrapper>
-            This address does not appear to have a USDC account. You have to pay one-time fee to
-            create a USDC account for this address. You can choose which currency to pay in below.
+            This address does not appear to have a {tokenSymbol} account. You have to pay a one-time
+            fee to create a {tokenSymbol} account for this address. You can choose which currency to
+            pay in below.
           </ConfirmWrapper>
         ) : undefined}
       </ToWrapper>
