@@ -139,7 +139,7 @@ export const SendButtonSolana: FC<Props> = ({ primary, disabled }) => {
     return (
       <>
         <SendIcon name="top" />
-        Send {fromTokenAccount?.balance?.formatUnits()}
+        Send {fromAmount}
       </>
     );
   }, [destinationAddress, fromAmount, fromTokenAccount?.balance, hasBalance]);
