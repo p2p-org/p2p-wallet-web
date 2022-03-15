@@ -93,7 +93,7 @@ export const TokenAvatar: FunctionComponent<Props & HTMLAttributes<HTMLDivElemen
     }
 
     if (token && isDead) {
-      return <Jazzicon address={address || ''} {...props} />;
+      return <Jazzicon address={token.address} {...props} />;
     }
 
     if ((!tokenInfo || !tokenInfo.icon) && address) {
