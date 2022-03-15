@@ -43,7 +43,7 @@ const WrappedBy = styled.div`
 `;
 
 type Props = {
-  size?: string | number;
+  size?: number;
   token?: Token;
   symbol?: string; // TODO: remove
   address?: string; // TODO: remove
@@ -93,11 +93,11 @@ export const TokenAvatar: FunctionComponent<Props & HTMLAttributes<HTMLDivElemen
     }
 
     if (token && isDead) {
-      return <Jazzicon address={token.address} {...props} />;
+      return <Jazzicon address={token.address} size={props.size} />;
     }
 
     if ((!tokenInfo || !tokenInfo.icon) && address) {
-      return <Jazzicon address={address} {...props} />;
+      return <Jazzicon address={address} size={props.size} />;
     }
 
     return <Avatar src={tokenInfo?.icon || undefined} {...props} {...commonAttr} />;
