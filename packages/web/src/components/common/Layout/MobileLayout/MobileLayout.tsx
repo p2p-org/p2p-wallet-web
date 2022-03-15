@@ -23,7 +23,6 @@ const Wrapper = styled.div`
 `;
 
 const Container = styled.div`
-  overflow-y: auto;
   ${fullHeight}
 `;
 
