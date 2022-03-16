@@ -1,11 +1,6 @@
 import type { FC } from 'react';
-import { useMemo } from 'react';
 
-import { ZERO } from '@orca-so/sdk';
-import { useNativeAccount } from '@p2p-wallet-web/sail';
-import { TokenAmount } from '@saberhq/token-utils';
-
-import { useFeeCompensation, useFreeFeeLimits, useSendState, useSettings } from 'app/contexts';
+import { useFreeFeeLimits, useSendState, useSettings } from 'app/contexts';
 import { CompensationFee } from 'components/common/CompensationFee';
 import { FreeTransactionTooltip } from 'components/common/TransactionDetails/FreeTransactionTooltip';
 import { Accordion } from 'components/ui';
@@ -16,63 +11,8 @@ export const TransactionDetails: FC = () => {
   const {
     settings: { useFreeTransactions },
   } = useSettings();
-  const { compensationState, feeToken, feeAmountInToken } = useFeeCompensation();
-  const { fromTokenAccount, parsedAmount, destinationAccount, setTotalAmount } = useSendState();
+  const { fromTokenAccount, destinationAccount, details } = useSendState();
   const { userFreeFeeLimits } = useFreeFeeLimits();
-  const nativeAccount = useNativeAccount();
-
-  const details = useMemo(() => {
-    let receiveAmount;
-
-    if (!parsedAmount && fromTokenAccount && fromTokenAccount.balance) {
-      receiveAmount = new TokenAmount(fromTokenAccount.balance.token, 0).formatUnits();
-    } else if (parsedAmount) {
-      receiveAmount = parsedAmount.formatUnits();
-    }
-
-    let totlalAmount = receiveAmount;
-    let accountCreationAmount;
-
-    if (compensationState.totalFee.gt(ZERO)) {
-      if (feeToken?.balance?.token.isRawSOL && nativeAccount.nativeBalance) {
-        accountCreationAmount = new TokenAmount(
-          nativeAccount.nativeBalance.token,
-          compensationState.estimatedFee.accountRent,
-        ).formatUnits();
-
-        setTotalAmount(totlalAmount);
-        totlalAmount += ` + ${accountCreationAmount}`;
-      } else {
-        if (feeToken && feeToken.balance) {
-          const accontCreationTokenAmount = new TokenAmount(
-            feeToken?.balance?.token,
-            feeAmountInToken,
-          );
-
-          accountCreationAmount = accontCreationTokenAmount.formatUnits();
-
-          totlalAmount = parsedAmount
-            ? parsedAmount.add(accontCreationTokenAmount).formatUnits()
-            : accountCreationAmount;
-
-          setTotalAmount(totlalAmount);
-        }
-      }
-    }
-
-    return {
-      receiveAmount,
-      accountCreationAmount,
-      totlalAmount,
-    };
-  }, [
-    compensationState,
-    feeAmountInToken,
-    feeToken,
-    fromTokenAccount,
-    nativeAccount,
-    parsedAmount,
-  ]);
 
   if (!details.receiveAmount) {
     return null;

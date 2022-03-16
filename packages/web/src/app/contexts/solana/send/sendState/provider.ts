@@ -4,7 +4,7 @@ import { useParams } from 'react-router-dom';
 import { ZERO } from '@orca-so/sdk';
 import type { TokenAccount } from '@p2p-wallet-web/core';
 import { tryParseTokenAmount, useTokenAccount, useWallet } from '@p2p-wallet-web/core';
-import { usePubkey } from '@p2p-wallet-web/sail';
+import { useNativeAccount, usePubkey } from '@p2p-wallet-web/sail';
 import type { RenNetwork } from '@renproject/interfaces';
 import { TokenAmount } from '@saberhq/token-utils';
 import { PublicKey } from '@solana/web3.js';
@@ -39,8 +39,7 @@ export interface UseSendState {
   blockchain: Blockchain;
   setBlockchain: (v: Blockchain) => void;
 
-  totalAmount?: string;
-  setTotalAmount: (amount?: string) => void;
+  totalAmountToShow?: string;
 
   renNetwork: RenNetwork;
 
@@ -62,13 +61,27 @@ export interface UseSendState {
 
   feeAmount: TokenAmount | undefined;
   hasBalance: boolean;
+
+  details: {
+    receiveAmount?: string;
+    accountCreationAmount?: string;
+    totlalAmount?: string;
+  };
 }
 
 const useSendStateInternal = (): UseSendState => {
   const { publicKey } = useParams<{ publicKey: string }>();
   const { publicKey: publicKeySol } = useWallet();
   const { resolveAddress } = useResolveAddress();
-  const { setFromToken, setAccountsCount, estimatedFeeAmount } = useFeeCompensation();
+  const nativeAccount = useNativeAccount();
+  const {
+    setFromToken,
+    setAccountsCount,
+    estimatedFeeAmount,
+    compensationState,
+    feeToken,
+    feeAmountInToken,
+  } = useFeeCompensation();
 
   const tokenAccount = useTokenAccount(usePubkey(publicKey ?? publicKeySol));
   const [fromTokenAccount, setFromTokenAccount] = useState<TokenAccount | null | undefined>(null);
@@ -82,7 +95,6 @@ const useSendStateInternal = (): UseSendState => {
   const [toPublicKey, setToPublicKey] = useState('');
   const [resolvedAddress, setResolvedAddress] = useState<string | null>(null);
   const [isResolvingAddress, setIsResolvingAddress] = useState(false);
-  const [totalAmount, setTotalAmount] = useState<string>();
 
   const [blockchain, setBlockchain] = useState<Blockchain>(BLOCKCHAINS[0]!);
 
@@ -94,6 +106,7 @@ const useSendStateInternal = (): UseSendState => {
   const [isInitBurnAndRelease, setIsInitBurnAndRelease] = useState(false);
 
   const [destinationAccount, setDestinationAccount] = useState<DestinationAccount | null>(null);
+  let totalAmountToShow;
 
   useEffect(() => {
     if (tokenAccount?.balance) {
@@ -181,6 +194,59 @@ const useSendStateInternal = (): UseSendState => {
     return tokenAccountBalance ? tokenAccountBalance.asNumber >= Number(fromAmount) : false;
   }, [feeAmount, fromAmount, tokenAccount]);
 
+  const details = useMemo(() => {
+    let receiveAmount;
+
+    if (!parsedAmount && fromTokenAccount && fromTokenAccount.balance) {
+      receiveAmount = new TokenAmount(fromTokenAccount.balance.token, 0).formatUnits();
+    } else if (parsedAmount) {
+      receiveAmount = parsedAmount.formatUnits();
+    }
+
+    let totlalAmount = receiveAmount;
+    let accountCreationAmount;
+
+    if (compensationState.totalFee.gt(ZERO)) {
+      if (feeToken?.balance?.token.isRawSOL && nativeAccount.nativeBalance) {
+        accountCreationAmount = new TokenAmount(
+          nativeAccount.nativeBalance.token,
+          compensationState.estimatedFee.accountRent,
+        ).formatUnits();
+
+        totalAmountToShow = totlalAmount;
+        totlalAmount += ` + ${accountCreationAmount}`;
+      } else {
+        if (feeToken && feeToken.balance) {
+          const accontCreationTokenAmount = new TokenAmount(
+            feeToken?.balance?.token,
+            feeAmountInToken,
+          );
+
+          accountCreationAmount = accontCreationTokenAmount.formatUnits();
+
+          totlalAmount = parsedAmount
+            ? parsedAmount.add(accontCreationTokenAmount).formatUnits()
+            : accountCreationAmount;
+
+          totalAmountToShow = totlalAmount;
+        }
+      }
+    }
+
+    return {
+      receiveAmount,
+      accountCreationAmount,
+      totlalAmount,
+    };
+  }, [
+    compensationState,
+    feeAmountInToken,
+    feeToken,
+    fromTokenAccount,
+    nativeAccount,
+    parsedAmount,
+  ]);
+
   return {
     fromTokenAccount,
     setFromTokenAccount,
@@ -194,8 +260,6 @@ const useSendStateInternal = (): UseSendState => {
     setResolvedAddress,
     blockchain,
     setBlockchain,
-    totalAmount,
-    setTotalAmount,
     renNetwork,
     isExecuting,
     setIsExecuting,
@@ -209,6 +273,8 @@ const useSendStateInternal = (): UseSendState => {
     isResolvingAddress,
     feeAmount,
     hasBalance,
+    totalAmountToShow,
+    details,
   };
 };
 
