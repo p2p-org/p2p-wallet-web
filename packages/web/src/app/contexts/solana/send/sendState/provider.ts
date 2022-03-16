@@ -4,7 +4,7 @@ import { useParams } from 'react-router-dom';
 import { ZERO } from '@orca-so/sdk';
 import type { TokenAccount } from '@p2p-wallet-web/core';
 import { tryParseTokenAmount, useTokenAccount, useWallet } from '@p2p-wallet-web/core';
-import { usePubkey } from '@p2p-wallet-web/sail';
+import { useNativeAccount, usePubkey } from '@p2p-wallet-web/sail';
 import type { RenNetwork } from '@renproject/interfaces';
 import { TokenAmount } from '@saberhq/token-utils';
 import { PublicKey } from '@solana/web3.js';
@@ -59,13 +59,28 @@ export interface UseSendState {
 
   feeAmount: TokenAmount | undefined;
   hasBalance: boolean;
+
+  details: {
+    receiveAmount?: string;
+    accountCreationAmount?: string;
+    totalAmount?: string;
+    totalAmountToShow?: string;
+  };
 }
 
 const useSendStateInternal = (): UseSendState => {
   const { publicKey } = useParams<{ publicKey: string }>();
   const { publicKey: publicKeySol } = useWallet();
   const { resolveAddress } = useResolveAddress();
-  const { setFromToken, setAccountsCount, estimatedFeeAmount } = useFeeCompensation();
+  const nativeAccount = useNativeAccount();
+  const {
+    setFromToken,
+    setAccountsCount,
+    estimatedFeeAmount,
+    compensationState,
+    feeToken,
+    feeAmountInToken,
+  } = useFeeCompensation();
 
   const tokenAccount = useTokenAccount(usePubkey(publicKey ?? publicKeySol));
   const [fromTokenAccount, setFromTokenAccount] = useState<TokenAccount | null | undefined>(null);
@@ -177,6 +192,61 @@ const useSendStateInternal = (): UseSendState => {
     return tokenAccountBalance ? tokenAccountBalance.asNumber >= Number(fromAmount) : false;
   }, [feeAmount, fromAmount, tokenAccount]);
 
+  const details = useMemo(() => {
+    let receiveAmount;
+    let totalAmountToShow;
+
+    if (!parsedAmount && fromTokenAccount && fromTokenAccount.balance) {
+      receiveAmount = new TokenAmount(fromTokenAccount.balance.token, 0).formatUnits();
+    } else if (parsedAmount) {
+      receiveAmount = parsedAmount.formatUnits();
+    }
+
+    let totalAmount = receiveAmount;
+    let accountCreationAmount;
+
+    if (compensationState.totalFee.gt(ZERO)) {
+      if (feeToken?.balance?.token.isRawSOL && nativeAccount.nativeBalance) {
+        accountCreationAmount = new TokenAmount(
+          nativeAccount.nativeBalance.token,
+          compensationState.estimatedFee.accountRent,
+        ).formatUnits();
+
+        totalAmountToShow = totalAmount;
+        totalAmount += ` + ${accountCreationAmount}`;
+      } else {
+        if (feeToken && feeToken.balance) {
+          const accontCreationTokenAmount = new TokenAmount(
+            feeToken?.balance?.token,
+            feeAmountInToken,
+          );
+
+          accountCreationAmount = accontCreationTokenAmount.formatUnits();
+
+          totalAmount = parsedAmount
+            ? parsedAmount.add(accontCreationTokenAmount).formatUnits()
+            : accountCreationAmount;
+
+          totalAmountToShow = totalAmount;
+        }
+      }
+    }
+
+    return {
+      receiveAmount,
+      accountCreationAmount,
+      totalAmount,
+      totalAmountToShow,
+    };
+  }, [
+    compensationState,
+    feeAmountInToken,
+    feeToken,
+    fromTokenAccount,
+    nativeAccount,
+    parsedAmount,
+  ]);
+
   return {
     fromTokenAccount,
     setFromTokenAccount,
@@ -203,6 +273,7 @@ const useSendStateInternal = (): UseSendState => {
     isResolvingAddress,
     feeAmount,
     hasBalance,
+    details,
   };
 };
 

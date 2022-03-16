@@ -1,11 +1,6 @@
 import type { FC } from 'react';
-import { useMemo } from 'react';
 
-import { ZERO } from '@orca-so/sdk';
-import { useNativeAccount } from '@p2p-wallet-web/sail';
-import { TokenAmount } from '@saberhq/token-utils';
-
-import { useFeeCompensation, useFreeFeeLimits, useSendState, useSettings } from 'app/contexts';
+import { useFreeFeeLimits, useSendState, useSettings } from 'app/contexts';
 import { CompensationFee } from 'components/common/CompensationFee';
 import { FreeTransactionTooltip } from 'components/common/TransactionDetails/FreeTransactionTooltip';
 import { Accordion } from 'components/ui';
@@ -16,60 +11,8 @@ export const TransactionDetails: FC = () => {
   const {
     settings: { useFreeTransactions },
   } = useSettings();
-  const { compensationState, feeToken, feeAmountInToken } = useFeeCompensation();
-  const { fromTokenAccount, parsedAmount, destinationAccount } = useSendState();
+  const { fromTokenAccount, destinationAccount, details } = useSendState();
   const { userFreeFeeLimits } = useFreeFeeLimits();
-  const nativeAccount = useNativeAccount();
-
-  const details = useMemo(() => {
-    let receiveAmount;
-
-    if (!parsedAmount && fromTokenAccount && fromTokenAccount.balance) {
-      receiveAmount = new TokenAmount(fromTokenAccount.balance.token, 0).formatUnits();
-    } else if (parsedAmount) {
-      receiveAmount = parsedAmount.formatUnits();
-    }
-
-    let totlalAmount = receiveAmount;
-    let accountCreationAmount;
-
-    if (compensationState.totalFee.gt(ZERO)) {
-      if (feeToken?.balance?.token.isRawSOL && nativeAccount.nativeBalance) {
-        accountCreationAmount = new TokenAmount(
-          nativeAccount.nativeBalance.token,
-          compensationState.estimatedFee.accountRent,
-        ).formatUnits();
-
-        totlalAmount += ` + ${accountCreationAmount}`;
-      } else {
-        if (feeToken && feeToken.balance) {
-          const accontCreationTokenAmount = new TokenAmount(
-            feeToken?.balance?.token,
-            feeAmountInToken,
-          );
-
-          accountCreationAmount = accontCreationTokenAmount.formatUnits();
-
-          totlalAmount = parsedAmount
-            ? parsedAmount.add(accontCreationTokenAmount).formatUnits()
-            : accountCreationAmount;
-        }
-      }
-    }
-
-    return {
-      receiveAmount,
-      accountCreationAmount,
-      totlalAmount,
-    };
-  }, [
-    compensationState,
-    feeAmountInToken,
-    feeToken,
-    fromTokenAccount,
-    nativeAccount,
-    parsedAmount,
-  ]);
 
   if (!details.receiveAmount) {
     return null;
@@ -81,7 +24,7 @@ export const TransactionDetails: FC = () => {
         <AccordionTitle
           title="Transaction details"
           titleBottomName="Total"
-          titleBottomValue={details.totlalAmount || ''}
+          titleBottomValue={details.totalAmount || ''}
         />
       }
       open
@@ -133,7 +76,7 @@ export const TransactionDetails: FC = () => {
         <Row>
           <Text>Total</Text>
           <Text>
-            {details.totlalAmount}
+            {details.totalAmount}
             {/* <Text className="gray">(~$150.5)</Text> */}
           </Text>
         </Row>
