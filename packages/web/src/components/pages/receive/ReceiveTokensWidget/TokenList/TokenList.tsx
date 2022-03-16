@@ -13,12 +13,7 @@ import { Hint } from '../common/Hint';
 import { TokenRow } from './TokenRow';
 
 const Wrapper = styled.div`
-  height: 600px;
   overflow-y: auto;
-
-  ${up.tablet} {
-    height: 300px;
-  }
 `;
 
 const Container = styled.div``;
