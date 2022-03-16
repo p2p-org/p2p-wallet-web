@@ -41,7 +41,7 @@ export const SendButtonSolana: FC<Props> = ({ primary, disabled }) => {
     parsedAmount,
     destinationAccount,
     hasBalance,
-    totalAmountToShow,
+    details,
   } = useSendState();
   const transferAction = useTransferAction();
   const { compensationParams } = useFeeCompensation();
@@ -140,10 +140,16 @@ export const SendButtonSolana: FC<Props> = ({ primary, disabled }) => {
     return (
       <>
         <SendIcon name="top" />
-        Send {totalAmountToShow}
+        Send {details.totalAmountToShow}
       </>
     );
-  }, [destinationAddress, fromAmount, fromTokenAccount?.balance, hasBalance, totalAmountToShow]);
+  }, [
+    destinationAddress,
+    fromAmount,
+    fromTokenAccount?.balance,
+    hasBalance,
+    details.totalAmountToShow,
+  ]);
 
   return (
     <Button primary={primary} disabled={disabled} big full onClick={handleSubmit}>

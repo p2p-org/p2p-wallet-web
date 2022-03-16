@@ -39,8 +39,6 @@ export interface UseSendState {
   blockchain: Blockchain;
   setBlockchain: (v: Blockchain) => void;
 
-  totalAmountToShow?: string;
-
   renNetwork: RenNetwork;
 
   isExecuting: boolean;
@@ -66,6 +64,7 @@ export interface UseSendState {
     receiveAmount?: string;
     accountCreationAmount?: string;
     totlalAmount?: string;
+    totalAmountToShow?: string;
   };
 }
 
@@ -106,7 +105,6 @@ const useSendStateInternal = (): UseSendState => {
   const [isInitBurnAndRelease, setIsInitBurnAndRelease] = useState(false);
 
   const [destinationAccount, setDestinationAccount] = useState<DestinationAccount | null>(null);
-  let totalAmountToShow;
 
   useEffect(() => {
     if (tokenAccount?.balance) {
@@ -196,6 +194,7 @@ const useSendStateInternal = (): UseSendState => {
 
   const details = useMemo(() => {
     let receiveAmount;
+    let totalAmountToShow;
 
     if (!parsedAmount && fromTokenAccount && fromTokenAccount.balance) {
       receiveAmount = new TokenAmount(fromTokenAccount.balance.token, 0).formatUnits();
@@ -237,6 +236,7 @@ const useSendStateInternal = (): UseSendState => {
       receiveAmount,
       accountCreationAmount,
       totlalAmount,
+      totalAmountToShow,
     };
   }, [
     compensationState,
@@ -273,7 +273,6 @@ const useSendStateInternal = (): UseSendState => {
     isResolvingAddress,
     feeAmount,
     hasBalance,
-    totalAmountToShow,
     details,
   };
 };
