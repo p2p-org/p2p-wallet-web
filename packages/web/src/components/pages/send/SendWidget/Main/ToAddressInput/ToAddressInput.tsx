@@ -37,12 +37,16 @@ const AddressWrapper = styled.div`
   grid-gap: 16px;
   align-items: center;
   margin-left: 12px;
+
+  min-width: 0;
 `;
 
 const ToInputWrapper = styled.div`
   display: flex;
   flex: 1;
   flex-direction: column;
+
+  min-width: 0;
 `;
 
 const ToInput = styled.input`

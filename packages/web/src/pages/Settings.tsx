@@ -48,7 +48,7 @@ const Item = styled.div`
 
 const ItemTitle = styled.div`
   display: flex;
-  flex-grow: 1;
+  flex: 1 0 auto;
 
   font-weight: 600;
   font-size: 16px;
@@ -93,14 +93,6 @@ const Title = styled.div`
   font-size: 16px;
 
   text-align: right;
-
-  &.overflow-ellipsis {
-    width: 250px;
-    overflow: hidden;
-
-    white-space: nowrap;
-    text-overflow: ellipsis;
-  }
 `;
 
 const ChevronIcon = styled(Icon)`
@@ -267,9 +259,7 @@ export const Settings: FunctionComponent = () => {
                 }}
                 style={{ cursor: 'pointer' }}
               >
-                <Title className="overflow-ellipsis" title={endpoint}>
-                  {endpoint}
-                </Title>
+                <Title title={endpoint}>{endpoint}</Title>
                 <ChevronWrapper
                   onClick={() => {
                     history.push('/settings/network');
