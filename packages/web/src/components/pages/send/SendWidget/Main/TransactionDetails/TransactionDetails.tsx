@@ -17,7 +17,7 @@ export const TransactionDetails: FC = () => {
     settings: { useFreeTransactions },
   } = useSettings();
   const { compensationState, feeToken, feeAmountInToken } = useFeeCompensation();
-  const { fromTokenAccount, parsedAmount, destinationAccount } = useSendState();
+  const { fromTokenAccount, parsedAmount, destinationAccount, setTotalAmount } = useSendState();
   const { userFreeFeeLimits } = useFreeFeeLimits();
   const nativeAccount = useNativeAccount();
 
@@ -56,6 +56,8 @@ export const TransactionDetails: FC = () => {
         }
       }
     }
+
+    setTotalAmount(totlalAmount);
 
     return {
       receiveAmount,

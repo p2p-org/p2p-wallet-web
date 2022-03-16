@@ -39,6 +39,9 @@ export interface UseSendState {
   blockchain: Blockchain;
   setBlockchain: (v: Blockchain) => void;
 
+  totalAmount?: string;
+  setTotalAmount: (amount?: string) => void;
+
   renNetwork: RenNetwork;
 
   isExecuting: boolean;
@@ -79,6 +82,7 @@ const useSendStateInternal = (): UseSendState => {
   const [toPublicKey, setToPublicKey] = useState('');
   const [resolvedAddress, setResolvedAddress] = useState<string | null>(null);
   const [isResolvingAddress, setIsResolvingAddress] = useState(false);
+  const [totalAmount, setTotalAmount] = useState<string>();
 
   const [blockchain, setBlockchain] = useState<Blockchain>(BLOCKCHAINS[0]!);
 
@@ -190,6 +194,8 @@ const useSendStateInternal = (): UseSendState => {
     setResolvedAddress,
     blockchain,
     setBlockchain,
+    totalAmount,
+    setTotalAmount,
     renNetwork,
     isExecuting,
     setIsExecuting,
