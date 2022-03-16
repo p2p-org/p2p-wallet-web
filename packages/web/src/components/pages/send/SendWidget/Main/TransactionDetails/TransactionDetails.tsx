@@ -40,6 +40,7 @@ export const TransactionDetails: FC = () => {
           compensationState.estimatedFee.accountRent,
         ).formatUnits();
 
+        setTotalAmount(totlalAmount);
         totlalAmount += ` + ${accountCreationAmount}`;
       } else {
         if (feeToken && feeToken.balance) {
@@ -53,11 +54,11 @@ export const TransactionDetails: FC = () => {
           totlalAmount = parsedAmount
             ? parsedAmount.add(accontCreationTokenAmount).formatUnits()
             : accountCreationAmount;
+
+          setTotalAmount(totlalAmount);
         }
       }
     }
-
-    setTotalAmount(totlalAmount);
 
     return {
       receiveAmount,
