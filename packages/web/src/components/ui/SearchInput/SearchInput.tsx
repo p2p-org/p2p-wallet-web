@@ -36,6 +36,8 @@ const Wrapper = styled.label`
   border-radius: 12px;
   cursor: text;
 
+  min-width: 0;
+
   &.isFocused {
     border: 1px solid rgba(163, 165, 186, 0.5);
 
@@ -50,6 +52,8 @@ const Content = styled.div`
   flex: 1;
   flex-direction: column;
   justify-content: center;
+
+  min-width: 0;
 `;
 
 const InputElement = styled.input`
