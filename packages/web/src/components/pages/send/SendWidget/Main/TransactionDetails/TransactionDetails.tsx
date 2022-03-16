@@ -24,7 +24,7 @@ export const TransactionDetails: FC = () => {
         <AccordionTitle
           title="Transaction details"
           titleBottomName="Total"
-          titleBottomValue={details.totlalAmount || ''}
+          titleBottomValue={details.totalAmount || ''}
         />
       }
       open
@@ -76,7 +76,7 @@ export const TransactionDetails: FC = () => {
         <Row>
           <Text>Total</Text>
           <Text>
-            {details.totlalAmount}
+            {details.totalAmount}
             {/* <Text className="gray">(~$150.5)</Text> */}
           </Text>
         </Row>

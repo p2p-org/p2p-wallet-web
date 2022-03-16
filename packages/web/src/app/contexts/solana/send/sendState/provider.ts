@@ -63,7 +63,7 @@ export interface UseSendState {
   details: {
     receiveAmount?: string;
     accountCreationAmount?: string;
-    totlalAmount?: string;
+    totalAmount?: string;
     totalAmountToShow?: string;
   };
 }
@@ -202,7 +202,7 @@ const useSendStateInternal = (): UseSendState => {
       receiveAmount = parsedAmount.formatUnits();
     }
 
-    let totlalAmount = receiveAmount;
+    let totalAmount = receiveAmount;
     let accountCreationAmount;
 
     if (compensationState.totalFee.gt(ZERO)) {
@@ -212,8 +212,8 @@ const useSendStateInternal = (): UseSendState => {
           compensationState.estimatedFee.accountRent,
         ).formatUnits();
 
-        totalAmountToShow = totlalAmount;
-        totlalAmount += ` + ${accountCreationAmount}`;
+        totalAmountToShow = totalAmount;
+        totalAmount += ` + ${accountCreationAmount}`;
       } else {
         if (feeToken && feeToken.balance) {
           const accontCreationTokenAmount = new TokenAmount(
@@ -223,11 +223,11 @@ const useSendStateInternal = (): UseSendState => {
 
           accountCreationAmount = accontCreationTokenAmount.formatUnits();
 
-          totlalAmount = parsedAmount
+          totalAmount = parsedAmount
             ? parsedAmount.add(accontCreationTokenAmount).formatUnits()
             : accountCreationAmount;
 
-          totalAmountToShow = totlalAmount;
+          totalAmountToShow = totalAmount;
         }
       }
     }
@@ -235,7 +235,7 @@ const useSendStateInternal = (): UseSendState => {
     return {
       receiveAmount,
       accountCreationAmount,
-      totlalAmount,
+      totalAmount,
       totalAmountToShow,
     };
   }, [
