@@ -12,7 +12,8 @@
     "test": "react-app-rewired test --env=jsdom",
     "eject": "react-scripts eject",
     "lint": "eslint src --ext js,ts,tsx --cache src --fix",
-    "test:integration": "yarn test --testPathPattern=integration --runInBand --forceExit"
+    "test:integration": "yarn test --testPathPattern=integration --runInBand --forceExit",
+    "precommit": "lint-staged"
   },
   "dependencies": {
     "@emotion/is-prop-valid": "^0.8.8",
