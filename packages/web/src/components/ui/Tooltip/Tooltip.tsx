@@ -22,7 +22,7 @@ const Popover = styled.div`
   position: absolute;
   top: 16px;
   right: -14px;
-  z-index: 1;
+  z-index: 2;
 
   min-width: max-content;
   margin-top: 8px;
