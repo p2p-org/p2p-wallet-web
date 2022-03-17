@@ -232,6 +232,8 @@ const useSendStateInternal = (): UseSendState => {
       }
     }
 
+    if (!totalAmountToShow) totalAmountToShow = totalAmount;
+
     return {
       receiveAmount,
       accountCreationAmount,
