@@ -12,6 +12,8 @@ import { SendButton } from 'components/pages/send/SendWidget/SendButton';
 
 import { BurnAndRelease } from './BurnAndRelease/BurnAndRelease';
 
+// @FRIDAY removed disabled button
+// find out what to do with account
 export const SendWidget: FunctionComponent = () => {
   useTrackEventOpen('Send_Viewed');
 
@@ -31,7 +33,9 @@ export const SendWidget: FunctionComponent = () => {
 
     const checkDestinationAddress = async () => {
       if (pubKey) {
+        // HERE
         const account = await provider.getAccountInfo(new PublicKey(pubKey));
+        console.log(account, pubKey);
 
         if (!account) {
           setIsShowConfirmAddressSwitch(true);
@@ -39,13 +43,13 @@ export const SendWidget: FunctionComponent = () => {
       }
     };
 
-    const isSolanaNetwork = blockchain === 'solana';
-
     if (isValidAddress(blockchain, toPublicKey, renNetwork)) {
       pubKey = toPublicKey;
     } else if (isValidAddress(blockchain, resolvedAddress ?? '', renNetwork)) {
       pubKey = resolvedAddress;
     }
+
+    const isSolanaNetwork = blockchain === 'solana';
 
     if (isSolanaNetwork && pubKey) {
       void checkDestinationAddress();
