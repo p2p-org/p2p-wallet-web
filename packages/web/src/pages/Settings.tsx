@@ -146,6 +146,7 @@ export const Settings: FunctionComponent = () => {
   const { username, domain } = useUsername();
 
   const handleLogoutClick = () => {
+    history.push('/login');
     trackEvent('Sign_Out');
     disconnect();
   };
