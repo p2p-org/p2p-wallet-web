@@ -22,24 +22,44 @@ export const SendWidget: FunctionComponent = () => {
     blockchain,
     renNetwork,
     isInitBurnAndRelease,
+    resolvedAddress,
     setIsShowConfirmAddressSwitch,
   } = useSendState();
 
   useEffect(() => {
-    const checkDestinationAddress = async () => {
-      const account = await provider.getAccountInfo(new PublicKey(toPublicKey));
+    let pubKey: string | null = '';
 
-      if (!account) {
-        setIsShowConfirmAddressSwitch(true);
+    const checkDestinationAddress = async () => {
+      if (pubKey) {
+        const account = await provider.getAccountInfo(new PublicKey(pubKey));
+
+        if (!account) {
+          setIsShowConfirmAddressSwitch(true);
+        }
       }
     };
 
-    if (blockchain === 'solana' && isValidAddress(blockchain, toPublicKey, renNetwork)) {
+    const isSolanaNetwork = blockchain === 'solana';
+
+    if (isValidAddress(blockchain, toPublicKey, renNetwork)) {
+      pubKey = toPublicKey;
+    } else if (isValidAddress(blockchain, resolvedAddress ?? '', renNetwork)) {
+      pubKey = resolvedAddress;
+    }
+
+    if (isSolanaNetwork && pubKey) {
       void checkDestinationAddress();
     } else {
       setIsShowConfirmAddressSwitch(false);
     }
-  }, [blockchain, renNetwork, toPublicKey, provider, setIsShowConfirmAddressSwitch]);
+  }, [
+    resolvedAddress,
+    blockchain,
+    renNetwork,
+    toPublicKey,
+    provider,
+    setIsShowConfirmAddressSwitch,
+  ]);
 
   return (
     <WidgetPageWithBottom title="Send" icon="top" bottom={<SendButton />}>
