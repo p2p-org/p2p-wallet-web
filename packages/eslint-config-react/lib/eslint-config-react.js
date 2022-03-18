@@ -15,6 +15,8 @@ module.exports = {
     "react/react-in-jsx-scope": "off",
     "react/no-unescaped-entities": "off",
     "react/prop-types": "off",
-    "react/display-name": "off"
+    "react/display-name": "off",
+    "@typescript-eslint/no-explicit-any": 'error',
+    "@typescript-eslint/no-unused-vars": "error"
   },
 };
