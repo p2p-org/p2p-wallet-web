@@ -16,6 +16,8 @@ initAmplitude();
 
 export const global = globalCss;
 
+const a = 5;
+console.log(a);
 const render = () => {
   // Load the app dynamically, which allows for hot-reloading in development mode.
   const App = require('./App').default as React.FC;
