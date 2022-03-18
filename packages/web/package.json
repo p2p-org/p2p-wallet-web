@@ -11,7 +11,6 @@
     "build": "DISABLE_ESLINT_PLUGIN=true react-app-rewired build",
     "test": "react-app-rewired test --env=jsdom",
     "eject": "react-scripts eject",
-    "lint": "eslint src --ext js,ts,tsx --cache src --fix",
     "test:integration": "yarn test --testPathPattern=integration --runInBand --forceExit",
     "precommit": "lint-staged"
   },
@@ -153,9 +152,10 @@
   },
   "lint-staged": {
     "./src/**/*.{js,jsx,ts,tsx}": [
-      "pretty-quick --staged",
-      "eslint --fix",
-      "stylelint"
+      "echo Linting code...",
+      "yarn pretty-quick --staged",
+      "eslint --ext js,ts,tsx --cache --fix",
+      "stylelint --cache --report-needless-disables --aei"
     ]
   }
 }

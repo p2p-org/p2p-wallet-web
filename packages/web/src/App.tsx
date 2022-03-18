@@ -26,8 +26,6 @@ import { Providers } from './Providers';
 
 dayjs.extend(localizedFormat);
 
-const a: string = 5;
-
 const App: React.FC = () => {
   return (
     <>
