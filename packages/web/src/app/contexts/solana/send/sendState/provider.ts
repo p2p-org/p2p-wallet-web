@@ -194,7 +194,6 @@ const useSendStateInternal = (): UseSendState => {
 
   const details = useMemo(() => {
     let receiveAmount;
-    let totalAmountToShow;
 
     if (!parsedAmount && fromTokenAccount && fromTokenAccount.balance) {
       receiveAmount = new TokenAmount(fromTokenAccount.balance.token, 0).formatUnits();
@@ -203,6 +202,7 @@ const useSendStateInternal = (): UseSendState => {
     }
 
     let totalAmount = receiveAmount;
+    let totalAmountToShow = receiveAmount;
     let accountCreationAmount;
 
     if (compensationState.totalFee.gt(ZERO)) {

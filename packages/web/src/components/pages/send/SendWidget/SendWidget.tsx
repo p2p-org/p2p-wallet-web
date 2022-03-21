@@ -30,12 +30,15 @@ export const SendWidget: FunctionComponent = () => {
 
   useEffect(() => {
     let pubKey: string | null = '';
+    const isSolanaNetwork = blockchain === 'solana';
 
     const checkDestinationAddress = async () => {
+      if (isSolanaNetwork) {
+        return;
+      }
+
       if (pubKey) {
-        // HERE
         const account = await provider.getAccountInfo(new PublicKey(pubKey));
-        console.log(account, pubKey);
 
         if (!account) {
           setIsShowConfirmAddressSwitch(true);
@@ -49,9 +52,7 @@ export const SendWidget: FunctionComponent = () => {
       pubKey = resolvedAddress;
     }
 
-    const isSolanaNetwork = blockchain === 'solana';
-
-    if (isSolanaNetwork && pubKey) {
+    if (pubKey) {
       void checkDestinationAddress();
     } else {
       setIsShowConfirmAddressSwitch(false);
