@@ -2,6 +2,7 @@ import type { FunctionComponent } from 'react';
 import { useEffect } from 'react';
 
 import { useSolana } from '@p2p-wallet-web/core';
+import { TOKEN_PROGRAM_ID } from '@solana/spl-token';
 import { PublicKey } from '@solana/web3.js';
 
 import { isValidAddress, useSendState } from 'app/contexts';
@@ -12,14 +13,13 @@ import { SendButton } from 'components/pages/send/SendWidget/SendButton';
 
 import { BurnAndRelease } from './BurnAndRelease/BurnAndRelease';
 
-// @FRIDAY removed disabled button
-// find out what to do with account
 export const SendWidget: FunctionComponent = () => {
   useTrackEventOpen('Send_Viewed');
 
   const { provider } = useSolana();
   const {
     fromAmount,
+    fromTokenAccount,
     toPublicKey,
     blockchain,
     renNetwork,
@@ -31,16 +31,22 @@ export const SendWidget: FunctionComponent = () => {
   useEffect(() => {
     let pubKey: string | null = '';
     const isSolanaNetwork = blockchain === 'solana';
+    const isSolanaToken = fromTokenAccount?.balance?.token?.isRawSOL;
 
     const checkDestinationAddress = async () => {
-      if (isSolanaNetwork) {
+      if (isSolanaToken) {
         return;
       }
 
       if (pubKey) {
         const account = await provider.getAccountInfo(new PublicKey(pubKey));
+        const programms = await provider.connection.getTokenAccountsByOwner(new PublicKey(pubKey), {
+          programId: TOKEN_PROGRAM_ID,
+          mint: fromTokenAccount?.balance?.token?.mintAccount,
+        });
+        const userHasToken = Boolean(programms.value.length);
 
-        if (!account) {
+        if (!account && !userHasToken) {
           setIsShowConfirmAddressSwitch(true);
         }
       }
@@ -52,7 +58,7 @@ export const SendWidget: FunctionComponent = () => {
       pubKey = resolvedAddress;
     }
 
-    if (pubKey) {
+    if (pubKey && isSolanaNetwork) {
       void checkDestinationAddress();
     } else {
       setIsShowConfirmAddressSwitch(false);
@@ -64,6 +70,7 @@ export const SendWidget: FunctionComponent = () => {
     toPublicKey,
     provider,
     setIsShowConfirmAddressSwitch,
+    fromTokenAccount,
   ]);
 
   return (
