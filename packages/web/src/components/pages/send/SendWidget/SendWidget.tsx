@@ -39,15 +39,16 @@ export const SendWidget: FunctionComponent = () => {
       }
 
       if (pubKey) {
-        const account = await provider.getAccountInfo(new PublicKey(pubKey));
         const programms = await provider.connection.getTokenAccountsByOwner(new PublicKey(pubKey), {
           programId: TOKEN_PROGRAM_ID,
           mint: fromTokenAccount?.balance?.token?.mintAccount,
         });
         const userHasToken = Boolean(programms.value.length);
 
-        if (!account && !userHasToken) {
+        if (!userHasToken) {
           setIsShowConfirmAddressSwitch(true);
+        } else {
+          setIsShowConfirmAddressSwitch(false);
         }
       }
     };
@@ -70,7 +71,7 @@ export const SendWidget: FunctionComponent = () => {
     toPublicKey,
     provider,
     setIsShowConfirmAddressSwitch,
-    fromTokenAccount,
+    fromTokenAccount?.balance?.token?.mintAccount,
   ]);
 
   return (
