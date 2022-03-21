@@ -12,6 +12,8 @@ import { SendButton } from 'components/pages/send/SendWidget/SendButton';
 
 import { BurnAndRelease } from './BurnAndRelease/BurnAndRelease';
 
+// @FRIDAY removed disabled button
+// find out what to do with account
 export const SendWidget: FunctionComponent = () => {
   useTrackEventOpen('Send_Viewed');
 
@@ -31,6 +33,7 @@ export const SendWidget: FunctionComponent = () => {
 
     const checkDestinationAddress = async () => {
       if (pubKey) {
+        // HERE
         const account = await provider.getAccountInfo(new PublicKey(pubKey));
         console.log(account, pubKey);
 
