@@ -6,7 +6,6 @@ import { Link } from 'react-router-dom';
 import { styled } from '@linaria/react';
 import type { TokenAccount } from '@p2p-wallet-web/core';
 import { borders, theme, up, useIsMobile, useIsTablet } from '@p2p-wallet-web/ui';
-import { TokenAmount } from '@saberhq/token-utils';
 
 import { useSettings } from 'app/contexts';
 import { AmountUSD } from 'components/common/AmountUSD';
@@ -63,39 +62,44 @@ const Content = styled.div`
   margin-left: 12px;
 `;
 
-const Top = styled.div`
-  display: flex;
-  justify-content: space-between;
-
-  color: ${theme.colors.textIcon.primary};
-  font-weight: 500;
-  font-size: 14px;
-  line-height: 140%;
-  letter-spacing: 0.01em;
-
-  ${up.tablet} {
-    font-weight: 600;
-    font-size: 16px;
-  }
-`;
-
 const TokenName = styled.div`
   flex: 1;
 
   max-width: 300px;
   overflow: hidden;
 
+  color: ${theme.colors.textIcon.primary};
+
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 140%;
+
   white-space: nowrap;
   text-overflow: ellipsis;
 `;
 
-const Bottom = styled.div`
-  display: flex;
-  justify-content: space-between;
+const TokenInfo = styled.div`
+  display: grid;
+  grid-auto-flow: column;
+  grid-template-rows: 22px 22px;
+  grid-template-columns: 1fr 1fr;
+`;
 
+const TokenBalance = styled.div`
   color: ${theme.colors.textIcon.secondary};
   font-weight: 500;
   font-size: 14px;
+  line-height: 140%;
+`;
+
+const TokenUSD = styled.div`
+  grid-row: 1 / -1;
+  align-self: center;
+  justify-self: flex-end;
+
+  color: #202020;
+  font-weight: 600;
+  font-size: 18px;
   line-height: 140%;
 `;
 
@@ -138,6 +142,45 @@ export const TokenAccountRow: FunctionComponent<Props> = ({ tokenAccount, isHidd
   const SwipeOrFragment =
     isMobile && !tokenAccount.balance?.token.isRawSOL ? SwipeToRevealActions : React.Fragment;
 
+  const elTokenName = () => {
+    const tokenName =
+      tokenAccount.balance?.token.name ||
+      tokenAccount.balance?.token.symbol ||
+      (tokenAccount.balance?.token.address && shortAddress(tokenAccount.balance?.token.address));
+
+    return (
+      <TokenName title={tokenAccount.balance?.token.address}>
+        {loading ? <Skeleton width={100} height={16} /> : tokenName}
+      </TokenName>
+    );
+  };
+
+  const elTokenBalance = (
+    <TokenBalance>
+      {loading ? <Skeleton width={100} height={14} /> : <>{tokenAccount.balance?.formatUnits()}</>}
+    </TokenBalance>
+  );
+
+  const elTokenUSD = () => {
+    if (loading) {
+      return (
+        <TokenUSD>
+          <Skeleton width={50} height={14} />
+        </TokenUSD>
+      );
+    }
+
+    if (tokenAccount.balance) {
+      return (
+        <TokenUSD>
+          <AmountUSD value={tokenAccount.balance} />
+        </TokenUSD>
+      );
+    }
+
+    return null;
+  };
+
   return (
     <SwipeOrFragment {...(isMobile ? { actions } : {})}>
       <WrapperLink to={`/wallet/${tokenAccount.key?.toBase58()}`}>
@@ -151,41 +194,11 @@ export const TokenAccountRow: FunctionComponent<Props> = ({ tokenAccount, isHidd
           />
         )}
         <Content>
-          <Top>
-            <TokenName title={tokenAccount.balance?.token.address}>
-              {loading ? (
-                <Skeleton width={100} height={16} />
-              ) : (
-                tokenAccount.balance?.token.name ||
-                tokenAccount.balance?.token.symbol ||
-                (tokenAccount.balance?.token.address &&
-                  shortAddress(tokenAccount.balance?.token.address))
-              )}
-            </TokenName>
-            <div>
-              {loading ? (
-                <Skeleton width={100} height={14} />
-              ) : (
-                <>{tokenAccount.balance?.formatUnits()}</>
-              )}
-            </div>
-          </Top>
-          <Bottom>
-            {loading ? (
-              <Skeleton width={50} height={14} />
-            ) : tokenAccount.balance ? (
-              <AmountUSD value={new TokenAmount(tokenAccount.balance.token, 1)} />
-            ) : (
-              <div />
-            )}
-            {loading ? (
-              <Skeleton width={50} height={14} />
-            ) : tokenAccount.balance ? (
-              <AmountUSD value={tokenAccount.balance} />
-            ) : (
-              <div />
-            )}
-          </Bottom>
+          <TokenInfo>
+            {elTokenName()}
+            {elTokenBalance}
+            {elTokenUSD()}
+          </TokenInfo>
         </Content>
         {isTablet ? <TokenMenuStyled tokenAccount={tokenAccount} isHidden={isHidden} /> : undefined}
       </WrapperLink>
