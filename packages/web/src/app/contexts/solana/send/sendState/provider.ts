@@ -212,7 +212,6 @@ const useSendStateInternal = (): UseSendState => {
           compensationState.estimatedFee.accountRent,
         ).formatUnits();
 
-        totalAmountToShow = totalAmount;
         totalAmount += ` + ${accountCreationAmount}`;
       } else {
         if (feeToken && feeToken.balance) {
