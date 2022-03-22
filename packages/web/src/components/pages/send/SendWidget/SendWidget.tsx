@@ -39,11 +39,14 @@ export const SendWidget: FunctionComponent = () => {
       }
 
       if (pubKey) {
-        const programms = await provider.connection.getTokenAccountsByOwner(new PublicKey(pubKey), {
-          programId: TOKEN_PROGRAM_ID,
-          mint: fromTokenAccount?.balance?.token?.mintAccount,
-        });
-        const userHasToken = Boolean(programms.value.length);
+        const addressTokenAccount = await provider.connection.getTokenAccountsByOwner(
+          new PublicKey(pubKey),
+          {
+            programId: TOKEN_PROGRAM_ID,
+            mint: fromTokenAccount?.balance?.token?.mintAccount,
+          },
+        );
+        const userHasToken = Boolean(addressTokenAccount.value.length);
 
         if (!userHasToken) {
           setIsShowConfirmAddressSwitch(true);
