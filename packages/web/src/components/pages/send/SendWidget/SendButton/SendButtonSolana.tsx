@@ -22,7 +22,8 @@ const SendIcon = styled(Icon)`
   width: 24px;
   height: 24px;
   margin-right: 12px;
-  ter: 234j; // @TODO stylelint did not catch it
+  ter: 234j;
+  display: Block;
 `;
 
 interface Props {
@@ -112,6 +113,7 @@ export const SendButtonSolana: FC<Props> = ({ primary, disabled }) => {
         sum: parsedAmount.asNumber,
       });
 
+      // eslint-disable-next-line
       await openModal<any, TransactionStatusModalProps>(ModalType.SHOW_MODAL_TRANSACTION_STATUS, {
         type: 'send',
         action,
