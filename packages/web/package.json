@@ -154,8 +154,8 @@
     "./src/**/*.{js,jsx,ts,tsx}": [
       "echo Linting code...",
       "yarn pretty-quick --staged",
-      "eslint --fix",
-      "stylelint"
+      "eslint --ext js,ts,tsx --cache --fix",
+      "stylelint --cache --report-needless-disables --aei"
     ]
   }
 }
