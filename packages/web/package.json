@@ -12,7 +12,10 @@
     "test": "react-app-rewired test --env=jsdom",
     "eject": "react-scripts eject",
     "test:integration": "yarn test --testPathPattern=integration --runInBand --forceExit",
-    "precommit": "lint-staged"
+    "lint:es": "eslint --ext js,ts,tsx --cache --fix",
+    "lint:style": "stylelint './src/**/*.tsx' --cache --report-needless-disables --aei",
+    "lint:prettier": "pretty-quick --staged",
+    "precommit": "yarn lint:es && yarn lint:style && yarn lint:prettier"
   },
   "dependencies": {
     "@emotion/is-prop-valid": "^0.8.8",
@@ -148,14 +151,6 @@
       "last 1 chrome version",
       "last 1 firefox version",
       "last 1 safari version"
-    ]
-  },
-  "lint-staged": {
-    "./src/**/*.{js,jsx,ts,tsx}": [
-      "echo Linting code...",
-      "yarn pretty-quick --staged",
-      "eslint --ext js,ts,tsx --cache --fix",
-      "stylelint --cache --report-needless-disables --aei"
     ]
   }
 }
