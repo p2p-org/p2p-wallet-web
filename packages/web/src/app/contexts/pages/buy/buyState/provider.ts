@@ -19,6 +19,8 @@ export interface UseBuyState {
 
   amount: string;
   setAmount: (nextAmount: string) => void;
+  isBaseAmountType: boolean;
+  changeAmountType: () => void;
 
   error: string;
   buyQuote: null | MoonpayGetBuyQuoteResponse;
@@ -33,6 +35,7 @@ const useBuyStateInternal = (): UseBuyState => {
   const [isShowIframe, setIsShowIframe] = useState(false);
   const [currency, setCurrency] = useState<BuyCurrencySelectType>(BUY_CURRENCIES_SELECT.SOL!);
   const [amount, setAmount] = useState('');
+  const [isBaseAmountType, setIsBaseAmountType] = useState(true);
   const [error, setError] = useState('');
   const [buyQuote, setBuyQuote] = useState<null | MoonpayGetBuyQuoteResponse>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -51,7 +54,7 @@ const useBuyStateInternal = (): UseBuyState => {
       setIsLoading(true);
       try {
         setError('');
-        const result = await getBuyQuote(amount, currency.currencyCode, controller);
+        const result = await getBuyQuote(amount, isBaseAmountType, currency.currencyCode, controller);
 
         if ((result as MoonpayErrorResponse).type === MoonpayErrorResponseType.BadRequestError) {
           setError((result as MoonpayErrorResponse).message);
@@ -70,7 +73,17 @@ const useBuyStateInternal = (): UseBuyState => {
     return () => {
       controller.abort();
     };
-  }, [amount, currency.currencyCode, getBuyQuote]);
+  }, [amount, isBaseAmountType, currency.currencyCode, getBuyQuote]);
+
+  const changeAmountType = () => {
+    if (isBaseAmountType) {
+      setAmount(buyQuote?.quoteCurrencyAmount || 0);
+    } else {
+      setAmount(buyQuote?.baseCurrencyAmount || 0);
+    }
+
+    setIsBaseAmountType(!isBaseAmountType);
+  };
 
   return {
     isShowIframe,
@@ -79,6 +92,8 @@ const useBuyStateInternal = (): UseBuyState => {
     setCurrency,
     amount,
     setAmount,
+    isBaseAmountType,
+    changeAmountType,
     error,
     buyQuote,
     isLoading,

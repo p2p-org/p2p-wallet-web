@@ -4,7 +4,7 @@ import { useBuyState } from 'app/contexts';
 import { Button } from 'components/ui';
 
 export const MoonpayButton: FC = () => {
-  const { isLoading, setIsShowIframe, error, amount, buyQuote } = useBuyState();
+  const { isLoading, setIsShowIframe, error, amount, isBaseAmountType, buyQuote } = useBuyState();
 
   if (isLoading) {
     return (
@@ -22,7 +22,7 @@ export const MoonpayButton: FC = () => {
     );
   }
 
-  if (buyQuote?.baseCurrencyAmount && buyQuote?.baseCurrencyAmount > Number(amount)) {
+  if (isBaseAmountType && buyQuote?.baseCurrencyAmount && buyQuote?.baseCurrencyAmount > Number(amount)) {
     return (
       <Button disabled primary full>
         Minimum amount ${buyQuote.baseCurrencyAmount}

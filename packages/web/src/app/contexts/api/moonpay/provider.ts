@@ -19,6 +19,7 @@ const baseParams: MoonpayBaseParams = {
 export interface UseMoonpay {
   getBuyQuote: (
     amount: string | number,
+    isBaseAmountType: boolean,
     currencyCode: string,
     controller: AbortController,
   ) => Promise<MoonpayGetBuyQuoteResponse | MoonpayErrorResponse>;
@@ -28,12 +29,22 @@ const useMoonpayInternal = (): UseMoonpay => {
   assert(MOONPAY_API_KEY, 'Define moonpay api key in .env');
 
   const getBuyQuote = useCallback(
-    async (amount: string | number, currencyCode: string, controller: AbortController) => {
+    async (
+      amount: string | number,
+      isBaseAmountType: boolean,
+      currencyCode: string,
+      controller: AbortController,
+    ) => {
       const params: MoonpayGetBuyQuoteParams = {
         ...baseParams,
-        baseCurrencyAmount: amount || 0,
         baseCurrencyCode: 'usd',
       };
+
+      if (isBaseAmountType) {
+        params.baseCurrencyAmount = amount || 0;
+      } else {
+        params.quoteCurrencyAmount = amount || 0;
+      }
 
       try {
         const res = await fetch(
