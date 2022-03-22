@@ -12,8 +12,8 @@
     "test": "react-app-rewired test --env=jsdom",
     "eject": "react-scripts eject",
     "test:integration": "yarn test --testPathPattern=integration --runInBand --forceExit",
-    "lint:es": "eslint --ext js,ts,tsx --cache --fix",
-    "lint:style": "stylelint './src/**/*.tsx' --cache --report-needless-disables --aei",
+    "lint:es": "eslint ./src --ext js,ts,tsx --cache --fix --quiet",
+    "lint:style": "stylelint ./src/**/*.tsx --color",
     "lint:prettier": "pretty-quick --staged",
     "precommit": "yarn lint:es && yarn lint:style && yarn lint:prettier"
   },
