@@ -58,6 +58,7 @@ import success from './assets/success-icon.svg';
 import sun from './assets/sun-icon.svg';
 import timer from './assets/timer-icon.svg';
 import walletOld from './assets/wallet-icon.svg';
+import oppositeArrows from './assets/opposite-arrows-icon.svg';
 
 const iconsMap = new Map<string, string>([
   ['arrow', arrow],
@@ -115,6 +116,7 @@ const iconsMap = new Map<string, string>([
   ['clock', clock],
   ['free-tx', freeTx],
   ['kebab', kebab],
+  ['opposite-arrows', oppositeArrows],
 ]);
 
 interface Props extends HTMLAttributes<HTMLOrSVGElement> {
