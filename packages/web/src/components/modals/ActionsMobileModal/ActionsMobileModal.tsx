@@ -5,7 +5,7 @@ import { styled } from '@linaria/react';
 
 import type { ModalPropsType } from 'app/contexts';
 import { ActionButton } from 'components/modals/ActionsMobileModal/ActionButton';
-import { Modal } from 'components/ui/Modal/Modal';
+import { Modal } from 'components/ui/Modal';
 
 const Content = styled.div`
   display: grid;
