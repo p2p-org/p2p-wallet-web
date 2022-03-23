@@ -70,9 +70,14 @@ const TokenName = styled.div`
 
   color: ${theme.colors.textIcon.primary};
 
-  font-weight: 600;
-  font-size: 16px;
+  font-weight: 700;
+  font-size: 14px;
   line-height: 140%;
+
+  ${up.small} {
+    font-weight: 600;
+    font-size: 16px;
+  }
 
   white-space: nowrap;
   text-overflow: ellipsis;
@@ -88,8 +93,12 @@ const TokenInfo = styled.div`
 const TokenBalance = styled.div`
   color: ${theme.colors.textIcon.secondary};
   font-weight: 500;
-  font-size: 14px;
+  font-size: 13px;
   line-height: 140%;
+
+  ${up.small} {
+    font-size: 14px;
+  }
 `;
 
 const TokenUSD = styled.div`
@@ -99,8 +108,12 @@ const TokenUSD = styled.div`
 
   color: #202020;
   font-weight: 600;
-  font-size: 18px;
+  font-size: 17px;
   line-height: 140%;
+
+  ${up.small} {
+    font-size: 18px;
+  }
 `;
 
 const TokenMenuStyled = styled(TokenMenu)`
