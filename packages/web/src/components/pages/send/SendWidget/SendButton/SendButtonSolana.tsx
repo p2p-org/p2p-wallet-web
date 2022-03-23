@@ -22,9 +22,6 @@ const SendIcon = styled(Icon)`
   width: 24px;
   height: 24px;
   margin-right: 12px;
-  ter: 234j;
-
-  display: Block;
 `;
 
 interface Props {
