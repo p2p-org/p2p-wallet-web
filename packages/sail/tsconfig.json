@@ -4,7 +4,8 @@
     "lib": ["ES2015", "DOM"],
     "outDir": "dist/esm/",
     "rootDir": "src/",
-    "noEmit": false
+    "noEmit": false,
+    "composite": true
   },
   "include": ["./src"]
 }
