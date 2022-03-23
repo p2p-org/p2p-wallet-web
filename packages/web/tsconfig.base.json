@@ -2,6 +2,7 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "experimentalDecorators": true,
+    "emitDeclarationOnly": true,
     "emitDecoratorMetadata": true,
     "baseUrl": "./",
     "paths": {

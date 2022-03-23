@@ -3,4 +3,4 @@
 
 # echo $PWD
 yarn stylelint './packages/web/src/**/*.tsx'  --color
-./node_modules/.bin/lerna run --concurrency 1 --stream precommit --since HEAD --exclude-dependents
+./node_modules/.bin/lerna run --concurrency 1 --stream precommit --since HEAD --exclude-dependents --loglevel verbose

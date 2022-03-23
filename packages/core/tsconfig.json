@@ -8,7 +8,6 @@
 
     "jsx": "react-jsx",
     "allowJs": true,
-    "composite": true
   },
   "include": ["./src"],
   "exclude": ["**/_*/"]
