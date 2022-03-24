@@ -47,7 +47,7 @@ type Action = {
 };
 
 interface Props {
-  actions: Action[];
+  actions?: Action[];
 }
 
 export const SwipeToRevealActions: FC<Props> = ({ actions, children }) => {
@@ -86,7 +86,7 @@ export const SwipeToRevealActions: FC<Props> = ({ actions, children }) => {
   return (
     <Wrapper {...handlers}>
       <ActionsBehind>
-        {actions.map((action, index) => (
+        {actions?.map((action, index) => (
           <SwipeActionButton key={index} onClick={action.onClick}>
             {action.icon}
           </SwipeActionButton>
@@ -95,7 +95,7 @@ export const SwipeToRevealActions: FC<Props> = ({ actions, children }) => {
       <Content
         style={{
           transform: `translateX(${
-            isExpanded ? `-${(actions.length || 0) * SWIPE_ACTION_BUTTON_SIZE}px` : '0px'
+            isExpanded ? `-${(actions?.length || 0) * SWIPE_ACTION_BUTTON_SIZE}px` : '0px'
           })`,
         }}
         className={classNames({ isExpanded })}
