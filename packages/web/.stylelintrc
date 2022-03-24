@@ -1,11 +1,6 @@
 {
-  "plugins": ["stylelint-prettier"],
-  "extends": [
-    "stylelint-config-standard",
-    "stylelint-config-rational-order",
-    "stylelint-prettier/recommended",
-    "@linaria/stylelint"
-  ],
+  "plugins": ["stylelint-prettier", "stylelint-order", "stylelint-config-rational-order/plugin"],
+  "extends": ["stylelint-config-standard", "stylelint-prettier/recommended", "@linaria/stylelint"],
   "rules": {
     "prettier/prettier": true,
     "block-no-empty": null,
@@ -15,6 +10,7 @@
     "indentation": null,
     "max-empty-lines": null,
     "value-keyword-case": null,
+    "order/properties-order": [],
     "selector-pseudo-class-no-unknown": [
       true,
       {
@@ -24,6 +20,7 @@
     "plugin/rational-order": [
       true,
       {
+        "border-in-box-model": false,
         "empty-line-between-groups": true
       }
     ]

@@ -18,11 +18,11 @@ import type { TransactionStatusModalProps } from 'components/modals/TransactionI
 import { Button, Icon } from 'components/ui';
 import { trackEvent } from 'utils/analytics';
 
+// @TODO check this rule againt
 const SendIcon = styled(Icon)`
   width: 24px;
   height: 24px;
   margin-right: 12px;
-  display: block;
 `;
 
 interface Props {
