@@ -74,7 +74,7 @@ const TokenName = styled.div`
   font-size: 14px;
   line-height: 140%;
 
-  ${up.small} {
+  ${up.tablet} {
     font-weight: 600;
     font-size: 16px;
   }
@@ -96,7 +96,7 @@ const TokenBalance = styled.div`
   font-size: 13px;
   line-height: 140%;
 
-  ${up.small} {
+  ${up.tablet} {
     font-size: 14px;
   }
 `;
@@ -111,7 +111,7 @@ const TokenUSD = styled.div`
   font-size: 17px;
   line-height: 140%;
 
-  ${up.small} {
+  ${up.tablet} {
     font-size: 18px;
   }
 `;
@@ -155,7 +155,7 @@ export const TokenAccountRow: FunctionComponent<Props> = ({ tokenAccount, isHidd
   const SwipeOrFragment =
     isMobile && !tokenAccount.balance?.token.isRawSOL ? SwipeToRevealActions : React.Fragment;
 
-  const elTokenName = () => {
+  const renderTokenName = () => {
     const tokenName =
       tokenAccount.balance?.token.name ||
       tokenAccount.balance?.token.symbol ||
@@ -174,7 +174,7 @@ export const TokenAccountRow: FunctionComponent<Props> = ({ tokenAccount, isHidd
     </TokenBalance>
   );
 
-  const elTokenUSD = () => {
+  const renderTokenUSD = () => {
     if (loading) {
       return (
         <TokenUSD>
@@ -208,9 +208,9 @@ export const TokenAccountRow: FunctionComponent<Props> = ({ tokenAccount, isHidd
         )}
         <Content>
           <TokenInfo>
-            {elTokenName()}
+            {renderTokenName()}
             {elTokenBalance}
-            {elTokenUSD()}
+            {renderTokenUSD()}
           </TokenInfo>
         </Content>
         {isTablet ? <TokenMenuStyled tokenAccount={tokenAccount} isHidden={isHidden} /> : undefined}
