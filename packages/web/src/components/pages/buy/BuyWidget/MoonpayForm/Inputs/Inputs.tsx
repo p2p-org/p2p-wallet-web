@@ -6,6 +6,7 @@ import { borders, theme } from '@p2p-wallet-web/ui';
 import { useBuyState } from 'app/contexts';
 import { TokenAvatar } from 'components/common/TokenAvatar';
 import { InputAmount } from 'components/ui/InputAmount';
+
 import { AmountTypeButton } from '../AmountTypeButton';
 
 const Wrapper = styled.div`
@@ -18,6 +19,8 @@ const InputWrapper = styled.div`
   align-items: center;
   justify-content: space-between;
   padding: 16px 20px;
+  height: 36px;
+  box-sizing: content-box;
 
   &:not(:last-child) {
     border-bottom: 1px solid ${theme.colors.stroke.secondary};
