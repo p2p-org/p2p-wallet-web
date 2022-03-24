@@ -15,6 +15,7 @@ export const AccountCreationFeeTooltip: FC = () => {
 
   return (
     <LaagTooltip
+      withClose={true}
       content={
         <TooltipContent>
           This value is calculated by subtracting the account creation fee from your balance

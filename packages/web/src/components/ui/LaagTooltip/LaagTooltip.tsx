@@ -2,6 +2,7 @@ import type { FunctionComponent, ReactElement } from 'react';
 import type { Placement } from 'react-laag';
 import { Arrow, useHover, useLayer } from 'react-laag';
 
+import { css } from '@linaria/core';
 import { styled } from '@linaria/react';
 import { theme } from '@p2p-wallet-web/ui';
 
@@ -12,9 +13,14 @@ interface Props {
   anchor?: string | ReactElement;
   placement?: Placement;
   snap?: boolean;
+  withClose?: boolean;
+  hideOnScroll?: boolean;
 }
 
 const TooltipContent = styled.div`
+  display: grid;
+  grid-gap: 8px;
+  grid-template-columns: 1fr minmax(0, max-content);
   padding: 12px;
 
   color: #fff;
@@ -28,7 +34,7 @@ const TooltipContent = styled.div`
   backdrop-filter: blur(10px);
 `;
 
-const QustionIcon = styled(Icon)`
+const QuestionIcon = styled(Icon)`
   width: 24px;
   height: 24px;
 
@@ -41,12 +47,34 @@ const Anchor = styled.div`
   justify-content: center;
 `;
 
+const CloseButton = styled.button`
+  width: 32px;
+  height: 32px;
+
+  color: #fff;
+
+  background: #686868;
+  border-radius: 8px;
+`;
+
+export const globals = css`
+  :global() {
+    #layers {
+      z-index: 1;
+    }
+  }
+`;
+
 const defaultProps = {
   placement: 'top-end' as Placement,
+  withClose: false,
+  hideOnScroll: false,
 };
 
 export const LaagTooltip: FunctionComponent<Props> = (props) => {
-  const [isOver, hoverProps] = useHover();
+  const [isOver, hoverProps, close] = useHover({ hideOnScroll: props.hideOnScroll });
+  const { onMouseEnter, onTouchEnd, onTouchStart } = hoverProps;
+  const anchorProps = props.withClose ? { onMouseEnter, onTouchEnd, onTouchStart } : hoverProps;
 
   const { triggerProps, layerProps, arrowProps, renderLayer } = useLayer({
     isOpen: isOver,
@@ -54,20 +82,28 @@ export const LaagTooltip: FunctionComponent<Props> = (props) => {
     possiblePlacements: ['top-end', 'bottom-end'],
     snap: props.snap,
     arrowOffset: 15,
+    auto: true,
     triggerOffset: 5,
   });
 
-  const elAnchor = props.anchor ?? <QustionIcon name={'question'} />;
+  const elAnchor = props.anchor ?? <QuestionIcon name={'question'} />;
+
+  const elClose = (
+    <CloseButton onClick={close}>
+      <Icon width={12} height={12} name={'close'} />
+    </CloseButton>
+  );
 
   return (
     <>
-      <Anchor {...triggerProps} {...hoverProps}>
+      <Anchor {...triggerProps} {...anchorProps}>
         {elAnchor}
       </Anchor>
       {isOver &&
         renderLayer(
           <TooltipContent className="tooltip" {...layerProps}>
             {props.content}
+            {props.withClose && elClose}
             <Arrow {...arrowProps} backgroundColor={'rgba(44, 44, 46, 0.9'} angle={35} size={10} />
           </TooltipContent>,
         )}
