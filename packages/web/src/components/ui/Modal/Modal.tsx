@@ -1,6 +1,7 @@
 import type { FunctionComponent } from 'react';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import * as React from 'react';
+import { useLocation } from 'react-router';
 import { animated, useSpring, useTransition } from 'react-spring';
 
 import { styled } from '@linaria/react';
@@ -207,6 +208,7 @@ type Props = {
 
   noDelimiter: boolean;
   close: () => void;
+  doNotCloseOnPathChangeMobile?: boolean;
   className?: string;
 };
 
@@ -219,12 +221,21 @@ export const Modal: FunctionComponent<Props> = ({
 
   noDelimiter,
   close,
+  doNotCloseOnPathChangeMobile,
   className,
 
   children,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const isMobile = useIsMobile();
+  const location = useLocation();
+  const currentPath = useRef(location.pathname);
+
+  useEffect(() => {
+    if (isMobile && !doNotCloseOnPathChangeMobile && currentPath.current !== location.pathname) {
+      close();
+    }
+  }, [isMobile, doNotCloseOnPathChangeMobile, location.pathname]);
 
   useEffect(() => {
     setIsOpen(true);
