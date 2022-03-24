@@ -11,6 +11,8 @@ import { Icon } from 'components/ui';
 import { MOBILE_FOOTER_TABS_HEIGHT } from './constants';
 
 const Wrapper = styled.div`
+  position: sticky;
+  bottom: 0;
   z-index: 31;
 
   display: flex;
@@ -20,9 +22,6 @@ const Wrapper = styled.div`
 
   background: ${theme.colors.bg.activeSecondary};
   box-shadow: 0 -2px 8px rgba(56, 60, 71, 0.05);
-
-  position: sticky;
-  bottom: 0;
 `;
 
 const NavButton = styled.div`

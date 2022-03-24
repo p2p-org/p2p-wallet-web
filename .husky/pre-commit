@@ -2,5 +2,5 @@
 . "$(dirname "$0")/_/husky.sh"
 
 # echo $PWD
-yarn stylelint './packages/web/src/**/*.tsx'  --color
-./node_modules/.bin/lerna run --concurrency 1 --stream precommit --since HEAD --exclude-dependents --loglevel verbose
+yarn stylelint './packages/web/src/**/*.tsx'  --color --fix
+./node_modules/.bin/lerna run --concurrency 1 --stream precommit --since HEAD --exclude-dependents --loglevel verbose --no-bail

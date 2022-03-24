@@ -28,6 +28,8 @@ const Wrapper = styled.label`
   display: flex;
   flex: 1;
   align-items: center;
+
+  min-width: 0;
   height: 48px;
   padding: 12px 0;
 
@@ -35,8 +37,6 @@ const Wrapper = styled.label`
   border: 1px solid ${theme.colors.stroke.primary};
   border-radius: 12px;
   cursor: text;
-
-  min-width: 0;
 
   &.isFocused {
     border: 1px solid rgba(163, 165, 186, 0.5);
