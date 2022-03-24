@@ -88,6 +88,10 @@ const modalsMap = new Map<ModalType, LoadableComponent<ModalPropsType & any>>([
     ModalType.SHOW_MODAL_PROCEED_USERNAME,
     loadable(() => import('components/modals/ProceedUsernameModal')),
   ],
+  [
+    ModalType.SHOW_MODAL_CHOOSE_BUY_TOKEN,
+    loadable(() => import('components/modals/ChooseBuyTokenMobileModal')),
+  ],
   [ModalType.SHOW_MODAL_ERROR, loadable(() => import('components/modals/ErrorModal'))],
 ]);
 
