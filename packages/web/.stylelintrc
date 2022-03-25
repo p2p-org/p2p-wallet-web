@@ -1,6 +1,7 @@
 {
   "plugins": ["stylelint-prettier", "stylelint-order", "stylelint-config-rational-order/plugin"],
   "extends": ["stylelint-config-standard", "stylelint-prettier/recommended", "@linaria/stylelint"],
+  "reportNeedlessDisables": true,
   "rules": {
     "prettier/prettier": true,
     "block-no-empty": null,
@@ -11,6 +12,30 @@
     "max-empty-lines": null,
     "value-keyword-case": null,
     "order/properties-order": [],
+    "color-no-invalid-hex": true,
+    "color-named": [
+      "never",
+      {
+        "message": "Use a variable color from palette instead of named colors"
+      }
+    ],
+    "color-no-hex": [
+      true,
+      {
+        "message": "Use a variable color from palette instead of HEX"
+      }
+    ],
+    "function-disallowed-list": [
+      [
+        "rgba",
+        "hsla",
+        "hsl",
+        "rgb"
+      ],
+      {
+        "message": "Use a variable color from palette instead of color functions"
+      }
+    ],
     "selector-pseudo-class-no-unknown": [
       true,
       {
