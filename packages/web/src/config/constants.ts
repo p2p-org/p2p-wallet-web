@@ -16,12 +16,7 @@ export type NetworkObj = {
   httpHeaders?: HttpHeaders;
 };
 
-export type NetworkNameType =
-  | 'serum-mainnet'
-  | 'p2p-rpcpool'
-  | 'solana-mainnet'
-  | 'solana-devnet'
-  | 'solana-testnet';
+export type NetworkNameType = 'serum-mainnet' | 'p2p-rpcpool' | 'solana-mainnet' | 'solana-testnet';
 
 type NetworksByNameType = {
   // eslint-disable-next-line no-unused-vars
@@ -43,11 +38,6 @@ export const NETWORKS: NetworksByNameType = {
     name: 'solana-mainnet',
     network: 'mainnet-beta',
     endpoint: `${clusterApiUrl('mainnet-beta')}/`,
-  },
-  'solana-devnet': {
-    name: 'solana-devnet',
-    network: 'devnet',
-    endpoint: `${clusterApiUrl('devnet')}/`,
   },
   'solana-testnet': {
     name: 'solana-testnet',
