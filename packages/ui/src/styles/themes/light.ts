@@ -12,15 +12,13 @@ const theme = {
       buttonSecondary: '#F6F6F8',
       buttonDisabled: '#A3A5BA',
       app: '#FBFBFD',
-      // chart: '',
+      tooltip: 'rgba(44, 44, 46, 0.9)',
     },
     stroke: {
       primary: '#D3D4DE',
       primaryRGB: toRGB('#D3D4DE'),
       secondary: '#F2F2F7',
       tertiary: '#F6F6F8',
-      // 'chart-red': '',
-      // 'chart-green': '',
     },
     system: {
       errorMain: '#F43D3D',
@@ -40,6 +38,12 @@ const theme = {
       buttonPrimary: '#FFFFFF',
       buttonSecondary: '#8E8E93',
       buttonDisabled: '#D0D3E9',
+    },
+    boxShadow: {
+      tooltip: '0px 8px 16px rgba',
+    },
+    buttons: {
+      buttonSecondary: '#686868',
     },
   },
 };

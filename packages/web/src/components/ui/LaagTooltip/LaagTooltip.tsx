@@ -9,8 +9,8 @@ import { theme } from '@p2p-wallet-web/ui';
 import { Icon } from 'components/ui';
 
 interface Props {
-  content: string | ReactElement;
-  anchor?: string | ReactElement;
+  elContent: string | ReactElement;
+  elAnchor?: string | ReactElement;
   placement?: Placement;
   possiblePlacements?: Array<Placement>;
   snap?: boolean;
@@ -25,14 +25,14 @@ const TooltipContent = styled.div`
   grid-template-columns: 1fr minmax(0, max-content);
   padding: 12px;
 
-  color: #fff;
+  color: ${theme.colors.textIcon.buttonPrimary};
   font-weight: 400;
   font-size: 15px;
   line-height: 22px;
 
-  background: rgba(44, 44, 46, 0.9);
+  background: ${theme.colors.bg.tooltip};
   border-radius: 8px;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
+  box-shadow: ${theme.colors.boxShadow.tooltip};
   backdrop-filter: blur(10px);
 `;
 
@@ -53,9 +53,9 @@ const CloseButton = styled.button`
   width: 32px;
   height: 32px;
 
-  color: #fff;
+  color: ${theme.colors.textIcon.buttonPrimary};
 
-  background: #686868;
+  background: ${theme.colors.buttons.buttonSecondary};
   border-radius: 8px;
 `;
 
@@ -74,6 +74,9 @@ const defaultProps = {
   auto: true,
 };
 
+const TOOLTIP_ARROW_OFFSET = 15;
+const TOOLTIP_TRIGGER_OFFSET = 5;
+
 export const LaagTooltip: FunctionComponent<Props> = (props) => {
   const [isOver, hoverProps, close] = useHover({ hideOnScroll: props.hideOnScroll });
   const { onMouseEnter, onTouchEnd, onTouchStart } = hoverProps;
@@ -85,12 +88,12 @@ export const LaagTooltip: FunctionComponent<Props> = (props) => {
     possiblePlacements: props.possiblePlacements,
     snap: props.snap,
     auto: props.auto,
-    arrowOffset: 15,
-    triggerOffset: 5,
+    arrowOffset: TOOLTIP_ARROW_OFFSET,
+    triggerOffset: TOOLTIP_TRIGGER_OFFSET,
     onOutsideClick: close,
   });
 
-  const elAnchor = props.anchor ?? <QuestionIcon name={'question'} />;
+  const elAnchor = props.elAnchor ?? <QuestionIcon name={'question'} />;
 
   const elClose = (
     <CloseButton onClick={close}>
@@ -106,7 +109,7 @@ export const LaagTooltip: FunctionComponent<Props> = (props) => {
       {isOver &&
         renderLayer(
           <TooltipContent className="tooltip" {...layerProps}>
-            {props.content}
+            {props.elContent}
             {props.withClose && elClose}
             <Arrow {...arrowProps} backgroundColor={'rgba(44, 44, 46, 0.9'} angle={35} size={10} />
           </TooltipContent>,
