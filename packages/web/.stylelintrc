@@ -20,11 +20,13 @@
       }
     ],
     "color-no-hex": [
-      true,
-      {
-        "message": "Use a variable color from palette instead of HEX"
-      }
+        true,
+        {
+            "message": "Use a variable color from palette instead of HEX"
+        }
     ],
+    "selector-max-combinators": 1,
+    "selector-max-compound-selectors": 2,
     "function-disallowed-list": [
       [
         "rgba",
@@ -34,6 +36,15 @@
       ],
       {
         "message": "Use a variable color from palette instead of color functions"
+      }
+    ],
+    "max-nesting-depth": [
+      1,
+      {
+        "ignore": [
+          "blockless-at-rules",
+          "pseudo-classes"
+        ]
       }
     ],
     "selector-pseudo-class-no-unknown": [
