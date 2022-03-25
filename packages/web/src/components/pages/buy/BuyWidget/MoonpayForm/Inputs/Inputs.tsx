@@ -33,11 +33,11 @@ const Title = styled.div`
 `;
 
 const LoaderWrapper = styled.div`
-  margin: none;
-  height: 36px;
   display: flex;
   flex-direction: column;
   justify-content: center;
+  height: 36px;
+  margin: none;
 `;
 
 export const Inputs: FC = () => {

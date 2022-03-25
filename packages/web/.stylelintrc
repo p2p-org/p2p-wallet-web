@@ -16,35 +16,30 @@
     "color-named": [
       "never",
       {
-        "message": "Use a variable color from palette instead of named colors"
+        "message": "Use a variable color from palette instead of named colors",
+        "severity": "warning"
       }
     ],
     "color-no-hex": [
-        true,
-        {
-            "message": "Use a variable color from palette instead of HEX"
-        }
+      true,
+      {
+        "message": "Use a variable color from palette instead of HEX",
+        "severity": "warning"
+      }
     ],
     "selector-max-combinators": 1,
     "selector-max-compound-selectors": 2,
     "function-disallowed-list": [
-      [
-        "rgba",
-        "hsla",
-        "hsl",
-        "rgb"
-      ],
+      ["rgba", "hsla", "hsl", "rgb"],
       {
-        "message": "Use a variable color from palette instead of color functions"
+        "message": "Use a variable color from palette instead of color functions",
+        "severity": "warning"
       }
     ],
     "max-nesting-depth": [
       1,
       {
-        "ignore": [
-          "blockless-at-rules",
-          "pseudo-classes"
-        ]
+        "ignore": ["blockless-at-rules", "pseudo-classes"]
       }
     ],
     "selector-pseudo-class-no-unknown": [
