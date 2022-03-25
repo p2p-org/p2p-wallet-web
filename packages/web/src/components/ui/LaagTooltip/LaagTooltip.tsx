@@ -30,9 +30,9 @@ const TooltipContent = styled.div`
   font-size: 15px;
   line-height: 22px;
 
-  background: ${theme.colors.bg.tooltip};
+  background: rgba(44, 44, 46, 0.9);
   border-radius: 8px;
-  box-shadow: ${theme.colors.boxShadow.tooltip};
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
   backdrop-filter: blur(10px);
 `;
 
@@ -55,7 +55,7 @@ const CloseButton = styled.button`
 
   color: ${theme.colors.textIcon.buttonPrimary};
 
-  background: ${theme.colors.buttons.buttonSecondary};
+  background: #686868;
   border-radius: 8px;
 `;
 
