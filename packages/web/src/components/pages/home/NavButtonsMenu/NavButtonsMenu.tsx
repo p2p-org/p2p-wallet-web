@@ -37,7 +37,7 @@ export const NavButtonsMenu: FC<Props> = () => {
   const { openModal } = useModals();
 
   const handleBuyButtonClick = () => {
-    openModal(ModalType.SHOW_MODAL_CHOOSE_BUY_TOKEN);
+    openModal(ModalType.SHOW_MODAL_CHOOSE_BUY_TOKEN_MOBILE);
   };
 
   useEffect(() => {

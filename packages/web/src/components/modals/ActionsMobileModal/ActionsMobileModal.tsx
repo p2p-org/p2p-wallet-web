@@ -28,7 +28,7 @@ export const ActionsMobileModal: FC<Props & ModalPropsType> = ({ close }) => {
   };
 
   const handleBuyButtonClick = () => {
-    openModal(ModalType.SHOW_MODAL_CHOOSE_BUY_TOKEN);
+    openModal(ModalType.SHOW_MODAL_CHOOSE_BUY_TOKEN_MOBILE);
   };
 
   const handleCloseClick = () => {
