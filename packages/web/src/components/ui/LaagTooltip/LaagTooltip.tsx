@@ -12,9 +12,11 @@ interface Props {
   content: string | ReactElement;
   anchor?: string | ReactElement;
   placement?: Placement;
+  possiblePlacements?: Array<Placement>;
   snap?: boolean;
   withClose?: boolean;
   hideOnScroll?: boolean;
+  auto?: boolean;
 }
 
 const TooltipContent = styled.div`
@@ -69,6 +71,7 @@ const defaultProps = {
   placement: 'top-end' as Placement,
   withClose: false,
   hideOnScroll: false,
+  auto: true,
 };
 
 export const LaagTooltip: FunctionComponent<Props> = (props) => {
@@ -79,11 +82,12 @@ export const LaagTooltip: FunctionComponent<Props> = (props) => {
   const { triggerProps, layerProps, arrowProps, renderLayer } = useLayer({
     isOpen: isOver,
     placement: props.placement,
-    possiblePlacements: ['top-end', 'bottom-end'],
+    possiblePlacements: props.possiblePlacements,
     snap: props.snap,
+    auto: props.auto,
     arrowOffset: 15,
-    auto: true,
     triggerOffset: 5,
+    onOutsideClick: close,
   });
 
   const elAnchor = props.anchor ?? <QuestionIcon name={'question'} />;
