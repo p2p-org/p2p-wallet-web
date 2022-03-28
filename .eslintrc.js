@@ -12,7 +12,4 @@ module.exports = {
   parserOptions: {
     project: 'tsconfig.json',
   },
-  rules: {
-    curly: 'error',
-  },
 };
