@@ -12,7 +12,7 @@ const Wrapper = styled.div`
 `;
 
 interface Props {
-  tokenAccount: TokenAccount;
+  tokenAccount?: TokenAccount;
   onClick: () => void;
 }
 

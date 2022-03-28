@@ -18,9 +18,9 @@ const InputWrapper = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 16px 20px;
-  height: 36px;
   box-sizing: content-box;
+  height: 36px;
+  padding: 16px 20px;
 
   &:not(:last-child) {
     border-bottom: 1px solid ${theme.colors.stroke.secondary};
@@ -33,14 +33,6 @@ const Title = styled.div`
   font-size: 16px;
   line-height: 140%;
   letter-spacing: 0.01em;
-`;
-
-const LoaderWrapper = styled.div`
-  margin: none;
-  height: 36px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
 `;
 
 export const Inputs: FC = () => {

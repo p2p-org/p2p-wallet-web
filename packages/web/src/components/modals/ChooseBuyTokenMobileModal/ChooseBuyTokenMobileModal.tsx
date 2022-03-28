@@ -17,11 +17,21 @@ export const ChooseBuyTokenMobileModal: FC<Props & ModalPropsType> = ({ close })
   const location = useLocation();
   const { userTokenAccountKeys } = useTokenAccountsContext();
   const tokenAccounts = useTokenAccounts(userTokenAccountKeys);
-  const tokenList = useMemo(
+  const tokenAccountList = useMemo(
     () =>
       tokenAccounts
-        .filter((token) => ['SOL', 'USDC'].includes(token.balance?.token.symbol ?? ''))
-        .sort(),
+        .filter((token) => ['SOL', 'USDC'].includes(token?.balance?.token.symbol ?? ''))
+        .sort((a, b) => {
+          const aSymbol = a?.balance?.token.symbol || '';
+          const bSymbol = b?.balance?.token.symbol || '';
+          if (aSymbol < bSymbol) {
+            return -1;
+          }
+          if (aSymbol > bSymbol) {
+            return 1;
+          }
+          return 0;
+        }),
     [tokenAccounts],
   );
 
@@ -29,29 +39,26 @@ export const ChooseBuyTokenMobileModal: FC<Props & ModalPropsType> = ({ close })
     close(false);
   };
 
-  const handleRowClick = (token: TokenAccount) => {
+  const handleRowClick = (tokenAccount?: TokenAccount) => {
     handleCloseClick();
 
-    const symbol = token.balance?.token.symbol || 'SOL';
+    const symbol = tokenAccount?.balance?.token.symbol || 'SOL';
     const newPath = `/buy/${symbol}`;
 
-    if (location.pathname !== newPath) history.push(newPath);
+    if (location.pathname !== newPath) {
+      history.push(newPath);
+    }
   };
 
   return (
     <Modal noDelimiter={false} close={handleCloseClick} title="Choose a crypto for buying">
-      {tokenList.map((token) => (
+      {tokenAccountList.map((tokenAccount) => (
         <ActionRow
-          key={token.key?.toBase58()}
-          tokenAccount={token}
-          onClick={() => handleRowClick(token)}
+          key={tokenAccount?.key?.toBase58()}
+          tokenAccount={tokenAccount}
+          onClick={() => handleRowClick(tokenAccount)}
         />
       ))}
     </Modal>
   );
 };
-
-//TODO: - убрать выбор валюты из мобильной версии покупки
-//TODO: - сделать строки
-//TODO: - сделать массив валют для строк
-//TODO: - спросить про стиль шрифта - он не один для всех, его делать нужно для каждой шторки?

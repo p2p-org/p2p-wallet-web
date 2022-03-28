@@ -5,6 +5,8 @@ import { styled } from '@linaria/react';
 import type { TokenAccount } from '@p2p-wallet-web/core';
 import { theme, up, useIsMobile } from '@p2p-wallet-web/ui';
 
+import { shortAddress } from 'utils/tokens';
+
 import { AmountUSD } from '../AmountUSD';
 import { TokenAvatar } from '../TokenAvatar';
 
@@ -73,11 +75,16 @@ const TokenUSD = styled.div`
 `;
 
 interface Props {
-  tokenAccount: TokenAccount;
+  tokenAccount?: TokenAccount;
 }
 
 export const TokenAccountRowContent: FC<Props> = ({ tokenAccount }) => {
   const isMobile = useIsMobile();
+
+  if (!tokenAccount) {
+    return null;
+  }
+
   const avatarSize = isMobile ? 32 : 44;
   const { loading } = tokenAccount;
 
