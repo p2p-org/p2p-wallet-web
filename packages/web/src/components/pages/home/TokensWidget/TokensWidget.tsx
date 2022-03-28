@@ -58,11 +58,11 @@ const ChevronWrapper = styled.div`
   width: 24px;
   height: 24px;
 
-  transform: rotate(270deg);
+  transform: rotate(0deg);
   cursor: pointer;
 
   &.isOpen {
-    transform: rotate(0deg);
+    transform: rotate(180deg);
   }
 `;
 
