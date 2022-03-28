@@ -15,6 +15,7 @@
     "lint:es": "eslint ./src --ext js,ts,tsx --cache --quiet || exit 0",
     "lint:type": "tsc  --noEmit --project ./tsconfig.json --emitDeclarationOnly false || exit 0",
     "lint:prettier": "pretty-quick --staged",
+    "lint:staged": "lint-staged",
     "precommit": "yarn lint:es && yarn lint:type && yarn lint:prettier"
   },
   "dependencies": {
