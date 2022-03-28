@@ -68,7 +68,7 @@ export const NavButtonsMenu: FC = () => {
           Send
         </NavButton>
         <NavButton onClick={handleButtonClick('/swap')}>
-          {!stuck ? <NavButtonIcon name="swap" /> : undefined}
+          {!stuck ? <NavButtonIcon name="arrow-swap" /> : undefined}
           Swap
         </NavButton>
       </NavButtonsMenuStyled>
