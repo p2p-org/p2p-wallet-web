@@ -6,9 +6,9 @@ import type { TokenAccount } from '@p2p-wallet-web/core';
 import { TokenAccountRowContent } from 'components/common/TokenAccountRowContent';
 
 const Wrapper = styled.div`
-  margin: 26px 26px;
   display: flex;
-  align-items: center;
+  align-items: cnter;
+  margin: 26px 26px;
 `;
 
 interface Props {
