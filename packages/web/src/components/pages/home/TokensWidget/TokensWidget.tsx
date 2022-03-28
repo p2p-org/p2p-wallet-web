@@ -85,7 +85,7 @@ export const TokensWidget: FunctionComponent<Props & HTMLAttributes<HTMLDivEleme
 
       {hiddenTokenAccounts.length > 0 ? (
         <Title onClick={handleChevronClick} className={classNames({ isOpen })}>
-          Hidden token{hiddenTokenAccounts.length !== 1 ? 's' : ''}({hiddenTokenAccounts.length})
+          Hidden token{hiddenTokenAccounts.length !== 1 ? 's' : ''}
           <ChevronWrapper className={classNames({ isOpen })}>
             <ChevronIcon name="chevron" />
           </ChevronWrapper>

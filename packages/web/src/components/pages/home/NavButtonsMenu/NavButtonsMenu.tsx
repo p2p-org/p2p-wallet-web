@@ -4,6 +4,7 @@ import { useHistory, useLocation } from 'react-router';
 
 import { styled } from '@linaria/react';
 import classNames from 'classnames';
+import throttle from 'lodash.throttle';
 
 import { NavButton, NavButtonIcon, NavButtons } from 'components/common/NavButtons';
 
@@ -23,41 +24,38 @@ const NavButtonsMenuStyled = styled(NavButtons)`
   }
 `;
 
-interface Props {}
+const MENU_TRIGGER_OFFSET = 100;
 
-// FIX: can produce weird "rattling" during scroll
-export const NavButtonsMenu: FC<Props> = () => {
+export const NavButtonsMenu: FC = () => {
   const history = useHistory();
   const location = useLocation();
 
-  const intersectionRef = useRef(null);
+  const menuRef = useRef<HTMLDivElement>(null);
   const [stuck, setStuck] = useState(false);
 
   useEffect(() => {
-    const observer = new IntersectionObserver(([e]) => setStuck((e?.intersectionRatio || 0) < 1), {
-      rootMargin: '100px',
-      threshold: [1],
+    const onHandle = throttle(() => {
+      const menuBottomEdge = menuRef?.current?.getBoundingClientRect()?.bottom;
+
+      if (menuBottomEdge) {
+        setStuck(menuBottomEdge < MENU_TRIGGER_OFFSET);
+      }
     });
 
-    const cachedRef = intersectionRef.current;
-    if (cachedRef) {
-      observer.observe(cachedRef);
-    }
+    window.addEventListener('scroll', onHandle);
 
     return () => {
-      if (cachedRef) {
-        observer.unobserve(cachedRef);
-      }
+      window.removeEventListener('scroll', onHandle);
     };
-  }, [intersectionRef]);
+  }, []);
 
   const handleButtonClick = (route: string) => () => {
     history.push(route, { fromPage: location.pathname });
   };
 
   return (
-    <Wrapper ref={intersectionRef}>
-      <NavButtonsMenuStyled className={classNames({ stuck })}>
+    <Wrapper>
+      <NavButtonsMenuStyled className={classNames({ stuck })} ref={menuRef}>
         <NavButton onClick={handleButtonClick('/buy')}>
           {!stuck ? <NavButtonIcon name="plus" /> : undefined} Buy
         </NavButton>
