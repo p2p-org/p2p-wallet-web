@@ -61,7 +61,7 @@ type ModalState = { modalType: ModalType; modalId: number; props: any };
 const modalsMap = new Map<ModalType, LoadableComponent<ModalPropsType & any>>([
   // [SHOW_MODAL_ADD_COIN, loadable(() => import('components/modals/__AddCoinModal'))],
   [
-    ModalType.SHOW_MODAL_ACTIONS_MOBILE_MODAL,
+    ModalType.SHOW_MODAL_ACTIONS_MOBILE,
     loadable(() => import('components/modals/ActionsMobileModal')),
   ],
   [
@@ -87,6 +87,10 @@ const modalsMap = new Map<ModalType, LoadableComponent<ModalPropsType & any>>([
   [
     ModalType.SHOW_MODAL_PROCEED_USERNAME,
     loadable(() => import('components/modals/ProceedUsernameModal')),
+  ],
+  [
+    ModalType.SHOW_MODAL_CHOOSE_BUY_TOKEN_MOBILE,
+    loadable(() => import('components/modals/ChooseBuyTokenMobileModal')),
   ],
   [ModalType.SHOW_MODAL_ERROR, loadable(() => import('components/modals/ErrorModal'))],
 ]);

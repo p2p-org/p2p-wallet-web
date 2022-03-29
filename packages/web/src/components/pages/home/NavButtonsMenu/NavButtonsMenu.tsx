@@ -6,6 +6,7 @@ import { styled } from '@linaria/react';
 import classNames from 'classnames';
 import throttle from 'lodash.throttle';
 
+import { ModalType, useModals } from 'app/contexts/general/modals';
 import { NavButton, NavButtonIcon, NavButtons } from 'components/common/NavButtons';
 
 const Wrapper = styled.div`
@@ -33,6 +34,12 @@ export const NavButtonsMenu: FC = () => {
   const menuRef = useRef<HTMLDivElement>(null);
   const [stuck, setStuck] = useState(false);
 
+  const { openModal } = useModals();
+
+  const handleBuyButtonClick = () => {
+    openModal(ModalType.SHOW_MODAL_CHOOSE_BUY_TOKEN_MOBILE);
+  };
+
   useEffect(() => {
     const onScroll = throttle(() => {
       const menuBottomEdge = menuRef?.current?.getBoundingClientRect()?.bottom;
@@ -56,7 +63,7 @@ export const NavButtonsMenu: FC = () => {
   return (
     <Wrapper>
       <NavButtonsMenuStyled className={classNames({ stuck })} ref={menuRef}>
-        <NavButton onClick={handleButtonClick('/buy')}>
+        <NavButton onClick={handleBuyButtonClick}>
           {!stuck ? <NavButtonIcon name="plus" /> : undefined} Buy
         </NavButton>
         <NavButton onClick={handleButtonClick('/receive')}>

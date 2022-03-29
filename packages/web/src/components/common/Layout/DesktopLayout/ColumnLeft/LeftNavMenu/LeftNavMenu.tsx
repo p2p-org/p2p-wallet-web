@@ -63,6 +63,8 @@ const StoreIcon = styled(Icon)`
   width: 20px;
   height: 20px;
   margin-right: 3px;
+
+  color: ${theme.colors.textIcon.secondary};
 `;
 
 const Name = styled.span`
