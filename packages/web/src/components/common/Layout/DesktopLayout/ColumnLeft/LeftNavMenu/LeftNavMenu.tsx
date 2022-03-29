@@ -249,6 +249,7 @@ export const LeftNavMenu: FunctionComponent = () => {
             <NavIcon name="google-play" />
           </IconBlock>
           <Name>Google Play</Name>
+          <StoreIcon name="store-icon" />
         </NavButton>
       </NavLinkMenu>
     </Wrapper>
