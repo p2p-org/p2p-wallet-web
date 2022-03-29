@@ -32,10 +32,10 @@ const FromWrapper = styled.div`
 `;
 
 const ToWrapper = styled.div`
+  min-width: 0;
+
   border: 1px solid #f6f6f8;
   border-radius: 12px;
-  
-  min-width: 0;
 `;
 
 const TopWrapperStyled = styled(TopWrapper)`
