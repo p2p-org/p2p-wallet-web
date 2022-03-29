@@ -40,7 +40,7 @@ export const NavButtonsMenu: FC = () => {
       if (menuBottomEdge) {
         setStuck(menuBottomEdge < MENU_TRIGGER_OFFSET);
       }
-    });
+    }, 200);
 
     window.addEventListener('scroll', onHandle);
 
