@@ -29,10 +29,6 @@ const TokensWidgetStyled = styled(TokensWidget)`
   }
 `;
 
-const a: string = 5;
-
-console.log(a);
-
 export const Home: FunctionComponent = () => {
   const isMobile = useIsMobile();
   const userTokenAccounts = useUserTokenAccounts();
