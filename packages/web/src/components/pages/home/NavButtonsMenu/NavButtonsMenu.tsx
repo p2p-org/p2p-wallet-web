@@ -34,7 +34,7 @@ export const NavButtonsMenu: FC = () => {
   const [stuck, setStuck] = useState(false);
 
   useEffect(() => {
-    const onHandle = throttle(() => {
+    const onScroll = throttle(() => {
       const menuBottomEdge = menuRef?.current?.getBoundingClientRect()?.bottom;
 
       if (menuBottomEdge) {
@@ -42,10 +42,10 @@ export const NavButtonsMenu: FC = () => {
       }
     }, 200);
 
-    window.addEventListener('scroll', onHandle);
+    window.addEventListener('scroll', onScroll);
 
     return () => {
-      window.removeEventListener('scroll', onHandle);
+      window.removeEventListener('scroll', onScroll);
     };
   }, []);
 
