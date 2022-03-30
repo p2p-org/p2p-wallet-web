@@ -1,21 +1,29 @@
 import type { FC } from 'react';
 
-import { useNativeAccount } from '@p2p-wallet-web/sail';
+import { LAMPORTS_PER_SOL } from '@solana/web3.js';
 
 import type { ModalPropsType } from 'app/contexts';
-import { useNetworkFees } from 'app/contexts';
+import { Loader } from 'components/common/Loader';
 
 import { Create } from './Create';
 import { TopUp } from './TopUp';
 
-export const ReceiveBitcoinModal: FC<ModalPropsType> = ({ close }) => {
-  const { nativeBalance } = useNativeAccount();
-  const { accountRentExemption } = useNetworkFees();
-  const isEnoughSol = (nativeBalance?.asNumber ?? 0) >= accountRentExemption.toNumber();
+interface Props {
+  accountRentExemption: any;
+  nativeAccount: any;
+}
 
-  if (isEnoughSol) {
-    return <Create close={close} />;
+export const ReceiveBitcoinModal: FC<ModalPropsType<boolean, Props>> = (props) => {
+  const solsInFee = props.accountRentExemption.toNumber() / LAMPORTS_PER_SOL;
+  const isEnoughSol = (props.nativeAccount?.nativeBalance?.asNumber ?? 0) >= solsInFee;
+
+  if (!props.nativeAccount?.nativeBalance) {
+    return <Loader size={'50'} />;
   }
 
-  return <TopUp close={close} />;
+  if (isEnoughSol) {
+    return <Create close={props.close} />;
+  }
+
+  return <TopUp close={props.close} />;
 };

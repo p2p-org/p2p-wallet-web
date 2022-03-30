@@ -3,13 +3,20 @@ import { useCallback, useEffect, useState } from 'react';
 
 import { styled } from '@linaria/react';
 import { useSolana } from '@p2p-wallet-web/core';
+import { useNativeAccount } from '@p2p-wallet-web/sail';
 import { theme } from '@p2p-wallet-web/ui';
 import { Bitcoin } from '@renproject/chains-bitcoin';
 import { Solana } from '@renproject/chains-solana';
 import type { PublicKey } from '@solana/web3.js';
 
 import type { ReceiveSourceNetworkType } from 'app/contexts';
-import { ModalType, RECEIVE_SOURCE_NETWORKS, useModals, useReceiveState } from 'app/contexts';
+import {
+  ModalType,
+  RECEIVE_SOURCE_NETWORKS,
+  useModals,
+  useNetworkFees,
+  useReceiveState,
+} from 'app/contexts';
 import { TokenAvatar } from 'components/common/TokenAvatar';
 import { Select, SelectItem } from 'components/ui';
 import { trackEvent } from 'utils/analytics';
@@ -61,6 +68,8 @@ export const NetworkSelect: FC<Props> = () => {
   const { openModal } = useModals();
   const solanaProvider = useSolana();
   const network = useRenNetwork();
+  const nativeAccount = useNativeAccount();
+  const { accountRentExemption } = useNetworkFees();
 
   const { sourceNetwork, setSourceNetwork } = useReceiveState();
   const [isBTCTokenLoading, setIsBTCTokenLoading] = useState(false);
@@ -86,7 +95,10 @@ export const NetworkSelect: FC<Props> = () => {
   const handleSourceNetworkClick = useCallback(
     (source: ReceiveSourceNetworkType) => async () => {
       if (source === 'bitcoin' && !hasBTCTokenAccount) {
-        const result = await openModal<boolean>(ModalType.SHOW_MODAL_RECEIVE_BITCOIN);
+        const result = await openModal<boolean>(ModalType.SHOW_MODAL_RECEIVE_BITCOIN, {
+          nativeAccount,
+          accountRentExemption,
+        });
 
         if (!result) {
           return false;
@@ -96,7 +108,7 @@ export const NetworkSelect: FC<Props> = () => {
       setSourceNetwork(source);
       trackEvent('Receive_Network_Changed', { Receive_Network: source });
     },
-    [hasBTCTokenAccount, openModal, setSourceNetwork],
+    [hasBTCTokenAccount, openModal, setSourceNetwork, nativeAccount, accountRentExemption],
   );
 
   const handleToggleClick = (isOpen: boolean) => {
