@@ -68,7 +68,7 @@ export const NetworkSelect: FC<Props> = () => {
   const { openModal } = useModals();
   const solanaProvider = useSolana();
   const network = useRenNetwork();
-  const nativeAccount = useNativeAccount();
+  const { nativeBalance } = useNativeAccount();
   const { accountRentExemption } = useNetworkFees();
 
   const { sourceNetwork, setSourceNetwork } = useReceiveState();
@@ -96,7 +96,7 @@ export const NetworkSelect: FC<Props> = () => {
     (source: ReceiveSourceNetworkType) => async () => {
       if (source === 'bitcoin' && !hasBTCTokenAccount) {
         const result = await openModal<boolean>(ModalType.SHOW_MODAL_RECEIVE_BITCOIN, {
-          nativeAccount,
+          nativeBalance,
           accountRentExemption,
         });
 
@@ -108,7 +108,7 @@ export const NetworkSelect: FC<Props> = () => {
       setSourceNetwork(source);
       trackEvent('Receive_Network_Changed', { Receive_Network: source });
     },
-    [hasBTCTokenAccount, openModal, setSourceNetwork, nativeAccount, accountRentExemption],
+    [hasBTCTokenAccount, openModal, setSourceNetwork, nativeBalance, accountRentExemption],
   );
 
   const handleToggleClick = (isOpen: boolean) => {
