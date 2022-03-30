@@ -58,11 +58,11 @@ const ChevronWrapper = styled.div`
   width: 24px;
   height: 24px;
 
-  transform: rotate(270deg);
+  transform: rotate(0deg);
   cursor: pointer;
 
   &.isOpen {
-    transform: rotate(0deg);
+    transform: rotate(180deg);
   }
 `;
 
@@ -85,7 +85,7 @@ export const TokensWidget: FunctionComponent<Props & HTMLAttributes<HTMLDivEleme
 
       {hiddenTokenAccounts.length > 0 ? (
         <Title onClick={handleChevronClick} className={classNames({ isOpen })}>
-          Hidden token{hiddenTokenAccounts.length !== 1 ? 's' : ''}({hiddenTokenAccounts.length})
+          Hidden token{hiddenTokenAccounts.length !== 1 ? 's' : ''}
           <ChevronWrapper className={classNames({ isOpen })}>
             <ChevronIcon name="chevron" />
           </ChevronWrapper>
