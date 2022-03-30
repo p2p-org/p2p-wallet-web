@@ -76,6 +76,7 @@
     "react-fast-compare": "^3.2.0",
     "react-helmet": "^6.1.0",
     "react-highcharts": "^16.1.0",
+    "react-laag": "2.0.3",
     "react-loading-skeleton": "^3.0.1",
     "react-query": "^3.34.6",
     "react-router": "^5.2.0",

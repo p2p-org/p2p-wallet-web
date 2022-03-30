@@ -5,6 +5,7 @@ import { useHistory, useLocation } from 'react-router';
 import { styled } from '@linaria/react';
 import classNames from 'classnames';
 
+import { ModalType, useModals } from 'app/contexts/general/modals';
 import { NavButton, NavButtonIcon, NavButtons } from 'components/common/NavButtons';
 
 const Wrapper = styled.div`
@@ -33,6 +34,12 @@ export const NavButtonsMenu: FC<Props> = () => {
   const intersectionRef = useRef(null);
   const [stuck, setStuck] = useState(false);
 
+  const { openModal } = useModals();
+
+  const handleBuyButtonClick = () => {
+    openModal(ModalType.SHOW_MODAL_CHOOSE_BUY_TOKEN_MOBILE);
+  };
+
   useEffect(() => {
     const observer = new IntersectionObserver(([e]) => setStuck((e?.intersectionRatio || 0) < 1), {
       rootMargin: '100px',
@@ -58,7 +65,7 @@ export const NavButtonsMenu: FC<Props> = () => {
   return (
     <Wrapper ref={intersectionRef}>
       <NavButtonsMenuStyled className={classNames({ stuck })}>
-        <NavButton onClick={handleButtonClick('/buy')}>
+        <NavButton onClick={handleBuyButtonClick}>
           {!stuck ? <NavButtonIcon name="plus" /> : undefined} Buy
         </NavButton>
         <NavButton onClick={handleButtonClick('/receive')}>

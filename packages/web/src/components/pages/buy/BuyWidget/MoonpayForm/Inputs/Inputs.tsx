@@ -6,6 +6,7 @@ import { borders, theme } from '@p2p-wallet-web/ui';
 import { useBuyState } from 'app/contexts';
 import { TokenAvatar } from 'components/common/TokenAvatar';
 import { InputAmount } from 'components/ui/InputAmount';
+
 import { AmountTypeButton } from '../AmountTypeButton';
 
 const Wrapper = styled.div`
@@ -17,6 +18,8 @@ const InputWrapper = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
+  box-sizing: content-box;
+  height: 36px;
   padding: 16px 20px;
 
   &:not(:last-child) {
@@ -30,14 +33,6 @@ const Title = styled.div`
   font-size: 16px;
   line-height: 140%;
   letter-spacing: 0.01em;
-`;
-
-const LoaderWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  height: 36px;
-  margin: none;
 `;
 
 export const Inputs: FC = () => {

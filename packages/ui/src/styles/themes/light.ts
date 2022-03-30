@@ -12,15 +12,12 @@ const theme = {
       buttonSecondary: '#F6F6F8',
       buttonDisabled: '#A3A5BA',
       app: '#FBFBFD',
-      // chart: '',
     },
     stroke: {
       primary: '#D3D4DE',
       primaryRGB: toRGB('#D3D4DE'),
       secondary: '#F2F2F7',
       tertiary: '#F6F6F8',
-      // 'chart-red': '',
-      // 'chart-green': '',
     },
     system: {
       errorMain: '#F43D3D',

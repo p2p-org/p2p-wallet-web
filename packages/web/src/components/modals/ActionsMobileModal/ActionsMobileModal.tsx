@@ -4,6 +4,7 @@ import { useHistory, useLocation } from 'react-router';
 import { styled } from '@linaria/react';
 
 import type { ModalPropsType } from 'app/contexts';
+import { ModalType, useModals } from 'app/contexts';
 import { ActionButton } from 'components/modals/ActionsMobileModal/ActionButton';
 import { Modal } from 'components/ui/Modal';
 
@@ -19,10 +20,15 @@ interface Props {}
 export const ActionsMobileModal: FC<Props & ModalPropsType> = ({ close }) => {
   const history = useHistory();
   const location = useLocation();
+  const { openModal } = useModals();
 
   const handleButtonClick = (route: string) => () => {
     close(false);
     history.push(route, { fromPage: location.pathname });
+  };
+
+  const handleBuyButtonClick = () => {
+    openModal(ModalType.SHOW_MODAL_CHOOSE_BUY_TOKEN_MOBILE);
   };
 
   const handleCloseClick = () => {
@@ -32,7 +38,7 @@ export const ActionsMobileModal: FC<Props & ModalPropsType> = ({ close }) => {
   return (
     <Modal close={handleCloseClick} noDelimiter>
       <Content>
-        <ActionButton icon="plus" onClick={handleButtonClick('/buy')}>
+        <ActionButton icon="plus" onClick={handleBuyButtonClick}>
           Buy
         </ActionButton>
         <ActionButton icon="bottom" onClick={handleButtonClick('/receive')}>
