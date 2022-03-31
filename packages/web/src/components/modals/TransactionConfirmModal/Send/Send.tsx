@@ -84,7 +84,11 @@ interface Props {
   params: TransferParams;
 }
 
-export const Send: FC<Props & TransactionDetailsProps> = ({ params, sendState }) => {
+export const Send: FC<Props & TransactionDetailsProps> = ({
+  params,
+  sendState,
+  userFreeFeeLimits,
+}) => {
   return (
     <Section className="send">
       <div>
@@ -123,7 +127,7 @@ export const Send: FC<Props & TransactionDetailsProps> = ({ params, sendState })
         </FieldInfo>
       </div>
 
-      <TransactionDetails sendState={sendState} />
+      <TransactionDetails sendState={sendState} userFreeFeeLimits={userFreeFeeLimits} />
     </Section>
   );
 };

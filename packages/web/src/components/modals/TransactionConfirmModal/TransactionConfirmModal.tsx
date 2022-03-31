@@ -67,7 +67,7 @@ export type TransactionConfirmModalProps = TransactionDetailsProps & {
 
 export const TransactionConfirmModal: FunctionComponent<
   ModalPropsType & TransactionConfirmModalProps
-> = ({ type, params, close, sendState }) => {
+> = ({ type, params, close, sendState, userFreeFeeLimits }) => {
   const { walletProviderInfo } = useWallet();
   const tryUnlockSeedAndMnemonic = useTryUnlockSeedAndMnemonic();
 
@@ -168,7 +168,11 @@ export const TransactionConfirmModal: FunctionComponent<
     >
       {type === 'send' ? <ActionTitle>You are going to send</ActionTitle> : undefined}
       {type === 'send' ? (
-        <Send params={params as TransferParams} sendState={sendState} />
+        <Send
+          params={params as TransferParams}
+          sendState={sendState}
+          userFreeFeeLimits={userFreeFeeLimits}
+        />
       ) : undefined}
       {type === 'swap' ? <Swap params={params as SwapParams} /> : undefined}
 

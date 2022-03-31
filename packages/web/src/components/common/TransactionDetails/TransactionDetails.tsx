@@ -4,16 +4,18 @@ import { styled } from '@linaria/react';
 
 import type { UseSendState } from 'app/contexts';
 import { useSettings } from 'app/contexts';
+import type { INITIAL_USER_FREE_FEE_LIMITS } from 'app/contexts/api/feeRelayer/utils';
 import { Accordion, LaagTooltip } from 'components/ui';
 import { AccordionTitle } from 'components/ui/AccordionDetails/AccordionTitle';
 import { ListWrapper, Row, Text } from 'components/ui/AccordionDetails/common';
 
 export interface TransactionDetailsProps {
   sendState: Pick<UseSendState, 'fromTokenAccount' | 'destinationAccount' | 'details'>;
+  userFreeFeeLimits: typeof INITIAL_USER_FREE_FEE_LIMITS;
 }
 
 const TooltipContent = styled.div`
-  width: 360px;
+  width: 300px;
 `;
 
 const MOCK_FREE_TRANSACTIONS = 100;
@@ -22,6 +24,19 @@ export const TransactionDetails: FC<TransactionDetailsProps> = (props) => {
   const {
     settings: { useFreeTransactions },
   } = useSettings();
+
+  const elTooltip = (
+    <TooltipContent>
+      <span>On the Solana network, the first {props.userFreeFeeLimits.maxTransactionCount}</span>
+      <span>
+        transactions in a day are paid by P2P.org. You have
+        {` ${props.userFreeFeeLimits.maxTransactionCount > 0 ? MOCK_FREE_TRANSACTIONS : 0} `}
+        free transactions left for today
+      </span>
+      <br />
+      <br /> Subsequent transactions will be charged based on the Solana blockchain gas fee.
+    </TooltipContent>
+  );
 
   return (
     <Accordion
@@ -47,19 +62,7 @@ export const TransactionDetails: FC<TransactionDetailsProps> = (props) => {
               Free{' '}
               <Text className="green inline-flex">
                 (Paid by P2P.org)
-                <LaagTooltip
-                  elContent={
-                    <TooltipContent>
-                      {`On the Solana network, the first ${MOCK_FREE_TRANSACTIONS} transactions in a day are paid by P2P.org. You have ${
-                        MOCK_FREE_TRANSACTIONS > 0 ? MOCK_FREE_TRANSACTIONS : 0
-                      }
-                            free transactions left for today.`}
-                      <br />
-                      <br /> Subsequent transactions will be charged based on the Solana blockchain
-                      gas fee.
-                    </TooltipContent>
-                  }
-                />
+                <LaagTooltip withClose={true} elContent={elTooltip} />
               </Text>
             </Text>
           ) : (

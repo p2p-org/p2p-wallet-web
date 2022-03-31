@@ -9,6 +9,7 @@ import { PublicKey } from '@solana/web3.js';
 import {
   ModalType,
   useFeeCompensation,
+  useFreeFeeLimits,
   useModals,
   useSendState,
   useTransferAction,
@@ -45,6 +46,7 @@ export const SendButtonSolana: FC<Props> = ({ primary, disabled }) => {
   } = useSendState();
   const transferAction = useTransferAction();
   const { compensationParams } = useFeeCompensation();
+  const { userFreeFeeLimits } = useFreeFeeLimits();
 
   const destinationTokenAccount = useTokenAccount(usePubkey(destinationAddress));
 
@@ -90,6 +92,7 @@ export const SendButtonSolana: FC<Props> = ({ primary, disabled }) => {
           username: resolvedAddress ? toPublicKey : '',
         },
         sendState: { fromTokenAccount, destinationAccount, details },
+        userFreeFeeLimits,
       },
     );
 
