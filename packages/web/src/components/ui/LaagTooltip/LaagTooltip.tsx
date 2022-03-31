@@ -85,6 +85,7 @@ export const LaagTooltip: FunctionComponent<Props> = (props) => {
   const { triggerProps, layerProps, arrowProps, renderLayer } = useLayer({
     isOpen: isOver,
     placement: props.placement,
+    overflowContainer: false,
     possiblePlacements: props.possiblePlacements,
     snap: props.snap,
     auto: props.auto,
