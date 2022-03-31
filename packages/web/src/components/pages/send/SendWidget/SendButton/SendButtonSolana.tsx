@@ -89,6 +89,7 @@ export const SendButtonSolana: FC<Props> = ({ primary, disabled }) => {
           amount: parsedAmount,
           username: resolvedAddress ? toPublicKey : '',
         },
+        sendState: { fromTokenAccount, destinationAccount, details },
       },
     );
 

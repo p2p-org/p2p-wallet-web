@@ -14,6 +14,7 @@ import type { ModalPropsType } from 'app/contexts/general/modals/types';
 import { ButtonCancel } from 'components/common/ButtonCancel';
 import { ErrorHint } from 'components/common/ErrorHint';
 import { PasswordInput } from 'components/common/PasswordInput';
+import type { TransactionDetailsProps } from 'components/common/TransactionDetails';
 import { Button, Icon } from 'components/ui';
 import { Modal } from 'components/ui/Modal';
 import { trackEvent } from 'utils/analytics';
@@ -59,14 +60,14 @@ const SendIcon = styled(Icon)`
   margin-right: 12px;
 `;
 
-export type TransactionConfirmModalProps = {
+export type TransactionConfirmModalProps = TransactionDetailsProps & {
   type: 'send' | 'swap';
   params: TransferParams | SwapParams;
 };
 
 export const TransactionConfirmModal: FunctionComponent<
   ModalPropsType & TransactionConfirmModalProps
-> = ({ type, params, close }) => {
+> = ({ type, params, close, sendState }) => {
   const { walletProviderInfo } = useWallet();
   const tryUnlockSeedAndMnemonic = useTryUnlockSeedAndMnemonic();
 
@@ -166,7 +167,9 @@ export const TransactionConfirmModal: FunctionComponent<
       footer={renderButtons()}
     >
       {type === 'send' ? <ActionTitle>You are going to send</ActionTitle> : undefined}
-      {type === 'send' ? <Send params={params as TransferParams} /> : undefined}
+      {type === 'send' ? (
+        <Send params={params as TransferParams} sendState={sendState} />
+      ) : undefined}
       {type === 'swap' ? <Swap params={params as SwapParams} /> : undefined}
 
       {isSecretKeyWallet ? (
