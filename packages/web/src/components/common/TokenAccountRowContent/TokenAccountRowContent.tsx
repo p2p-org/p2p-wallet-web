@@ -4,34 +4,23 @@ import Skeleton from 'react-loading-skeleton';
 import { styled } from '@linaria/react';
 import type { TokenAccount } from '@p2p-wallet-web/core';
 import { theme, up, useIsMobile } from '@p2p-wallet-web/ui';
+import classNames from 'classnames';
 
 import { shortAddress } from 'utils/tokens';
 
 import { AmountUSD } from '../AmountUSD';
 import { TokenAvatar } from '../TokenAvatar';
 
-interface MobileChildProps {
-  isMobilePopupChild?: boolean;
-}
-
 export const TokenAvatarStyled = styled(TokenAvatar)``;
 
-const Content = styled.div`
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  justify-content: center;
-  margin-left: 12px;
-`;
-
-const TokenInfo = styled.div<MobileChildProps>`
+const TokenInfo = styled.div`
   display: grid;
   grid-auto-flow: column;
-  grid-template-rows: ${(props) => (props.isMobilePopupChild ? '20px 20px' : '22px 22px')};
+  grid-template-rows: 22px 22px;
   grid-template-columns: 1fr 1fr;
 `;
 
-const TokenName = styled.div<MobileChildProps>`
+const TokenName = styled.div`
   flex: 1;
 
   max-width: 300px;
@@ -39,7 +28,7 @@ const TokenName = styled.div<MobileChildProps>`
 
   color: ${theme.colors.textIcon.primary};
 
-  font-weight: ${(props) => (props.isMobilePopupChild ? 500 : 700)};
+  font-weight: 700;
   font-size: 14px;
   line-height: 140%;
 
@@ -52,10 +41,10 @@ const TokenName = styled.div<MobileChildProps>`
   text-overflow: ellipsis;
 `;
 
-const TokenBalance = styled.div<MobileChildProps>`
+const TokenBalance = styled.div`
   color: ${theme.colors.textIcon.secondary};
   font-weight: 500;
-  font-size: ${(props) => (props.isMobilePopupChild ? '14px' : '13px')};
+  font-size: 13px;
   line-height: 140%;
 
   ${up.tablet} {
@@ -63,14 +52,14 @@ const TokenBalance = styled.div<MobileChildProps>`
   }
 `;
 
-const TokenUSD = styled.div<MobileChildProps>`
+const TokenUSD = styled.div`
   grid-row: 1 / -1;
   align-self: center;
   justify-self: flex-end;
 
   color: #202020;
   font-weight: 600;
-  font-size: ${(props) => (props.isMobilePopupChild ? '16px' : '17px')};
+  font-size: 17px;
   line-height: 140%;
 
   ${up.tablet} {
@@ -78,8 +67,35 @@ const TokenUSD = styled.div<MobileChildProps>`
   }
 `;
 
-interface Props extends MobileChildProps {
+const Content = styled.div`
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: center;
+  margin-left: 12px;
+
+  &.isMobilePopupChild {
+    ${TokenInfo} {
+      grid-template-rows: 20px 20px;
+    }
+
+    ${TokenName} {
+      font-weight: 500;
+    }
+
+    ${TokenBalance} {
+      font-size: 14px;
+    }
+
+    ${TokenUSD} {
+      font-size: 16px;
+    }
+  }
+`;
+
+interface Props {
   tokenAccount?: TokenAccount;
+  isMobilePopupChild?: boolean;
 }
 
 export const TokenAccountRowContent: FC<Props> = ({ tokenAccount, isMobilePopupChild }) => {
@@ -99,17 +115,14 @@ export const TokenAccountRowContent: FC<Props> = ({ tokenAccount, isMobilePopupC
       (tokenAccount.balance?.token.address && shortAddress(tokenAccount.balance?.token.address));
 
     return (
-      <TokenName
-        title={tokenAccount.balance?.token.address}
-        isMobilePopupChild={isMobilePopupChild}
-      >
+      <TokenName title={tokenAccount.balance?.token.address}>
         {loading ? <Skeleton width={100} height={16} /> : tokenName}
       </TokenName>
     );
   };
 
   const elTokenBalance = (
-    <TokenBalance isMobilePopupChild={isMobilePopupChild}>
+    <TokenBalance>
       {loading ? <Skeleton width={100} height={14} /> : <>{tokenAccount.balance?.formatUnits()}</>}
     </TokenBalance>
   );
@@ -117,7 +130,7 @@ export const TokenAccountRowContent: FC<Props> = ({ tokenAccount, isMobilePopupC
   const renderTokenUSD = () => {
     if (loading) {
       return (
-        <TokenUSD isMobilePopupChild={isMobilePopupChild}>
+        <TokenUSD>
           <Skeleton width={50} height={14} />
         </TokenUSD>
       );
@@ -125,7 +138,7 @@ export const TokenAccountRowContent: FC<Props> = ({ tokenAccount, isMobilePopupC
 
     if (tokenAccount.balance) {
       return (
-        <TokenUSD isMobilePopupChild={isMobilePopupChild}>
+        <TokenUSD>
           <AmountUSD value={tokenAccount.balance} />
         </TokenUSD>
       );
@@ -145,8 +158,8 @@ export const TokenAccountRowContent: FC<Props> = ({ tokenAccount, isMobilePopupC
           size={avatarSize}
         />
       )}
-      <Content>
-        <TokenInfo isMobilePopupChild={isMobilePopupChild}>
+      <Content className={classNames({ isMobilePopupChild })}>
+        <TokenInfo>
           {renderTokenName()}
           {elTokenBalance}
           {renderTokenUSD()}
