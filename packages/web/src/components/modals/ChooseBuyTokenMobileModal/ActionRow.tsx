@@ -7,8 +7,8 @@ import { TokenAccountRowContent } from 'components/common/TokenAccountRowContent
 
 const Wrapper = styled.div`
   display: flex;
-  align-items: cnter;
-  margin: 26px 26px;
+  align-items: center;
+  margin: 26px 10px;
 `;
 
 interface Props {
@@ -19,7 +19,7 @@ interface Props {
 export const ActionRow: FC<Props> = ({ tokenAccount, onClick }) => {
   return (
     <Wrapper onClick={onClick}>
-      <TokenAccountRowContent tokenAccount={tokenAccount} />
+      <TokenAccountRowContent tokenAccount={tokenAccount} isMobilePopupChild />
     </Wrapper>
   );
 };

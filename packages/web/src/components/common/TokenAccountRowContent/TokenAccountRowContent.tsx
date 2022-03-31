@@ -10,6 +10,10 @@ import { shortAddress } from 'utils/tokens';
 import { AmountUSD } from '../AmountUSD';
 import { TokenAvatar } from '../TokenAvatar';
 
+interface MobileChildProps {
+  isMobilePopupChild?: boolean;
+}
+
 export const TokenAvatarStyled = styled(TokenAvatar)``;
 
 const Content = styled.div`
@@ -20,14 +24,14 @@ const Content = styled.div`
   margin-left: 12px;
 `;
 
-const TokenInfo = styled.div`
+const TokenInfo = styled.div<MobileChildProps>`
   display: grid;
   grid-auto-flow: column;
-  grid-template-rows: 22px 22px;
+  grid-template-rows: ${(props) => (props.isMobilePopupChild ? '20px 20px' : '22px 22px')};
   grid-template-columns: 1fr 1fr;
 `;
 
-const TokenName = styled.div`
+const TokenName = styled.div<MobileChildProps>`
   flex: 1;
 
   max-width: 300px;
@@ -35,7 +39,7 @@ const TokenName = styled.div`
 
   color: ${theme.colors.textIcon.primary};
 
-  font-weight: 700;
+  font-weight: ${(props) => (props.isMobilePopupChild ? 500 : 700)};
   font-size: 14px;
   line-height: 140%;
 
@@ -48,10 +52,10 @@ const TokenName = styled.div`
   text-overflow: ellipsis;
 `;
 
-const TokenBalance = styled.div`
+const TokenBalance = styled.div<MobileChildProps>`
   color: ${theme.colors.textIcon.secondary};
   font-weight: 500;
-  font-size: 13px;
+  font-size: ${(props) => (props.isMobilePopupChild ? '14px' : '13px')};
   line-height: 140%;
 
   ${up.tablet} {
@@ -59,14 +63,14 @@ const TokenBalance = styled.div`
   }
 `;
 
-const TokenUSD = styled.div`
+const TokenUSD = styled.div<MobileChildProps>`
   grid-row: 1 / -1;
   align-self: center;
   justify-self: flex-end;
 
   color: #202020;
   font-weight: 600;
-  font-size: 17px;
+  font-size: ${(props) => (props.isMobilePopupChild ? '16px' : '17px')};
   line-height: 140%;
 
   ${up.tablet} {
@@ -74,11 +78,11 @@ const TokenUSD = styled.div`
   }
 `;
 
-interface Props {
+interface Props extends MobileChildProps {
   tokenAccount?: TokenAccount;
 }
 
-export const TokenAccountRowContent: FC<Props> = ({ tokenAccount }) => {
+export const TokenAccountRowContent: FC<Props> = ({ tokenAccount, isMobilePopupChild }) => {
   const isMobile = useIsMobile();
 
   if (!tokenAccount) {
@@ -95,14 +99,17 @@ export const TokenAccountRowContent: FC<Props> = ({ tokenAccount }) => {
       (tokenAccount.balance?.token.address && shortAddress(tokenAccount.balance?.token.address));
 
     return (
-      <TokenName title={tokenAccount.balance?.token.address}>
+      <TokenName
+        title={tokenAccount.balance?.token.address}
+        isMobilePopupChild={isMobilePopupChild}
+      >
         {loading ? <Skeleton width={100} height={16} /> : tokenName}
       </TokenName>
     );
   };
 
   const elTokenBalance = (
-    <TokenBalance>
+    <TokenBalance isMobilePopupChild={isMobilePopupChild}>
       {loading ? <Skeleton width={100} height={14} /> : <>{tokenAccount.balance?.formatUnits()}</>}
     </TokenBalance>
   );
@@ -110,7 +117,7 @@ export const TokenAccountRowContent: FC<Props> = ({ tokenAccount }) => {
   const renderTokenUSD = () => {
     if (loading) {
       return (
-        <TokenUSD>
+        <TokenUSD isMobilePopupChild={isMobilePopupChild}>
           <Skeleton width={50} height={14} />
         </TokenUSD>
       );
@@ -118,7 +125,7 @@ export const TokenAccountRowContent: FC<Props> = ({ tokenAccount }) => {
 
     if (tokenAccount.balance) {
       return (
-        <TokenUSD>
+        <TokenUSD isMobilePopupChild={isMobilePopupChild}>
           <AmountUSD value={tokenAccount.balance} />
         </TokenUSD>
       );
@@ -139,7 +146,7 @@ export const TokenAccountRowContent: FC<Props> = ({ tokenAccount }) => {
         />
       )}
       <Content>
-        <TokenInfo>
+        <TokenInfo isMobilePopupChild={isMobilePopupChild}>
           {renderTokenName()}
           {elTokenBalance}
           {renderTokenUSD()}
