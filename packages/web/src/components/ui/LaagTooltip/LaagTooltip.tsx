@@ -47,6 +47,10 @@ const Anchor = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
+
+  &:hover {
+    cursor: pointer;
+  }
 `;
 
 const CloseButton = styled.button`
@@ -75,7 +79,7 @@ const defaultProps = {
 };
 
 const TOOLTIP_ARROW_OFFSET = 15;
-const TOOLTIP_TRIGGER_OFFSET = 5;
+const TOOLTIP_TRIGGER_OFFSET = 10;
 
 export const LaagTooltip: FunctionComponent<Props> = (props) => {
   const [isOver, hoverProps, close] = useHover({ hideOnScroll: props.hideOnScroll });

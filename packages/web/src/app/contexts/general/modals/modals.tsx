@@ -111,8 +111,13 @@ const ModalsContext = React.createContext<{
 export function ModalsProvider({ children = null as any }) {
   const [modals, setModals] = useState<ModalState[]>([]);
 
+  const setPageScroll = (overflow: 'hidden' | 'scroll') =>
+    (document.documentElement.style.overflow = overflow);
+
   const openModal = useCallback(async (modalType: ModalType, props?: any): Promise<any> => {
     ++modalId;
+
+    setPageScroll('hidden');
 
     setModals((state) => [
       ...state,
@@ -137,6 +142,7 @@ export function ModalsProvider({ children = null as any }) {
 
   const closeModal = useCallback((modalId: number, result?: any) => {
     setModals((state) => state.filter((modal) => modal.modalId !== modalId));
+    setPageScroll('scroll');
 
     const dialogInfo = promises.get(modalId);
     if (dialogInfo) {
@@ -148,6 +154,7 @@ export function ModalsProvider({ children = null as any }) {
   }, []);
 
   const closeTopModal = useCallback(() => {
+    setPageScroll('scroll');
     setModals((state) => state.slice(0, state.length - 1));
   }, []);
 
