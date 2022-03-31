@@ -1,23 +1,26 @@
 import type { FC } from 'react';
-import { useMemo } from 'react';
 
-import { useUserTokenAccounts } from '@p2p-wallet-web/core';
+import type { TokenAmount } from '@saberhq/token-utils';
+import type { u64 } from '@solana/spl-token';
 
 import type { ModalPropsType } from 'app/contexts';
 
 import { Create } from './Create';
 import { TopUp } from './TopUp';
 
-export const ReceiveBitcoinModal: FC<ModalPropsType> = ({ close }) => {
-  const tokenAccounts = useUserTokenAccounts();
+interface Props {
+  accountRentExemption: u64;
+  nativeBalance: TokenAmount;
+}
 
-  const hasSomeBalance = useMemo(() => {
-    return tokenAccounts.some((value) => value.balance?.greaterThan(0));
-  }, [tokenAccounts]);
+export const ReceiveBitcoinModal: FC<ModalPropsType<boolean, Props>> = (props) => {
+  const nativeLamports = props.nativeBalance?.toU64().toNumber() ?? 0;
+  const lamportsRentExcemption = props.accountRentExemption.toNumber();
+  const isEnoughSol = nativeLamports > lamportsRentExcemption;
 
-  if (hasSomeBalance) {
-    return <Create close={close} />;
+  if (isEnoughSol) {
+    return <Create close={props.close} />;
   }
 
-  return <TopUp close={close} />;
+  return <TopUp close={props.close} />;
 };

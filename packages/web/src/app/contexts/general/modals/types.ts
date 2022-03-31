@@ -11,7 +11,8 @@ export enum ModalType {
   SHOW_MODAL_CHOOSE_BUY_TOKEN_MOBILE,
 }
 
-export type ModalPropsType<T = boolean> = {
+export type ModalPropsType<T = boolean, P = any> = {
   close: (result?: T) => void;
-  [prop: string]: any;
+} & {
+  [K in keyof P]: P[K];
 };
