@@ -1,5 +1,5 @@
 import type { FunctionComponent, ReactElement } from 'react';
-import type { Placement } from 'react-laag';
+import type { Placement, UseHoverOptions, UseLayerOptions } from 'react-laag';
 import { Arrow, useHover, useLayer } from 'react-laag';
 
 import { css } from '@linaria/core';
@@ -8,16 +8,20 @@ import { theme } from '@p2p-wallet-web/ui';
 
 import { Icon } from 'components/ui';
 
-interface Props {
+interface TooltipProps {
   elContent: string | ReactElement;
   elAnchor?: string | ReactElement;
-  placement?: Placement;
-  possiblePlacements?: Array<Placement>;
-  snap?: boolean;
   withClose?: boolean;
-  hideOnScroll?: boolean;
-  auto?: boolean;
 }
+
+type LaagProps = Pick<UseLayerOptions, 'auto' | 'snap' | 'possiblePlacements' | 'placement'> &
+  Pick<UseHoverOptions, 'hideOnScroll'>;
+
+type AnchorProps = {
+  iconColor?: string;
+};
+
+type OuterProps = LaagProps & AnchorProps & TooltipProps;
 
 const TooltipContent = styled.div`
   display: grid;
@@ -36,11 +40,11 @@ const TooltipContent = styled.div`
   backdrop-filter: blur(10px);
 `;
 
-const QuestionIcon = styled(Icon)`
-  width: 24px;
-  height: 24px;
+const QuestionIcon = styled(Icon)<AnchorProps>`
+  width: 16px;
+  height: 16px;
 
-  color: ${theme.colors.textIcon.secondary};
+  color: ${(props) => props.iconColor || theme.colors.textIcon.secondary};
 `;
 
 const Anchor = styled.div`
@@ -80,8 +84,11 @@ const defaultProps = {
 
 const TOOLTIP_ARROW_OFFSET = 15;
 const TOOLTIP_TRIGGER_OFFSET = 10;
+const CLOSE_BUTTON_SIZE = 12;
+const TOOLTIP_ARROW_SIZE = 10;
+const TOOLTIP_ARROW_ANGLE = 35;
 
-export const LaagTooltip: FunctionComponent<Props> = (props) => {
+export const LaagTooltip: FunctionComponent<OuterProps> = (props) => {
   const [isOver, hoverProps, close] = useHover({ hideOnScroll: props.hideOnScroll });
   const { onMouseEnter, onTouchEnd, onTouchStart } = hoverProps;
   const anchorProps = props.withClose ? { onMouseEnter, onTouchEnd, onTouchStart } : hoverProps;
@@ -98,11 +105,11 @@ export const LaagTooltip: FunctionComponent<Props> = (props) => {
     onOutsideClick: close,
   });
 
-  const elAnchor = props.elAnchor ?? <QuestionIcon name={'question'} />;
+  const elAnchor = props.elAnchor ?? <QuestionIcon name={'question'} iconColor={props.iconColor} />;
 
   const elClose = (
     <CloseButton onClick={close}>
-      <Icon width={12} height={12} name={'close'} />
+      <Icon width={CLOSE_BUTTON_SIZE} height={CLOSE_BUTTON_SIZE} name={'close'} />
     </CloseButton>
   );
 
@@ -116,7 +123,12 @@ export const LaagTooltip: FunctionComponent<Props> = (props) => {
           <TooltipContent className="tooltip" {...layerProps}>
             {props.elContent}
             {props.withClose && elClose}
-            <Arrow {...arrowProps} backgroundColor={'rgba(44, 44, 46, 0.9'} angle={35} size={10} />
+            <Arrow
+              {...arrowProps}
+              backgroundColor={'rgba(44, 44, 46, 0.9'}
+              angle={TOOLTIP_ARROW_ANGLE}
+              size={TOOLTIP_ARROW_SIZE}
+            />
           </TooltipContent>,
         )}
     </>

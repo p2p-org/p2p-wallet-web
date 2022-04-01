@@ -49,6 +49,7 @@ import swap from './assets/new/swap-icon.svg';
 import top from './assets/new/top-icon.svg';
 import wallet from './assets/new/wallet-icon.svg';
 import warning from './assets/new/warning-icon.svg';
+import oppositeArrows from './assets/opposite-arrows-icon.svg';
 import plug from './assets/plug-icon.svg';
 import questionCircle from './assets/question-circle-icon.svg';
 import reload from './assets/reload-icon.svg';
@@ -58,7 +59,6 @@ import success from './assets/success-icon.svg';
 import sun from './assets/sun-icon.svg';
 import timer from './assets/timer-icon.svg';
 import walletOld from './assets/wallet-icon.svg';
-import oppositeArrows from './assets/opposite-arrows-icon.svg';
 
 const iconsMap = new Map<string, string>([
   ['arrow', arrow],
