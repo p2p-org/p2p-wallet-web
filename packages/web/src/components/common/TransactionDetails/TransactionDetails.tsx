@@ -50,7 +50,7 @@ export const TransactionDetails: FC<TransactionDetailsProps> = (props) => {
           titleBottomValue={props.sendState.details.totalAmount || ''}
         />
       }
-      open
+      open={false}
       noContentPadding
     >
       <ListWrapper>

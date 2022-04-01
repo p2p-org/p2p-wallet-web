@@ -147,13 +147,7 @@ export const Icon: FC<Props> = ({ name, size, height, width, ...props }) => {
   }
 
   return (
-    <svg
-      {...validProps}
-      viewBox={icon.viewBox}
-      height={size || height}
-      width={size || width}
-      {...props}
-    >
+    <svg {...validProps} viewBox={icon.viewBox} height={size || height} width={size || width}>
       <use xlinkHref={`#${icon.id}`} />
     </svg>
   );

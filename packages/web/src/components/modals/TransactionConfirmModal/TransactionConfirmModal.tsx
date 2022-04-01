@@ -29,6 +29,12 @@ const WrapperModal = styled(Modal)`
   flex-basis: 524px;
 `;
 
+const ModalTitle = styled.div`
+  font-weight: 500;
+  font-size: 24px;
+  line-height: 140%;
+`;
+
 const SubTitle = styled.span`
   display: flex;
   margin-bottom: 8px;
@@ -116,7 +122,11 @@ export const TransactionConfirmModal: FunctionComponent<
   const renderTitle = () => {
     switch (type) {
       case 'send':
-        return <>Confirm sending {(params as TransferParams).source.balance?.token.symbol}</>;
+        return (
+          <ModalTitle>
+            Confirm sending {(params as TransferParams).source.balance?.token.symbol}
+          </ModalTitle>
+        );
       default:
         return 'Double check and confirm';
     }
@@ -151,10 +161,15 @@ export const TransactionConfirmModal: FunctionComponent<
 
     return (
       <>
-        <Button primary disabled={isDisabled} onClick={handleConfirmClick}>
+        <Button
+          primary
+          disabled={isDisabled}
+          onClick={handleConfirmClick}
+          style={{ width: '314px' }}
+        >
           {action}
         </Button>
-        <ButtonCancel onClick={handleCloseClick} />
+        <ButtonCancel onClick={handleCloseClick} style={{ width: '154px' }} />
       </>
     );
   };
