@@ -4,6 +4,7 @@ import Skeleton from 'react-loading-skeleton';
 import { styled } from '@linaria/react';
 import type { TokenAccount } from '@p2p-wallet-web/core';
 import { theme, up, useIsMobile } from '@p2p-wallet-web/ui';
+import classNames from 'classnames';
 
 import { shortAddress } from 'utils/tokens';
 
@@ -11,14 +12,6 @@ import { AmountUSD } from '../AmountUSD';
 import { TokenAvatar } from '../TokenAvatar';
 
 export const TokenAvatarStyled = styled(TokenAvatar)``;
-
-const Content = styled.div`
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  justify-content: center;
-  margin-left: 12px;
-`;
 
 const TokenInfo = styled.div`
   display: grid;
@@ -74,11 +67,38 @@ const TokenUSD = styled.div`
   }
 `;
 
+const Content = styled.div`
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: center;
+  margin-left: 12px;
+
+  &.isMobilePopupChild {
+    ${TokenInfo} {
+      grid-template-rows: 20px 20px;
+    }
+
+    ${TokenName} {
+      font-weight: 500;
+    }
+
+    ${TokenBalance} {
+      font-size: 14px;
+    }
+
+    ${TokenUSD} {
+      font-size: 16px;
+    }
+  }
+`;
+
 interface Props {
   tokenAccount?: TokenAccount;
+  isMobilePopupChild?: boolean;
 }
 
-export const TokenAccountRowContent: FC<Props> = ({ tokenAccount }) => {
+export const TokenAccountRowContent: FC<Props> = ({ tokenAccount, isMobilePopupChild }) => {
   const isMobile = useIsMobile();
 
   if (!tokenAccount) {
@@ -138,7 +158,7 @@ export const TokenAccountRowContent: FC<Props> = ({ tokenAccount }) => {
           size={avatarSize}
         />
       )}
-      <Content>
+      <Content className={classNames({ isMobilePopupChild })}>
         <TokenInfo>
           {renderTokenName()}
           {elTokenBalance}
