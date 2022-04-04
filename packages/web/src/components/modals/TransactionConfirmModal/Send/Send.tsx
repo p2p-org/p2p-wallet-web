@@ -88,6 +88,7 @@ export const Send: FC<Props & TransactionDetailsProps> = ({
   params,
   sendState,
   userFreeFeeLimits,
+  address,
 }) => {
   return (
     <Section className="send">
@@ -121,7 +122,7 @@ export const Send: FC<Props & TransactionDetailsProps> = ({
               <InfoTitle className="secondary">To address</InfoTitle>
             )}
             <InfoValue>
-              <AddressText address={params.destination.toBase58()} medium />
+              <AddressText address={params.destination?.toBase58?.() || address} medium />
             </InfoValue>
           </InfoWrapper>
         </FieldInfo>
