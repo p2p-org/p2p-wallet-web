@@ -128,16 +128,7 @@ export const TransactionConfirmModal: FunctionComponent<
           </ModalTitle>
         );
       default:
-        return 'Double check and confirm';
-    }
-  };
-
-  const renderDescription = () => {
-    switch (type) {
-      case 'swap':
-        return 'Swap transaction';
-      default:
-        return null;
+        return <ModalTitle>Confirm swapping SOL → BTC</ModalTitle>;
     }
   };
 
@@ -172,7 +163,6 @@ export const TransactionConfirmModal: FunctionComponent<
   return (
     <WrapperModal
       title={renderTitle()}
-      description={renderDescription()}
       close={handleCloseClick}
       footer={renderButtons()}
       noDelimiter={false}

@@ -5,14 +5,18 @@ import type { u64 } from '@solana/spl-token';
 import { useConfig } from 'app/contexts/solana/swap';
 import { formatBigNumber } from 'app/contexts/solana/swap/utils/format';
 import { TokenAvatar } from 'components/common/TokenAvatar';
+import { Icon } from 'components/ui';
 
 import {
   FieldInfo,
+  FromToWrapper,
   InfoTitle,
   InfoValue,
   InfoWrapper,
+  Overlay,
   Section,
-  SectionTitle,
+  Subtitle,
+  Wrapper,
 } from '../common/styled';
 
 export type SwapParams = {
@@ -32,9 +36,9 @@ export const Swap: FC<Props> = ({
   const { tokenConfigs } = useConfig();
 
   return (
-    <>
+    <Wrapper>
+      <Subtitle>You are going to swap</Subtitle>
       <Section className="swap">
-        <SectionTitle>From</SectionTitle>
         <FieldInfo>
           <TokenAvatar symbol={inputTokenName} size={44} />
           <InfoWrapper>
@@ -45,8 +49,12 @@ export const Swap: FC<Props> = ({
           </InfoWrapper>
         </FieldInfo>
       </Section>
+      <FromToWrapper>
+        <Overlay>
+          <Icon name={'arrow-down'} />
+        </Overlay>
+      </FromToWrapper>
       <Section className="top">
-        <SectionTitle>To</SectionTitle>
         <FieldInfo>
           <TokenAvatar symbol={outputTokenName} size={44} />
           <InfoWrapper>
@@ -57,20 +65,7 @@ export const Swap: FC<Props> = ({
             </InfoValue>
           </InfoWrapper>
         </FieldInfo>
-        {/*<FieldInfo>*/}
-        {/*  <IconWrapper>*/}
-        {/*    <WalletIcon name="wallet" />*/}
-        {/*  </IconWrapper>*/}
-        {/*  <InfoWrapper>*/}
-        {/*    <InfoTitle>Destination wallet</InfoTitle>*/}
-        {/*    <InfoValue>*/}
-        {/*      {(params as SwapParams).secondTokenAccount*/}
-        {/*        ? (params as SwapParams).secondTokenAccount.address.toBase58()*/}
-        {/*        : 'Will be created after transaction processing'}*/}
-        {/*    </InfoValue>*/}
-        {/*  </InfoWrapper>*/}
-        {/*</FieldInfo>*/}
       </Section>
-    </>
+    </Wrapper>
   );
 };

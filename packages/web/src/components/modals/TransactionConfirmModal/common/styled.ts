@@ -90,3 +90,45 @@ export const InfoValue = styled.div`
   line-height: 120%;
   letter-spacing: 0.01em;
 `;
+
+export const Subtitle = styled.div`
+  margin-left: 20px;
+  margin-top: 16px;
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 140%;
+`;
+
+export const Wrapper = styled.div`
+  position: relative;
+`;
+
+export const FromToWrapper = styled.div`
+  position: absolute;
+  border: 1px solid #f2f2f7;
+  width: 32px;
+  height: 32px;
+  background: #ffffff;
+  border-radius: 40%;
+  left: 27px;
+  top: 107px;
+  color: #5887ff;
+
+  svg {
+    width: 20px;
+    height: 20px;
+  }
+`;
+
+export const Overlay = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 19px;
+
+  position: absolute;
+  width: 34px;
+  top: 5px;
+  left: -2px;
+  background: white;
+`;
