@@ -12,7 +12,7 @@ import { useConfig, usePrice, useSwap } from 'app/contexts/solana/swap';
 import { formatBigNumber, formatNumberToUSD } from 'app/contexts/solana/swap/utils/format';
 import { CompensationFee } from 'components/common/CompensationFee';
 import { LoaderBlock } from 'components/common/LoaderBlock';
-import { FreeTransactionTooltip } from 'components/common/TransactionDetails/FreeTransactionTooltip';
+import { FeeToolTip } from 'components/common/TransactionDetails/FeeNewTooltip';
 import { Accordion } from 'components/ui';
 import { AccordionTitle } from 'components/ui/AccordionDetails/AccordionTitle';
 import { ListWrapper, Row, Text } from 'components/ui/AccordionDetails/common';
@@ -323,11 +323,7 @@ export const FeesOriginal: FC = () => {
           <Text>
             Free{' '}
             <Text className="green inline-flex">
-              (Paid by P2P.org){' '}
-              <FreeTransactionTooltip
-                freeTransactionCount={userFreeFeeLimits.maxTransactionCount}
-                currentTransactionCount={userFreeFeeLimits.currentTransactionCount}
-              />
+              (Paid by P2P.org) <FeeToolTip userFreeFeeLimits={userFreeFeeLimits} />
             </Text>
           </Text>
         </Row>

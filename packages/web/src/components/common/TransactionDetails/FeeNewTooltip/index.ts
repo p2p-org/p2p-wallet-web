@@ -1,0 +1,1 @@
+export { FeeToolTip } from './FeeNewTooltip';
