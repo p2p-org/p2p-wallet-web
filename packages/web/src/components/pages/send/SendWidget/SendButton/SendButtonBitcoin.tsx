@@ -57,7 +57,7 @@ export const SendButtonBitcoin: FC<Props> = ({ primary, disabled, onInitBurnAndR
       params,
       userFreeFeeLimits,
       sendState,
-      address: sendState.toPublicKey,
+      btcAddress: sendState.toPublicKey,
     });
 
     if (!result) {
@@ -67,8 +67,7 @@ export const SendButtonBitcoin: FC<Props> = ({ primary, disabled, onInitBurnAndR
     onInitBurnAndRelease();
   };
 
-  // const hasRenBtcMinimalAmount = isRenBTC ? renBtcMinimalAmount > 0 : true;
-  const hasRenBtcMinimalAmount = true;
+  const hasRenBtcMinimalAmount = (sendState.isRenBTC ? renBtcMinimalAmount > 0 : true) || true;
 
   return (
     <Button

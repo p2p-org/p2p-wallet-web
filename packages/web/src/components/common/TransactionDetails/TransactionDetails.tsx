@@ -13,6 +13,7 @@ import { ListWrapper, Row, Text } from 'components/ui/AccordionDetails/common';
 export interface TransactionDetailsProps {
   sendState: Pick<UseSendState, 'fromTokenAccount' | 'destinationAccount' | 'details'>;
   userFreeFeeLimits: typeof INITIAL_USER_FREE_FEE_LIMITS;
+  btcAddress?: string;
 }
 
 const TooltipContent = styled.div`

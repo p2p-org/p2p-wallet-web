@@ -73,7 +73,7 @@ export type TransactionConfirmModalProps = TransactionDetailsProps & {
 
 export const TransactionConfirmModal: FunctionComponent<
   ModalPropsType & TransactionConfirmModalProps
-> = ({ type, params, close, sendState, userFreeFeeLimits, address }) => {
+> = ({ type, params, close, sendState, userFreeFeeLimits, btcAddress }) => {
   const { walletProviderInfo } = useWallet();
   const tryUnlockSeedAndMnemonic = useTryUnlockSeedAndMnemonic();
 
@@ -161,15 +161,10 @@ export const TransactionConfirmModal: FunctionComponent<
 
     return (
       <>
-        <Button
-          primary
-          disabled={isDisabled}
-          onClick={handleConfirmClick}
-          style={{ width: '314px' }}
-        >
+        <Button primary disabled={isDisabled} onClick={handleConfirmClick}>
           {action}
         </Button>
-        <ButtonCancel onClick={handleCloseClick} style={{ width: '154px' }} />
+        <ButtonCancel onClick={handleCloseClick} />
       </>
     );
   };
@@ -180,6 +175,7 @@ export const TransactionConfirmModal: FunctionComponent<
       description={renderDescription()}
       close={handleCloseClick}
       footer={renderButtons()}
+      noDelimiter={false}
     >
       {type === 'send' ? <ActionTitle>You are going to send</ActionTitle> : undefined}
       {type === 'send' ? (
@@ -187,7 +183,7 @@ export const TransactionConfirmModal: FunctionComponent<
           params={params as TransferParams}
           sendState={sendState}
           userFreeFeeLimits={userFreeFeeLimits}
-          address={address}
+          btcAddress={btcAddress}
         />
       ) : undefined}
       {type === 'swap' ? <Swap params={params as SwapParams} /> : undefined}
