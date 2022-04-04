@@ -5,6 +5,7 @@ import { useAsync } from 'react-async-hook';
 import { styled } from '@linaria/react';
 import { useSolana, useTokenAccount, useUserTokenAccounts } from '@p2p-wallet-web/core';
 import { usePubkey } from '@p2p-wallet-web/sail';
+import { theme } from '@p2p-wallet-web/ui';
 import { u64 } from '@solana/spl-token';
 import { LAMPORTS_PER_SOL } from '@solana/web3.js';
 import Decimal from 'decimal.js';
@@ -15,7 +16,7 @@ import { formatBigNumber, formatNumberToUSD } from 'app/contexts/solana/swap/uti
 import { CompensationFee } from 'components/common/CompensationFee';
 import { LoaderBlock } from 'components/common/LoaderBlock';
 import { FreeTransactionTooltip } from 'components/common/TransactionDetails/FreeTransactionTooltip';
-import { Accordion } from 'components/ui';
+import { Accordion, Icon } from 'components/ui';
 import { AccordionTitle } from 'components/ui/AccordionDetails/AccordionTitle';
 import { ListWrapper, Row, Text } from 'components/ui/AccordionDetails/common';
 
@@ -23,6 +24,15 @@ import { AmountUSD } from '../AmountUSD';
 
 // TODO: is it right?
 const ATA_ACCOUNT_CREATION_FEE = 0.00203928;
+
+const PenIcon = styled(Icon)`
+  width: 16px;
+  height: 16px;
+
+  color: ${theme.colors.textIcon.secondary};
+
+  cursor: pointer;
+`;
 
 // const Small = styled.div`
 //   color: #b9bbcd;
@@ -353,6 +363,12 @@ export const FeesOriginal: FC = () => {
         </Row>
       </ListWrapper>
       <ListWrapper>
+        <Row>
+          <Text className="gray">Max price slippage</Text>
+          <Text>
+            {trade.slippageTolerance.toString()}% <PenIcon name="pen" onClick={() => {}} />
+          </Text>
+        </Row>
         <Row>
           <Text className="gray">Receive at least:</Text>
           <Text>
