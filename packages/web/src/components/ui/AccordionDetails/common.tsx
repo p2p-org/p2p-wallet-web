@@ -3,11 +3,11 @@ import { theme } from '@p2p-wallet-web/ui';
 
 export const ListWrapper = styled.div`
   display: grid;
-  grid-gap: 4px;
-  padding: 16px 20px;
+  grid-gap: 8px;
+  padding: 20px;
 
   &.total {
-    padding: 26px 20px;
+    padding: 23px 20px;
   }
 
   &:not(:last-child) {

@@ -47,6 +47,7 @@ import roundStop from './assets/new/round-stop-icon.svg';
 import search from './assets/new/search-icon.svg';
 import sendMessage from './assets/new/send-message-icon.svg';
 import storeIcon from './assets/new/store-icon.svg';
+import swapBordered from './assets/new/swap-bordered.svg';
 import swap from './assets/new/swap-icon.svg';
 import top from './assets/new/top-icon.svg';
 import wallet from './assets/new/wallet-icon.svg';
@@ -98,6 +99,7 @@ const iconsMap = new Map<string, string>([
   ['success', success],
   ['sun', sun],
   ['swap', swap],
+  ['swap-bordered', swapBordered],
   ['timer', timer],
   ['wallet', wallet],
   ['lock', lock],

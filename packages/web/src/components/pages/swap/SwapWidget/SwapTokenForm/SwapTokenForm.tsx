@@ -3,7 +3,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import * as React from 'react';
 
 import { styled } from '@linaria/react';
-import { u64 } from '@solana/spl-token';
+import { theme } from '@p2p-wallet-web/ui';
+import type { u64 } from '@solana/spl-token';
 import classNames from 'classnames';
 import throttle from 'lodash.throttle';
 
@@ -17,6 +18,7 @@ import { Empty } from 'components/common/Empty';
 import { SlideContainer } from 'components/common/SlideContainer';
 import { TokenAvatar } from 'components/common/TokenAvatar';
 import { Icon } from 'components/ui';
+import { Row, Text } from 'components/ui/AccordionDetails/common';
 import { InputAmount } from 'components/ui/InputAmount';
 import { SearchInput } from 'components/ui/SearchInput';
 import { shortAddress } from 'utils/tokens';
@@ -35,26 +37,40 @@ const Wrapper = styled.div`
   padding: 16px 20px;
 
   border: 1px solid #f6f6f8;
-  border-radius: 12px;
+  border-radius: 0 0 12px 12px;
+
+  &:first-child {
+    border-radius: 12px 12px 0 0;
+  }
 `;
 
 const TopWrapper = styled.div`
   display: flex;
   justify-content: space-between;
+
+  margin-bottom: 8px;
 `;
 
-const FromTitle = styled.div`
-  color: #000;
-  font-weight: 600;
+const MainWrapper = styled.div`
+  display: flex;
+  justify-content: space-between;
+`;
+
+const BottomWrapper = styled.div`
+  margin-top: 12px;
+`;
+
+const FromToTitle = styled.div`
+  color: ${theme.colors.textIcon.primary};
+  font-weight: 500;
   font-size: 16px;
-  line-height: 24px;
+  line-height: 140%;
+  letter-spacing: 0.01em;
 `;
 
 const AllBalance = styled.div`
   display: flex;
   align-items: center;
-
-  color: #5887ff;
 
   cursor: pointer;
 
@@ -63,16 +79,13 @@ const AllBalance = styled.div`
 
     pointer-events: none;
   }
-
-  &.error {
-    color: #f43d3d;
-  }
 `;
 
-const MainWrapper = styled.div`
-  display: flex;
+const Max = styled.div`
+  margin-left: 8px;
 
-  margin-top: 8px;
+  color: ${theme.colors.textIcon.active};
+  text-transform: uppercase;
 `;
 
 const WalletTokenIcon = styled(Icon)`
@@ -85,7 +98,11 @@ const WalletTokenIcon = styled(Icon)`
 const WalletBalanceIcon = styled(Icon)`
   width: 20px;
   height: 20px;
-  margin-right: 5px;
+  margin-right: 4px;
+`;
+
+const TokenSelector = styled.div`
+  display: flex;
 `;
 
 const TokenAvatarWrapper = styled.div`
@@ -107,30 +124,16 @@ const TokenAvatarWrapper = styled.div`
   }
 `;
 
-const InfoWrapper = styled.div`
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  min-width: 0;
-
-  margin-left: 12px;
-`;
-
-const SpecifyTokenWrapper = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  height: 44px;
-`;
-
 const TokenName = styled.div`
   max-width: 200px;
+
+  margin: auto 0;
   overflow: hidden;
 
-  color: #000;
-  font-weight: 600;
-  font-size: 24px;
-  line-height: 140%;
+  color: ${theme.colors.textIcon.primary};
+  font-weight: 500;
+  font-size: 20px;
+  line-height: 100%;
 
   white-space: nowrap;
   text-overflow: ellipsis;
@@ -144,25 +147,25 @@ const ChevronWrapper = styled.div`
   display: flex;
   align-items: center;
 
-  margin-left: 26px;
+  width: 24px;
+  height: 24px;
+  margin-left: 4px;
 `;
 
 const ChevronIcon = styled(Icon)`
-  width: 24px;
-  height: 24px;
-
-  color: #000;
+  color: ${theme.colors.textIcon.secondary};
 `;
 
 const TokenWrapper = styled.div`
   display: flex;
-  min-width: 0;
+  align-items: center;
+  margin-left: 8px;
 
   cursor: pointer;
 
   &.isOpen {
     ${TokenName}, ${ChevronIcon} {
-      color: #5887ff;
+      color: ${theme.colors.textIcon.active};
     }
   }
 `;
@@ -175,12 +178,12 @@ const BalanceWrapper = styled.div`
 
 const BalanceText = styled.div`
   display: flex;
-  align-items: center;
 
-  color: #a3a5ba;
-  font-weight: 600;
+  color: ${theme.colors.textIcon.secondary};
+  font-weight: 500;
   font-size: 16px;
-  line-height: 24px;
+  line-height: 140%;
+  letter-spacing: 0.01em;
 `;
 
 const AmountUSDStyled = styled(AmountUSD)`
@@ -554,70 +557,81 @@ export const SwapTokenForm: FC<Props> = ({
   return (
     <Wrapper className={className}>
       <TopWrapper>
-        <FromTitle>{isInput ? 'From' : 'To'} </FromTitle>
+        <FromToTitle>{isInput ? 'From' : 'To'} </FromToTitle>
         <BalanceText>
           {maxAmount ? (
             isInput ? (
               <AllBalance
                 onClick={() => setAmount(maxAmount)}
-                className={classNames({ disabled, error: !maxAmount })}
+                className={classNames({
+                  disabled,
+                  error: !maxAmount,
+                })}
               >
                 <WalletBalanceIcon name="wallet" />
-                {formatBigNumber(maxAmount, tokenConfigs[tokenName].decimals)} {tokenName}
+                {formatBigNumber(maxAmount, tokenConfigs[tokenName].decimals)}
+                <Max>MAX</Max>
               </AllBalance>
             ) : (
               <>
                 <WalletBalanceIcon name="wallet" />
-                {formatBigNumber(maxAmount || new u64(0), tokenConfigs[tokenName].decimals)}{' '}
-                {tokenName}
+                {formatBigNumber(maxAmount, tokenConfigs[tokenName].decimals)} {tokenName}
               </>
             )
           ) : undefined}
         </BalanceText>
       </TopWrapper>
       <MainWrapper>
-        <TokenAvatarWrapper className={classNames({ isOpen: isOpen && !tokenName })}>
-          {tokenName ? (
-            <TokenAvatar address={tokenInfo?.mint.toString()} size={44} />
-          ) : (
-            <WalletTokenIcon name="wallet" />
-          )}
-        </TokenAvatarWrapper>
-        <InfoWrapper>
-          <SpecifyTokenWrapper>
-            <TokenWrapper
-              ref={selectorRef}
-              onClick={handleSelectorClick}
-              className={classNames({ isOpen })}
-            >
-              <TokenName title={tokenInfo?.mint.toString()}>
-                {tokenName || (tokenInfo?.mint && shortAddress(tokenInfo.mint.toString())) || (
-                  <EmptyName>—</EmptyName>
-                )}
-              </TokenName>
-              <ChevronWrapper>
-                <ChevronIcon name="arrow-triangle" />
-              </ChevronWrapper>
-            </TokenWrapper>
-            <InputWrapper>
-              <InputAmount
-                placeholder={Number(0).toFixed(tokenInfo?.decimals || 0)}
-                value={formatBigNumber(amount, tokenInfo?.decimals || 0)}
-                onChange={handleAmountChange}
-                disabled={disabled || disabledInput}
-              />
-              {isFeeSubtracted ? <AccountCreationFeeTooltip /> : undefined}
-            </InputWrapper>
-          </SpecifyTokenWrapper>
-          <BalanceWrapper>
-            {!amount.eqn(0) ? (
-              <BalanceText>
-                ≈ <AmountUSDStyled amount={amount} tokenName={tokenName} />
-              </BalanceText>
-            ) : undefined}
-          </BalanceWrapper>
-        </InfoWrapper>
+        <TokenSelector>
+          <TokenAvatarWrapper className={classNames({ isOpen: isOpen && !tokenName })}>
+            {tokenName ? (
+              <TokenAvatar address={tokenInfo?.mint.toString()} size={44} />
+            ) : (
+              <WalletTokenIcon name="wallet" />
+            )}
+          </TokenAvatarWrapper>
+          <TokenWrapper
+            ref={selectorRef}
+            onClick={handleSelectorClick}
+            className={classNames({ isOpen })}
+          >
+            <TokenName title={tokenInfo?.mint.toString()}>
+              {tokenName || (tokenInfo?.mint && shortAddress(tokenInfo.mint.toString())) || (
+                <EmptyName>—</EmptyName>
+              )}
+            </TokenName>
+            <ChevronWrapper>
+              <ChevronIcon name="arrow-triangle" />
+            </ChevronWrapper>
+          </TokenWrapper>
+        </TokenSelector>
+        <InputWrapper>
+          <InputAmount
+            placeholder={Number(0).toFixed(tokenInfo?.decimals || 0)}
+            value={formatBigNumber(amount, tokenInfo?.decimals || 0)}
+            onChange={handleAmountChange}
+            disabled={disabled || disabledInput}
+          />
+          {isFeeSubtracted ? <AccountCreationFeeTooltip /> : undefined}
+        </InputWrapper>
+        {/* <BalanceWrapper>
+          {!amount.eqn(0) ? (
+            <BalanceText>
+              ≈ <AmountUSDStyled amount={amount} tokenName={tokenName} />
+            </BalanceText>
+          ) : undefined}
+        </BalanceWrapper> */}
       </MainWrapper>
+      {!isInput ? (
+        <BottomWrapper>
+          <Row>
+            <Text className="gray">Receive at least:</Text>
+            <Text>
+              {100} <Text className="gray">(~$150)</Text>
+            </Text>
+          </Row>
+        </BottomWrapper>
+      ) : undefined}
       {isOpen ? (
         <DropDownListContainer ref={dropdownRef}>
           <DropDownHeader

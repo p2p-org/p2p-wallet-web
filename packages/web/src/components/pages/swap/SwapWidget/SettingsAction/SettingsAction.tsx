@@ -2,10 +2,10 @@ import type { FunctionComponent } from 'react';
 import { useState } from 'react';
 
 import { styled } from '@linaria/react';
-import classNames from 'classnames';
+import { theme } from '@p2p-wallet-web/ui';
 
-import { useSwap } from 'app/contexts/swapSerum';
-import { Button, Icon, Input } from 'components/ui';
+import { useSwap } from 'app/contexts';
+import { Button as ButtonUI, Icon } from 'components/ui';
 import { trackEvent } from 'utils/analytics';
 
 const Wrapper = styled.div`
@@ -13,14 +13,18 @@ const Wrapper = styled.div`
 `;
 
 const ActionIcon = styled(Icon)`
-  width: 32px;
-  height: 32px;
+  width: 16px;
+  height: 16px;
   margin-right: 8px;
 
-  color: #a3a5ba;
+  color: ${theme.colors.textIcon.active};
 `;
 
-const ActionWrapper = styled.div`
+const Button = styled(ButtonUI)`
+  border: 1px solid ${theme.colors.stroke.primary};
+`;
+
+/* const ActionWrapper = styled.div`
   display: flex;
   align-items: center;
   height: 36px;
@@ -135,17 +139,15 @@ const ButtonsWrapper = styled.div`
 
 const BottomButton = styled(Button)`
   min-width: 104px;
-`;
+`; */
 
 export const SettingsAction: FunctionComponent = () => {
   const [isShow, setIsShow] = useState(false);
   const [isCustomShow, setIsCustomShow] = useState(false);
-  const { slippage, setSlippage } = useSwap();
-  const [nextSlippage, setNextSlippage] = useState(String(slippage));
+  const { slippageTolerance, setSlippageTolerance } = useSwap();
+  const [nextSlippageTolerance, setNextSlippageTolerance] = useState(String(slippageTolerance));
 
   const handleToggleShow = () => {
-    setIsShow((state) => !state);
-
     trackEvent('swap_slippage_click');
   };
 
@@ -155,10 +157,10 @@ export const SettingsAction: FunctionComponent = () => {
 
   const handleDoneClick = () => {
     trackEvent('swap_slippage_done_click', {
-      slippage: Number(nextSlippage),
+      slippage: Number(nextSlippageTolerance),
     });
 
-    setSlippage(Number(nextSlippage));
+    setSlippage(Number(nextSlippageTolerance));
     setIsShow(false);
   };
 
@@ -178,18 +180,22 @@ export const SettingsAction: FunctionComponent = () => {
         .replace(/^0(\d+)/, '$1');
     }
 
-    setNextSlippage(cleanSlippage);
+    setNextSlippageTolerance(cleanSlippage);
   };
 
-  const isDisabled = Number.parseFloat(String(nextSlippage)) > 100;
+  const isDisabled = Number.parseFloat(String(nextSlippageTolerance)) > 100;
 
   return (
     <Wrapper>
-      <ActionWrapper onClick={handleToggleShow}>
-        <ActionIcon name="settings" />
-        Slippage
-      </ActionWrapper>
-      {isShow ? (
+      {/* <ActionWrapper  > */}
+      <Button small onClick={handleToggleShow}>
+        <ActionIcon name="gear" />
+        Swap settings
+      </Button>
+      {/* </ActionWrapper> */}
+    </Wrapper>
+  );
+  /* {isShow ? (
         <SettingsWrapper>
           <Description>
             Slippage refers to the difference between the expected price of a trade and the price at
@@ -233,7 +239,7 @@ export const SettingsAction: FunctionComponent = () => {
             </BottomButton>
           </ButtonsWrapper>
         </SettingsWrapper>
-      ) : undefined}
+          ) : undefined} 
     </Wrapper>
-  );
+  );*/
 };

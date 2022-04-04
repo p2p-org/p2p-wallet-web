@@ -5,7 +5,9 @@ import { useAsync } from 'react-async-hook';
 import { styled } from '@linaria/react';
 import { useSolana, useTokenAccount, useUserTokenAccounts } from '@p2p-wallet-web/core';
 import { usePubkey } from '@p2p-wallet-web/sail';
+import { u64 } from '@solana/spl-token';
 import { LAMPORTS_PER_SOL } from '@solana/web3.js';
+import Decimal from 'decimal.js';
 
 import { useFeeCompensation, useFreeFeeLimits } from 'app/contexts';
 import { useConfig, usePrice, useSwap } from 'app/contexts/solana/swap';
@@ -16,6 +18,8 @@ import { FreeTransactionTooltip } from 'components/common/TransactionDetails/Fre
 import { Accordion } from 'components/ui';
 import { AccordionTitle } from 'components/ui/AccordionDetails/AccordionTitle';
 import { ListWrapper, Row, Text } from 'components/ui/AccordionDetails/common';
+
+import { AmountUSD } from '../AmountUSD';
 
 // TODO: is it right?
 const ATA_ACCOUNT_CREATION_FEE = 0.00203928;
@@ -298,12 +302,20 @@ export const FeesOriginal: FC = () => {
     };
   }, [compensationState, feeAmountInToken, feeToken, tokenConfigs, trade]);
 
+  const getTokenPrice = (isReverse: boolean) => {
+    const one = new Decimal(1);
+
+    return (isReverse ? one.div(trade.getExchangeRate()) : trade.getExchangeRate())
+      .toSignificantDigits(6)
+      .toString();
+  };
+
   return (
     <Accordion
       title={
         <AccordionTitle
-          title="Transaction details"
-          titleBottomName="Total"
+          title="Swap details"
+          titleBottomName="Total amount spent"
           titleBottomValue={details.totlalAmount || ''}
         />
       }
@@ -312,10 +324,43 @@ export const FeesOriginal: FC = () => {
     >
       <ListWrapper>
         <Row>
-          <Text className="gray">Receive at least</Text>
+          <Text className="gray">1 {trade.inputTokenName} price</Text>
+          <Text>
+            {getTokenPrice(false)} {trade.outputTokenName}
+            <Text className="gray inline-flex">
+              &nbsp;(~
+              <AmountUSD
+                amount={new u64(Math.pow(10, tokenConfigs[trade.inputTokenName]?.decimals || 6))}
+                tokenName={trade.inputTokenName}
+              />
+              )
+            </Text>
+          </Text>
+        </Row>
+        <Row>
+          <Text className="gray">1 {trade.outputTokenName} price</Text>
+          <Text>
+            {getTokenPrice(true)} {trade.inputTokenName}
+            <Text className="gray inline-flex">
+              &nbsp;(~
+              <AmountUSD
+                amount={new u64(Math.pow(10, tokenConfigs[trade.outputTokenName]?.decimals || 6))}
+                tokenName={trade.outputTokenName}
+              />
+              )
+            </Text>
+          </Text>
+        </Row>
+      </ListWrapper>
+      <ListWrapper>
+        <Row>
+          <Text className="gray">Receive at least:</Text>
           <Text>
             {details.receiveAmount}
-            {/* <Text className="gray">(~$150)</Text> */}
+            <Text className="gray inline-flex">
+              &nbsp;(~
+              <AmountUSD amount={trade.getOutputAmount()} tokenName={trade.outputTokenName} />)
+            </Text>
           </Text>
         </Row>
         <Row>
