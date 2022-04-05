@@ -11,6 +11,7 @@ import {
 import { theme } from '@p2p-wallet-web/ui';
 
 import type { ModalPropsType } from 'app/contexts/general/modals/types';
+import type Trade from 'app/contexts/solana/swap/models/Trade';
 import { ButtonCancel } from 'components/common/ButtonCancel';
 import { ErrorHint } from 'components/common/ErrorHint';
 import { PasswordInput } from 'components/common/PasswordInput';
@@ -66,14 +67,20 @@ const SendIcon = styled(Icon)`
   margin-right: 12px;
 `;
 
-export type TransactionConfirmModalProps = TransactionDetailsProps & {
+export type SwapInfo = {
+  trade: Trade;
+};
+
+type ModalParams = {
   type: 'send' | 'swap';
   params: TransferParams | SwapParams;
 };
 
+export type TransactionConfirmModalProps = SwapInfo & TransactionDetailsProps & ModalParams;
+
 export const TransactionConfirmModal: FunctionComponent<
   ModalPropsType & TransactionConfirmModalProps
-> = ({ type, params, close, sendState, userFreeFeeLimits, btcAddress }) => {
+> = ({ type, params, close, ...props }) => {
   const { walletProviderInfo } = useWallet();
   const tryUnlockSeedAndMnemonic = useTryUnlockSeedAndMnemonic();
 
@@ -171,12 +178,12 @@ export const TransactionConfirmModal: FunctionComponent<
       {type === 'send' ? (
         <Send
           params={params as TransferParams}
-          sendState={sendState}
-          userFreeFeeLimits={userFreeFeeLimits}
-          btcAddress={btcAddress}
+          sendState={props.sendState}
+          userFreeFeeLimits={props.userFreeFeeLimits}
+          btcAddress={props.btcAddress}
         />
       ) : undefined}
-      {type === 'swap' ? <Swap params={params as SwapParams} /> : undefined}
+      {type === 'swap' ? <Swap params={params as SwapParams} trade={props.trade} /> : undefined}
 
       {isSecretKeyWallet ? (
         <Section className="password">

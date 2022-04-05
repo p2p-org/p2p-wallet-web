@@ -20,6 +20,7 @@ export const SwapButtonOriginal: FC = () => {
         inputAmount: trade.getInputAmount(),
         minimumOutputAmount: trade.getMinimumOutputAmount(),
       },
+      trade,
     });
 
     if (!result) {

@@ -3,8 +3,10 @@ import type { FC } from 'react';
 import type { u64 } from '@solana/spl-token';
 
 import { useConfig } from 'app/contexts/solana/swap';
+import type Trade from 'app/contexts/solana/swap/models/Trade';
 import { formatBigNumber } from 'app/contexts/solana/swap/utils/format';
 import { TokenAvatar } from 'components/common/TokenAvatar';
+import { AmountUSD } from 'components/pages/swap/SwapWidget/AmountUSD';
 import { Icon } from 'components/ui';
 
 import {
@@ -28,12 +30,16 @@ export type SwapParams = {
 
 interface Props {
   params: SwapParams;
+  trade: Trade;
 }
 
 export const Swap: FC<Props> = ({
-  params: { inputTokenName, outputTokenName, inputAmount, minimumOutputAmount },
+  params: { inputTokenName, outputTokenName, inputAmount },
+  ...props
 }) => {
   const { tokenConfigs } = useConfig();
+  const decimals = tokenConfigs[inputTokenName]?.decimals || 0;
+  const minReceiveAmount = formatBigNumber(props.trade.getMinimumOutputAmount(), decimals);
 
   return (
     <Wrapper>
@@ -42,9 +48,15 @@ export const Swap: FC<Props> = ({
         <FieldInfo>
           <TokenAvatar symbol={inputTokenName} size={44} />
           <InfoWrapper>
-            <InfoTitle>Check the amount</InfoTitle>
+            <InfoTitle>
+              {formatBigNumber(inputAmount, decimals)} {inputTokenName}
+            </InfoTitle>
             <InfoValue>
-              {formatBigNumber(inputAmount, tokenConfigs[inputTokenName].decimals)} {inputTokenName}
+              <AmountUSD
+                prefix={'~'}
+                amount={props.trade.getInputAmount()}
+                tokenName={props.trade.inputTokenName}
+              />
             </InfoValue>
           </InfoWrapper>
         </FieldInfo>
@@ -58,10 +70,11 @@ export const Swap: FC<Props> = ({
         <FieldInfo>
           <TokenAvatar symbol={outputTokenName} size={44} />
           <InfoWrapper>
-            <InfoTitle>Minimum receive</InfoTitle>
+            <InfoTitle>
+              {formatBigNumber(props.trade.getOutputAmount(), decimals)} {outputTokenName}
+            </InfoTitle>
             <InfoValue>
-              {formatBigNumber(minimumOutputAmount, tokenConfigs[outputTokenName].decimals)}{' '}
-              {outputTokenName}
+              Receive at least: {minReceiveAmount} {props.trade.outputTokenName}
             </InfoValue>
           </InfoWrapper>
         </FieldInfo>

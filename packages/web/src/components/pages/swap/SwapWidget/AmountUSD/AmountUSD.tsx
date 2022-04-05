@@ -1,4 +1,4 @@
-import type { FunctionComponent } from 'react';
+import type { FunctionComponent, ReactElement } from 'react';
 import { useEffect, useState } from 'react';
 
 import type { CSSProperties } from '@linaria/core';
@@ -16,6 +16,7 @@ type Props = {
   tokenName?: string;
   style?: CSSProperties;
   className?: string;
+  prefix?: ReactElement | string;
 };
 
 export const AmountUSD: FunctionComponent<Props> = ({
@@ -36,11 +37,13 @@ export const AmountUSD: FunctionComponent<Props> = ({
       return;
     }
 
-    setUSDValue(formatNumberToUSD(getUSDValue(amount, tokenConfigs[tokenName].decimals, price)));
+    // setUSDValue(formatNumberToUSD(getUSDValue(amount, tokenConfigs[tokenName].decimals, price)));
+    setUSDValue(formatNumberToUSD(getUSDValue(amount, 10, price)));
   }, [tokenName, price, amount, tokenConfigs]);
 
   return (
     <Wrapper title="Amount in USD" {...props}>
+      {props.prefix}
       {usdValue}
     </Wrapper>
   );

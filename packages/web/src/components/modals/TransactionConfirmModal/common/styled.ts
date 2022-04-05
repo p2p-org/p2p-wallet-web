@@ -103,6 +103,7 @@ export const Wrapper = styled.div`
   position: relative;
 `;
 
+// @TODO colors to palette
 export const FromToWrapper = styled.div`
   position: absolute;
   border: 1px solid #f2f2f7;
