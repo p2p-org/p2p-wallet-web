@@ -101,6 +101,7 @@ export const Subtitle = styled.div`
 
 export const Wrapper = styled.div`
   position: relative;
+  margin-bottom: 8px;
 `;
 
 // @TODO colors to palette

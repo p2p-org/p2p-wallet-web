@@ -3,10 +3,11 @@ import type { FC } from 'react';
 import type { u64 } from '@solana/spl-token';
 
 import { useConfig } from 'app/contexts/solana/swap';
-import type Trade from 'app/contexts/solana/swap/models/Trade';
 import { formatBigNumber } from 'app/contexts/solana/swap/utils/format';
 import { TokenAvatar } from 'components/common/TokenAvatar';
 import { AmountUSD } from 'components/pages/swap/SwapWidget/AmountUSD';
+import type { FeesOriginalProps } from 'components/pages/swap/SwapWidget/Fees/FeesOriginal';
+import { FeesOriginal } from 'components/pages/swap/SwapWidget/Fees/FeesOriginal';
 import { Icon } from 'components/ui';
 
 import {
@@ -30,16 +31,15 @@ export type SwapParams = {
 
 interface Props {
   params: SwapParams;
-  trade: Trade;
 }
 
-export const Swap: FC<Props> = ({
+export const Swap: FC<Props & FeesOriginalProps> = ({
   params: { inputTokenName, outputTokenName, inputAmount },
   ...props
 }) => {
   const { tokenConfigs } = useConfig();
   const decimals = tokenConfigs[inputTokenName]?.decimals || 0;
-  const minReceiveAmount = formatBigNumber(props.trade.getMinimumOutputAmount(), decimals);
+  const minReceiveAmount = formatBigNumber(props.swapInfo.trade.getMinimumOutputAmount(), decimals);
 
   return (
     <Wrapper>
@@ -54,8 +54,8 @@ export const Swap: FC<Props> = ({
             <InfoValue>
               <AmountUSD
                 prefix={'~'}
-                amount={props.trade.getInputAmount()}
-                tokenName={props.trade.inputTokenName}
+                amount={props.swapInfo.trade.getInputAmount()}
+                tokenName={props.swapInfo.trade.inputTokenName}
               />
             </InfoValue>
           </InfoWrapper>
@@ -71,14 +71,21 @@ export const Swap: FC<Props> = ({
           <TokenAvatar symbol={outputTokenName} size={44} />
           <InfoWrapper>
             <InfoTitle>
-              {formatBigNumber(props.trade.getOutputAmount(), decimals)} {outputTokenName}
+              {formatBigNumber(props.swapInfo.trade.getOutputAmount(), decimals)} {outputTokenName}
             </InfoTitle>
             <InfoValue>
-              Receive at least: {minReceiveAmount} {props.trade.outputTokenName}
+              Receive at least: {minReceiveAmount} {props.swapInfo.trade.outputTokenName}
             </InfoValue>
           </InfoWrapper>
         </FieldInfo>
       </Section>
+      <FeesOriginal
+        swapInfo={props.swapInfo}
+        userTokenAccounts={props.userTokenAccounts}
+        feeCompensationInfo={props.feeCompensationInfo}
+        feeLimitsInfo={props.feeLimitsInfo}
+        open={false}
+      />
     </Wrapper>
   );
 };

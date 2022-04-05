@@ -8,20 +8,24 @@ import { usePubkey } from '@p2p-wallet-web/sail';
 import type { useFeeCompensation, useFreeFeeLimits, UseSwap } from 'app/contexts';
 import { useConfig } from 'app/contexts/solana/swap';
 import { formatBigNumber } from 'app/contexts/solana/swap/utils/format';
-import { CompensationFee } from 'components/common/CompensationFee';
 import { FeeToolTip } from 'components/common/TransactionDetails/FeeNewTooltip';
 import { Accordion } from 'components/ui';
 import { AccordionTitle } from 'components/ui/AccordionDetails/AccordionTitle';
 import { ListWrapper, Row, Text } from 'components/ui/AccordionDetails/common';
 
-interface Props {
+export interface FeesOriginalProps {
   swapInfo: UseSwap;
   userTokenAccounts: ReturnType<typeof useUserTokenAccounts>;
   feeCompensationInfo: ReturnType<typeof useFeeCompensation>;
   feeLimitsInfo: ReturnType<typeof useFreeFeeLimits>;
+  open?: boolean;
 }
 
-export const FeesOriginal: FC<Props> = (props) => {
+const defaultProps = {
+  open: true,
+};
+
+export const FeesOriginal: FC<FeesOriginalProps> = (props) => {
   const { tokenConfigs } = useConfig();
   const { trade, asyncStandardTokenAccounts } = props.swapInfo;
   const userTokenAccounts = props.userTokenAccounts;
@@ -93,21 +97,18 @@ export const FeesOriginal: FC<Props> = (props) => {
     <Accordion
       title={
         <AccordionTitle
-          title="Transaction details"
+          title="Swap details"
           titleBottomName="Total"
           titleBottomValue={details.totlalAmount || ''}
         />
       }
-      open
+      open={props.open}
       noContentPadding
     >
       <ListWrapper>
         <Row>
           <Text className="gray">Receive at least</Text>
-          <Text>
-            {details.receiveAmount}
-            {/* <Text className="gray">(~$150)</Text> */}
-          </Text>
+          <Text>{details.receiveAmount}</Text>
         </Row>
         <Row>
           <Text className="gray">Transaction fee</Text>
@@ -121,25 +122,18 @@ export const FeesOriginal: FC<Props> = (props) => {
         {details.accountCreationAmount && false ? (
           <Row>
             <Text className="gray">USDC account creation</Text>
-            <Text>
-              {details.accountCreationAmount}
-              {/* <Text className="gray">(~$0.5)</Text> */}
-            </Text>
+            <Text>{details.accountCreationAmount}</Text>
           </Row>
-        ) : undefined}
-        {!fromTokenAccount?.balance?.token.isRawSOL ? (
-          <CompensationFee type="swap" isShow={trade.inputTokenName !== 'SOL'} />
         ) : undefined}
       </ListWrapper>
       <ListWrapper className="total">
         <Row>
           <Text>Total</Text>
-          <Text>
-            {details.totlalAmount}
-            {/* <Text className="gray">(~$150.5)</Text> */}
-          </Text>
+          <Text>{details.totlalAmount}</Text>
         </Row>
       </ListWrapper>
     </Accordion>
   );
 };
+
+FeesOriginal.defaultProps = defaultProps;

@@ -16,6 +16,7 @@ import { ButtonCancel } from 'components/common/ButtonCancel';
 import { ErrorHint } from 'components/common/ErrorHint';
 import { PasswordInput } from 'components/common/PasswordInput';
 import type { TransactionDetailsProps } from 'components/common/TransactionDetails';
+import type { FeesOriginalProps } from 'components/pages/swap/SwapWidget/Fees/FeesOriginal';
 import { Button, Icon } from 'components/ui';
 import { Modal } from 'components/ui/Modal';
 import { trackEvent } from 'utils/analytics';
@@ -76,7 +77,10 @@ type ModalParams = {
   params: TransferParams | SwapParams;
 };
 
-export type TransactionConfirmModalProps = SwapInfo & TransactionDetailsProps & ModalParams;
+export type TransactionConfirmModalProps = SwapInfo &
+  TransactionDetailsProps &
+  ModalParams &
+  FeesOriginalProps;
 
 export const TransactionConfirmModal: FunctionComponent<
   ModalPropsType & TransactionConfirmModalProps
@@ -183,7 +187,15 @@ export const TransactionConfirmModal: FunctionComponent<
           btcAddress={props.btcAddress}
         />
       ) : undefined}
-      {type === 'swap' ? <Swap params={params as SwapParams} trade={props.trade} /> : undefined}
+      {type === 'swap' ? (
+        <Swap
+          params={params as SwapParams}
+          swapInfo={props.swapInfo}
+          userTokenAccounts={props.userTokenAccounts}
+          feeCompensationInfo={props.feeCompensationInfo}
+          feeLimitsInfo={props.feeLimitsInfo}
+        />
+      ) : undefined}
 
       {isSecretKeyWallet ? (
         <Section className="password">

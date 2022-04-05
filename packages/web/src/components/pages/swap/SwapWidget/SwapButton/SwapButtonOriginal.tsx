@@ -1,5 +1,8 @@
 import type { FC } from 'react';
 
+import { useUserTokenAccounts } from '@p2p-wallet-web/core';
+
+import { useFeeCompensation, useFreeFeeLimits } from 'app/contexts';
 import { ModalType, useModals } from 'app/contexts/general/modals';
 import { ButtonState, useSwap } from 'app/contexts/solana/swap';
 import { Button } from 'components/ui';
@@ -8,6 +11,10 @@ import { trackEvent } from 'utils/analytics';
 export const SwapButtonOriginal: FC = () => {
   const { openModal } = useModals();
   const { buttonState, trade, onSwap } = useSwap();
+  const swapInfo = useSwap();
+  const userTokenAccounts = useUserTokenAccounts();
+  const feeCompensationInfo = useFeeCompensation();
+  const feeLimitsInfo = useFreeFeeLimits();
 
   const handleSwapClick = async () => {
     trackEvent('Swap_Verification_Invoked');
@@ -20,7 +27,10 @@ export const SwapButtonOriginal: FC = () => {
         inputAmount: trade.getInputAmount(),
         minimumOutputAmount: trade.getMinimumOutputAmount(),
       },
-      trade,
+      swapInfo,
+      userTokenAccounts,
+      feeCompensationInfo,
+      feeLimitsInfo,
     });
 
     if (!result) {
