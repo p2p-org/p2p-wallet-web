@@ -8,6 +8,7 @@ import { usePubkey } from '@p2p-wallet-web/sail';
 import type { useFeeCompensation, useFreeFeeLimits, UseSwap } from 'app/contexts';
 import { useConfig } from 'app/contexts/solana/swap';
 import { formatBigNumber } from 'app/contexts/solana/swap/utils/format';
+import { CompensationFee } from 'components/common/CompensationFee';
 import { FeeToolTip } from 'components/common/TransactionDetails/FeeNewTooltip';
 import { Accordion } from 'components/ui';
 import { AccordionTitle } from 'components/ui/AccordionDetails/AccordionTitle';
@@ -19,10 +20,12 @@ export interface FeesOriginalProps {
   feeCompensationInfo: ReturnType<typeof useFeeCompensation>;
   feeLimitsInfo: ReturnType<typeof useFreeFeeLimits>;
   open?: boolean;
+  forPage?: boolean;
 }
 
 const defaultProps = {
   open: true,
+  forPage: false,
 };
 
 export const FeesOriginal: FC<FeesOriginalProps> = (props) => {
@@ -93,6 +96,21 @@ export const FeesOriginal: FC<FeesOriginalProps> = (props) => {
     };
   }, [compensationState, feeAmountInToken, feeToken, tokenConfigs, trade]);
 
+  const elCompensationFee =
+    props.forPage &&
+    (!fromTokenAccount?.balance?.token.isRawSOL ? (
+      <CompensationFee type="swap" isShow={trade.inputTokenName !== 'SOL'} />
+    ) : undefined);
+
+  const elTotal = props.forPage && (
+    <ListWrapper className="total">
+      <Row>
+        <Text>Total</Text>
+        <Text>{details.totlalAmount}</Text>
+      </Row>
+    </ListWrapper>
+  );
+
   return (
     <Accordion
       title={
@@ -125,13 +143,9 @@ export const FeesOriginal: FC<FeesOriginalProps> = (props) => {
             <Text>{details.accountCreationAmount}</Text>
           </Row>
         ) : undefined}
+        {elCompensationFee}
       </ListWrapper>
-      <ListWrapper className="total">
-        <Row>
-          <Text>Total</Text>
-          <Text>{details.totlalAmount}</Text>
-        </Row>
-      </ListWrapper>
+      {elTotal}
     </Accordion>
   );
 };

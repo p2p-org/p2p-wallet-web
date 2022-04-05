@@ -20,6 +20,7 @@ export const Fees: FC = () => {
   return (
     <FeesOriginal
       swapInfo={swapInfo}
+      forPage={true}
       userTokenAccounts={userTokenAccounts}
       feeCompensationInfo={feeCompensationInfo}
       feeLimitsInfo={feeLimitsInfo}

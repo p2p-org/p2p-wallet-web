@@ -85,6 +85,7 @@ export const Swap: FC<Props & FeesOriginalProps> = ({
         feeCompensationInfo={props.feeCompensationInfo}
         feeLimitsInfo={props.feeLimitsInfo}
         open={false}
+        forPage={false}
       />
     </Wrapper>
   );
