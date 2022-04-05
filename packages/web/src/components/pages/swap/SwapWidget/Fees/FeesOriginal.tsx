@@ -1,13 +1,17 @@
 import type { FC } from 'react';
 import { useEffect, useMemo } from 'react';
+import { useAsync } from 'react-async-hook';
 
 import type { useUserTokenAccounts } from '@p2p-wallet-web/core';
 import { useTokenAccount } from '@p2p-wallet-web/core';
 import { usePubkey } from '@p2p-wallet-web/sail';
+import { useSolana } from '@saberhq/use-solana';
+import { LAMPORTS_PER_SOL } from '@solana/web3.js';
 
 import type { useFeeCompensation, useFreeFeeLimits, UseSwap } from 'app/contexts';
+import { usePrice } from 'app/contexts';
 import { useConfig } from 'app/contexts/solana/swap';
-import { formatBigNumber } from 'app/contexts/solana/swap/utils/format';
+import { formatBigNumber, formatNumberToUSD } from 'app/contexts/solana/swap/utils/format';
 import { CompensationFee } from 'components/common/CompensationFee';
 import { FeeToolTip } from 'components/common/TransactionDetails/FeeNewTooltip';
 import { Accordion } from 'components/ui';
@@ -28,11 +32,18 @@ const defaultProps = {
   forPage: false,
 };
 
+const ATA_ACCOUNT_CREATION_FEE = 0.00203928;
+
 export const FeesOriginal: FC<FeesOriginalProps> = (props) => {
-  const { tokenConfigs } = useConfig();
-  const { trade, asyncStandardTokenAccounts } = props.swapInfo;
+  // @FIXME replace hooks with props
+  const { wallet, connection } = useSolana();
+  const { programIds, tokenConfigs } = useConfig();
+  const { trade, intermediateTokenName, asyncStandardTokenAccounts } = props.swapInfo;
+  const { useAsyncMergedPrices } = usePrice();
   const userTokenAccounts = props.userTokenAccounts;
-  const { setFromToken, compensationState, feeToken, feeAmountInToken } = props.feeCompensationInfo;
+  const asyncPrices = useAsyncMergedPrices();
+  const { setFromToken, setAccountsCount, compensationState, feeToken, feeAmountInToken } =
+    props.feeCompensationInfo;
   const { userFreeFeeLimits } = props.feeLimitsInfo;
 
   const [solTokenAccount] = useMemo(
@@ -45,6 +56,8 @@ export const FeesOriginal: FC<FeesOriginalProps> = (props) => {
 
   const fromTokenAccount = useTokenAccount(usePubkey(inputUserTokenAccount?.account));
 
+  const publicKey = wallet?.publicKey;
+
   useEffect(() => {
     if (fromTokenAccount?.balance) {
       setFromToken(fromTokenAccount);
@@ -52,6 +65,136 @@ export const FeesOriginal: FC<FeesOriginalProps> = (props) => {
       setFromToken(solTokenAccount);
     }
   }, [fromTokenAccount, setFromToken, trade]);
+
+  const tokenNames = useMemo(() => {
+    if (!asyncStandardTokenAccounts) {
+      return [];
+    }
+
+    return trade.getTokenNamesToSetup(asyncStandardTokenAccounts);
+  }, [trade, asyncStandardTokenAccounts]);
+
+  const feePools = useMemo(() => {
+    if (!intermediateTokenName) {
+      return [
+        [
+          formatBigNumber(trade.getFees()[0], tokenConfigs[trade.outputTokenName].decimals),
+          trade.outputTokenName,
+        ],
+      ];
+    } else if (trade.derivedFields?.doubleHopFields) {
+      const fees = trade.getFees();
+      return [
+        [
+          formatBigNumber(fees[0], tokenConfigs[intermediateTokenName].decimals, 3),
+          intermediateTokenName,
+        ],
+        [
+          formatBigNumber(fees[1], tokenConfigs[trade.outputTokenName].decimals, 3),
+          trade.outputTokenName,
+        ],
+      ];
+    } else {
+      return [];
+    }
+  }, [intermediateTokenName, tokenConfigs, trade]);
+
+  const transactionFee = useAsync(async () => {
+    if (!publicKey) {
+      return {
+        setupFee: 0,
+        swapFee: 0,
+      };
+    }
+
+    const { feeCalculator } = await connection.getRecentBlockhash();
+
+    const inputUserTokenPublicKey = asyncStandardTokenAccounts?.[trade.inputTokenName];
+    const intermediateTokenPublicKey = intermediateTokenName
+      ? asyncStandardTokenAccounts?.[intermediateTokenName]
+      : undefined;
+    const outputUserTokenAccount = asyncStandardTokenAccounts?.[trade.outputTokenName];
+
+    const { userSwapArgs, setupSwapArgs } = await trade.prepareExchangeTransactionsArgs(
+      connection,
+      tokenConfigs,
+      programIds,
+      publicKey,
+      inputUserTokenPublicKey?.account,
+      intermediateTokenPublicKey?.account,
+      outputUserTokenAccount?.account,
+    );
+
+    let setupFee;
+
+    let newAccountCount = 0;
+    if (setupSwapArgs) {
+      newAccountCount += 1;
+      setupFee = (1 * feeCalculator.lamportsPerSignature) / LAMPORTS_PER_SOL;
+    }
+
+    if (userSwapArgs?.exchangeData?.wsolAccountParams) {
+      newAccountCount += 1;
+    }
+
+    setAccountsCount(newAccountCount);
+
+    const swapFee = 0;
+
+    return { setupFee, swapFee };
+  }, [connection, tokenNames, programIds, tokenConfigs, trade, wallet]);
+
+  const totalFee = useAsync(async () => {
+    let totalFeeUSD = 0;
+    const priceSOL = asyncPrices.value?.['SOL'];
+
+    const accountsCreationFeeSOL = tokenNames.length * ATA_ACCOUNT_CREATION_FEE;
+
+    const feePoolsFeeUSD = feePools.reduce((sum, fee) => {
+      const amount = fee[0];
+      const tokenName = fee[1];
+      const price = asyncPrices.value?.[tokenName];
+
+      if (price) {
+        sum += Number(amount) * price;
+      }
+
+      return sum;
+    }, 0);
+    totalFeeUSD += feePoolsFeeUSD;
+
+    if (priceSOL) {
+      const accountsCreationFeeUSD = accountsCreationFeeSOL * priceSOL;
+
+      let transactionSetupFeeUSD = 0;
+      if (transactionFee.result?.setupFee) {
+        transactionSetupFeeUSD = transactionFee.result.setupFee * priceSOL;
+      }
+
+      let transactionSwapFeeUSD = 0;
+      if (transactionFee.result?.swapFee) {
+        transactionSwapFeeUSD = transactionFee.result.swapFee * priceSOL;
+      }
+
+      totalFeeUSD += accountsCreationFeeUSD + transactionSetupFeeUSD + transactionSwapFeeUSD;
+    }
+
+    return formatNumberToUSD(totalFeeUSD);
+  }, [tokenNames, transactionFee.result, feePools, asyncPrices.value]);
+
+  const renderTransactionFee = () => {
+    if (transactionFee.result) {
+      return (
+        <>
+          {transactionFee.result.setupFee &&
+            `${transactionFee.result.setupFee} SOL (Create token accounts) + `}
+          {transactionFee.result.swapFee && `${transactionFee.result.swapFee} SOL (Swap)`}
+        </>
+      );
+    }
+
+    return "Can't calculate";
+  };
 
   const details = useMemo(() => {
     let receiveAmount;
