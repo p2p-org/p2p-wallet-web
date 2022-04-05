@@ -119,7 +119,7 @@ const iconsMap = new Map<string, string>([
   ['opposite-arrows', oppositeArrows],
 ]);
 
-interface Props extends HTMLAttributes<HTMLOrSVGElement> {
+export interface Props extends HTMLAttributes<HTMLOrSVGElement> {
   name: string;
   size?: string | number;
   height?: string | number;

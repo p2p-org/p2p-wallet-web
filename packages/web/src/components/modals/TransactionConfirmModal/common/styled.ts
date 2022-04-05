@@ -1,6 +1,7 @@
 import { styled } from '@linaria/react';
 import { theme } from '@p2p-wallet-web/ui';
 
+import type { Props as IconProps } from 'components/ui';
 import { Icon } from 'components/ui';
 
 export const Section = styled.div`
@@ -37,7 +38,7 @@ export const FieldInfo = styled.div`
   border-radius: 12px;
 `;
 
-export const WalletIcon = styled(Icon)`
+export const WalletIcon = styled<IconProps>(Icon)`
   width: 24px;
   height: 24px;
 
@@ -104,17 +105,16 @@ export const Wrapper = styled.div`
   margin-bottom: 8px;
 `;
 
-// @TODO colors to palette
 export const FromToWrapper = styled.div`
   position: absolute;
-  border: 1px solid #f2f2f7;
+  border: 1px solid ${theme.colors.stroke.secondary};
   width: 32px;
   height: 32px;
-  background: #ffffff;
+  background: ${theme.colors.bg.primary};
   border-radius: 40%;
   left: 27px;
   top: 107px;
-  color: #5887ff;
+  color: ${theme.colors.textIcon.active};
 
   svg {
     width: 20px;
@@ -132,5 +132,5 @@ export const Overlay = styled.div`
   width: 34px;
   top: 5px;
   left: -2px;
-  background: white;
+  background: ${theme.colors.bg.primary};
 `;
