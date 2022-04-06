@@ -67,6 +67,11 @@ export const FeesOriginal: FC<FeesOriginalProps> = (props) => {
   const fromTokenAccount = useTokenAccount(usePubkey(inputUserTokenAccount?.account));
 
   const publicKey = wallet?.publicKey;
+  const outputDecimals = tokenConfigs[props.swapInfo.trade.outputTokenName]?.decimals || 0;
+  const minReceiveAmount = formatBigNumber(
+    props.swapInfo.trade.getMinimumOutputAmount(),
+    outputDecimals,
+  );
 
   useEffect(() => {
     if (fromTokenAccount?.balance) {
@@ -279,7 +284,9 @@ export const FeesOriginal: FC<FeesOriginalProps> = (props) => {
         <ListWrapper>
           <Row>
             <Text className="gray">Receive at least</Text>
-            <Text>{details.receiveAmount}</Text>
+            <Text>
+              {minReceiveAmount} {props.swapInfo.trade.outputTokenName}
+            </Text>
           </Row>
           <Row>
             <Text className="gray">Transaction fee</Text>

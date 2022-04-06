@@ -37,8 +37,7 @@ export const AmountUSD: FunctionComponent<Props> = ({
       return;
     }
 
-    // setUSDValue(formatNumberToUSD(getUSDValue(amount, tokenConfigs[tokenName].decimals, price)));
-    setUSDValue(formatNumberToUSD(getUSDValue(amount, 10, price)));
+    setUSDValue(formatNumberToUSD(getUSDValue(amount, tokenConfigs[tokenName].decimals, price)));
   }, [tokenName, price, amount, tokenConfigs]);
 
   return (

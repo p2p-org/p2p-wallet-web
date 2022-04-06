@@ -38,8 +38,12 @@ export const Swap: FC<Props & FeesOriginalProps> = ({
   ...props
 }) => {
   const { tokenConfigs } = useConfig();
-  const decimals = tokenConfigs[inputTokenName]?.decimals || 0;
-  const minReceiveAmount = formatBigNumber(props.swapInfo.trade.getMinimumOutputAmount(), decimals);
+  const inputDecimals = tokenConfigs[inputTokenName]?.decimals || 0;
+  const outputDecimals = tokenConfigs[outputTokenName]?.decimals || 0;
+  const minReceiveAmount = formatBigNumber(
+    props.swapInfo.trade.getMinimumOutputAmount(),
+    outputDecimals,
+  );
 
   return (
     <Wrapper>
@@ -49,7 +53,7 @@ export const Swap: FC<Props & FeesOriginalProps> = ({
           <TokenAvatar symbol={inputTokenName} size={44} />
           <InfoWrapper>
             <InfoTitle>
-              {formatBigNumber(inputAmount, decimals)} {inputTokenName}
+              {formatBigNumber(inputAmount, inputDecimals)} {inputTokenName}
             </InfoTitle>
             <InfoValue>
               <AmountUSD
@@ -71,7 +75,8 @@ export const Swap: FC<Props & FeesOriginalProps> = ({
           <TokenAvatar symbol={outputTokenName} size={44} />
           <InfoWrapper>
             <InfoTitle>
-              {formatBigNumber(props.swapInfo.trade.getOutputAmount(), decimals)} {outputTokenName}
+              {formatBigNumber(props.swapInfo.trade.getOutputAmount(), outputDecimals)}{' '}
+              {outputTokenName}
             </InfoTitle>
             <InfoValue>
               Receive at least: {minReceiveAmount} {props.swapInfo.trade.outputTokenName}
