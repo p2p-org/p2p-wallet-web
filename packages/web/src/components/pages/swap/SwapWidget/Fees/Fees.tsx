@@ -1,8 +1,9 @@
 import type { FC } from 'react';
 
 import { useUserTokenAccounts } from '@p2p-wallet-web/core';
+import { useSolana } from '@saberhq/use-solana';
 
-import { useFeeCompensation, useFreeFeeLimits } from 'app/contexts';
+import { useFeeCompensation, useFreeFeeLimits, usePrice } from 'app/contexts';
 import { useSwap } from 'app/contexts/solana/swap';
 
 import { FeesOriginal } from './FeesOriginal';
@@ -12,6 +13,8 @@ export const Fees: FC = () => {
   const userTokenAccounts = useUserTokenAccounts();
   const feeCompensationInfo = useFeeCompensation();
   const feeLimitsInfo = useFreeFeeLimits();
+  const priceInfo = usePrice();
+  const solanaProvider = useSolana();
 
   if (!swapInfo.trade.derivedFields) {
     return null;
@@ -24,6 +27,8 @@ export const Fees: FC = () => {
       userTokenAccounts={userTokenAccounts}
       feeCompensationInfo={feeCompensationInfo}
       feeLimitsInfo={feeLimitsInfo}
+      priceInfo={priceInfo}
+      solanaProvider={solanaProvider}
     />
   );
 };

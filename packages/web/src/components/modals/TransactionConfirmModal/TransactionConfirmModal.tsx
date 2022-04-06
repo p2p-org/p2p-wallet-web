@@ -11,7 +11,6 @@ import {
 import { theme } from '@p2p-wallet-web/ui';
 
 import type { ModalPropsType } from 'app/contexts/general/modals/types';
-import type Trade from 'app/contexts/solana/swap/models/Trade';
 import { ButtonCancel } from 'components/common/ButtonCancel';
 import { ErrorHint } from 'components/common/ErrorHint';
 import { PasswordInput } from 'components/common/PasswordInput';
@@ -68,17 +67,12 @@ const SendIcon = styled(Icon)`
   margin-right: 12px;
 `;
 
-export type SwapInfo = {
-  trade: Trade;
-};
-
 type ModalParams = {
   type: 'send' | 'swap';
   params: TransferParams | SwapParams;
 };
 
-export type TransactionConfirmModalProps = SwapInfo &
-  TransactionDetailsProps &
+export type TransactionConfirmModalProps = TransactionDetailsProps &
   ModalParams &
   FeesOriginalProps;
 
@@ -194,6 +188,8 @@ export const TransactionConfirmModal: FunctionComponent<
           userTokenAccounts={props.userTokenAccounts}
           feeCompensationInfo={props.feeCompensationInfo}
           feeLimitsInfo={props.feeLimitsInfo}
+          priceInfo={props.priceInfo}
+          solanaProvider={props.solanaProvider}
         />
       ) : undefined}
 

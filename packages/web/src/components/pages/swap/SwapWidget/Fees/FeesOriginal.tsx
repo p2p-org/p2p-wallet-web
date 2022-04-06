@@ -5,11 +5,10 @@ import { useAsync } from 'react-async-hook';
 import type { useUserTokenAccounts } from '@p2p-wallet-web/core';
 import { useTokenAccount } from '@p2p-wallet-web/core';
 import { usePubkey } from '@p2p-wallet-web/sail';
-import { useSolana } from '@saberhq/use-solana';
+import type { useSolana } from '@saberhq/use-solana';
 import { LAMPORTS_PER_SOL } from '@solana/web3.js';
 
-import type { useFeeCompensation, useFreeFeeLimits, UseSwap } from 'app/contexts';
-import { usePrice } from 'app/contexts';
+import type { useFeeCompensation, useFreeFeeLimits, UsePrice, UseSwap } from 'app/contexts';
 import { useConfig } from 'app/contexts/solana/swap';
 import { formatBigNumber, formatNumberToUSD } from 'app/contexts/solana/swap/utils/format';
 import { CompensationFee } from 'components/common/CompensationFee';
@@ -23,6 +22,8 @@ export interface FeesOriginalProps {
   userTokenAccounts: ReturnType<typeof useUserTokenAccounts>;
   feeCompensationInfo: ReturnType<typeof useFeeCompensation>;
   feeLimitsInfo: ReturnType<typeof useFreeFeeLimits>;
+  priceInfo: UsePrice;
+  solanaProvider: ReturnType<typeof useSolana>;
   open?: boolean;
   forPage?: boolean;
 }
@@ -35,11 +36,10 @@ const defaultProps = {
 const ATA_ACCOUNT_CREATION_FEE = 0.00203928;
 
 export const FeesOriginal: FC<FeesOriginalProps> = (props) => {
-  // @FIXME replace hooks with props
-  const { wallet, connection } = useSolana();
+  const { wallet, connection } = props.solanaProvider;
   const { programIds, tokenConfigs } = useConfig();
   const { trade, intermediateTokenName, asyncStandardTokenAccounts } = props.swapInfo;
-  const { useAsyncMergedPrices } = usePrice();
+  const { useAsyncMergedPrices } = props.priceInfo;
   const userTokenAccounts = props.userTokenAccounts;
   const asyncPrices = useAsyncMergedPrices();
   const { setFromToken, setAccountsCount, compensationState, feeToken, feeAmountInToken } =
