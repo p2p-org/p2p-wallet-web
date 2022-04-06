@@ -225,11 +225,10 @@ export const FeesOriginal: FC<FeesOriginalProps> = (props) => {
     let fees;
 
     if (feeToken?.balance?.token.isRawSOL) {
-      fees = `${formatBigNumber(
-        compensationState.estimatedFee.accountRent,
-        tokenConfigs['SOL'].decimals,
-      )} SOL`;
-      totlalAmount += ` + ${fees}`;
+      const feesAndFromAmount = trade
+        .getInputAmount()
+        .add(compensationState.estimatedFee.accountRent);
+      totlalAmount = `${formatBigNumber(feesAndFromAmount, tokenConfigs['SOL'].decimals)} SOL`;
     }
     if (compensationState.needTopUp && !feeToken?.balance?.token.isRawSOL) {
       if (feeToken && feeToken.balance) {
@@ -258,7 +257,7 @@ export const FeesOriginal: FC<FeesOriginalProps> = (props) => {
   const elTotal = props.forPage && (
     <ListWrapper className="total">
       <Row>
-        <Text>Total</Text>
+        <Text>Total amount spent:</Text>
         <Text>{details.totlalAmount}</Text>
       </Row>
     </ListWrapper>
