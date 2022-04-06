@@ -142,7 +142,12 @@ export const TransactionConfirmModal: FunctionComponent<
 
     switch (type) {
       case 'swap':
-        action = 'Confirm and send';
+        action = (
+          <>
+            <SendIcon name="swap" />
+            Swap {props.swapInfo.trade.inputTokenName} → {props.swapInfo.trade.outputTokenName}
+          </>
+        );
         break;
       case 'send':
       default:

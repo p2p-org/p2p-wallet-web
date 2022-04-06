@@ -2,9 +2,11 @@ import type { FC } from 'react';
 import { useEffect, useMemo } from 'react';
 import { useAsync } from 'react-async-hook';
 
+import { styled } from '@linaria/react';
 import type { useUserTokenAccounts } from '@p2p-wallet-web/core';
 import { useTokenAccount } from '@p2p-wallet-web/core';
 import { usePubkey } from '@p2p-wallet-web/sail';
+import { up } from '@p2p-wallet-web/ui';
 import type { useSolana } from '@saberhq/use-solana';
 import { LAMPORTS_PER_SOL } from '@solana/web3.js';
 
@@ -32,6 +34,14 @@ const defaultProps = {
   open: true,
   forPage: false,
 };
+
+const FeesWrapper = styled.div`
+  margin-top: 16px;
+
+  ${up.tablet} {
+    margin-top: 0;
+  }
+`;
 
 const ATA_ACCOUNT_CREATION_FEE = 0.00203928;
 
@@ -255,41 +265,43 @@ export const FeesOriginal: FC<FeesOriginalProps> = (props) => {
   );
 
   return (
-    <Accordion
-      title={
-        <AccordionTitle
-          title="Swap details"
-          titleBottomName="Total"
-          titleBottomValue={details.totlalAmount || ''}
-        />
-      }
-      open={props.open}
-      noContentPadding
-    >
-      <ListWrapper>
-        <Row>
-          <Text className="gray">Receive at least</Text>
-          <Text>{details.receiveAmount}</Text>
-        </Row>
-        <Row>
-          <Text className="gray">Transaction fee</Text>
-          <Text>
-            Free{' '}
-            <Text className="green inline-flex">
-              (Paid by P2P.org) <FeeToolTip userFreeFeeLimits={userFreeFeeLimits} />
-            </Text>
-          </Text>
-        </Row>
-        {details.accountCreationAmount && false ? (
+    <FeesWrapper>
+      <Accordion
+        title={
+          <AccordionTitle
+            title="Swap details"
+            titleBottomName="Total"
+            titleBottomValue={details.totlalAmount || ''}
+          />
+        }
+        open={props.open}
+        noContentPadding
+      >
+        <ListWrapper>
           <Row>
-            <Text className="gray">USDC account creation</Text>
-            <Text>{details.accountCreationAmount}</Text>
+            <Text className="gray">Receive at least</Text>
+            <Text>{details.receiveAmount}</Text>
           </Row>
-        ) : undefined}
-        {elCompensationFee}
-      </ListWrapper>
-      {elTotal}
-    </Accordion>
+          <Row>
+            <Text className="gray">Transaction fee</Text>
+            <Text>
+              Free{' '}
+              <Text className="green inline-flex">
+                (Paid by P2P.org) <FeeToolTip userFreeFeeLimits={userFreeFeeLimits} />
+              </Text>
+            </Text>
+          </Row>
+          {details.accountCreationAmount && false ? (
+            <Row>
+              <Text className="gray">USDC account creation</Text>
+              <Text>{details.accountCreationAmount}</Text>
+            </Row>
+          ) : undefined}
+          {elCompensationFee}
+        </ListWrapper>
+        {elTotal}
+      </Accordion>
+    </FeesWrapper>
   );
 };
 
