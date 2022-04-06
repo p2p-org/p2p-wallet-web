@@ -100,9 +100,9 @@ const Warning = styled.div`
 `;
 
 const WarningIcon = styled(Icon)`
-  margin-left: 10px;
   width: 18px;
   height: 18px;
+  margin-left: 10px;
 
   color: #ffa631;
 `;

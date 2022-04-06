@@ -36,9 +36,9 @@ const AddressWrapper = styled.div`
   flex: 1;
   grid-gap: 16px;
   align-items: center;
-  margin-left: 12px;
 
   min-width: 0;
+  margin-left: 12px;
 `;
 
 const ToInputWrapper = styled.div`

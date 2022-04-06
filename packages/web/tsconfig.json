@@ -21,16 +21,5 @@
     "noEmit": true,
     "jsx": "react-jsx",
     "noFallthroughCasesInSwitch": true
-  },
-  "references": [
-    {
-      "path": "../sail"
-    },
-    {
-      "path": "../core"
-    },
-    {
-      "path": "../ui"
-    }
-  ]
+  }
 }

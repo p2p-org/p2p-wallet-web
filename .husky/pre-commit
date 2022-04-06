@@ -1,0 +1,5 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+yarn stylelint './packages/web/src/**/*.tsx'  --color
+./node_modules/.bin/lerna run --concurrency 1 --stream lint:staged --since HEAD --exclude-dependents --loglevel verbose
