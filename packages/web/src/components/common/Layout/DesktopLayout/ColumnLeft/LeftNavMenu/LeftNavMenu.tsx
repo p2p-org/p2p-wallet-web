@@ -17,9 +17,10 @@ const Wrapper = styled.div`
 `;
 
 const NavButton = styled.div`
-  display: flex;
+  display: grid;
+  grid-template-rows: 30px;
+  grid-template-columns: repeat(2, max-content) 1fr;
   align-items: center;
-  height: 52px;
 
   color: ${theme.colors.textIcon.primary};
   font-weight: 500;
@@ -57,6 +58,15 @@ const NavIcon = styled(Icon)`
   color: ${theme.colors.textIcon.secondary};
 `;
 
+const StoreIcon = styled(Icon)`
+  justify-self: flex-end;
+  width: 20px;
+  height: 20px;
+  margin-right: 3px;
+
+  color: ${theme.colors.textIcon.secondary};
+`;
+
 const Name = styled.span`
   ${up.tablet} {
     display: none;
@@ -64,7 +74,7 @@ const Name = styled.span`
 
   ${up.desktop} {
     display: block;
-    margin-left: 20px;
+    margin-left: 9px;
   }
 `;
 
@@ -226,6 +236,7 @@ export const LeftNavMenu: FunctionComponent = () => {
             <NavIcon name="app-store" />
           </IconBlock>
           <Name>App Store</Name>
+          <StoreIcon name="store-icon" />
         </NavButton>
       </NavLinkMenu>
       <NavLinkMenu
@@ -240,6 +251,7 @@ export const LeftNavMenu: FunctionComponent = () => {
             <NavIcon name="google-play" />
           </IconBlock>
           <Name>Google Play</Name>
+          <StoreIcon name="store-icon" />
         </NavButton>
       </NavLinkMenu>
     </Wrapper>

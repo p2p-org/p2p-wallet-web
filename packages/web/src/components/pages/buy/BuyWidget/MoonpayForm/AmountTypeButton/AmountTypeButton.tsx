@@ -12,8 +12,9 @@ const ArrowsIcon = styled(Icon)`
 `;
 
 const Button = styled(UIButton)`
-  border: #E5E5E5 solid 1px;
   padding: 0 10px;
+
+  border: #e5e5e5 solid 1px;
 `;
 
 interface Props {

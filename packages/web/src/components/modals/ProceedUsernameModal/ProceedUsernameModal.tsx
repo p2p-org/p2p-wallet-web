@@ -25,6 +25,7 @@ const Header = styled.div`
   font-size: 20px;
 
   text-align: center;
+
   border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 `;
 
@@ -53,8 +54,8 @@ const CloseButton = styled.button`
   right: 32px;
 
   flex-shrink: 0;
-  height: 36px;
   width: 36px;
+  height: 36px;
   margin: -10px -12px -10px 0;
 
   color: #a3a5ba;

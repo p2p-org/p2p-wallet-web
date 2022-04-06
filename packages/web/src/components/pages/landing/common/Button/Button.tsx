@@ -59,6 +59,7 @@ export const ButtonLink = styled(Link)`
     }
 
     &.green {
+      /* stylelint-disable-next-line max-nesting-depth */
       &::before {
         background: linear-gradient(90deg, #bcff4e 0%, #bcff4e 100%);
       }
@@ -119,6 +120,7 @@ export const ButtonA = styled.a`
     }
 
     &.green {
+      /* stylelint-disable-next-line max-nesting-depth */
       &::before {
         background: linear-gradient(90deg, #bcff4e 0%, #bcff4e 100%);
       }

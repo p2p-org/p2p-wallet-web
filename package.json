@@ -10,7 +10,8 @@
     "prepare": "husky install",
     "predeploy": "npm run build",
     "deploy": "lerna run deploy",
-    "lint": "lerna run lint"
+    "lint": "lerna run lint",
+    "precommit": "lint-staged"
   },
   "devDependencies": {
     "@commitlint/cli": "^14.1.0",
@@ -25,12 +26,6 @@
     "lint-staged": "^11.2.2",
     "prettier": "^2.4.1",
     "typescript": "^4.5.4"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged",
-      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
-    }
   },
   "lint-staged": {
     "*.{ts,tsx}": "eslint --cache --fix",

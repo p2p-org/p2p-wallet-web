@@ -67,10 +67,10 @@ const LogoutWrapper = styled.div`
 
 const Logout = styled.div`
   padding: 0 10px;
-  font-size: 16px;
-  font-weight: 600;
 
   color: #f43d3d;
+  font-weight: 600;
+  font-size: 16px;
 
   cursor: pointer;
 `;

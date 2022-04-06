@@ -4,6 +4,7 @@ import { useHistory, useLocation } from 'react-router';
 
 import { styled } from '@linaria/react';
 import classNames from 'classnames';
+import throttle from 'lodash.throttle';
 
 import { ModalType, useModals } from 'app/contexts/general/modals';
 import { NavButton, NavButtonIcon, NavButtons } from 'components/common/NavButtons';
@@ -24,14 +25,13 @@ const NavButtonsMenuStyled = styled(NavButtons)`
   }
 `;
 
-interface Props {}
+const MENU_TRIGGER_OFFSET = 100;
 
-// FIX: can produce weird "rattling" during scroll
-export const NavButtonsMenu: FC<Props> = () => {
+export const NavButtonsMenu: FC = () => {
   const history = useHistory();
   const location = useLocation();
 
-  const intersectionRef = useRef(null);
+  const menuRef = useRef<HTMLDivElement>(null);
   const [stuck, setStuck] = useState(false);
 
   const { openModal } = useModals();
@@ -41,30 +41,28 @@ export const NavButtonsMenu: FC<Props> = () => {
   };
 
   useEffect(() => {
-    const observer = new IntersectionObserver(([e]) => setStuck((e?.intersectionRatio || 0) < 1), {
-      rootMargin: '100px',
-      threshold: [1],
-    });
+    const onScroll = throttle(() => {
+      const menuBottomEdge = menuRef?.current?.getBoundingClientRect()?.bottom;
 
-    const cachedRef = intersectionRef.current;
-    if (cachedRef) {
-      observer.observe(cachedRef);
-    }
+      if (menuBottomEdge) {
+        setStuck(menuBottomEdge < MENU_TRIGGER_OFFSET);
+      }
+    }, 200);
+
+    window.addEventListener('scroll', onScroll);
 
     return () => {
-      if (cachedRef) {
-        observer.unobserve(cachedRef);
-      }
+      window.removeEventListener('scroll', onScroll);
     };
-  }, [intersectionRef]);
+  }, []);
 
   const handleButtonClick = (route: string) => () => {
     history.push(route, { fromPage: location.pathname });
   };
 
   return (
-    <Wrapper ref={intersectionRef}>
-      <NavButtonsMenuStyled className={classNames({ stuck })}>
+    <Wrapper>
+      <NavButtonsMenuStyled className={classNames({ stuck })} ref={menuRef}>
         <NavButton onClick={handleBuyButtonClick}>
           {!stuck ? <NavButtonIcon name="plus" /> : undefined} Buy
         </NavButton>
@@ -77,7 +75,7 @@ export const NavButtonsMenu: FC<Props> = () => {
           Send
         </NavButton>
         <NavButton onClick={handleButtonClick('/swap')}>
-          {!stuck ? <NavButtonIcon name="swap" /> : undefined}
+          {!stuck ? <NavButtonIcon name="arrow-swap" /> : undefined}
           Swap
         </NavButton>
       </NavButtonsMenuStyled>

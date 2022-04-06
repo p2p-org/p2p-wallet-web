@@ -10,8 +10,9 @@ import { TokenAvatar } from 'components/common/TokenAvatar';
 import { Icon } from 'components/ui';
 
 const ToastStyled = styled(Toast)`
-  align-items: flex-start;
   position: relative;
+
+  align-items: flex-start;
 
   color: #000;
 
@@ -20,6 +21,7 @@ const ToastStyled = styled(Toast)`
 
 const ToastIconWrapper = styled.div`
   padding: 10px;
+
   border-radius: 12px;
 `;
 

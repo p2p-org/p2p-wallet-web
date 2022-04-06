@@ -29,7 +29,8 @@ const StyledDialogContent = styled(({ ...props }) => <AnimatedDialogContent {...
     display: flex;
     flex-direction: column;
     align-self: flex-end;
-    width: 100vw;
+    width: 100%;
+    max-height: 80vh;
     margin: 0;
     padding: 0;
     overflow-x: hidden;
