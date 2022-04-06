@@ -2,7 +2,7 @@ import type { FC } from 'react';
 
 import { useFreeFeeLimits, useSendState, useSettings } from 'app/contexts';
 import { CompensationFee } from 'components/common/CompensationFee';
-import { FeeToolTip } from 'components/common/TransactionDetails/FeeNewTooltip';
+import { FeeToolTip } from 'components/common/TransactionDetails/FeeTransactinTooltip';
 import { Accordion } from 'components/ui';
 import { AccordionTitle } from 'components/ui/AccordionDetails/AccordionTitle';
 import { ListWrapper, Row, Text } from 'components/ui/AccordionDetails/common';

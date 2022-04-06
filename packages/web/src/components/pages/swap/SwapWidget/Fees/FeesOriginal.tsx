@@ -20,7 +20,7 @@ import type {
 import { useConfig } from 'app/contexts/solana/swap';
 import { formatBigNumber, formatNumberToUSD } from 'app/contexts/solana/swap/utils/format';
 import { CompensationFee } from 'components/common/CompensationFee';
-import { FeeToolTip } from 'components/common/TransactionDetails/FeeNewTooltip';
+import { FeeToolTip } from 'components/common/TransactionDetails/FeeTransactinTooltip';
 import { AmountUSD } from 'components/pages/swap/SwapWidget/AmountUSD';
 import { Accordion } from 'components/ui';
 import { AccordionTitle } from 'components/ui/AccordionDetails/AccordionTitle';

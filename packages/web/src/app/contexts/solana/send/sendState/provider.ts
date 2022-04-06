@@ -130,22 +130,6 @@ const useSendStateInternal = (): UseSendState => {
 
         if (!isSOL) {
           setIsResolvingAddress(true);
-
-          // @FIXME the error is here (is is trying to init a Solana public key with BTC address
-          // comment this out and then try to find out why modal fails (there are also other params in the modal which
-          // are wrong)
-          // const { address, owner, needCreateATA } = await resolveAddress(
-          //   new PublicKey(destinationAddress),
-          //   fromTokenAccount.balance.token,
-          // );
-          //
-          // setIsResolvingAddress(true);
-          // setDestinationAccount({
-          //   address,
-          //   owner,
-          //   isNeedCreate: needCreateATA,
-          //   symbol: fromTokenAccount.balance.token.symbol,
-          // });
         } else {
           setDestinationAccount({
             address: new PublicKey(destinationAddress),
