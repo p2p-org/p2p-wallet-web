@@ -91,6 +91,7 @@ export const Swap: FC<Props & FeesOriginalProps> = ({
         feeLimitsInfo={props.feeLimitsInfo}
         priceInfo={props.priceInfo}
         solanaProvider={props.solanaProvider}
+        networkFees={props.networkFees}
         open={false}
         forPage={false}
       />

@@ -10,22 +10,30 @@ import { up } from '@p2p-wallet-web/ui';
 import type { useSolana } from '@saberhq/use-solana';
 import { LAMPORTS_PER_SOL } from '@solana/web3.js';
 
-import type { useFeeCompensation, useFreeFeeLimits, UsePrice, UseSwap } from 'app/contexts';
+import type {
+  useFeeCompensation,
+  useFreeFeeLimits,
+  useNetworkFees,
+  UsePrice,
+  UseSwap,
+} from 'app/contexts';
 import { useConfig } from 'app/contexts/solana/swap';
 import { formatBigNumber, formatNumberToUSD } from 'app/contexts/solana/swap/utils/format';
 import { CompensationFee } from 'components/common/CompensationFee';
 import { FeeToolTip } from 'components/common/TransactionDetails/FeeNewTooltip';
+import { AmountUSD } from 'components/pages/swap/SwapWidget/AmountUSD';
 import { Accordion } from 'components/ui';
 import { AccordionTitle } from 'components/ui/AccordionDetails/AccordionTitle';
 import { ListWrapper, Row, Text } from 'components/ui/AccordionDetails/common';
 
 export interface FeesOriginalProps {
-  swapInfo: UseSwap;
   userTokenAccounts: ReturnType<typeof useUserTokenAccounts>;
   feeCompensationInfo: ReturnType<typeof useFeeCompensation>;
   feeLimitsInfo: ReturnType<typeof useFreeFeeLimits>;
-  priceInfo: UsePrice;
   solanaProvider: ReturnType<typeof useSolana>;
+  networkFees: ReturnType<typeof useNetworkFees>;
+  priceInfo: UsePrice;
+  swapInfo: UseSwap;
   open?: boolean;
   forPage?: boolean;
 }
@@ -43,7 +51,22 @@ const FeesWrapper = styled.div`
   }
 `;
 
+const AmountUSDStyled = styled(AmountUSD)`
+  &::before {
+    content: '(';
+  }
+
+  &::after {
+    content: ')';
+  }
+
+  margin-left: 8px;
+
+  color: #8e8e93;
+`;
+
 const ATA_ACCOUNT_CREATION_FEE = 0.00203928;
+const FEE_SIGNIFICANT_DIGITS = 1;
 
 export const FeesOriginal: FC<FeesOriginalProps> = (props) => {
   const { wallet, connection } = props.solanaProvider;
@@ -262,10 +285,16 @@ export const FeesOriginal: FC<FeesOriginalProps> = (props) => {
   const elTotal = props.forPage && (
     <ListWrapper className="total">
       <Row>
-        <Text>Total amount spent:</Text>
+        <Text>Total</Text>
         <Text>{details.totlalAmount}</Text>
       </Row>
     </ListWrapper>
+  );
+
+  const accountCreationFee = formatBigNumber(
+    props.networkFees.accountRentExemption,
+    tokenConfigs['SOL'].decimals,
+    FEE_SIGNIFICANT_DIGITS,
   );
 
   return (
@@ -274,7 +303,7 @@ export const FeesOriginal: FC<FeesOriginalProps> = (props) => {
         title={
           <AccordionTitle
             title="Swap details"
-            titleBottomName="Total"
+            titleBottomName="Total amount spent"
             titleBottomValue={details.totlalAmount || ''}
           />
         }
@@ -286,6 +315,11 @@ export const FeesOriginal: FC<FeesOriginalProps> = (props) => {
             <Text className="gray">Receive at least</Text>
             <Text>
               {minReceiveAmount} {props.swapInfo.trade.outputTokenName}
+              <AmountUSDStyled
+                prefix={'~'}
+                amount={props.swapInfo.trade.getMinimumOutputAmount()}
+                tokenName={props.swapInfo.trade.outputTokenName}
+              />
             </Text>
           </Row>
           <Row>
@@ -297,12 +331,20 @@ export const FeesOriginal: FC<FeesOriginalProps> = (props) => {
               </Text>
             </Text>
           </Row>
-          {details.accountCreationAmount && false ? (
-            <Row>
-              <Text className="gray">USDC account creation</Text>
-              <Text>{details.accountCreationAmount}</Text>
-            </Row>
-          ) : undefined}
+          {Boolean(tokenNames.length) &&
+            tokenNames.map((tokenName) => (
+              <Row>
+                <Text className="gray">{tokenName} account creation</Text>
+                <Text>
+                  {accountCreationFee} SOL
+                  <AmountUSDStyled
+                    prefix={'~'}
+                    amount={props.networkFees.accountRentExemption}
+                    tokenName={'SOL'}
+                  />
+                </Text>
+              </Row>
+            ))}
           {elCompensationFee}
         </ListWrapper>
         {elTotal}

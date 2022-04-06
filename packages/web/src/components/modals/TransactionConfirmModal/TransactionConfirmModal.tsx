@@ -195,6 +195,7 @@ export const TransactionConfirmModal: FunctionComponent<
           feeLimitsInfo={props.feeLimitsInfo}
           priceInfo={props.priceInfo}
           solanaProvider={props.solanaProvider}
+          networkFees={props.networkFees}
         />
       ) : undefined}
 

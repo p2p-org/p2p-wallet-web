@@ -3,7 +3,7 @@ import type { FC } from 'react';
 import { useUserTokenAccounts } from '@p2p-wallet-web/core';
 import { useSolana } from '@saberhq/use-solana';
 
-import { useFeeCompensation, useFreeFeeLimits, usePrice } from 'app/contexts';
+import { useFeeCompensation, useFreeFeeLimits, useNetworkFees, usePrice } from 'app/contexts';
 import { ModalType, useModals } from 'app/contexts/general/modals';
 import { ButtonState, useSwap } from 'app/contexts/solana/swap';
 import { Button } from 'components/ui';
@@ -11,6 +11,7 @@ import { trackEvent } from 'utils/analytics';
 
 export const SwapButtonOriginal: FC = () => {
   const { openModal } = useModals();
+  const networkFees = useNetworkFees();
   const solanaProvider = useSolana();
   const priceInfo = usePrice();
   const { buttonState, trade, onSwap } = useSwap();
@@ -36,6 +37,7 @@ export const SwapButtonOriginal: FC = () => {
       feeLimitsInfo,
       solanaProvider,
       priceInfo,
+      networkFees,
     });
 
     if (!result) {
