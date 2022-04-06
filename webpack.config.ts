@@ -19,9 +19,27 @@ const config: ConfigFn = (env, argv) => {
       publicPath: '/',
     },
 
+    // @FIXME extract aliases
     module: {
       rules: [
         {
+          test: /-icon\.svg$/,
+          use: [
+            {
+              loader: 'svg-sprite-loader',
+            },
+            {
+              loader: 'svgo-loader',
+            },
+          ],
+        },
+        {
+          // @TODO make sure global styles are loaded. read the docs
+          test: /\.css$/i,
+          loader: 'css-loader',
+        },
+        {
+          // @TODO add source maps
           test: /\.(ts|js)x?$/i,
           exclude: /node_modules/,
           use: {
@@ -38,7 +56,7 @@ const config: ConfigFn = (env, argv) => {
                 [
                   'module-resolver',
                   {
-                    root: ['./packages/web/src'],
+                    root: [path.resolve(__dirname, './packages/web/src')],
                     alias: {
                       constants: './packages/web/src/constants',
                       config: './packages/web/src/config',
@@ -59,6 +77,10 @@ const config: ConfigFn = (env, argv) => {
           },
         },
       ],
+    },
+
+    resolve: {
+      extensions: ['.js', '.jsx', '.ts', '.tsx', '.json', '.css'],
     },
 
     devServer: {
