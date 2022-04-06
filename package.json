@@ -11,7 +11,7 @@
     "predeploy": "npm run build",
     "deploy": "lerna run deploy",
     "lint": "lerna run lint",
-    "serve": "webpack-dev-server"
+    "serve": "NODE_ENV=development webpack-dev-server --mode development"
   },
   "devDependencies": {
     "@commitlint/cli": "^14.1.0",
