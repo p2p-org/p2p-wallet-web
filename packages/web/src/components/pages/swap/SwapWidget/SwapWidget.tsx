@@ -4,13 +4,11 @@ import { styled } from '@linaria/react';
 
 import { WidgetPageWithBottom } from 'components/common/WidgetPageWithBottom';
 
-import { CurrentPrice } from './CurrentPrice';
 import { Fees } from './Fees';
 // import { PriceImpact } from './PriceImpact';
 // import { Properties } from './Properties';
 import { Reverse } from './Reverse';
 import { SettingsAction } from './SettingsAction';
-import { Slippage } from './Slippage';
 import { SwapButton } from './SwapButton';
 import { SwapFromForm } from './SwapFromForm';
 import { SwapToForm } from './SwapToForm';
@@ -71,9 +69,9 @@ export const SwapWidget: FC = () => {
         <SwapToForm />
       </Wrapper>
       {/* <Lines> */}
-      <CurrentPrice />
+      {/* <CurrentPrice /> */}
       {/*/!*<PriceImpact />*!/*/}
-      <Slippage />
+      {/* <Slippage /> */}
       <Fees />
       {/* </Lines> */}
       {/* </Wrapper> */}

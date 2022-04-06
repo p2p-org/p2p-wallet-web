@@ -370,7 +370,7 @@ export const FeesOriginal: FC = () => {
           </Text>
         </Row>
         <Row>
-          <Text className="gray">Receive at least:</Text>
+          <Text className="gray">Receive at least</Text>
           <Text>
             {details.receiveAmount}
             <Text className="gray inline-flex">

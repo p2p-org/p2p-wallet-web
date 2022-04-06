@@ -554,6 +554,17 @@ export const SwapTokenForm: FC<Props> = ({
     [tokenConfigs, pairTokenName, tokenName, filter, filteredTokenAccounts],
   );
 
+  const receiveAmount = useMemo(() => {
+    if (trade.getOutputAmount()) {
+      return `${formatBigNumber(
+        trade.getOutputAmount(),
+        tokenConfigs[trade.outputTokenName].decimals,
+      )} ${trade.outputTokenName}`;
+    }
+
+    return null;
+  }, [trade, tokenConfigs]);
+
   return (
     <Wrapper className={className}>
       <TopWrapper>
@@ -622,12 +633,16 @@ export const SwapTokenForm: FC<Props> = ({
           ) : undefined}
         </BalanceWrapper> */}
       </MainWrapper>
-      {!isInput ? (
+      {!isInput && trade.getOutputAmount().toNumber() ? (
         <BottomWrapper>
           <Row>
             <Text className="gray">Receive at least:</Text>
             <Text>
-              {100} <Text className="gray">(~$150)</Text>
+              {receiveAmount}
+              <Text className="gray inline-flex">
+                &nbsp;(~
+                <AmountUSD amount={trade.getOutputAmount()} tokenName={trade.outputTokenName} />)
+              </Text>
             </Text>
           </Row>
         </BottomWrapper>
