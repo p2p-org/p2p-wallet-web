@@ -20,7 +20,7 @@ import type {
 import { useConfig } from 'app/contexts/solana/swap';
 import { formatBigNumber, formatNumberToUSD } from 'app/contexts/solana/swap/utils/format';
 import { CompensationFee } from 'components/common/CompensationFee';
-import { FeeToolTip } from 'components/common/TransactionDetails/FeeTransactinTooltip';
+import { FeeTransactionTooltip } from 'components/common/TransactionDetails/FeeTransactinTooltip';
 import { AmountUSD } from 'components/pages/swap/SwapWidget/AmountUSD';
 import { Accordion } from 'components/ui';
 import { AccordionTitle } from 'components/ui/AccordionDetails/AccordionTitle';
@@ -55,7 +55,7 @@ const AmountUSDStyled = styled(AmountUSD)`
 
 const ATA_ACCOUNT_CREATION_FEE = 0.00203928;
 const FEE_SIGNIFICANT_DIGITS = 1;
-const POOL_SIGINFICANT_DIGITS = 3;
+const POOL_SIGNIFICANT_DIGITS = 3;
 
 export interface FeesOriginalProps {
   userTokenAccounts: ReturnType<typeof useUserTokenAccounts>;
@@ -133,7 +133,7 @@ export const FeesOriginal: FC<FeesOriginalProps> = ({
           formatBigNumber(
             fees[0],
             tokenConfigs[intermediateTokenName].decimals,
-            POOL_SIGINFICANT_DIGITS,
+            POOL_SIGNIFICANT_DIGITS,
           ),
           intermediateTokenName,
         ],
@@ -141,7 +141,7 @@ export const FeesOriginal: FC<FeesOriginalProps> = ({
           formatBigNumber(
             fees[1],
             tokenConfigs[trade.outputTokenName].decimals,
-            POOL_SIGINFICANT_DIGITS,
+            POOL_SIGNIFICANT_DIGITS,
           ),
           trade.outputTokenName,
         ],
@@ -196,7 +196,7 @@ export const FeesOriginal: FC<FeesOriginalProps> = ({
     return { setupFee, swapFee };
   }, [connection, tokenNames, programIds, tokenConfigs, trade, wallet]);
 
-  // eslint-disable-next-line
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/require-await
   const totalFee = useAsync(async () => {
     let totalFeeUSD = 0;
     const priceSOL = asyncPrices.value?.['SOL'];
@@ -235,7 +235,7 @@ export const FeesOriginal: FC<FeesOriginalProps> = ({
     return formatNumberToUSD(totalFeeUSD);
   }, [tokenNames, transactionFee.result, feePools, asyncPrices.value]);
 
-  // eslint-disable-next-line
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const renderTransactionFee = () => {
     if (transactionFee.result) {
       return (
@@ -343,7 +343,7 @@ export const FeesOriginal: FC<FeesOriginalProps> = ({
             <Text>
               Free{' '}
               <Text className="green inline-flex">
-                (Paid by P2P.org) <FeeToolTip userFreeFeeLimits={userFreeFeeLimits} />
+                (Paid by P2P.org) <FeeTransactionTooltip userFreeFeeLimits={userFreeFeeLimits} />
               </Text>
             </Text>
           </Row>

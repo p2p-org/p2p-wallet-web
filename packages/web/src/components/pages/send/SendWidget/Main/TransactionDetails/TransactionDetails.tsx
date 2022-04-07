@@ -2,7 +2,7 @@ import type { FC } from 'react';
 
 import { useFreeFeeLimits, useSendState, useSettings } from 'app/contexts';
 import { CompensationFee } from 'components/common/CompensationFee';
-import { FeeToolTip } from 'components/common/TransactionDetails/FeeTransactinTooltip';
+import { FeeTransactionTooltip } from 'components/common/TransactionDetails/FeeTransactinTooltip';
 import { Accordion } from 'components/ui';
 import { AccordionTitle } from 'components/ui/AccordionDetails/AccordionTitle';
 import { ListWrapper, Row, Text } from 'components/ui/AccordionDetails/common';
@@ -44,7 +44,7 @@ export const TransactionDetails: FC = () => {
             <Text>
               Free{' '}
               <Text className="green inline-flex">
-                (Paid by P2P.org) <FeeToolTip userFreeFeeLimits={userFreeFeeLimits} />
+                (Paid by P2P.org) <FeeTransactionTooltip userFreeFeeLimits={userFreeFeeLimits} />
               </Text>
             </Text>
           ) : (

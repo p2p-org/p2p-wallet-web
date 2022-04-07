@@ -14,7 +14,7 @@ interface Props {
   userFreeFeeLimits: typeof INITIAL_USER_FREE_FEE_LIMITS;
 }
 
-const FeeToolTip: FC<Props> = ({ userFreeFeeLimits }) => {
+export const FeeTransactionTooltip: FC<Props> = ({ userFreeFeeLimits }) => {
   const currentTransactionCount = userFreeFeeLimits.currentTransactionCount;
   const maxTransactionCount = userFreeFeeLimits.maxTransactionCount;
   const availableTransactionsCount = userFreeFeeLimits.hasFreeTransactions
@@ -40,5 +40,3 @@ const FeeToolTip: FC<Props> = ({ userFreeFeeLimits }) => {
     />
   );
 };
-
-export { FeeToolTip };

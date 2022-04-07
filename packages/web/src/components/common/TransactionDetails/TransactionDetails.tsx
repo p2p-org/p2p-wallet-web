@@ -3,7 +3,7 @@ import type { FC } from 'react';
 import type { UseSendState } from 'app/contexts';
 import { useSettings } from 'app/contexts';
 import type { INITIAL_USER_FREE_FEE_LIMITS } from 'app/contexts/api/feeRelayer/utils';
-import { FeeToolTip } from 'components/common/TransactionDetails/FeeTransactinTooltip';
+import { FeeTransactionTooltip } from 'components/common/TransactionDetails/FeeTransactinTooltip';
 import { Accordion } from 'components/ui';
 import { AccordionTitle } from 'components/ui/AccordionDetails/AccordionTitle';
 import { ListWrapper, Row, Text } from 'components/ui/AccordionDetails/common';
@@ -46,7 +46,7 @@ export const TransactionDetails: FC<TransactionDetailsProps> = ({
               Free{' '}
               <Text className="green inline-flex">
                 (Paid by P2P.org)
-                <FeeToolTip userFreeFeeLimits={userFreeFeeLimits} />
+                <FeeTransactionTooltip userFreeFeeLimits={userFreeFeeLimits} />
               </Text>
             </Text>
           ) : (

@@ -147,7 +147,11 @@ export const TransactionConfirmModal: FunctionComponent<
           </ModalTitle>
         );
       default:
-        return <ModalTitle>Confirm swapping SOL → BTC</ModalTitle>;
+        return (
+          <ModalTitle>
+            Confirm swapping {swapInfo.trade.inputTokenName} → {swapInfo.trade.outputTokenName}
+          </ModalTitle>
+        );
     }
   };
 

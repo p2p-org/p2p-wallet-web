@@ -1,1 +1,1 @@
-export { FeeToolTip } from './FeeTransactionTooltip';
+export { FeeTransactionTooltip } from './FeeTransactionTooltip';
