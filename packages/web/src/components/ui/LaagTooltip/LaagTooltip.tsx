@@ -88,24 +88,34 @@ const CLOSE_BUTTON_SIZE = 12;
 const TOOLTIP_ARROW_SIZE = 10;
 const TOOLTIP_ARROW_ANGLE = 35;
 
-export const LaagTooltip: FunctionComponent<OuterProps> = (props) => {
-  const [isOver, hoverProps, close] = useHover({ hideOnScroll: props.hideOnScroll });
+export const LaagTooltip: FunctionComponent<OuterProps> = ({
+  placement,
+  withClose,
+  possiblePlacements,
+  snap,
+  auto,
+  hideOnScroll,
+  iconColor,
+  elContent,
+  elAnchor,
+}) => {
+  const [isOver, hoverProps, close] = useHover({ hideOnScroll: hideOnScroll });
   const { onMouseEnter, onTouchEnd, onTouchStart } = hoverProps;
-  const anchorProps = props.withClose ? { onMouseEnter, onTouchEnd, onTouchStart } : hoverProps;
+  const anchorProps = withClose ? { onMouseEnter, onTouchEnd, onTouchStart } : hoverProps;
 
   const { triggerProps, layerProps, arrowProps, renderLayer } = useLayer({
     isOpen: isOver,
-    placement: props.placement,
+    placement: placement,
     overflowContainer: false,
-    possiblePlacements: props.possiblePlacements,
-    snap: props.snap,
-    auto: props.auto,
+    possiblePlacements: possiblePlacements,
+    snap: snap,
+    auto: auto,
     arrowOffset: TOOLTIP_ARROW_OFFSET,
     triggerOffset: TOOLTIP_TRIGGER_OFFSET,
     onOutsideClick: close,
   });
 
-  const elAnchor = props.elAnchor ?? <QuestionIcon name={'question'} iconColor={props.iconColor} />;
+  const elTooltipAnchor = elAnchor ?? <QuestionIcon name={'question'} iconColor={iconColor} />;
 
   const elClose = (
     <CloseButton onClick={close}>
@@ -116,13 +126,13 @@ export const LaagTooltip: FunctionComponent<OuterProps> = (props) => {
   return (
     <>
       <Anchor {...triggerProps} {...anchorProps}>
-        {elAnchor}
+        {elTooltipAnchor}
       </Anchor>
       {isOver &&
         renderLayer(
           <TooltipContent className="tooltip" {...layerProps}>
-            {props.elContent}
-            {props.withClose && elClose}
+            {elContent}
+            {withClose && elClose}
             <Arrow
               {...arrowProps}
               backgroundColor={'rgba(44, 44, 46, 0.9'}

@@ -67,17 +67,26 @@ const AmountUSDStyled = styled(AmountUSD)`
 
 const ATA_ACCOUNT_CREATION_FEE = 0.00203928;
 const FEE_SIGNIFICANT_DIGITS = 1;
+const POOL_SIGINFICANT_DIGITS = 3;
 
-export const FeesOriginal: FC<FeesOriginalProps> = (props) => {
-  const { wallet, connection } = props.solanaProvider;
+export const FeesOriginal: FC<FeesOriginalProps> = ({
+  feeLimitsInfo,
+  swapInfo,
+  networkFees,
+  solanaProvider,
+  userTokenAccounts,
+  priceInfo,
+  feeCompensationInfo,
+  forPage,
+}) => {
+  const { wallet, connection } = solanaProvider;
   const { programIds, tokenConfigs } = useConfig();
-  const { trade, intermediateTokenName, asyncStandardTokenAccounts } = props.swapInfo;
-  const { useAsyncMergedPrices } = props.priceInfo;
-  const userTokenAccounts = props.userTokenAccounts;
+  const { trade, intermediateTokenName, asyncStandardTokenAccounts } = swapInfo;
+  const { useAsyncMergedPrices } = priceInfo;
   const asyncPrices = useAsyncMergedPrices();
   const { setFromToken, setAccountsCount, compensationState, feeToken, feeAmountInToken } =
-    props.feeCompensationInfo;
-  const { userFreeFeeLimits } = props.feeLimitsInfo;
+    feeCompensationInfo;
+  const { userFreeFeeLimits } = feeLimitsInfo;
 
   const [solTokenAccount] = useMemo(
     () => userTokenAccounts.filter((token) => token.balance?.token.isRawSOL),
@@ -90,11 +99,8 @@ export const FeesOriginal: FC<FeesOriginalProps> = (props) => {
   const fromTokenAccount = useTokenAccount(usePubkey(inputUserTokenAccount?.account));
 
   const publicKey = wallet?.publicKey;
-  const outputDecimals = tokenConfigs[props.swapInfo.trade.outputTokenName]?.decimals || 0;
-  const minReceiveAmount = formatBigNumber(
-    props.swapInfo.trade.getMinimumOutputAmount(),
-    outputDecimals,
-  );
+  const outputDecimals = tokenConfigs[swapInfo.trade.outputTokenName]?.decimals || 0;
+  const minReceiveAmount = formatBigNumber(swapInfo.trade.getMinimumOutputAmount(), outputDecimals);
 
   useEffect(() => {
     if (fromTokenAccount?.balance) {
@@ -124,11 +130,19 @@ export const FeesOriginal: FC<FeesOriginalProps> = (props) => {
       const fees = trade.getFees();
       return [
         [
-          formatBigNumber(fees[0], tokenConfigs[intermediateTokenName].decimals, 3),
+          formatBigNumber(
+            fees[0],
+            tokenConfigs[intermediateTokenName].decimals,
+            POOL_SIGINFICANT_DIGITS,
+          ),
           intermediateTokenName,
         ],
         [
-          formatBigNumber(fees[1], tokenConfigs[trade.outputTokenName].decimals, 3),
+          formatBigNumber(
+            fees[1],
+            tokenConfigs[trade.outputTokenName].decimals,
+            POOL_SIGINFICANT_DIGITS,
+          ),
           trade.outputTokenName,
         ],
       ];
@@ -182,6 +196,7 @@ export const FeesOriginal: FC<FeesOriginalProps> = (props) => {
     return { setupFee, swapFee };
   }, [connection, tokenNames, programIds, tokenConfigs, trade, wallet]);
 
+  // eslint-disable-next-line
   const totalFee = useAsync(async () => {
     let totalFeeUSD = 0;
     const priceSOL = asyncPrices.value?.['SOL'];
@@ -220,6 +235,7 @@ export const FeesOriginal: FC<FeesOriginalProps> = (props) => {
     return formatNumberToUSD(totalFeeUSD);
   }, [tokenNames, transactionFee.result, feePools, asyncPrices.value]);
 
+  // eslint-disable-next-line
   const renderTransactionFee = () => {
     if (transactionFee.result) {
       return (
@@ -277,12 +293,12 @@ export const FeesOriginal: FC<FeesOriginalProps> = (props) => {
   }, [compensationState, feeAmountInToken, feeToken, tokenConfigs, trade]);
 
   const elCompensationFee =
-    props.forPage &&
+    forPage &&
     (!fromTokenAccount?.balance?.token.isRawSOL ? (
       <CompensationFee type="swap" isShow={trade.inputTokenName !== 'SOL'} />
     ) : undefined);
 
-  const elTotal = props.forPage && (
+  const elTotal = forPage && (
     <ListWrapper className="total">
       <Row>
         <Text>Total</Text>
@@ -292,7 +308,7 @@ export const FeesOriginal: FC<FeesOriginalProps> = (props) => {
   );
 
   const accountCreationFee = formatBigNumber(
-    props.networkFees.accountRentExemption,
+    networkFees.accountRentExemption,
     tokenConfigs['SOL'].decimals,
     FEE_SIGNIFICANT_DIGITS,
   );
@@ -307,18 +323,18 @@ export const FeesOriginal: FC<FeesOriginalProps> = (props) => {
             titleBottomValue={details.totlalAmount || ''}
           />
         }
-        open={props.open}
+        open={open}
         noContentPadding
       >
         <ListWrapper>
           <Row>
             <Text className="gray">Receive at least</Text>
             <Text>
-              {minReceiveAmount} {props.swapInfo.trade.outputTokenName}
+              {minReceiveAmount} {swapInfo.trade.outputTokenName}
               <AmountUSDStyled
                 prefix={'~'}
-                amount={props.swapInfo.trade.getMinimumOutputAmount()}
-                tokenName={props.swapInfo.trade.outputTokenName}
+                amount={swapInfo.trade.getMinimumOutputAmount()}
+                tokenName={swapInfo.trade.outputTokenName}
               />
             </Text>
           </Row>
@@ -331,20 +347,19 @@ export const FeesOriginal: FC<FeesOriginalProps> = (props) => {
               </Text>
             </Text>
           </Row>
-          {Boolean(tokenNames.length) &&
-            tokenNames.map((tokenName) => (
-              <Row>
-                <Text className="gray">{tokenName} account creation</Text>
-                <Text>
-                  {accountCreationFee} SOL
-                  <AmountUSDStyled
-                    prefix={'~'}
-                    amount={props.networkFees.accountRentExemption}
-                    tokenName={'SOL'}
-                  />
-                </Text>
-              </Row>
-            ))}
+          {tokenNames?.map((tokenName) => (
+            <Row key={tokenName}>
+              <Text className="gray">{tokenName} account creation</Text>
+              <Text>
+                {accountCreationFee} SOL
+                <AmountUSDStyled
+                  prefix={'~'}
+                  amount={networkFees.accountRentExemption}
+                  tokenName={'SOL'}
+                />
+              </Text>
+            </Row>
+          ))}
           {elCompensationFee}
         </ListWrapper>
         {elTotal}

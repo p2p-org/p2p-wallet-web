@@ -93,7 +93,7 @@ export const SendButtonSolana: FC<Props> = ({ primary, disabled }) => {
         },
         sendState: { fromTokenAccount, destinationAccount, details },
         userFreeFeeLimits,
-      },
+      } as TransactionConfirmModalProps,
     );
 
     if (!result) {
@@ -115,7 +115,7 @@ export const SendButtonSolana: FC<Props> = ({ primary, disabled }) => {
         sum: parsedAmount.asNumber,
       });
 
-      await openModal<any, TransactionStatusModalProps>(ModalType.SHOW_MODAL_TRANSACTION_STATUS, {
+      await openModal<void, TransactionStatusModalProps>(ModalType.SHOW_MODAL_TRANSACTION_STATUS, {
         type: 'send',
         action,
         params: {

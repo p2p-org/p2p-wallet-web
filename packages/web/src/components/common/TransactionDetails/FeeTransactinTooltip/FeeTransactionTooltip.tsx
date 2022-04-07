@@ -14,10 +14,10 @@ interface Props {
   userFreeFeeLimits: typeof INITIAL_USER_FREE_FEE_LIMITS;
 }
 
-const FeeToolTip: FC<Props> = (props) => {
-  const currentTransactionCount = props.userFreeFeeLimits.currentTransactionCount;
-  const maxTransactionCount = props.userFreeFeeLimits.maxTransactionCount;
-  const availableTransactionsCount = props.userFreeFeeLimits.hasFreeTransactions
+const FeeToolTip: FC<Props> = ({ userFreeFeeLimits }) => {
+  const currentTransactionCount = userFreeFeeLimits.currentTransactionCount;
+  const maxTransactionCount = userFreeFeeLimits.maxTransactionCount;
+  const availableTransactionsCount = userFreeFeeLimits.hasFreeTransactions
     ? maxTransactionCount - currentTransactionCount
     : 0;
 

@@ -78,7 +78,21 @@ export type TransactionConfirmModalProps = TransactionDetailsProps &
 
 export const TransactionConfirmModal: FunctionComponent<
   ModalPropsType & TransactionConfirmModalProps
-> = ({ type, params, close, ...props }) => {
+> = ({
+  type,
+  params,
+  close,
+  btcAddress,
+  swapInfo,
+  sendState,
+  userTokenAccounts,
+  userFreeFeeLimits,
+  feeCompensationInfo,
+  feeLimitsInfo,
+  priceInfo,
+  solanaProvider,
+  networkFees,
+}) => {
   const { walletProviderInfo } = useWallet();
   const tryUnlockSeedAndMnemonic = useTryUnlockSeedAndMnemonic();
 
@@ -91,9 +105,9 @@ export const TransactionConfirmModal: FunctionComponent<
     }
   }, []);
 
-  const validatePassword = async (password: string) => {
+  const validatePassword = async (value: string) => {
     try {
-      await tryUnlockSeedAndMnemonic(password);
+      await tryUnlockSeedAndMnemonic(value);
       setHasError(false);
     } catch (error) {
       setHasError(true);
@@ -145,7 +159,7 @@ export const TransactionConfirmModal: FunctionComponent<
         action = (
           <>
             <SendIcon name="swap" />
-            Swap {props.swapInfo.trade.inputTokenName} → {props.swapInfo.trade.outputTokenName}
+            Swap {swapInfo.trade.inputTokenName} → {swapInfo.trade.outputTokenName}
           </>
         );
         break;
@@ -181,21 +195,21 @@ export const TransactionConfirmModal: FunctionComponent<
       {type === 'send' ? (
         <Send
           params={params as TransferParams}
-          sendState={props.sendState}
-          userFreeFeeLimits={props.userFreeFeeLimits}
-          btcAddress={props.btcAddress}
+          sendState={sendState}
+          userFreeFeeLimits={userFreeFeeLimits}
+          btcAddress={btcAddress}
         />
       ) : undefined}
       {type === 'swap' ? (
         <Swap
           params={params as SwapParams}
-          swapInfo={props.swapInfo}
-          userTokenAccounts={props.userTokenAccounts}
-          feeCompensationInfo={props.feeCompensationInfo}
-          feeLimitsInfo={props.feeLimitsInfo}
-          priceInfo={props.priceInfo}
-          solanaProvider={props.solanaProvider}
-          networkFees={props.networkFees}
+          swapInfo={swapInfo}
+          userTokenAccounts={userTokenAccounts}
+          feeCompensationInfo={feeCompensationInfo}
+          feeLimitsInfo={feeLimitsInfo}
+          priceInfo={priceInfo}
+          solanaProvider={solanaProvider}
+          networkFees={networkFees}
         />
       ) : undefined}
 

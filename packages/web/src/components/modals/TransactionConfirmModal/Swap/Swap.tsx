@@ -35,15 +35,18 @@ interface Props {
 
 export const Swap: FC<Props & FeesOriginalProps> = ({
   params: { inputTokenName, outputTokenName, inputAmount },
-  ...props
+  swapInfo,
+  userTokenAccounts,
+  feeLimitsInfo,
+  networkFees,
+  solanaProvider,
+  priceInfo,
+  feeCompensationInfo,
 }) => {
   const { tokenConfigs } = useConfig();
   const inputDecimals = tokenConfigs[inputTokenName]?.decimals || 0;
   const outputDecimals = tokenConfigs[outputTokenName]?.decimals || 0;
-  const minReceiveAmount = formatBigNumber(
-    props.swapInfo.trade.getMinimumOutputAmount(),
-    outputDecimals,
-  );
+  const minReceiveAmount = formatBigNumber(swapInfo.trade.getMinimumOutputAmount(), outputDecimals);
 
   return (
     <Wrapper>
@@ -58,8 +61,8 @@ export const Swap: FC<Props & FeesOriginalProps> = ({
             <InfoValue>
               <AmountUSD
                 prefix={'~'}
-                amount={props.swapInfo.trade.getInputAmount()}
-                tokenName={props.swapInfo.trade.inputTokenName}
+                amount={swapInfo.trade.getInputAmount()}
+                tokenName={swapInfo.trade.inputTokenName}
               />
             </InfoValue>
           </InfoWrapper>
@@ -75,23 +78,22 @@ export const Swap: FC<Props & FeesOriginalProps> = ({
           <TokenAvatar symbol={outputTokenName} size={44} />
           <InfoWrapper>
             <InfoTitle>
-              {formatBigNumber(props.swapInfo.trade.getOutputAmount(), outputDecimals)}{' '}
-              {outputTokenName}
+              {formatBigNumber(swapInfo.trade.getOutputAmount(), outputDecimals)} {outputTokenName}
             </InfoTitle>
             <InfoValue>
-              Receive at least: {minReceiveAmount} {props.swapInfo.trade.outputTokenName}
+              Receive at least: {minReceiveAmount} {swapInfo.trade.outputTokenName}
             </InfoValue>
           </InfoWrapper>
         </FieldInfo>
       </Section>
       <FeesOriginal
-        swapInfo={props.swapInfo}
-        userTokenAccounts={props.userTokenAccounts}
-        feeCompensationInfo={props.feeCompensationInfo}
-        feeLimitsInfo={props.feeLimitsInfo}
-        priceInfo={props.priceInfo}
-        solanaProvider={props.solanaProvider}
-        networkFees={props.networkFees}
+        swapInfo={swapInfo}
+        userTokenAccounts={userTokenAccounts}
+        feeCompensationInfo={feeCompensationInfo}
+        feeLimitsInfo={feeLimitsInfo}
+        priceInfo={priceInfo}
+        solanaProvider={solanaProvider}
+        networkFees={networkFees}
         open={false}
         forPage={false}
       />

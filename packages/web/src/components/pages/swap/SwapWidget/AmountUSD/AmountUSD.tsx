@@ -22,6 +22,7 @@ type Props = {
 export const AmountUSD: FunctionComponent<Props> = ({
   amount = new u64(0),
   tokenName = '',
+  prefix,
   ...props
 }) => {
   const { tokenConfigs } = useConfig();
@@ -42,7 +43,7 @@ export const AmountUSD: FunctionComponent<Props> = ({
 
   return (
     <Wrapper title="Amount in USD" {...props}>
-      {props.prefix}
+      {prefix}
       {usdValue}
     </Wrapper>
   );
