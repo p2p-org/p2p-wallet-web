@@ -26,18 +26,6 @@ import { Accordion } from 'components/ui';
 import { AccordionTitle } from 'components/ui/AccordionDetails/AccordionTitle';
 import { ListWrapper, Row, Text } from 'components/ui/AccordionDetails/common';
 
-export interface FeesOriginalProps {
-  userTokenAccounts: ReturnType<typeof useUserTokenAccounts>;
-  feeCompensationInfo: ReturnType<typeof useFeeCompensation>;
-  feeLimitsInfo: ReturnType<typeof useFreeFeeLimits>;
-  solanaProvider: ReturnType<typeof useSolana>;
-  networkFees: ReturnType<typeof useNetworkFees>;
-  priceInfo: UsePrice;
-  swapInfo: UseSwap;
-  open?: boolean;
-  forPage?: boolean;
-}
-
 const defaultProps = {
   open: true,
   forPage: false,
@@ -68,6 +56,18 @@ const AmountUSDStyled = styled(AmountUSD)`
 const ATA_ACCOUNT_CREATION_FEE = 0.00203928;
 const FEE_SIGNIFICANT_DIGITS = 1;
 const POOL_SIGINFICANT_DIGITS = 3;
+
+export interface FeesOriginalProps {
+  userTokenAccounts: ReturnType<typeof useUserTokenAccounts>;
+  feeCompensationInfo: ReturnType<typeof useFeeCompensation>;
+  feeLimitsInfo: ReturnType<typeof useFreeFeeLimits>;
+  solanaProvider: ReturnType<typeof useSolana>;
+  networkFees: ReturnType<typeof useNetworkFees>;
+  priceInfo: UsePrice;
+  swapInfo: UseSwap;
+  open?: boolean;
+  forPage?: boolean;
+}
 
 export const FeesOriginal: FC<FeesOriginalProps> = ({
   feeLimitsInfo,
