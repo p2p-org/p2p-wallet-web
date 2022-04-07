@@ -8,6 +8,8 @@ import { useSwap } from 'app/contexts';
 import { Button as ButtonUI, Icon } from 'components/ui';
 import { trackEvent } from 'utils/analytics';
 
+import { useShowSettings } from '../../hooks/useShowSettings';
+
 const Wrapper = styled.div`
   position: relative;
 `;
@@ -142,14 +144,9 @@ const BottomButton = styled(Button)`
 `; */
 
 export const SettingsAction: FunctionComponent = () => {
-  const [isShow, setIsShow] = useState(false);
-  const [isCustomShow, setIsCustomShow] = useState(false);
   const { slippageTolerance, setSlippageTolerance } = useSwap();
   const [nextSlippageTolerance, setNextSlippageTolerance] = useState(String(slippageTolerance));
-
-  const handleToggleShow = () => {
-    trackEvent('swap_slippage_click');
-  };
+  const { handleShowSettings } = useShowSettings();
 
   const handleToggleCustomShow = () => {
     setIsCustomShow((state) => !state);
@@ -161,12 +158,9 @@ export const SettingsAction: FunctionComponent = () => {
     });
 
     setSlippage(Number(nextSlippageTolerance));
-    setIsShow(false);
   };
 
-  const handleCloseClick = () => {
-    setIsShow(false);
-  };
+  const handleCloseClick = () => {};
 
   const handleSlippageChange = (newSlippage: string) => {
     let cleanSlippage = newSlippage.replace(/,/g, '.'); // , to .
@@ -188,7 +182,7 @@ export const SettingsAction: FunctionComponent = () => {
   return (
     <Wrapper>
       {/* <ActionWrapper  > */}
-      <Button small onClick={handleToggleShow}>
+      <Button small onClick={handleShowSettings}>
         <ActionIcon name="gear" />
         Swap settings
       </Button>
