@@ -3,6 +3,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import * as React from 'react';
 
 import { styled } from '@linaria/react';
+import { ZERO } from '@orca-so/sdk';
 import { theme } from '@p2p-wallet-web/ui';
 import type { u64 } from '@solana/spl-token';
 import classNames from 'classnames';
@@ -633,7 +634,7 @@ export const SwapTokenForm: FC<Props> = ({
           ) : undefined}
         </BalanceWrapper> */}
       </MainWrapper>
-      {!isInput && trade.getOutputAmount().toNumber() ? (
+      {!isInput && !trade.getOutputAmount().eq(ZERO) ? (
         <BottomWrapper>
           <Row>
             <Text className="gray">Receive at least:</Text>
