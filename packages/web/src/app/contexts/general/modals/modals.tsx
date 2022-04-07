@@ -1,4 +1,4 @@
-import { Suspense, useCallback, useContext, useMemo, useState } from 'react';
+import { Suspense, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import * as React from 'react';
 
 import { styled } from '@linaria/react';
@@ -99,11 +99,11 @@ const promises = new Map();
 let modalId = 0;
 
 const ModalsContext = React.createContext<{
-  openModal: <T, S = any>(modalType: ModalType, props?: S) => Promise<T>;
+  openModal: <T, S extends {}>(modalType: ModalType, props?: S) => Promise<T | void>;
   closeModal: (modalId: number) => void;
   closeTopModal: () => void;
 }>({
-  openModal: (): Promise<void> => Promise.resolve(),
+  openModal: () => Promise.resolve(),
   closeModal: () => {},
   closeTopModal: () => {},
 });
@@ -113,11 +113,12 @@ export function ModalsProvider({ children = null as any }) {
 
   const setPageScroll = (overflow: 'hidden' | 'scroll') =>
     (document.documentElement.style.overflow = overflow);
+  useEffect(() => {
+    setPageScroll(modals.length ? 'hidden' : 'scroll');
+  }, [modals.length]);
 
   const openModal = useCallback(async (modalType: ModalType, props?: any): Promise<any> => {
     ++modalId;
-
-    setPageScroll('hidden');
 
     setModals((state) => [
       ...state,
@@ -142,7 +143,6 @@ export function ModalsProvider({ children = null as any }) {
 
   const closeModal = useCallback((modalId: number, result?: any) => {
     setModals((state) => state.filter((modal) => modal.modalId !== modalId));
-    setPageScroll('scroll');
 
     const dialogInfo = promises.get(modalId);
     if (dialogInfo) {
@@ -154,7 +154,6 @@ export function ModalsProvider({ children = null as any }) {
   }, []);
 
   const closeTopModal = useCallback(() => {
-    setPageScroll('scroll');
     setModals((state) => state.slice(0, state.length - 1));
   }, []);
 
