@@ -10,7 +10,7 @@ import { u64 } from '@solana/spl-token';
 import { LAMPORTS_PER_SOL } from '@solana/web3.js';
 import Decimal from 'decimal.js';
 
-import { useFeeCompensation, useFreeFeeLimits } from 'app/contexts';
+import { useFeeCompensation, useFreeFeeLimits, useNetworkFees } from 'app/contexts';
 import { useConfig, usePrice, useSwap } from 'app/contexts/solana/swap';
 import { formatBigNumber, formatNumberToUSD } from 'app/contexts/solana/swap/utils/format';
 import { CompensationFee } from 'components/common/CompensationFee';
@@ -20,10 +20,10 @@ import { Accordion, Icon } from 'components/ui';
 import { AccordionTitle } from 'components/ui/AccordionDetails/AccordionTitle';
 import { ListWrapper, Row, Text } from 'components/ui/AccordionDetails/common';
 
+import { useShowSettings } from '../../hooks/useShowSettings';
 import { AmountUSD } from '../AmountUSD';
 
-// TODO: is it right?
-const ATA_ACCOUNT_CREATION_FEE = 0.00203928;
+const FEE_SIGNIFICANT_DIGITS = 1;
 
 const PenIcon = styled(Icon)`
   width: 16px;
@@ -39,6 +39,18 @@ const PenIcon = styled(Icon)`
 //   font-size: 14px;
 // `;
 
+const AmountUSDStyled = styled(AmountUSD)`
+  &::before {
+    content: '(';
+  }
+
+  &::after {
+    content: ')';
+  }
+
+  margin-left: 8px;
+`;
+
 const LoaderBlockStyled = styled(LoaderBlock)`
   height: 24px;
 `;
@@ -50,9 +62,17 @@ export const FeesOriginal: FC = () => {
   const { useAsyncMergedPrices } = usePrice();
   const userTokenAccounts = useUserTokenAccounts();
   const asyncPrices = useAsyncMergedPrices();
-  const { setFromToken, setAccountsCount, compensationState, feeToken, feeAmountInToken } =
-    useFeeCompensation();
+  const {
+    setFromToken,
+    setAccountsCount,
+    compensationState,
+    feeToken,
+    feeAmountInToken,
+    estimatedFeeAmount,
+  } = useFeeCompensation();
   const { userFreeFeeLimits } = useFreeFeeLimits();
+  const { accountRentExemption } = useNetworkFees();
+  const { handleShowSettings } = useShowSettings();
 
   const [solTokenAccount] = useMemo(
     () => userTokenAccounts.filter((token) => token.balance?.token.isRawSOL),
@@ -320,6 +340,12 @@ export const FeesOriginal: FC = () => {
       .toString();
   };
 
+  const accountCreationFee = formatBigNumber(
+    accountRentExemption,
+    tokenConfigs['SOL'].decimals,
+    FEE_SIGNIFICANT_DIGITS,
+  );
+
   return (
     <Accordion
       title={
@@ -338,12 +364,10 @@ export const FeesOriginal: FC = () => {
           <Text>
             {getTokenPrice(false)} {trade.outputTokenName}
             <Text className="gray inline-flex">
-              &nbsp;(~
-              <AmountUSD
+              <AmountUSDStyled
                 amount={new u64(Math.pow(10, tokenConfigs[trade.inputTokenName]?.decimals || 6))}
                 tokenName={trade.inputTokenName}
               />
-              )
             </Text>
           </Text>
         </Row>
@@ -352,12 +376,10 @@ export const FeesOriginal: FC = () => {
           <Text>
             {getTokenPrice(true)} {trade.inputTokenName}
             <Text className="gray inline-flex">
-              &nbsp;(~
-              <AmountUSD
+              <AmountUSDStyled
                 amount={new u64(Math.pow(10, tokenConfigs[trade.outputTokenName]?.decimals || 6))}
                 tokenName={trade.outputTokenName}
               />
-              )
             </Text>
           </Text>
         </Row>
@@ -366,7 +388,8 @@ export const FeesOriginal: FC = () => {
         <Row>
           <Text className="gray">Max price slippage</Text>
           <Text>
-            {trade.slippageTolerance.toString()}% <PenIcon name="pen" onClick={() => {}} />
+            {trade.slippageTolerance.toString()}%{' '}
+            <PenIcon name="pen" onClick={handleShowSettings}></PenIcon>
           </Text>
         </Row>
         <Row>
@@ -374,8 +397,7 @@ export const FeesOriginal: FC = () => {
           <Text>
             {details.receiveAmount}
             <Text className="gray inline-flex">
-              &nbsp;(~
-              <AmountUSD amount={trade.getOutputAmount()} tokenName={trade.outputTokenName} />)
+              <AmountUSDStyled amount={trade.getOutputAmount()} tokenName={trade.outputTokenName} />
             </Text>
           </Text>
         </Row>
@@ -392,19 +414,23 @@ export const FeesOriginal: FC = () => {
             </Text>
           </Text>
         </Row>
-        {details.accountCreationAmount && false ? (
-          <Row>
-            <Text className="gray">USDC account creation</Text>
+        {tokenNames.map((tokenName) => (
+          <Row key={tokenName}>
+            <Text className="gray">{tokenName} account creation</Text>
             <Text>
-              {details.accountCreationAmount}
-              {/* <Text className="gray">(~$0.5)</Text> */}
+              {accountCreationFee} SOL
+              <Text className="gray inline-flex">
+                <AmountUSDStyled amount={accountRentExemption} tokenName={'SOL'} />
+              </Text>
             </Text>
           </Row>
-        ) : undefined}
-        {!fromTokenAccount?.balance?.token.isRawSOL ? (
-          <CompensationFee type="swap" isShow={trade.inputTokenName !== 'SOL'} />
-        ) : undefined}
+        ))}
       </ListWrapper>
+      {!fromTokenAccount?.balance?.token.isRawSOL ? (
+        <ListWrapper className="slim">
+          <CompensationFee type="swap" isShow={trade.inputTokenName !== 'SOL'} />
+        </ListWrapper>
+      ) : undefined}
       <ListWrapper className="total">
         <Row>
           <Text>Total</Text>
