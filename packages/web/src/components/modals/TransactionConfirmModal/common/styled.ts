@@ -1,6 +1,7 @@
 import { styled } from '@linaria/react';
 import { theme } from '@p2p-wallet-web/ui';
 
+import type { IconProps } from 'components/ui';
 import { Icon } from 'components/ui';
 
 export const Section = styled.div`
@@ -37,7 +38,7 @@ export const FieldInfo = styled.div`
   border-radius: 12px;
 `;
 
-export const WalletIcon = styled(Icon)`
+export const WalletIcon = styled<IconProps>(Icon)`
   width: 24px;
   height: 24px;
 
@@ -89,4 +90,47 @@ export const InfoValue = styled.div`
   font-size: 14px;
   line-height: 120%;
   letter-spacing: 0.01em;
+`;
+
+export const Subtitle = styled.div`
+  margin-left: 20px;
+  margin-top: 16px;
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 140%;
+`;
+
+export const Wrapper = styled.div`
+  position: relative;
+  margin-bottom: 8px;
+`;
+
+export const FromToWrapper = styled.div`
+  position: absolute;
+  border: 1px solid ${theme.colors.stroke.secondary};
+  width: 32px;
+  height: 32px;
+  background: ${theme.colors.bg.primary};
+  border-radius: 40%;
+  left: 27px;
+  top: 107px;
+  color: ${theme.colors.textIcon.active};
+
+  svg {
+    width: 20px;
+    height: 20px;
+  }
+`;
+
+export const Overlay = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 19px;
+
+  position: absolute;
+  width: 34px;
+  top: 5px;
+  left: -2px;
+  background: ${theme.colors.bg.primary};
 `;

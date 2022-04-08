@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 
 import { styled } from '@linaria/react';
 
-import { ModalType, useModals, useSendState } from 'app/contexts';
+import { ModalType, useFreeFeeLimits, useModals, useSendState } from 'app/contexts';
 import { Button, Icon } from 'components/ui';
 import { useFetchFees } from 'utils/providers/LockAndMintProvider';
 
@@ -32,26 +32,32 @@ interface Props {
 
 export const SendButtonBitcoin: FC<Props> = ({ primary, disabled, onInitBurnAndRelease }) => {
   const { openModal } = useModals();
-  const { fromTokenAccount, toPublicKey, fromAmount, blockchain, isRenBTC } = useSendState();
+  const sendState = useSendState();
   const { fees, pending: isFetchingFee } = useFetchFees(true);
 
   const [renBtcMinimalAmount, setRenBtcMinimalAmount] = useState(0);
+  const { userFreeFeeLimits } = useFreeFeeLimits();
 
   useEffect(() => {
-    if (blockchain === 'bitcoin' && !isFetchingFee) {
-      const amount = getTransactionFee(fromAmount, fees);
+    if (sendState.blockchain === 'bitcoin' && !isFetchingFee) {
+      const amount = getTransactionFee(sendState.fromAmount, fees);
       setRenBtcMinimalAmount(amount);
     }
-  }, [fees, fromAmount, isFetchingFee, blockchain]);
+  }, [fees, sendState.fromAmount, isFetchingFee, sendState.blockchain]);
 
   const handleSubmit = async () => {
+    const params = {
+      source: sendState.fromTokenAccount,
+      destination: sendState.toPublicKey,
+      amount: sendState.parsedAmount, // new TokenAmount
+    };
+
     const result = await openModal<boolean>(ModalType.SHOW_MODAL_TRANSACTION_CONFIRM, {
       type: 'send',
-      params: {
-        source: fromTokenAccount,
-        destination: toPublicKey,
-        amount: fromAmount,
-      },
+      params,
+      userFreeFeeLimits,
+      sendState,
+      btcAddress: sendState.toPublicKey,
     });
 
     if (!result) {
@@ -61,7 +67,7 @@ export const SendButtonBitcoin: FC<Props> = ({ primary, disabled, onInitBurnAndR
     onInitBurnAndRelease();
   };
 
-  const hasRenBtcMinimalAmount = isRenBTC ? renBtcMinimalAmount > 0 : true;
+  const hasRenBtcMinimalAmount = (sendState.isRenBTC ? renBtcMinimalAmount > 0 : true) || true;
 
   return (
     <Button

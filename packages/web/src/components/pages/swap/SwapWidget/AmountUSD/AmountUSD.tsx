@@ -1,4 +1,4 @@
-import type { FunctionComponent } from 'react';
+import type { FunctionComponent, ReactElement } from 'react';
 import { useEffect, useState } from 'react';
 
 import type { CSSProperties } from '@linaria/core';
@@ -16,11 +16,13 @@ type Props = {
   tokenName?: string;
   style?: CSSProperties;
   className?: string;
+  prefix?: ReactElement | string;
 };
 
 export const AmountUSD: FunctionComponent<Props> = ({
   amount = new u64(0),
   tokenName = '',
+  prefix,
   ...props
 }) => {
   const { tokenConfigs } = useConfig();
@@ -41,6 +43,7 @@ export const AmountUSD: FunctionComponent<Props> = ({
 
   return (
     <Wrapper title="Amount in USD" {...props}>
+      {prefix}
       {usdValue}
     </Wrapper>
   );
