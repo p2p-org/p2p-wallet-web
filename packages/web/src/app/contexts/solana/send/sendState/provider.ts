@@ -15,7 +15,7 @@ import type { DestinationAccount } from 'app/contexts/api/feeRelayer/types';
 import { useRenNetwork } from 'utils/hooks/renBridge/useNetwork';
 
 import { useResolveAddress } from './hooks/useResolveAddress';
-import { isValidAddress } from './utils';
+import { isValidAddress, isValidSolanaAddress } from './utils';
 
 export type Blockchain = 'solana' | 'bitcoin';
 
@@ -95,7 +95,7 @@ const useSendStateInternal = (): UseSendState => {
   const [resolvedAddress, setResolvedAddress] = useState<string | null>(null);
   const [isResolvingAddress, setIsResolvingAddress] = useState(false);
 
-  const [blockchain, setBlockchain] = useState<Blockchain>(BLOCKCHAINS[0]!);
+  const [blockchain, setBlockchain] = useState<Blockchain>(BLOCKCHAINS[0]);
 
   const renNetwork = useRenNetwork();
 
@@ -125,33 +125,44 @@ const useSendStateInternal = (): UseSendState => {
 
   useEffect(() => {
     const resolve = async () => {
+      // 2. do logic if only both accounts are present
       if (destinationAddress && fromTokenAccount && fromTokenAccount.balance) {
         const isSOL = fromTokenAccount.balance.token.isRawSOL;
+        const isValidSolDestinationAddress = isValidSolanaAddress(destinationAddress);
+        const canSendOverSolana = isValidSolDestinationAddress && blockchain === 'solana';
 
-        if (!isSOL) {
-          setIsResolvingAddress(true);
+        // FIX. run code which instantiates new PublicKey() only if the solana network chosen
+        // and the destination address belongs to the network
+        if (canSendOverSolana) {
+          if (!isSOL) {
+            setIsResolvingAddress(true);
 
-          const { address, owner, needCreateATA } = await resolveAddress(
-            new PublicKey(destinationAddress),
-            fromTokenAccount.balance.token,
-          );
+            // 3.WRONG run those lines. should be run only if there is valid Solana destination address
+            const { address, owner, needCreateATA } = await resolveAddress(
+              new PublicKey(destinationAddress),
+              fromTokenAccount.balance.token,
+            );
 
-          setIsResolvingAddress(true);
-          setDestinationAccount({
-            address,
-            owner,
-            isNeedCreate: needCreateATA,
-            symbol: fromTokenAccount.balance.token.symbol,
-          });
-        } else {
-          setDestinationAccount({
-            address: new PublicKey(destinationAddress),
-          });
+            setIsResolvingAddress(true);
+            setDestinationAccount({
+              address,
+              owner,
+              isNeedCreate: needCreateATA,
+              symbol: fromTokenAccount.balance.token.symbol,
+            });
+          } else {
+            // 4.WRONG run this if from tokenAccount is not SOL. Should be run only if there is valid Solana destination address
+            setDestinationAccount({
+              address: new PublicKey(destinationAddress),
+            });
+          }
         }
       } else {
         setDestinationAccount(null);
       }
     };
+
+    // 1. if address is a valid BTC or SOL address please come here
     if (!isAddressInvalid) {
       void resolve();
     }
