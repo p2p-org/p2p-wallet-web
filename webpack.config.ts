@@ -20,6 +20,7 @@ const config: ConfigFn = (env, argv) => {
     },
 
     // @FIXME extract aliases
+    // @TODO file names in loaders for PROD and DEV
     module: {
       rules: [
         {
@@ -34,6 +35,10 @@ const config: ConfigFn = (env, argv) => {
           ],
         },
         {
+          test: /.(svg|png)$/,
+          type: 'asset/resource',
+        },
+        {
           // @TODO make sure global styles are loaded. read the docs
           test: /\.css$/i,
           loader: 'css-loader',
@@ -46,8 +51,11 @@ const config: ConfigFn = (env, argv) => {
             loader: 'babel-loader',
             options: {
               presets: [
-                ['react-app', { flow: false, typescript: true, runtime: 'automatic' }],
-                '@linaria',
+                '@babel/preset-env',
+                '@babel/preset-react',
+                '@babel/preset-typescript',
+                // ['react-app', { flow: false, typescript: true, runtime: 'automatic' }],
+                // '@linaria',
               ],
               plugins: [
                 ['@babel/plugin-proposal-private-methods', { loose: true }],
@@ -80,7 +88,13 @@ const config: ConfigFn = (env, argv) => {
     },
 
     resolve: {
-      extensions: ['.js', '.jsx', '.ts', '.tsx', '.json', '.css'],
+      extensions: ['.ts', '.tsx', '.js', '.jsx', '.json', '.css'],
+      fallback: {
+        http: require.resolve('stream-http'),
+        https: require.resolve('https-browserify'),
+        crypto: require.resolve('crypto-browserify'),
+        stream: require.resolve('stream-browserify'),
+      },
     },
 
     devServer: {
