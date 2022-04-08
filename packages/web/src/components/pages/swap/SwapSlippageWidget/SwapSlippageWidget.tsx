@@ -61,6 +61,7 @@ const ButtonsRow = styled.div`
 `;
 
 const ButtonStyled = styled(Button)`
+  height: 38px;
   box-sizing: border-box;
 
   font-weight: 500;
@@ -72,6 +73,7 @@ const ButtonStyled = styled(Button)`
 
   &.custom {
     width: 93px;
+    padding: 0;
 
     &.active {
       background-color: inherit;
@@ -82,8 +84,6 @@ const ButtonStyled = styled(Button)`
     color: ${theme.colors.textIcon.active};
 
     font-weight: 700;
-    font-size: 16px;
-    line-height: 140%;
 
     background-color: ${theme.colors.bg.activePrimary};
     border-color: ${theme.colors.bg.buttonPrimary};
@@ -147,6 +147,9 @@ export const SwapSlippageWidget = () => {
   const isCustomSlippageValue = activeButtonIdx === -1;
 
   const handleCustomButtonClick = useCallback(() => setIsCustomInputShown(true), []);
+  const handleCustomInputBlur = useCallback(() => {
+    setIsCustomInputShown(false);
+  }, [setIsCustomInputShown]);
 
   return (
     <WidgetPageWithBottom title={['Swap', 'Swap settings']} backTo={backToPath}>
@@ -159,7 +162,6 @@ export const SwapSlippageWidget = () => {
                 {PREDEFINED_SLIPPAGE_VALUES.map((value, idx) => (
                   <ButtonStyled
                     key={idx}
-                    small
                     className={classNames({
                       active: !isCustomInputShown && activeButtonIdx === idx,
                     })}
@@ -169,13 +171,12 @@ export const SwapSlippageWidget = () => {
                   </ButtonStyled>
                 ))}
                 <ButtonStyled
-                  small
                   className={classNames('custom', {
                     active: isCustomInputShown || isCustomSlippageValue,
                   })}
                   onClick={handleCustomButtonClick}
                 >
-                  {isCustomInputShown ? <CustomInput /> : 'Custom'}
+                  {isCustomInputShown ? <CustomInput onBlur={handleCustomInputBlur} /> : 'Custom'}
                 </ButtonStyled>
               </ButtonsRow>
             </SlippageWrapper>
