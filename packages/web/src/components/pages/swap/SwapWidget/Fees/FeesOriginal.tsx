@@ -426,9 +426,9 @@ export const FeesOriginal: FC = () => {
           </Row>
         ))}
       </ListWrapper>
-      {!fromTokenAccount?.balance?.token.isRawSOL ? (
+      {trade.inputTokenName !== 'SOL' ? (
         <ListWrapper className="slim">
-          <CompensationFee type="swap" isShow={trade.inputTokenName !== 'SOL'} />
+          <CompensationFee type="swap" isShow={true} />
         </ListWrapper>
       ) : undefined}
       <ListWrapper className="total">

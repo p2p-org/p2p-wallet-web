@@ -26,6 +26,7 @@ dist/
 .env.test.local
 .env.production.local
 .vscode
+/**/TODOs*
 
 *.log
 npm-debug.log*
