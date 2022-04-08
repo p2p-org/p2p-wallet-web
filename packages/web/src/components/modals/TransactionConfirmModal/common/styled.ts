@@ -1,7 +1,7 @@
 import { styled } from '@linaria/react';
 import { theme } from '@p2p-wallet-web/ui';
 
-import type { Props as IconProps } from 'components/ui';
+import type { IconProps } from 'components/ui';
 import { Icon } from 'components/ui';
 
 export const Section = styled.div`
