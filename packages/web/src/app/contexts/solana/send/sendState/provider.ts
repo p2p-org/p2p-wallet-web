@@ -95,7 +95,7 @@ const useSendStateInternal = (): UseSendState => {
   const [resolvedAddress, setResolvedAddress] = useState<string | null>(null);
   const [isResolvingAddress, setIsResolvingAddress] = useState(false);
 
-  const [blockchain, setBlockchain] = useState<Blockchain>(BLOCKCHAINS[0]!);
+  const [blockchain, setBlockchain] = useState<Blockchain>(BLOCKCHAINS[0]);
 
   const renNetwork = useRenNetwork();
 
@@ -125,7 +125,12 @@ const useSendStateInternal = (): UseSendState => {
 
   useEffect(() => {
     const resolve = async () => {
-      if (destinationAddress && fromTokenAccount && fromTokenAccount.balance) {
+      if (
+        destinationAddress &&
+        fromTokenAccount &&
+        fromTokenAccount.balance &&
+        blockchain === 'solana'
+      ) {
         const isSOL = fromTokenAccount.balance.token.isRawSOL;
 
         if (!isSOL) {

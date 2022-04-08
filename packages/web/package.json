@@ -11,8 +11,12 @@
     "build": "DISABLE_ESLINT_PLUGIN=true react-app-rewired build",
     "test": "react-app-rewired test --env=jsdom",
     "eject": "react-scripts eject",
-    "lint": "eslint src --ext js,ts,tsx --cache src --fix",
-    "test:integration": "yarn test --testPathPattern=integration --runInBand --forceExit"
+    "test:integration": "yarn test --testPathPattern=integration --runInBand --forceExit",
+    "lint:es": "eslint ./src --ext js,ts,tsx --cache --quiet || exit 0",
+    "lint:type": "tsc  --noEmit --project ./tsconfig.json --emitDeclarationOnly false || exit 0",
+    "lint:prettier": "pretty-quick --staged",
+    "lint:staged": "lint-staged",
+    "precommit": "yarn lint:es && yarn lint:type && yarn lint:prettier"
   },
   "dependencies": {
     "@emotion/is-prop-valid": "^0.8.8",
@@ -149,13 +153,6 @@
       "last 1 chrome version",
       "last 1 firefox version",
       "last 1 safari version"
-    ]
-  },
-  "lint-staged": {
-    "./src/**/*.{js,jsx,ts,tsx}": [
-      "pretty-quick --staged",
-      "eslint --fix",
-      "stylelint"
     ]
   }
 }

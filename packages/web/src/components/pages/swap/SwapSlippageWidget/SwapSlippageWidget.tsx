@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from 'react';
-import { generatePath, useParams, useRouteMatch } from 'react-router';
+import { generatePath, useParams } from 'react-router';
 
 import { styled } from '@linaria/react';
 import { theme } from '@p2p-wallet-web/ui';
@@ -8,7 +8,7 @@ import classNames from 'classnames';
 import { useSwap } from 'app/contexts';
 import SlippageTolerance from 'app/contexts/solana/swap/models/SlippageTolerance';
 import { WidgetPageWithBottom } from 'components/common/WidgetPageWithBottom';
-import { Button, Icon, Input } from 'components/ui';
+import { Button } from 'components/ui';
 
 import type { SwapRouteParams } from '../types';
 import { CustomInput } from './CustomInput';
@@ -61,8 +61,9 @@ const ButtonsRow = styled.div`
 `;
 
 const ButtonStyled = styled(Button)`
-  height: 38px;
   box-sizing: border-box;
+
+  height: 38px;
 
   font-weight: 500;
   font-size: 16px;
@@ -108,7 +109,7 @@ const DescriptionItem = styled.li`
   }
 `;
 
-const InputStyled = styled(Input)`
+/* const InputStyled = styled(Input)`
   box-sizing: content-box;
   width: 100%;
   height: 100%;
@@ -123,17 +124,16 @@ const InputStyled = styled(Input)`
     font-size: 16px;
     line-height: 140%;
   }
-`;
+`; */
 
-const PenIcon = styled(Icon)`
+/* const PenIcon = styled(Icon)`
   width: 16px;
   height: 16px;
-`;
+`; */
 
 const PREDEFINED_SLIPPAGE_VALUES = ['0.1', '0.5', '1', '5'];
 
 export const SwapSlippageWidget = () => {
-  const match = useRouteMatch();
   const { symbol } = useParams<SwapRouteParams>();
   const { slippageTolerance, setSlippageTolerance } = useSwap();
   const [isCustomInputShown, setIsCustomInputShown] = useState(false);

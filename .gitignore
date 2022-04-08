@@ -3,6 +3,7 @@
 .linaria_cache
 .cache
 .eslintcache
+.stylelintcache
 
 # dependencies
 node_modules/

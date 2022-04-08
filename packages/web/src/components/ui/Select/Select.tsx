@@ -66,6 +66,7 @@ const Selector = styled.div`
 
   &.flat {
     padding: 12px 0;
+
     border: none;
   }
 `;

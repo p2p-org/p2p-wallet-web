@@ -14,6 +14,8 @@ import type { ModalPropsType } from 'app/contexts/general/modals/types';
 import { ButtonCancel } from 'components/common/ButtonCancel';
 import { ErrorHint } from 'components/common/ErrorHint';
 import { PasswordInput } from 'components/common/PasswordInput';
+import type { TransactionDetailsProps } from 'components/common/TransactionDetails';
+import type { FeesOriginalProps } from 'components/pages/swap/SwapWidget/Fees/FeesOriginal';
 import { Button, Icon } from 'components/ui';
 import { Modal } from 'components/ui/Modal';
 import { trackEvent } from 'utils/analytics';
@@ -26,6 +28,12 @@ import { Swap } from './Swap';
 
 const WrapperModal = styled(Modal)`
   flex-basis: 524px;
+`;
+
+const ModalTitle = styled.div`
+  font-weight: 500;
+  font-size: 24px;
+  line-height: 140%;
 `;
 
 const SubTitle = styled.span`
@@ -59,14 +67,32 @@ const SendIcon = styled(Icon)`
   margin-right: 12px;
 `;
 
-export type TransactionConfirmModalProps = {
+type ModalParams = {
   type: 'send' | 'swap';
   params: TransferParams | SwapParams;
 };
 
+export type TransactionConfirmModalProps = TransactionDetailsProps &
+  ModalParams &
+  FeesOriginalProps;
+
 export const TransactionConfirmModal: FunctionComponent<
   ModalPropsType & TransactionConfirmModalProps
-> = ({ type, params, close }) => {
+> = ({
+  type,
+  params,
+  close,
+  btcAddress,
+  swapInfo,
+  sendState,
+  userTokenAccounts,
+  userFreeFeeLimits,
+  feeCompensationInfo,
+  feeLimitsInfo,
+  priceInfo,
+  solanaProvider,
+  networkFees,
+}) => {
   const { walletProviderInfo } = useWallet();
   const tryUnlockSeedAndMnemonic = useTryUnlockSeedAndMnemonic();
 
@@ -79,9 +105,9 @@ export const TransactionConfirmModal: FunctionComponent<
     }
   }, []);
 
-  const validatePassword = async (password: string) => {
+  const validatePassword = async (value: string) => {
     try {
-      await tryUnlockSeedAndMnemonic(password);
+      await tryUnlockSeedAndMnemonic(value);
       setHasError(false);
     } catch (error) {
       setHasError(true);
@@ -115,18 +141,17 @@ export const TransactionConfirmModal: FunctionComponent<
   const renderTitle = () => {
     switch (type) {
       case 'send':
-        return <>Confirm sending {(params as TransferParams).source.balance?.token.symbol}</>;
+        return (
+          <ModalTitle>
+            Confirm sending {(params as TransferParams).source.balance?.token.symbol}
+          </ModalTitle>
+        );
       default:
-        return 'Double check and confirm';
-    }
-  };
-
-  const renderDescription = () => {
-    switch (type) {
-      case 'swap':
-        return 'Swap transaction';
-      default:
-        return null;
+        return (
+          <ModalTitle>
+            Confirm swapping {swapInfo.trade.inputTokenName} → {swapInfo.trade.outputTokenName}
+          </ModalTitle>
+        );
     }
   };
 
@@ -135,7 +160,12 @@ export const TransactionConfirmModal: FunctionComponent<
 
     switch (type) {
       case 'swap':
-        action = 'Confirm and send';
+        action = (
+          <>
+            <SendIcon name="swap" />
+            Swap {swapInfo.trade.inputTokenName} → {swapInfo.trade.outputTokenName}
+          </>
+        );
         break;
       case 'send':
       default:
@@ -161,13 +191,31 @@ export const TransactionConfirmModal: FunctionComponent<
   return (
     <WrapperModal
       title={renderTitle()}
-      description={renderDescription()}
       close={handleCloseClick}
       footer={renderButtons()}
+      noDelimiter={false}
     >
       {type === 'send' ? <ActionTitle>You are going to send</ActionTitle> : undefined}
-      {type === 'send' ? <Send params={params as TransferParams} /> : undefined}
-      {type === 'swap' ? <Swap params={params as SwapParams} /> : undefined}
+      {type === 'send' ? (
+        <Send
+          params={params as TransferParams}
+          sendState={sendState}
+          userFreeFeeLimits={userFreeFeeLimits}
+          btcAddress={btcAddress}
+        />
+      ) : undefined}
+      {type === 'swap' ? (
+        <Swap
+          params={params as SwapParams}
+          swapInfo={swapInfo}
+          userTokenAccounts={userTokenAccounts}
+          feeCompensationInfo={feeCompensationInfo}
+          feeLimitsInfo={feeLimitsInfo}
+          priceInfo={priceInfo}
+          solanaProvider={solanaProvider}
+          networkFees={networkFees}
+        />
+      ) : undefined}
 
       {isSecretKeyWallet ? (
         <Section className="password">

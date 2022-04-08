@@ -6,6 +6,7 @@ import { theme } from '@p2p-wallet-web/ui';
 
 const Wrapper = styled.div`
   display: flex;
+
   color: ${theme.colors.textIcon.primary};
 `;
 

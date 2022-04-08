@@ -331,7 +331,6 @@ interface Props {
 }
 
 export const SwapTokenForm: FC<Props> = ({
-  trade,
   isInput,
   tokenName,
   setTokenName,
@@ -349,7 +348,7 @@ export const SwapTokenForm: FC<Props> = ({
   const listRef = useRef<HTMLDivElement>(null);
 
   const { tokenConfigs, mintToTokenName } = useConfig();
-  const { asyncStandardTokenAccounts } = useSwap();
+  const { asyncStandardTokenAccounts, trade } = useSwap();
   const [isOpen, setIsOpen] = useState(false);
   const [filter, setFilter] = useState('');
   const [scrollTop, setScrollTop] = useState(0);
@@ -556,14 +555,8 @@ export const SwapTokenForm: FC<Props> = ({
   );
 
   const receiveAmount = useMemo(() => {
-    if (trade.getOutputAmount()) {
-      return `${formatBigNumber(
-        trade.getOutputAmount(),
-        tokenConfigs[trade.outputTokenName].decimals,
-      )} ${trade.outputTokenName}`;
-    }
-
-    return null;
+    const outputDecimals = tokenConfigs[trade.outputTokenName]?.decimals || 0;
+    return formatBigNumber(trade.getMinimumOutputAmount(), outputDecimals);
   }, [trade, tokenConfigs]);
 
   return (
