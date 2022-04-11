@@ -123,7 +123,7 @@ const iconsMap = new Map<string, string>([
   ['arrow-swap', arrowSwap],
 ]);
 
-interface Props extends HTMLAttributes<HTMLOrSVGElement> {
+export interface IconProps extends HTMLAttributes<HTMLOrSVGElement> {
   name: string;
   size?: string | number;
   height?: string | number;
@@ -132,7 +132,7 @@ interface Props extends HTMLAttributes<HTMLOrSVGElement> {
   className?: string;
 }
 
-export const Icon: FC<Props> = ({ name, size, height, width, ...props }) => {
+export const Icon: FC<IconProps> = ({ name, size, height, width, ...props }) => {
   const validProps: {
     [prop: string]: never;
   } = {};
@@ -151,13 +151,7 @@ export const Icon: FC<Props> = ({ name, size, height, width, ...props }) => {
   }
 
   return (
-    <svg
-      {...validProps}
-      viewBox={icon.viewBox}
-      height={size || height}
-      width={size || width}
-      {...props}
-    >
+    <svg {...validProps} viewBox={icon.viewBox} height={size || height} width={size || width}>
       <use xlinkHref={`#${icon.id}`} />
     </svg>
   );

@@ -3,42 +3,90 @@ import { useEffect, useMemo } from 'react';
 import { useAsync } from 'react-async-hook';
 
 import { styled } from '@linaria/react';
-import { useSolana, useTokenAccount, useUserTokenAccounts } from '@p2p-wallet-web/core';
+import type { useUserTokenAccounts } from '@p2p-wallet-web/core';
+import { useTokenAccount } from '@p2p-wallet-web/core';
 import { usePubkey } from '@p2p-wallet-web/sail';
+import { up } from '@p2p-wallet-web/ui';
+import type { useSolana } from '@saberhq/use-solana';
 import { LAMPORTS_PER_SOL } from '@solana/web3.js';
 
-import { useFeeCompensation, useFreeFeeLimits } from 'app/contexts';
-import { useConfig, usePrice, useSwap } from 'app/contexts/solana/swap';
+import type {
+  useFeeCompensation,
+  useFreeFeeLimits,
+  useNetworkFees,
+  UsePrice,
+  UseSwap,
+} from 'app/contexts';
+import { useConfig } from 'app/contexts/solana/swap';
 import { formatBigNumber, formatNumberToUSD } from 'app/contexts/solana/swap/utils/format';
 import { CompensationFee } from 'components/common/CompensationFee';
-import { LoaderBlock } from 'components/common/LoaderBlock';
-import { FreeTransactionTooltip } from 'components/common/TransactionDetails/FreeTransactionTooltip';
+import { FeeTransactionTooltip } from 'components/common/TransactionDetails/FeeTransactinTooltip';
+import { AmountUSD } from 'components/pages/swap/SwapWidget/AmountUSD';
 import { Accordion } from 'components/ui';
 import { AccordionTitle } from 'components/ui/AccordionDetails/AccordionTitle';
 import { ListWrapper, Row, Text } from 'components/ui/AccordionDetails/common';
 
-// TODO: is it right?
-const ATA_ACCOUNT_CREATION_FEE = 0.00203928;
+const defaultProps = {
+  open: true,
+  forPage: false,
+};
 
-// const Small = styled.div`
-//   color: #b9bbcd;
-//   font-size: 14px;
-// `;
+const FeesWrapper = styled.div`
+  margin-top: 16px;
 
-const LoaderBlockStyled = styled(LoaderBlock)`
-  height: 24px;
+  ${up.tablet} {
+    margin-top: 0;
+  }
 `;
 
-export const FeesOriginal: FC = () => {
-  const { wallet, connection } = useSolana();
+const AmountUSDStyled = styled(AmountUSD)`
+  &::before {
+    content: '(';
+  }
+
+  &::after {
+    content: ')';
+  }
+
+  margin-left: 8px;
+
+  color: #8e8e93;
+`;
+
+const ATA_ACCOUNT_CREATION_FEE = 0.00203928;
+const FEE_SIGNIFICANT_DIGITS = 1;
+const POOL_SIGNIFICANT_DIGITS = 3;
+
+export interface FeesOriginalProps {
+  userTokenAccounts: ReturnType<typeof useUserTokenAccounts>;
+  feeCompensationInfo: ReturnType<typeof useFeeCompensation>;
+  feeLimitsInfo: ReturnType<typeof useFreeFeeLimits>;
+  solanaProvider: ReturnType<typeof useSolana>;
+  networkFees: ReturnType<typeof useNetworkFees>;
+  priceInfo: UsePrice;
+  swapInfo: UseSwap;
+  open?: boolean;
+  forPage?: boolean;
+}
+
+export const FeesOriginal: FC<FeesOriginalProps> = ({
+  feeLimitsInfo,
+  swapInfo,
+  networkFees,
+  solanaProvider,
+  userTokenAccounts,
+  priceInfo,
+  feeCompensationInfo,
+  forPage,
+}) => {
+  const { wallet, connection } = solanaProvider;
   const { programIds, tokenConfigs } = useConfig();
-  const { trade, intermediateTokenName, asyncStandardTokenAccounts } = useSwap();
-  const { useAsyncMergedPrices } = usePrice();
-  const userTokenAccounts = useUserTokenAccounts();
+  const { trade, intermediateTokenName, asyncStandardTokenAccounts } = swapInfo;
+  const { useAsyncMergedPrices } = priceInfo;
   const asyncPrices = useAsyncMergedPrices();
   const { setFromToken, setAccountsCount, compensationState, feeToken, feeAmountInToken } =
-    useFeeCompensation();
-  const { userFreeFeeLimits } = useFreeFeeLimits();
+    feeCompensationInfo;
+  const { userFreeFeeLimits } = feeLimitsInfo;
 
   const [solTokenAccount] = useMemo(
     () => userTokenAccounts.filter((token) => token.balance?.token.isRawSOL),
@@ -51,6 +99,8 @@ export const FeesOriginal: FC = () => {
   const fromTokenAccount = useTokenAccount(usePubkey(inputUserTokenAccount?.account));
 
   const publicKey = wallet?.publicKey;
+  const outputDecimals = tokenConfigs[swapInfo.trade.outputTokenName]?.decimals || 0;
+  const minReceiveAmount = formatBigNumber(swapInfo.trade.getMinimumOutputAmount(), outputDecimals);
 
   useEffect(() => {
     if (fromTokenAccount?.balance) {
@@ -80,11 +130,19 @@ export const FeesOriginal: FC = () => {
       const fees = trade.getFees();
       return [
         [
-          formatBigNumber(fees[0], tokenConfigs[intermediateTokenName].decimals, 3),
+          formatBigNumber(
+            fees[0],
+            tokenConfigs[intermediateTokenName].decimals,
+            POOL_SIGNIFICANT_DIGITS,
+          ),
           intermediateTokenName,
         ],
         [
-          formatBigNumber(fees[1], tokenConfigs[trade.outputTokenName].decimals, 3),
+          formatBigNumber(
+            fees[1],
+            tokenConfigs[trade.outputTokenName].decimals,
+            POOL_SIGNIFICANT_DIGITS,
+          ),
           trade.outputTokenName,
         ],
       ];
@@ -92,51 +150,6 @@ export const FeesOriginal: FC = () => {
       return [];
     }
   }, [intermediateTokenName, tokenConfigs, trade]);
-
-  // const feePercentages = useMemo(() => {
-  //   const pool1 = trade.getPoolFromSelectedRoute(0);
-  //   const pool2 = trade.getPoolFromSelectedRoute(1);
-  //   if (!intermediateTokenName && pool1) {
-  //     if (outputTokenPrice) {
-  //       return (
-  //         pool1.getFeePercentage() +
-  //         '% (' +
-  //         formatNumberToUSD(
-  //           getUSDValue(
-  //             trade.getFees()[0],
-  //             tokenConfigs[trade.outputTokenName].decimals,
-  //             outputTokenPrice,
-  //           ),
-  //         ) +
-  //         ')'
-  //       );
-  //     } else {
-  //       return pool1.getFeePercentage() + '%';
-  //     }
-  //   } else if (intermediateTokenName && intermediateTokenPrice && pool1 && pool2) {
-  //     const fees = trade.getFees();
-  //     const totalFeePercentage = pool1.getFeePercentage() + pool2.getFeePercentage();
-  //     if (intermediateTokenPrice && outputTokenPrice) {
-  //       return (
-  //         totalFeePercentage +
-  //         '% (' +
-  //         formatNumberToUSD(
-  //           getUSDValue(
-  //             fees[0],
-  //             tokenConfigs[intermediateTokenName].decimals,
-  //             intermediateTokenPrice,
-  //           ) +
-  //             getUSDValue(fees[1], tokenConfigs[trade.outputTokenName].decimals, outputTokenPrice),
-  //         ) +
-  //         `) - ${pool1.getFeePercentage()}% + ${pool2.getFeePercentage()}%`
-  //       );
-  //     } else {
-  //       return totalFeePercentage + '%';
-  //     }
-  //   } else {
-  //     return null;
-  //   }
-  // }, [intermediateTokenName, intermediateTokenPrice, outputTokenPrice, tokenConfigs, trade]);
 
   const transactionFee = useAsync(async () => {
     if (!publicKey) {
@@ -154,16 +167,6 @@ export const FeesOriginal: FC = () => {
       : undefined;
     const outputUserTokenAccount = asyncStandardTokenAccounts?.[trade.outputTokenName];
 
-    // const { setupTransaction, swapTransaction } = await trade.prepareExchangeTransactions(
-    //   connection,
-    //   tokenConfigs,
-    //   programIds,
-    //   publicKey,
-    //   inputUserTokenPublicKey?.account,
-    //   intermediateTokenPublicKey?.account,
-    //   outputUserTokenAccount?.account,
-    // );
-
     const { userSwapArgs, setupSwapArgs } = await trade.prepareExchangeTransactionsArgs(
       connection,
       tokenConfigs,
@@ -175,11 +178,7 @@ export const FeesOriginal: FC = () => {
     );
 
     let setupFee;
-    // if (setupTransaction) {
-    //   setupFee =
-    //     (setupTransaction.signatures.length * feeCalculator.lamportsPerSignature) /
-    //     LAMPORTS_PER_SOL;
-    // }
+
     let newAccountCount = 0;
     if (setupSwapArgs) {
       newAccountCount += 1;
@@ -191,14 +190,13 @@ export const FeesOriginal: FC = () => {
     }
 
     setAccountsCount(newAccountCount);
-    // const swapFee =
-    //   (swapTransaction.signatures.length * feeCalculator.lamportsPerSignature) / LAMPORTS_PER_SOL;
 
     const swapFee = 0;
 
     return { setupFee, swapFee };
   }, [connection, tokenNames, programIds, tokenConfigs, trade, wallet]);
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/require-await
   const totalFee = useAsync(async () => {
     let totalFeeUSD = 0;
     const priceSOL = asyncPrices.value?.['SOL'];
@@ -237,11 +235,8 @@ export const FeesOriginal: FC = () => {
     return formatNumberToUSD(totalFeeUSD);
   }, [tokenNames, transactionFee.result, feePools, asyncPrices.value]);
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const renderTransactionFee = () => {
-    if (transactionFee.loading) {
-      return <LoaderBlockStyled size="16" />;
-    }
-
     if (transactionFee.result) {
       return (
         <>
@@ -274,11 +269,10 @@ export const FeesOriginal: FC = () => {
     let fees;
 
     if (feeToken?.balance?.token.isRawSOL) {
-      fees = `${formatBigNumber(
-        compensationState.estimatedFee.accountRent,
-        tokenConfigs['SOL'].decimals,
-      )} SOL`;
-      totlalAmount += ` + ${fees}`;
+      const feesAndFromAmount = trade
+        .getInputAmount()
+        .add(compensationState.estimatedFee.accountRent);
+      totlalAmount = `${formatBigNumber(feesAndFromAmount, tokenConfigs['SOL'].decimals)} SOL`;
     }
     if (compensationState.needTopUp && !feeToken?.balance?.token.isRawSOL) {
       if (feeToken && feeToken.balance) {
@@ -298,61 +292,80 @@ export const FeesOriginal: FC = () => {
     };
   }, [compensationState, feeAmountInToken, feeToken, tokenConfigs, trade]);
 
+  const elCompensationFee =
+    forPage &&
+    (!fromTokenAccount?.balance?.token.isRawSOL ? (
+      <CompensationFee type="swap" isShow={trade.inputTokenName !== 'SOL'} />
+    ) : undefined);
+
+  const elTotal = forPage && (
+    <ListWrapper className="total">
+      <Row>
+        <Text>Total</Text>
+        <Text>{details.totlalAmount}</Text>
+      </Row>
+    </ListWrapper>
+  );
+
+  const accountCreationFee = formatBigNumber(
+    networkFees.accountRentExemption,
+    tokenConfigs['SOL'].decimals,
+    FEE_SIGNIFICANT_DIGITS,
+  );
+
   return (
-    <Accordion
-      title={
-        <AccordionTitle
-          title="Transaction details"
-          titleBottomName="Total"
-          titleBottomValue={details.totlalAmount || ''}
-        />
-      }
-      open
-      noContentPadding
-    >
-      <ListWrapper>
-        <Row>
-          <Text className="gray">Receive at least</Text>
-          <Text>
-            {details.receiveAmount}
-            {/* <Text className="gray">(~$150)</Text> */}
-          </Text>
-        </Row>
-        <Row>
-          <Text className="gray">Transaction fee</Text>
-          <Text>
-            Free{' '}
-            <Text className="green inline-flex">
-              (Paid by P2P.org){' '}
-              <FreeTransactionTooltip
-                freeTransactionCount={userFreeFeeLimits.maxTransactionCount}
-                currentTransactionCount={userFreeFeeLimits.currentTransactionCount}
+    <FeesWrapper>
+      <Accordion
+        title={
+          <AccordionTitle
+            title="Swap details"
+            titleBottomName="Total amount spent"
+            titleBottomValue={details.totlalAmount || ''}
+          />
+        }
+        open={open}
+        noContentPadding
+      >
+        <ListWrapper>
+          <Row>
+            <Text className="gray">Receive at least</Text>
+            <Text>
+              {minReceiveAmount} {swapInfo.trade.outputTokenName}
+              <AmountUSDStyled
+                prefix={'~'}
+                amount={swapInfo.trade.getMinimumOutputAmount()}
+                tokenName={swapInfo.trade.outputTokenName}
               />
             </Text>
-          </Text>
-        </Row>
-        {details.accountCreationAmount && false ? (
+          </Row>
           <Row>
-            <Text className="gray">USDC account creation</Text>
+            <Text className="gray">Transaction fee</Text>
             <Text>
-              {details.accountCreationAmount}
-              {/* <Text className="gray">(~$0.5)</Text> */}
+              Free{' '}
+              <Text className="green inline-flex">
+                (Paid by P2P.org) <FeeTransactionTooltip userFreeFeeLimits={userFreeFeeLimits} />
+              </Text>
             </Text>
           </Row>
-        ) : undefined}
-        {!fromTokenAccount?.balance?.token.isRawSOL ? (
-          <CompensationFee type="swap" isShow={trade.inputTokenName !== 'SOL'} />
-        ) : undefined}
-      </ListWrapper>
-      <ListWrapper className="total">
-        <Row>
-          <Text>Total</Text>
-          <Text>
-            {details.totlalAmount}
-            {/* <Text className="gray">(~$150.5)</Text> */}
-          </Text>
-        </Row>
-      </ListWrapper>
-    </Accordion>
+          {tokenNames?.map((tokenName) => (
+            <Row key={tokenName}>
+              <Text className="gray">{tokenName} account creation</Text>
+              <Text>
+                {accountCreationFee} SOL
+                <AmountUSDStyled
+                  prefix={'~'}
+                  amount={networkFees.accountRentExemption}
+                  tokenName={'SOL'}
+                />
+              </Text>
+            </Row>
+          ))}
+          {elCompensationFee}
+        </ListWrapper>
+        {elTotal}
+      </Accordion>
+    </FeesWrapper>
   );
 };
+
+FeesOriginal.defaultProps = defaultProps;

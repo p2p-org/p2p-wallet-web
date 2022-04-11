@@ -327,7 +327,6 @@ interface Props {
 }
 
 export const SwapTokenForm: FC<Props> = ({
-  trade,
   isInput,
   tokenName,
   setTokenName,

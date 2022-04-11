@@ -1,4 +1,4 @@
-import { Suspense, useCallback, useContext, useMemo, useState } from 'react';
+import { Suspense, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import * as React from 'react';
 
 import { styled } from '@linaria/react';
@@ -99,17 +99,23 @@ const promises = new Map();
 let modalId = 0;
 
 const ModalsContext = React.createContext<{
-  openModal: <T, S = any>(modalType: ModalType, props?: S) => Promise<T>;
+  openModal: <T, S extends {}>(modalType: ModalType, props?: S) => Promise<T | void>;
   closeModal: (modalId: number) => void;
   closeTopModal: () => void;
 }>({
-  openModal: (): Promise<void> => Promise.resolve(),
+  openModal: () => Promise.resolve(),
   closeModal: () => {},
   closeTopModal: () => {},
 });
 
 export function ModalsProvider({ children = null as any }) {
   const [modals, setModals] = useState<ModalState[]>([]);
+
+  const setPageScroll = (overflow: 'hidden' | 'scroll') =>
+    (document.documentElement.style.overflow = overflow);
+  useEffect(() => {
+    setPageScroll(modals.length ? 'hidden' : 'scroll');
+  }, [modals.length]);
 
   const openModal = useCallback(async (modalType: ModalType, props?: any): Promise<any> => {
     ++modalId;
