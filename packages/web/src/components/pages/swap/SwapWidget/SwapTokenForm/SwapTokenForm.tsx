@@ -1,10 +1,9 @@
 import type { FC } from 'react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import * as React from 'react';
 
 import { styled } from '@linaria/react';
 import { ZERO } from '@orca-so/sdk';
-import { theme } from '@p2p-wallet-web/ui';
+import { theme, up } from '@p2p-wallet-web/ui';
 import type { u64 } from '@solana/spl-token';
 import classNames from 'classnames';
 import throttle from 'lodash.throttle';
@@ -41,7 +40,13 @@ const Wrapper = styled.div`
   border-radius: 0 0 12px 12px;
 
   &:first-child {
+    padding-bottom: 32px;
+
     border-radius: 12px 12px 0 0;
+
+    ${up.tablet} {
+      padding-bottom: 16px;
+    }
   }
 `;
 
@@ -171,12 +176,6 @@ const TokenWrapper = styled.div`
   }
 `;
 
-const BalanceWrapper = styled.div`
-  display: flex;
-  justify-content: flex-end;
-  height: 24px;
-`;
-
 const BalanceText = styled.div`
   display: flex;
 
@@ -185,10 +184,6 @@ const BalanceText = styled.div`
   font-size: 16px;
   line-height: 140%;
   letter-spacing: 0.01em;
-`;
-
-const AmountUSDStyled = styled(AmountUSD)`
-  margin-left: 3px;
 `;
 
 const DropDownListContainer = styled.div`
@@ -231,6 +226,20 @@ const FiltersWrapper = styled.div`
   & > :not(:last-child) {
     margin-right: 12px;
   }
+`;
+
+const AmountUSDStyled = styled(AmountUSD)`
+  &::before {
+    content: '(';
+  }
+
+  &::after {
+    content: ')';
+  }
+
+  margin-left: 8px;
+
+  color: #8e8e93;
 `;
 
 //
@@ -310,6 +319,7 @@ const InputWrapper = styled.div`
 `;
 
 const SCROLL_THRESHOLD = 15;
+const THROTTLE_MILLISECONDS = 100;
 
 function matchesFilter(str: string, filter: string) {
   return str.toLowerCase().indexOf(filter.toLowerCase().trim()) >= 0;
@@ -362,7 +372,7 @@ export const SwapTokenForm: FC<Props> = ({
 
   const boxShadow = useMemo(() => {
     return `0 5px 10px rgba(56, 60, 71, ${
-      scrollTop >= SCROLL_THRESHOLD ? '0.05' : 0.003 * scrollTop
+      scrollTop >= SCROLL_THRESHOLD ? '0.05' : Number('0.003') * scrollTop
     }`;
   }, [scrollTop]);
 
@@ -393,7 +403,7 @@ export const SwapTokenForm: FC<Props> = ({
     } else {
       setScrollTop(SCROLL_THRESHOLD);
     }
-  }, 100);
+  }, THROTTLE_MILLISECONDS);
 
   useEffect(() => {
     const element = listRef.current;
@@ -434,14 +444,14 @@ export const SwapTokenForm: FC<Props> = ({
     setIsOpen(false);
 
     const mintAddress = nextTokenAccount.accountInfo.mint.toBase58();
-    const tokenName = mintToTokenName[mintAddress];
-    setTokenName(tokenName);
+    const tokenN = mintToTokenName[mintAddress];
+    setTokenName(tokenN);
   };
 
   const handleTokenClick = useCallback(
-    (tokenName: string) => {
+    (tokenN: string) => {
       setIsOpen(false);
-      setTokenName(tokenName);
+      setTokenName(tokenN);
     },
     [setTokenName],
   );
@@ -452,8 +462,8 @@ export const SwapTokenForm: FC<Props> = ({
     }
 
     const tokenAccounts = Object.entries(asyncStandardTokenAccounts).reduce(
-      (tokenAccountMap, [tokenName, tokenAccount]) => {
-        tokenAccountMap[tokenName] = tokenAccount;
+      (tokenAccountMap, [tokenN, tokenAccount]) => {
+        tokenAccountMap[tokenN] = tokenAccount;
         return tokenAccountMap;
       },
       {} as UserTokenAccountMap,
@@ -634,8 +644,11 @@ export const SwapTokenForm: FC<Props> = ({
             <Text>
               {receiveAmount}
               <Text className="gray inline-flex">
-                &nbsp;(~
-                <AmountUSD amount={trade.getOutputAmount()} tokenName={trade.outputTokenName} />)
+                <AmountUSDStyled
+                  prefix="~"
+                  amount={trade.getOutputAmount()}
+                  tokenName={trade.outputTokenName}
+                />
               </Text>
             </Text>
           </Row>

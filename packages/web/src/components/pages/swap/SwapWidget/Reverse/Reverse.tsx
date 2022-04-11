@@ -1,7 +1,7 @@
 import type { FC } from 'react';
 
 import { styled } from '@linaria/react';
-import { theme } from '@p2p-wallet-web/ui';
+import { theme, up } from '@p2p-wallet-web/ui';
 
 import { useSwap } from 'app/contexts/solana/swap';
 import { Icon } from 'components/ui';
@@ -24,8 +24,13 @@ const ReverseWrapper = styled.div`
   justify-content: center;
   width: 48px;
   height: 48px;
+  margin-left: -32%;
 
   cursor: pointer;
+
+  ${up.tablet} {
+    margin: 0;
+  }
 `;
 
 const ReverseIcon = styled(Icon)`

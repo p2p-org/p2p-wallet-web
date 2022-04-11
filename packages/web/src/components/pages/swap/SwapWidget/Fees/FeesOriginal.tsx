@@ -6,10 +6,11 @@ import { styled } from '@linaria/react';
 import type { useUserTokenAccounts } from '@p2p-wallet-web/core';
 import { useTokenAccount } from '@p2p-wallet-web/core';
 import { usePubkey } from '@p2p-wallet-web/sail';
-import { theme } from '@p2p-wallet-web/ui';
+import { theme, useIsMobile } from '@p2p-wallet-web/ui';
 import type { useSolana } from '@saberhq/use-solana';
 import { u64 } from '@solana/spl-token';
 import { LAMPORTS_PER_SOL } from '@solana/web3.js';
+import classNames from 'classnames';
 import Decimal from 'decimal.js';
 
 import type {
@@ -55,6 +56,7 @@ const AmountUSDStyled = styled(AmountUSD)`
     content: ')';
   }
 
+  justify-self: flex-end;
   margin-left: 8px;
 
   color: #8e8e93;
@@ -96,6 +98,7 @@ export const FeesOriginal: FC<FeesOriginalProps> = ({
   const { setFromToken, setAccountsCount, compensationState, feeToken, feeAmountInToken } =
     feeCompensationInfo;
   const { userFreeFeeLimits } = feeLimitsInfo;
+  const isMobile = useIsMobile();
 
   const { handleShowSettings } = useShowSettings();
 
@@ -349,42 +352,32 @@ export const FeesOriginal: FC<FeesOriginalProps> = ({
       <ListWrapper>
         <Row>
           <Text className="gray">1 {trade.inputTokenName} price</Text>
-          <Text>
+          <Text className={classNames({ grid: isMobile })}>
             {getTokenPrice(false)} {trade.outputTokenName}
-            <Text className="gray inline-flex">
-              <AmountUSDStyled
-                prefix={'~'}
-                amount={
-                  new u64(
-                    Math.pow(
-                      ONE_TOKEN_BASE,
-                      tokenConfigs[trade.inputTokenName]?.decimals as number,
-                    ),
-                  )
-                }
-                tokenName={trade.inputTokenName}
-              />
-            </Text>
+            <AmountUSDStyled
+              prefix={'~'}
+              amount={
+                new u64(
+                  Math.pow(ONE_TOKEN_BASE, tokenConfigs[trade.inputTokenName]?.decimals as number),
+                )
+              }
+              tokenName={trade.inputTokenName}
+            />
           </Text>
         </Row>
         <Row>
           <Text className="gray">1 {trade.outputTokenName} price</Text>
-          <Text>
+          <Text className={classNames({ grid: isMobile })}>
             {getTokenPrice(true)} {trade.inputTokenName}
-            <Text className="gray inline-flex">
-              <AmountUSDStyled
-                prefix={'~'}
-                amount={
-                  new u64(
-                    Math.pow(
-                      ONE_TOKEN_BASE,
-                      tokenConfigs[trade.outputTokenName]?.decimals as number,
-                    ),
-                  )
-                }
-                tokenName={trade.outputTokenName}
-              />
-            </Text>
+            <AmountUSDStyled
+              prefix={'~'}
+              amount={
+                new u64(
+                  Math.pow(ONE_TOKEN_BASE, tokenConfigs[trade.outputTokenName]?.decimals as number),
+                )
+              }
+              tokenName={trade.outputTokenName}
+            />
           </Text>
         </Row>
       </ListWrapper>
@@ -398,7 +391,7 @@ export const FeesOriginal: FC<FeesOriginalProps> = ({
         </Row>
         <Row>
           <Text className="gray">Receive at least</Text>
-          <Text>
+          <Text className={classNames({ grid: isMobile })}>
             {minReceiveAmount} {swapInfo.trade.outputTokenName}
             <AmountUSDStyled
               prefix={'~'}
@@ -419,7 +412,7 @@ export const FeesOriginal: FC<FeesOriginalProps> = ({
         {tokenNames?.map((tokenName) => (
           <Row key={tokenName}>
             <Text className="gray">{tokenName} account creation</Text>
-            <Text>
+            <Text className={classNames({ grid: isMobile })}>
               {accountCreationFee} SOL
               <AmountUSDStyled
                 prefix={'~'}

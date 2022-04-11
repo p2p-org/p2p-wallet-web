@@ -51,6 +51,11 @@ export const Text = styled.div`
     display: inline-flex;
   }
 
+  &.grid {
+    display: grid;
+    flex-shrink: 0;
+  }
+
   &.gray {
     color: ${theme.colors.textIcon.secondary};
   }
