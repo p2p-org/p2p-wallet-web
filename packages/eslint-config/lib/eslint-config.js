@@ -17,16 +17,20 @@ module.exports = {
   rules: {
     curly: 'error',
     eqeqeq: 'error',
-    '@typescript-eslint/explicit-member-accessibility': ['error', { accessibility: 'no-public' }],
-    'import/order': 'off',
-    'simple-import-sort/exports': 'warn',
     'import/first': 'warn',
+    'import/order': 'off',
     'import/newline-after-import': 'warn',
     'import/no-duplicates': 'warn',
+    'no-console': ['error', { allow: ['warn', 'error'] }],
+    "no-magic-numbers": "off",
+    "require-await": "off",
+    'simple-import-sort/exports': 'warn',
     'unused-imports/no-unused-imports': 'warn',
     '@typescript-eslint/consistent-type-imports': 'error',
+    "@typescript-eslint/require-await": "error",
+    '@typescript-eslint/explicit-member-accessibility': ['error', { accessibility: 'no-public' }],
     '@typescript-eslint/no-unused-vars': [
-      'warn',
+      'error',
       {
         vars: 'all',
         varsIgnorePattern: '^_',
@@ -59,7 +63,29 @@ module.exports = {
         ],
       },
     ],
+    "@typescript-eslint/no-magic-numbers": [
+      "error",
+      {
+        ignore: [-1, 0, 1],
+        ignoreEnums: true,
+        ignoreNumericLiteralTypes: true,
+        ignoreArrayIndexes: true
+      }
+    ],
 
+    '@typescript-eslint/no-explicit-any': 'error',
+    '@typescript-eslint/no-shadow': 'error',
+    "@typescript-eslint/await-thenable": "error",
+    "@typescript-eslint/no-non-null-assertion": "error",
+    "@typescript-eslint/no-for-in-array": "error",
+    "@typescript-eslint/no-unnecessary-type-assertion": "error",
+    "@typescript-eslint/prefer-as-const": "error",
+    "@typescript-eslint/no-empty-interface": [
+      "error",
+      {
+        "allowSingleExtends": false
+      }
+    ],
     '@typescript-eslint/ban-ts-comment': 'warn',
     '@typescript-eslint/no-unsafe-argument': 'warn',
     '@typescript-eslint/no-unsafe-assignment': 'warn',
@@ -73,10 +99,8 @@ module.exports = {
     '@typescript-eslint/no-floating-promises': 'warn',
     '@typescript-eslint/restrict-plus-operands': 'warn',
     '@typescript-eslint/ban-types': 'warn',
-    '@typescript-eslint/require-await': 'warn',
     'no-prototype-builtins': 'warn',
     'no-constant-condition': 'warn',
-    '@typescript-eslint/no-empty-interface': 'warn',
     '@typescript-eslint/no-empty-function': 'warn',
     '@typescript-eslint/no-var-requires': 'warn',
   },

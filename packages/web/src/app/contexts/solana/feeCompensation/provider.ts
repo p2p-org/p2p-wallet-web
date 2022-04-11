@@ -133,7 +133,7 @@ const useFeeCompensationInternal = () => {
     }
 
     if (!isPayInSol && userRelayAccount && !userRelayAccount.exist) {
-      total = total.add(RELAY_ACCOUNT_RENT_EXEMPTION as u64);
+      total = total.add(RELAY_ACCOUNT_RENT_EXEMPTION);
     }
 
     return new u64(total.toArray());
@@ -247,7 +247,7 @@ const useFeeCompensationInternal = () => {
     }
 
     if (userRelayAccount && !userRelayAccount.exist) {
-      state.totalFee = state.totalFee.add(RELAY_ACCOUNT_RENT_EXEMPTION as u64);
+      state.totalFee = state.totalFee.add(RELAY_ACCOUNT_RENT_EXEMPTION);
       state.estimatedFee.relayAccountRent = RELAY_ACCOUNT_RENT_EXEMPTION;
       state.needCreateRelayAccount = true;
       state.topUpCompensationFee = state.topUpCompensationFee.add(RELAY_ACCOUNT_RENT_EXEMPTION);

@@ -5,14 +5,13 @@ import type { TokenAccount } from '@p2p-wallet-web/core';
 import { theme } from '@p2p-wallet-web/ui';
 import type { TokenAmount } from '@saberhq/token-utils';
 import type { PublicKey } from '@solana/web3.js';
-import { Feature } from 'flagged';
 
 import { AddressText } from 'components/common/AddressText';
 import { AmountUSD } from 'components/common/AmountUSD';
 import { TokenAvatar } from 'components/common/TokenAvatar';
+import type { TransactionDetailsProps } from 'components/common/TransactionDetails';
 import { TransactionDetails } from 'components/common/TransactionDetails';
 import { Icon } from 'components/ui';
-import { FEATURE_TRANSACTION_DETAILS_ACCORDION } from 'config/featureFlags';
 
 import {
   FieldInfo,
@@ -85,7 +84,14 @@ interface Props {
   params: TransferParams;
 }
 
-export const Send: FC<Props> = ({ params }) => {
+export const Send: FC<Props & TransactionDetailsProps> = ({
+  params,
+  sendState,
+  userFreeFeeLimits,
+  btcAddress,
+}) => {
+  const address = params.destination?.toBase58?.() || btcAddress;
+
   return (
     <Section className="send">
       <div>
@@ -117,16 +123,12 @@ export const Send: FC<Props> = ({ params }) => {
             ) : (
               <InfoTitle className="secondary">To address</InfoTitle>
             )}
-            <InfoValue>
-              <AddressText address={params.destination.toBase58()} medium />
-            </InfoValue>
+            <InfoValue>{address && <AddressText address={address} medium />}</InfoValue>
           </InfoWrapper>
         </FieldInfo>
       </div>
 
-      <Feature name={FEATURE_TRANSACTION_DETAILS_ACCORDION}>
-        <TransactionDetails />
-      </Feature>
+      <TransactionDetails sendState={sendState} userFreeFeeLimits={userFreeFeeLimits} />
     </Section>
   );
 };

@@ -168,14 +168,6 @@ const LogoWrapper = styled.div`
   display: flex;
   align-items: center;
   height: 34px;
-
-  // ${up.tablet} {
-  //   margin-right: 146px;
-  // }
-  //
-  // ${up.desktop} {
-  //   margin-right: 264px;
-  // }
 `;
 
 const LogoP2P = styled.div`

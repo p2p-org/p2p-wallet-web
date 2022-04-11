@@ -14,9 +14,13 @@ import classNames from 'classnames';
 import { MOBILE_FOOTER_TABS_HEIGHT } from 'components/common/Layout';
 import { Icon } from 'components/ui';
 
+// eslint-disable-next-line @typescript-eslint/no-magic-numbers
 const easing = BezierEasing(0.7, -0.4, 0.4, 1.4);
 
 const AnimatedDialogContent = animated(DialogContent);
+
+const DRAG_MOVEMENT_THRESHOLD = 300;
+const DRAG_VELOCITY_THRESHOLD = 3;
 
 const StyledDialogContent = styled(({ ...props }) => <AnimatedDialogContent {...props} />)`
   overflow-y: ${({ mobile }) => (mobile ? 'scroll' : 'hidden')};
@@ -30,11 +34,11 @@ const StyledDialogContent = styled(({ ...props }) => <AnimatedDialogContent {...
     flex-direction: column;
     align-self: flex-end;
     width: 100%;
-    max-height: 80vh;
+    max-height: 90vh;
     margin: 0;
     padding: 0;
     overflow-x: hidden;
-    overflow-y: auto;
+    overflow-y: scroll;
 
     background: ${theme.colors.bg.primary};
     border-radius: 18px 18px 0 0;
@@ -270,7 +274,10 @@ export const Modal: FunctionComponent<Props> = ({
     set({
       y: state.down ? state.movement[1] : 0,
     });
-    if (state.movement[1] > 300 || (state.velocity[1] > 3 && state.direction[1] > 0)) {
+    if (
+      state.movement[1] > DRAG_MOVEMENT_THRESHOLD ||
+      (state.velocity[1] > DRAG_VELOCITY_THRESHOLD && state.direction[1] > 0)
+    ) {
       close();
     }
   });
