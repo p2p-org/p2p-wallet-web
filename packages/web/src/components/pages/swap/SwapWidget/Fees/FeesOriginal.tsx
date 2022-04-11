@@ -6,7 +6,7 @@ import { styled } from '@linaria/react';
 import type { useUserTokenAccounts } from '@p2p-wallet-web/core';
 import { useTokenAccount } from '@p2p-wallet-web/core';
 import { usePubkey } from '@p2p-wallet-web/sail';
-import { theme, up } from '@p2p-wallet-web/ui';
+import { theme } from '@p2p-wallet-web/ui';
 import type { useSolana } from '@saberhq/use-solana';
 import { u64 } from '@solana/spl-token';
 import { LAMPORTS_PER_SOL } from '@solana/web3.js';
@@ -39,17 +39,11 @@ const PenIcon = styled(Icon)`
   width: 16px;
   height: 16px;
 
+  margin: auto 0;
+
   color: ${theme.colors.textIcon.secondary};
 
   cursor: pointer;
-`;
-
-const FeesWrapper = styled.div`
-  margin-top: 16px;
-
-  ${up.tablet} {
-    margin-top: 0;
-  }
 `;
 
 const AmountUSDStyled = styled(AmountUSD)`
@@ -69,6 +63,8 @@ const AmountUSDStyled = styled(AmountUSD)`
 const ATA_ACCOUNT_CREATION_FEE = 0.00203928;
 const FEE_SIGNIFICANT_DIGITS = 1;
 const POOL_SIGNIFICANT_DIGITS = 3;
+const TOKEN_AMOUNT_SIGNIFICANT_DIGITS = 6;
+const ONE_TOKEN_BASE = 10;
 
 export interface FeesOriginalProps {
   userTokenAccounts: ReturnType<typeof useUserTokenAccounts>;
@@ -123,7 +119,7 @@ export const FeesOriginal: FC<FeesOriginalProps> = ({
     } else {
       setFromToken(solTokenAccount);
     }
-  }, [fromTokenAccount, setFromToken, trade]);
+  }, [fromTokenAccount, setFromToken, solTokenAccount]);
 
   const tokenNames = useMemo(() => {
     if (!asyncStandardTokenAccounts) {
@@ -311,14 +307,14 @@ export const FeesOriginal: FC<FeesOriginalProps> = ({
     const one = new Decimal(1);
 
     return (isReverse ? one.div(trade.getExchangeRate()) : trade.getExchangeRate())
-      .toSignificantDigits(6)
+      .toSignificantDigits(TOKEN_AMOUNT_SIGNIFICANT_DIGITS)
       .toString();
   };
 
   const elCompensationFee =
     forPage &&
     (trade.inputTokenName !== 'SOL' ? (
-      <ListWrapper className="slim">
+      <ListWrapper className="flat">
         <CompensationFee type="swap" isShow={true} />
       </ListWrapper>
     ) : undefined);
@@ -358,7 +354,14 @@ export const FeesOriginal: FC<FeesOriginalProps> = ({
             <Text className="gray inline-flex">
               <AmountUSDStyled
                 prefix={'~'}
-                amount={new u64(Math.pow(10, tokenConfigs[trade.inputTokenName]?.decimals || 6))}
+                amount={
+                  new u64(
+                    Math.pow(
+                      ONE_TOKEN_BASE,
+                      tokenConfigs[trade.inputTokenName]?.decimals as number,
+                    ),
+                  )
+                }
                 tokenName={trade.inputTokenName}
               />
             </Text>
@@ -371,7 +374,14 @@ export const FeesOriginal: FC<FeesOriginalProps> = ({
             <Text className="gray inline-flex">
               <AmountUSDStyled
                 prefix={'~'}
-                amount={new u64(Math.pow(10, tokenConfigs[trade.outputTokenName]?.decimals || 6))}
+                amount={
+                  new u64(
+                    Math.pow(
+                      ONE_TOKEN_BASE,
+                      tokenConfigs[trade.outputTokenName]?.decimals as number,
+                    ),
+                  )
+                }
                 tokenName={trade.outputTokenName}
               />
             </Text>

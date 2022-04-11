@@ -24,9 +24,8 @@ const InputElement = styled.input`
 
   border-width: 0;
 
-  &:focus,
-  &:active {
-    border-width: 0;
+  &:focus {
+    outline: none;
   }
 `;
 

@@ -1,13 +1,21 @@
 import type { FC } from 'react';
 
+import { styled } from '@linaria/react';
 import { useUserTokenAccounts } from '@p2p-wallet-web/core';
 import { useSolana } from '@saberhq/use-solana';
 
 import { useFeeCompensation, useFreeFeeLimits, useNetworkFees, usePrice } from 'app/contexts';
 import { ModalType, useModals } from 'app/contexts/general/modals';
 import { ButtonState, useSwap } from 'app/contexts/solana/swap';
-import { Button } from 'components/ui';
+import { Button, Icon } from 'components/ui';
 import { trackEvent } from 'utils/analytics';
+
+const SwapIcon = styled(Icon)`
+  width: 24px;
+  height: 24px;
+
+  margin-right: 8px;
+`;
 
 export const SwapButtonOriginal: FC = () => {
   const { openModal } = useModals();
@@ -66,7 +74,8 @@ export const SwapButtonOriginal: FC = () => {
     case ButtonState.Exchange:
       return (
         <Button primary big full onClick={handleSwapClick}>
-          Swap
+          <SwapIcon name="swap" />
+          Swap {swapInfo.trade.inputTokenName} → {swapInfo.trade.outputTokenName}
         </Button>
       );
     case ButtonState.Retry:

@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { generatePath, useParams } from 'react-router';
 
 import { styled } from '@linaria/react';
@@ -7,11 +7,14 @@ import classNames from 'classnames';
 
 import { useSwap } from 'app/contexts';
 import SlippageTolerance from 'app/contexts/solana/swap/models/SlippageTolerance';
+import { CompensationFee } from 'components/common/CompensationFee';
 import { WidgetPageWithBottom } from 'components/common/WidgetPageWithBottom';
 import { Button } from 'components/ui';
 
 import type { SwapRouteParams } from '../types';
-import { CustomInput } from './CustomInput';
+import { CustomButton } from './CustomButton';
+
+const MAX_SLIPPAGE_TOLERANCE = 50;
 
 const Wrapper = styled.div`
   display: grid;
@@ -38,6 +41,10 @@ const ListWrapper = styled.div`
   }
 `;
 
+const CompensationWrapper = styled.div`
+  padding: 0 20px;
+`;
+
 const SlippageWrapper = styled.div`
   display: grid;
   grid-row-gap: 16px;
@@ -60,7 +67,7 @@ const ButtonsRow = styled.div`
   grid-template-columns: repeat(5, 1fr);
 `;
 
-const ButtonStyled = styled(Button)`
+export const ButtonStyled = styled(Button)`
   box-sizing: border-box;
 
   height: 38px;
@@ -74,7 +81,7 @@ const ButtonStyled = styled(Button)`
 
   &.custom {
     width: 93px;
-    padding: 0;
+    padding: 0 5px;
 
     &.active {
       background-color: inherit;
@@ -109,36 +116,30 @@ const DescriptionItem = styled.li`
   }
 `;
 
-/* const InputStyled = styled(Input)`
-  box-sizing: content-box;
-  width: 100%;
-  height: 100%;
-  padding: 0 16px;
-
-  border: 1px solid ${theme.colors.textIcon.active};
-  border-width: 0;
-  border-radius: 8px;
-
-  & input {
-    font-weight: 500;
-    font-size: 16px;
-    line-height: 140%;
-  }
-`; */
-
-/* const PenIcon = styled(Icon)`
-  width: 16px;
-  height: 16px;
-`; */
+const elDescriptionRender = () => (
+  <ListWrapper className="description">
+    <DescriptionWrapper>
+      <DescriptionList>
+        {[
+          'A slippage is a difference between the expected price and the actual price at which a trade is executed',
+          'Slippage can occur at any time, but it is most prevalent during periods of higher volatility',
+          'Transactions that exceed 20% slippage tolerance may be frontrun',
+          'Slippage tolerance cannot exceed 50%',
+        ].map((item: string, idx: number) => (
+          <DescriptionItem key={idx}>{item}</DescriptionItem>
+        ))}
+      </DescriptionList>
+    </DescriptionWrapper>
+  </ListWrapper>
+);
 
 const PREDEFINED_SLIPPAGE_VALUES = ['0.1', '0.5', '1', '5'];
 
 export const SwapSlippageWidget = () => {
   const { symbol } = useParams<SwapRouteParams>();
-  const { slippageTolerance, setSlippageTolerance } = useSwap();
-  const [isCustomInputShown, setIsCustomInputShown] = useState(false);
-
   const backToPath = useMemo(() => generatePath('/swap/:symbol?', { symbol }), []);
+
+  const { slippageTolerance, setSlippageTolerance, trade } = useSwap();
 
   const activeButtonIdx = useMemo(
     () => PREDEFINED_SLIPPAGE_VALUES.findIndex((value) => slippageTolerance.stringEq(value)),
@@ -146,10 +147,14 @@ export const SwapSlippageWidget = () => {
   );
   const isCustomSlippageValue = activeButtonIdx === -1;
 
-  const handleCustomButtonClick = useCallback(() => setIsCustomInputShown(true), []);
-  const handleCustomInputBlur = useCallback(() => {
-    setIsCustomInputShown(false);
-  }, [setIsCustomInputShown]);
+  const [isCustomButtonActive, setIsCustomButtonActive] = useState(isCustomSlippageValue);
+
+  const handleCustomButtonClick = () => setIsCustomButtonActive(true);
+
+  const handleSlippageValueChange = (value: string) => {
+    setIsCustomButtonActive(false);
+    setSlippageTolerance(SlippageTolerance.fromString(value));
+  };
 
   return (
     <WidgetPageWithBottom title={['Swap', 'Swap settings']} backTo={backToPath}>
@@ -163,40 +168,34 @@ export const SwapSlippageWidget = () => {
                   <ButtonStyled
                     key={idx}
                     className={classNames({
-                      active: !isCustomInputShown && activeButtonIdx === idx,
+                      active: !isCustomButtonActive && activeButtonIdx === idx,
                     })}
-                    onClick={() => setSlippageTolerance(SlippageTolerance.fromString(value))}
+                    onClick={() => handleSlippageValueChange(value)}
                   >
                     {value}%
                   </ButtonStyled>
                 ))}
-                <ButtonStyled
-                  className={classNames('custom', {
-                    active: isCustomInputShown || isCustomSlippageValue,
-                  })}
+                <CustomButton
+                  isCustomSlippageValue={isCustomSlippageValue}
+                  slippageValue={slippageTolerance.toString()}
+                  maxSlippage={MAX_SLIPPAGE_TOLERANCE}
                   onClick={handleCustomButtonClick}
-                >
-                  {isCustomInputShown ? <CustomInput onBlur={handleCustomInputBlur} /> : 'Custom'}
-                </ButtonStyled>
+                  onValueChange={handleSlippageValueChange}
+                />
               </ButtonsRow>
             </SlippageWrapper>
           </ListWrapper>
-          <ListWrapper className="description">
-            <DescriptionWrapper>
-              <DescriptionList>
-                {[
-                  'A slippage is a difference between the expected price and the actual price at which a trade is executed',
-                  'Slippage can occur at any time, but it is most prevalent during periods of higher volatility',
-                  'Transactions that exceed 20% slippage tolerance may be frontrun',
-                  'Slippage tolerance cannot exceed 50%',
-                ].map((item: string, idx: number) => (
-                  <DescriptionItem key={idx}>{item}</DescriptionItem>
-                ))}
-              </DescriptionList>
-            </DescriptionWrapper>
-          </ListWrapper>
+          {elDescriptionRender()}
         </Content>
-        <Content>asdasd</Content>
+        {trade.inputTokenName !== 'SOL' ? (
+          <Content>
+            <ListWrapper>
+              <CompensationWrapper>
+                <CompensationFee type="swap" isShow={true} />
+              </CompensationWrapper>
+            </ListWrapper>
+          </Content>
+        ) : undefined}
       </Wrapper>
     </WidgetPageWithBottom>
   );

@@ -6,8 +6,8 @@ export const ListWrapper = styled.div`
   grid-gap: 8px;
   padding: 20px;
 
-  &.slim {
-    padding: 12px 20px;
+  &.flat {
+    padding: 0 20px;
   }
 
   &.total {
