@@ -1,3 +1,4 @@
+// @FIXME
 // import './wdyr';
 import 'sanitize.css';
 import '@p2p-wallet-web/ui/css/nprogress.css';

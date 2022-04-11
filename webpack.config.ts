@@ -79,6 +79,7 @@ const config: ConfigFn = (env, argv) => {
         https: require.resolve('https-browserify'),
         crypto: require.resolve('crypto-browserify'),
         stream: require.resolve('stream-browserify'),
+        Buffer: require.resolve('buffer'),
       },
       alias: {
         constants: path.resolve(__dirname, './packages/web/src/constants'),
@@ -124,6 +125,10 @@ const config: ConfigFn = (env, argv) => {
       new DotEnv({
         path: './packages/web/.env.development',
         ignoreStub: true,
+      }),
+      new webpack.ProvidePlugin({
+        process: 'process/browser.js',
+        Buffer: ['buffer', 'Buffer'],
       }),
     ],
   };
