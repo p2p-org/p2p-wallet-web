@@ -24,6 +24,9 @@ export const isValidAddress = (
   return Bitcoin.utils.addressIsValid(address, renNetwork);
 };
 
+/*
+ * Checks if a given address is a valid Solana address
+ */
 export const isValidSolanaAddress = (address: string) => {
   try {
     new PublicKey(address);

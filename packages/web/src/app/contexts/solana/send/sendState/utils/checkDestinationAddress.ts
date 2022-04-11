@@ -5,23 +5,26 @@ import { PublicKey } from '@solana/web3.js';
 
 import { isValidSolanaAddress } from 'app/contexts';
 
-type CheckDestinationAddress = (
+type CheckUserHasTokenAccount = (
   pubKey: string,
   fromTokenAccount: TokenAccount | null | undefined,
   provider: ReadonlyProvider,
 ) => Promise<boolean>;
-export const checkDestinationAddress: CheckDestinationAddress = async (
+
+/*
+ * Checks if user has a token account by his public key and mint address
+ */
+export const isUserHasTokenAccount: CheckUserHasTokenAccount = async (
   pubKey,
   fromTokenAccount,
   provider,
 ) => {
   const isSolanaToken = fromTokenAccount?.balance?.token?.isRawSOL;
-  let userHasTokenAccount = true;
 
   if (isSolanaToken) {
-    return userHasTokenAccount;
+    return true;
   } else if (pubKey && !isValidSolanaAddress(pubKey)) {
-    userHasTokenAccount = false;
+    return false;
   } else if (pubKey) {
     const addressTokenAccount = await provider.connection.getTokenAccountsByOwner(
       new PublicKey(pubKey),
@@ -31,8 +34,8 @@ export const checkDestinationAddress: CheckDestinationAddress = async (
       },
     );
 
-    userHasTokenAccount = Boolean(addressTokenAccount.value.length);
+    return Boolean(addressTokenAccount.value.length);
   }
 
-  return userHasTokenAccount;
+  return true;
 };
