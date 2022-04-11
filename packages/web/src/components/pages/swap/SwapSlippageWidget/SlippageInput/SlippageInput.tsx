@@ -2,7 +2,7 @@ import type { FC } from 'react';
 import React, { useEffect, useRef, useState } from 'react';
 
 import { styled } from '@linaria/react';
-import { theme } from '@p2p-wallet-web/ui';
+import { theme, up } from '@p2p-wallet-web/ui';
 
 const Wrapper = styled.div`
   display: flex;
@@ -18,11 +18,15 @@ const InputElement = styled.input`
   width: 100%;
 
   font-weight: 500;
-  font-size: 16px;
+  font-size: 14px;
   font-style: normal;
   letter-spacing: 0.01em;
 
   border-width: 0;
+
+  ${up.tablet} {
+    font-size: 16px;
+  }
 
   &:focus {
     outline: none;

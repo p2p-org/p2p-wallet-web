@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { generatePath, useParams } from 'react-router';
 
 import { styled } from '@linaria/react';
-import { theme } from '@p2p-wallet-web/ui';
+import { theme, up } from '@p2p-wallet-web/ui';
 import classNames from 'classnames';
 
 import { useSwap } from 'app/contexts';
@@ -69,19 +69,29 @@ const ButtonsRow = styled.div`
 
 export const ButtonStyled = styled(Button)`
   box-sizing: border-box;
-
-  height: 38px;
+  height: 33px;
+  padding: 8px 0;
 
   font-weight: 500;
-  font-size: 16px;
-  line-height: 140%;
+  font-size: 14px;
+  line-height: 120%;
 
   border: 1px solid ${theme.colors.stroke.primary};
   border-radius: 8px;
 
+  ${up.tablet} {
+    height: 38px;
+
+    font-size: 16px;
+    line-height: 140%;
+  }
+
   &.custom {
-    width: 93px;
-    padding: 0 5px;
+    width: 69px;
+
+    ${up.tablet} {
+      width: 93px;
+    }
 
     &.active {
       background-color: inherit;
@@ -89,7 +99,11 @@ export const ButtonStyled = styled(Button)`
   }
 
   &.custom.active.editing {
-    padding: 0 20px;
+    padding: 0 10px;
+
+    ${up.tablet} {
+      padding: 0 20px;
+    }
   }
 
   &.active {
@@ -112,8 +126,12 @@ const DescriptionList = styled.ul`
 
 const DescriptionItem = styled.li`
   font-weight: 400;
-  font-size: 14px;
+  font-size: 12px;
   line-height: 160%;
+
+  ${up.tablet} {
+    font-size: 14px;
+  }
 
   &:not(:last-child) {
     margin-bottom: 25px;
