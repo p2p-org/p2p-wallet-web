@@ -1,2 +1,2 @@
-export * from './isUserHasTokenAccount';
+export * from './checkUserHasTokenAccount';
 export * from './isValidAddress';

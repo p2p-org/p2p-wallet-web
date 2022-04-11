@@ -14,7 +14,7 @@ type CheckUserHasTokenAccount = (
 /*
  * Checks if user has a token account by his public key and mint address
  */
-export const isUserHasTokenAccount: CheckUserHasTokenAccount = async (
+export const checkUserHasTokenAccount: CheckUserHasTokenAccount = async (
   pubKey,
   fromTokenAccount,
   provider,
