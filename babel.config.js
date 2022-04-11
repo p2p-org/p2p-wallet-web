@@ -7,7 +7,7 @@ module.exports = {
       {
         runtime: 'automatic',
         // @TODO check out what this does
-        development: process.env.BABEL_ENV === 'development',
+       // development: process.env.BABEL_ENV === 'development',
       },
     ],
     '@linaria',

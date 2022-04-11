@@ -1,6 +1,7 @@
 // @ts-ignore
 import DotEnv from 'dotenv-webpack';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
+import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import path from 'path';
 import type { Configuration as WebpackConfiguration } from 'webpack';
 import webpack from 'webpack';
@@ -48,10 +49,36 @@ const config: ConfigFn = (env, argv) => {
           test: /.(svg|png)$/,
           type: 'asset/resource',
         },
+        // {
+        // @TODO for prod and dev builds https://github.com/webpack-contrib/css-loader#recommend
+        // @TODO make sure global styles are loaded. read the docs
+        // test: /\.css$/i,
+        // loader: 'css-loader',
+        // options: {
+        //   modules: {
+        // mode: 'global',
+        // auto: false,
+        // exportGlobals: true,
+        // localIdentName: '[path][name]__[local]--[hash:base64:5]',
+        // localIdentContext: path.resolve(__dirname, 'src'),
+        // localIdentHashSalt: 'my-custom-hash',
+        // namedExport: true,
+        // exportLocalsConvention: 'camelCase',
+        // exportOnlyLocals: false,
+        // },
+        // },
+        // },
         {
-          // @TODO make sure global styles are loaded. read the docs
-          test: /\.css$/i,
-          loader: 'css-loader',
+          test: /\.css$/,
+          use: [
+            {
+              loader: MiniCssExtractPlugin.loader,
+            },
+            {
+              loader: 'css-loader',
+              options: { sourceMap: isDevelopment },
+            },
+          ],
         },
         {
           // @TODO add source maps
@@ -64,7 +91,7 @@ const config: ConfigFn = (env, argv) => {
             {
               loader: '@linaria/webpack-loader',
               options: {
-                sourceMap: !isDevelopment,
+                sourceMap: isDevelopment,
               },
             },
           ],
@@ -129,6 +156,9 @@ const config: ConfigFn = (env, argv) => {
       new webpack.ProvidePlugin({
         process: 'process/browser.js',
         Buffer: ['buffer', 'Buffer'],
+      }),
+      new MiniCssExtractPlugin({
+        filename: isDevelopment ? 'styles.css' : 'styles-[contenthash].css',
       }),
     ],
   };
