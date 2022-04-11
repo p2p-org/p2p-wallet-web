@@ -24,6 +24,7 @@ import logout from './assets/logout-icon.svg';
 import more from './assets/more-icon.svg';
 import appStore from './assets/new/app-store-icon.svg';
 import arrowDown from './assets/new/arrow-down-icon.svg';
+import arrowLeft from './assets/new/arrow-left-icon.svg';
 import arrowSwap from './assets/new/arrow-swap-icon.svg';
 import bottom from './assets/new/bottom-icon.svg';
 import caret from './assets/new/caret-icon.svg';
@@ -89,6 +90,7 @@ const iconsMap = new Map<string, string>([
   ['info', info],
   ['more', more],
   ['arrow-down', arrowDown],
+  ['arrow-left', arrowLeft],
   ['eye-hide', eyeHide],
   ['eye', eye],
   ['external', external],

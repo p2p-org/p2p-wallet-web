@@ -1,6 +1,8 @@
 import type { FC } from 'react';
+import { useMemo } from 'react';
 
 import { styled } from '@linaria/react';
+import { useIsMobile } from '@p2p-wallet-web/ui';
 
 import { WidgetPageWithBottom } from 'components/common/WidgetPageWithBottom';
 
@@ -22,17 +24,18 @@ const ActionsWrapper = styled.div`
 const Wrapper = styled.div``;
 
 export const SwapWidget: FC = () => {
+  const isMobile = useIsMobile();
+
+  const actionElement = useMemo(() => {
+    return !isMobile ? (
+      <ActionsWrapper>
+        <SettingsAction />
+      </ActionsWrapper>
+    ) : undefined;
+  }, [isMobile]);
+
   return (
-    <WidgetPageWithBottom
-      title="Swap"
-      icon="swap"
-      bottom={<SwapButton />}
-      action={
-        <ActionsWrapper>
-          <SettingsAction />
-        </ActionsWrapper>
-      }
-    >
+    <WidgetPageWithBottom title="Swap" icon="swap" bottom={<SwapButton />} action={actionElement}>
       <Wrapper>
         <SwapFromForm />
         <Reverse />
