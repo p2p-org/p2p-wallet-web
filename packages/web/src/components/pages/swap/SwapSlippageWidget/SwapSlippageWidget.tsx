@@ -88,6 +88,10 @@ export const ButtonStyled = styled(Button)`
     }
   }
 
+  &.custom.active.editing {
+    padding: 0 20px;
+  }
+
   &.active {
     color: ${theme.colors.textIcon.active};
 
