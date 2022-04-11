@@ -3,6 +3,8 @@ import type { ReadonlyProvider } from '@saberhq/solana-contrib';
 import { TOKEN_PROGRAM_ID } from '@solana/spl-token';
 import { PublicKey } from '@solana/web3.js';
 
+import { isValidSolanaAddress } from 'app/contexts';
+
 type CheckDestinationAddress = (
   pubKey: string,
   fromTokenAccount: TokenAccount | null | undefined,
@@ -18,6 +20,8 @@ export const checkDestinationAddress: CheckDestinationAddress = async (
 
   if (isSolanaToken) {
     return userHasTokenAccount;
+  } else if (pubKey && !isValidSolanaAddress(pubKey)) {
+    userHasTokenAccount = false;
   } else if (pubKey) {
     const addressTokenAccount = await provider.connection.getTokenAccountsByOwner(
       new PublicKey(pubKey),
