@@ -386,7 +386,7 @@ export const FeesOriginal: FC<FeesOriginalProps> = ({
           <Text className="gray">Max price slippage</Text>
           <Text>
             {trade.slippageTolerance.toString()}%{' '}
-            <PenIcon name="pen" onClick={handleShowSettings}></PenIcon>
+            {forPage ? <PenIcon name="pen" onClick={handleShowSettings}></PenIcon> : undefined}
           </Text>
         </Row>
         <Row>
