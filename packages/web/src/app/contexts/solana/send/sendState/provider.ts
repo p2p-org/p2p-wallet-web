@@ -10,7 +10,7 @@ import { TokenAmount } from '@saberhq/token-utils';
 import { PublicKey } from '@solana/web3.js';
 import { createContainer } from 'unstated-next';
 
-import { useFeeCompensation } from 'app/contexts';
+import { isValidSolanaAddress, useFeeCompensation } from 'app/contexts';
 import type { DestinationAccount } from 'app/contexts/api/feeRelayer/types';
 import { useRenNetwork } from 'utils/hooks/renBridge/useNetwork';
 
@@ -133,30 +133,33 @@ const useSendStateInternal = (): UseSendState => {
       ) {
         const isSOL = fromTokenAccount.balance.token.isRawSOL;
 
-        if (!isSOL) {
-          setIsResolvingAddress(true);
+        if (isValidSolanaAddress(destinationAddress)) {
+          if (!isSOL) {
+            setIsResolvingAddress(true);
 
-          const { address, owner, needCreateATA } = await resolveAddress(
-            new PublicKey(destinationAddress),
-            fromTokenAccount.balance.token,
-          );
+            const { address, owner, needCreateATA } = await resolveAddress(
+              new PublicKey(destinationAddress),
+              fromTokenAccount.balance.token,
+            );
 
-          setIsResolvingAddress(true);
-          setDestinationAccount({
-            address,
-            owner,
-            isNeedCreate: needCreateATA,
-            symbol: fromTokenAccount.balance.token.symbol,
-          });
-        } else {
-          setDestinationAccount({
-            address: new PublicKey(destinationAddress),
-          });
+            setIsResolvingAddress(true);
+            setDestinationAccount({
+              address,
+              owner,
+              isNeedCreate: needCreateATA,
+              symbol: fromTokenAccount.balance.token.symbol,
+            });
+          } else {
+            setDestinationAccount({
+              address: new PublicKey(destinationAddress),
+            });
+          }
         }
       } else {
         setDestinationAccount(null);
       }
     };
+
     if (!isAddressInvalid) {
       void resolve();
     }
