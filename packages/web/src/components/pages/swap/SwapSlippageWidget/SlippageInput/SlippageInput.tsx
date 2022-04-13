@@ -66,15 +66,17 @@ export const SlippageInput: FC<Props> = ({ deafultValue, maxSlippage, onChangeVa
     setInputValue(newValue);
   };
 
-  const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
-    const newValue = Number(e.target.value);
+  const changeValue = (value: string) => {
+    onChangeValue(String(Math.min(Number(value), maxSlippage)));
+  };
 
-    onChangeValue(String(Math.min(newValue, maxSlippage)));
+  const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    changeValue(e.target.value);
   };
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (['Enter', 'Escape'].includes(e.key)) {
-      handleBlur(e as unknown as React.FocusEvent<HTMLInputElement>);
+      changeValue(e.target.value);
     }
   };
 

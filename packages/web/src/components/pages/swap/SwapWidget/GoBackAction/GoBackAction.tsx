@@ -1,4 +1,3 @@
-import { useMemo } from 'react';
 import { generatePath, useHistory, useParams } from 'react-router';
 
 import { styled } from '@linaria/react';
@@ -25,10 +24,10 @@ const ButtonStyled = styled(Button)`
 export const GoBackAction = () => {
   const history = useHistory();
   const { symbol } = useParams<SwapRouteParams>();
-  const backToPath = useMemo(() => generatePath('/swap/:symbol?', { symbol }), []);
+  const backToPath = () => generatePath('/swap/:symbol?', { symbol });
 
   const handleButtonClick = () => {
-    history.push(backToPath);
+    history.back(backToPath);
   };
 
   return (

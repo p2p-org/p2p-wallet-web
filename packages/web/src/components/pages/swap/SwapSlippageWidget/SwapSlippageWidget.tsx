@@ -63,7 +63,7 @@ const Title = styled.span`
 
 const ButtonsRow = styled.div`
   display: grid;
-  grid-column-gap: 8px;
+  grid-column-gap: 6px;
   grid-template-columns: repeat(5, 1fr);
 `;
 
