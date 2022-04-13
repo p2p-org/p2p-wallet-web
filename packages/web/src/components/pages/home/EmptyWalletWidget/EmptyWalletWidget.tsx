@@ -2,7 +2,7 @@ import type { FC } from 'react';
 import { useHistory, useLocation } from 'react-router';
 
 import { styled } from '@linaria/react';
-import { theme, up } from '@p2p-wallet-web/ui';
+import { theme, up, useIsMobile } from '@p2p-wallet-web/ui';
 import classNames from 'classnames';
 
 import { ModalType, useModals } from 'app/contexts';
@@ -79,10 +79,15 @@ interface Props {
 export const EmptyWalletWidget: FC<Props> = ({ isLoading }) => {
   const history = useHistory();
   const location = useLocation();
+  const isMobile = useIsMobile();
   const { openModal } = useModals();
 
   const handleBuyButtonClick = () => {
-    openModal(ModalType.SHOW_MODAL_CHOOSE_BUY_TOKEN_MOBILE);
+    if (isMobile) {
+      openModal(ModalType.SHOW_MODAL_CHOOSE_BUY_TOKEN_MOBILE);
+    } else {
+      handleButtonClick('/buy')();
+    }
   };
 
   const handleButtonClick = (route: string) => () => {
