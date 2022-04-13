@@ -95,7 +95,7 @@ const useSendStateInternal = (): UseSendState => {
   const [resolvedAddress, setResolvedAddress] = useState<string | null>(null);
   const [isResolvingAddress, setIsResolvingAddress] = useState(false);
 
-  const [blockchain, setBlockchain] = useState<Blockchain>(BLOCKCHAINS[0]);
+  const [blockchain, setBlockchain] = useState<Blockchain>(BLOCKCHAINS[0] as Blockchain);
 
   const renNetwork = useRenNetwork();
 
@@ -110,6 +110,14 @@ const useSendStateInternal = (): UseSendState => {
     if (tokenAccount?.balance) {
       setFromTokenAccount(tokenAccount);
       setFromToken(tokenAccount);
+    }
+
+    const tokenSymbol = tokenAccount?.balance?.token?.symbol;
+    const shouldUseSolanaNetwork =
+      tokenSymbol && tokenSymbol !== 'renBTC' && blockchain === 'bitcoin';
+
+    if (shouldUseSolanaNetwork) {
+      setBlockchain(BLOCKCHAINS[0] as Blockchain);
     }
   }, [setFromToken, tokenAccount]);
 
