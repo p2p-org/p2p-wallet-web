@@ -17,9 +17,12 @@ import { useRenNetwork } from 'utils/hooks/renBridge/useNetwork';
 import { useResolveAddress } from './hooks/useResolveAddress';
 import { isValidAddress } from './utils';
 
-export type Blockchain = 'solana' | 'bitcoin';
+export enum Blockchain {
+  solana = 'solana',
+  bitcoin = 'bitcoin',
+}
 
-export const BLOCKCHAINS: Blockchain[] = ['solana', 'bitcoin'];
+export const BLOCKCHAINS = [Blockchain.solana, Blockchain.bitcoin] as const;
 
 export interface UseSendState {
   fromTokenAccount?: TokenAccount | null;
@@ -95,7 +98,7 @@ const useSendStateInternal = (): UseSendState => {
   const [resolvedAddress, setResolvedAddress] = useState<string | null>(null);
   const [isResolvingAddress, setIsResolvingAddress] = useState(false);
 
-  const [blockchain, setBlockchain] = useState<Blockchain>(BLOCKCHAINS[0] as Blockchain);
+  const [blockchain, setBlockchain] = useState<Blockchain>(BLOCKCHAINS[0]);
 
   const renNetwork = useRenNetwork();
 
@@ -117,7 +120,7 @@ const useSendStateInternal = (): UseSendState => {
       tokenSymbol && tokenSymbol !== 'renBTC' && blockchain === 'bitcoin';
 
     if (shouldUseSolanaNetwork) {
-      setBlockchain(BLOCKCHAINS[0] as Blockchain);
+      setBlockchain(BLOCKCHAINS[0]);
     }
   }, [setFromToken, tokenAccount]);
 
