@@ -2,6 +2,7 @@ import type { FC } from 'react';
 
 import { styled } from '@linaria/react';
 import type { TokenAccount } from '@p2p-wallet-web/core';
+import { theme } from '@p2p-wallet-web/ui';
 import type { TokenAmount } from '@saberhq/token-utils';
 
 import { AmountUSD } from 'components/common/AmountUSD';
@@ -29,7 +30,18 @@ const Bottom = styled.div``;
 const Label = styled.span`
   margin-right: 4px;
 
-  color: #8e8e93;
+  color: ${theme.colors.textIcon.secondary};
+  font-weight: 500;
+
+  &.primary {
+    color: ${theme.colors.textIcon.primary};
+    font-size: 16px;
+  }
+`;
+
+const SwapLabelWrapper = styled.div`
+  display: grid;
+  grid-row-gap: 2px;
 `;
 
 const Amount = styled.span``;
@@ -126,15 +138,18 @@ export const FeeTokenSelector: FC<Props> = ({
           <TokenAvatarStyled
             symbol={selectedTokenSymbol}
             address={value?.balance?.token.address}
-            size={40}
+            size={44}
           />
           <Fees>
             <Top>
-              <Label>
-                {isSend
-                  ? `${accountSymbol as string} account creation:`
-                  : `Pay swap fees with:  ${selectedTokenSymbol}`}
-              </Label>
+              {isSend ? (
+                <Label>`${accountSymbol as string} account creation:`</Label>
+              ) : (
+                <SwapLabelWrapper>
+                  <Label>Pay swap fees with</Label>
+                  <Label className="primary">{selectedTokenSymbol}</Label>
+                </SwapLabelWrapper>
+              )}
               {isSend && feeAmount ? (
                 <Amount>
                   <AmountUSDStyled value={feeAmount} />

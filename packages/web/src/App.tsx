@@ -40,7 +40,7 @@ const App: React.FC = () => {
             <AuthRequiredRoute path="/receive/(tokens)?" component={Receive} />
             <AuthRequiredRoute path="/send/:publicKey/:status(result)" component={Send} />
             <AuthRequiredRoute path="/send/:publicKey?" component={Send} />
-            <AuthRequiredRoute path="/swap/:symbol?" component={Swap} />
+            <AuthRequiredRoute path="/swap/(settings)?/:symbol?" component={Swap} />
             {/*<AuthRequiredRoute path="/swap/:publicKey?" component={SwapNew} />*/}
             <AuthRequiredRoute path="/settings/network" component={SettingsNetwork} />
             <AuthRequiredRoute path="/settings" component={Settings} />
