@@ -6,9 +6,12 @@ import { styled } from '@linaria/react';
 import type { useUserTokenAccounts } from '@p2p-wallet-web/core';
 import { useTokenAccount } from '@p2p-wallet-web/core';
 import { usePubkey } from '@p2p-wallet-web/sail';
-import { up } from '@p2p-wallet-web/ui';
+import { theme, useIsMobile } from '@p2p-wallet-web/ui';
 import type { useSolana } from '@saberhq/use-solana';
+import { u64 } from '@solana/spl-token';
 import { LAMPORTS_PER_SOL } from '@solana/web3.js';
+import classNames from 'classnames';
+import Decimal from 'decimal.js';
 
 import type {
   useFeeCompensation,
@@ -21,41 +24,34 @@ import { useConfig } from 'app/contexts/solana/swap';
 import { formatBigNumber, formatNumberToUSD } from 'app/contexts/solana/swap/utils/format';
 import { CompensationFee } from 'components/common/CompensationFee';
 import { FeeTransactionTooltip } from 'components/common/TransactionDetails/FeeTransactinTooltip';
-import { AmountUSD } from 'components/pages/swap/SwapWidget/AmountUSD';
-import { Accordion } from 'components/ui';
+import { Accordion, Icon } from 'components/ui';
 import { AccordionTitle } from 'components/ui/AccordionDetails/AccordionTitle';
 import { ListWrapper, Row, Text } from 'components/ui/AccordionDetails/common';
+
+import { useShowSettings } from '../../hooks/useShowSettings';
+import { AmountUSDStyled } from '../AmountUSD';
 
 const defaultProps = {
   open: true,
   forPage: false,
 };
 
-const FeesWrapper = styled.div`
-  margin-top: 16px;
+const PenIcon = styled(Icon)`
+  width: 16px;
+  height: 16px;
 
-  ${up.tablet} {
-    margin-top: 0;
-  }
-`;
+  margin: auto 0;
 
-const AmountUSDStyled = styled(AmountUSD)`
-  &::before {
-    content: '(';
-  }
+  color: ${theme.colors.textIcon.secondary};
 
-  &::after {
-    content: ')';
-  }
-
-  margin-left: 8px;
-
-  color: #8e8e93;
+  cursor: pointer;
 `;
 
 const ATA_ACCOUNT_CREATION_FEE = 0.00203928;
 const FEE_SIGNIFICANT_DIGITS = 1;
 const POOL_SIGNIFICANT_DIGITS = 3;
+const TOKEN_AMOUNT_SIGNIFICANT_DIGITS = 6;
+const ONE_TOKEN_BASE = 10;
 
 export interface FeesOriginalProps {
   userTokenAccounts: ReturnType<typeof useUserTokenAccounts>;
@@ -87,6 +83,9 @@ export const FeesOriginal: FC<FeesOriginalProps> = ({
   const { setFromToken, setAccountsCount, compensationState, feeToken, feeAmountInToken } =
     feeCompensationInfo;
   const { userFreeFeeLimits } = feeLimitsInfo;
+  const isMobile = useIsMobile();
+
+  const { handleShowSettings } = useShowSettings();
 
   const [solTokenAccount] = useMemo(
     () => userTokenAccounts.filter((token) => token.balance?.token.isRawSOL),
@@ -108,7 +107,7 @@ export const FeesOriginal: FC<FeesOriginalProps> = ({
     } else {
       setFromToken(solTokenAccount);
     }
-  }, [fromTokenAccount, setFromToken, trade]);
+  }, [fromTokenAccount, setFromToken, solTokenAccount]);
 
   const tokenNames = useMemo(() => {
     if (!asyncStandardTokenAccounts) {
@@ -292,10 +291,20 @@ export const FeesOriginal: FC<FeesOriginalProps> = ({
     };
   }, [compensationState, feeAmountInToken, feeToken, tokenConfigs, trade]);
 
+  const getTokenPrice = (isReverse: boolean) => {
+    const one = new Decimal(1);
+
+    return (isReverse ? one.div(trade.getExchangeRate()) : trade.getExchangeRate())
+      .toSignificantDigits(TOKEN_AMOUNT_SIGNIFICANT_DIGITS)
+      .toString();
+  };
+
   const elCompensationFee =
     forPage &&
-    (!fromTokenAccount?.balance?.token.isRawSOL ? (
-      <CompensationFee type="swap" isShow={trade.inputTokenName !== 'SOL'} />
+    (trade.inputTokenName !== 'SOL' ? (
+      <ListWrapper className="flat">
+        <CompensationFee type="swap" isShow={true} />
+      </ListWrapper>
     ) : undefined);
 
   const elTotal = forPage && (
@@ -313,58 +322,103 @@ export const FeesOriginal: FC<FeesOriginalProps> = ({
     FEE_SIGNIFICANT_DIGITS,
   );
 
+  const inputTokenPrice = new u64(
+    Math.pow(ONE_TOKEN_BASE, tokenConfigs[trade.inputTokenName]?.decimals as number),
+  );
+
+  const outputTokenPrice = new u64(
+    Math.pow(ONE_TOKEN_BASE, tokenConfigs[trade.outputTokenName]?.decimals as number),
+  );
+
   return (
-    <FeesWrapper>
-      <Accordion
-        title={
-          <AccordionTitle
-            title="Swap details"
-            titleBottomName="Total amount spent"
-            titleBottomValue={details.totlalAmount || ''}
-          />
-        }
-        open={open}
-        noContentPadding
-      >
-        <ListWrapper>
-          <Row>
-            <Text className="gray">Receive at least</Text>
-            <Text>
-              {minReceiveAmount} {swapInfo.trade.outputTokenName}
+    <Accordion
+      title={
+        <AccordionTitle
+          title="Swap details"
+          titleBottomName="Total amount spent"
+          titleBottomValue={details.totlalAmount || ''}
+        />
+      }
+      open
+      noContentPadding
+    >
+      <ListWrapper>
+        <Row>
+          <Text className="gray">1 {trade.inputTokenName} price</Text>
+          <Text className={classNames({ grid: isMobile })}>
+            {getTokenPrice(false)} {trade.outputTokenName}
+            <Text className="flex-end">
+              <AmountUSDStyled
+                prefix={'~'}
+                amount={inputTokenPrice}
+                tokenName={trade.inputTokenName}
+              />
+            </Text>
+          </Text>
+        </Row>
+        <Row>
+          <Text className="gray">1 {trade.outputTokenName} price</Text>
+          <Text className={classNames({ grid: isMobile })}>
+            {getTokenPrice(true)} {trade.inputTokenName}
+            <Text className="flex-end">
+              <AmountUSDStyled
+                prefix={'~'}
+                amount={outputTokenPrice}
+                tokenName={trade.outputTokenName}
+              />
+            </Text>
+          </Text>
+        </Row>
+      </ListWrapper>
+      <ListWrapper>
+        <Row>
+          <Text className="gray">Max price slippage</Text>
+          <Text>
+            {trade.slippageTolerance.toString()}%{' '}
+            {forPage ? <PenIcon name="pen" onClick={handleShowSettings}></PenIcon> : undefined}
+          </Text>
+        </Row>
+        <Row>
+          <Text className="gray">Receive at least</Text>
+          <Text className={classNames({ grid: isMobile })}>
+            {minReceiveAmount} {swapInfo.trade.outputTokenName}
+            <Text className="flex-end">
               <AmountUSDStyled
                 prefix={'~'}
                 amount={swapInfo.trade.getMinimumOutputAmount()}
                 tokenName={swapInfo.trade.outputTokenName}
               />
             </Text>
-          </Row>
-          <Row>
-            <Text className="gray">Transaction fee</Text>
-            <Text>
-              Free{' '}
-              <Text className="green inline-flex">
-                (Paid by P2P.org) <FeeTransactionTooltip userFreeFeeLimits={userFreeFeeLimits} />
-              </Text>
+          </Text>
+        </Row>
+        <Row>
+          <Text className="gray">Transaction fee</Text>
+          <Text>
+            Free{' '}
+            <Text className="green inline-flex">
+              (Paid by P2P.org) <FeeTransactionTooltip userFreeFeeLimits={userFreeFeeLimits} />
             </Text>
-          </Row>
-          {tokenNames?.map((tokenName) => (
-            <Row key={tokenName}>
-              <Text className="gray">{tokenName} account creation</Text>
-              <Text>
-                {accountCreationFee} SOL
+          </Text>
+        </Row>
+        {tokenNames?.map((tokenName) => (
+          <Row key={tokenName}>
+            <Text className="gray">{tokenName} account creation</Text>
+            <Text className={classNames({ grid: isMobile })}>
+              {accountCreationFee} SOL
+              <Text className="flex-end">
                 <AmountUSDStyled
                   prefix={'~'}
                   amount={networkFees.accountRentExemption}
                   tokenName={'SOL'}
                 />
               </Text>
-            </Row>
-          ))}
-          {elCompensationFee}
-        </ListWrapper>
-        {elTotal}
-      </Accordion>
-    </FeesWrapper>
+            </Text>
+          </Row>
+        ))}
+      </ListWrapper>
+      {elCompensationFee}
+      {elTotal}
+    </Accordion>
   );
 };
 

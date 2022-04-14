@@ -1,6 +1,7 @@
 import type { FC } from 'react';
 
 import { styled } from '@linaria/react';
+import { theme, up } from '@p2p-wallet-web/ui';
 
 import { useSwap } from 'app/contexts/solana/swap';
 import { Icon } from 'components/ui';
@@ -11,7 +12,12 @@ const Wrapper = styled.div`
   z-index: 1;
 
   display: flex;
-  justify-content: center;
+  padding-left: 72px;
+
+  ${up.tablet} {
+    justify-content: center;
+    padding-left: 0;
+  }
 `;
 
 const ReverseWrapper = styled.div`
@@ -21,20 +27,17 @@ const ReverseWrapper = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 44px;
-  height: 44px;
+  width: 48px;
+  height: 48px;
 
-  background: #5887ff;
-  border-radius: 12px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
   cursor: pointer;
 `;
 
 const ReverseIcon = styled(Icon)`
-  width: 24px;
-  height: 24px;
+  width: 100%;
+  height: 100%;
 
-  color: #fff;
+  color: ${theme.colors.textIcon.active};
 `;
 
 export const Reverse: FC = () => {
@@ -49,7 +52,7 @@ export const Reverse: FC = () => {
   return (
     <Wrapper>
       <ReverseWrapper onClick={handleReverseClick}>
-        <ReverseIcon name="swap" />
+        <ReverseIcon name="swap-bordered" />
       </ReverseWrapper>
     </Wrapper>
   );

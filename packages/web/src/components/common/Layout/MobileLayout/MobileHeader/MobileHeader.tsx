@@ -11,6 +11,7 @@ import logo from './logo.png';
 const Wrapper = styled.div`
   display: flex;
   align-items: center;
+  justify-content: space-between;
   height: ${MOBILE_HEADER_HEIGHT}px;
   padding: 0 20px;
 
@@ -39,7 +40,16 @@ const Name = styled.span`
   line-height: 140%;
 `;
 
-export const MobileHeader: FC = () => {
+const ActionWrapper = styled.div`
+  justify-self: flex-end;
+  margin-right: -3px;
+`;
+
+type Props = {
+  action?: React.ReactNode;
+};
+
+export const MobileHeader: FC<Props> = ({ action }) => {
   const { connected } = useWallet();
 
   return (
@@ -48,6 +58,7 @@ export const MobileHeader: FC = () => {
         <LogoImg src={logo} />
         <Name>Wallet</Name>
       </LogoLink>
+      {action ? <ActionWrapper>{action}</ActionWrapper> : undefined}
     </Wrapper>
   );
 };

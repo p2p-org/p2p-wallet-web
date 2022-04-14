@@ -12,10 +12,11 @@ import type { BreadcrumbType } from './types';
 
 type Props = {
   breadcrumb?: BreadcrumbType;
+  mobileAction?: React.ReactNode;
   children: React.ReactNode;
 };
 
-export const LayoutOrigin: FunctionComponent<Props> = ({ breadcrumb, children }) => {
+export const LayoutOrigin: FunctionComponent<Props> = ({ breadcrumb, mobileAction, children }) => {
   const isMobile = useIsMobile();
 
   // useEffect(() => {
@@ -32,7 +33,9 @@ export const LayoutOrigin: FunctionComponent<Props> = ({ breadcrumb, children })
         <body className="" />
       </Helmet>
       {isMobile ? (
-        <MobileLayout breadcrumb={breadcrumb}>{children}</MobileLayout>
+        <MobileLayout breadcrumb={breadcrumb} action={mobileAction}>
+          {children}
+        </MobileLayout>
       ) : (
         <DesktopLayout breadcrumb={breadcrumb}>{children}</DesktopLayout>
       )}

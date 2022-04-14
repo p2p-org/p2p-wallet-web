@@ -15,7 +15,7 @@ import { HEADER_HEIGHT } from './constants';
 const Wrapper = styled.header`
   position: sticky;
   top: 0;
-  z-index: 1;
+  z-index: 100;
 
   width: 100%;
   height: ${HEADER_HEIGHT}px;
