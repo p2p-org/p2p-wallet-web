@@ -30,8 +30,7 @@ const config: ConfigFn = (env, argv) => {
       chunkFilename: '[id].chunk.js',
     },
 
-    // @FIXME extract aliases
-    // @TODO file names in loaders for PROD and DEV
+    // @TODO file names in loaders for PROD and DEV (check all files)
     module: {
       rules: [
         {
@@ -49,39 +48,20 @@ const config: ConfigFn = (env, argv) => {
           test: /.(svg|png)$/,
           type: 'asset/resource',
         },
-        // {
-        // @TODO for prod and dev builds https://github.com/webpack-contrib/css-loader#recommend
-        // @TODO make sure global styles are loaded. read the docs
-        // test: /\.css$/i,
-        // loader: 'css-loader',
-        // options: {
-        //   modules: {
-        // mode: 'global',
-        // auto: false,
-        // exportGlobals: true,
-        // localIdentName: '[path][name]__[local]--[hash:base64:5]',
-        // localIdentContext: path.resolve(__dirname, 'src'),
-        // localIdentHashSalt: 'my-custom-hash',
-        // namedExport: true,
-        // exportLocalsConvention: 'camelCase',
-        // exportOnlyLocals: false,
-        // },
-        // },
-        // },
         {
           test: /\.css$/,
           use: [
             {
-              loader: MiniCssExtractPlugin.loader,
+              loader: isDevelopment ? 'style-loader' : MiniCssExtractPlugin.loader,
             },
             {
               loader: 'css-loader',
+              // @FIXME there are a lot of style tags when isDevelopment = false
               options: { sourceMap: isDevelopment },
             },
           ],
         },
         {
-          // @TODO add source maps
           test: /\.(ts|js)x?$/i,
           exclude: /node_modules/,
           use: [
@@ -123,6 +103,9 @@ const config: ConfigFn = (env, argv) => {
       },
     },
 
+    // @TODO production https://webpack.js.org/configuration/devtool/#production
+    devtool: isDevelopment ? 'eval-cheap-module-source-map' : 'none',
+
     devServer: {
       client: {
         overlay: {
@@ -142,8 +125,7 @@ const config: ConfigFn = (env, argv) => {
 
     plugins: [
       new HtmlWebpackPlugin({
-        // @FIXME remove title
-        title: 'My App',
+        title: 'Solana Wallet',
         template: path.join(__dirname + '/packages/web/index.html'),
       }),
       new webpack.DefinePlugin({
