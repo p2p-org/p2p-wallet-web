@@ -1,9 +1,9 @@
 import type { FunctionComponent } from 'react';
 import { useEffect, useState } from 'react';
 
-import { styled } from '@linaria/react';
 import { useConnectionContext, useTransaction, useWallet } from '@p2p-wallet-web/core';
 import classNames from 'classnames';
+import dayjs from 'dayjs';
 
 import type { ModalPropsType } from 'app/contexts';
 import { ToastManager } from 'components/common/ToastManager';
@@ -19,6 +19,7 @@ import {
   CloseIcon,
   CloseWrapper,
   Content,
+  DateHeader,
   Desc,
   FieldsWrapper,
   FieldTitle,
@@ -27,27 +28,22 @@ import {
   Footer,
   Header,
   OtherIcon,
+  ProgressLine,
   ProgressWrapper,
+  Section,
   ShareIcon,
   ShareWrapper,
+  Time,
   Title,
+  TransactionBadge,
+  TransactionLabel,
+  TransactionStatus,
   Wrapper,
 } from '../common/styled';
 import type { TransferParams } from './Send';
 import { Send } from './Send';
 import type { SwapParams } from './Swap';
 import { Swap } from './Swap';
-
-const INITIAL_PROGRESS = 5;
-
-const ProgressLine = styled.div`
-  width: ${INITIAL_PROGRESS}%;
-  height: 1px;
-
-  background: #5887ff;
-
-  transition: width 0.15s;
-`;
 
 const handleCopyClick = (str: string) => () => {
   try {
@@ -58,6 +54,8 @@ const handleCopyClick = (str: string) => () => {
   }
 };
 
+export const INITIAL_PROGRESS = 5;
+/* eslint-disable  @typescript-eslint/no-magic-numbers */
 const DEFAULT_TRANSACTION_ERROR = 'Transaction error';
 
 type SendActionType = () => Promise<string>;
@@ -220,7 +218,8 @@ export const TransactionStatusModal: FunctionComponent<
   };
 
   const isProcessing = (!signature || !transaction?.key) && !transactionError;
-  const isSuccess = signature && transaction?.key && !transactionError;
+  const isSuccess = Boolean(signature && transaction?.key && !transactionError);
+  const isError = Boolean(transactionError);
 
   const renderTitle = () => {
     if (isSuccess) {
@@ -248,19 +247,44 @@ export const TransactionStatusModal: FunctionComponent<
     return 'Transaction processing';
   };
 
+  // @FIXME MOCKS
+  const DATE = new Date();
+  const utcDiff = DATE.getHours() - DATE.getUTCHours();
+
+  const renderStatus = (executing: boolean, success: boolean, error: boolean) => {
+    switch (true) {
+      case executing:
+        return 'Pending';
+      case success:
+        return 'Completed';
+      case error:
+        return 'Error';
+      default:
+        return 'Pending';
+    }
+  };
+
   return (
     <Wrapper>
-      <Header>
-        <Title>{renderTitle()}</Title>
-        <Desc>{renderDescription()}</Desc>
-        <CloseWrapper onClick={handleCloseClick}>
-          <CloseIcon name="close" />
-        </CloseWrapper>
+      <Section>
+        {/*<Header>{(params as TransferParams).amount.token.symbol}`</Header>*/}
+        <Header>SOL → 5faZ...zbXz</Header>
+        <DateHeader>
+          <span>{dayjs().format('MMMM D, YYYY')}</span>
+          <Time>{dayjs().format('hh:mm:ss')}</Time>
+          <span>
+            (UTC{utcDiff >= 0 ? '+' : '-'}
+            {utcDiff})
+          </span>
+        </DateHeader>
+      </Section>
+      <ProgressWrapper>
+        <ProgressLine style={{ width: `${progress}%` }} />
         <BlockWrapper
           className={classNames({
             isProcessing,
             isSuccess,
-            isError: Boolean(transactionError),
+            isError,
           })}
         >
           {isSuccess ? (
@@ -269,10 +293,32 @@ export const TransactionStatusModal: FunctionComponent<
             <OtherIcon name={transactionError ? 'warning' : 'timer'} />
           )}
         </BlockWrapper>
-      </Header>
-      <ProgressWrapper>
-        <ProgressLine style={{ width: `${progress}%` }} />
       </ProgressWrapper>
+      <TransactionStatus>
+        Transaction status:
+        <TransactionBadge>
+          <TransactionLabel
+            className={classNames({
+              isProcessing,
+              isSuccess,
+              isError,
+            })}
+          />
+          {renderStatus(isExecuting, isSuccess, isError)}
+        </TransactionBadge>
+      </TransactionStatus>
+    </Wrapper>
+  );
+
+  return (
+    <Wrapper>
+      <Header>
+        <Title>{renderTitle()}</Title>
+        <Desc>{renderDescription()}</Desc>
+        <CloseWrapper onClick={handleCloseClick}>
+          <CloseIcon name="close" />
+        </CloseWrapper>
+      </Header>
       <Content>
         {type === 'send' ? (
           <Send params={params as TransferParams} transaction={transaction} />

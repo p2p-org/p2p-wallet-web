@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 
 import { styled } from '@linaria/react';
 import { useTokenAccount } from '@p2p-wallet-web/core';
@@ -50,6 +50,16 @@ export const SendButtonSolana: FC<Props> = ({ primary, disabled }) => {
 
   const destinationTokenAccount = useTokenAccount(usePubkey(destinationAddress));
 
+  useEffect(async () => {
+    await openModal<void, TransactionStatusModalProps>(ModalType.SHOW_MODAL_TRANSACTION_STATUS, {
+      type: 'send',
+      action: () => null,
+      params: {
+        source: fromTokenAccount,
+        amount: parsedAmount,
+      },
+    });
+  }, []);
   const handleSubmit = async () => {
     if (!fromTokenAccount?.key || !fromTokenAccount?.balance || !parsedAmount) {
       throw new Error("Didn't find token account");

@@ -1,26 +1,32 @@
 import { styled } from '@linaria/react';
+import { theme } from '@p2p-wallet-web/ui';
 import { rgba } from 'polished';
 
 import { Button, Icon } from 'components/ui';
 
+import { INITIAL_PROGRESS } from '../TransactionStatusModal/TransactionStatusModal';
+
+// @FIXME fix all pallete colors
+/* eslint-disable  @typescript-eslint/no-magic-numbers */
+
 export const Wrapper = styled.div`
-  position: relative;
-
   display: flex;
-  flex-basis: 524px;
   flex-direction: column;
-  overflow: hidden;
+  justify-content: stretch;
+  width: 524px;
 
-  background: #fff;
+  background: ${theme.colors.bg.primary};
 
   border-radius: 15px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
 `;
 
 export const Header = styled.div`
-  position: relative;
-
-  padding: 26px 20px 50px;
-
+  color: ${theme.colors.textIcon.primary};
+  font-weight: 500;
+  font-size: 24px;
+  font-style: normal;
+  line-height: 140%;
   text-align: center;
 `;
 
@@ -65,34 +71,6 @@ export const CloseIcon = styled(Icon)`
   color: #a3a5ba;
 `;
 
-export const BlockWrapper = styled.div`
-  position: absolute;
-  bottom: -28px;
-  left: 50%;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 55px;
-  height: 55px;
-  margin-left: -27px;
-
-  background: #5887ff;
-  border-radius: 12px;
-
-  &.isProcessing {
-    background: #ffd177;
-  }
-
-  &.isSuccess {
-    background: #77db7c;
-  }
-
-  &.isError {
-    background: #f77;
-  }
-`;
-
 export const CheckmarkIcon = styled(Icon)`
   width: 45px;
   height: 45px;
@@ -108,9 +86,91 @@ export const OtherIcon = styled(Icon)`
 `;
 
 export const ProgressWrapper = styled.div`
+  position: relative;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  height: 85px;
+`;
+
+export const ProgressLine = styled.div`
+  position: absolute;
+
+  z-index: ${theme.zIndex.base + theme.zIndex.bellow};
+
+  width: ${INITIAL_PROGRESS}%;
   height: 1px;
 
-  background: rgba(0, 0, 0, 0.05);
+  background: #5887ff;
+
+  transition: width 0.15s;
+`;
+
+const StatusColors = styled.div`
+  &.isProcessing {
+    background: #ffd177;
+  }
+
+  &.isSuccess {
+    background: #77db7c;
+  }
+
+  &.isError {
+    background: #f77;
+  }
+`;
+
+export const BlockWrapper = styled(StatusColors)`
+  z-index: ${theme.zIndex.base};
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 55px;
+  height: 55px;
+
+  border-radius: 12px;
+`;
+
+export const TransactionStatus = styled.div`
+  display: flex;
+  align-items: center;
+
+  margin: 17px 40px;
+
+  color: ${theme.colors.textIcon.primary};
+
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 140%;
+`;
+
+export const TransactionBadge = styled.div`
+  display: flex;
+  align-items: center;
+
+  margin-left: 4px;
+  padding: 5px 12px;
+
+  color: ${theme.colors.textIcon.secondary};
+
+  font-weight: 500;
+  font-size: 12px;
+
+  background: ${theme.colors.bg.secondary};
+  border-radius: 4px;
+`;
+
+export const TransactionLabel = styled(StatusColors)`
+  display: block;
+  width: 8px;
+  height: 8px;
+
+  margin-right: 8px;
+
+  content: '';
 `;
 
 export const Content = styled.div`
@@ -276,4 +336,29 @@ export const ButtonExplorer = styled(Button)`
   font-weight: 600;
   font-size: 14px;
   line-height: 150%;
+`;
+
+export const Section = styled.div`
+  display: flex;
+  flex-direction: column;
+  padding: 12px 20px;
+`;
+
+export const DateHeader = styled.div`
+  display: flex;
+  justify-content: center;
+
+  color: ${theme.colors.textIcon.secondary};
+
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 120%;
+
+  & > *:not(:first-child) {
+    margin-left: 4px;
+  }
+`;
+
+export const Time = styled.div`
+  color: ${theme.colors.textIcon.primary};
 `;
