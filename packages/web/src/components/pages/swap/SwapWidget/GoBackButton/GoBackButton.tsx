@@ -21,13 +21,13 @@ const ButtonStyled = styled(Button)`
   border: 1px solid ${theme.colors.stroke.primary};
 `;
 
-export const GoBackAction = () => {
+export const GoBackButton = () => {
   const history = useHistory();
   const { symbol } = useParams<SwapRouteParams>();
-  const backToPath = () => generatePath('/swap/:symbol?', { symbol });
+  const backToPath = generatePath('/swap/:symbol?', { symbol });
 
   const handleButtonClick = () => {
-    history.back(backToPath);
+    history.push(backToPath);
   };
 
   return (

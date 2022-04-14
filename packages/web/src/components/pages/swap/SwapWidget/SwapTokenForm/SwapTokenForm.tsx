@@ -23,7 +23,7 @@ import { InputAmount } from 'components/ui/InputAmount';
 import { SearchInput } from 'components/ui/SearchInput';
 import { shortAddress } from 'utils/tokens';
 
-import { AmountUSD } from '../AmountUSD/AmountUSD';
+import { AmountUSDStyled } from '../AmountUSD';
 import { TokenAccountRow } from './TokenAccountRow';
 import { TokenRow } from './TokenRow';
 
@@ -226,20 +226,6 @@ const FiltersWrapper = styled.div`
   & > :not(:last-child) {
     margin-right: 12px;
   }
-`;
-
-const AmountUSDStyled = styled(AmountUSD)`
-  &::before {
-    content: '(';
-  }
-
-  &::after {
-    content: ')';
-  }
-
-  margin-left: 8px;
-
-  color: #8e8e93;
 `;
 
 //

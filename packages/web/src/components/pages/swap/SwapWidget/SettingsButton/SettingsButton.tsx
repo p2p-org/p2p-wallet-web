@@ -7,10 +7,6 @@ import { Button, Icon } from 'components/ui';
 
 import { useShowSettings } from '../../hooks/useShowSettings';
 
-const Wrapper = styled.div`
-  position: relative;
-`;
-
 const ActionIcon = styled(Icon)`
   width: 16px;
   height: 16px;
@@ -23,15 +19,13 @@ const ButtonStyled = styled(Button)`
   border: 1px solid ${theme.colors.stroke.primary};
 `;
 
-export const SettingsAction: FunctionComponent = () => {
+export const SettingsButton: FunctionComponent = () => {
   const { handleShowSettings } = useShowSettings();
 
   return (
-    <Wrapper>
-      <ButtonStyled small onClick={handleShowSettings}>
-        <ActionIcon name="gear" />
-        Swap settings
-      </ButtonStyled>
-    </Wrapper>
+    <ButtonStyled small onClick={handleShowSettings}>
+      <ActionIcon name="gear" />
+      Swap settings
+    </ButtonStyled>
   );
 };

@@ -24,12 +24,12 @@ import { useConfig } from 'app/contexts/solana/swap';
 import { formatBigNumber, formatNumberToUSD } from 'app/contexts/solana/swap/utils/format';
 import { CompensationFee } from 'components/common/CompensationFee';
 import { FeeTransactionTooltip } from 'components/common/TransactionDetails/FeeTransactinTooltip';
-import { AmountUSD } from 'components/pages/swap/SwapWidget/AmountUSD';
 import { Accordion, Icon } from 'components/ui';
 import { AccordionTitle } from 'components/ui/AccordionDetails/AccordionTitle';
 import { ListWrapper, Row, Text } from 'components/ui/AccordionDetails/common';
 
 import { useShowSettings } from '../../hooks/useShowSettings';
+import { AmountUSDStyled } from '../AmountUSD';
 
 const defaultProps = {
   open: true,
@@ -45,21 +45,6 @@ const PenIcon = styled(Icon)`
   color: ${theme.colors.textIcon.secondary};
 
   cursor: pointer;
-`;
-
-const AmountUSDStyled = styled(AmountUSD)`
-  &::before {
-    content: '(';
-  }
-
-  &::after {
-    content: ')';
-  }
-
-  justify-self: flex-end;
-  margin-left: 8px;
-
-  color: #8e8e93;
 `;
 
 const ATA_ACCOUNT_CREATION_FEE = 0.00203928;
@@ -354,30 +339,40 @@ export const FeesOriginal: FC<FeesOriginalProps> = ({
           <Text className="gray">1 {trade.inputTokenName} price</Text>
           <Text className={classNames({ grid: isMobile })}>
             {getTokenPrice(false)} {trade.outputTokenName}
-            <AmountUSDStyled
-              prefix={'~'}
-              amount={
-                new u64(
-                  Math.pow(ONE_TOKEN_BASE, tokenConfigs[trade.inputTokenName]?.decimals as number),
-                )
-              }
-              tokenName={trade.inputTokenName}
-            />
+            <Text className="flex-end">
+              <AmountUSDStyled
+                prefix={'~'}
+                amount={
+                  new u64(
+                    Math.pow(
+                      ONE_TOKEN_BASE,
+                      tokenConfigs[trade.inputTokenName]?.decimals as number,
+                    ),
+                  )
+                }
+                tokenName={trade.inputTokenName}
+              />
+            </Text>
           </Text>
         </Row>
         <Row>
           <Text className="gray">1 {trade.outputTokenName} price</Text>
           <Text className={classNames({ grid: isMobile })}>
             {getTokenPrice(true)} {trade.inputTokenName}
-            <AmountUSDStyled
-              prefix={'~'}
-              amount={
-                new u64(
-                  Math.pow(ONE_TOKEN_BASE, tokenConfigs[trade.outputTokenName]?.decimals as number),
-                )
-              }
-              tokenName={trade.outputTokenName}
-            />
+            <Text className="flex-end">
+              <AmountUSDStyled
+                prefix={'~'}
+                amount={
+                  new u64(
+                    Math.pow(
+                      ONE_TOKEN_BASE,
+                      tokenConfigs[trade.outputTokenName]?.decimals as number,
+                    ),
+                  )
+                }
+                tokenName={trade.outputTokenName}
+              />
+            </Text>
           </Text>
         </Row>
       </ListWrapper>
@@ -393,11 +388,13 @@ export const FeesOriginal: FC<FeesOriginalProps> = ({
           <Text className="gray">Receive at least</Text>
           <Text className={classNames({ grid: isMobile })}>
             {minReceiveAmount} {swapInfo.trade.outputTokenName}
-            <AmountUSDStyled
-              prefix={'~'}
-              amount={swapInfo.trade.getMinimumOutputAmount()}
-              tokenName={swapInfo.trade.outputTokenName}
-            />
+            <Text className="flex-end">
+              <AmountUSDStyled
+                prefix={'~'}
+                amount={swapInfo.trade.getMinimumOutputAmount()}
+                tokenName={swapInfo.trade.outputTokenName}
+              />
+            </Text>
           </Text>
         </Row>
         <Row>
@@ -414,11 +411,13 @@ export const FeesOriginal: FC<FeesOriginalProps> = ({
             <Text className="gray">{tokenName} account creation</Text>
             <Text className={classNames({ grid: isMobile })}>
               {accountCreationFee} SOL
-              <AmountUSDStyled
-                prefix={'~'}
-                amount={networkFees.accountRentExemption}
-                tokenName={'SOL'}
-              />
+              <Text className="flex-end">
+                <AmountUSDStyled
+                  prefix={'~'}
+                  amount={networkFees.accountRentExemption}
+                  tokenName={'SOL'}
+                />
+              </Text>
             </Text>
           </Row>
         ))}

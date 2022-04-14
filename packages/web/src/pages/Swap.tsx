@@ -10,8 +10,8 @@ import { useTrackEventOpen } from 'app/hooks/metrics';
 import { Layout } from 'components/common/Layout';
 import { SwapSlippageWidget } from 'components/pages/swap/SwapSlippageWidget';
 import { SwapWidget } from 'components/pages/swap/SwapWidget';
-import { GoBackAction } from 'components/pages/swap/SwapWidget/GoBackAction';
-import { SettingsAction } from 'components/pages/swap/SwapWidget/SettingsAction';
+import { GoBackButton } from 'components/pages/swap/SwapWidget/GoBackButton';
+import { SettingsButton } from 'components/pages/swap/SwapWidget/SettingsButton';
 
 export const Swap: FunctionComponent = () => {
   useTrackEventOpen('Swap_Viewed');
@@ -20,18 +20,18 @@ export const Swap: FunctionComponent = () => {
   const isMobile = useIsMobile();
   const location = useLocation();
 
-  const mobileAction = useMemo(() => {
+  const mobileHeaderButton = useMemo(() => {
     if (!isMobile) {
       return undefined;
     }
 
     const isSettingsPage = location.pathname.includes('settings');
 
-    return isSettingsPage ? <GoBackAction /> : <SettingsAction />;
+    return isSettingsPage ? <GoBackButton /> : <SettingsButton />;
   }, [isMobile, location]);
 
   return (
-    <Layout mobileAction={mobileAction}>
+    <Layout mobileAction={mobileHeaderButton}>
       <FeeCompensationProvider>
         <SwapProvider initialState={{ inputTokenName: symbol }}>
           <Switch>

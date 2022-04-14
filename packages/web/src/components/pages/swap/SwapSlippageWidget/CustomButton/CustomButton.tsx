@@ -6,8 +6,8 @@ import classNames from 'classnames';
 
 import { Icon } from 'components/ui/Icon';
 
+import { ButtonStyled } from '../common/styled';
 import { SlippageInput } from '../SlippageInput';
-import { ButtonStyled } from '../SwapSlippageWidget';
 
 const CustomButtonTitle = styled.div`
   display: flex;

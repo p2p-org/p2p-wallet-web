@@ -12,7 +12,12 @@ const Wrapper = styled.div`
   z-index: 1;
 
   display: flex;
-  justify-content: center;
+  padding-left: 72px;
+
+  ${up.tablet} {
+    justify-content: center;
+    padding-left: 0;
+  }
 `;
 
 const ReverseWrapper = styled.div`
@@ -24,13 +29,8 @@ const ReverseWrapper = styled.div`
   justify-content: center;
   width: 48px;
   height: 48px;
-  margin-left: -32%;
 
   cursor: pointer;
-
-  ${up.tablet} {
-    margin: 0;
-  }
 `;
 
 const ReverseIcon = styled(Icon)`
