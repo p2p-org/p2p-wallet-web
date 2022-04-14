@@ -322,6 +322,14 @@ export const FeesOriginal: FC<FeesOriginalProps> = ({
     FEE_SIGNIFICANT_DIGITS,
   );
 
+  const inputTokenPrice = new u64(
+    Math.pow(ONE_TOKEN_BASE, tokenConfigs[trade.inputTokenName]?.decimals as number),
+  );
+
+  const outputTokenPrice = new u64(
+    Math.pow(ONE_TOKEN_BASE, tokenConfigs[trade.outputTokenName]?.decimals as number),
+  );
+
   return (
     <Accordion
       title={
@@ -342,14 +350,7 @@ export const FeesOriginal: FC<FeesOriginalProps> = ({
             <Text className="flex-end">
               <AmountUSDStyled
                 prefix={'~'}
-                amount={
-                  new u64(
-                    Math.pow(
-                      ONE_TOKEN_BASE,
-                      tokenConfigs[trade.inputTokenName]?.decimals as number,
-                    ),
-                  )
-                }
+                amount={inputTokenPrice}
                 tokenName={trade.inputTokenName}
               />
             </Text>
@@ -362,14 +363,7 @@ export const FeesOriginal: FC<FeesOriginalProps> = ({
             <Text className="flex-end">
               <AmountUSDStyled
                 prefix={'~'}
-                amount={
-                  new u64(
-                    Math.pow(
-                      ONE_TOKEN_BASE,
-                      tokenConfigs[trade.outputTokenName]?.decimals as number,
-                    ),
-                  )
-                }
+                amount={outputTokenPrice}
                 tokenName={trade.outputTokenName}
               />
             </Text>
