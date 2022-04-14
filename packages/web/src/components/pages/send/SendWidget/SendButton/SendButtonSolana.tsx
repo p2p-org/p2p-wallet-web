@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import { useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
 
 import { styled } from '@linaria/react';
 import { useTokenAccount } from '@p2p-wallet-web/core';
@@ -32,6 +32,11 @@ interface Props {
 
 export const SendButtonSolana: FC<Props> = ({ primary, disabled }) => {
   const { openModal } = useModals();
+  const sendState = useSendState();
+  const transferAction = useTransferAction();
+  const { compensationParams } = useFeeCompensation();
+  const { userFreeFeeLimits } = useFreeFeeLimits();
+  const destinationTokenAccount = useTokenAccount(usePubkey(sendState.destinationAddress));
   const {
     fromAmount,
     fromTokenAccount,
@@ -43,23 +48,22 @@ export const SendButtonSolana: FC<Props> = ({ primary, disabled }) => {
     destinationAccount,
     hasBalance,
     details,
-  } = useSendState();
-  const transferAction = useTransferAction();
-  const { compensationParams } = useFeeCompensation();
-  const { userFreeFeeLimits } = useFreeFeeLimits();
+  } = sendState;
 
-  const destinationTokenAccount = useTokenAccount(usePubkey(destinationAddress));
-
-  useEffect(async () => {
-    await openModal<void, TransactionStatusModalProps>(ModalType.SHOW_MODAL_TRANSACTION_STATUS, {
-      type: 'send',
-      action: () => null,
-      params: {
-        source: fromTokenAccount,
-        amount: parsedAmount,
-      },
-    });
-  }, []);
+  // useEffect(async () => {
+  //   await openModal<void, TransactionStatusModalProps>(ModalType.SHOW_MODAL_TRANSACTION_STATUS, {
+  //     type: 'send',
+  //     action: () => null,
+  //     params: {
+  //       source: fromTokenAccount,
+  //       destination: new PublicKey('RjR1coGGoQhfS1QAUoyTnHUfDgSte5Yx4obCXXeXeJc'),
+  //       amount: parsedAmount,
+  //       username: resolvedAddress ? toPublicKey : '',
+  //     },
+  //     sendState,
+  //     userFreeFeeLimits,
+  //   });
+  // }, []);
   const handleSubmit = async () => {
     if (!fromTokenAccount?.key || !fromTokenAccount?.balance || !parsedAmount) {
       throw new Error("Didn't find token account");
@@ -130,8 +134,12 @@ export const SendButtonSolana: FC<Props> = ({ primary, disabled }) => {
         action,
         params: {
           source: fromTokenAccount,
+          destination: new PublicKey(destinationAddress),
           amount: parsedAmount,
+          username: resolvedAddress ? toPublicKey : '',
         },
+        sendState,
+        userFreeFeeLimits,
       });
     } finally {
       setIsExecuting(false);

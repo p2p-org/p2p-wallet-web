@@ -12,6 +12,7 @@ export interface TransactionDetailsProps {
   sendState: Pick<UseSendState, 'fromTokenAccount' | 'destinationAccount' | 'details'>;
   userFreeFeeLimits: typeof INITIAL_USER_FREE_FEE_LIMITS;
   btcAddress?: string;
+  isOpen?: boolean;
 }
 
 export const TransactionDetails: FC<TransactionDetailsProps> = ({

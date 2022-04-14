@@ -169,8 +169,6 @@ export const TransactionLabel = styled(StatusColors)`
   height: 8px;
 
   margin-right: 8px;
-
-  content: '';
 `;
 
 export const Content = styled.div`
