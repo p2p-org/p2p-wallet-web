@@ -34,6 +34,10 @@ const config: ConfigFn = (env, argv) => {
     module: {
       rules: [
         {
+          test: /.(png)$/,
+          type: 'asset/resource',
+        },
+        {
           test: /-icon\.svg$/,
           use: [
             {
@@ -43,10 +47,6 @@ const config: ConfigFn = (env, argv) => {
               loader: 'svgo-loader',
             },
           ],
-        },
-        {
-          test: /.(svg|png)$/,
-          type: 'asset/resource',
         },
         {
           test: /\.css$/,
@@ -114,9 +114,6 @@ const config: ConfigFn = (env, argv) => {
         }, // @TODO check
         progress: true,
       },
-      // static: {
-      //   directory: path.join(__dirname, '/packages/web/public'),
-      // },
       historyApiFallback: true, // @TODO check
       compress: true,
       port: 9000,
