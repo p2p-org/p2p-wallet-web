@@ -18,6 +18,7 @@ import {
   Header,
   OtherIcon,
   ProgressLine,
+  ProgressStub,
   ProgressWrapper,
   Section,
   Time,
@@ -51,7 +52,7 @@ export const TransactionStatusModal: FunctionComponent<
   const [progress, setProgress] = useState(5);
   const [isExecuting, setIsExecuting] = useState(false);
   const [signature, setSignature] = useState<string | null>(null);
-  const transaction = useTransaction(signature);
+  const transaction = useTransaction(signature as string);
   const [transactionError, setTransactionError] = useState(
     transaction?.raw?.meta?.err ? DEFAULT_TRANSACTION_ERROR : '',
   );
@@ -156,9 +157,13 @@ export const TransactionStatusModal: FunctionComponent<
   const isSuccess = Boolean(signature && transaction?.key && !transactionError);
   const isError = Boolean(transactionError);
 
-  // @FIXME MOCKS
-  const DATE = new Date();
-  const utcDiff = DATE.getHours() - DATE.getUTCHours();
+  const today = new Date();
+  const utcDiff = today.getHours() - today.getUTCHours();
+
+  const shortAddress = sendState.destinationAddress.replace(
+    sendState.destinationAddress.substring(4, sendState.destinationAddress.length - 4),
+    '...',
+  );
 
   const renderStatus = (executing: boolean, success: boolean, error: boolean) => {
     switch (true) {
@@ -176,19 +181,30 @@ export const TransactionStatusModal: FunctionComponent<
   return (
     <Wrapper>
       <Section>
-        {/*<Header>{(params as TransferParams).amount.token.symbol}`</Header>*/}
-        <Header>SOL → 5faZ...zbXz</Header>
-        <DateHeader>
-          <span>{dayjs().format('MMMM D, YYYY')}</span>
-          <Time>{dayjs().format('hh:mm:ss')}</Time>
-          <span>
-            (UTC{utcDiff >= 0 ? '+' : '-'}
-            {utcDiff})
-          </span>
-        </DateHeader>
+        <>
+          <Header>
+            {(params as TransferParams).amount.token.symbol} → {shortAddress}
+          </Header>
+          <DateHeader>
+            <span>{dayjs().format('MMMM D, YYYY')}</span>
+            <Time>{dayjs().format('hh:mm:ss')}</Time>
+            <span>
+              (UTC{utcDiff >= 0 ? '+' : '-'}
+              {utcDiff})
+            </span>
+          </DateHeader>
+        </>
       </Section>
       <ProgressWrapper>
-        <ProgressLine style={{ width: `${progress}%` }} />
+        <ProgressLine
+          style={{ width: `${progress}%` }}
+          className={classNames({
+            // isSuccess,
+            // isError,
+          })}
+        />
+        <ProgressStub />
+
         <BlockWrapper
           className={classNames({
             isProcessing,
@@ -197,9 +213,9 @@ export const TransactionStatusModal: FunctionComponent<
           })}
         >
           {isSuccess ? (
-            <CheckmarkIcon name="checkmark" />
+            <CheckmarkIcon name="success-send" />
           ) : (
-            <OtherIcon name={transactionError ? 'warning' : 'timer'} />
+            <OtherIcon name={transactionError ? 'error-send' : 'clock-send'} />
           )}
         </BlockWrapper>
       </ProgressWrapper>

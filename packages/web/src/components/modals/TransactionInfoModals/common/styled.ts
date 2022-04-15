@@ -72,15 +72,15 @@ export const CloseIcon = styled(Icon)`
 `;
 
 export const CheckmarkIcon = styled(Icon)`
-  width: 45px;
-  height: 45px;
+  width: 24px;
+  height: 24px;
 
   color: #fff;
 `;
 
 export const OtherIcon = styled(Icon)`
-  width: 37px;
-  height: 37px;
+  width: 24px;
+  height: 24px;
 
   color: #fff;
 `;
@@ -92,20 +92,7 @@ export const ProgressWrapper = styled.div`
   align-items: center;
   justify-content: center;
 
-  height: 85px;
-`;
-
-export const ProgressLine = styled.div`
-  position: absolute;
-
-  z-index: ${theme.zIndex.base + theme.zIndex.bellow};
-
-  width: ${INITIAL_PROGRESS}%;
-  height: 1px;
-
-  background: #5887ff;
-
-  transition: width 0.15s;
+  height: 55px;
 `;
 
 const StatusColors = styled.div`
@@ -114,16 +101,49 @@ const StatusColors = styled.div`
   }
 
   &.isSuccess {
-    background: #77db7c;
+    background: #2db533;
   }
 
   &.isError {
-    background: #f77;
+    background: #f43d3d;
   }
 `;
 
+export const ProgressLine = styled(StatusColors)`
+  position: absolute;
+
+  z-index: ${theme.zIndex.middle};
+
+  width: ${INITIAL_PROGRESS}%;
+  height: 2px;
+  left: 0;
+
+  background: #5887ff;
+
+  transition: width 0.15s;
+
+  /* @FIXME those colors are present in the palette */
+
+  &.isSuccess {
+    background: #2db533;
+  }
+
+  &.isError {
+    background: #f43d3d;
+  }
+`;
+
+export const ProgressStub = styled.div`
+  position: absolute;
+  height: 1px;
+  left: 0px;
+  width: 100%;
+  background: #f2f2f7;
+  z-index: ${theme.zIndex.bottom};
+`;
+
 export const BlockWrapper = styled(StatusColors)`
-  z-index: ${theme.zIndex.base};
+  z-index: ${theme.zIndex.top};
 
   display: flex;
   align-items: center;
@@ -131,14 +151,14 @@ export const BlockWrapper = styled(StatusColors)`
   width: 55px;
   height: 55px;
 
-  border-radius: 12px;
+  border-radius: 40%;
 `;
 
 export const TransactionStatus = styled.div`
   display: flex;
   align-items: center;
 
-  margin: 17px 40px;
+  margin-left: 20px;
 
   color: ${theme.colors.textIcon.primary};
 

@@ -51,18 +51,18 @@ export const SendButtonSolana: FC<Props> = ({ primary, disabled }) => {
   } = sendState;
 
   // useEffect(async () => {
-  //   await openModal<void, TransactionStatusModalProps>(ModalType.SHOW_MODAL_TRANSACTION_STATUS, {
-  //     type: 'send',
-  //     action: () => null,
-  //     params: {
-  //       source: fromTokenAccount,
-  //       destination: new PublicKey('RjR1coGGoQhfS1QAUoyTnHUfDgSte5Yx4obCXXeXeJc'),
-  //       amount: parsedAmount,
-  //       username: resolvedAddress ? toPublicKey : '',
-  //     },
-  //     sendState,
-  //     userFreeFeeLimits,
-  //   });
+  //   // await openModal<void, TransactionStatusModalProps>(ModalType.SHOW_MODAL_TRANSACTION_STATUS, {
+  //   //   type: 'send',
+  //   //   action: () => null,
+  //   //   params: {
+  //   //     source: fromTokenAccount,
+  //   //     destination: new PublicKey('RjR1coGGoQhfS1QAUoyTnHUfDgSte5Yx4obCXXeXeJc'),
+  //   //     amount: parsedAmount,
+  //   //     username: resolvedAddress ? toPublicKey : '',
+  //   //   },
+  //   //   sendState,
+  //   //   userFreeFeeLimits,
+  //   // });
   // }, []);
   const handleSubmit = async () => {
     if (!fromTokenAccount?.key || !fromTokenAccount?.balance || !parsedAmount) {

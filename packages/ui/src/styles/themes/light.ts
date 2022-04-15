@@ -40,10 +40,10 @@ const theme = {
     },
   },
   zIndex: {
-    base: 1,
-    bellow: -1,
-    above: +1,
-    // add more here if you need
+    bottom: 1,
+    middle: 10,
+    top: 20,
+    modal: 30,
   },
 };
 console.log(generate(theme));
