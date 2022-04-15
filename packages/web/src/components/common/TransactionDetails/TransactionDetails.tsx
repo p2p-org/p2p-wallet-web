@@ -7,7 +7,16 @@ import { LAMPORTS_PER_SOL } from '@solana/web3.js';
 import type { UseSendState } from 'app/contexts';
 import { useConfig, useSettings } from 'app/contexts';
 import type { INITIAL_USER_FREE_FEE_LIMITS } from 'app/contexts/api/feeRelayer/utils';
+import { AddressText } from 'components/common/AddressText';
 import { FeeTransactionTooltip } from 'components/common/TransactionDetails/FeeTransactinTooltip';
+import {
+  FieldInfo,
+  IconWrapper,
+  InfoTitle,
+  InfoValue,
+  InfoWrapper,
+  WalletIcon,
+} from 'components/modals/TransactionConfirmModal/common/styled';
 import { AmountUSDStyled } from 'components/pages/swap/SwapWidget/AmountUSD';
 import { Accordion } from 'components/ui';
 import { AccordionTitle } from 'components/ui/AccordionDetails/AccordionTitle';
@@ -41,6 +50,7 @@ export const TransactionDetails: FC<TransactionDetailsProps> = ({
     parseFloat(sendState.fromAmount) * LAMPORTS_PER_SOL,
     tokenConfigs[sendState.fromTokenAccount?.balance?.token?.symbol as string]?.decimals as number,
   );
+  const senderAddress = sendState?.fromTokenAccount?.key?.toBase58();
 
   return (
     <Accordion
@@ -54,6 +64,15 @@ export const TransactionDetails: FC<TransactionDetailsProps> = ({
       open={false}
       noContentPadding
     >
+      <FieldInfo>
+        <IconWrapper>
+          <WalletIcon name="wallet" />
+        </IconWrapper>
+        <InfoWrapper>
+          <InfoTitle className="secondary">Sender address</InfoTitle>
+          <InfoValue>{senderAddress && <AddressText address={senderAddress} medium />}</InfoValue>
+        </InfoWrapper>
+      </FieldInfo>
       <ListWrapper>
         <Row>
           <Text className="gray">Receive</Text>

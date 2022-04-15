@@ -199,8 +199,8 @@ export const TransactionStatusModal: FunctionComponent<
         <ProgressLine
           style={{ width: `${progress}%` }}
           className={classNames({
-            // isSuccess,
-            // isError,
+            isSuccess,
+            isError,
           })}
         />
         <ProgressStub />
