@@ -11,6 +11,7 @@ import {
   useFeeCompensation,
   useFreeFeeLimits,
   useModals,
+  useNetworkFees,
   useSendState,
   useTransferAction,
 } from 'app/contexts';
@@ -37,6 +38,7 @@ export const SendButtonSolana: FC<Props> = ({ primary, disabled }) => {
   const { compensationParams } = useFeeCompensation();
   const { userFreeFeeLimits } = useFreeFeeLimits();
   const destinationTokenAccount = useTokenAccount(usePubkey(sendState.destinationAddress));
+  const networkFees = useNetworkFees();
   const {
     fromAmount,
     fromTokenAccount,
@@ -107,6 +109,7 @@ export const SendButtonSolana: FC<Props> = ({ primary, disabled }) => {
         },
         sendState: { fromTokenAccount, destinationAccount, details },
         userFreeFeeLimits,
+        networkFees,
       } as TransactionConfirmModalProps,
     );
 
@@ -140,6 +143,7 @@ export const SendButtonSolana: FC<Props> = ({ primary, disabled }) => {
         },
         sendState,
         userFreeFeeLimits,
+        networkFees,
       });
     } finally {
       setIsExecuting(false);

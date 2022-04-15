@@ -28,6 +28,11 @@ import { Swap } from './Swap';
 
 const WrapperModal = styled(Modal)`
   flex-basis: 524px;
+  max-height: 80vh;
+
+  &:focus-visible {
+    outline: none;
+  }
 `;
 
 const ModalTitle = styled.div`
@@ -201,6 +206,7 @@ export const TransactionConfirmModal: FunctionComponent<
           params={params as TransferParams}
           sendState={sendState}
           userFreeFeeLimits={userFreeFeeLimits}
+          networkFees={networkFees}
           btcAddress={btcAddress}
         />
       ) : undefined}

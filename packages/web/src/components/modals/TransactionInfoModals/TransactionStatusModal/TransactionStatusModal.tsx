@@ -43,10 +43,15 @@ export type TransactionStatusModalProps = TransactionDetailsProps & {
   params: TransferParams | SwapParams;
 };
 
-// @FIXME clean up props as in ConfirmModal
+// @FRIDAY not working USD amount in SendConfirmation
+// add solana explorer link
+// check all old tracking events (analytics)
+// close button
+// clean up
+// remove old send
 export const TransactionStatusModal: FunctionComponent<
   ModalPropsType<string | null> & TransactionStatusModalProps
-> = ({ type, action, params, sendState, userFreeFeeLimits }) => {
+> = ({ type, action, params, sendState, userFreeFeeLimits, networkFees }) => {
   const { provider } = useWallet();
 
   const [progress, setProgress] = useState(5);
@@ -233,7 +238,12 @@ export const TransactionStatusModal: FunctionComponent<
             {renderStatus(isExecuting, isSuccess, isError)}
           </TransactionBadge>
         </TransactionStatus>
-        <Send sendState={sendState} userFreeFeeLimits={userFreeFeeLimits} params={params} />
+        <Send
+          sendState={sendState}
+          userFreeFeeLimits={userFreeFeeLimits}
+          params={params as TransferParams}
+          networkFees={networkFees}
+        />
       </Section>
     </Wrapper>
   );

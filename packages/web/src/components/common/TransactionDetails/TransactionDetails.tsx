@@ -1,16 +1,14 @@
 import type { FC } from 'react';
 
 import { styled } from '@linaria/react';
-import { u64 } from '@saberhq/token-utils';
-import { LAMPORTS_PER_SOL } from '@solana/web3.js';
+import { theme } from '@p2p-wallet-web/ui';
 
-import type { UseSendState } from 'app/contexts';
-import { useConfig, useSettings } from 'app/contexts';
+import type { NetworkFees, UseSendState } from 'app/contexts';
+import { useSettings } from 'app/contexts';
 import type { INITIAL_USER_FREE_FEE_LIMITS } from 'app/contexts/api/feeRelayer/utils';
 import { AddressText } from 'components/common/AddressText';
 import { FeeTransactionTooltip } from 'components/common/TransactionDetails/FeeTransactinTooltip';
 import {
-  FieldInfo,
   IconWrapper,
   InfoTitle,
   InfoValue,
@@ -25,31 +23,32 @@ import { ListWrapper, Row, Text } from 'components/ui/AccordionDetails/common';
 export interface TransactionDetailsProps {
   sendState: UseSendState;
   userFreeFeeLimits: typeof INITIAL_USER_FREE_FEE_LIMITS;
+  networkFees: NetworkFees;
   btcAddress?: string;
   isOpen?: boolean;
 }
 
+// @FIXME move to styled
 const TokenAndUsd = styled.div`
   display: flex;
+`;
+
+const SenderAddress = styled.div`
+  display: flex;
+  align-items: center;
+  padding: 12px 20px;
+
+  border-bottom: 1px solid ${theme.colors.stroke.secondary};
 `;
 
 export const TransactionDetails: FC<TransactionDetailsProps> = ({
   sendState,
   userFreeFeeLimits,
+  networkFees,
 }) => {
   const {
     settings: { useFreeTransactions },
   } = useSettings();
-  const { tokenConfigs } = useConfig();
-
-  const totalUsdAmount = new u64(
-    parseFloat(sendState.fromAmount) * LAMPORTS_PER_SOL,
-    tokenConfigs[sendState.fromTokenAccount?.balance?.token?.symbol as string]?.decimals as number,
-  );
-  const receiveUsdAmount = new u64(
-    parseFloat(sendState.fromAmount) * LAMPORTS_PER_SOL,
-    tokenConfigs[sendState.fromTokenAccount?.balance?.token?.symbol as string]?.decimals as number,
-  );
   const senderAddress = sendState?.fromTokenAccount?.key?.toBase58();
 
   return (
@@ -64,7 +63,7 @@ export const TransactionDetails: FC<TransactionDetailsProps> = ({
       open={false}
       noContentPadding
     >
-      <FieldInfo>
+      <SenderAddress>
         <IconWrapper>
           <WalletIcon name="wallet" />
         </IconWrapper>
@@ -72,7 +71,7 @@ export const TransactionDetails: FC<TransactionDetailsProps> = ({
           <InfoTitle className="secondary">Sender address</InfoTitle>
           <InfoValue>{senderAddress && <AddressText address={senderAddress} medium />}</InfoValue>
         </InfoWrapper>
-      </FieldInfo>
+      </SenderAddress>
       <ListWrapper>
         <Row>
           <Text className="gray">Receive</Text>
@@ -80,7 +79,7 @@ export const TransactionDetails: FC<TransactionDetailsProps> = ({
             <Text>{sendState.details.receiveAmount}</Text>
             <AmountUSDStyled
               prefix="~"
-              amount={receiveUsdAmount}
+              amount={sendState.parsedAmount?.toU64()}
               tokenName={sendState.fromTokenAccount?.balance?.token.symbol}
             />
           </TokenAndUsd>
@@ -102,7 +101,14 @@ export const TransactionDetails: FC<TransactionDetailsProps> = ({
         {sendState.details.accountCreationAmount ? (
           <Row>
             <Text className="gray">{sendState.destinationAccount?.symbol} account creation</Text>
-            <Text>{sendState.details.accountCreationAmount}</Text>
+            <TokenAndUsd>
+              <Text>{sendState.details.accountCreationAmount}</Text>
+              <AmountUSDStyled
+                prefix="~"
+                amount={networkFees?.accountRentExemption}
+                tokenName={sendState.fromTokenAccount?.balance?.token.symbol}
+              />
+            </TokenAndUsd>
           </Row>
         ) : undefined}
       </ListWrapper>
@@ -113,7 +119,8 @@ export const TransactionDetails: FC<TransactionDetailsProps> = ({
             <Text>{sendState.details.totalAmount}</Text>
             <AmountUSDStyled
               prefix="~"
-              amount={totalUsdAmount}
+              /*@FIXME make sure this is the right thing to put here*/
+              amount={sendState.parsedAmount?.toU64()}
               tokenName={sendState.fromTokenAccount?.balance?.token.symbol}
             />
           </TokenAndUsd>
