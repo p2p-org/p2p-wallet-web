@@ -4,9 +4,9 @@ import type { PublicKey } from '@solana/web3.js';
 /**
  * A token account that may or may not exist.
  */
-export interface TokenAccount {
-  key?: PublicKey;
+export interface TokenAccount<Loaded extends boolean = boolean> {
+  key: Loaded extends true ? PublicKey : undefined;
   loading: boolean;
-  balance?: TokenAmount;
+  balance: Loaded extends true ? TokenAmount : undefined;
   isInitialized?: boolean;
 }

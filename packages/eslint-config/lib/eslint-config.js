@@ -103,5 +103,7 @@ module.exports = {
     'no-constant-condition': 'warn',
     '@typescript-eslint/no-empty-function': 'warn',
     '@typescript-eslint/no-var-requires': 'warn',
+    '@typescript-eslint/triple-slash-reference': 'warn',
+    '@typescript-eslint/no-namespace': 'warn',
   },
 };

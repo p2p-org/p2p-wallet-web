@@ -1,6 +1,7 @@
+import { useMemo } from "react";
+
 import type { Token } from "@saberhq/token-utils";
 import { TokenAmount } from "@saberhq/token-utils";
-import { useMemo } from "react";
 
 /**
  * Parses a {@link TokenAmount}.

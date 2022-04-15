@@ -56,6 +56,7 @@ export const useTokenAccounts = (
       }
 
       const token = tokens[i];
+      token?.info.extensions
       if (!token) {
         return {
           key: tokenAccountKey,

@@ -27,6 +27,7 @@
   "devDependencies": {
     "@p2p-wallet-web/sail": "^2.8.0",
     "@project-serum/anchor": "^0.16.2",
+    "@saberhq/solana-contrib": "^1.12.60",
     "@saberhq/token-utils": "^1.12.27",
     "@saberhq/use-solana": "^1.12.27",
     "@solana/spl-token": "^0.1.8",

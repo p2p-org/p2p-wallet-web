@@ -5,13 +5,13 @@ import { useAccountsInternal } from ".";
 import type {
   UseAccounts,
   UseAccountsArgs,
+  UseHandleTXs,
   UseHandleTXsArgs,
-  UseHandleTXsInternal,
   UseTransactions,
 } from "./internal";
 import { useHandleTXsInternal, useTransactionsInternal } from "./internal";
 
-export interface UseSail extends UseHandleTXsInternal {
+export interface UseSail extends UseHandleTXs {
   accounts: UseAccounts;
   transactions: UseTransactions;
   /**

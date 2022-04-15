@@ -1,4 +1,8 @@
-import type { Network, TransactionEnvelope } from "@saberhq/solana-contrib";
+import type {
+  Network,
+  PendingTransaction,
+  TransactionEnvelope,
+} from "@saberhq/solana-contrib";
 import type {
   Commitment,
   KeyedAccountInfo,
@@ -7,6 +11,7 @@ import type {
 } from "@solana/web3.js";
 
 import type { KeyedTransactionInfo } from "../internal";
+import type { ProgramAccountParser } from "../parsers/programAccounts";
 import type { TransactionErrorType } from "./categorizeTransactionError";
 import { categorizeTransactionError } from "./categorizeTransactionError";
 
@@ -17,12 +22,15 @@ export type SailErrorName = `Sail${
   | "RefetchAfterTX"
   | "RefetchSubscriptions"
   | "TransactionSign"
+  | "CacheRefetch"
   | "AccountsCacheRefetch"
   | "TransactionsCacheRefetch"
   | "AccountParse"
+  | "ProgramAccountParse"
   | "AccountLoad"
   | "TransactionParse"
   | "TransactionLoad"
+  | "SignAndConfirm"
   | "GetMultipleTransactions"
   | "GetMultipleAccounts"}Error`;
 
@@ -33,14 +41,17 @@ export const ERROR_TITLES: { [N in SailErrorName]: string } = {
   SailRefetchAfterTXError: "Error fetching changed accounts",
   SailRefetchSubscriptionsError: "Error refetching subscribed accounts",
   SailTransactionSignError: "Error signing transactions",
+  SailCacheRefetchError: "Error refetching from cache",
   SailAccountsCacheRefetchError: "Error accounts refetching from cache",
   SailTransactionsCacheRefetchError: "Error transactions refetching from cache",
   SailAccountParseError: "Error parsing account",
+  SailProgramAccountParseError: "Error parsing program account",
   SailAccountLoadError: "Error loading account",
   SailTransactionParseError: "Error parsing transaction",
   SailTransactionLoadError: "Error loading transaction",
   SailGetMultipleAccountsError: "Error fetching multiple accounts",
   SailGetMultipleTransactionsError: "Error fetching multiple transactions",
+  SailSignAndConfirmError: "Error signing and confirming transactions",
 };
 
 /**
@@ -87,6 +98,18 @@ export class SailError extends Error {
   get title(): string {
     return ERROR_TITLES[this.sailErrorName];
   }
+
+  /**
+   * Returns the value as a {@link SailError}, or null if it isn't.
+   * @param e
+   * @returns
+   */
+  static tryInto = (e: unknown): SailError | null => {
+    return e instanceof SailError ||
+      ("_isSailError" in (e as SailError) && (e as SailError)._isSailError)
+      ? (e as SailError)
+      : null;
+  };
 }
 
 /**
@@ -152,7 +175,9 @@ export class SailTransactionError extends SailError {
     const parts = [this.tx.debugStr];
     if (this.network !== "localnet") {
       parts.push(
-        `View on Solana Explorer: ${this.tx.generateInspectLink(this.network)}`
+        `Inspect transaction details: ${this.tx.generateInspectLink(
+          this.network
+        )}`
       );
     }
     return parts.join("\n");
@@ -175,9 +200,15 @@ export class SailRefetchAfterTXError extends SailError {
   constructor(
     originalError: unknown,
     readonly writable: readonly PublicKey[],
-    readonly txSigs: readonly TransactionSignature[]
+    readonly txs: readonly PendingTransaction[]
   ) {
     super("SailRefetchAfterTXError", originalError);
+  }
+  /**
+   * List of {@link TransactionSignature}s.
+   */
+  get txSigs(): readonly TransactionSignature[] {
+    return this.txs.map((tx) => tx.signature);
   }
 }
 
@@ -199,6 +230,18 @@ export class SailTransactionSignError extends SailError {
     readonly txs: readonly TransactionEnvelope[]
   ) {
     super("SailTransactionSignError", originalError);
+  }
+}
+
+/**
+ * Thrown if a cache refetch results in an error.
+ */
+export class SailCacheRefetchError extends SailError {
+  constructor(
+    originalError: unknown,
+    readonly keys: readonly (PublicKey | null | undefined)[]
+  ) {
+    super("SailCacheRefetchError", originalError);
   }
 }
 
@@ -232,6 +275,19 @@ export class SailTransactionsCacheRefetchError extends SailError {
 export class SailAccountParseError extends SailError {
   constructor(originalError: unknown, readonly data: KeyedAccountInfo) {
     super("SailAccountParseError", originalError);
+  }
+}
+
+/**
+ * Thrown if there is an error parsing an account.
+ */
+export class SailProgramAccountParseError extends SailError {
+  constructor(
+    originalError: unknown,
+    readonly data: KeyedAccountInfo,
+    readonly parser: ProgramAccountParser<unknown>
+  ) {
+    super("SailProgramAccountParseError", originalError);
   }
 }
 
@@ -293,5 +349,14 @@ export class SailGetMultipleTransactionsError extends SailError {
     originalError: unknown
   ) {
     super("SailGetMultipleTransactionsError", originalError);
+  }
+}
+
+/**
+ * Callback called whenever getMultipleAccounts fails.
+ */
+export class SailSignAndConfirmError extends SailError {
+  constructor(readonly errors: readonly SailError[] | undefined) {
+    super("SailSignAndConfirmError", errors);
   }
 }

@@ -4,7 +4,7 @@ import { useTokenAccountsContext } from '../index';
 import type { TokenAccount } from '../models';
 import { useTokenAccounts } from './useTokenAccounts';
 
-export const useUserTokenAccounts = (): readonly TokenAccount[] => {
+export const useUserTokenAccounts = (): readonly TokenAccount<true>[] => {
   const { userTokenAccountKeys } = useTokenAccountsContext();
   const accountsData = useTokenAccounts(userTokenAccountKeys);
 

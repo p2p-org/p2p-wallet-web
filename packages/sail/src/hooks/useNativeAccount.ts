@@ -4,8 +4,8 @@ import { RAW_SOL, TokenAmount } from "@saberhq/token-utils";
 import { useConnectedWallet, useConnectionContext } from "@saberhq/use-solana";
 import type { AccountInfo } from "@solana/web3.js";
 
-import type { AccountParser } from "./useParsedAccountsData";
-import { useParsedAccountData } from "./useParsedAccountsData";
+import type { AccountParser } from "../parsers";
+import { useParsedAccountData } from "../parsers";
 
 /**
  * Uses the data of the raw SOL account.

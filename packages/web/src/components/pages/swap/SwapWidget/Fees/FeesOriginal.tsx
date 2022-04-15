@@ -68,6 +68,8 @@ export const FeesOriginal: FC = () => {
     return trade.getTokenNamesToSetup(asyncStandardTokenAccounts);
   }, [trade, asyncStandardTokenAccounts]);
 
+  console.log(111, tokenNames, trade.routes);
+
   const feePools = useMemo(() => {
     if (!intermediateTokenName) {
       return [
