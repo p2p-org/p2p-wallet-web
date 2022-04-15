@@ -30,10 +30,6 @@ import {
 import type { TransferParams } from './Send';
 import type { SwapParams } from './Swap';
 
-export const INITIAL_PROGRESS = 5;
-/* eslint-disable  @typescript-eslint/no-magic-numbers */
-const DEFAULT_TRANSACTION_ERROR = 'Transaction error';
-
 type SendActionType = () => Promise<string>;
 type SwapActionType = () => Promise<string>;
 
@@ -47,14 +43,25 @@ export type TransactionStatusModalProps = TransactionDetailsProps & {
 // add solana explorer link
 // check all old tracking events (analytics)
 // close button
-// clean up
+// remove all disables
+// palette
+// remove unused styled components from common (bear in mind they are used in Swap)
 // remove old send
+
+export const INITIAL_PROGRESS = 5;
+const UPPER_PROGRESS_BOUND = 95;
+const LOWER_PROGRESS_BOUND = 7;
+const CHECK_PROGRESS_INTERVAL = 2500;
+const FULL_PROGRESS = 100;
+const ADDRESS_CHARS_SHOW = 4;
+const DEFAULT_TRANSACTION_ERROR = 'Transaction error';
+
 export const TransactionStatusModal: FunctionComponent<
   ModalPropsType<string | null> & TransactionStatusModalProps
 > = ({ type, action, params, sendState, userFreeFeeLimits, networkFees }) => {
   const { provider } = useWallet();
 
-  const [progress, setProgress] = useState(5);
+  const [progress, setProgress] = useState(INITIAL_PROGRESS);
   const [isExecuting, setIsExecuting] = useState(false);
   const [signature, setSignature] = useState<string | null>(null);
   const transaction = useTransaction(signature as string);
@@ -70,18 +77,18 @@ export const TransactionStatusModal: FunctionComponent<
     }
 
     const timerId = setInterval(() => {
-      if (progress <= 95) {
-        newProgress += 7;
+      if (progress <= UPPER_PROGRESS_BOUND) {
+        newProgress += LOWER_PROGRESS_BOUND;
         setProgress(newProgress);
       } else {
-        newProgress = 95;
+        newProgress = UPPER_PROGRESS_BOUND;
         setProgress(newProgress);
       }
-    }, 2500);
+    }, CHECK_PROGRESS_INTERVAL);
 
     return () => {
       clearTimeout(timerId);
-      setProgress(100);
+      setProgress(FULL_PROGRESS);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isExecuting]);
@@ -144,7 +151,7 @@ export const TransactionStatusModal: FunctionComponent<
             setTransactionError('');
           }
         } else {
-          setTimeout(mount, 3000);
+          setTimeout(mount, CHECK_PROGRESS_INTERVAL);
         }
       } catch (error) {
         // setTransactionError((error as Error).message);
@@ -166,7 +173,10 @@ export const TransactionStatusModal: FunctionComponent<
   const utcDiff = today.getHours() - today.getUTCHours();
 
   const shortAddress = sendState.destinationAddress.replace(
-    sendState.destinationAddress.substring(4, sendState.destinationAddress.length - 4),
+    sendState.destinationAddress.substring(
+      ADDRESS_CHARS_SHOW,
+      sendState.destinationAddress.length - ADDRESS_CHARS_SHOW,
+    ),
     '...',
   );
 
