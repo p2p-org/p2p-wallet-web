@@ -2,19 +2,27 @@ import type { FunctionComponent } from 'react';
 import { useEffect, useState } from 'react';
 
 import { useTransaction, useWallet } from '@p2p-wallet-web/core';
+import { useConnectionContext } from '@saberhq/use-solana';
 import classNames from 'classnames';
 import dayjs from 'dayjs';
 
 import type { ModalPropsType } from 'app/contexts';
 import { ToastManager } from 'components/common/ToastManager';
 import type { TransactionDetailsProps } from 'components/common/TransactionDetails';
+import { trackEvent } from 'utils/analytics';
+import { getExplorerUrl } from 'utils/connection';
 import { transferNotification } from 'utils/transactionNotifications';
 
 import { Send } from '../../TransactionConfirmModal/Send/Send';
 import {
   BlockWrapper,
   CheckmarkIcon,
+  CloseIcon,
+  CloseWrapper,
   DateHeader,
+  Footer,
+  GoToExplorerIcon,
+  GoToExplorerLink,
   Header,
   OtherIcon,
   ProgressLine,
@@ -39,15 +47,6 @@ export type TransactionStatusModalProps = TransactionDetailsProps & {
   params: TransferParams | SwapParams;
 };
 
-// @FRIDAY not working USD amount in SendConfirmation
-// add solana explorer link
-// check all old tracking events (analytics)
-// close button
-// remove all disables
-// palette
-// remove unused styled components from common (bear in mind they are used in Swap)
-// remove old send
-
 export const INITIAL_PROGRESS = 5;
 const UPPER_PROGRESS_BOUND = 95;
 const LOWER_PROGRESS_BOUND = 7;
@@ -58,9 +57,10 @@ const DEFAULT_TRANSACTION_ERROR = 'Transaction error';
 
 export const TransactionStatusModal: FunctionComponent<
   ModalPropsType<string | null> & TransactionStatusModalProps
-> = ({ type, action, params, sendState, userFreeFeeLimits, networkFees }) => {
+> = ({ type, action, params, sendState, userFreeFeeLimits, networkFees, close }) => {
   const { provider } = useWallet();
 
+  const { network } = useConnectionContext();
   const [progress, setProgress] = useState(INITIAL_PROGRESS);
   const [isExecuting, setIsExecuting] = useState(false);
   const [signature, setSignature] = useState<string | null>(null);
@@ -193,12 +193,25 @@ export const TransactionStatusModal: FunctionComponent<
     }
   };
 
+  const handleCloseClick = () => {
+    if (type === 'send') {
+      trackEvent('send_close_click', { transactionConfirmed: !isExecuting });
+    } else if (type === 'swap') {
+      trackEvent('swap_close_click', { transactionConfirmed: !isExecuting });
+    }
+
+    close(signature);
+  };
+
   return (
     <Wrapper>
       <Section>
         <>
           <Header>
             {(params as TransferParams).amount.token.symbol} → {shortAddress}
+            <CloseWrapper onClick={handleCloseClick}>
+              <CloseIcon name="close" />
+            </CloseWrapper>
           </Header>
           <DateHeader>
             <span>{dayjs().format('MMMM D, YYYY')}</span>
@@ -255,6 +268,26 @@ export const TransactionStatusModal: FunctionComponent<
           networkFees={networkFees}
         />
       </Section>
+      <Footer>
+        {signature ? (
+          <GoToExplorerLink
+            href={getExplorerUrl('tx', signature, network)}
+            target="_blank"
+            rel="noopener noreferrer noindex"
+            onClick={() => {
+              if (type === 'send') {
+                trackEvent('send_explorer_click', { transactionConfirmed: !isExecuting });
+              } else if (type === 'swap') {
+                trackEvent('swap_explorer_click', { transactionConfirmed: !isExecuting });
+              }
+            }}
+            className="button"
+          >
+            <GoToExplorerIcon name={'external'} />
+            View in Solana explorer
+          </GoToExplorerLink>
+        ) : undefined}
+      </Footer>
     </Wrapper>
   );
 };

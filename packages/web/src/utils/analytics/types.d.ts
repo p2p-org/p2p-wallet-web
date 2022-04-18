@@ -201,12 +201,12 @@ export type TrackEventType = {
   // (event: 'send_address_keydown'): void;
   // // Пользователь нажимает "Send"
   // (event: 'send_send_click', data: { tokenTicker: string; sum: number }): void;
-  // // Пользователь нажимает "Close"
-  // (event: 'send_close_click', data: { transactionConfirmed: boolean }): void;
+  // Пользователь нажимает "Close"
+  (event: 'send_close_click', data: { transactionConfirmed: boolean }): void;
   // // Пользователь нажимает "Done"
   // (event: 'send_done_click', data: { transactionConfirmed: boolean }): void;
   // // Пользователь нажимает "View in explorer"
-  // (event: 'send_explorer_click', data: { transactionConfirmed: boolean }): void;
+  (event: 'send_explorer_click', data: { transactionConfirmed: boolean }): void;
   // // Пользователь нажимает "Try again"
   // (event: 'send_try_again_click', data: { error: string }): void;
   // // Пользователь нажимает "Cancel"
@@ -239,11 +239,11 @@ export type TrackEventType = {
   //   data: { tokenA: string; tokenB: string; sumA: number; sumB: number },
   // ): void;
   // // Пользователь нажимает "Close"
-  // (event: 'swap_close_click', data: { transactionConfirmed: boolean }): void;
-  // // Пользователь нажимает "Done"
+  (event: 'swap_close_click', data: { transactionConfirmed: boolean }): void;
+  // Пользователь нажимает "Done"
   // (event: 'swap_done_click', data: { transactionConfirmed: boolean }): void;
   // // Пользователь нажимает "View in explorer"
-  // (event: 'swap_explorer_click', data: { transactionConfirmed: boolean }): void;
+  (event: 'swap_explorer_click', data: { transactionConfirmed: boolean }): void;
   // // Пользователь нажимает "Try again"
   // (event: 'swap_try_again_click', data: { error: string }): void;
   // // Пользователь нажимает "Cancel"

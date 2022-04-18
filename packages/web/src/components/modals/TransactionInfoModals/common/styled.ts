@@ -18,6 +18,8 @@ export const Wrapper = styled.div`
 `;
 
 export const Header = styled.div`
+  position: relative;
+
   color: ${theme.colors.textIcon.primary};
   font-weight: 500;
   font-size: 24px;
@@ -45,8 +47,8 @@ export const Desc = styled.div`
 
 export const CloseWrapper = styled.div`
   position: absolute;
-  top: 15px;
-  right: 15px;
+  top: 0;
+  right: 0;
 
   display: flex;
   align-items: center;
@@ -54,7 +56,8 @@ export const CloseWrapper = styled.div`
   width: 32px;
   height: 32px;
 
-  color: ${theme.colors.stroke.tertiary};
+  color: ${theme.colors.bg.buttonPrimary};
+
   border-radius: 8px;
 
   cursor: pointer;
@@ -63,8 +66,6 @@ export const CloseWrapper = styled.div`
 export const CloseIcon = styled(Icon)`
   width: 16px;
   height: 16px;
-
-  color: ${theme.colors.bg.buttonDisabled};
 `;
 
 export const CheckmarkIcon = styled(Icon)`
@@ -108,11 +109,12 @@ const StatusColors = styled.div`
 export const ProgressLine = styled.div`
   position: absolute;
 
+  left: 0;
+
   z-index: ${theme.zIndex.middle};
 
   width: ${INITIAL_PROGRESS}%;
   height: 2px;
-  left: 0;
 
   background: ${theme.colors.bg.buttonPrimary};
 
@@ -129,12 +131,15 @@ export const ProgressLine = styled.div`
 
 export const ProgressStub = styled.div`
   position: absolute;
-  height: 1px;
-  left: 0px;
-  width: 100%;
-  background: #f2f2f7;
-  background: ${theme.colors.stroke.secondary};
+
+  left: 0;
+
   z-index: ${theme.zIndex.bottom};
+
+  width: 100%;
+  height: 1px;
+
+  background: ${theme.colors.stroke.secondary};
 `;
 
 export const BlockWrapper = styled(StatusColors)`
@@ -332,6 +337,7 @@ export const ShareWrapper = styled.div`
 export const Footer = styled.div`
   display: flex;
   align-items: center;
+  justify-content: center;
   padding: 24px 20px;
 
   border-top: 1px solid rgba(0, 0, 0, 0.05);
@@ -374,4 +380,19 @@ export const DateHeader = styled.div`
 
 export const Time = styled.div`
   color: ${theme.colors.textIcon.primary};
+`;
+
+export const GoToExplorerIcon = styled(Icon)`
+  width: 24px;
+  height: 24px;
+  margin-right: 8px;
+`;
+
+export const GoToExplorerLink = styled.a`
+  display: inline-flex;
+  align-items: center;
+
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 140%;
 `;
