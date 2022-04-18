@@ -56,7 +56,6 @@ const config: ConfigFn = (env, argv) => {
             },
             {
               loader: 'css-loader',
-              // @FIXME there are a lot of style tags when isDevelopment = false
               options: { sourceMap: isDevelopment },
             },
           ],
@@ -103,8 +102,11 @@ const config: ConfigFn = (env, argv) => {
       },
     },
 
-    // @TODO production https://webpack.js.org/configuration/devtool/#production
     devtool: isDevelopment ? 'eval-cheap-module-source-map' : 'none',
+
+    // @TODO Webpack cache https://webpack.js.org/configuration/cache/#cache
+    // @TODO Webpack plugins https://webpack.js.org/configuration/plugins/
+    // @TODO Webpack perf https://webpack.js.org/configuration/plugins/
 
     devServer: {
       client: {
@@ -117,7 +119,9 @@ const config: ConfigFn = (env, argv) => {
       historyApiFallback: true, // @TODO check
       compress: true,
       port: 9000,
-      // hot: true // @TODO check
+      hot: true,
+      open: false,
+      // liveReload: false,
     },
 
     plugins: [
