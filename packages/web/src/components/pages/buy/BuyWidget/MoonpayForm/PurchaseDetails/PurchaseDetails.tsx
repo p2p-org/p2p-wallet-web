@@ -4,6 +4,7 @@ import { useMemo } from 'react';
 import { useBuyState } from 'app/contexts';
 import type { Accordion } from 'components/ui/AccordionDetails';
 import { AccordionDetails } from 'components/ui/AccordionDetails';
+import { formatNumberToUSD } from 'components/utils/format';
 
 export const PurchaseDetails: FC = () => {
   const { buyQuote, currency } = useBuyState();
@@ -17,7 +18,7 @@ export const PurchaseDetails: FC = () => {
             id: 1,
             titleClassName: 'gray',
             title: `1 ${currency.symbol} price`,
-            value: `$${buyQuote?.quoteCurrencyPrice.toFixed(2) || 0}`,
+            value: formatNumberToUSD(buyQuote?.quoteCurrencyPrice || 0),
           },
         ],
       },
@@ -28,21 +29,21 @@ export const PurchaseDetails: FC = () => {
             id: 1,
             titleClassName: 'gray',
             title: `${currency.symbol} purchase cost`,
-            value: `$${
-              buyQuote ? (buyQuote.quoteCurrencyPrice * buyQuote.quoteCurrencyAmount).toFixed(2) : 0
-            }`,
+            value: formatNumberToUSD(
+              buyQuote ? buyQuote.quoteCurrencyPrice * buyQuote.quoteCurrencyAmount : 0,
+            ),
           },
           {
             id: 2,
             titleClassName: 'gray',
             title: 'Processing fee',
-            value: `$${buyQuote?.feeAmount.toFixed(2) || 0}`,
+            value: formatNumberToUSD(buyQuote?.feeAmount || 0),
           },
           {
             id: 3,
             titleClassName: 'gray',
             title: 'Network fee',
-            value: `$${buyQuote?.networkFeeAmount.toFixed(2) || 0}`,
+            value: formatNumberToUSD(buyQuote?.networkFeeAmount || 0),
           },
         ],
       },
@@ -53,7 +54,7 @@ export const PurchaseDetails: FC = () => {
           {
             id: 1,
             title: 'Total',
-            value: `$${buyQuote?.totalAmount.toFixed(2) || 0}`,
+            value: formatNumberToUSD(buyQuote?.totalAmount || 0),
           },
         ],
       },
@@ -66,7 +67,7 @@ export const PurchaseDetails: FC = () => {
     <AccordionDetails
       title="Purchase details"
       titleBottomName="Total amount spent"
-      titleBottomValue={`$${buyQuote?.totalAmount.toFixed(2) || 0}`}
+      titleBottomValue={formatNumberToUSD(buyQuote?.totalAmount || 0)}
       accordion={accordion}
     />
   );

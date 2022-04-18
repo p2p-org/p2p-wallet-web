@@ -4,6 +4,7 @@ import { styled } from '@linaria/react';
 
 import { useBuyState } from 'app/contexts';
 import { Button, Icon } from 'components/ui';
+import { formatNumberToUSD } from 'components/utils/format';
 
 const IconWrapper = styled(Icon)`
   width: 24px;
@@ -37,7 +38,7 @@ export const MoonpayButton: FC = () => {
   ) {
     return (
       <Button disabled primary full>
-        Minimum amount ${buyQuote.baseCurrencyAmount.toLocaleString('us-US')}
+        Minimum amount {formatNumberToUSD(buyQuote.baseCurrencyAmount)}
       </Button>
     );
   }
