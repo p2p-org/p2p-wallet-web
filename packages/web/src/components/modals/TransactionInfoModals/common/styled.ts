@@ -10,11 +10,17 @@ export const Wrapper = styled.div`
   flex-direction: column;
   justify-content: stretch;
   width: 524px;
+  max-height: 80vh;
+  overflow: scroll;
 
   background: ${theme.colors.bg.primary};
 
   border-radius: 15px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
 `;
 
 export const Header = styled.div`

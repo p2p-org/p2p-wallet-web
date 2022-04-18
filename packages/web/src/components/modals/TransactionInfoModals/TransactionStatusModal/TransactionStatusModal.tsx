@@ -268,8 +268,8 @@ export const TransactionStatusModal: FunctionComponent<
           networkFees={networkFees}
         />
       </Section>
-      <Footer>
-        {signature ? (
+      {signature ? (
+        <Footer>
           <GoToExplorerLink
             href={getExplorerUrl('tx', signature, network)}
             target="_blank"
@@ -286,8 +286,8 @@ export const TransactionStatusModal: FunctionComponent<
             <GoToExplorerIcon name={'external'} />
             View in Solana explorer
           </GoToExplorerLink>
-        ) : undefined}
-      </Footer>
+        </Footer>
+      ) : undefined}
     </Wrapper>
   );
 };

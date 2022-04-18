@@ -2,6 +2,7 @@ import type { FC } from 'react';
 
 import { styled } from '@linaria/react';
 import { theme } from '@p2p-wallet-web/ui';
+import type { u64 } from '@saberhq/token-utils';
 
 import type { NetworkFees, UseSendState } from 'app/contexts';
 import { useSettings } from 'app/contexts';
@@ -26,6 +27,7 @@ export interface TransactionDetailsProps {
   networkFees: NetworkFees;
   btcAddress?: string;
   isOpen?: boolean;
+  amount?: u64;
 }
 
 // @FIXME move to styled
@@ -45,6 +47,7 @@ export const TransactionDetails: FC<TransactionDetailsProps> = ({
   sendState,
   userFreeFeeLimits,
   networkFees,
+  amount,
 }) => {
   const {
     settings: { useFreeTransactions },
@@ -79,7 +82,7 @@ export const TransactionDetails: FC<TransactionDetailsProps> = ({
             <Text>{sendState.details.receiveAmount}</Text>
             <AmountUSDStyled
               prefix="~"
-              amount={sendState.parsedAmount?.toU64()}
+              amount={sendState.parsedAmount?.toU64() || amount}
               tokenName={sendState.fromTokenAccount?.balance?.token.symbol}
             />
           </TokenAndUsd>
@@ -119,8 +122,7 @@ export const TransactionDetails: FC<TransactionDetailsProps> = ({
             <Text>{sendState.details.totalAmount}</Text>
             <AmountUSDStyled
               prefix="~"
-              /*@FIXME make sure this is the right thing to put here*/
-              amount={sendState.parsedAmount?.toU64()}
+              amount={sendState.parsedAmount?.toU64() || amount}
               tokenName={sendState.fromTokenAccount?.balance?.token.symbol}
             />
           </TokenAndUsd>

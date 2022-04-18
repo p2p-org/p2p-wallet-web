@@ -133,6 +133,7 @@ export const Send: FC<Props & TransactionDetailsProps> = ({
         sendState={sendState}
         userFreeFeeLimits={userFreeFeeLimits}
         networkFees={networkFees}
+        amount={params.amount.toU64()}
       />
     </Section>
   );
