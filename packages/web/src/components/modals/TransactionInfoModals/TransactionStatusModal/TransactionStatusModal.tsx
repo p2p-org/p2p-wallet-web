@@ -36,15 +36,13 @@ import {
   Wrapper,
 } from '../common/styled';
 import type { TransferParams } from './Send';
-import type { SwapParams } from './Swap';
 
 type SendActionType = () => Promise<string>;
-type SwapActionType = () => Promise<string>;
 
 export type TransactionStatusModalProps = TransactionDetailsProps & {
   type: 'send' | 'swap';
-  action: SendActionType | SwapActionType;
-  params: TransferParams | SwapParams;
+  action: SendActionType;
+  params: TransferParams;
 };
 
 export const INITIAL_PROGRESS = 5;
@@ -99,20 +97,14 @@ export const TransactionStatusModal: FunctionComponent<
 
       switch (type) {
         case 'send': {
-          const resultSignature = await (action as SendActionType)();
+          const resultSignature = await action();
           setSignature(resultSignature);
 
           transferNotification({
             header: 'Sent',
-            text: `- ${(params as TransferParams).amount.formatUnits()}`,
-            symbol: (params as TransferParams).amount.token.symbol,
+            text: `- ${params.amount.formatUnits()}`,
+            symbol: params.amount.token.symbol,
           });
-
-          break;
-        }
-        case 'swap': {
-          const resultSignature = await (action as SwapActionType)();
-          setSignature(resultSignature);
 
           break;
         }
@@ -194,11 +186,7 @@ export const TransactionStatusModal: FunctionComponent<
   };
 
   const handleCloseClick = () => {
-    if (type === 'send') {
-      trackEvent('send_close_click', { transactionConfirmed: !isExecuting });
-    } else if (type === 'swap') {
-      trackEvent('swap_close_click', { transactionConfirmed: !isExecuting });
-    }
+    trackEvent('send_close_click', { transactionConfirmed: !isExecuting });
 
     close(signature);
   };
@@ -208,7 +196,7 @@ export const TransactionStatusModal: FunctionComponent<
       <Section>
         <>
           <Header>
-            {(params as TransferParams).amount.token.symbol} → {shortAddress}
+            {params.amount.token.symbol} → {shortAddress}
             <CloseWrapper onClick={handleCloseClick}>
               <CloseIcon name="close" />
             </CloseWrapper>
@@ -264,30 +252,26 @@ export const TransactionStatusModal: FunctionComponent<
         <Send
           sendState={sendState}
           userFreeFeeLimits={userFreeFeeLimits}
-          params={params as TransferParams}
+          params={params}
           networkFees={networkFees}
         />
       </Section>
-      {signature ? (
-        <Footer>
-          <GoToExplorerLink
-            href={getExplorerUrl('tx', signature, network)}
-            target="_blank"
-            rel="noopener noreferrer noindex"
-            onClick={() => {
-              if (type === 'send') {
-                trackEvent('send_explorer_click', { transactionConfirmed: !isExecuting });
-              } else if (type === 'swap') {
-                trackEvent('swap_explorer_click', { transactionConfirmed: !isExecuting });
-              }
-            }}
-            className="button"
-          >
-            <GoToExplorerIcon name={'external'} />
-            View in Solana explorer
-          </GoToExplorerLink>
-        </Footer>
-      ) : undefined}
+      <Footer>
+        <GoToExplorerLink
+          href={signature ? getExplorerUrl('tx', signature, network) : ''}
+          target="_blank"
+          rel="noopener noreferrer noindex"
+          onClick={() => {
+            trackEvent('send_explorer_click', { transactionConfirmed: !isExecuting });
+          }}
+          className={classNames({
+            isDisabled: !signature,
+          })}
+        >
+          <GoToExplorerIcon name={'external'} />
+          View in Solana explorer
+        </GoToExplorerLink>
+      </Footer>
     </Wrapper>
   );
 };

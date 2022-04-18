@@ -401,4 +401,10 @@ export const GoToExplorerLink = styled.a`
   font-weight: 500;
   font-size: 16px;
   line-height: 140%;
+
+  text-decoration: none;
+
+  &.isDisabled {
+    pointer-events: none;
+  }
 `;
