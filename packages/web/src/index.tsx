@@ -31,6 +31,7 @@ const render = () => {
 render();
 
 // Allow the hot-reloading of the App in development mode
+// @TODO Fix typing resolution
 if (DEVELOPMENT && module.hot) {
   module.hot.accept('./App', render);
 }
