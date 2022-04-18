@@ -1,4 +1,6 @@
 // @ts-ignore
+import ReactRefreshWebpackPlugin from '@pmmmwh/react-refresh-webpack-plugin';
+// @ts-ignore
 import DotEnv from 'dotenv-webpack';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
@@ -17,12 +19,17 @@ type ConfigFn = (env: any, argv: any) => Configuration;
 
 // @ts-ignore
 const config: ConfigFn = (env, argv) => {
-  const isDevelopment = argv.mode === 'development';
+  const DEVELOPMENT = argv.mode === 'development';
+
+  const devPlugins = [];
+
+  if (DEVELOPMENT) {
+    devPlugins.push(new ReactRefreshWebpackPlugin());
+  }
 
   return {
     mode: argv.mode,
 
-    // entry: './packages/web/src/testy.tsx',
     entry: path.resolve(__dirname, './packages/web/src/index.tsx'),
 
     output: {
@@ -52,11 +59,11 @@ const config: ConfigFn = (env, argv) => {
           test: /\.css$/,
           use: [
             {
-              loader: isDevelopment ? 'style-loader' : MiniCssExtractPlugin.loader,
+              loader: DEVELOPMENT ? 'style-loader' : MiniCssExtractPlugin.loader,
             },
             {
               loader: 'css-loader',
-              options: { sourceMap: isDevelopment },
+              options: { sourceMap: DEVELOPMENT },
             },
           ],
         },
@@ -70,7 +77,7 @@ const config: ConfigFn = (env, argv) => {
             {
               loader: '@linaria/webpack-loader',
               options: {
-                sourceMap: isDevelopment,
+                sourceMap: DEVELOPMENT,
               },
             },
           ],
@@ -102,7 +109,7 @@ const config: ConfigFn = (env, argv) => {
       },
     },
 
-    devtool: isDevelopment ? 'eval-cheap-module-source-map' : 'none',
+    devtool: DEVELOPMENT ? 'eval-cheap-module-source-map' : 'none',
 
     // @TODO Webpack cache https://webpack.js.org/configuration/cache/#cache
     // @TODO Webpack plugins https://webpack.js.org/configuration/plugins/
@@ -113,16 +120,18 @@ const config: ConfigFn = (env, argv) => {
         overlay: {
           errors: true,
           warnings: false,
-        }, // @TODO check
+        },
         progress: true,
       },
-      historyApiFallback: true, // @TODO check
+      historyApiFallback: true,
       compress: true,
       port: 9000,
       hot: true,
       open: false,
-      // liveReload: false,
     },
+
+    // @TODO should be different for the prod build (browserlist) and ES sth for packages build
+    target: 'web',
 
     plugins: [
       new HtmlWebpackPlugin({
@@ -131,6 +140,7 @@ const config: ConfigFn = (env, argv) => {
       }),
       new webpack.DefinePlugin({
         'process.env': { NODE_ENV: JSON.stringify(process.env.NODE_ENV) },
+        DEVELOPMENT,
       }),
       new DotEnv({
         path: './packages/web/.env.development',
@@ -141,8 +151,9 @@ const config: ConfigFn = (env, argv) => {
         Buffer: ['buffer', 'Buffer'],
       }),
       new MiniCssExtractPlugin({
-        filename: isDevelopment ? 'styles.css' : 'styles-[contenthash].css',
+        filename: DEVELOPMENT ? 'styles.css' : 'styles-[contenthash].css',
       }),
+      ...devPlugins,
     ],
   };
 };

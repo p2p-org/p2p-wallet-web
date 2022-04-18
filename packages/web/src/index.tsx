@@ -10,7 +10,6 @@ import ReactDOM from 'react-dom';
 
 import { globalCss } from '@p2p-wallet-web/ui';
 
-import { isDev } from 'config/constants';
 import { initAmplitude } from 'utils/analytics';
 
 initAmplitude();
@@ -32,6 +31,6 @@ const render = () => {
 render();
 
 // Allow the hot-reloading of the App in development mode
-if (isDev && module.hot) {
+if (DEVELOPMENT && module.hot) {
   module.hot.accept('./App', render);
 }
