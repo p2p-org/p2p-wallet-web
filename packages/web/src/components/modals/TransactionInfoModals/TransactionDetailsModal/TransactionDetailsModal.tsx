@@ -431,7 +431,7 @@ export const TransactionDetailsModal: FC<Props> = ({ signature, source, close })
                     {isShowFeeBadge ? <PaidByBadge>Paid by p2p.org</PaidByBadge> : undefined}
                   </FieldTitleWrapper>
                   <FieldValue>
-                    {transaction.raw.meta?.fee.toLocaleString('us-US')} lamports
+                    {transaction.raw.meta?.fee.toLocaleString('en-US')} lamports
                   </FieldValue>
                 </FieldWrapper>
               ) : null}

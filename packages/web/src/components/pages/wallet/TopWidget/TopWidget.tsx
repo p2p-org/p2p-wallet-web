@@ -322,7 +322,7 @@ const TopWidgetOrigin: FunctionComponent<Props> = ({ publicKey }) => {
 
     return (
       <ValueDelta>
-        {Intl.NumberFormat('us-US', {
+        {new Intl.NumberFormat('en-US', {
           style: 'currency',
           currency: 'USD',
           currencyDisplay: 'code',
