@@ -198,7 +198,7 @@ export const TransactionDetailsModal: FC<Props> = ({ signature, source, close })
   const renderFromTo = () => {
     const type = transaction?.details.type;
 
-    const source = transaction?.data?.source;
+    const transactionSource = transaction?.data?.source;
     const destination = transaction?.data?.destination;
     const sourceToken = sourceTokenAccount?.balance?.token;
     const destinationToken = destinationTokenAccount?.balance?.token;
@@ -222,17 +222,17 @@ export const TransactionDetailsModal: FC<Props> = ({ signature, source, close })
       );
     }
 
-    if (type && ((source && sourceToken) || (destination && destinationToken))) {
+    if (type && ((transactionSource && sourceToken) || (destination && destinationToken))) {
       return (
         <FieldRowWrapper>
-          {source && sourceToken ? (
+          {transactionSource && sourceToken ? (
             <ColumnWrapper>
               <FieldTitle>From</FieldTitle>
               <FieldInfo>
                 <TokenAvatar symbol={sourceToken.symbol} address={sourceToken.address} size={48} />
                 <AddressWrapper>
                   <AddressTitle>{sourceToken.symbol}</AddressTitle>
-                  <AddressValue>{shortAddress(source)}</AddressValue>
+                  <AddressValue>{shortAddress(transactionSource)}</AddressValue>
                 </AddressWrapper>
               </FieldInfo>
             </ColumnWrapper>
@@ -430,7 +430,9 @@ export const TransactionDetailsModal: FC<Props> = ({ signature, source, close })
                     <FieldTitle>Transaction fee</FieldTitle>
                     {isShowFeeBadge ? <PaidByBadge>Paid by p2p.org</PaidByBadge> : undefined}
                   </FieldTitleWrapper>
-                  <FieldValue>{transaction.raw.meta?.fee} lamports</FieldValue>
+                  <FieldValue>
+                    {transaction.raw.meta?.fee.toLocaleString('us-US')} lamports
+                  </FieldValue>
                 </FieldWrapper>
               ) : null}
               <FieldWrapper>
