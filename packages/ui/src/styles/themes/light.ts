@@ -46,6 +46,5 @@ const theme = {
     modal: 30,
   },
 };
-console.log(generate(theme));
 
 export const lightTheme = generate(theme);

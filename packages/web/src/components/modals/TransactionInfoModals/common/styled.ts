@@ -1,13 +1,9 @@
 import { styled } from '@linaria/react';
 import { theme } from '@p2p-wallet-web/ui';
-import { rgba } from 'polished';
 
 import { Button, Icon } from 'components/ui';
 
 import { INITIAL_PROGRESS } from '../TransactionStatusModal/TransactionStatusModal';
-
-// @FIXME fix all pallete colors
-/* eslint-disable  @typescript-eslint/no-magic-numbers */
 
 export const Wrapper = styled.div`
   display: flex;
@@ -41,7 +37,7 @@ export const Title = styled.div`
 `;
 
 export const Desc = styled.div`
-  color: #a3a5ba;
+  color: ${theme.colors.bg.buttonDisabled};
   font-weight: 600;
   font-size: 16px;
   line-height: 100%;
@@ -58,7 +54,7 @@ export const CloseWrapper = styled.div`
   width: 32px;
   height: 32px;
 
-  background: #f6f6f8;
+  color: ${theme.colors.stroke.tertiary};
   border-radius: 8px;
 
   cursor: pointer;
@@ -68,21 +64,21 @@ export const CloseIcon = styled(Icon)`
   width: 16px;
   height: 16px;
 
-  color: #a3a5ba;
+  color: ${theme.colors.bg.buttonDisabled};
 `;
 
 export const CheckmarkIcon = styled(Icon)`
   width: 24px;
   height: 24px;
 
-  color: #fff;
+  color: ${theme.colors.textIcon.buttonPrimary};
 `;
 
 export const OtherIcon = styled(Icon)`
   width: 24px;
   height: 24px;
 
-  color: #fff;
+  color: ${theme.colors.textIcon.buttonPrimary};
 `;
 
 export const ProgressWrapper = styled.div`
@@ -97,19 +93,19 @@ export const ProgressWrapper = styled.div`
 
 const StatusColors = styled.div`
   &.isProcessing {
-    background: #ffd177;
+    background: ${theme.colors.system.warningMain};
   }
 
   &.isSuccess {
-    background: #2db533;
+    background: ${theme.colors.system.successMain};
   }
 
   &.isError {
-    background: #f43d3d;
+    background: ${theme.colors.system.errorMain};
   }
 `;
 
-export const ProgressLine = styled(StatusColors)`
+export const ProgressLine = styled.div`
   position: absolute;
 
   z-index: ${theme.zIndex.middle};
@@ -118,18 +114,16 @@ export const ProgressLine = styled(StatusColors)`
   height: 2px;
   left: 0;
 
-  background: #5887ff;
+  background: ${theme.colors.bg.buttonPrimary};
 
   transition: width 0.15s;
 
-  /* @FIXME those colors are present in the palette */
-
   &.isSuccess {
-    background: #2db533;
+    background: ${theme.colors.system.successMain};
   }
 
   &.isError {
-    background: #f43d3d;
+    background: ${theme.colors.system.errorMain};
   }
 `;
 
@@ -139,6 +133,7 @@ export const ProgressStub = styled.div`
   left: 0px;
   width: 100%;
   background: #f2f2f7;
+  background: ${theme.colors.stroke.secondary};
   z-index: ${theme.zIndex.bottom};
 `;
 
@@ -212,7 +207,7 @@ export const ValueCurrency = styled.div`
 export const ValueOriginal = styled.div`
   margin-top: 4px;
 
-  color: #a3a5ba;
+  color: ${theme.colors.bg.buttonDisabled};
   font-weight: 600;
   font-size: 16px;
   line-height: 120%;
@@ -254,7 +249,7 @@ export const SwapBlock = styled.div`
   height: 32px;
   margin: 6px 26px 0;
 
-  background: #f6f6f8;
+  background: ${theme.colors.bg.buttonSecondary};
   border-radius: 12px;
 `;
 
@@ -262,7 +257,7 @@ export const SwapIcon = styled(Icon)`
   width: 24px;
   height: 24px;
 
-  color: #a3a5ba;
+  color: ${theme.colors.bg.buttonDisabled};
 `;
 
 export const SwapAmount = styled.div`
@@ -280,16 +275,16 @@ export const FieldWrapper = styled.div`
   padding: 16px 30px;
 
   &:first-child {
-    border-top: 1px solid ${rgba('#000', 0.05)};
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
   }
 
   &:not(:last-child) {
-    border-bottom: 1px solid ${rgba('#000', 0.05)};
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
   }
 `;
 
 export const FieldTitle = styled.div`
-  color: #a3a5ba;
+  color: ${theme.colors.bg.buttonDisabled};
   font-weight: 600;
   font-size: 14px;
   line-height: 21px;
@@ -309,7 +304,7 @@ export const ShareIcon = styled(Icon)`
   width: 24px;
   height: 24px;
 
-  color: #a3a5ba;
+  color: ${theme.colors.bg.buttonDisabled};
 `;
 
 export const ShareWrapper = styled.div`
@@ -326,10 +321,10 @@ export const ShareWrapper = styled.div`
   cursor: pointer;
 
   &:hover {
-    background: #eff3ff;
+    background: ${theme.colors.bg.activePrimary};
 
     ${ShareIcon} {
-      color: #5887ff;
+      color: ${theme.colors.textIcon.active};
     }
   }
 `;
@@ -339,7 +334,7 @@ export const Footer = styled.div`
   align-items: center;
   padding: 24px 20px;
 
-  border-top: 1px solid ${rgba('#000', 0.05)};
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
 
   & > :not(:last-child) {
     margin-right: 16px;
