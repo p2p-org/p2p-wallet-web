@@ -171,6 +171,10 @@ const TokenSettingsIcon = styled(Icon)`
   color: #a3a5ba;
 `;
 
+const PERCENT_FRACTION_DIGITS = 2;
+const SCROLL_THROTTLE_VALUE = 100;
+const WIDGET_BOTTOM_FOR_SHOW_STICKY = 150;
+
 type Props = {
   publicKey: string;
 };
@@ -219,12 +223,12 @@ const TopWidgetOrigin: FunctionComponent<Props> = ({ publicKey }) => {
 
     const { bottom } = widgetRef.current.getBoundingClientRect();
 
-    if (bottom <= 150) {
+    if (bottom <= WIDGET_BOTTOM_FOR_SHOW_STICKY) {
       setIsShowFixed(true);
     } else {
       setIsShowFixed(false);
     }
-  }, 100);
+  }, SCROLL_THROTTLE_VALUE);
 
   useEffect(() => {
     window.addEventListener('scroll', handleScroll);
@@ -240,8 +244,11 @@ const TopWidgetOrigin: FunctionComponent<Props> = ({ publicKey }) => {
       return null;
     }
 
-    const diff = rates[rates.length - 1]!.price - rates[rates.length - 2]!.price;
-    const sum = rates[rates.length - 1]!.price + rates[rates.length - 2]!.price;
+    // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+    const diff = rates[rates.length - 1]?.price ?? 0 - (rates[rates.length - 2]?.price ?? 0);
+    // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+    const sum = rates[rates.length - 1]?.price ?? 0 + (rates[rates.length - 2]?.price ?? 0);
+    // eslint-disable-next-line @typescript-eslint/no-magic-numbers
     const percentage = 100 * (diff / (sum / 2));
 
     return { diff, percentage };
@@ -315,7 +322,12 @@ const TopWidgetOrigin: FunctionComponent<Props> = ({ publicKey }) => {
 
     return (
       <ValueDelta>
-        {delta.diff.toFixed(2)} USD ({delta.percentage.toFixed(2)}%) {period}
+        {Intl.NumberFormat('us-US', {
+          style: 'currency',
+          currency: 'USD',
+          currencyDisplay: 'code',
+        }).format(delta.diff)}{' '}
+        ({delta.percentage.toFixed(PERCENT_FRACTION_DIGITS)}%) {period}
       </ValueDelta>
     );
   };
@@ -350,7 +362,7 @@ const TopWidgetOrigin: FunctionComponent<Props> = ({ publicKey }) => {
               <TokenAvatar
                 symbol={tokenAccount.balance?.token.symbol}
                 address={tokenAccount.balance?.token?.address}
-                size="44"
+                size={44}
               />
               <TokenInfo>
                 <TokenSymbol>{tokenAccount.balance?.token.symbol}</TokenSymbol>
@@ -394,7 +406,7 @@ const TopWidgetOrigin: FunctionComponent<Props> = ({ publicKey }) => {
           </FixedInfoWrapper>
           {renderButtons()}
         </WrapperFixed>
-      ) : undefined}
+      ) : null}
     </>
   );
 };
