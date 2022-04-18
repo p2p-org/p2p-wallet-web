@@ -81,6 +81,10 @@ const modalsMap = new Map<ModalType, LoadableComponent<ModalPropsType & any>>([
     loadable(() => import('components/modals/TransactionInfoModals/TransactionStatusModal')),
   ],
   [
+    ModalType.SHOW_MODAL_TRANSACTION_STATUS_SWAP,
+    loadable(() => import('components/modals/TransactionInfoModals/TransactionSwap')),
+  ],
+  [
     ModalType.SHOW_MODAL_CLOSE_TOKEN_ACCOUNT,
     loadable(() => import('components/modals/CloseTokenAccountModal')),
   ],
