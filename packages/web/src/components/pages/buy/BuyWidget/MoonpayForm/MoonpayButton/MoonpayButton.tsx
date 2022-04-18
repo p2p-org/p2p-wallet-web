@@ -37,7 +37,7 @@ export const MoonpayButton: FC = () => {
   ) {
     return (
       <Button disabled primary full>
-        Minimum amount ${buyQuote.baseCurrencyAmount}
+        Minimum amount ${buyQuote.baseCurrencyAmount.toLocaleString('us-US')}
       </Button>
     );
   }
