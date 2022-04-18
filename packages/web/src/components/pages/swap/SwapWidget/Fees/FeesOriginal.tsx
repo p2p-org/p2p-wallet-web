@@ -21,12 +21,13 @@ import type {
   UseSwap,
 } from 'app/contexts';
 import { useConfig } from 'app/contexts/solana/swap';
-import { formatBigNumber, formatNumberToUSD } from 'app/contexts/solana/swap/utils/format';
+import { formatBigNumber } from 'app/contexts/solana/swap/utils/format';
 import { CompensationFee } from 'components/common/CompensationFee';
 import { FeeTransactionTooltip } from 'components/common/TransactionDetails/FeeTransactinTooltip';
 import { Accordion, Icon } from 'components/ui';
 import { AccordionTitle } from 'components/ui/AccordionDetails/AccordionTitle';
 import { ListWrapper, Row, Text } from 'components/ui/AccordionDetails/common';
+import { formatNumberToUSD } from 'components/utils/format';
 
 import { useShowSettings } from '../../hooks/useShowSettings';
 import { AmountUSDStyled } from '../AmountUSD';
@@ -235,6 +236,7 @@ export const FeesOriginal: FC<FeesOriginalProps> = ({
   }, [tokenNames, transactionFee.result, feePools, asyncPrices.value]);
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  /*
   const renderTransactionFee = () => {
     if (transactionFee.result) {
       return (
@@ -248,6 +250,7 @@ export const FeesOriginal: FC<FeesOriginalProps> = ({
 
     return "Can't calculate";
   };
+  */
 
   const details = useMemo(() => {
     let receiveAmount;
