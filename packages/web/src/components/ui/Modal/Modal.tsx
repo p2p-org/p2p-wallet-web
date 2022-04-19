@@ -57,6 +57,10 @@ const StyledDialogContent = styled(({ ...props }) => <AnimatedDialogContent {...
       border-radius: 12px;
     }
   }
+
+  &:focus-visible {
+    outline: none;
+  }
 `;
 
 const Handle = styled.div`
