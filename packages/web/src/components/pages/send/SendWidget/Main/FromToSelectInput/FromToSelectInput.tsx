@@ -10,9 +10,9 @@ import { TokenAmount } from '@saberhq/token-utils';
 import classNames from 'classnames';
 
 import { AccountCreationFeeTooltip } from 'components/common/AccountCreationFeeTooltip';
-import { AmountUSD } from 'components/common/AmountUSD';
 import { Icon } from 'components/ui';
 import { InputAmount } from 'components/ui/InputAmount';
+import { NUMBER_FORMAT } from 'components/utils/format';
 
 import { FromToTitle, TopWrapper } from '../common/styled';
 import { TokenSelector } from './TokenSelector';
@@ -70,21 +70,6 @@ const MainWrapper = styled.div`
   grid-template-columns: min-content 1fr;
 `;
 
-const BalanceWrapper = styled.div`
-  display: flex;
-  justify-content: space-between;
-  margin-top: 3px;
-
-  color: #a3a5ba;
-  font-weight: 600;
-  font-size: 16px;
-  line-height: 24px;
-`;
-
-const AmountUSDStyled = styled(AmountUSD)`
-  margin-left: 3px;
-`;
-
 const InputWrapper = styled.div`
   display: flex;
 `;
@@ -119,18 +104,18 @@ export const FromToSelectInput: FC<Props> = ({
       return null;
     }
 
-    let tokenAccountBalance = tokenAccount.balance;
+    let tokenAccountBal = tokenAccount.balance;
 
     if (feeAmount) {
       const balanceSubstractFee = tokenAccount.balance.toU64().sub(feeAmount.toU64());
 
-      tokenAccountBalance = balanceSubstractFee.gt(ZERO)
+      tokenAccountBal = balanceSubstractFee.gt(ZERO)
         ? new TokenAmount(tokenAccount.balance.token, balanceSubstractFee)
         : new TokenAmount(tokenAccount.balance.token, 0);
-      return tokenAccountBalance;
+      return tokenAccountBal;
     }
 
-    return tokenAccountBalance;
+    return tokenAccountBal;
   }, [feeAmount, tokenAccount]);
 
   const handleAllBalanceClick = () => {
@@ -150,7 +135,7 @@ export const FromToSelectInput: FC<Props> = ({
       return;
     }
 
-    return tokenAccountBalance.toExact();
+    return tokenAccountBalance.toExact(NUMBER_FORMAT);
   };
 
   const hasBalance = tokenAccountBalance ? tokenAccountBalance.asNumber >= Number(amount) : false;

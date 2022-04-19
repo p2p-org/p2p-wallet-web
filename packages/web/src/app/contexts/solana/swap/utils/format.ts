@@ -1,6 +1,8 @@
 import { ZERO } from '@orca-so/sdk';
 import { u64 } from '@solana/spl-token';
 
+import { formatNumber, getNumberFromFormattedNumber } from 'components/utils/format';
+
 const floatRegex = /^(\d*)?(\.)?(\d*)?$/;
 const MAX_SIGNIFICANT_DIGITS = 5;
 const BASE = 10;
@@ -57,7 +59,7 @@ export function formatBigNumber(
     return integers.toString();
   }
 
-  return `${integers.toString()}.${fractionsString}`;
+  return formatNumber(`${integers.toString()}.${fractionsString}`);
 }
 
 export function getUSDValue(amount: u64, decimals: number, price: number): number {
@@ -65,5 +67,5 @@ export function getUSDValue(amount: u64, decimals: number, price: number): numbe
 }
 
 export function getNumber(amount: u64, decimals: number): number {
-  return parseFloat(formatBigNumber(amount, decimals));
+  return getNumberFromFormattedNumber(formatBigNumber(amount, decimals));
 }

@@ -8,6 +8,7 @@ import type { TokenAmount } from '@saberhq/token-utils';
 import { AmountUSD } from 'components/common/AmountUSD';
 import { TokenAvatar } from 'components/common/TokenAvatar';
 import { Select } from 'components/ui';
+import { NUMBER_FORMAT } from 'components/utils/format';
 
 const SelectorValue = styled.div`
   display: flex;
@@ -143,7 +144,7 @@ export const FeeTokenSelector: FC<Props> = ({
           <Fees>
             <Top>
               {isSend ? (
-                <Label>`${accountSymbol as string} account creation:`</Label>
+                <Label>{accountSymbol as string} account creation:</Label>
               ) : (
                 <SwapLabelWrapper>
                   <Label>Pay swap fees with</Label>
@@ -159,7 +160,7 @@ export const FeeTokenSelector: FC<Props> = ({
             {isSend && feeAmount ? (
               <Bottom>
                 <Label>Pay with:</Label>
-                <Amount>{`${feeAmount.formatUnits()}`}</Amount>
+                <Amount>{feeAmount.formatUnits(NUMBER_FORMAT)}</Amount>
               </Bottom>
             ) : undefined}
           </Fees>

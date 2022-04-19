@@ -12,6 +12,7 @@ import { createContainer } from 'unstated-next';
 
 import { isValidSolanaAddress, useFeeCompensation } from 'app/contexts';
 import type { DestinationAccount } from 'app/contexts/api/feeRelayer/types';
+import { NUMBER_FORMAT } from 'components/utils/format';
 import { useRenNetwork } from 'utils/hooks/renBridge/useNetwork';
 
 import { useResolveAddress } from './hooks/useResolveAddress';
@@ -215,9 +216,9 @@ const useSendStateInternal = (): UseSendState => {
     let receiveAmount;
 
     if (!parsedAmount && fromTokenAccount && fromTokenAccount.balance) {
-      receiveAmount = new TokenAmount(fromTokenAccount.balance.token, 0).formatUnits();
+      receiveAmount = new TokenAmount(fromTokenAccount.balance.token, 0).formatUnits(NUMBER_FORMAT);
     } else if (parsedAmount) {
-      receiveAmount = parsedAmount.formatUnits();
+      receiveAmount = parsedAmount.formatUnits(NUMBER_FORMAT);
     }
 
     let totalAmount = receiveAmount;
@@ -229,7 +230,7 @@ const useSendStateInternal = (): UseSendState => {
         accountCreationAmount = new TokenAmount(
           nativeAccount.nativeBalance.token,
           compensationState.estimatedFee.accountRent,
-        ).formatUnits();
+        ).formatUnits(NUMBER_FORMAT);
 
         totalAmount += ` + ${accountCreationAmount}`;
       } else {
@@ -239,10 +240,10 @@ const useSendStateInternal = (): UseSendState => {
             feeAmountInToken,
           );
 
-          accountCreationAmount = accontCreationTokenAmount.formatUnits();
+          accountCreationAmount = accontCreationTokenAmount.formatUnits(NUMBER_FORMAT);
 
           totalAmount = parsedAmount
-            ? parsedAmount.add(accontCreationTokenAmount).formatUnits()
+            ? parsedAmount.add(accontCreationTokenAmount).formatUnits(NUMBER_FORMAT)
             : accountCreationAmount;
 
           totalAmountToShow = totalAmount;

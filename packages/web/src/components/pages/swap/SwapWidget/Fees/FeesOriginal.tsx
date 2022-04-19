@@ -27,7 +27,7 @@ import { FeeTransactionTooltip } from 'components/common/TransactionDetails/FeeT
 import { Accordion, Icon } from 'components/ui';
 import { AccordionTitle } from 'components/ui/AccordionDetails/AccordionTitle';
 import { ListWrapper, Row, Text } from 'components/ui/AccordionDetails/common';
-import { formatNumberToUSD } from 'components/utils/format';
+import { getNumberFromFormattedNumber } from 'components/utils/format';
 
 import { useShowSettings } from '../../hooks/useShowSettings';
 import { AmountUSDStyled } from '../AmountUSD';
@@ -209,7 +209,7 @@ export const FeesOriginal: FC<FeesOriginalProps> = ({
       const price = asyncPrices.value?.[tokenName];
 
       if (price) {
-        sum += Number(amount) * price;
+        sum += getNumberFromFormattedNumber(amount) * price;
       }
 
       return sum;
@@ -295,6 +295,7 @@ export const FeesOriginal: FC<FeesOriginalProps> = ({
   }, [compensationState, feeAmountInToken, feeToken, tokenConfigs, trade]);
 
   const getTokenPrice = (isReverse: boolean) => {
+    trade.inpu;
     const one = new Decimal(1);
 
     return (isReverse ? one.div(trade.getExchangeRate()) : trade.getExchangeRate())

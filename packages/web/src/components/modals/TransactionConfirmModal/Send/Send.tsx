@@ -12,6 +12,7 @@ import { TokenAvatar } from 'components/common/TokenAvatar';
 import type { TransactionDetailsProps } from 'components/common/TransactionDetails';
 import { TransactionDetails } from 'components/common/TransactionDetails';
 import { Icon } from 'components/ui';
+import { NUMBER_FORMAT } from 'components/utils/format';
 
 import {
   FieldInfo,
@@ -102,7 +103,7 @@ export const Send: FC<Props & TransactionDetailsProps> = ({
             size={44}
           />
           <InfoWrapper>
-            <InfoTitle>{params.amount.formatUnits()}</InfoTitle>
+            <InfoTitle>{params.amount.formatUnits(NUMBER_FORMAT)}</InfoTitle>
             <InfoValue>
               <AmountUSD value={params.amount} />
             </InfoValue>

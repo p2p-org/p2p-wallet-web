@@ -11,6 +11,7 @@ import {
   ValueCurrency,
   ValueOriginal,
 } from 'components/modals/TransactionInfoModals/common/styled';
+import { NUMBER_FORMAT } from 'components/utils/format';
 
 export type TransferParams = {
   source: TokenAccount;
@@ -32,7 +33,7 @@ export const Send: FC<Props> = ({ params: { amount }, transaction }) => {
     <SendWrapper>
       <ValueCurrency>
         {transaction?.details.isReceiver ? '+' : '-'}{' '}
-        {tokenAmount?.balance?.formatUnits() || amount.formatUnits()}
+        {tokenAmount?.balance?.formatUnits(NUMBER_FORMAT) || amount.formatUnits(NUMBER_FORMAT)}
       </ValueCurrency>
       <ValueOriginal>
         <AmountUSD
