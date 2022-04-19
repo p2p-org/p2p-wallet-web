@@ -10,16 +10,19 @@ import { TokenAmount } from '@saberhq/token-utils';
 import { PublicKey } from '@solana/web3.js';
 import { createContainer } from 'unstated-next';
 
-import { useFeeCompensation } from 'app/contexts';
+import { isValidSolanaAddress, useFeeCompensation } from 'app/contexts';
 import type { DestinationAccount } from 'app/contexts/api/feeRelayer/types';
 import { useRenNetwork } from 'utils/hooks/renBridge/useNetwork';
 
 import { useResolveAddress } from './hooks/useResolveAddress';
 import { isValidAddress } from './utils';
 
-export type Blockchain = 'solana' | 'bitcoin';
+export enum Blockchain {
+  solana = 'solana',
+  bitcoin = 'bitcoin',
+}
 
-export const BLOCKCHAINS: Blockchain[] = ['solana', 'bitcoin'];
+export const BLOCKCHAINS = [Blockchain.solana, Blockchain.bitcoin] as const;
 
 export interface UseSendState {
   fromTokenAccount?: TokenAccount | null;
@@ -111,6 +114,14 @@ const useSendStateInternal = (): UseSendState => {
       setFromTokenAccount(tokenAccount);
       setFromToken(tokenAccount);
     }
+
+    const tokenSymbol = tokenAccount?.balance?.token?.symbol;
+    const shouldUseSolanaNetwork =
+      tokenSymbol && tokenSymbol !== 'renBTC' && blockchain === 'bitcoin';
+
+    if (shouldUseSolanaNetwork) {
+      setBlockchain(BLOCKCHAINS[0]);
+    }
   }, [setFromToken, tokenAccount]);
 
   const destinationAddress = resolvedAddress || toPublicKey;
@@ -133,30 +144,33 @@ const useSendStateInternal = (): UseSendState => {
       ) {
         const isSOL = fromTokenAccount.balance.token.isRawSOL;
 
-        if (!isSOL) {
-          setIsResolvingAddress(true);
+        if (isValidSolanaAddress(destinationAddress)) {
+          if (!isSOL) {
+            setIsResolvingAddress(true);
 
-          const { address, owner, needCreateATA } = await resolveAddress(
-            new PublicKey(destinationAddress),
-            fromTokenAccount.balance.token,
-          );
+            const { address, owner, needCreateATA } = await resolveAddress(
+              new PublicKey(destinationAddress),
+              fromTokenAccount.balance.token,
+            );
 
-          setIsResolvingAddress(true);
-          setDestinationAccount({
-            address,
-            owner,
-            isNeedCreate: needCreateATA,
-            symbol: fromTokenAccount.balance.token.symbol,
-          });
-        } else {
-          setDestinationAccount({
-            address: new PublicKey(destinationAddress),
-          });
+            setIsResolvingAddress(true);
+            setDestinationAccount({
+              address,
+              owner,
+              isNeedCreate: needCreateATA,
+              symbol: fromTokenAccount.balance.token.symbol,
+            });
+          } else {
+            setDestinationAccount({
+              address: new PublicKey(destinationAddress),
+            });
+          }
         }
       } else {
         setDestinationAccount(null);
       }
     };
+
     if (!isAddressInvalid) {
       void resolve();
     }

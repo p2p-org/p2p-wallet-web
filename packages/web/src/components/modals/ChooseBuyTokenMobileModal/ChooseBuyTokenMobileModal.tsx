@@ -1,39 +1,29 @@
 import type { FC } from 'react';
-import { useMemo } from 'react';
 import { useHistory, useLocation } from 'react-router';
 
 import type { TokenAccount } from '@p2p-wallet-web/core';
-import { useTokenAccounts, useTokenAccountsContext } from '@p2p-wallet-web/core';
+import {
+  useToken,
+  useUserAssociatedTokenAccountsWithNativeSOLOverride,
+} from '@p2p-wallet-web/core';
 
 import type { ModalPropsType } from 'app/contexts';
+import { useConfig } from 'app/contexts';
 import { Modal } from 'components/ui/Modal';
 
 import { ActionRow } from './ActionRow';
 
-interface Props {}
-
-export const ChooseBuyTokenMobileModal: FC<Props & ModalPropsType> = ({ close }) => {
+export const ChooseBuyTokenMobileModal: FC<ModalPropsType> = ({ close }) => {
   const history = useHistory();
   const location = useLocation();
-  const { userTokenAccountKeys } = useTokenAccountsContext();
-  const tokenAccounts = useTokenAccounts(userTokenAccountKeys);
-  const tokenAccountList = useMemo(
-    () =>
-      tokenAccounts
-        .filter((token) => ['SOL', 'USDC'].includes(token?.balance?.token.symbol ?? ''))
-        .sort((a, b) => {
-          const aSymbol = a?.balance?.token.symbol || '';
-          const bSymbol = b?.balance?.token.symbol || '';
-          if (aSymbol < bSymbol) {
-            return -1;
-          }
-          if (aSymbol > bSymbol) {
-            return 1;
-          }
-          return 0;
-        }),
-    [tokenAccounts],
-  );
+  const { tokenConfigs } = useConfig();
+  const tokenSOL = useToken(tokenConfigs['SOL']?.mint);
+  const tokenUSDC = useToken(tokenConfigs['USDC']?.mint);
+
+  const tokenAccountList = useUserAssociatedTokenAccountsWithNativeSOLOverride([
+    tokenSOL,
+    tokenUSDC,
+  ]);
 
   const handleCloseClick = () => {
     close(false);
