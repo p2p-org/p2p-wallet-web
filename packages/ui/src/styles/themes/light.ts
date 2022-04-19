@@ -39,12 +39,6 @@ const theme = {
       buttonDisabled: '#D0D3E9',
     },
   },
-  zIndex: {
-    bottom: 1,
-    middle: 10,
-    top: 20,
-    modal: 30,
-  },
 };
 
 export const lightTheme = generate(theme);

@@ -2,7 +2,7 @@ import { css } from '@linaria/core';
 import { rgba } from 'polished';
 
 import { up } from './breakpoints';
-import { fonts } from './helpers';
+import { commonVariables, fonts } from './helpers';
 import { dark, light, theme } from './themes';
 
 export const globalCss = css`
@@ -14,7 +14,8 @@ export const globalCss = css`
     }
 
     body {
-      ${light}
+      ${light};
+      ${commonVariables};
     }
 
     // body[data-theme='light'] {

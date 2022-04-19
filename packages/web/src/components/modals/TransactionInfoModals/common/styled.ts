@@ -1,5 +1,5 @@
 import { styled } from '@linaria/react';
-import { theme } from '@p2p-wallet-web/ui';
+import { common, theme } from '@p2p-wallet-web/ui';
 
 import { Button, Icon } from 'components/ui';
 
@@ -117,7 +117,7 @@ export const ProgressLine = styled.div`
 
   left: 0;
 
-  z-index: ${theme.zIndex.middle};
+  z-index: ${common.zIndex.middle};
 
   width: ${INITIAL_PROGRESS}%;
   height: 2px;
@@ -140,7 +140,7 @@ export const ProgressStub = styled.div`
 
   left: 0;
 
-  z-index: ${theme.zIndex.bottom};
+  z-index: ${common.zIndex.bottom};
 
   width: 100%;
   height: 1px;
@@ -149,7 +149,7 @@ export const ProgressStub = styled.div`
 `;
 
 export const BlockWrapper = styled(StatusColors)`
-  z-index: ${theme.zIndex.top};
+  z-index: ${common.zIndex.top};
 
   display: flex;
   align-items: center;
