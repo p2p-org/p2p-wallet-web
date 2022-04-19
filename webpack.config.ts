@@ -16,12 +16,17 @@ interface Configuration extends WebpackConfiguration, WebpackDevServerConfigurat
 type ConfigFn = (env: any, argv: any) => Configuration;
 
 // @TODO add process and may be dashboard in terminal
+// PROD checks:
+// -minimazation
+// -filenames (contenthash)
+// -cache for CI  https://webpack.js.org/configuration/cache/#setup-cache-in-cicd-system
+// target browserlist for prod
 
 // @ts-ignore
 const config: ConfigFn = (env, argv) => {
   const DEVELOPMENT = argv.mode === 'development';
 
-  const devPlugins = [];
+  const devPlugins: Array<unknown> = [];
 
   if (DEVELOPMENT) {
     devPlugins.push(new ReactRefreshWebpackPlugin());
@@ -34,10 +39,30 @@ const config: ConfigFn = (env, argv) => {
 
     output: {
       path: path.resolve(__dirname, 'packages/web/public'),
-      chunkFilename: '[id].chunk.js',
+      filename: '[name].[contenthash].js',
+      // chunkFilename: DEVELOPMENT ? '[name]-[contenthash].chunk.js' : '[contenthash].chunk.js',
+      chunkFilename: DEVELOPMENT ? '[contenthash].chunk.js' : '[contenthash].chunk.js',
     },
 
-    // @TODO file names in loaders for PROD and DEV (check all files)
+    // @TODO NEXT optimization  https://webpack.js.org/configuration/optimization/
+    optimization: {
+      runtimeChunk: 'single',
+      splitChunks: {
+        cacheGroups: {
+          vendor: {
+            test: /[\\/]node_modules[\\/]/,
+            name: 'vendor',
+            chunks: 'all',
+            reuseExistingChunk: true,
+          },
+        },
+      },
+    },
+
+    performance: {
+      hints: DEVELOPMENT ? 'warning' : 'error',
+    },
+
     module: {
       rules: [
         {
@@ -130,7 +155,6 @@ const config: ConfigFn = (env, argv) => {
       open: false,
     },
 
-    // @TODO should be different for the prod build (browserlist) and ES sth for packages build
     target: 'web',
 
     plugins: [
