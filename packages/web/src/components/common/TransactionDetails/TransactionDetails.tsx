@@ -1,21 +1,12 @@
 import type { FC } from 'react';
 
 import { styled } from '@linaria/react';
-import { theme } from '@p2p-wallet-web/ui';
 import type { u64 } from '@saberhq/token-utils';
 
 import type { NetworkFees, UseSendState } from 'app/contexts';
 import { useSettings } from 'app/contexts';
 import type { INITIAL_USER_FREE_FEE_LIMITS } from 'app/contexts/api/feeRelayer/utils';
-import { AddressText } from 'components/common/AddressText';
 import { FeeTransactionTooltip } from 'components/common/TransactionDetails/FeeTransactinTooltip';
-import {
-  IconWrapper,
-  InfoTitle,
-  InfoValue,
-  InfoWrapper,
-  WalletIcon,
-} from 'components/modals/TransactionConfirmModal/common/styled';
 import { AmountUSDStyled } from 'components/pages/swap/SwapWidget/AmountUSD';
 import { Accordion } from 'components/ui';
 import { AccordionTitle } from 'components/ui/AccordionDetails/AccordionTitle';
@@ -30,17 +21,8 @@ export interface TransactionDetailsProps {
   amount?: u64;
 }
 
-// @FIXME move to styled
 const TokenAndUsd = styled.div`
   display: flex;
-`;
-
-const SenderAddress = styled.div`
-  display: flex;
-  align-items: center;
-  padding: 12px 20px;
-
-  border-bottom: 1px solid ${theme.colors.stroke.secondary};
 `;
 
 export const TransactionDetails: FC<TransactionDetailsProps> = ({
@@ -52,7 +34,6 @@ export const TransactionDetails: FC<TransactionDetailsProps> = ({
   const {
     settings: { useFreeTransactions },
   } = useSettings();
-  const senderAddress = sendState?.fromTokenAccount?.key?.toBase58();
 
   return (
     <Accordion
@@ -66,15 +47,6 @@ export const TransactionDetails: FC<TransactionDetailsProps> = ({
       open={false}
       noContentPadding
     >
-      <SenderAddress>
-        <IconWrapper>
-          <WalletIcon name="wallet" />
-        </IconWrapper>
-        <InfoWrapper>
-          <InfoTitle className="secondary">Sender address</InfoTitle>
-          <InfoValue>{senderAddress && <AddressText address={senderAddress} medium />}</InfoValue>
-        </InfoWrapper>
-      </SenderAddress>
       <ListWrapper>
         <Row>
           <Text className="gray">Receive</Text>

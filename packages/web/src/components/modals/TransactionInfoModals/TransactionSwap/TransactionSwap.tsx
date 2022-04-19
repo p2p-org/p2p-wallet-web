@@ -35,36 +35,39 @@ import type { SwapParams } from '../TransactionStatusModal/Swap';
 import { Swap } from '../TransactionStatusModal/Swap';
 
 /* eslint-disable */
+/* THIS FILE IS A COPY-PASTE, WILL BE REMOVED WITH
+ * https://p2pvalidator.atlassian.net/browse/PWN-3322
+ */
 
 const INITIAL_PROGRESS = 5;
 
 export const Header = styled.div`
   position: relative;
-  
+
   padding: 26px 20px 50px;
-  
+
   text-align: center;
 `;
 
 export const ProgressWrapper = styled.div`
   height: 1px;
-  
+
   background: rgba(0, 0, 0, 0.05);
 `;
 
 export const BlockWrapper = styled.div`
   position: absolute;
-  
-  display: flex;
-  align-items: center;
-  
   bottom: -28px;
   left: 50%;
+
+  display: flex;
+  align-items: center;
+
   justify-content: center;
   width: 55px;
   height: 55px;
   margin-left: -27px;
-  
+
   background: #5887ff;
   border-radius: 12px;
   &.isProcessing {
