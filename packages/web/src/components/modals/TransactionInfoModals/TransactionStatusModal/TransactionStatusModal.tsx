@@ -176,10 +176,10 @@ export const TransactionStatusModal: FunctionComponent<
     switch (true) {
       case executing:
         return 'Pending';
-      case success:
-        return 'Completed';
       case error:
         return 'Error';
+      case success:
+        return 'Completed';
       default:
         return 'Pending';
     }
