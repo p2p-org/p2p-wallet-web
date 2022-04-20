@@ -20,6 +20,7 @@ import {
   InfoValue,
   InfoWrapper,
   Section,
+  To,
   Username,
   WalletIcon,
 } from '../common/styled';
@@ -120,7 +121,10 @@ export const Send: FC<Props & TransactionDetailsProps> = ({
           </IconWrapper>
           <InfoWrapper>
             {params.username ? (
-              <Username>{params.username}</Username>
+              <Username>
+                <To>To</To>
+                {params.username}
+              </Username>
             ) : (
               <InfoTitle className="secondary">To address</InfoTitle>
             )}

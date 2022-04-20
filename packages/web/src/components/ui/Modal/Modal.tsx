@@ -27,6 +27,7 @@ const StyledDialogContent = styled(({ ...props }) => <AnimatedDialogContent {...
 
   &[data-reach-dialog-content] {
     position: fixed;
+    top: 33px;
     right: 0;
     bottom: ${MOBILE_FOOTER_TABS_HEIGHT}px;
 
