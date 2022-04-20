@@ -52,7 +52,7 @@ export const SwapButtonOriginal: FC = () => {
       return false;
     }
 
-    openModal(ModalType.SHOW_MODAL_TRANSACTION_STATUS, {
+    openModal(ModalType.SHOW_MODAL_TRANSACTION_STATUS_SWAP, {
       type: 'swap',
       action: onSwap,
       params: {

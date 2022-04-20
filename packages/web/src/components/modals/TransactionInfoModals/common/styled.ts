@@ -1,26 +1,36 @@
 import { styled } from '@linaria/react';
-import { rgba } from 'polished';
+import { theme, zIndexes } from '@p2p-wallet-web/ui';
 
 import { Button, Icon } from 'components/ui';
 
+import { INITIAL_PROGRESS } from '../TransactionStatusModal/TransactionStatusModal';
+
 export const Wrapper = styled.div`
-  position: relative;
-
   display: flex;
-  flex-basis: 524px;
   flex-direction: column;
-  overflow: hidden;
+  justify-content: stretch;
+  width: 524px;
+  max-height: 80vh;
+  overflow: scroll;
 
-  background: #fff;
+  background: ${theme.colors.bg.primary};
 
   border-radius: 15px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
 `;
 
 export const Header = styled.div`
   position: relative;
 
-  padding: 26px 20px 50px;
-
+  color: ${theme.colors.textIcon.primary};
+  font-weight: 500;
+  font-size: 24px;
+  font-style: normal;
+  line-height: 140%;
   text-align: center;
 `;
 
@@ -35,7 +45,7 @@ export const Title = styled.div`
 `;
 
 export const Desc = styled.div`
-  color: #a3a5ba;
+  color: ${theme.colors.bg.buttonDisabled};
   font-weight: 600;
   font-size: 16px;
   line-height: 100%;
@@ -43,8 +53,8 @@ export const Desc = styled.div`
 
 export const CloseWrapper = styled.div`
   position: absolute;
-  top: 15px;
-  right: 15px;
+  top: 0;
+  right: 0;
 
   display: flex;
   align-items: center;
@@ -52,7 +62,8 @@ export const CloseWrapper = styled.div`
   width: 32px;
   height: 32px;
 
-  background: #f6f6f8;
+  color: ${theme.colors.bg.buttonPrimary};
+
   border-radius: 8px;
 
   cursor: pointer;
@@ -61,56 +72,129 @@ export const CloseWrapper = styled.div`
 export const CloseIcon = styled(Icon)`
   width: 16px;
   height: 16px;
-
-  color: #a3a5ba;
 `;
 
-export const BlockWrapper = styled.div`
+export const CheckmarkIcon = styled(Icon)`
+  width: 24px;
+  height: 24px;
+
+  color: ${theme.colors.textIcon.buttonPrimary};
+`;
+
+export const OtherIcon = styled(Icon)`
+  width: 24px;
+  height: 24px;
+
+  color: ${theme.colors.textIcon.buttonPrimary};
+`;
+
+export const ProgressWrapper = styled.div`
+  position: relative;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  height: 55px;
+`;
+
+const StatusColors = styled.div`
+  &.isProcessing {
+    background: ${theme.colors.system.warningMain};
+  }
+
+  &.isSuccess {
+    background: ${theme.colors.system.successMain};
+  }
+
+  &.isError {
+    background: ${theme.colors.system.errorMain};
+  }
+`;
+
+export const ProgressLine = styled.div`
   position: absolute;
-  bottom: -28px;
-  left: 50%;
+
+  left: 0;
+
+  z-index: ${zIndexes.middle};
+
+  width: ${INITIAL_PROGRESS}%;
+  height: 2px;
+
+  background: ${theme.colors.bg.buttonPrimary};
+
+  transition: width 0.15s;
+
+  &.isSuccess {
+    background: ${theme.colors.system.successMain};
+  }
+
+  &.isError {
+    background: ${theme.colors.system.errorMain};
+  }
+`;
+
+export const ProgressStub = styled.div`
+  position: absolute;
+
+  left: 0;
+
+  z-index: ${zIndexes.bottom};
+
+  width: 100%;
+  height: 1px;
+
+  background: ${theme.colors.stroke.secondary};
+`;
+
+export const BlockWrapper = styled(StatusColors)`
+  z-index: ${zIndexes.top};
 
   display: flex;
   align-items: center;
   justify-content: center;
   width: 55px;
   height: 55px;
-  margin-left: -27px;
 
-  background: #5887ff;
-  border-radius: 12px;
-
-  &.isProcessing {
-    background: #ffd177;
-  }
-
-  &.isSuccess {
-    background: #77db7c;
-  }
-
-  &.isError {
-    background: #f77;
-  }
+  border-radius: 40%;
 `;
 
-export const CheckmarkIcon = styled(Icon)`
-  width: 45px;
-  height: 45px;
+export const TransactionStatus = styled.div`
+  display: flex;
+  align-items: center;
 
-  color: #fff;
+  margin-left: 20px;
+
+  color: ${theme.colors.textIcon.primary};
+
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 140%;
 `;
 
-export const OtherIcon = styled(Icon)`
-  width: 37px;
-  height: 37px;
+export const TransactionBadge = styled.div`
+  display: flex;
+  align-items: center;
 
-  color: #fff;
+  margin-left: 4px;
+  padding: 5px 12px;
+
+  color: ${theme.colors.textIcon.secondary};
+
+  font-weight: 500;
+  font-size: 12px;
+
+  background: ${theme.colors.bg.secondary};
+  border-radius: 4px;
 `;
 
-export const ProgressWrapper = styled.div`
-  height: 1px;
+export const TransactionLabel = styled(StatusColors)`
+  display: block;
+  width: 8px;
+  height: 8px;
 
-  background: rgba(0, 0, 0, 0.05);
+  margin-right: 8px;
 `;
 
 export const Content = styled.div`
@@ -134,7 +218,7 @@ export const ValueCurrency = styled.div`
 export const ValueOriginal = styled.div`
   margin-top: 4px;
 
-  color: #a3a5ba;
+  color: ${theme.colors.bg.buttonDisabled};
   font-weight: 600;
   font-size: 16px;
   line-height: 120%;
@@ -176,7 +260,7 @@ export const SwapBlock = styled.div`
   height: 32px;
   margin: 6px 26px 0;
 
-  background: #f6f6f8;
+  background: ${theme.colors.bg.buttonSecondary};
   border-radius: 12px;
 `;
 
@@ -184,7 +268,7 @@ export const SwapIcon = styled(Icon)`
   width: 24px;
   height: 24px;
 
-  color: #a3a5ba;
+  color: ${theme.colors.bg.buttonDisabled};
 `;
 
 export const SwapAmount = styled.div`
@@ -202,16 +286,16 @@ export const FieldWrapper = styled.div`
   padding: 16px 30px;
 
   &:first-child {
-    border-top: 1px solid ${rgba('#000', 0.05)};
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
   }
 
   &:not(:last-child) {
-    border-bottom: 1px solid ${rgba('#000', 0.05)};
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
   }
 `;
 
 export const FieldTitle = styled.div`
-  color: #a3a5ba;
+  color: ${theme.colors.bg.buttonDisabled};
   font-weight: 600;
   font-size: 14px;
   line-height: 21px;
@@ -231,7 +315,7 @@ export const ShareIcon = styled(Icon)`
   width: 24px;
   height: 24px;
 
-  color: #a3a5ba;
+  color: ${theme.colors.bg.buttonDisabled};
 `;
 
 export const ShareWrapper = styled.div`
@@ -248,10 +332,10 @@ export const ShareWrapper = styled.div`
   cursor: pointer;
 
   &:hover {
-    background: #eff3ff;
+    background: ${theme.colors.bg.activePrimary};
 
     ${ShareIcon} {
-      color: #5887ff;
+      color: ${theme.colors.textIcon.active};
     }
   }
 `;
@@ -259,9 +343,10 @@ export const ShareWrapper = styled.div`
 export const Footer = styled.div`
   display: flex;
   align-items: center;
+  justify-content: center;
   padding: 24px 20px;
 
-  border-top: 1px solid ${rgba('#000', 0.05)};
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
 
   & > :not(:last-child) {
     margin-right: 16px;
@@ -276,4 +361,50 @@ export const ButtonExplorer = styled(Button)`
   font-weight: 600;
   font-size: 14px;
   line-height: 150%;
+`;
+
+export const Section = styled.div`
+  display: flex;
+  flex-direction: column;
+  padding: 12px 20px;
+`;
+
+export const DateHeader = styled.div`
+  display: flex;
+  justify-content: center;
+
+  color: ${theme.colors.textIcon.secondary};
+
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 120%;
+
+  & > *:not(:first-child) {
+    margin-left: 4px;
+  }
+`;
+
+export const Time = styled.div`
+  color: ${theme.colors.textIcon.primary};
+`;
+
+export const GoToExplorerIcon = styled(Icon)`
+  width: 24px;
+  height: 24px;
+  margin-right: 8px;
+`;
+
+export const GoToExplorerLink = styled.a`
+  display: inline-flex;
+  align-items: center;
+
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 140%;
+
+  text-decoration: none;
+
+  &.isDisabled {
+    pointer-events: none;
+  }
 `;
