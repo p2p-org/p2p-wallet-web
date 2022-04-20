@@ -19,6 +19,7 @@ import dayjs from 'dayjs';
 
 import { AmountUSD } from 'components/common/AmountUSD';
 import { TokenAvatar } from 'components/common/TokenAvatar';
+import { formatNumber, NUMBER_FORMAT } from 'components/utils/format';
 import { trackEvent } from 'utils/analytics';
 import { getExplorerUrl } from 'utils/connection';
 import { shortAddress } from 'utils/tokens';
@@ -284,7 +285,7 @@ export const TransactionDetailsModal: FC<Props> = ({ signature, source, close })
                 {sourceTokenAccount?.loading ? (
                   <Skeleton width={50} height={16} />
                 ) : (
-                  <>- {sourceTokenAccount?.balance?.formatUnits()}</>
+                  <>- {sourceTokenAccount?.balance?.formatUnits(NUMBER_FORMAT)}</>
                 )}
               </SwapAmount>
             </SwapInfo>
@@ -307,7 +308,7 @@ export const TransactionDetailsModal: FC<Props> = ({ signature, source, close })
                 {sourceTokenAccount?.loading ? (
                   <Skeleton width={80} height={16} />
                 ) : (
-                  <>+ {destinationTokenAccount?.balance?.formatUnits()}</>
+                  <>+ {destinationTokenAccount?.balance?.formatUnits(NUMBER_FORMAT)}</>
                 )}
               </SwapAmount>
             </SwapInfo>
@@ -328,7 +329,8 @@ export const TransactionDetailsModal: FC<Props> = ({ signature, source, close })
       return (
         <SendWrapper>
           <ValueCurrency>
-            {transaction?.details.isReceiver ? '+' : '-'} {tokenAmount.balance.formatUnits()}
+            {transaction?.details.isReceiver ? '+' : '-'}{' '}
+            {tokenAmount.balance.formatUnits(NUMBER_FORMAT)}
           </ValueCurrency>
           <ValueOriginal>
             <AmountUSD
@@ -407,11 +409,11 @@ export const TransactionDetailsModal: FC<Props> = ({ signature, source, close })
                   <FieldValue>
                     {transaction?.data instanceof SwapTransaction ? (
                       <>
-                        {sourceTokenAccount?.balance?.formatUnits()} to{' '}
-                        {destinationTokenAccount?.balance?.formatUnits()}
+                        {sourceTokenAccount?.balance?.formatUnits(NUMBER_FORMAT)} to{' '}
+                        {destinationTokenAccount?.balance?.formatUnits(NUMBER_FORMAT)}
                       </>
                     ) : (
-                      <>{tokenAmount?.balance?.formatUnits()}</>
+                      <>{tokenAmount?.balance?.formatUnits(NUMBER_FORMAT)}</>
                     )}
                   </FieldValue>
                 </FieldWrapper>
@@ -430,9 +432,7 @@ export const TransactionDetailsModal: FC<Props> = ({ signature, source, close })
                     <FieldTitle>Transaction fee</FieldTitle>
                     {isShowFeeBadge ? <PaidByBadge>Paid by p2p.org</PaidByBadge> : undefined}
                   </FieldTitleWrapper>
-                  <FieldValue>
-                    {transaction.raw.meta?.fee.toLocaleString('en-US')} lamports
-                  </FieldValue>
+                  <FieldValue>{formatNumber(transaction.raw.meta?.fee)} lamports</FieldValue>
                 </FieldWrapper>
               ) : null}
               <FieldWrapper>

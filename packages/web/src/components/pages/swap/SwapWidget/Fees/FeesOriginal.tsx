@@ -27,7 +27,7 @@ import { FeeTransactionTooltip } from 'components/common/TransactionDetails/FeeT
 import { Accordion, Icon } from 'components/ui';
 import { AccordionTitle } from 'components/ui/AccordionDetails/AccordionTitle';
 import { ListWrapper, Row, Text } from 'components/ui/AccordionDetails/common';
-import { getNumberFromFormattedNumber } from 'components/utils/format';
+import { formatNumber, getNumberFromFormattedNumber } from 'components/utils/format';
 
 import { useShowSettings } from '../../hooks/useShowSettings';
 import { AmountUSDStyled } from '../AmountUSD';
@@ -295,12 +295,13 @@ export const FeesOriginal: FC<FeesOriginalProps> = ({
   }, [compensationState, feeAmountInToken, feeToken, tokenConfigs, trade]);
 
   const getTokenPrice = (isReverse: boolean) => {
-    trade.inpu;
     const one = new Decimal(1);
 
-    return (isReverse ? one.div(trade.getExchangeRate()) : trade.getExchangeRate())
-      .toSignificantDigits(TOKEN_AMOUNT_SIGNIFICANT_DIGITS)
-      .toString();
+    return formatNumber(
+      (isReverse ? one.div(trade.getExchangeRate()) : trade.getExchangeRate())
+        .toSignificantDigits(TOKEN_AMOUNT_SIGNIFICANT_DIGITS)
+        .toString(),
+    );
   };
 
   const elCompensationFee =
