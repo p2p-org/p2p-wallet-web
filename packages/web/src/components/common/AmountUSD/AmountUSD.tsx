@@ -6,7 +6,7 @@ import { styled } from '@linaria/react';
 import type { TokenAmount } from '@p2p-wallet-web/token-utils';
 
 import { useMarketData } from 'app/contexts';
-import { formatNumberToUSD } from 'components/utils/format';
+import { formatNumberToUSD } from 'utils/format';
 
 const Wrapper = styled.div``;
 

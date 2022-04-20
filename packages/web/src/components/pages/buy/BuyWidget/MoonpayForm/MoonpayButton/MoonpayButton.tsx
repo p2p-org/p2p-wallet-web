@@ -4,7 +4,7 @@ import { styled } from '@linaria/react';
 
 import { useBuyState } from 'app/contexts';
 import { Button, Icon } from 'components/ui';
-import { formatNumberToUSD } from 'components/utils/format';
+import { formatNumberToUSD } from 'utils/format';
 
 const IconWrapper = styled(Icon)`
   width: 24px;

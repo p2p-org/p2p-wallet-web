@@ -4,7 +4,7 @@ import { useMemo } from 'react';
 import { useBuyState } from 'app/contexts';
 import type { Accordion } from 'components/ui/AccordionDetails';
 import { AccordionDetails } from 'components/ui/AccordionDetails';
-import { formatNumberToUSD } from 'components/utils/format';
+import { formatNumberToUSD } from 'utils/format';
 
 export const PurchaseDetails: FC = () => {
   const { buyQuote, currency } = useBuyState();

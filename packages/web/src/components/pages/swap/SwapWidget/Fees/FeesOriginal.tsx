@@ -27,7 +27,7 @@ import { FeeTransactionTooltip } from 'components/common/TransactionDetails/FeeT
 import { Accordion, Icon } from 'components/ui';
 import { AccordionTitle } from 'components/ui/AccordionDetails/AccordionTitle';
 import { ListWrapper, Row, Text } from 'components/ui/AccordionDetails/common';
-import { formatNumber, getNumberFromFormattedNumber } from 'components/utils/format';
+import { formatNumber, getNumberFromFormattedNumber } from 'utils/format';
 
 import { useShowSettings } from '../../hooks/useShowSettings';
 import { AmountUSDStyled } from '../AmountUSD';

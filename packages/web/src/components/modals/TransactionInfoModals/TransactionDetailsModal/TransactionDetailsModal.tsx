@@ -19,9 +19,9 @@ import dayjs from 'dayjs';
 
 import { AmountUSD } from 'components/common/AmountUSD';
 import { TokenAvatar } from 'components/common/TokenAvatar';
-import { formatNumber } from 'components/utils/format';
 import { trackEvent } from 'utils/analytics';
 import { getExplorerUrl } from 'utils/connection';
+import { formatNumber } from 'utils/format';
 import { shortAddress } from 'utils/tokens';
 
 import {

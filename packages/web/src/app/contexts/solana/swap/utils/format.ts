@@ -1,7 +1,7 @@
 import { ZERO } from '@orca-so/sdk';
 import { u64 } from '@solana/spl-token';
 
-import { formatNumber, getNumberFromFormattedNumber } from 'components/utils/format';
+import { formatNumber, getNumberFromFormattedNumber } from 'utils/format';
 
 const floatRegex = /^(\d*)?(\.)?(\d*)?$/;
 const MAX_SIGNIFICANT_DIGITS = 5;

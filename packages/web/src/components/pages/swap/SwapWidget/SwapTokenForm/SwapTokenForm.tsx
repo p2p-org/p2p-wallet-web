@@ -21,7 +21,7 @@ import { Icon } from 'components/ui';
 import { Row, Text } from 'components/ui/AccordionDetails/common';
 import { InputAmount } from 'components/ui/InputAmount';
 import { SearchInput } from 'components/ui/SearchInput';
-import { getNumberFromFormattedNumber } from 'components/utils/format';
+import { getNumberFromFormattedNumber } from 'utils/format';
 import { shortAddress } from 'utils/tokens';
 
 import { AmountUSDStyled } from '../AmountUSD';

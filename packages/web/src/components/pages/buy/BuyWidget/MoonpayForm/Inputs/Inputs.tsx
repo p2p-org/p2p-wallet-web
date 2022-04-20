@@ -9,7 +9,7 @@ import { LAMPORTS_PER_SOL } from '@solana/web3.js';
 import { useBuyState, useConfig } from 'app/contexts';
 import { TokenAvatar } from 'components/common/TokenAvatar';
 import { InputAmount } from 'components/ui/InputAmount';
-import { formatNumberToUSD } from 'components/utils/format';
+import { formatNumberToUSD } from 'utils/format';
 
 import { AmountTypeButton } from '../AmountTypeButton';
 

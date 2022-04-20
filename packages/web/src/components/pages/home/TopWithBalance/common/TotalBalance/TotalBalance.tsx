@@ -6,7 +6,7 @@ import { theme, up } from '@p2p-wallet-web/ui';
 
 import { useUsername } from 'app/contexts';
 import { useTotalBalance } from 'components/pages/home/TopWithBalance/common/TotalBalance/hooks/useTotalBalance';
-import { formatNumberToUSD } from 'components/utils/format';
+import { formatNumberToUSD } from 'utils/format';
 
 const Wrapper = styled.div``;
 

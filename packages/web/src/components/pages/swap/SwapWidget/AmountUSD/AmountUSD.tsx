@@ -8,7 +8,7 @@ import { u64 } from '@solana/spl-token';
 
 import { useConfig, usePrice } from 'app/contexts/solana/swap';
 import { getUSDValue } from 'app/contexts/solana/swap/utils/format';
-import { formatNumberToUSD } from 'components/utils/format';
+import { formatNumberToUSD } from 'utils/format';
 
 const Wrapper = styled.div``;
 
