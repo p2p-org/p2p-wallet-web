@@ -8,6 +8,8 @@ import classNames from 'classnames';
 import { Icon } from 'components/ui';
 
 const WrapperLabel = styled.label`
+  position: relative;
+
   display: flex;
   align-items: center;
   height: 54px;
@@ -28,6 +30,24 @@ const WrapperLabel = styled.label`
   }
 `;
 
+const Mask = styled.div`
+  position: absolute;
+  top: 14px;
+  left: 16px;
+
+  color: #202020;
+
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 140%;
+
+  opacity: 0;
+
+  &.isVisible {
+    opacity: 1;
+  }
+`;
+
 const Input = styled.input`
   flex: 1;
 
@@ -41,16 +61,22 @@ const Input = styled.input`
   border: 0;
   outline: none;
 
+  opacity: 0;
+
   appearance: none;
 
   &::placeholder {
-    color: #d2d4e5 !important;
+    color: #d2d4e5;
 
     font-weight: 500;
     font-size: 16px;
     font-family: 'Inter', sans-serif;
     font-style: normal;
     line-height: 140%;
+  }
+
+  &.isVisible {
+    opacity: 1;
   }
 `;
 
@@ -103,6 +129,8 @@ export const PasswordInput: FC<
     setIsShowPassword((state) => !state);
   };
 
+  const maskValue = String(props.value)?.replace(/[\w,\d,\W]/g, '*');
+
   return (
     <WrapperLabel className={classNames(className, { isFocused, isError })}>
       <Input
@@ -112,7 +140,9 @@ export const PasswordInput: FC<
         onChange={handleChange}
         onFocus={handleFocus}
         onBlur={handleBlur}
+        className={classNames({ isVisible: isShowPassword })}
       />
+      <Mask className={classNames({ isVisible: !isShowPassword })}>{maskValue}</Mask>
       <EyeWrapper onClick={handleToggleShowPassword}>
         <EyeIcon name={isShowPassword ? 'eye' : 'eye-hide'} />
       </EyeWrapper>
