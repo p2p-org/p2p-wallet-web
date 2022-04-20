@@ -23,7 +23,7 @@ import { ToastManager } from 'components/common/ToastManager';
 import { TokenAvatar } from 'components/common/TokenAvatar';
 import { Widget } from 'components/common/Widget';
 import { Button, Icon } from 'components/ui';
-import { NUMBER_FORMAT } from 'components/utils/format';
+import { formatNumberToUSD, NUMBER_FORMAT } from 'components/utils/format';
 import { shortAddress } from 'utils/tokens';
 
 import { Chart } from './Chart';
@@ -323,12 +323,8 @@ const TopWidgetOrigin: FunctionComponent<Props> = ({ publicKey }) => {
 
     return (
       <ValueDelta>
-        {new Intl.NumberFormat('en-US', {
-          style: 'currency',
-          currency: 'USD',
-          currencyDisplay: 'code',
-        }).format(delta.diff)}{' '}
-        ({delta.percentage.toFixed(PERCENT_FRACTION_DIGITS)}%) {period}
+        {formatNumberToUSD(delta.diff)} ({delta.percentage.toFixed(PERCENT_FRACTION_DIGITS)}%){' '}
+        {period}
       </ValueDelta>
     );
   };
