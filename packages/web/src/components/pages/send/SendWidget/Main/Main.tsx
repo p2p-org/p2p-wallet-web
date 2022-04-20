@@ -147,18 +147,6 @@ export const Main: FC = () => {
       </Feature>
 
       <TransactionDetails />
-
-      {/*<TextFieldStyled*/}
-      {/*  label="Current price"*/}
-      {/*  value={*/}
-      {/*    <>*/}
-      {/*      <RateUSD symbol={fromTokenAccount?.balance?.token.symbol} />{' '}*/}
-      {/*      <span>&nbsp;per {fromTokenAccount?.balance?.token.symbol} </span>*/}
-      {/*    </>*/}
-      {/*  }*/}
-      {/*/>*/}
-
-      {/*<TransferFee />*/}
     </>
   );
 };

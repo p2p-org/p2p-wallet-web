@@ -53,10 +53,13 @@ const StyledDialogContent = styled(({ ...props }) => <AnimatedDialogContent {...
       width: unset;
       height: unset;
       margin: 0;
-      overflow-y: hidden;
 
       border-radius: 12px;
     }
+  }
+
+  &:focus-visible {
+    outline: none;
   }
 `;
 

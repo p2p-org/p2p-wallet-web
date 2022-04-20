@@ -1,87 +1,71 @@
 import type { FunctionComponent } from 'react';
 import { useEffect, useState } from 'react';
 
-import { styled } from '@linaria/react';
-import { useConnectionContext, useTransaction, useWallet } from '@p2p-wallet-web/core';
+import { useTransaction, useWallet } from '@p2p-wallet-web/core';
+import { useConnectionContext } from '@saberhq/use-solana';
 import classNames from 'classnames';
+import dayjs from 'dayjs';
 
 import type { ModalPropsType } from 'app/contexts';
 import { ToastManager } from 'components/common/ToastManager';
-import { Button } from 'components/ui';
+import type { TransactionDetailsProps } from 'components/common/TransactionDetails';
 import { trackEvent } from 'utils/analytics';
 import { getExplorerUrl } from 'utils/connection';
 import { transferNotification } from 'utils/transactionNotifications';
 
+import { Send } from '../../TransactionConfirmModal/Send/Send';
 import {
   BlockWrapper,
-  ButtonExplorer,
   CheckmarkIcon,
   CloseIcon,
   CloseWrapper,
-  Content,
-  Desc,
-  FieldsWrapper,
-  FieldTitle,
-  FieldValue,
-  FieldWrapper,
+  DateHeader,
   Footer,
+  GoToExplorerIcon,
+  GoToExplorerLink,
   Header,
   OtherIcon,
+  ProgressLine,
+  ProgressStub,
   ProgressWrapper,
-  ShareIcon,
-  ShareWrapper,
-  Title,
+  Section,
+  Time,
+  TransactionBadge,
+  TransactionLabel,
+  TransactionStatus,
   Wrapper,
 } from '../common/styled';
 import type { TransferParams } from './Send';
-import { Send } from './Send';
-import type { SwapParams } from './Swap';
-import { Swap } from './Swap';
-
-const INITIAL_PROGRESS = 5;
-
-const ProgressLine = styled.div`
-  width: ${INITIAL_PROGRESS}%;
-  height: 1px;
-
-  background: #5887ff;
-
-  transition: width 0.15s;
-`;
-
-const handleCopyClick = (str: string) => () => {
-  try {
-    void navigator.clipboard.writeText(str);
-    ToastManager.info('Copied to buffer!');
-  } catch (error) {
-    console.error(error);
-  }
-};
-
-const DEFAULT_TRANSACTION_ERROR = 'Transaction error';
 
 type SendActionType = () => Promise<string>;
-type SwapActionType = () => Promise<string>;
 
-export type TransactionStatusModalProps = {
+export type TransactionStatusModalProps = TransactionDetailsProps & {
   type: 'send' | 'swap';
-  action: SendActionType | SwapActionType;
-  params: TransferParams | SwapParams;
+  action: SendActionType;
+  params: TransferParams;
 };
+
+export const INITIAL_PROGRESS = 5;
+const UPPER_PROGRESS_BOUND = 95;
+const LOWER_PROGRESS_BOUND = 7;
+const CHECK_PROGRESS_INTERVAL = 2500;
+const FULL_PROGRESS = 100;
+const ADDRESS_CHARS_SHOW = 4;
+const DEFAULT_TRANSACTION_ERROR = 'Transaction error';
 
 export const TransactionStatusModal: FunctionComponent<
   ModalPropsType<string | null> & TransactionStatusModalProps
-> = ({ type, action, params, close }) => {
+> = ({ type, action, params, sendState, userFreeFeeLimits, networkFees, close }) => {
   const { provider } = useWallet();
 
-  const [progress, setProgress] = useState(5);
+  const { network } = useConnectionContext();
+  const [progress, setProgress] = useState(INITIAL_PROGRESS);
   const [isExecuting, setIsExecuting] = useState(false);
   const [signature, setSignature] = useState<string | null>(null);
-  const transaction = useTransaction(signature);
+  const transaction = useTransaction(signature as string);
   const [transactionError, setTransactionError] = useState(
     transaction?.raw?.meta?.err ? DEFAULT_TRANSACTION_ERROR : '',
   );
-  const { network } = useConnectionContext();
 
   useEffect(() => {
     let newProgress = INITIAL_PROGRESS;
@@ -91,18 +75,18 @@ export const TransactionStatusModal: FunctionComponent<
     }
 
     const timerId = setInterval(() => {
-      if (progress <= 95) {
-        newProgress += 7;
+      if (progress <= UPPER_PROGRESS_BOUND) {
+        newProgress += LOWER_PROGRESS_BOUND;
         setProgress(newProgress);
       } else {
-        newProgress = 95;
+        newProgress = UPPER_PROGRESS_BOUND;
         setProgress(newProgress);
       }
-    }, 2500);
+    }, CHECK_PROGRESS_INTERVAL);
 
     return () => {
       clearTimeout(timerId);
-      setProgress(100);
+      setProgress(FULL_PROGRESS);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isExecuting]);
@@ -113,20 +97,14 @@ export const TransactionStatusModal: FunctionComponent<
 
       switch (type) {
         case 'send': {
-          const resultSignature = await (action as SendActionType)();
+          const resultSignature = await action();
           setSignature(resultSignature);
 
           transferNotification({
             header: 'Sent',
-            text: `- ${(params as TransferParams).amount.formatUnits()}`,
-            symbol: (params as TransferParams).amount.token.symbol,
+            text: `- ${params.amount.formatUnits()}`,
+            symbol: params.amount.token.symbol,
           });
-
-          break;
-        }
-        case 'swap': {
-          const resultSignature = await (action as SwapActionType)();
-          setSignature(resultSignature);
 
           break;
         }
@@ -165,7 +143,7 @@ export const TransactionStatusModal: FunctionComponent<
             setTransactionError('');
           }
         } else {
-          setTimeout(mount, 3000);
+          setTimeout(mount, CHECK_PROGRESS_INTERVAL);
         }
       } catch (error) {
         // setTransactionError((error as Error).message);
@@ -179,153 +157,120 @@ export const TransactionStatusModal: FunctionComponent<
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [signature]);
 
-  const handleCloseClick = () => {
-    if (type === 'send') {
-      trackEvent('send_close_click', { transactionConfirmed: !isExecuting });
-    } else if (type === 'swap') {
-      trackEvent('swap_close_click', { transactionConfirmed: !isExecuting });
-    }
-
-    close(signature);
-  };
-
-  const handleDoneClick = () => {
-    if (type === 'send') {
-      trackEvent('send_done_click', { transactionConfirmed: !isExecuting });
-    } else if (type === 'swap') {
-      trackEvent('swap_done_click', { transactionConfirmed: !isExecuting });
-    }
-
-    close(signature);
-  };
-
-  const handleRetryClick = () => {
-    if (type === 'send') {
-      trackEvent('send_try_again_click', { error: transactionError });
-    } else if (type === 'swap') {
-      trackEvent('swap_try_again_click', { error: transactionError });
-    }
-
-    void executeAction();
-  };
-
-  const handleCancelClick = () => {
-    if (type === 'send') {
-      trackEvent('send_cancel_click', { error: transactionError });
-    } else if (type === 'swap') {
-      trackEvent('swap_cancel_click', { error: transactionError });
-    }
-
-    close(signature);
-  };
-
   const isProcessing = (!signature || !transaction?.key) && !transactionError;
-  const isSuccess = signature && transaction?.key && !transactionError;
+  const isSuccess = Boolean(signature && transaction?.key && !transactionError);
+  const isError = Boolean(transactionError);
 
-  const renderTitle = () => {
-    if (isSuccess) {
-      return 'Success';
+  const today = new Date();
+  const utcDiff = today.getHours() - today.getUTCHours();
+
+  const shortAddress = sendState.destinationAddress.replace(
+    sendState.destinationAddress.substring(
+      ADDRESS_CHARS_SHOW,
+      sendState.destinationAddress.length - ADDRESS_CHARS_SHOW,
+    ),
+    '...',
+  );
+
+  const renderStatus = (executing: boolean, success: boolean, error: boolean) => {
+    switch (true) {
+      case executing:
+        return 'Pending';
+      case error:
+        return 'Error';
+      case success:
+        return 'Completed';
+      default:
+        return 'Pending';
     }
-
-    if (transactionError) {
-      return 'Something went wrong';
-    }
-
-    return type === 'send' ? 'Sending...' : 'Swapping...';
   };
 
-  const renderDescription = () => {
-    if (isSuccess) {
-      return type === 'send'
-        ? `You’ve successfully sent ${(params as TransferParams).amount.token.symbol}`
-        : 'You’ve successfully swapped tokens';
-    }
+  const handleCloseClick = () => {
+    trackEvent('send_close_click', { transactionConfirmed: !isExecuting });
 
-    if (transactionError) {
-      return type === 'send' ? 'Tokens have not been debited' : 'Tokens have not been swapped';
-    }
-
-    return 'Transaction processing';
+    close(signature);
   };
 
   return (
     <Wrapper>
-      <Header>
-        <Title>{renderTitle()}</Title>
-        <Desc>{renderDescription()}</Desc>
-        <CloseWrapper onClick={handleCloseClick}>
-          <CloseIcon name="close" />
-        </CloseWrapper>
+      <Section>
+        <>
+          <Header>
+            {params.amount.token.symbol} → {shortAddress}
+            <CloseWrapper onClick={handleCloseClick}>
+              <CloseIcon name="close" />
+            </CloseWrapper>
+          </Header>
+          <DateHeader>
+            <span>{dayjs().format('MMMM D, YYYY')}</span>
+            <Time>{dayjs().format('hh:mm:ss')}</Time>
+            <span>
+              (UTC{utcDiff >= 0 ? '+' : '-'}
+              {utcDiff})
+            </span>
+          </DateHeader>
+        </>
+      </Section>
+      <ProgressWrapper>
+        <ProgressLine
+          style={{ width: `${progress}%` }}
+          className={classNames({
+            isSuccess,
+            isError,
+          })}
+        />
+        <ProgressStub />
+
         <BlockWrapper
           className={classNames({
             isProcessing,
             isSuccess,
-            isError: Boolean(transactionError),
+            isError,
           })}
         >
           {isSuccess ? (
-            <CheckmarkIcon name="checkmark" />
+            <CheckmarkIcon name="success-send" />
           ) : (
-            <OtherIcon name={transactionError ? 'warning' : 'timer'} />
+            <OtherIcon name={transactionError ? 'error-send' : 'clock-send'} />
           )}
         </BlockWrapper>
-      </Header>
-      <ProgressWrapper>
-        <ProgressLine style={{ width: `${progress}%` }} />
       </ProgressWrapper>
-      <Content>
-        {type === 'send' ? (
-          <Send params={params as TransferParams} transaction={transaction} />
-        ) : undefined}
-        {type === 'swap' ? <Swap params={params as SwapParams} /> : undefined}
-        {signature ? (
-          <FieldsWrapper>
-            <FieldWrapper>
-              <FieldTitle>Transaction ID</FieldTitle>
-              <FieldValue>
-                {signature}{' '}
-                <ShareWrapper onClick={handleCopyClick(getExplorerUrl('tx', signature, network))}>
-                  <ShareIcon name="copy" />
-                </ShareWrapper>
-              </FieldValue>
-            </FieldWrapper>
-          </FieldsWrapper>
-        ) : undefined}
-      </Content>
+      <Section>
+        <TransactionStatus>
+          Transaction status:
+          <TransactionBadge>
+            <TransactionLabel
+              className={classNames({
+                isProcessing,
+                isSuccess,
+                isError,
+              })}
+            />
+            {renderStatus(isExecuting, isSuccess, isError)}
+          </TransactionBadge>
+        </TransactionStatus>
+        <Send
+          sendState={sendState}
+          userFreeFeeLimits={userFreeFeeLimits}
+          params={params}
+          networkFees={networkFees}
+        />
+      </Section>
       <Footer>
-        {transactionError ? (
-          <>
-            <Button primary disabled={isExecuting} onClick={handleRetryClick}>
-              Try again
-            </Button>
-            <Button lightGray disabled={isExecuting} onClick={handleCancelClick}>
-              Cancel
-            </Button>
-          </>
-        ) : (
-          <>
-            <Button primary onClick={handleDoneClick}>
-              Done
-            </Button>
-            {signature ? (
-              <a
-                href={getExplorerUrl('tx', signature, network)}
-                target="_blank"
-                rel="noopener noreferrer noindex"
-                onClick={() => {
-                  if (type === 'send') {
-                    trackEvent('send_explorer_click', { transactionConfirmed: !isExecuting });
-                  } else if (type === 'swap') {
-                    trackEvent('swap_explorer_click', { transactionConfirmed: !isExecuting });
-                  }
-                }}
-                className="button"
-              >
-                <ButtonExplorer lightGray>View in blockchain explorer</ButtonExplorer>
-              </a>
-            ) : undefined}
-          </>
-        )}
+        <GoToExplorerLink
+          href={signature ? getExplorerUrl('tx', signature, network) : ''}
+          target="_blank"
+          rel="noopener noreferrer noindex"
+          onClick={() => {
+            trackEvent('send_explorer_click', { transactionConfirmed: !isExecuting });
+          }}
+          className={classNames({
+            isDisabled: !signature,
+          })}
+        >
+          <GoToExplorerIcon name={'external'} />
+          View in Solana explorer
+        </GoToExplorerLink>
       </Footer>
     </Wrapper>
   );
