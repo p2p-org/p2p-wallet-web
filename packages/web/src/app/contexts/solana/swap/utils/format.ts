@@ -40,7 +40,7 @@ export function formatBigNumber(
   const integers = amount.div(base);
   const fractions = amount.umod(base);
   if (fractions.isZero()) {
-    return integers.toString();
+    return formatNumber(integers.toString());
   }
 
   const significantDigits = amount.toString().replace(/^0+/, '').replace(/0+$/, '').length;
@@ -56,7 +56,7 @@ export function formatBigNumber(
     .substring(0, numFractionDigits);
 
   if (!fractionsString.length) {
-    return integers.toString();
+    return formatNumber(integers.toString());
   }
 
   return formatNumber(`${integers.toString()}.${fractionsString}`);
