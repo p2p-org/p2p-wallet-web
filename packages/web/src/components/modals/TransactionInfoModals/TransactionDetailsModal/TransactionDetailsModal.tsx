@@ -150,10 +150,10 @@ type Props = {
   close: () => void;
 };
 
-export const TransactionDetailsModal: FC<Props> = ({ signature, source, close }) => {
+export const TransactionDetailsModal: FC<Props> = ({ signature, source: sourceAddress, close }) => {
   const [isShowDetails, setShowDetails] = useState(false);
   const { network } = useWallet();
-  const transaction = useTransaction(signature, source);
+  const transaction = useTransaction(signature, sourceAddress);
 
   const sourceTokenAccount = useTokenAccount(usePubkey(transaction?.data?.source));
   const destinationTokenAccount = useTokenAccount(usePubkey(transaction?.data?.destination));
@@ -199,7 +199,7 @@ export const TransactionDetailsModal: FC<Props> = ({ signature, source, close })
   const renderFromTo = () => {
     const type = transaction?.details.type;
 
-    const transactionSource = transaction?.data?.source;
+    const source = transaction?.data?.source;
     const destination = transaction?.data?.destination;
     const sourceToken = sourceTokenAccount?.balance?.token;
     const destinationToken = destinationTokenAccount?.balance?.token;
@@ -207,33 +207,33 @@ export const TransactionDetailsModal: FC<Props> = ({ signature, source, close })
     if (type === 'swap') {
       return (
         <>
-          {transaction?.data?.source ? (
+          {source ? (
             <FieldWrapper>
               <FieldTitle>From</FieldTitle>
-              <FieldValue>{transaction.data.source}</FieldValue>
+              <FieldValue>{source}</FieldValue>
             </FieldWrapper>
           ) : undefined}
-          {transaction?.data?.destination ? (
+          {destination ? (
             <FieldWrapper>
               <FieldTitle>To</FieldTitle>
-              <FieldValue>{transaction.data.destination}</FieldValue>
+              <FieldValue>{destination}</FieldValue>
             </FieldWrapper>
           ) : undefined}
         </>
       );
     }
 
-    if (type && ((transactionSource && sourceToken) || (destination && destinationToken))) {
+    if (type && ((source && sourceToken) || (destination && destinationToken))) {
       return (
         <FieldRowWrapper>
-          {transactionSource && sourceToken ? (
+          {source && sourceToken ? (
             <ColumnWrapper>
               <FieldTitle>From</FieldTitle>
               <FieldInfo>
                 <TokenAvatar symbol={sourceToken.symbol} address={sourceToken.address} size={48} />
                 <AddressWrapper>
                   <AddressTitle>{sourceToken.symbol}</AddressTitle>
-                  <AddressValue>{shortAddress(transactionSource)}</AddressValue>
+                  <AddressValue>{shortAddress(source)}</AddressValue>
                 </AddressWrapper>
               </FieldInfo>
             </ColumnWrapper>

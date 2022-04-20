@@ -153,9 +153,9 @@ type Props = {
   source: string;
 };
 
-export const TransactionRow: FunctionComponent<Props> = ({ signature, source }) => {
+export const TransactionRow: FunctionComponent<Props> = ({ signature, source: sourceAddress }) => {
   const { openModal } = useModals();
-  const transaction = useTransaction(signature, source);
+  const transaction = useTransaction(signature, sourceAddress);
 
   const sourceTokenAccount = useTokenAccount(usePubkey(transaction?.data?.source));
   const destinationTokenAccount = useTokenAccount(usePubkey(transaction?.data?.destination));
@@ -172,7 +172,7 @@ export const TransactionRow: FunctionComponent<Props> = ({ signature, source }) 
 
     trackEvent('wallet_transaction_details_open');
 
-    openModal(ModalType.SHOW_MODAL_TRANSACTION_DETAILS, { signature, source });
+    openModal(ModalType.SHOW_MODAL_TRANSACTION_DETAILS, { signature, sourceAddress });
   };
 
   const bottomLeft = useMemo(() => {
@@ -183,15 +183,15 @@ export const TransactionRow: FunctionComponent<Props> = ({ signature, source }) 
 
     const type = transaction?.details.type;
 
-    const transactionSource = transaction?.data?.source;
+    const source = transaction?.data?.source;
     const destination = transaction?.data?.destination;
     const sourceToken = sourceTokenAccount?.balance?.token;
     const destinationToken = destinationTokenAccount?.balance?.token;
 
-    if (type === 'swap' && transactionSource && destination && sourceToken && destinationToken) {
+    if (type === 'swap' && source && destination && sourceToken && destinationToken) {
       return (
         <>
-          <LinkStyled to={`/wallet/${transactionSource}`}>{sourceToken.symbol}</LinkStyled> to{' '}
+          <LinkStyled to={`/wallet/${source}`}>{sourceToken.symbol}</LinkStyled> to{' '}
           <LinkStyled to={`/wallet/${destination}`}>{destinationToken.symbol}</LinkStyled>
         </>
       );
@@ -205,7 +205,7 @@ export const TransactionRow: FunctionComponent<Props> = ({ signature, source }) 
     }
 
     if (type === 'receive') {
-      const address = transactionSource;
+      const address = source;
       if (address) {
         return `From ${shortAddress(address)}`;
       }
