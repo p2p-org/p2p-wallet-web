@@ -12,17 +12,11 @@
     "watch": "rm -fr dist/ && tsc && tsc -P tsconfig.cjs.json -w"
   },
   "dependencies": {
-
   },
   "devDependencies": {
-    "react": "^17.0.2",
-    "typescript": "^4.5.4"
+    "@saberhq/token-utils": "^1.12.27"
   },
   "peerDependencies": {
-    "@types/react": "^17.0.19",
-    "react": "^17.0.2"
-  },
-  "publishConfig": {
-    "access": "public"
+    "@saberhq/token-utils": "^1.12.27"
   }
 }
