@@ -28,7 +28,6 @@ import { Swap } from './Swap';
 
 const WrapperModal = styled(Modal)`
   flex-basis: 524px;
-  max-height: 80vh;
 `;
 
 const ModalTitle = styled.div`

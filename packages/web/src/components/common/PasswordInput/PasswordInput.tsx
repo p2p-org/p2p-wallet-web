@@ -115,7 +115,6 @@ export const PasswordInput: FC<
         onChange={handleChange}
         onFocus={handleFocus}
         onBlur={handleBlur}
-        className={classNames({ isVisible: isShowPassword })}
       />
       <EyeWrapper onClick={handleToggleShowPassword}>
         <EyeIcon name={isShowPassword ? 'eye' : 'eye-hide'} />
