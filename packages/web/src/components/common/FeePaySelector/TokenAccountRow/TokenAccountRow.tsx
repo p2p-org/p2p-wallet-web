@@ -7,7 +7,6 @@ import { theme } from '@p2p-wallet-web/ui';
 
 import { AmountUSD } from 'components/common/AmountUSD';
 import { TokenAvatar } from 'components/common/TokenAvatar';
-import { NUMBER_FORMAT } from 'components/utils/format';
 
 const Wrapper = styled.div`
   padding: 12px;
@@ -83,7 +82,7 @@ export const TokenAccountRow: FunctionComponent<Props> = ({ tokenAccount, onClic
             {loading ? (
               <Skeleton width={100} height={16} />
             ) : (
-              <>{tokenAccount.balance?.formatUnits(NUMBER_FORMAT)}</>
+              <>{tokenAccount.balance?.formatUnits()}</>
             )}
           </Top>
           <Bottom>

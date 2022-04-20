@@ -8,7 +8,6 @@ import classNames from 'classnames';
 import type { ModalPropsType } from 'app/contexts';
 import { ToastManager } from 'components/common/ToastManager';
 import { Button } from 'components/ui';
-import { NUMBER_FORMAT } from 'components/utils/format';
 import { trackEvent } from 'utils/analytics';
 import { getExplorerUrl } from 'utils/connection';
 import { transferNotification } from 'utils/transactionNotifications';
@@ -124,7 +123,7 @@ export const TransactionStatusModal: FunctionComponent<
 
           transferNotification({
             header: 'Sent',
-            text: `- ${(params as TransferParams).amount.formatUnits(NUMBER_FORMAT)}`,
+            text: `- ${(params as TransferParams).amount.formatUnits()}`,
             symbol: (params as TransferParams).amount.token.symbol,
           });
 

@@ -6,7 +6,6 @@ import { useSail } from '@p2p-wallet-web/sail';
 import { useFeeCompensation, useFeeRelayer, useSettings } from 'app/contexts';
 import type { RelayTransferParams } from 'app/contexts/api/feeRelayer/types';
 import { transfer } from 'app/instructions';
-import { NUMBER_FORMAT } from 'components/utils/format';
 
 export const useTransferAction = () => {
   const {
@@ -54,7 +53,7 @@ export const useTransferAction = () => {
           },
           publicKey,
         );
-        const result = await handleTX(tx, `Transfer ${params.amount.formatUnits(NUMBER_FORMAT)}`);
+        const result = await handleTX(tx, `Transfer ${params.amount.formatUnits()}`);
         if (!result.success || !result.pending) {
           throw new Error('Error transfer');
         }

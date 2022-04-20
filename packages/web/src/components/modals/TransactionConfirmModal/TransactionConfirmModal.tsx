@@ -18,7 +18,6 @@ import type { TransactionDetailsProps } from 'components/common/TransactionDetai
 import type { FeesOriginalProps } from 'components/pages/swap/SwapWidget/Fees/FeesOriginal';
 import { Button, Icon } from 'components/ui';
 import { Modal } from 'components/ui/Modal';
-import { NUMBER_FORMAT } from 'components/utils/format';
 import { trackEvent } from 'utils/analytics';
 
 import { Section } from './common/styled';
@@ -173,7 +172,7 @@ export const TransactionConfirmModal: FunctionComponent<
         action = (
           <>
             <SendIcon name="top" />
-            Send {(params as TransferParams).amount.formatUnits(NUMBER_FORMAT)}
+            Send {(params as TransferParams).amount.formatUnits()}
           </>
         );
         break;

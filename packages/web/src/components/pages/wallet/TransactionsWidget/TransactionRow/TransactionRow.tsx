@@ -20,7 +20,6 @@ import { ModalType, useModals } from 'app/contexts/general/modals';
 import { AmountUSD } from 'components/common/AmountUSD';
 import { SwapAvatars } from 'components/pages/wallet/TransactionsWidget/TransactionRow/swap/SwapAvatars';
 import { Icon } from 'components/ui';
-import { NUMBER_FORMAT } from 'components/utils/format';
 import { trackEvent } from 'utils/analytics';
 import { shortAddress } from 'utils/tokens';
 
@@ -293,8 +292,7 @@ export const TransactionRow: FunctionComponent<Props> = ({ signature, source }) 
                 <Skeleton width={70} height={16} />
               ) : tokenAmount?.balance ? (
                 <>
-                  {transaction?.details.isReceiver ? '+' : '-'}{' '}
-                  {tokenAmount.balance.formatUnits(NUMBER_FORMAT)}
+                  {transaction?.details.isReceiver ? '+' : '-'} {tokenAmount.balance.formatUnits()}
                 </>
               ) : (
                 <>#{transaction?.raw?.slot}</>

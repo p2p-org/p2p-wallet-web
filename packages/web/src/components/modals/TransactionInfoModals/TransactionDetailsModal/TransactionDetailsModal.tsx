@@ -19,7 +19,7 @@ import dayjs from 'dayjs';
 
 import { AmountUSD } from 'components/common/AmountUSD';
 import { TokenAvatar } from 'components/common/TokenAvatar';
-import { formatNumber, NUMBER_FORMAT } from 'components/utils/format';
+import { formatNumber } from 'components/utils/format';
 import { trackEvent } from 'utils/analytics';
 import { getExplorerUrl } from 'utils/connection';
 import { shortAddress } from 'utils/tokens';
@@ -285,7 +285,7 @@ export const TransactionDetailsModal: FC<Props> = ({ signature, source, close })
                 {sourceTokenAccount?.loading ? (
                   <Skeleton width={50} height={16} />
                 ) : (
-                  <>- {sourceTokenAccount?.balance?.formatUnits(NUMBER_FORMAT)}</>
+                  <>- {sourceTokenAccount?.balance?.formatUnits()}</>
                 )}
               </SwapAmount>
             </SwapInfo>
@@ -308,7 +308,7 @@ export const TransactionDetailsModal: FC<Props> = ({ signature, source, close })
                 {sourceTokenAccount?.loading ? (
                   <Skeleton width={80} height={16} />
                 ) : (
-                  <>+ {destinationTokenAccount?.balance?.formatUnits(NUMBER_FORMAT)}</>
+                  <>+ {destinationTokenAccount?.balance?.formatUnits()}</>
                 )}
               </SwapAmount>
             </SwapInfo>
@@ -329,8 +329,7 @@ export const TransactionDetailsModal: FC<Props> = ({ signature, source, close })
       return (
         <SendWrapper>
           <ValueCurrency>
-            {transaction?.details.isReceiver ? '+' : '-'}{' '}
-            {tokenAmount.balance.formatUnits(NUMBER_FORMAT)}
+            {transaction?.details.isReceiver ? '+' : '-'} {tokenAmount.balance.formatUnits()}
           </ValueCurrency>
           <ValueOriginal>
             <AmountUSD
@@ -409,11 +408,11 @@ export const TransactionDetailsModal: FC<Props> = ({ signature, source, close })
                   <FieldValue>
                     {transaction?.data instanceof SwapTransaction ? (
                       <>
-                        {sourceTokenAccount?.balance?.formatUnits(NUMBER_FORMAT)} to{' '}
-                        {destinationTokenAccount?.balance?.formatUnits(NUMBER_FORMAT)}
+                        {sourceTokenAccount?.balance?.formatUnits()} to{' '}
+                        {destinationTokenAccount?.balance?.formatUnits()}
                       </>
                     ) : (
-                      <>{tokenAmount?.balance?.formatUnits(NUMBER_FORMAT)}</>
+                      <>{tokenAmount?.balance?.formatUnits()}</>
                     )}
                   </FieldValue>
                 </FieldWrapper>

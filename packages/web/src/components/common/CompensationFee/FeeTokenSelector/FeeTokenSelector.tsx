@@ -8,7 +8,6 @@ import { theme } from '@p2p-wallet-web/ui';
 import { AmountUSD } from 'components/common/AmountUSD';
 import { TokenAvatar } from 'components/common/TokenAvatar';
 import { Select } from 'components/ui';
-import { NUMBER_FORMAT } from 'components/utils/format';
 
 const SelectorValue = styled.div`
   display: flex;
@@ -160,7 +159,7 @@ export const FeeTokenSelector: FC<Props> = ({
             {isSend && feeAmount ? (
               <Bottom>
                 <Label>Pay with:</Label>
-                <Amount>{feeAmount.formatUnits(NUMBER_FORMAT)}</Amount>
+                <Amount>{feeAmount.formatUnits()}</Amount>
               </Bottom>
             ) : undefined}
           </Fees>

@@ -23,7 +23,7 @@ import { ToastManager } from 'components/common/ToastManager';
 import { TokenAvatar } from 'components/common/TokenAvatar';
 import { Widget } from 'components/common/Widget';
 import { Button, Icon } from 'components/ui';
-import { formatNumberToUSD, NUMBER_FORMAT } from 'components/utils/format';
+import { formatNumberToUSD } from 'components/utils/format';
 import { shortAddress } from 'utils/tokens';
 
 import { Chart } from './Chart';
@@ -342,7 +342,7 @@ const TopWidgetOrigin: FunctionComponent<Props> = ({ publicKey }) => {
           </ValueCurrency>
         ) : undefined}
         <BottomWrapper className={classNames({ isSticky })}>
-          <ValueOriginal>{tokenAccount.balance?.formatUnits(NUMBER_FORMAT)}</ValueOriginal>
+          <ValueOriginal>{tokenAccount.balance?.formatUnits()}</ValueOriginal>
           {renderDelta(isSticky)}
         </BottomWrapper>
       </PriceWrapped>
