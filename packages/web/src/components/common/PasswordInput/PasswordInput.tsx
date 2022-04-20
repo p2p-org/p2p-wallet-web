@@ -3,6 +3,7 @@ import { useState } from 'react';
 import * as React from 'react';
 
 import { styled } from '@linaria/react';
+import { theme } from '@p2p-wallet-web/ui';
 import classNames from 'classnames';
 
 import { Icon } from 'components/ui';
@@ -15,68 +16,44 @@ const WrapperLabel = styled.label`
   height: 54px;
   padding: 0 15px;
 
-  border: 1px solid #d3d4de;
+  border: 1px solid ${theme.colors.stroke.primary};
   border-radius: 12px;
   cursor: text;
 
   &.isFocused {
-    background: #fff;
-    border-color: #5887ff;
-    caret-color: #5887ff;
+    background: ${theme.colors.bg.primary};
+    border-color: ${theme.colors.textIcon.active};
+    caret-color: ${theme.colors.textIcon.active};
   }
 
   &.isError {
-    border-color: #f43d3d;
-  }
-`;
-
-const Mask = styled.div`
-  position: absolute;
-  top: 14px;
-  left: 16px;
-
-  color: #202020;
-
-  font-weight: 500;
-  font-size: 16px;
-  line-height: 140%;
-
-  opacity: 0;
-
-  &.isVisible {
-    opacity: 1;
+    border-color: ${theme.colors.system.errorMain};
   }
 `;
 
 const Input = styled.input`
   flex: 1;
 
-  color: #161616;
+  color: ${theme.colors.textIcon.primary};
   font-weight: 500;
   font-size: 16px;
-  font-family: 'Aktiv Grotesk Corp', sans-serif;
+  font-family: 'Inter', sans-serif;
   line-height: 22px;
 
   background: transparent;
   border: 0;
   outline: none;
 
-  opacity: 0;
-
   appearance: none;
 
   &::placeholder {
-    color: #d2d4e5;
+    color: ${theme.colors.textIcon.tertiary};
 
     font-weight: 500;
     font-size: 16px;
     font-family: 'Inter', sans-serif;
     font-style: normal;
     line-height: 140%;
-  }
-
-  &.isVisible {
-    opacity: 1;
   }
 `;
 
@@ -88,7 +65,7 @@ const EyeIcon = styled(Icon)`
   width: 24px;
   height: 24px;
 
-  color: #8e8e93;
+  color: ${theme.colors.textIcon.buttonSecondary};
 `;
 
 const REGEX_PASSWORD = /[^\w!"#$%&'()*+,./:;<=>?@[\\\]^`{|}~-]+/g;
@@ -129,8 +106,6 @@ export const PasswordInput: FC<
     setIsShowPassword((state) => !state);
   };
 
-  const maskValue = String(props.value)?.replace(/[\w,\d,\W]/g, '*');
-
   return (
     <WrapperLabel className={classNames(className, { isFocused, isError })}>
       <Input
@@ -142,7 +117,6 @@ export const PasswordInput: FC<
         onBlur={handleBlur}
         className={classNames({ isVisible: isShowPassword })}
       />
-      <Mask className={classNames({ isVisible: !isShowPassword })}>{maskValue}</Mask>
       <EyeWrapper onClick={handleToggleShowPassword}>
         <EyeIcon name={isShowPassword ? 'eye' : 'eye-hide'} />
       </EyeWrapper>
