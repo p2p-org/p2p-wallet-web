@@ -2,7 +2,7 @@ import type { FC } from 'react';
 
 import { styled } from '@linaria/react';
 import type { TokenAccount } from '@p2p-wallet-web/core';
-import { NUMBER_FORMAT } from '@p2p-wallet-web/web/src/components/utils/format';
+import { NUMBER_FORMAT } from '@p2p-wallet-web/token-utils';
 
 const Wrapper = styled.div``;
 

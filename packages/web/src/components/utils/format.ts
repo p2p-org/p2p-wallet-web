@@ -1,12 +1,6 @@
 const USD_MAX_FRACTION_DIGITS = 2;
 const GROUP_SIZE = 3;
 
-export const NUMBER_FORMAT = {
-  decimalSeparator: '.',
-  groupSeparator: ' ',
-  groupSize: 3,
-};
-
 export const formatNumberToUSD = (
   amount: number,
   options: { alwaysShowCents: boolean } = { alwaysShowCents: true },
