@@ -8,6 +8,7 @@ import classNames from 'classnames';
 import type { ModalPropsType } from 'app/contexts';
 import { ToastManager } from 'components/common/ToastManager';
 import { Button } from 'components/ui';
+import { NUMBER_FORMAT } from 'components/utils/format';
 import { trackEvent } from 'utils/analytics';
 import { getExplorerUrl } from 'utils/connection';
 import { transferNotification } from 'utils/transactionNotifications';
@@ -39,6 +40,11 @@ import type { SwapParams } from './Swap';
 import { Swap } from './Swap';
 
 const INITIAL_PROGRESS = 5;
+const ALMOST_DONE_PROGRESS = 95;
+const FULL_PROGRESS = 100;
+const PROGRESS_STEP = 7;
+const PROGRESS_TIMER_INTERVAL = 2500;
+const TRANSACTION_CHECK_TIMOEOUT = 3000;
 
 const ProgressLine = styled.div`
   width: ${INITIAL_PROGRESS}%;
@@ -74,7 +80,7 @@ export const TransactionStatusModal: FunctionComponent<
 > = ({ type, action, params, close }) => {
   const { provider } = useWallet();
 
-  const [progress, setProgress] = useState(5);
+  const [progress, setProgress] = useState(INITIAL_PROGRESS);
   const [isExecuting, setIsExecuting] = useState(false);
   const [signature, setSignature] = useState<string | null>(null);
   const transaction = useTransaction(signature);
@@ -91,18 +97,18 @@ export const TransactionStatusModal: FunctionComponent<
     }
 
     const timerId = setInterval(() => {
-      if (progress <= 95) {
-        newProgress += 7;
+      if (progress <= ALMOST_DONE_PROGRESS) {
+        newProgress += PROGRESS_STEP;
         setProgress(newProgress);
       } else {
-        newProgress = 95;
+        newProgress = ALMOST_DONE_PROGRESS;
         setProgress(newProgress);
       }
-    }, 2500);
+    }, PROGRESS_TIMER_INTERVAL);
 
     return () => {
       clearTimeout(timerId);
-      setProgress(100);
+      setProgress(FULL_PROGRESS);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isExecuting]);
@@ -118,7 +124,7 @@ export const TransactionStatusModal: FunctionComponent<
 
           transferNotification({
             header: 'Sent',
-            text: `- ${(params as TransferParams).amount.formatUnits()}`,
+            text: `- ${(params as TransferParams).amount.formatUnits(NUMBER_FORMAT)}`,
             symbol: (params as TransferParams).amount.token.symbol,
           });
 
@@ -165,7 +171,7 @@ export const TransactionStatusModal: FunctionComponent<
             setTransactionError('');
           }
         } else {
-          setTimeout(mount, 3000);
+          setTimeout(mount, TRANSACTION_CHECK_TIMOEOUT);
         }
       } catch (error) {
         // setTransactionError((error as Error).message);

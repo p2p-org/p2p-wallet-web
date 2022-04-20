@@ -9,7 +9,7 @@ import { LAMPORTS_PER_SOL } from '@solana/web3.js';
 import { useBuyState, useConfig } from 'app/contexts';
 import { TokenAvatar } from 'components/common/TokenAvatar';
 import { InputAmount } from 'components/ui/InputAmount';
-import { formatNumberToUSD } from 'components/utils/format';
+import { formatNumberToUSD, NUMBER_FORMAT } from 'components/utils/format';
 
 import { AmountTypeButton } from '../AmountTypeButton';
 
@@ -60,7 +60,7 @@ export const Inputs: FC = () => {
       : Number(buyQuote?.baseCurrencyAmount)) || 0;
 
   const buttonAmountFormatted = isBaseAmountType
-    ? new TokenAmount(token, buttonAmount * LAMPORTS_PER_SOL).formatUnits()
+    ? new TokenAmount(token, buttonAmount * LAMPORTS_PER_SOL).formatUnits(NUMBER_FORMAT)
     : formatNumberToUSD(buttonAmount, { alwaysShowCents: false });
 
   return (

@@ -6,6 +6,7 @@ import { useSail } from '@p2p-wallet-web/sail';
 import { useFeeCompensation, useFeeRelayer, useSettings } from 'app/contexts';
 import type { RelayTransferParams } from 'app/contexts/api/feeRelayer/types';
 import { transfer } from 'app/instructions';
+import { NUMBER_FORMAT } from 'components/utils/format';
 
 export const useTransferAction = () => {
   const {
@@ -38,7 +39,7 @@ export const useTransferAction = () => {
           feeAmount: compensationState?.nextTransactionFee,
           feeToken,
         });
-        return signature as string;
+        return signature;
       } else {
         if (!params.fromTokenAccount.key) {
           throw new Error('fromTokenAccount must be set');
@@ -53,7 +54,7 @@ export const useTransferAction = () => {
           },
           publicKey,
         );
-        const result = await handleTX(tx, `Transfer ${params.amount.formatUnits()}`);
+        const result = await handleTX(tx, `Transfer ${params.amount.formatUnits(NUMBER_FORMAT)}`);
         if (!result.success || !result.pending) {
           throw new Error('Error transfer');
         }

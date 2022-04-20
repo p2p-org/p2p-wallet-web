@@ -6,6 +6,7 @@ import type { TokenAccount } from '@p2p-wallet-web/core';
 import { theme, up, useIsMobile } from '@p2p-wallet-web/ui';
 import classNames from 'classnames';
 
+import { NUMBER_FORMAT } from 'components/utils/format';
 import { shortAddress } from 'utils/tokens';
 
 import { AmountUSD } from '../AmountUSD';
@@ -105,6 +106,7 @@ export const TokenAccountRowContent: FC<Props> = ({ tokenAccount, isMobilePopupC
     return null;
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-magic-numbers
   const avatarSize = isMobile ? 32 : 44;
   const { loading } = tokenAccount;
 
@@ -123,7 +125,11 @@ export const TokenAccountRowContent: FC<Props> = ({ tokenAccount, isMobilePopupC
 
   const elTokenBalance = (
     <TokenBalance>
-      {loading ? <Skeleton width={100} height={14} /> : <>{tokenAccount.balance?.formatUnits()}</>}
+      {loading ? (
+        <Skeleton width={100} height={14} />
+      ) : (
+        <>{tokenAccount.balance?.formatUnits(NUMBER_FORMAT)}</>
+      )}
     </TokenBalance>
   );
 

@@ -20,6 +20,7 @@ import { ModalType, useModals } from 'app/contexts/general/modals';
 import { AmountUSD } from 'components/common/AmountUSD';
 import { SwapAvatars } from 'components/pages/wallet/TransactionsWidget/TransactionRow/swap/SwapAvatars';
 import { Icon } from 'components/ui';
+import { NUMBER_FORMAT } from 'components/utils/format';
 import { trackEvent } from 'utils/analytics';
 import { shortAddress } from 'utils/tokens';
 
@@ -37,7 +38,7 @@ const Wrapper = styled.div`
       bottom: 0;
       left: 10px;
 
-      border-bottom: 1px solid ${rgba(0, 0, 0, 0.05)};
+      border-bottom: 1px solid ${rgba(0, 0, 0, Number('0.05'))};
 
       content: '';
     }
@@ -183,15 +184,15 @@ export const TransactionRow: FunctionComponent<Props> = ({ signature, source }) 
 
     const type = transaction?.details.type;
 
-    const source = transaction?.data?.source;
+    const transactionSource = transaction?.data?.source;
     const destination = transaction?.data?.destination;
     const sourceToken = sourceTokenAccount?.balance?.token;
     const destinationToken = destinationTokenAccount?.balance?.token;
 
-    if (type === 'swap' && source && destination && sourceToken && destinationToken) {
+    if (type === 'swap' && transactionSource && destination && sourceToken && destinationToken) {
       return (
         <>
-          <LinkStyled to={`/wallet/${source}`}>{sourceToken.symbol}</LinkStyled> to{' '}
+          <LinkStyled to={`/wallet/${transactionSource}`}>{sourceToken.symbol}</LinkStyled> to{' '}
           <LinkStyled to={`/wallet/${destination}`}>{destinationToken.symbol}</LinkStyled>
         </>
       );
@@ -205,7 +206,7 @@ export const TransactionRow: FunctionComponent<Props> = ({ signature, source }) 
     }
 
     if (type === 'receive') {
-      const address = source;
+      const address = transactionSource;
       if (address) {
         return `From ${shortAddress(address)}`;
       }
@@ -292,7 +293,8 @@ export const TransactionRow: FunctionComponent<Props> = ({ signature, source }) 
                 <Skeleton width={70} height={16} />
               ) : tokenAmount?.balance ? (
                 <>
-                  {transaction?.details.isReceiver ? '+' : '-'} {tokenAmount.balance.formatUnits()}
+                  {transaction?.details.isReceiver ? '+' : '-'}{' '}
+                  {tokenAmount.balance.formatUnits(NUMBER_FORMAT)}
                 </>
               ) : (
                 <>#{transaction?.raw?.slot}</>
