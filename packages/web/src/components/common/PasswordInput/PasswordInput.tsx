@@ -13,17 +13,17 @@ const WrapperLabel = styled.label`
   height: 54px;
   padding: 0 15px;
 
-  background: #f6f6f8;
-  border: 1px solid transparent;
+  border: 1px solid #d3d4de;
   border-radius: 12px;
   cursor: text;
 
   &.isFocused {
     background: #fff;
     border-color: #5887ff;
+    caret-color: #5887ff;
   }
 
-  &.error {
+  &.isError {
     border-color: #f43d3d;
   }
 `;
@@ -44,8 +44,13 @@ const Input = styled.input`
   appearance: none;
 
   &::placeholder {
-    color: #1616164c;
-    font-weight: 400;
+    color: #d2d4e5 !important;
+
+    font-weight: 500;
+    font-size: 16px;
+    font-family: 'Inter', sans-serif;
+    font-style: normal;
+    line-height: 140%;
   }
 `;
 
@@ -57,18 +62,19 @@ const EyeIcon = styled(Icon)`
   width: 24px;
   height: 24px;
 
-  color: #c0c1cb;
+  color: #8e8e93;
 `;
 
 const REGEX_PASSWORD = /[^\w!"#$%&'()*+,./:;<=>?@[\\\]^`{|}~-]+/g;
 
 type Props = {
   onChange: (password: string) => void;
+  isError: boolean;
 };
 
 export const PasswordInput: FC<
   Props & Omit<React.InputHTMLAttributes<HTMLInputElement>, 'type' | 'onChange'>
-> = ({ onChange, onFocus, onBlur, className, ...props }) => {
+> = ({ onChange, onFocus, onBlur, className, isError, ...props }) => {
   const [isShowPassword, setIsShowPassword] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
 
@@ -98,10 +104,11 @@ export const PasswordInput: FC<
   };
 
   return (
-    <WrapperLabel className={classNames(className, { isFocused })}>
+    <WrapperLabel className={classNames(className, { isFocused, isError })}>
       <Input
         type={isShowPassword ? 'input' : 'password'}
         {...props}
+        placeholder={'Password'}
         onChange={handleChange}
         onFocus={handleFocus}
         onBlur={handleBlur}

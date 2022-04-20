@@ -220,7 +220,11 @@ export const TransactionConfirmModal: FunctionComponent<
       {isSecretKeyWallet ? (
         <Section className="password">
           <SubTitle>Enter password to confirm</SubTitle>
-          <PasswordInputStyled value={password} onChange={handlePasswordChange} />
+          <PasswordInputStyled
+            value={password}
+            onChange={handlePasswordChange}
+            isError={hasError}
+          />
           {hasError ? <ErrorHint error="Incorrect password, try again" noIcon /> : undefined}
         </Section>
       ) : undefined}
