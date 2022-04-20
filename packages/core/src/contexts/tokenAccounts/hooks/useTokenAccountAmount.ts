@@ -1,9 +1,9 @@
 import { useMemo } from 'react';
 
-import { TokenAmount } from '@saberhq/token-utils';
 import type { PublicKey } from '@solana/web3.js';
 
 import { useTokenAccount } from './index';
+import { TokenAmount } from '@p2p-wallet-web/token-utils';
 
 export const useTokenAccountAmount = (
   publicKey: PublicKey | null | undefined,

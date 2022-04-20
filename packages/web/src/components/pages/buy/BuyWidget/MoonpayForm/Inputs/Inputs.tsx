@@ -2,8 +2,8 @@ import type { FC } from 'react';
 
 import { styled } from '@linaria/react';
 import { useToken } from '@p2p-wallet-web/core';
+import { TokenAmount } from '@p2p-wallet-web/token-utils';
 import { borders, theme } from '@p2p-wallet-web/ui';
-import { TokenAmount } from '@saberhq/token-utils';
 import { LAMPORTS_PER_SOL } from '@solana/web3.js';
 
 import { useBuyState, useConfig } from 'app/contexts';

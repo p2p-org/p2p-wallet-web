@@ -5,8 +5,8 @@ import { ZERO } from '@orca-so/sdk';
 import type { TokenAccount } from '@p2p-wallet-web/core';
 import { tryParseTokenAmount, useTokenAccount, useWallet } from '@p2p-wallet-web/core';
 import { useNativeAccount, usePubkey } from '@p2p-wallet-web/sail';
+import { TokenAmount } from '@p2p-wallet-web/token-utils';
 import type { RenNetwork } from '@renproject/interfaces';
-import { TokenAmount } from '@saberhq/token-utils';
 import { PublicKey } from '@solana/web3.js';
 import { createContainer } from 'unstated-next';
 

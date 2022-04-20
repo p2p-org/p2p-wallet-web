@@ -1,5 +1,5 @@
 import type { Token } from '@saberhq/token-utils';
-import { TokenAmount } from '@saberhq/token-utils';
+import { TokenAmount } from '@p2p-wallet-web/token-utils';
 
 export const tryParseTokenAmount = (
   token: Token | null | undefined,

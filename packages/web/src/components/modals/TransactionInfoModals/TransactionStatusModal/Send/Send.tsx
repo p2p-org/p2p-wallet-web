@@ -3,7 +3,7 @@ import type { FC } from 'react';
 import type { TokenAccount, Transaction, TransferTransaction } from '@p2p-wallet-web/core';
 import { useTokenAccountAmount } from '@p2p-wallet-web/core';
 import { usePubkey } from '@p2p-wallet-web/sail';
-import type { TokenAmount } from '@saberhq/token-utils';
+import type { TokenAmount } from '@p2p-wallet-web/token-utils';
 
 import { AmountUSD } from 'components/common/AmountUSD';
 import {

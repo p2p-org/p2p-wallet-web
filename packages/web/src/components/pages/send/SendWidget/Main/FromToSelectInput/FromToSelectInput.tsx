@@ -4,9 +4,9 @@ import { useMemo } from 'react';
 import { styled } from '@linaria/react';
 import { ZERO } from '@orca-so/sdk';
 import type { TokenAccount } from '@p2p-wallet-web/core';
+import { TokenAmount } from '@p2p-wallet-web/token-utils';
 import { theme } from '@p2p-wallet-web/ui';
 import type { Token } from '@saberhq/token-utils';
-import { TokenAmount } from '@saberhq/token-utils';
 import classNames from 'classnames';
 
 import { AccountCreationFeeTooltip } from 'components/common/AccountCreationFeeTooltip';

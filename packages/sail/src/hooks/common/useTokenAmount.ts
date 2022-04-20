@@ -1,6 +1,6 @@
 import type { Token } from "@saberhq/token-utils";
-import { TokenAmount } from "@saberhq/token-utils";
 import { useMemo } from "react";
+import { TokenAmount } from "@p2p-wallet-web/token-utils";
 
 /**
  * Parses a {@link TokenAmount}.
