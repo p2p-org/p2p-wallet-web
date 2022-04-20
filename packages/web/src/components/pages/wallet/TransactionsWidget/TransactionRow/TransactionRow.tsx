@@ -37,7 +37,7 @@ const Wrapper = styled.div`
       bottom: 0;
       left: 10px;
 
-      border-bottom: 1px solid ${rgba(0, 0, 0, Number('0.05'))};
+      border-bottom: 1px solid ${rgba(0, 0, 0, 0.05)};
 
       content: '';
     }
