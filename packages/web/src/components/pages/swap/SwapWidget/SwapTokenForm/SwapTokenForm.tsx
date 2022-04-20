@@ -628,7 +628,7 @@ export const SwapTokenForm: FC<Props> = ({
           <Row>
             <Text className="gray">Receive at least:</Text>
             <Text>
-              {receiveAmount}
+              {receiveAmount} {trade.outputTokenName}
               <Text className="gray inline-flex">
                 <AmountUSDStyled
                   prefix="~"
