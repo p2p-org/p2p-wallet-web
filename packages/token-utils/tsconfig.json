@@ -1,0 +1,10 @@
+{
+  "extends": "@p2p-wallet-web/tsconfig/tsconfig.lib.json",
+  "compilerOptions": {
+    "lib": ["ES2015", "DOM"],
+    "outDir": "dist/esm/",
+    "rootDir": "src/",
+    "noEmit": false
+  },
+  "include": ["./src"]
+}
