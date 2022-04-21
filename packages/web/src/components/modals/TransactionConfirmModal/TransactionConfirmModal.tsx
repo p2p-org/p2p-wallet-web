@@ -28,7 +28,6 @@ import { Swap } from './Swap';
 
 const WrapperModal = styled(Modal)`
   flex-basis: 524px;
-  max-height: 80vh;
 `;
 
 const ModalTitle = styled.div`
@@ -222,7 +221,11 @@ export const TransactionConfirmModal: FunctionComponent<
       {isSecretKeyWallet ? (
         <Section className="password">
           <SubTitle>Enter password to confirm</SubTitle>
-          <PasswordInputStyled value={password} onChange={handlePasswordChange} />
+          <PasswordInputStyled
+            value={password}
+            onChange={handlePasswordChange}
+            isError={hasError}
+          />
           {hasError ? <ErrorHint error="Incorrect password, try again" noIcon /> : undefined}
         </Section>
       ) : undefined}

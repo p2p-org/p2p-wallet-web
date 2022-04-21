@@ -23,6 +23,8 @@ const DRAG_MOVEMENT_THRESHOLD = 300;
 const DRAG_VELOCITY_THRESHOLD = 3;
 
 const StyledDialogContent = styled(({ ...props }) => <AnimatedDialogContent {...props} />)`
+  max-height: calc(100vh - 80px);
+
   overflow-y: ${({ mobile }) => (mobile ? 'scroll' : 'hidden')};
 
   &[data-reach-dialog-content] {
