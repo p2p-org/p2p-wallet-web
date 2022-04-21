@@ -14,7 +14,7 @@ export const globalCss = css`
     }
 
     body {
-      ${light}
+      ${light};
     }
 
     // body[data-theme='light'] {

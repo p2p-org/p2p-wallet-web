@@ -14,10 +14,12 @@ import change from './assets/change-icon.svg';
 import checkmark from './assets/checkmark-icon.svg';
 import chevron1 from './assets/chevron-1-icon.svg';
 import chevronRounded from './assets/chevron-rounded-icon.svg';
+import clockSend from './assets/clock-send-icon.svg';
 import close from './assets/close-icon.svg';
 import currency from './assets/currency-icon.svg';
 import db from './assets/db-icon.svg';
 import error from './assets/error-icon.svg';
+import errorSend from './assets/error-send-icon.svg';
 import freeTx from './assets/free-tx-icon.svg';
 import lock from './assets/lock-icon.svg';
 import logout from './assets/logout-icon.svg';
@@ -60,6 +62,7 @@ import reload from './assets/reload-icon.svg';
 import searchOld from './assets/search-icon.svg';
 import settings from './assets/settings-icon.svg';
 import success from './assets/success-icon.svg';
+import successSend from './assets/success-send-icon.svg';
 import sun from './assets/sun-icon.svg';
 import timer from './assets/timer-icon.svg';
 import walletOld from './assets/wallet-icon.svg';
@@ -125,6 +128,9 @@ const iconsMap = new Map<string, string>([
   ['opposite-arrows', oppositeArrows],
   ['store-icon', storeIcon],
   ['arrow-swap', arrowSwap],
+  ['clock-send', clockSend],
+  ['success-send', successSend],
+  ['error-send', errorSend],
 ]);
 
 export interface IconProps extends HTMLAttributes<HTMLOrSVGElement> {

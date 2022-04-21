@@ -4,6 +4,7 @@ import type { TokenAccount, Transaction, TransferTransaction } from '@p2p-wallet
 import { useTokenAccountAmount } from '@p2p-wallet-web/core';
 import { usePubkey } from '@p2p-wallet-web/sail';
 import type { TokenAmount } from '@p2p-wallet-web/token-utils';
+import type { PublicKey } from '@solana/web3.js';
 
 import { AmountUSD } from 'components/common/AmountUSD';
 import {
@@ -15,6 +16,8 @@ import {
 export type TransferParams = {
   source: TokenAccount;
   amount: TokenAmount;
+  destination: PublicKey;
+  username: string;
 };
 
 interface Props {

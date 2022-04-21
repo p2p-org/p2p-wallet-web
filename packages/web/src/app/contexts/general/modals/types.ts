@@ -9,6 +9,7 @@ export enum ModalType {
   SHOW_MODAL_PROCEED_USERNAME,
   SHOW_MODAL_ADD_COIN,
   SHOW_MODAL_CHOOSE_BUY_TOKEN_MOBILE,
+  SHOW_MODAL_TRANSACTION_STATUS_SWAP,
 }
 
 export type ModalPropsType<T = boolean, P = any> = {

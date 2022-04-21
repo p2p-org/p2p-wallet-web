@@ -23,7 +23,7 @@ export const Section = styled.div`
 `;
 
 export const SectionTitle = styled.div`
-  color: #a3a5ba;
+  color: ${theme.colors.bg.buttonDisabled};
   font-weight: 600;
   font-size: 14px;
   line-height: 140%;
@@ -79,7 +79,14 @@ export const InfoTitle = styled.div`
 
 export const Username = styled(InfoTitle)`
   color: #000;
-  font-size: 16px;
+  font-weight: 500;
+  font-size: 14px;
+`;
+
+export const To = styled.span`
+  margin-right: 4px;
+
+  color: ${theme.colors.textIcon.secondary};
 `;
 
 export const InfoValue = styled.div`
@@ -93,8 +100,9 @@ export const InfoValue = styled.div`
 `;
 
 export const Subtitle = styled.div`
-  margin-left: 20px;
   margin-top: 16px;
+  margin-left: 20px;
+
   font-weight: 500;
   font-size: 16px;
   line-height: 140%;
@@ -102,19 +110,24 @@ export const Subtitle = styled.div`
 
 export const Wrapper = styled.div`
   position: relative;
+
   margin-bottom: 8px;
 `;
 
 export const FromToWrapper = styled.div`
   position: absolute;
-  border: 1px solid ${theme.colors.stroke.secondary};
+  top: 107px;
+  left: 27px;
+
   width: 32px;
   height: 32px;
-  background: ${theme.colors.bg.primary};
-  border-radius: 40%;
-  left: 27px;
-  top: 107px;
+
   color: ${theme.colors.textIcon.active};
+
+  background: ${theme.colors.bg.primary};
+
+  border: 1px solid ${theme.colors.stroke.secondary};
+  border-radius: 40%;
 
   svg {
     width: 20px;
@@ -123,14 +136,15 @@ export const FromToWrapper = styled.div`
 `;
 
 export const Overlay = styled.div`
+  position: absolute;
+  top: 5px;
+  left: -2px;
+
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 34px;
   height: 19px;
 
-  position: absolute;
-  width: 34px;
-  top: 5px;
-  left: -2px;
   background: ${theme.colors.bg.primary};
 `;

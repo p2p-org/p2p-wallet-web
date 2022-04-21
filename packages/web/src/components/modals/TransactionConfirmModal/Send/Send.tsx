@@ -20,6 +20,7 @@ import {
   InfoValue,
   InfoWrapper,
   Section,
+  To,
   Username,
   WalletIcon,
 } from '../common/styled';
@@ -88,6 +89,7 @@ export const Send: FC<Props & TransactionDetailsProps> = ({
   params,
   sendState,
   userFreeFeeLimits,
+  networkFees,
   btcAddress,
 }) => {
   const address = params.destination?.toBase58?.() || btcAddress;
@@ -119,7 +121,10 @@ export const Send: FC<Props & TransactionDetailsProps> = ({
           </IconWrapper>
           <InfoWrapper>
             {params.username ? (
-              <Username>{params.username}</Username>
+              <Username>
+                <To>To</To>
+                {params.username}
+              </Username>
             ) : (
               <InfoTitle className="secondary">To address</InfoTitle>
             )}
@@ -128,7 +133,12 @@ export const Send: FC<Props & TransactionDetailsProps> = ({
         </FieldInfo>
       </div>
 
-      <TransactionDetails sendState={sendState} userFreeFeeLimits={userFreeFeeLimits} />
+      <TransactionDetails
+        sendState={sendState}
+        userFreeFeeLimits={userFreeFeeLimits}
+        networkFees={networkFees}
+        amount={params.amount.toU64()}
+      />
     </Section>
   );
 };
