@@ -12,13 +12,12 @@ import type { AmplitudeActions } from 'utils/analytics/types';
 import { getExplorerUrl } from 'utils/connection';
 
 export interface IProps {
-  signature: string;
+  signature: string | null;
   network: Network;
-  isExecuting: boolean;
   amplitudeAction: AmplitudeActions;
 }
 
-export const SolanaExplorer: FC<IProps> = (props) => {
+export const SolanaExplorerLink: FC<IProps> = (props) => {
   return (
     <GoToExplorerLink
       href={props.signature ? getExplorerUrl('tx', props.signature, props.network) : ''}
@@ -36,5 +35,3 @@ export const SolanaExplorer: FC<IProps> = (props) => {
     </GoToExplorerLink>
   );
 };
-
-export default SolanaExplorer;
