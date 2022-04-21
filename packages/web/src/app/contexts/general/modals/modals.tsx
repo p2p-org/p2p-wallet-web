@@ -163,8 +163,12 @@ export function ModalsProvider({ children = null as any }) {
   }, []);
 
   const closeTopModal = useCallback(() => {
-    closeModal(modalIdCounter--);
-  }, []);
+    if (!modals.length) {
+      return;
+    }
+
+    closeModal(modals[modals.length - 1].modalId);
+  }, [modals]);
 
   const handleWrapperClick = useCallback(
     (e: React.MouseEvent<HTMLDivElement>) => {
