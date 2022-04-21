@@ -39,6 +39,7 @@
   },
   "devDependencies": {
     "@p2p-wallet-web/eslint-config-react": "^1.0.0",
+    "@p2p-wallet-web/token-utils": "^1.0.0",
     "@p2p-wallet-web/tsconfig": "^1.0.0",
     "@project-serum/anchor": "^0.19.1-beta.1",
     "@rushstack/eslint-patch": "^1.1.0",
@@ -78,6 +79,7 @@
     "use-debounce": "^7.0.1"
   },
   "peerDependencies": {
+    "@p2p-wallet-web/token-utils": "^1.0.0",
     "@project-serum/anchor": "*",
     "@saberhq/anchor-contrib": "*",
     "@saberhq/solana-contrib": "^1.7.1",

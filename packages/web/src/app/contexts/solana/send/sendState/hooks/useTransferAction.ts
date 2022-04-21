@@ -38,7 +38,7 @@ export const useTransferAction = () => {
           feeAmount: compensationState?.nextTransactionFee,
           feeToken,
         });
-        return signature as string;
+        return signature;
       } else {
         if (!params.fromTokenAccount.key) {
           throw new Error('fromTokenAccount must be set');

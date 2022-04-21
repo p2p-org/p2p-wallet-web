@@ -21,6 +21,7 @@ import { AmountUSD } from 'components/common/AmountUSD';
 import { TokenAvatar } from 'components/common/TokenAvatar';
 import { trackEvent } from 'utils/analytics';
 import { getExplorerUrl } from 'utils/connection';
+import { formatNumber } from 'utils/format';
 import { shortAddress } from 'utils/tokens';
 
 import {
@@ -149,10 +150,10 @@ type Props = {
   close: () => void;
 };
 
-export const TransactionDetailsModal: FC<Props> = ({ signature, source, close }) => {
+export const TransactionDetailsModal: FC<Props> = ({ signature, source: sourceAddress, close }) => {
   const [isShowDetails, setShowDetails] = useState(false);
   const { network } = useWallet();
-  const transaction = useTransaction(signature, source);
+  const transaction = useTransaction(signature, sourceAddress);
 
   const sourceTokenAccount = useTokenAccount(usePubkey(transaction?.data?.source));
   const destinationTokenAccount = useTokenAccount(usePubkey(transaction?.data?.destination));
@@ -206,16 +207,16 @@ export const TransactionDetailsModal: FC<Props> = ({ signature, source, close })
     if (type === 'swap') {
       return (
         <>
-          {transaction?.data?.source ? (
+          {source ? (
             <FieldWrapper>
               <FieldTitle>From</FieldTitle>
-              <FieldValue>{transaction.data.source}</FieldValue>
+              <FieldValue>{source}</FieldValue>
             </FieldWrapper>
           ) : undefined}
-          {transaction?.data?.destination ? (
+          {destination ? (
             <FieldWrapper>
               <FieldTitle>To</FieldTitle>
-              <FieldValue>{transaction.data.destination}</FieldValue>
+              <FieldValue>{destination}</FieldValue>
             </FieldWrapper>
           ) : undefined}
         </>
@@ -430,7 +431,7 @@ export const TransactionDetailsModal: FC<Props> = ({ signature, source, close })
                     <FieldTitle>Transaction fee</FieldTitle>
                     {isShowFeeBadge ? <PaidByBadge>Paid by p2p.org</PaidByBadge> : undefined}
                   </FieldTitleWrapper>
-                  <FieldValue>{transaction.raw.meta?.fee} lamports</FieldValue>
+                  <FieldValue>{formatNumber(transaction.raw.meta?.fee)} lamports</FieldValue>
                 </FieldWrapper>
               ) : null}
               <FieldWrapper>

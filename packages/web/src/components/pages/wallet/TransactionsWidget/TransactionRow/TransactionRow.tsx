@@ -153,9 +153,9 @@ type Props = {
   source: string;
 };
 
-export const TransactionRow: FunctionComponent<Props> = ({ signature, source }) => {
+export const TransactionRow: FunctionComponent<Props> = ({ signature, source: sourceAddress }) => {
   const { openModal } = useModals();
-  const transaction = useTransaction(signature, source);
+  const transaction = useTransaction(signature, sourceAddress);
 
   const sourceTokenAccount = useTokenAccount(usePubkey(transaction?.data?.source));
   const destinationTokenAccount = useTokenAccount(usePubkey(transaction?.data?.destination));
@@ -172,7 +172,7 @@ export const TransactionRow: FunctionComponent<Props> = ({ signature, source }) 
 
     trackEvent('wallet_transaction_details_open');
 
-    openModal(ModalType.SHOW_MODAL_TRANSACTION_DETAILS, { signature, source });
+    openModal(ModalType.SHOW_MODAL_TRANSACTION_DETAILS, { signature, sourceAddress });
   };
 
   const bottomLeft = useMemo(() => {

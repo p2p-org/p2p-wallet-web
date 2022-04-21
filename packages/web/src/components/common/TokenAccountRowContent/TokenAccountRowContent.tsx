@@ -105,6 +105,7 @@ export const TokenAccountRowContent: FC<Props> = ({ tokenAccount, isMobilePopupC
     return null;
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-magic-numbers
   const avatarSize = isMobile ? 32 : 44;
   const { loading } = tokenAccount;
 

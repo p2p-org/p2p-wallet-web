@@ -3,9 +3,10 @@ import Skeleton from 'react-loading-skeleton';
 
 import type { CSSProperties } from '@linaria/core';
 import { styled } from '@linaria/react';
-import type { TokenAmount } from '@saberhq/token-utils';
+import type { TokenAmount } from '@p2p-wallet-web/token-utils';
 
 import { useMarketData } from 'app/contexts';
+import { formatNumberToUSD } from 'utils/format';
 
 const Wrapper = styled.div``;
 
@@ -30,9 +31,7 @@ export const AmountUSD: FunctionComponent<Props> = ({ prefix, value, ...props })
       ) : rate.data ? (
         <>
           {prefix ? `${prefix} ` : undefined}
-          {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(
-            value.asNumber * rate.data,
-          )}
+          {formatNumberToUSD(value.asNumber * rate.data)}
         </>
       ) : undefined}
     </Wrapper>
