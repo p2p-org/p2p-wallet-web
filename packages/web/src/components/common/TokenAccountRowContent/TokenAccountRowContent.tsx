@@ -91,6 +91,16 @@ const Content = styled.div`
       font-size: 16px;
     }
   }
+
+  .isSelected & {
+    ${TokenName} {
+      font-weight: 700;
+    }
+
+    ${TokenUSD} {
+      font-weight: 700;
+    }
+  }
 `;
 
 interface Props {

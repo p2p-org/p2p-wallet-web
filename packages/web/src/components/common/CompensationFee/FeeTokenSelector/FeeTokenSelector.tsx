@@ -6,8 +6,9 @@ import type { TokenAmount } from '@p2p-wallet-web/token-utils';
 import { theme } from '@p2p-wallet-web/ui';
 
 import { AmountUSD } from 'components/common/AmountUSD';
+import { TokenAccountRowContent } from 'components/common/TokenAccountRowContent';
 import { TokenAvatar } from 'components/common/TokenAvatar';
-import { Select } from 'components/ui';
+import { Select, SelectItem } from 'components/ui';
 
 const SelectorValue = styled.div`
   display: flex;
@@ -46,62 +47,9 @@ const SwapLabelWrapper = styled.div`
 
 const Amount = styled.span``;
 
-const FeeTokenItemWrapper = styled.div`
-  display: flex;
-  align-items: center;
-  padding: 10px;
-
-  font-size: 16px;
-
-  border-radius: 12px;
-  cursor: pointer;
-
-  &:not(:last-child) {
-    border-bottom: 1px solid #f6f6f8;
-  }
-
-  &:hover {
-    background: #f6f6f8;
-  }
-
-  ${Top} {
-    font-weight: 600;
-  }
-`;
-
-const TokenInfo = styled.div`
-  display: flex;
-  flex-direction: column;
-`;
-
 const AmountUSDStyled = styled(AmountUSD)`
   display: inline-flex;
 `;
-
-const FeeTokenItem: FC<{
-  item: TokenAccount;
-  onItemClick: (item: TokenAccount) => void;
-  close?: () => void;
-}> = ({ item, onItemClick, close = () => {} }) => {
-  const handleItemClick = () => {
-    onItemClick(item);
-    close();
-  };
-
-  return (
-    <FeeTokenItemWrapper onClick={handleItemClick}>
-      <TokenAvatarStyled
-        symbol={item?.balance?.token.symbol}
-        address={item?.balance?.token.address}
-        size={40}
-      />
-      <TokenInfo>
-        <Top>{item?.balance?.token.symbol}</Top>
-        <Bottom>{item?.balance?.token.name}</Bottom>
-      </TokenInfo>
-    </FeeTokenItemWrapper>
-  );
-};
 
 type Props = {
   type: 'send' | 'swap';
@@ -133,6 +81,7 @@ export const FeeTokenSelector: FC<Props> = ({
   return (
     <Select
       flat
+      mobileListTitle="Pay swap fees with"
       value={
         <SelectorValue>
           <TokenAvatarStyled
@@ -167,7 +116,13 @@ export const FeeTokenSelector: FC<Props> = ({
       }
     >
       {feeTokenAccounts.map((item: TokenAccount) => (
-        <FeeTokenItem key={item.key?.toBase58()} item={item} onItemClick={onItemClick(item)} />
+        <SelectItem
+          key={item.key?.toBase58()}
+          onItemClick={onItemClick(item)}
+          isSelected={item.balance?.token.symbol === selectedTokenSymbol}
+        >
+          <TokenAccountRowContent tokenAccount={item} isMobilePopupChild />
+        </SelectItem>
       ))}
     </Select>
   );
