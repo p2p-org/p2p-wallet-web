@@ -139,6 +139,10 @@ export const Select: FunctionComponent<Props> = ({
     }
   };
 
+  const handleMobileListCloseByWrapper = () => {
+    handleSelectorClick();
+  };
+
   const items = Children.map(children, (child) => {
     if (isValidElement(child)) {
       return cloneElement(child, { close: handleSelectorClick });
@@ -154,7 +158,12 @@ export const Select: FunctionComponent<Props> = ({
       </Selector>
       {isOpen ? (
         isMobile ? (
-          <SelectListMobile title={mobileListTitle}>{items}</SelectListMobile>
+          <SelectListMobile
+            title={mobileListTitle}
+            onCloseByWrapper={handleMobileListCloseByWrapper}
+          >
+            {items}
+          </SelectListMobile>
         ) : (
           <DropDownList>{items}</DropDownList>
         )

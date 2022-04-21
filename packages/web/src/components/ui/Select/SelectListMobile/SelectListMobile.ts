@@ -5,9 +5,10 @@ import { ModalType, useModals } from 'app/contexts';
 
 type Props = {
   title?: string;
+  onCloseByWrapper: () => void;
 };
 
-export const SelectListMobile: FC<Props> = ({ children, title }) => {
+export const SelectListMobile: FC<Props> = ({ children, title, onCloseByWrapper }) => {
   const { openModal, closeModal } = useModals();
 
   useEffect(() => {
@@ -15,9 +16,16 @@ export const SelectListMobile: FC<Props> = ({ children, title }) => {
       items: children,
       title,
     });
+    const { modalId } = modalPromise;
+
+    modalPromise.then((result) => {
+      if (!result) {
+        onCloseByWrapper();
+      }
+    });
 
     return () => {
-      closeModal(modalPromise.modalId);
+      closeModal(modalId, true);
     };
   }, []);
 
