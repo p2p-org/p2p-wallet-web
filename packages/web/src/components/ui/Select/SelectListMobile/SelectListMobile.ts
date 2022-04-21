@@ -19,13 +19,15 @@ export const SelectListMobile: FC<Props> = ({ children, title, onCloseByWrapper 
     const { modalId } = modalPromise;
 
     modalPromise.then((result) => {
-      if (!result) {
-        onCloseByWrapper();
+      if (result && result.closedByItem) {
+        return;
       }
+
+      onCloseByWrapper();
     });
 
     return () => {
-      closeModal(modalId, true);
+      closeModal(modalId, { closedByItem: true });
     };
   }, []);
 
