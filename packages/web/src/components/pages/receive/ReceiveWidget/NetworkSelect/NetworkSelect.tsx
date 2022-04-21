@@ -20,6 +20,7 @@ import {
 import { TokenAvatar } from 'components/common/TokenAvatar';
 import { Select, SelectItem } from 'components/ui';
 import { trackEvent } from 'utils/analytics';
+import { getAvatarSize } from 'utils/common';
 import { useRenNetwork } from 'utils/hooks/renBridge/useNetwork';
 
 const InfoWrapper = styled.div`
@@ -117,8 +118,7 @@ export const NetworkSelect: FC = () => {
   };
 
   const title = 'Showing my address for';
-  // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-  const avatarSize = isMobile ? 32 : 44;
+  const avatarSize = getAvatarSize(isMobile);
 
   return (
     <Select
