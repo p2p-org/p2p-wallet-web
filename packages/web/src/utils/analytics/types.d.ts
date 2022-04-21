@@ -1,3 +1,64 @@
+type SendEvents =
+  | 'Send_Viewed'
+  | 'Send_Max_Info_Showed'
+  | 'Send_Verification_Invoked'
+  | 'Send_Reviewing'
+  | 'Send_Process_Shown';
+
+type SwapEvents =
+  | 'Swap_Viewed'
+  | 'Swap_Process_Shown'
+  | 'Swap_Reversing'
+  | 'Swap_Verification_Invoked';
+
+type ReceiveEvents =
+  | 'Receive_Viewed'
+  | 'Receive_Username_Copied'
+  | 'Receive_Address_Copied'
+  | 'Receive_QR_Saved'
+  | 'Receive_Changing_Network'
+  | 'Receive_Network_Changed'
+  | 'Receive_Viewing_Explorer'
+  | 'Receive_Topping_Up';
+
+type BuyEvents = 'Buy_Viewed' | 'Buy_Fees_Showed' | 'Buy_Provider_Step_Viewed';
+
+type StoresEvent = 'App_Store_Pressed' | 'Google_Play_Pressed';
+
+type AuthEvents = 'Sign_Out';
+
+type MapActionWithNoData<U> = U extends unknown ? { name: U; data: undefined } : never;
+
+type Events = Parameters<TrackEventType[keyof TrackEventType]>;
+
+type SendSimpleActions = MapActionWithNoData<SendEvents>;
+
+type SwapSimpleActions = MapActionWithNoData<SwapEvents>;
+
+type BuySimpleActions = MapActionWithNoData<BuyEvents>;
+
+type AuthSimpleActions = MapActionWithNoData<AuthEvents>;
+
+type StoreSimpleActions = MapActionWithNoData<StoresEvent>;
+
+type ReceiveComplexActions =
+  | {
+      name: 'Receive_Network_Changed';
+      data: { Receive_Network: 'solana' | 'bitcoin' };
+    }
+  | {
+      name: 'Receive_Viewing_Explorer';
+      data: { Receive_Network: 'solana' | 'bitcoin' };
+    };
+
+export type AmplitudeActions =
+  | SendSimpleActions
+  | SwapSimpleActions
+  | BuySimpleActions
+  | AuthSimpleActions
+  | StoreSimpleActions
+  | ReceiveComplexActions;
+
 export type TrackEventType = {
   /*
     Send

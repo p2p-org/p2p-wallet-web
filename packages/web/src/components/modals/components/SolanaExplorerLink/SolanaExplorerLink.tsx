@@ -1,24 +1,42 @@
 import type { FC } from 'react';
 
+import { styled } from '@linaria/react';
 import type { Network } from '@saberhq/solana-contrib';
 import classNames from 'classnames';
 
-import {
-  GoToExplorerIcon,
-  GoToExplorerLink,
-} from 'components/modals/TransactionInfoModals/common/styled';
+import { Icon } from 'components/ui';
 import { trackEventUniversal } from 'utils/analytics';
 import type { AmplitudeActions } from 'utils/analytics/types';
 import { getExplorerUrl } from 'utils/connection';
 
 export interface IProps {
-  signature: string;
+  signature: string | null;
   network: Network;
-  isExecuting: boolean;
   amplitudeAction: AmplitudeActions;
 }
 
-export const SolanaExplorer: FC<IProps> = (props) => {
+export const GoToExplorerIcon = styled(Icon)`
+  width: 24px;
+  height: 24px;
+  margin-right: 8px;
+`;
+
+export const GoToExplorerLink = styled.a`
+  display: inline-flex;
+  align-items: center;
+
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 140%;
+
+  text-decoration: none;
+
+  &.isDisabled {
+    pointer-events: none;
+  }
+`;
+
+export const SolanaExplorerLink: FC<IProps> = (props) => {
   return (
     <GoToExplorerLink
       href={props.signature ? getExplorerUrl('tx', props.signature, props.network) : ''}
@@ -36,5 +54,3 @@ export const SolanaExplorer: FC<IProps> = (props) => {
     </GoToExplorerLink>
   );
 };
-
-export default SolanaExplorer;

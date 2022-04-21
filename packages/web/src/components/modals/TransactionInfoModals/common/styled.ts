@@ -386,24 +386,3 @@ export const DateHeader = styled.div`
 export const Time = styled.div`
   color: ${theme.colors.textIcon.primary};
 `;
-
-export const GoToExplorerIcon = styled(Icon)`
-  width: 24px;
-  height: 24px;
-  margin-right: 8px;
-`;
-
-export const GoToExplorerLink = styled.a`
-  display: inline-flex;
-  align-items: center;
-
-  font-weight: 500;
-  font-size: 16px;
-  line-height: 140%;
-
-  text-decoration: none;
-
-  &.isDisabled {
-    pointer-events: none;
-  }
-`;
