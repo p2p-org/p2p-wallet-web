@@ -10,22 +10,17 @@ import type { ModalPropsType } from 'app/contexts';
 import { ToastManager } from 'components/common/ToastManager';
 import type { TransactionDetailsProps } from 'components/common/TransactionDetails';
 import { SolanaExplorerLink } from 'components/modals/components';
+import { TransactionProgress } from 'components/modals/components/TransactionProgress';
 import { trackEvent } from 'utils/analytics';
 import { transferNotification } from 'utils/transactionNotifications';
 
 import { Send } from '../../TransactionConfirmModal/Send/Send';
 import {
-  BlockWrapper,
-  CheckmarkIcon,
   CloseIcon,
   CloseWrapper,
   DateHeader,
   Footer,
   Header,
-  OtherIcon,
-  ProgressLine,
-  ProgressStub,
-  ProgressWrapper,
   Section,
   Time,
   TransactionBadge,
@@ -209,30 +204,12 @@ export const TransactionStatusModal: FunctionComponent<
           </DateHeader>
         </>
       </Section>
-      <ProgressWrapper>
-        <ProgressLine
-          style={{ width: `${progress}%` }}
-          className={classNames({
-            isSuccess,
-            isError,
-          })}
-        />
-        <ProgressStub />
-
-        <BlockWrapper
-          className={classNames({
-            isProcessing,
-            isSuccess,
-            isError,
-          })}
-        >
-          {isSuccess ? (
-            <CheckmarkIcon name="success-send" />
-          ) : (
-            <OtherIcon name={transactionError ? 'error-send' : 'clock-send'} />
-          )}
-        </BlockWrapper>
-      </ProgressWrapper>
+      <TransactionProgress
+        isError={isError}
+        isProcessing={isProcessing}
+        isSuccess={isSuccess}
+        progress={progress}
+      />
       <Section>
         <TransactionStatus>
           Transaction status:

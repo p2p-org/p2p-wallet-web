@@ -1,9 +1,9 @@
 import { styled } from '@linaria/react';
-import { theme, zIndexes } from '@p2p-wallet-web/ui';
+import { theme } from '@p2p-wallet-web/ui';
+import { zIndexes } from '@p2p-wallet-web/ui/dist/esm';
 
+import { StatusColors } from 'components/modals/components/TransactionProgress/TransactionProgress';
 import { Button, Icon } from 'components/ui';
-
-import { INITIAL_PROGRESS } from '../TransactionStatusModal/TransactionStatusModal';
 
 export const Wrapper = styled.div`
   display: flex;
@@ -20,6 +20,35 @@ export const Wrapper = styled.div`
   &::-webkit-scrollbar {
     display: none;
   }
+`;
+
+export const ProgressWrapper = styled.div`
+  position: relative;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  height: 55px;
+`;
+
+export const BlockWrapper = styled(StatusColors)`
+  z-index: ${zIndexes.top};
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 55px;
+  height: 55px;
+
+  border-radius: 40%;
+`;
+
+export const OtherIcon = styled(Icon)`
+  width: 24px;
+  height: 24px;
+
+  color: ${theme.colors.textIcon.buttonPrimary};
 `;
 
 export const Header = styled.div`
@@ -78,85 +107,6 @@ export const CheckmarkIcon = styled(Icon)`
   height: 24px;
 
   color: ${theme.colors.textIcon.buttonPrimary};
-`;
-
-export const OtherIcon = styled(Icon)`
-  width: 24px;
-  height: 24px;
-
-  color: ${theme.colors.textIcon.buttonPrimary};
-`;
-
-export const ProgressWrapper = styled.div`
-  position: relative;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  height: 55px;
-`;
-
-const StatusColors = styled.div`
-  &.isProcessing {
-    background: ${theme.colors.system.warningMain};
-  }
-
-  &.isSuccess {
-    background: ${theme.colors.system.successMain};
-  }
-
-  &.isError {
-    background: ${theme.colors.system.errorMain};
-  }
-`;
-
-export const ProgressLine = styled.div`
-  position: absolute;
-
-  left: 0;
-
-  z-index: ${zIndexes.middle};
-
-  width: ${INITIAL_PROGRESS}%;
-  height: 2px;
-
-  background: ${theme.colors.bg.buttonPrimary};
-
-  transition: width 0.15s;
-
-  &.isSuccess {
-    background: ${theme.colors.system.successMain};
-  }
-
-  &.isError {
-    background: ${theme.colors.system.errorMain};
-  }
-`;
-
-export const ProgressStub = styled.div`
-  position: absolute;
-
-  left: 0;
-
-  z-index: ${zIndexes.bottom};
-
-  width: 100%;
-  height: 1px;
-
-  background: ${theme.colors.stroke.secondary};
-`;
-
-export const BlockWrapper = styled(StatusColors)`
-  z-index: ${zIndexes.top};
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 55px;
-  height: 55px;
-
-  border-radius: 40%;
 `;
 
 export const TransactionStatus = styled.div`
