@@ -122,7 +122,10 @@ export const SwapSlippageWidget = () => {
 
   const handleSlippageValueChange = (value: string) => {
     setIsCustomButtonActive(false);
-    setSlippageTolerance(SlippageTolerance.fromString(value));
+
+    if (Number(value)) {
+      setSlippageTolerance(SlippageTolerance.fromString(value));
+    }
   };
 
   return (

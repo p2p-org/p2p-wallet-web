@@ -1,11 +1,15 @@
 import type { FC } from 'react';
 
 import { styled } from '@linaria/react';
+import { useToken } from '@p2p-wallet-web/core';
+import { TokenAmount } from '@p2p-wallet-web/token-utils';
 import { borders, theme } from '@p2p-wallet-web/ui';
+import { LAMPORTS_PER_SOL } from '@solana/web3.js';
 
-import { useBuyState } from 'app/contexts';
+import { useBuyState, useConfig } from 'app/contexts';
 import { TokenAvatar } from 'components/common/TokenAvatar';
 import { InputAmount } from 'components/ui/InputAmount';
+import { formatNumberToUSD } from 'utils/format';
 
 import { AmountTypeButton } from '../AmountTypeButton';
 
@@ -43,17 +47,21 @@ export const Inputs: FC = () => {
     isBaseAmountType,
     changeAmountType,
     buyQuote,
-    isLoading,
   } = useBuyState();
+
+  const { tokenConfigs } = useConfig();
+  const token = useToken(tokenConfigs[symbol]?.mint);
 
   const prefix = isBaseAmountType ? '$' : <TokenAvatar symbol={symbol} size={32} />;
 
   const buttonAmount =
-    (isBaseAmountType ? buyQuote?.quoteCurrencyAmount : buyQuote?.baseCurrencyAmount) || 0;
+    (isBaseAmountType
+      ? Number(buyQuote?.quoteCurrencyAmount)
+      : Number(buyQuote?.baseCurrencyAmount)) || 0;
 
   const buttonAmountFormatted = isBaseAmountType
-    ? `${buttonAmount} ${symbol}`
-    : `$ ${buttonAmount}`;
+    ? new TokenAmount(token, buttonAmount * LAMPORTS_PER_SOL).formatUnits()
+    : formatNumberToUSD(buttonAmount, { alwaysShowCents: false });
 
   return (
     <Wrapper>

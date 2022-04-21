@@ -1,4 +1,4 @@
-import type { TokenAmount } from '@saberhq/token-utils';
+import type { TokenAmount } from '@p2p-wallet-web/token-utils';
 import type { PublicKey } from '@solana/web3.js';
 
 /**

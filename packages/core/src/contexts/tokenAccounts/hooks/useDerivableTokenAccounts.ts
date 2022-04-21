@@ -2,7 +2,7 @@ import { useCallback, useMemo } from 'react';
 
 import type { AccountParser } from '@p2p-wallet-web/sail';
 import { useParsedAccountsData } from '@p2p-wallet-web/sail';
-import { RAW_SOL, TokenAmount } from '@saberhq/token-utils';
+import { RAW_SOL } from '@saberhq/token-utils';
 import { useConnectionContext } from '@saberhq/use-solana';
 import { PublicKey } from '@solana/web3.js';
 
@@ -10,6 +10,7 @@ import type { DERIVATION_PATH } from '../../../constants/common';
 import type { ValueOf } from '../../../types/utility-types';
 import { derivePublicKeyFromSeed } from '../../seed';
 import type { TokenAccount } from '../models';
+import { TokenAmount } from '@p2p-wallet-web/token-utils';
 
 export const useDerivableTokenAccounts = (
   seed: string,

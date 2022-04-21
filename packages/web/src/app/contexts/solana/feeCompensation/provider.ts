@@ -3,7 +3,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { ZERO } from '@orca-so/sdk';
 import type { TokenAccount } from '@p2p-wallet-web/core';
 import { useUserTokenAccounts } from '@p2p-wallet-web/core';
-import { TokenAmount } from '@saberhq/token-utils';
+import { TokenAmount } from '@p2p-wallet-web/token-utils';
 import { u64 } from '@solana/spl-token';
 import { createContainer } from 'unstated-next';
 

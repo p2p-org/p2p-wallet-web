@@ -7,13 +7,14 @@ import {
   useParsedAccountsData,
 } from '@p2p-wallet-web/sail';
 import type { Token, TokenAccountData } from '@saberhq/token-utils';
-import { NATIVE_MINT, TokenAmount } from '@saberhq/token-utils';
+import { NATIVE_MINT } from '@saberhq/token-utils';
 import { useConnectedWallet } from '@saberhq/use-solana';
 import type { PublicKey } from '@solana/web3.js';
 
 import type { TokenAccount } from '../models';
 import type { PDAInput } from './useProgramAddresses';
 import { PDA, useProgramAddresses } from './useProgramAddresses';
+import { TokenAmount } from '@p2p-wallet-web/token-utils';
 
 const getATAs = (
   memoTokens: readonly (Token | null | undefined)[],

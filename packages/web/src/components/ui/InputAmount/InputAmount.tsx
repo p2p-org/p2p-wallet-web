@@ -38,7 +38,6 @@ const Input = styled.input`
   min-width: 0;
   padding: 0;
 
-  ${textCss}
   text-align: right;
 
   background: transparent;
@@ -47,6 +46,8 @@ const Input = styled.input`
   outline: none;
 
   appearance: none;
+
+  ${textCss}
 
   &::placeholder {
     color: ${theme.colors.textIcon.secondary};
@@ -99,9 +100,9 @@ export const InputAmount: FC<Props> = ({
   // Calculate width of input for correct prefix render
   // on left side of input
   const width = useMemo(() => {
-    const value = localValue || placeholder;
-    if (value) {
-      return String(value).length + 'ch';
+    const val = localValue || placeholder;
+    if (val) {
+      return String(val).length + 'ch';
     }
   }, [localValue, placeholder]);
 

@@ -10,7 +10,6 @@ export const Wrapper = styled.div`
   flex-direction: column;
   justify-content: stretch;
   width: 524px;
-  max-height: 80vh;
   overflow: scroll;
 
   background: ${theme.colors.bg.primary};

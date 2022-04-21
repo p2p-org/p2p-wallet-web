@@ -2,8 +2,8 @@ import type { FC } from 'react';
 
 import { styled } from '@linaria/react';
 import type { TokenAccount } from '@p2p-wallet-web/core';
+import type { TokenAmount } from '@p2p-wallet-web/token-utils';
 import { theme } from '@p2p-wallet-web/ui';
-import type { TokenAmount } from '@saberhq/token-utils';
 
 import { AmountUSD } from 'components/common/AmountUSD';
 import { TokenAvatar } from 'components/common/TokenAvatar';
@@ -143,7 +143,7 @@ export const FeeTokenSelector: FC<Props> = ({
           <Fees>
             <Top>
               {isSend ? (
-                <Label>`${accountSymbol as string} account creation:`</Label>
+                <Label>{accountSymbol as string} account creation:</Label>
               ) : (
                 <SwapLabelWrapper>
                   <Label>Pay swap fees with</Label>
@@ -159,7 +159,7 @@ export const FeeTokenSelector: FC<Props> = ({
             {isSend && feeAmount ? (
               <Bottom>
                 <Label>Pay with:</Label>
-                <Amount>{`${feeAmount.formatUnits()}`}</Amount>
+                <Amount>{feeAmount.formatUnits()}</Amount>
               </Bottom>
             ) : undefined}
           </Fees>
