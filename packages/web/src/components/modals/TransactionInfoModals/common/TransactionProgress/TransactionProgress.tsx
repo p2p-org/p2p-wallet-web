@@ -1,4 +1,5 @@
 import type { FC } from 'react';
+import { useEffect, useState } from 'react';
 
 import { styled } from '@linaria/react';
 import { theme, zIndexes } from '@p2p-wallet-web/ui/dist/esm';
@@ -7,28 +8,9 @@ import classNames from 'classnames';
 import { INITIAL_PROGRESS } from 'components/modals/TransactionInfoModals/TransactionStatusModal/TransactionStatusModal';
 import { Icon } from 'components/ui';
 
-export const StatusColors = styled.div`
-  &.isProcessing {
-    background: ${theme.colors.system.warningMain};
-  }
+import { StatusColors } from '../styled';
 
-  &.isSuccess {
-    background: ${theme.colors.system.successMain};
-  }
-
-  &.isError {
-    background: ${theme.colors.system.errorMain};
-  }
-`;
-
-export const OtherIcon = styled(Icon)`
-  width: 24px;
-  height: 24px;
-
-  color: ${theme.colors.textIcon.buttonPrimary};
-`;
-
-export const CheckmarkIcon = styled(Icon)`
+export const ProgressIcon = styled(Icon)`
   width: 24px;
   height: 24px;
 
@@ -97,14 +79,46 @@ export interface Props {
   isError: boolean;
   isProcessing: boolean;
   isSuccess: boolean;
-  progress: number;
+  isExecuting: boolean;
 }
 
+const UPPER_PROGRESS_BOUND = 95;
+const LOWER_PROGRESS_BOUND = 7;
+const FULL_PROGRESS = 100;
+const CHECK_PROGRESS_INTERVAL = 2500;
+
 export const TransactionProgress: FC<Props> = (props) => {
+  const [progress, setProgress] = useState(INITIAL_PROGRESS);
+
+  useEffect(() => {
+    let newProgress = INITIAL_PROGRESS;
+
+    // @FIXME isExecuting and isProcessing used. They are simular.
+    if (!props.isExecuting) {
+      return;
+    }
+
+    const timerId = setInterval(() => {
+      if (progress <= UPPER_PROGRESS_BOUND) {
+        newProgress += LOWER_PROGRESS_BOUND;
+        setProgress(newProgress);
+      } else {
+        newProgress = UPPER_PROGRESS_BOUND;
+        setProgress(newProgress);
+      }
+    }, CHECK_PROGRESS_INTERVAL);
+
+    return () => {
+      clearTimeout(timerId);
+      setProgress(FULL_PROGRESS);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [props.isExecuting]);
+
   return (
     <ProgressWrapper>
       <ProgressLine
-        style={{ width: `${props.progress}%` }}
+        style={{ width: `${progress}%` }}
         className={classNames({
           isSuccess: props.isSuccess,
           isError: props.isError,
@@ -120,9 +134,9 @@ export const TransactionProgress: FC<Props> = (props) => {
         })}
       >
         {props.isSuccess ? (
-          <CheckmarkIcon name="success-send" />
+          <ProgressIcon name="success-send" />
         ) : (
-          <OtherIcon name={props.isError ? 'error-send' : 'clock-send'} />
+          <ProgressIcon name={props.isError ? 'error-send' : 'clock-send'} />
         )}
       </BlockWrapper>
     </ProgressWrapper>

@@ -4,25 +4,20 @@ import { useEffect, useState } from 'react';
 import { useTransaction, useWallet } from '@p2p-wallet-web/core';
 import { useConnectionContext } from '@saberhq/use-solana';
 import classNames from 'classnames';
-import dayjs from 'dayjs';
 
 import type { ModalPropsType } from 'app/contexts';
 import { ToastManager } from 'components/common/ToastManager';
 import type { TransactionDetailsProps } from 'components/common/TransactionDetails';
-import { SolanaExplorerLink } from 'components/modals/components';
-import { TransactionProgress } from 'components/modals/components/TransactionProgress';
 import { trackEvent } from 'utils/analytics';
 import { transferNotification } from 'utils/transactionNotifications';
 
 import { Send } from '../../TransactionConfirmModal/Send/Send';
+import { DateHeader, SolanaExplorerLink, TransactionProgress } from '../common';
 import {
   CloseIcon,
   CloseWrapper,
-  DateHeader,
-  Footer,
   Header,
   Section,
-  Time,
   TransactionBadge,
   TransactionLabel,
   TransactionStatus,
@@ -30,59 +25,29 @@ import {
 } from '../common/styled';
 import type { TransferParams } from './Send';
 
-type SendActionType = () => Promise<string>;
-
 export type TransactionStatusModalProps = TransactionDetailsProps & {
-  type: 'send' | 'swap';
-  action: SendActionType;
+  action: () => Promise<string>;
   params: TransferParams;
 };
 
 export const INITIAL_PROGRESS = 5;
-const UPPER_PROGRESS_BOUND = 95;
-const LOWER_PROGRESS_BOUND = 7;
-const CHECK_PROGRESS_INTERVAL = 2500;
-const FULL_PROGRESS = 100;
 const ADDRESS_CHARS_SHOW = 4;
 const DEFAULT_TRANSACTION_ERROR = 'Transaction error';
+const CHECK_TRANSACTION_INTERVAL = 3000;
 
+// @TODO remove old swap and send
 export const TransactionStatusModal: FunctionComponent<
   ModalPropsType<string | null> & TransactionStatusModalProps
 > = ({ type, action, params, sendState, userFreeFeeLimits, networkFees, close }) => {
   const { provider } = useWallet();
 
   const { network } = useConnectionContext();
-  const [progress, setProgress] = useState(INITIAL_PROGRESS);
   const [isExecuting, setIsExecuting] = useState(false);
   const [signature, setSignature] = useState<string | null>(null);
   const transaction = useTransaction(signature as string);
   const [transactionError, setTransactionError] = useState(
     transaction?.raw?.meta?.err ? DEFAULT_TRANSACTION_ERROR : '',
   );
-
-  useEffect(() => {
-    let newProgress = INITIAL_PROGRESS;
-
-    if (!isExecuting) {
-      return;
-    }
-
-    const timerId = setInterval(() => {
-      if (progress <= UPPER_PROGRESS_BOUND) {
-        newProgress += LOWER_PROGRESS_BOUND;
-        setProgress(newProgress);
-      } else {
-        newProgress = UPPER_PROGRESS_BOUND;
-        setProgress(newProgress);
-      }
-    }, CHECK_PROGRESS_INTERVAL);
-
-    return () => {
-      clearTimeout(timerId);
-      setProgress(FULL_PROGRESS);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isExecuting]);
 
   const executeAction = async () => {
     try {
@@ -136,7 +101,7 @@ export const TransactionStatusModal: FunctionComponent<
             setTransactionError('');
           }
         } else {
-          setTimeout(mount, CHECK_PROGRESS_INTERVAL);
+          setTimeout(mount, CHECK_TRANSACTION_INTERVAL);
         }
       } catch (error) {
         // setTransactionError((error as Error).message);
@@ -153,9 +118,6 @@ export const TransactionStatusModal: FunctionComponent<
   const isProcessing = (!signature || !transaction?.key) && !transactionError;
   const isSuccess = Boolean(signature && transaction?.key && !transactionError);
   const isError = Boolean(transactionError);
-
-  const today = new Date();
-  const utcDiff = today.getHours() - today.getUTCHours();
 
   const shortAddress = sendState.destinationAddress.replace(
     sendState.destinationAddress.substring(
@@ -179,6 +141,7 @@ export const TransactionStatusModal: FunctionComponent<
   };
 
   const handleCloseClick = () => {
+    // @ts-ignore
     trackEvent('send_close_click', { transactionConfirmed: !isExecuting });
 
     close(signature);
@@ -193,22 +156,15 @@ export const TransactionStatusModal: FunctionComponent<
             <CloseWrapper onClick={handleCloseClick}>
               <CloseIcon name="close" />
             </CloseWrapper>
+            <DateHeader />
           </Header>
-          <DateHeader>
-            <span>{dayjs().format('MMMM D, YYYY')}</span>
-            <Time>{dayjs().format('hh:mm:ss')}</Time>
-            <span>
-              (UTC{utcDiff >= 0 ? '+' : '-'}
-              {utcDiff})
-            </span>
-          </DateHeader>
         </>
       </Section>
       <TransactionProgress
         isError={isError}
         isProcessing={isProcessing}
         isSuccess={isSuccess}
-        progress={progress}
+        isExecuting={isExecuting}
       />
       <Section>
         <TransactionStatus>
@@ -231,17 +187,16 @@ export const TransactionStatusModal: FunctionComponent<
           networkFees={networkFees}
         />
       </Section>
-      <Footer>
-        <SolanaExplorerLink
-          signature={signature}
-          network={network}
-          isExecuting={isExecuting}
-          amplitudeAction={{
-            name: 'send_explorer_click',
-            transactionConfirmed: !isExecuting,
-          }}
-        />
-      </Footer>
+      <SolanaExplorerLink
+        signature={signature}
+        network={network}
+        isExecuting={isExecuting}
+        amplitudeAction={{
+          // @ts-ignore
+          name: 'send_explorer_click',
+          transactionConfirmed: !isExecuting,
+        }}
+      />
     </Wrapper>
   );
 };

@@ -9,19 +9,21 @@ import { trackEventUniversal } from 'utils/analytics';
 import type { AmplitudeActions } from 'utils/analytics/types';
 import { getExplorerUrl } from 'utils/connection';
 
-export interface IProps {
+import { Footer } from '../styled';
+
+interface IProps {
   signature: string | null;
   network: Network;
   amplitudeAction: AmplitudeActions;
 }
 
-export const GoToExplorerIcon = styled(Icon)`
+const GoToExplorerIcon = styled(Icon)`
   width: 24px;
   height: 24px;
   margin-right: 8px;
 `;
 
-export const GoToExplorerLink = styled.a`
+const GoToExplorerLink = styled.a`
   display: inline-flex;
   align-items: center;
 
@@ -38,19 +40,21 @@ export const GoToExplorerLink = styled.a`
 
 export const SolanaExplorerLink: FC<IProps> = (props) => {
   return (
-    <GoToExplorerLink
-      href={props.signature ? getExplorerUrl('tx', props.signature, props.network) : ''}
-      target="_blank"
-      rel="noopener noreferrer noindex"
-      onClick={() => {
-        trackEventUniversal(props.amplitudeAction);
-      }}
-      className={classNames({
-        isDisabled: !props.signature,
-      })}
-    >
-      <GoToExplorerIcon name={'external'} />
-      View in Solana explorer
-    </GoToExplorerLink>
+    <Footer>
+      <GoToExplorerLink
+        href={props.signature ? getExplorerUrl('tx', props.signature, props.network) : ''}
+        target="_blank"
+        rel="noopener noreferrer noindex"
+        onClick={() => {
+          trackEventUniversal(props.amplitudeAction);
+        }}
+        className={classNames({
+          isDisabled: !props.signature,
+        })}
+      >
+        <GoToExplorerIcon name={'external'} />
+        View in Solana explorer
+      </GoToExplorerLink>
+    </Footer>
   );
 };

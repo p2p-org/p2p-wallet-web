@@ -2,8 +2,21 @@ import { styled } from '@linaria/react';
 import { theme } from '@p2p-wallet-web/ui';
 import { zIndexes } from '@p2p-wallet-web/ui/dist/esm';
 
-import { StatusColors } from 'components/modals/components/TransactionProgress/TransactionProgress';
 import { Button, Icon } from 'components/ui';
+
+export const StatusColors = styled.div`
+  &.isProcessing {
+    background: ${theme.colors.system.warningMain};
+  }
+
+  &.isSuccess {
+    background: ${theme.colors.system.successMain};
+  }
+
+  &.isError {
+    background: ${theme.colors.system.errorMain};
+  }
+`;
 
 export const Wrapper = styled.div`
   display: flex;
@@ -289,6 +302,8 @@ export const ShareWrapper = styled.div`
   }
 `;
 
+// @FIXME there are a lot of intersections of usages of these styled components
+// @TODO move modal/componets into TransactionInfoModals/common and put all styled into styled.ts
 export const Footer = styled.div`
   display: flex;
   align-items: center;
@@ -316,23 +331,4 @@ export const Section = styled.div`
   display: flex;
   flex-direction: column;
   padding: 12px 20px;
-`;
-
-export const DateHeader = styled.div`
-  display: flex;
-  justify-content: center;
-
-  color: ${theme.colors.textIcon.secondary};
-
-  font-weight: 500;
-  font-size: 14px;
-  line-height: 120%;
-
-  & > *:not(:first-child) {
-    margin-left: 4px;
-  }
-`;
-
-export const Time = styled.div`
-  color: ${theme.colors.textIcon.primary};
 `;

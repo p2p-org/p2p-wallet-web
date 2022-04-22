@@ -1,4 +1,5 @@
 import type { FC } from 'react';
+import { useEffect } from 'react';
 
 import { styled } from '@linaria/react';
 import { useUserTokenAccounts } from '@p2p-wallet-web/core';
@@ -27,6 +28,10 @@ export const SwapButtonOriginal: FC = () => {
   const userTokenAccounts = useUserTokenAccounts();
   const feeCompensationInfo = useFeeCompensation();
   const feeLimitsInfo = useFreeFeeLimits();
+
+  useEffect(() => {
+    openModal(ModalType.SHOW_MODAL_TRANSACTION_STATUS_SWAP, {});
+  }, []);
 
   const handleSwapClick = async () => {
     trackEvent('Swap_Verification_Invoked');
