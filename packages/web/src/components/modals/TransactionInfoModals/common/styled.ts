@@ -1,8 +1,8 @@
 import { styled } from '@linaria/react';
 import { theme } from '@p2p-wallet-web/ui';
 import { zIndexes } from '@p2p-wallet-web/ui/dist/esm';
-
 import { Button, Icon } from 'components/ui';
+import { Modal, Content as ModalContent } from 'components/ui/Modal';
 
 export const StatusColors = styled.div`
   &.isProcessing {
@@ -18,17 +18,22 @@ export const StatusColors = styled.div`
   }
 `;
 
-export const Wrapper = styled.div`
+export const Wrapper = styled(Modal)`
   display: flex;
   flex-direction: column;
   justify-content: stretch;
   width: 524px;
   overflow: scroll;
+  padding: 0;
 
   background: ${theme.colors.bg.primary};
 
   border-radius: 15px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+
+  ${ModalContent} {
+    padding: 0;
+  }
 
   &::-webkit-scrollbar {
     display: none;

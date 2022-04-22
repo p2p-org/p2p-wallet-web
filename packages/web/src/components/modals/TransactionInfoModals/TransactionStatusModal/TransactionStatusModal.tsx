@@ -157,7 +157,8 @@ export const TransactionStatusModal: FunctionComponent<
         amplitudeAction={{
           // @ts-ignore
           name: 'send_explorer_click',
-          transactionConfirmed: !isExecuting,
+          // @ts-ignore
+          data: { transactionConfirmed: !isExecuting },
         }}
       />
     </Wrapper>

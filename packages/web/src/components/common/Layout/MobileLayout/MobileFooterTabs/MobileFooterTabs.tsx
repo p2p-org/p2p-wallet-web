@@ -3,7 +3,7 @@ import { NavLink } from 'react-router-dom';
 import { useIntercom } from 'react-use-intercom';
 
 import { styled } from '@linaria/react';
-import { theme } from '@p2p-wallet-web/ui';
+import { theme, zIndexes } from '@p2p-wallet-web/ui';
 
 import { ModalType, useModals } from 'app/contexts';
 import { Icon } from 'components/ui';
@@ -13,7 +13,7 @@ import { MOBILE_FOOTER_TABS_HEIGHT } from './constants';
 const Wrapper = styled.div`
   position: sticky;
   bottom: 0;
-  z-index: 31;
+  z-index: ${zIndexes.nav};
 
   display: flex;
   align-content: center;
@@ -60,6 +60,7 @@ const NavLinkMenu = styled.div`
   color: ${theme.colors.textIcon.secondary};
 
   /* TODO: temp, delete after release recieve and settings */
+
   &.disabled {
     pointer-events: none;
   }

@@ -2,6 +2,7 @@ import { Suspense, useCallback, useContext, useEffect, useMemo, useState } from 
 import * as React from 'react';
 
 import { styled } from '@linaria/react';
+import { zIndexes } from '@p2p-wallet-web/ui';
 import type { LoadableComponent } from '@loadable/component';
 import loadable from '@loadable/component';
 
@@ -12,7 +13,7 @@ const Wrapper = styled.div`
   position: fixed;
   top: 0;
   left: 0;
-  z-index: 30;
+  z-index: ${zIndexes.modal};
 
   width: 100vw;
   height: 100vh;
@@ -30,6 +31,7 @@ const ModalContainer = styled.div`
   overscroll-behavior: none;
 
   /* Above background */
+
   &:last-child {
     z-index: 2;
   }
@@ -40,7 +42,6 @@ const ModalWrapper = styled.div`
   align-items: center;
   justify-content: center;
   min-height: 100%;
-  padding: 10px 0;
 `;
 
 const ModalBackground = styled.div`

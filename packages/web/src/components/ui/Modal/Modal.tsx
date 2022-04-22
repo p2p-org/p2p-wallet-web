@@ -11,7 +11,6 @@ import { useDrag } from '@use-gesture/react';
 import BezierEasing from 'bezier-easing';
 import classNames from 'classnames';
 
-import { MOBILE_FOOTER_TABS_HEIGHT } from 'components/common/Layout';
 import { Icon } from 'components/ui';
 
 // eslint-disable-next-line @typescript-eslint/no-magic-numbers
@@ -29,9 +28,7 @@ const StyledDialogContent = styled(({ ...props }) => <AnimatedDialogContent {...
 
   &[data-reach-dialog-content] {
     position: fixed;
-    top: 33px;
     right: 0;
-    bottom: ${MOBILE_FOOTER_TABS_HEIGHT}px;
 
     display: flex;
     flex-direction: column;
@@ -187,7 +184,7 @@ const CloseIcon = styled(Icon)`
   cursor: pointer;
 `;
 
-const Content = styled.div`
+export const Content = styled.div`
   padding: 0 16px;
 
   ${up.tablet} {
