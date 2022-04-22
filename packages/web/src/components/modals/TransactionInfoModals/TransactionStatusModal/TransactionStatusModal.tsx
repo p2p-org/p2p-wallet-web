@@ -3,7 +3,6 @@ import { useEffect, useState } from 'react';
 
 import { useTransaction, useWallet } from '@p2p-wallet-web/core';
 import { useConnectionContext } from '@saberhq/use-solana';
-import classNames from 'classnames';
 
 import type { ModalPropsType } from 'app/contexts';
 import { ToastManager } from 'components/common/ToastManager';
@@ -13,16 +12,7 @@ import { transferNotification } from 'utils/transactionNotifications';
 
 import { Send } from '../../TransactionConfirmModal/Send/Send';
 import { DateHeader, SolanaExplorerLink, TransactionProgress } from '../common';
-import {
-  CloseIcon,
-  CloseWrapper,
-  Header,
-  Section,
-  TransactionBadge,
-  TransactionLabel,
-  TransactionStatus,
-  Wrapper,
-} from '../common/styled';
+import { CloseIcon, CloseWrapper, Header, Section, Wrapper } from '../common/styled';
 import type { TransferParams } from './Send';
 
 export type TransactionStatusModalProps = TransactionDetailsProps & {
@@ -127,19 +117,6 @@ export const TransactionStatusModal: FunctionComponent<
     '...',
   );
 
-  const renderStatus = (executing: boolean, success: boolean, error: boolean) => {
-    switch (true) {
-      case executing:
-        return 'Pending';
-      case error:
-        return 'Error';
-      case success:
-        return 'Completed';
-      default:
-        return 'Pending';
-    }
-  };
-
   const handleCloseClick = () => {
     // @ts-ignore
     trackEvent('send_close_click', { transactionConfirmed: !isExecuting });
@@ -150,36 +127,22 @@ export const TransactionStatusModal: FunctionComponent<
   return (
     <Wrapper>
       <Section>
-        <>
-          <Header>
-            {params.amount.token.symbol} → {shortAddress}
-            <CloseWrapper onClick={handleCloseClick}>
-              <CloseIcon name="close" />
-            </CloseWrapper>
-            <DateHeader />
-          </Header>
-        </>
+        <Header>
+          {params.amount.token.symbol} → {shortAddress}
+          <CloseWrapper onClick={handleCloseClick}>
+            <CloseIcon name="close" />
+          </CloseWrapper>
+          <DateHeader />
+        </Header>
       </Section>
       <TransactionProgress
         isError={isError}
         isProcessing={isProcessing}
         isSuccess={isSuccess}
         isExecuting={isExecuting}
+        label={'Transaction status:'}
       />
       <Section>
-        <TransactionStatus>
-          Transaction status:
-          <TransactionBadge>
-            <TransactionLabel
-              className={classNames({
-                isProcessing,
-                isSuccess,
-                isError,
-              })}
-            />
-            {renderStatus(isExecuting, isSuccess, isError)}
-          </TransactionBadge>
-        </TransactionStatus>
         <Send
           sendState={sendState}
           userFreeFeeLimits={userFreeFeeLimits}

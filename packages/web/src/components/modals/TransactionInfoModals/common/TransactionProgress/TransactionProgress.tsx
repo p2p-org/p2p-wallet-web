@@ -8,13 +8,43 @@ import classNames from 'classnames';
 import { INITIAL_PROGRESS } from 'components/modals/TransactionInfoModals/TransactionStatusModal/TransactionStatusModal';
 import { Icon } from 'components/ui';
 
-import { StatusColors } from '../styled';
+import { StatusColors, TransactionLabel } from '../styled';
 
 export const ProgressIcon = styled(Icon)`
   width: 24px;
   height: 24px;
 
   color: ${theme.colors.textIcon.buttonPrimary};
+`;
+
+export const TransactionStatus = styled.div`
+  display: flex;
+  align-items: center;
+
+  margin-top: 13px;
+  margin-left: 38px;
+
+  color: ${theme.colors.textIcon.primary};
+
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 140%;
+`;
+
+export const TransactionBadge = styled.div`
+  display: flex;
+  align-items: center;
+
+  margin-left: 4px;
+  padding: 5px 12px;
+
+  color: ${theme.colors.textIcon.secondary};
+
+  font-weight: 500;
+  font-size: 12px;
+
+  background: ${theme.colors.bg.secondary};
+  border-radius: 4px;
 `;
 
 export const ProgressWrapper = styled.div`
@@ -80,6 +110,7 @@ export interface Props {
   isProcessing: boolean;
   isSuccess: boolean;
   isExecuting: boolean;
+  label: string;
 }
 
 const UPPER_PROGRESS_BOUND = 95;
@@ -115,30 +146,58 @@ export const TransactionProgress: FC<Props> = (props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [props.isExecuting]);
 
-  return (
-    <ProgressWrapper>
-      <ProgressLine
-        style={{ width: `${progress}%` }}
-        className={classNames({
-          isSuccess: props.isSuccess,
-          isError: props.isError,
-        })}
-      />
-      <ProgressStub />
+  const renderStatus = (executing: boolean, success: boolean, error: boolean) => {
+    switch (true) {
+      case executing:
+        return 'Pending';
+      case error:
+        return 'Error';
+      case success:
+        return 'Completed';
+      default:
+        return 'Pending';
+    }
+  };
 
-      <BlockWrapper
-        className={classNames({
-          isProcessing: props.isProcessing,
-          isSuccess: props.isSuccess,
-          isError: props.isError,
-        })}
-      >
-        {props.isSuccess ? (
-          <ProgressIcon name="success-send" />
-        ) : (
-          <ProgressIcon name={props.isError ? 'error-send' : 'clock-send'} />
-        )}
-      </BlockWrapper>
-    </ProgressWrapper>
+  return (
+    <>
+      <ProgressWrapper>
+        <ProgressLine
+          style={{ width: `${progress}%` }}
+          className={classNames({
+            isSuccess: props.isSuccess,
+            isError: props.isError,
+          })}
+        />
+        <ProgressStub />
+
+        <BlockWrapper
+          className={classNames({
+            isProcessing: props.isProcessing,
+            isSuccess: props.isSuccess,
+            isError: props.isError,
+          })}
+        >
+          {props.isSuccess ? (
+            <ProgressIcon name="success-send" />
+          ) : (
+            <ProgressIcon name={props.isError ? 'error-send' : 'clock-send'} />
+          )}
+        </BlockWrapper>
+      </ProgressWrapper>
+      <TransactionStatus>
+        {props.label}
+        <TransactionBadge>
+          <TransactionLabel
+            className={classNames({
+              isProcessing: props.isProcessing,
+              isSuccess: props.isSuccess,
+              isError: props.isError,
+            })}
+          />
+          {renderStatus(props.isExecuting, props.isSuccess, props.isError)}
+        </TransactionBadge>
+      </TransactionStatus>
+    </>
   );
 };

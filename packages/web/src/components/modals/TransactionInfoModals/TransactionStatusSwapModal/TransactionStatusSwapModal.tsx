@@ -20,6 +20,7 @@ export type TransactionStatusModalProps = {
   params: SwapParams;
 };
 
+// @TODO fix all mobile modals
 const CHECK_TRANSACTION_INTERVAL = 3000;
 export const TransactionStatusModal: FunctionComponent<
   ModalPropsType<string | null> & TransactionStatusModalProps
@@ -107,6 +108,7 @@ export const TransactionStatusModal: FunctionComponent<
         isProcessing={isProcessing}
         isSuccess={isSuccess}
         isExecuting={isExecuting}
+        label={'Swap status:'}
       />
       <SolanaExplorerLink
         signature={signature}

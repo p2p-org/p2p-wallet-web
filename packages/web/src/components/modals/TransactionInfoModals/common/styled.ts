@@ -122,35 +122,6 @@ export const CheckmarkIcon = styled(Icon)`
   color: ${theme.colors.textIcon.buttonPrimary};
 `;
 
-export const TransactionStatus = styled.div`
-  display: flex;
-  align-items: center;
-
-  margin-left: 20px;
-
-  color: ${theme.colors.textIcon.primary};
-
-  font-weight: 500;
-  font-size: 16px;
-  line-height: 140%;
-`;
-
-export const TransactionBadge = styled.div`
-  display: flex;
-  align-items: center;
-
-  margin-left: 4px;
-  padding: 5px 12px;
-
-  color: ${theme.colors.textIcon.secondary};
-
-  font-weight: 500;
-  font-size: 12px;
-
-  background: ${theme.colors.bg.secondary};
-  border-radius: 4px;
-`;
-
 export const TransactionLabel = styled(StatusColors)`
   display: block;
   width: 8px;
