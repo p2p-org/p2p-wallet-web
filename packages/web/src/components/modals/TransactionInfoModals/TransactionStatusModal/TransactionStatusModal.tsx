@@ -9,8 +9,8 @@ import dayjs from 'dayjs';
 import type { ModalPropsType } from 'app/contexts';
 import { ToastManager } from 'components/common/ToastManager';
 import type { TransactionDetailsProps } from 'components/common/TransactionDetails';
+import { SolanaExplorerLink } from 'components/modals/components';
 import { trackEvent } from 'utils/analytics';
-import { getExplorerUrl } from 'utils/connection';
 import { transferNotification } from 'utils/transactionNotifications';
 
 import { Send } from '../../TransactionConfirmModal/Send/Send';
@@ -21,8 +21,6 @@ import {
   CloseWrapper,
   DateHeader,
   Footer,
-  GoToExplorerIcon,
-  GoToExplorerLink,
   Header,
   OtherIcon,
   ProgressLine,
@@ -257,20 +255,15 @@ export const TransactionStatusModal: FunctionComponent<
         />
       </Section>
       <Footer>
-        <GoToExplorerLink
-          href={signature ? getExplorerUrl('tx', signature, network) : ''}
-          target="_blank"
-          rel="noopener noreferrer noindex"
-          onClick={() => {
-            trackEvent('send_explorer_click', { transactionConfirmed: !isExecuting });
+        <SolanaExplorerLink
+          signature={signature}
+          network={network}
+          isExecuting={isExecuting}
+          amplitudeAction={{
+            name: 'send_explorer_click',
+            transactionConfirmed: !isExecuting,
           }}
-          className={classNames({
-            isDisabled: !signature,
-          })}
-        >
-          <GoToExplorerIcon name={'external'} />
-          View in Solana explorer
-        </GoToExplorerLink>
+        />
       </Footer>
     </Wrapper>
   );
