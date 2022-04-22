@@ -30,7 +30,7 @@ export const NetworkSelect: FC = () => {
   return (
     <Wrapper>
       <NetworkSelectText>Network</NetworkSelectText>
-      <Select value={blockchain}>
+      <Select value={blockchain} mobileListTitle="Choose network">
         {BLOCKCHAINS.map((itemBlockchain) => (
           <SelectItem
             key={itemBlockchain}

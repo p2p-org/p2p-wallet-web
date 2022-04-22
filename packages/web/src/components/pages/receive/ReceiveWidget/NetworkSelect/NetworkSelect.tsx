@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { styled } from '@linaria/react';
 import { useSolana } from '@p2p-wallet-web/core';
 import { useNativeAccount } from '@p2p-wallet-web/sail';
-import { theme } from '@p2p-wallet-web/ui';
+import { theme, useIsMobile } from '@p2p-wallet-web/ui';
 import { Bitcoin } from '@renproject/chains-bitcoin';
 import { Solana } from '@renproject/chains-solana';
 import type { PublicKey } from '@solana/web3.js';
@@ -20,6 +20,7 @@ import {
 import { TokenAvatar } from 'components/common/TokenAvatar';
 import { Select, SelectItem } from 'components/ui';
 import { trackEvent } from 'utils/analytics';
+import { getAvatarSize } from 'utils/common';
 import { useRenNetwork } from 'utils/hooks/renBridge/useNetwork';
 
 const InfoWrapper = styled.div`
@@ -62,12 +63,11 @@ const SYMBOLS = {
   solana: 'SOL',
 };
 
-interface Props {}
-
-export const NetworkSelect: FC<Props> = () => {
+export const NetworkSelect: FC = () => {
+  const isMobile = useIsMobile();
   const { openModal } = useModals();
   const solanaProvider = useSolana();
-  const network = useRenNetwork();
+  const renNetwork = useRenNetwork();
   const { nativeBalance } = useNativeAccount();
   const { accountRentExemption } = useNetworkFees();
 
@@ -80,7 +80,7 @@ export const NetworkSelect: FC<Props> = () => {
       setIsBTCTokenLoading(true);
       try {
         setBTCTokenAccount(
-          await new Solana(solanaProvider, network).getAssociatedTokenAccount(Bitcoin.asset),
+          await new Solana(solanaProvider, renNetwork).getAssociatedTokenAccount(Bitcoin.asset),
         );
       } catch (err) {
         console.error(err);
@@ -90,7 +90,7 @@ export const NetworkSelect: FC<Props> = () => {
     };
 
     void mount();
-  }, [network, solanaProvider]);
+  }, [renNetwork, solanaProvider]);
 
   const handleSourceNetworkClick = useCallback(
     (source: ReceiveSourceNetworkType) => async () => {
@@ -117,16 +117,20 @@ export const NetworkSelect: FC<Props> = () => {
     }
   };
 
+  const title = 'Showing my address for';
+  const avatarSize = getAvatarSize(isMobile);
+
   return (
     <Select
       isLoading={isBTCTokenLoading}
       onToggle={handleToggleClick}
+      mobileListTitle={title}
       value={
         <>
           <TokenAvatar symbol={SYMBOLS[sourceNetwork]} size={44} />
           <InfoWrapper>
             <Line>
-              <Text>Showing my address for</Text>
+              <Text>{title}</Text>
             </Line>
             <Line>
               <Text className="bottom">{sourceNetwork} network</Text>
@@ -141,7 +145,7 @@ export const NetworkSelect: FC<Props> = () => {
           isSelected={network === sourceNetwork}
           onItemClick={handleSourceNetworkClick(network)}
         >
-          <TokenAvatar symbol={SYMBOLS[network]} size={44} />
+          <TokenAvatar symbol={SYMBOLS[network]} size={avatarSize} />
           <Network>{network} network</Network>
         </SelectItem>
       ))}
