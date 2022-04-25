@@ -78,7 +78,7 @@ export const TransactionStatusModal: FunctionComponent<
           commitment: 'confirmed',
         });
         if (trx) {
-          if (trx.meta?.err) {
+          if (trx?.meta?.err) {
             setTransactionError(DEFAULT_TRANSACTION_ERROR);
           } else if (transactionError) {
             setTransactionError('');
@@ -87,7 +87,7 @@ export const TransactionStatusModal: FunctionComponent<
           setTimeout(mount, CHECK_TRANSACTION_INTERVAL);
         }
       } catch (error) {
-        // setTransactionError((error as Error).message);
+        setTransactionError((error as Error).message);
         ToastManager.error((error as Error).message);
       } finally {
         setIsExecuting(false);
@@ -104,9 +104,9 @@ export const TransactionStatusModal: FunctionComponent<
 
     close(signature);
   };
-  const isProcessing = (!signature || !transaction?.key) && !transactionError;
-  const isSuccess = Boolean(signature && transaction?.key && !transactionError);
   const isError = Boolean(transactionError);
+  const isProcessing = (!signature || !transaction?.key) && !isError;
+  const isSuccess = Boolean(signature && transaction?.key && !isError);
 
   return (
     <Wrapper>

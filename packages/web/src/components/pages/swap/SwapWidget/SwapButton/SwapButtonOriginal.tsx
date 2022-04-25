@@ -30,24 +30,6 @@ export const SwapButtonOriginal: FC = () => {
   const feeCompensationInfo = useFeeCompensation();
   const feeLimitsInfo = useFreeFeeLimits();
 
-  // useEffect(() => {
-  //   openModal(ModalType.SHOW_MODAL_TRANSACTION_STATUS_SWAP, {
-  //     params: {
-  //       inputTokenName: trade.inputTokenName,
-  //       outputTokenName: trade.outputTokenName,
-  //       inputAmount: trade.getInputAmount(),
-  //       minimumOutputAmount: trade.getMinimumOutputAmount(),
-  //     },
-  //     userTokenAccounts,
-  //     feeCompensationInfo,
-  //     feeLimitsInfo,
-  //     priceInfo,
-  //     solanaProvider,
-  //     networkFees,
-  //     swapInfo,
-  //   });
-  // }, []);
-
   const handleSwapClick = async () => {
     trackEvent('Swap_Verification_Invoked');
 

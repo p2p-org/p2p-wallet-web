@@ -124,7 +124,6 @@ export const TransactionProgress: FC<Props> = (props) => {
   useEffect(() => {
     let newProgress = INITIAL_PROGRESS;
 
-    // @FIXME isExecuting and isProcessing used. They are simular.
     if (!props.isExecuting) {
       return;
     }

@@ -1,5 +1,5 @@
 import { styled } from '@linaria/react';
-import { theme } from '@p2p-wallet-web/ui';
+import { theme, up } from '@p2p-wallet-web/ui';
 import { zIndexes } from '@p2p-wallet-web/ui/dist/esm';
 
 import { Button, Icon } from 'components/ui';
@@ -32,7 +32,10 @@ export const Wrapper = styled(Modal)`
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
 
   ${ModalContent} {
-    width: 524px;
+    ${up.tablet} {
+      width: 524px;
+    }
+
     padding: 0;
   }
 
@@ -279,8 +282,6 @@ export const ShareWrapper = styled.div`
   }
 `;
 
-// @FIXME there are a lot of intersections of usages of these styled components
-// @TODO move modal/componets into TransactionInfoModals/common and put all styled into styled.ts
 export const Footer = styled.div`
   display: flex;
   align-items: center;
