@@ -5,9 +5,9 @@ import { styled } from '@linaria/react';
 import { theme, zIndexes } from '@p2p-wallet-web/ui/dist/esm';
 import classNames from 'classnames';
 
-import { INITIAL_PROGRESS } from 'components/modals/TransactionInfoModals/TransactionStatusModal/TransactionStatusModal';
 import { Icon } from 'components/ui';
 
+import { INITIAL_PROGRESS } from '../../TransactionStatusSendModal';
 import { StatusColors, TransactionLabel } from '../styled';
 
 export const ProgressIcon = styled(Icon)`

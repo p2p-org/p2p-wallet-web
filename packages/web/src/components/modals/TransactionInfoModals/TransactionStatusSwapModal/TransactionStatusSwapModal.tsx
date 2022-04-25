@@ -11,7 +11,7 @@ import { trackEvent } from 'utils/analytics';
 
 import { DateHeader, SolanaExplorerLink, TransactionProgress } from '../common';
 import { CloseIcon, CloseWrapper, Header, Section, Wrapper } from '../common/styled';
-import type { SwapParams } from '../TransactionStatusModal/Swap';
+import type { SwapParams } from '../TransactionStatusSendModal/Swap';
 
 const DEFAULT_TRANSACTION_ERROR = 'Transaction error';
 

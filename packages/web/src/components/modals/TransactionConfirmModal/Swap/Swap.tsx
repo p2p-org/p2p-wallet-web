@@ -49,10 +49,10 @@ export const Swap: FC<Props & FeesOriginalProps> = ({
   const inputDecimals = tokenConfigs[inputTokenName]?.decimals || 0;
   const outputDecimals = tokenConfigs[outputTokenName]?.decimals || 0;
   const minReceiveAmount = formatBigNumber(swapInfo.trade.getMinimumOutputAmount(), outputDecimals);
+  const outputAmount = formatBigNumber(swapInfo.trade.getOutputAmount(), outputDecimals);
 
   return (
     <Wrapper>
-      {/*// @TODO check title in the confirm modal*/}
       {titled && <Subtitle>You are going to swap</Subtitle>}
       <Section className="swap">
         <FieldInfo>
@@ -62,11 +62,7 @@ export const Swap: FC<Props & FeesOriginalProps> = ({
               {formatBigNumber(inputAmount, inputDecimals)} {inputTokenName}
             </InfoTitle>
             <InfoValue>
-              <AmountUSD
-                prefix={'~'}
-                amount={swapInfo.trade.getInputAmount()}
-                tokenName={swapInfo.trade.inputTokenName}
-              />
+              <AmountUSD prefix={'~'} amount={inputAmount} tokenName={inputTokenName} />
             </InfoValue>
           </InfoWrapper>
         </FieldInfo>
@@ -81,11 +77,10 @@ export const Swap: FC<Props & FeesOriginalProps> = ({
           <TokenAvatar symbol={outputTokenName} size={44} />
           <InfoWrapper>
             <InfoTitle>
-              {/*// @FIXME*/}
-              {formatBigNumber(swapInfo.trade.getOutputAmount(), outputDecimals)} {outputTokenName}
+              {outputAmount} {outputTokenName}
             </InfoTitle>
             <InfoValue>
-              Receive at least: {minReceiveAmount} {swapInfo.trade.outputTokenName}
+              Receive at least: {minReceiveAmount} {outputTokenName}
             </InfoValue>
           </InfoWrapper>
         </FieldInfo>

@@ -25,9 +25,7 @@ const ADDRESS_CHARS_SHOW = 4;
 const DEFAULT_TRANSACTION_ERROR = 'Transaction error';
 const CHECK_TRANSACTION_INTERVAL = 3000;
 
-// @TODO remove old swap and send
-// @TODO rename to TransactionStatusSendModal
-export const TransactionStatusModal: FunctionComponent<
+export const TransactionStatusSendModal: FunctionComponent<
   ModalPropsType<string | null> & TransactionStatusModalProps
 > = ({ type, action, params, sendState, userFreeFeeLimits, networkFees, close }) => {
   const { provider } = useWallet();
@@ -110,10 +108,10 @@ export const TransactionStatusModal: FunctionComponent<
   const isSuccess = Boolean(signature && transaction?.key && !transactionError);
   const isError = Boolean(transactionError);
 
-  const shortAddress = sendState.destinationAddress.replace(
-    sendState.destinationAddress.substring(
+  const shortAddress = sendState?.destinationAddress.replace(
+    sendState?.destinationAddress.substring(
       ADDRESS_CHARS_SHOW,
-      sendState.destinationAddress.length - ADDRESS_CHARS_SHOW,
+      sendState?.destinationAddress.length - ADDRESS_CHARS_SHOW,
     ),
     '...',
   );

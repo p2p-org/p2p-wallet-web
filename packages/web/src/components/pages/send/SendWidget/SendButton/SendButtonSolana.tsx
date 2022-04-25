@@ -16,7 +16,7 @@ import {
   useTransferAction,
 } from 'app/contexts';
 import type { TransactionConfirmModalProps } from 'components/modals/TransactionConfirmModal/TransactionConfirmModal';
-import type { TransactionStatusModalProps } from 'components/modals/TransactionInfoModals/TransactionStatusModal/TransactionStatusModal';
+import type { TransactionStatusModalProps } from 'components/modals/TransactionInfoModals/TransactionStatusSendModal/TransactionStatusModal';
 import { Button, Icon } from 'components/ui';
 import { trackEvent } from 'utils/analytics';
 
