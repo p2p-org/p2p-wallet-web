@@ -5,6 +5,8 @@ import { useConnectionContext, useTransaction, useWallet } from '@p2p-wallet-web
 
 import type { ModalPropsType } from 'app/contexts';
 import { ToastManager } from 'components/common/ToastManager';
+import type { FeesOriginalProps } from 'components/pages/swap/SwapWidget/Fees/FeesOriginal';
+import { FeesOriginal } from 'components/pages/swap/SwapWidget/Fees/FeesOriginal';
 import { trackEvent } from 'utils/analytics';
 
 import { DateHeader, SolanaExplorerLink, TransactionProgress } from '../common';
@@ -15,16 +17,29 @@ const DEFAULT_TRANSACTION_ERROR = 'Transaction error';
 
 type SwapActionType = () => Promise<string>;
 
-export type TransactionStatusModalProps = {
+type ModalProps = {
   action: SwapActionType;
   params: SwapParams;
 };
 
-// @TODO fix all mobile modals
+export type TransactionStatusModalProps = FeesOriginalProps & ModalProps;
+
 const CHECK_TRANSACTION_INTERVAL = 3000;
+
 export const TransactionStatusModal: FunctionComponent<
   ModalPropsType<string | null> & TransactionStatusModalProps
-> = ({ action, close }) => {
+> = ({
+  action,
+  close,
+  userTokenAccounts,
+  priceInfo,
+  solanaProvider,
+  swapInfo,
+  feeLimitsInfo,
+  feeCompensationInfo,
+  networkFees,
+  // params,
+}) => {
   const { provider } = useWallet();
 
   const [isExecuting, setIsExecuting] = useState(false);
@@ -110,6 +125,18 @@ export const TransactionStatusModal: FunctionComponent<
         isExecuting={isExecuting}
         label={'Swap status:'}
       />
+      <Section>
+        <FeesOriginal
+          userTokenAccounts={userTokenAccounts}
+          feeCompensationInfo={feeCompensationInfo}
+          feeLimitsInfo={feeLimitsInfo}
+          solanaProvider={solanaProvider}
+          networkFees={networkFees}
+          priceInfo={priceInfo}
+          swapInfo={swapInfo}
+          forPage={false}
+        />
+      </Section>
       <SolanaExplorerLink
         signature={signature}
         network={network}

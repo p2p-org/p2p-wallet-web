@@ -26,6 +26,7 @@ const DEFAULT_TRANSACTION_ERROR = 'Transaction error';
 const CHECK_TRANSACTION_INTERVAL = 3000;
 
 // @TODO remove old swap and send
+// @TODO rename to TransactionStatusSendModal
 export const TransactionStatusModal: FunctionComponent<
   ModalPropsType<string | null> & TransactionStatusModalProps
 > = ({ type, action, params, sendState, userFreeFeeLimits, networkFees, close }) => {

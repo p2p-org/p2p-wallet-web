@@ -205,15 +205,15 @@ const Footer = styled.div`
   }
 `;
 
-type Props = {
+export type Props = {
   title?: React.ReactNode;
   description?: React.ReactNode;
   footer?: React.ReactNode;
   iconName?: string;
   iconBgClassName?: string;
 
-  noDelimiter: boolean;
-  close: () => void;
+  noDelimiter?: boolean;
+  close?: () => void;
   doNotCloseOnPathChangeMobile?: boolean;
   className?: string;
 };
@@ -239,7 +239,7 @@ export const Modal: FunctionComponent<Props> = ({
 
   useEffect(() => {
     if (isMobile && !doNotCloseOnPathChangeMobile && currentPath.current !== location.pathname) {
-      close();
+      close?.();
     }
   }, [isMobile, doNotCloseOnPathChangeMobile, location.pathname]);
 
@@ -280,7 +280,7 @@ export const Modal: FunctionComponent<Props> = ({
       state.movement[1] > DRAG_MOVEMENT_THRESHOLD ||
       (state.velocity[1] > DRAG_VELOCITY_THRESHOLD && state.direction[1] > 0)
     ) {
-      close();
+      close?.();
     }
   });
 

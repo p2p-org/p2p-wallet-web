@@ -1,10 +1,10 @@
-import { Suspense, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import * as React from 'react';
+import { Suspense, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
 import { styled } from '@linaria/react';
-import { zIndexes } from '@p2p-wallet-web/ui';
 import type { LoadableComponent } from '@loadable/component';
 import loadable from '@loadable/component';
+import { zIndexes } from '@p2p-wallet-web/ui';
 
 import type { ModalPropsType } from 'app/contexts/general/modals/types';
 import { ModalType } from 'app/contexts/general/modals/types';
