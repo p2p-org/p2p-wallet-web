@@ -5,6 +5,9 @@ import DotEnv from 'dotenv-webpack';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import path from 'path';
+// @ts-ignore
+import TerserPlugin from 'terser-webpack-plugin';
+// @ts-ignore
 import type { Configuration as WebpackConfiguration } from 'webpack';
 import webpack from 'webpack';
 import type { Configuration as WebpackDevServerConfiguration } from 'webpack-dev-server';
@@ -40,13 +43,15 @@ const config: ConfigFn = (env, argv) => {
     // @TODO output for library https://webpack.js.org/configuration/output/#outputlibrary
     output: {
       path: path.resolve(__dirname, 'packages/web/public'),
-      filename: __DEVELOPMENT__ ? '[file].[contenthash].js' : '[contenthash].js',
+      filename: __DEVELOPMENT__ ? '[name].[contenthash].js' : '[contenthash].js',
       chunkFilename: __DEVELOPMENT__ ? '[id]-[contenthash].chunk.js' : '[contenthash].chunk.js',
     },
 
     optimization: {
       nodeEnv: argv.mode,
       runtimeChunk: 'single',
+      minimize: !__DEVELOPMENT__,
+      minimizer: __DEVELOPMENT__ ? [] : [new TerserPlugin()],
       splitChunks: {
         cacheGroups: {
           vendor: {
