@@ -5,8 +5,8 @@ import { useConnectionContext, useTransaction, useWallet } from '@p2p-wallet-web
 
 import type { ModalPropsType } from 'app/contexts';
 import { ToastManager } from 'components/common/ToastManager';
+import { Swap } from 'components/modals/TransactionConfirmModal/Swap';
 import type { FeesOriginalProps } from 'components/pages/swap/SwapWidget/Fees/FeesOriginal';
-import { FeesOriginal } from 'components/pages/swap/SwapWidget/Fees/FeesOriginal';
 import { trackEvent } from 'utils/analytics';
 
 import { DateHeader, SolanaExplorerLink, TransactionProgress } from '../common';
@@ -25,6 +25,7 @@ type ModalProps = {
 export type TransactionStatusModalProps = FeesOriginalProps & ModalProps;
 
 const CHECK_TRANSACTION_INTERVAL = 3000;
+// @TODO check mobile modal again (there should be no footer)
 
 export const TransactionStatusModal: FunctionComponent<
   ModalPropsType<string | null> & TransactionStatusModalProps
@@ -38,7 +39,7 @@ export const TransactionStatusModal: FunctionComponent<
   feeLimitsInfo,
   feeCompensationInfo,
   networkFees,
-  // params,
+  params,
 }) => {
   const { provider } = useWallet();
 
@@ -111,7 +112,7 @@ export const TransactionStatusModal: FunctionComponent<
     <Wrapper>
       <Section>
         <Header>
-          Swappy swap
+          {swapInfo.trade.inputTokenName} → {swapInfo.trade.outputTokenName}
           <CloseWrapper onClick={handleCloseClick}>
             <CloseIcon name="close" />
           </CloseWrapper>
@@ -126,15 +127,17 @@ export const TransactionStatusModal: FunctionComponent<
         label={'Swap status:'}
       />
       <Section>
-        <FeesOriginal
+        <Swap
+          params={params}
           userTokenAccounts={userTokenAccounts}
-          feeCompensationInfo={feeCompensationInfo}
-          feeLimitsInfo={feeLimitsInfo}
-          solanaProvider={solanaProvider}
-          networkFees={networkFees}
           priceInfo={priceInfo}
+          solanaProvider={solanaProvider}
+          feeLimitsInfo={feeLimitsInfo}
+          feeCompensationInfo={feeCompensationInfo}
+          networkFees={networkFees}
           swapInfo={swapInfo}
           forPage={false}
+          titled={false}
         />
       </Section>
       <SolanaExplorerLink

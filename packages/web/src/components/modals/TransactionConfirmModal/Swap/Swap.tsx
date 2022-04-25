@@ -31,6 +31,7 @@ export type SwapParams = {
 
 interface Props {
   params: SwapParams;
+  titled: boolean;
 }
 
 export const Swap: FC<Props & FeesOriginalProps> = ({
@@ -42,6 +43,7 @@ export const Swap: FC<Props & FeesOriginalProps> = ({
   solanaProvider,
   priceInfo,
   feeCompensationInfo,
+  titled,
 }) => {
   const { tokenConfigs } = useConfig();
   const inputDecimals = tokenConfigs[inputTokenName]?.decimals || 0;
@@ -50,7 +52,8 @@ export const Swap: FC<Props & FeesOriginalProps> = ({
 
   return (
     <Wrapper>
-      <Subtitle>You are going to swap</Subtitle>
+      {/*// @TODO check title in the confirm modal*/}
+      {titled && <Subtitle>You are going to swap</Subtitle>}
       <Section className="swap">
         <FieldInfo>
           <TokenAvatar symbol={inputTokenName} size={44} />
@@ -67,17 +70,18 @@ export const Swap: FC<Props & FeesOriginalProps> = ({
             </InfoValue>
           </InfoWrapper>
         </FieldInfo>
+        <FromToWrapper>
+          <Overlay>
+            <Icon name={'arrow-down'} />
+          </Overlay>
+        </FromToWrapper>
       </Section>
-      <FromToWrapper>
-        <Overlay>
-          <Icon name={'arrow-down'} />
-        </Overlay>
-      </FromToWrapper>
       <Section className="top">
         <FieldInfo>
           <TokenAvatar symbol={outputTokenName} size={44} />
           <InfoWrapper>
             <InfoTitle>
+              {/*// @FIXME*/}
               {formatBigNumber(swapInfo.trade.getOutputAmount(), outputDecimals)} {outputTokenName}
             </InfoTitle>
             <InfoValue>
