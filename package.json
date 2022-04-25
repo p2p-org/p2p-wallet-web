@@ -12,7 +12,7 @@
     "deploy": "lerna run deploy",
     "lint": "lerna run lint",
     "precommit": "lint-staged",
-    "serve": "NODE_ENV=development webpack-dev-server --mode development --stats-error-details"
+    "serve": "webpack-dev-server --mode development --stats-error-details"
   },
   "devDependencies": {
     "@babel/preset-react": "^7.16.7",

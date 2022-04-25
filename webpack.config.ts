@@ -24,11 +24,11 @@ type ConfigFn = (env: any, argv: any) => Configuration;
 
 // @ts-ignore
 const config: ConfigFn = (env, argv) => {
-  const DEVELOPMENT = argv.mode === 'development';
+  const __DEVELOPMENT__ = argv.mode === 'development';
 
   const devPlugins: Array<unknown> = [];
 
-  if (DEVELOPMENT) {
+  if (__DEVELOPMENT__) {
     devPlugins.push(new ReactRefreshWebpackPlugin());
   }
 
@@ -37,15 +37,15 @@ const config: ConfigFn = (env, argv) => {
 
     entry: path.resolve(__dirname, './packages/web/src/index.tsx'),
 
+    // @TODO output for library https://webpack.js.org/configuration/output/#outputlibrary
     output: {
       path: path.resolve(__dirname, 'packages/web/public'),
-      filename: '[name].[contenthash].js',
-      // chunkFilename: DEVELOPMENT ? '[name]-[contenthash].chunk.js' : '[contenthash].chunk.js',
-      chunkFilename: DEVELOPMENT ? '[contenthash].chunk.js' : '[contenthash].chunk.js',
+      filename: __DEVELOPMENT__ ? '[file].[contenthash].js' : '[contenthash].js',
+      chunkFilename: __DEVELOPMENT__ ? '[id]-[contenthash].chunk.js' : '[contenthash].chunk.js',
     },
 
-    // @TODO NEXT optimization  https://webpack.js.org/configuration/optimization/
     optimization: {
+      nodeEnv: argv.mode,
       runtimeChunk: 'single',
       splitChunks: {
         cacheGroups: {
@@ -60,7 +60,7 @@ const config: ConfigFn = (env, argv) => {
     },
 
     performance: {
-      hints: DEVELOPMENT ? 'warning' : 'error',
+      hints: __DEVELOPMENT__ ? 'warning' : 'error',
     },
 
     module: {
@@ -84,11 +84,11 @@ const config: ConfigFn = (env, argv) => {
           test: /\.css$/,
           use: [
             {
-              loader: DEVELOPMENT ? 'style-loader' : MiniCssExtractPlugin.loader,
+              loader: __DEVELOPMENT__ ? 'style-loader' : MiniCssExtractPlugin.loader,
             },
             {
               loader: 'css-loader',
-              options: { sourceMap: DEVELOPMENT },
+              options: { sourceMap: __DEVELOPMENT__ },
             },
           ],
         },
@@ -102,7 +102,7 @@ const config: ConfigFn = (env, argv) => {
             {
               loader: '@linaria/webpack-loader',
               options: {
-                sourceMap: DEVELOPMENT,
+                sourceMap: __DEVELOPMENT__,
               },
             },
           ],
@@ -134,7 +134,7 @@ const config: ConfigFn = (env, argv) => {
       },
     },
 
-    devtool: DEVELOPMENT ? 'eval-cheap-module-source-map' : 'none',
+    devtool: __DEVELOPMENT__ ? 'eval-cheap-module-source-map' : 'none',
 
     // @TODO Webpack cache https://webpack.js.org/configuration/cache/#cache
     // @TODO Webpack plugins https://webpack.js.org/configuration/plugins/
@@ -163,8 +163,7 @@ const config: ConfigFn = (env, argv) => {
         template: path.join(__dirname + '/packages/web/index.html'),
       }),
       new webpack.DefinePlugin({
-        'process.env': { NODE_ENV: JSON.stringify(process.env.NODE_ENV) },
-        DEVELOPMENT,
+        __DEVELOPMENT__,
       }),
       new DotEnv({
         path: './packages/web/.env.development',
@@ -175,7 +174,7 @@ const config: ConfigFn = (env, argv) => {
         Buffer: ['buffer', 'Buffer'],
       }),
       new MiniCssExtractPlugin({
-        filename: DEVELOPMENT ? 'styles.css' : 'styles-[contenthash].css',
+        filename: __DEVELOPMENT__ ? 'styles.css' : 'styles-[contenthash].css',
       }),
       ...devPlugins,
     ],

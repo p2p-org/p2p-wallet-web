@@ -4,8 +4,8 @@ import 'sanitize.css';
 import '@p2p-wallet-web/ui/css/nprogress.css';
 import 'react-loading-skeleton/dist/skeleton.css';
 
-import { StrictMode } from 'react';
 import * as React from 'react';
+import { StrictMode } from 'react';
 import ReactDOM from 'react-dom';
 
 import { globalCss } from '@p2p-wallet-web/ui';
@@ -32,6 +32,6 @@ render();
 
 // Allow the hot-reloading of the App in development mode
 // @TODO Fix typing resolution
-if (DEVELOPMENT && module.hot) {
+if (__DEVELOPMENT__ && module.hot) {
   module.hot.accept('./App', render);
 }
