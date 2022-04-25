@@ -83,7 +83,7 @@ export interface UseSwap {
   intermediateTokenName: string | undefined;
   intermediateTokenPrice: number | undefined;
   buttonState: ButtonState;
-  onSwap: () => Promise<string | undefined>;
+  onSwap: () => Promise<string>;
 
   feeAmount: u64 | undefined;
 }
@@ -101,7 +101,6 @@ const useSwapInternal = (props: UseSwapArgs = {}): UseSwap => {
   const { programIds, tokenConfigs, routeConfigs } = useConfig();
   const { relayTopUpWithSwap, userSetupSwap, userSwap } = useFeeRelayer();
   const {
-    compensationParams,
     estimatedFeeAmount,
     compensationState,
     compensationSwapData,
@@ -233,12 +232,12 @@ const useSwapInternal = (props: UseSwapArgs = {}): UseSwap => {
   // Update trade instance when pool data refreshes
   useEffect(() => {
     if (asyncPools.value) {
-      setTrade((trade) => trade.updatePools(asyncPools.value));
+      setTrade((currentTrade) => currentTrade.updatePools(asyncPools.value));
     }
   }, [asyncPools]);
 
   useEffect(() => {
-    setTrade((trade) => trade.updateSlippageTolerance(slippageTolerance));
+    setTrade((currentTrade) => currentTrade.updateSlippageTolerance(slippageTolerance));
   }, [slippageTolerance]);
 
   const feeAmount: u64 | undefined = useMemo(() => {

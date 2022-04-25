@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-import { useEffect } from 'react';
 
 import { styled } from '@linaria/react';
 import { useUserTokenAccounts } from '@p2p-wallet-web/core';
@@ -8,6 +7,7 @@ import { useSolana } from '@saberhq/use-solana';
 import { useFeeCompensation, useFreeFeeLimits, useNetworkFees, usePrice } from 'app/contexts';
 import { ModalType, useModals } from 'app/contexts/general/modals';
 import { ButtonState, useSwap } from 'app/contexts/solana/swap';
+import type { TransactionConfirmModalProps } from 'components/modals/TransactionConfirmModal/TransactionConfirmModal';
 import type { TransactionStatusModalProps } from 'components/modals/TransactionInfoModals/TransactionStatusSwapModal';
 import { Button, Icon } from 'components/ui';
 import { trackEvent } from 'utils/analytics';
@@ -30,31 +30,30 @@ export const SwapButtonOriginal: FC = () => {
   const feeCompensationInfo = useFeeCompensation();
   const feeLimitsInfo = useFreeFeeLimits();
 
-  useEffect(() => {
-    openModal(ModalType.SHOW_MODAL_TRANSACTION_STATUS_SWAP, {
-      params: {
-        inputTokenName: trade.inputTokenName,
-        outputTokenName: trade.outputTokenName,
-        inputAmount: trade.getInputAmount(),
-        minimumOutputAmount: trade.getMinimumOutputAmount(),
-      },
-      userTokenAccounts,
-      feeCompensationInfo,
-      feeLimitsInfo,
-      priceInfo,
-      solanaProvider,
-      networkFees,
-      swapInfo,
-    });
-  }, []);
+  // useEffect(() => {
+  //   openModal(ModalType.SHOW_MODAL_TRANSACTION_STATUS_SWAP, {
+  //     params: {
+  //       inputTokenName: trade.inputTokenName,
+  //       outputTokenName: trade.outputTokenName,
+  //       inputAmount: trade.getInputAmount(),
+  //       minimumOutputAmount: trade.getMinimumOutputAmount(),
+  //     },
+  //     userTokenAccounts,
+  //     feeCompensationInfo,
+  //     feeLimitsInfo,
+  //     priceInfo,
+  //     solanaProvider,
+  //     networkFees,
+  //     swapInfo,
+  //   });
+  // }, []);
 
   const handleSwapClick = async () => {
     trackEvent('Swap_Verification_Invoked');
 
-    const result = await openModal<boolean, TransactionStatusModalProps>(
+    const result = await openModal<boolean, TransactionConfirmModalProps>(
       ModalType.SHOW_MODAL_TRANSACTION_CONFIRM,
       {
-        // @FIXME
         type: 'swap',
         params: {
           inputTokenName: trade.inputTokenName,
