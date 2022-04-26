@@ -117,7 +117,6 @@ export const TransactionStatusSendModal: FunctionComponent<
   );
 
   const handleCloseClick = () => {
-    // @ts-ignore
     trackEvent('send_close_click', { transactionConfirmed: !isExecuting });
 
     close(signature);
@@ -152,11 +151,8 @@ export const TransactionStatusSendModal: FunctionComponent<
       <SolanaExplorerLink
         signature={signature}
         network={network}
-        isExecuting={isExecuting}
         amplitudeAction={{
-          // @ts-ignore
           name: 'send_explorer_click',
-          // @ts-ignore
           data: { transactionConfirmed: !isExecuting },
         }}
       />

@@ -8,7 +8,6 @@ export const Time = styled.div`
   color: ${theme.colors.textIcon.primary};
 `;
 
-// @FIXME probably you might need to move it to TransactionInfoModals/common
 export const DateHeaderWrapper = styled.div`
   display: flex;
   justify-content: center;

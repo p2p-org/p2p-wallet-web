@@ -25,7 +25,6 @@ type ModalProps = {
 export type TransactionStatusModalProps = FeesOriginalProps & ModalProps;
 
 const CHECK_TRANSACTION_INTERVAL = 3000;
-// @TODO check mobile modal again (there should be no footer)
 
 export const TransactionStatusModal: FunctionComponent<
   ModalPropsType<string | null> & TransactionStatusModalProps
@@ -99,7 +98,6 @@ export const TransactionStatusModal: FunctionComponent<
   }, [signature]);
 
   const handleCloseClick = () => {
-    // @ts-ignore
     trackEvent('swap_close_click', { transactionConfirmed: !isExecuting });
 
     close(signature);
@@ -144,9 +142,7 @@ export const TransactionStatusModal: FunctionComponent<
         signature={signature}
         network={network}
         amplitudeAction={{
-          // @ts-ignore
           name: 'swap_explorer_click',
-          // @ts-ignore
           data: { transactionConfirmed: !isExecuting },
         }}
       />
