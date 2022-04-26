@@ -216,7 +216,7 @@ export const TransactionConfirmModal: FunctionComponent<
           priceInfo={priceInfo}
           solanaProvider={solanaProvider}
           networkFees={networkFees}
-          titled={true}
+          showTitle={true}
         />
       ) : undefined}
 

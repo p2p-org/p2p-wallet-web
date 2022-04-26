@@ -10,7 +10,7 @@ import type { FeesOriginalProps } from 'components/pages/swap/SwapWidget/Fees/Fe
 import { trackEvent } from 'utils/analytics';
 
 import { DateHeader, SolanaExplorerLink, TransactionProgress } from '../common';
-import { CloseIcon, CloseWrapper, Header, Section, Wrapper } from '../common/styled';
+import { CloseIcon, CloseWrapper, Header, Section, WrapperModal } from '../common/styled';
 import type { SwapParams } from '../TransactionStatusSendModal/Swap';
 
 const DEFAULT_TRANSACTION_ERROR = 'Transaction error';
@@ -107,7 +107,7 @@ export const TransactionStatusModal: FunctionComponent<
   const isSuccess = Boolean(signature && transaction?.key && !isError);
 
   return (
-    <Wrapper>
+    <WrapperModal close={handleCloseClick}>
       <Section>
         <Header>
           {swapInfo.trade.inputTokenName} → {swapInfo.trade.outputTokenName}
@@ -135,7 +135,7 @@ export const TransactionStatusModal: FunctionComponent<
           networkFees={networkFees}
           swapInfo={swapInfo}
           forPage={false}
-          titled={false}
+          showTitle={false}
         />
       </Section>
       <SolanaExplorerLink
@@ -146,6 +146,6 @@ export const TransactionStatusModal: FunctionComponent<
           data: { transactionConfirmed: !isExecuting },
         }}
       />
-    </Wrapper>
+    </WrapperModal>
   );
 };

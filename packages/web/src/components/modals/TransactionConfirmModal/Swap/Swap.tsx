@@ -31,7 +31,7 @@ export type SwapParams = {
 
 interface Props {
   params: SwapParams;
-  titled: boolean;
+  showTitle: boolean;
 }
 
 export const Swap: FC<Props & FeesOriginalProps> = ({
@@ -43,7 +43,7 @@ export const Swap: FC<Props & FeesOriginalProps> = ({
   solanaProvider,
   priceInfo,
   feeCompensationInfo,
-  titled,
+  showTitle,
 }) => {
   const { tokenConfigs } = useConfig();
   const inputDecimals = tokenConfigs[inputTokenName]?.decimals || 0;
@@ -53,7 +53,7 @@ export const Swap: FC<Props & FeesOriginalProps> = ({
 
   return (
     <Wrapper>
-      {titled && <Subtitle>You are going to swap</Subtitle>}
+      {showTitle && <Subtitle>You are going to swap</Subtitle>}
       <Section className="swap">
         <FieldInfo>
           <TokenAvatar symbol={inputTokenName} size={44} />

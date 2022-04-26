@@ -51,7 +51,7 @@ import {
   Title,
   ValueCurrency,
   ValueOriginal,
-  Wrapper,
+  WrapperModal,
 } from '../common/styled';
 
 const StatusWrapper = styled.div`
@@ -352,7 +352,7 @@ export const TransactionDetailsModal: FC<Props> = ({ signature, source: sourceAd
     transaction?.data instanceof TransferTransaction && transaction.data.wasPaidByP2POrg;
 
   return (
-    <Wrapper>
+    <WrapperModal>
       <Header>
         <Title>{titleCase(transaction?.details.type)}</Title>
         <Desc title={`${transaction?.raw?.slot} SLOT`}>{date}</Desc>
@@ -463,6 +463,6 @@ export const TransactionDetailsModal: FC<Props> = ({ signature, source: sourceAd
           {isShowDetails ? 'Hide transaction details' : 'Show transaction details'}
         </ButtonExplorer>
       </Footer>
-    </Wrapper>
+    </WrapperModal>
   );
 };

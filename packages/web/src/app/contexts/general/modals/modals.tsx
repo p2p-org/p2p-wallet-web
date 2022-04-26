@@ -78,7 +78,7 @@ const modalsMap = new Map<ModalType, LoadableComponent<ModalPropsType & any>>([
     loadable(() => import('components/modals/TransactionInfoModals/TransactionDetailsModal')),
   ],
   [
-    ModalType.SHOW_MODAL_TRANSACTION_STATUS,
+    ModalType.SHOW_MODAL_TRANSACTION_STATUS_SEND,
     loadable(() => import('components/modals/TransactionInfoModals/TransactionStatusSendModal')),
   ],
   [

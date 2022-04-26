@@ -12,7 +12,7 @@ import { transferNotification } from 'utils/transactionNotifications';
 
 import { Send } from '../../TransactionConfirmModal/Send/Send';
 import { DateHeader, SolanaExplorerLink, TransactionProgress } from '../common';
-import { CloseIcon, CloseWrapper, Header, Section, Wrapper } from '../common/styled';
+import { CloseIcon, CloseWrapper, Header, Section, WrapperModal } from '../common/styled';
 import type { TransferParams } from './Send';
 
 export type TransactionStatusModalProps = TransactionDetailsProps & {
@@ -123,7 +123,7 @@ export const TransactionStatusSendModal: FunctionComponent<
   };
 
   return (
-    <Wrapper>
+    <WrapperModal close={handleCloseClick}>
       <Section>
         <Header>
           {params.amount.token.symbol} → {shortAddress}
@@ -156,6 +156,6 @@ export const TransactionStatusSendModal: FunctionComponent<
           data: { transactionConfirmed: !isExecuting },
         }}
       />
-    </Wrapper>
+    </WrapperModal>
   );
 };

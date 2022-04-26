@@ -19,7 +19,7 @@ export const StatusColors = styled.div`
   }
 `;
 
-export const Wrapper = styled(Modal)`
+export const WrapperModal = styled(Modal)`
   display: flex;
   flex-direction: column;
   justify-content: stretch;
