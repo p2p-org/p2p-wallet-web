@@ -1,6 +1,6 @@
 import type { FunctionComponent } from 'react';
-import { useEffect, useMemo, useRef, useState } from 'react';
 import * as React from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation } from 'react-router';
 import { animated, useSpring, useTransition } from 'react-spring';
 
@@ -205,7 +205,7 @@ const Footer = styled.div`
   }
 `;
 
-export type Props = {
+export type ModalProps = {
   title?: React.ReactNode;
   description?: React.ReactNode;
   footer?: React.ReactNode;
@@ -213,12 +213,12 @@ export type Props = {
   iconBgClassName?: string;
 
   noDelimiter?: boolean;
-  close?: () => void;
+  close: () => void;
   doNotCloseOnPathChangeMobile?: boolean;
   className?: string;
 };
 
-export const Modal: FunctionComponent<Props> = ({
+export const Modal: FunctionComponent<ModalProps> = ({
   title,
   description,
   footer,
@@ -239,7 +239,7 @@ export const Modal: FunctionComponent<Props> = ({
 
   useEffect(() => {
     if (isMobile && !doNotCloseOnPathChangeMobile && currentPath.current !== location.pathname) {
-      close?.();
+      close();
     }
   }, [isMobile, doNotCloseOnPathChangeMobile, location.pathname]);
 
@@ -280,7 +280,7 @@ export const Modal: FunctionComponent<Props> = ({
       state.movement[1] > DRAG_MOVEMENT_THRESHOLD ||
       (state.velocity[1] > DRAG_VELOCITY_THRESHOLD && state.direction[1] > 0)
     ) {
-      close?.();
+      close();
     }
   });
 
