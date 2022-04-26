@@ -64,6 +64,7 @@ export const TransactionStatusSendModal: FunctionComponent<
 
       if (type === 'send') {
         ToastManager.error(type, (error as Error).message);
+        setTransactionError(DEFAULT_TRANSACTION_ERROR);
       }
     }
   };

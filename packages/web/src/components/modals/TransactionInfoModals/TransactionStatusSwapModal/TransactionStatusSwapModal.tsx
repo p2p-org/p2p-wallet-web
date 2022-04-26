@@ -58,6 +58,7 @@ export const TransactionStatusModal: FunctionComponent<
       setSignature(resultSignature);
     } catch (error) {
       setIsExecuting(false);
+      setTransactionError(DEFAULT_TRANSACTION_ERROR);
     }
   };
 

@@ -352,7 +352,7 @@ export const TransactionDetailsModal: FC<Props> = ({ signature, source: sourceAd
     transaction?.data instanceof TransferTransaction && transaction.data.wasPaidByP2POrg;
 
   return (
-    <WrapperModal>
+    <WrapperModal close={close}>
       <Header>
         <Title>{titleCase(transaction?.details.type)}</Title>
         <Desc title={`${transaction?.raw?.slot} SLOT`}>{date}</Desc>
