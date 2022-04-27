@@ -28,6 +28,8 @@ type ArgV = {
 
 type ConfigFn = (env: CustomEnv, argv: ArgV) => Configuration;
 
+const MAX_CHUNK_SIZE = 300000;
+
 const config: ConfigFn = (env, argv) => {
   const __DEVELOPMENT__ = argv.mode === 'development';
   const __PRODUCTION__ = argv.mode === 'production';
@@ -69,6 +71,7 @@ const config: ConfigFn = (env, argv) => {
       minimize: !__DEVELOPMENT__,
       minimizer: __DEVELOPMENT__ ? [] : [new TerserPlugin()],
       splitChunks: {
+        maxSize: __PRODUCTION__ ? MAX_CHUNK_SIZE : undefined,
         cacheGroups: {
           vendor: {
             test: /[\\/]node_modules[\\/]/,
@@ -81,7 +84,7 @@ const config: ConfigFn = (env, argv) => {
     },
 
     performance: {
-      hints: __PRODUCTION__ ? 'error' : 'warning',
+      hints: 'warning',
     },
 
     module: {
