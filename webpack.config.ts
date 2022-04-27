@@ -8,27 +8,39 @@ import path from 'path';
 // @ts-ignore
 import TerserPlugin from 'terser-webpack-plugin';
 // @ts-ignore
-import type { Configuration as WebpackConfiguration } from 'webpack';
+import type { Configuration as WebpackConfiguration, WebpackPluginInstance } from 'webpack';
 import webpack from 'webpack';
+import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
 import type { Configuration as WebpackDevServerConfiguration } from 'webpack-dev-server';
 
 interface Configuration extends WebpackConfiguration, WebpackDevServerConfiguration {
   devServer?: WebpackDevServerConfiguration;
 }
 
-type ConfigFn = (env: any, argv: any) => Configuration;
+type CustomEnv = {
+  analyze: boolean;
+};
 
-// @TODO add process and may be dashboard in terminal
-// target browserlist for prod
+type ArgV = {
+  mode: Configuration['mode'];
+};
 
-// @ts-ignore
+type ConfigFn = (env: CustomEnv, argv: ArgV) => Configuration;
+
 const config: ConfigFn = (env, argv) => {
   const __DEVELOPMENT__ = argv.mode === 'development';
+  const __PRODUCTION__ = argv.mode === 'production';
+  const __ANALYSE__ = env.analyze;
 
-  const devPlugins: Array<unknown> = [];
+  const devPlugins: Array<WebpackPluginInstance> = [];
+  const utilityPlugins: Array<WebpackPluginInstance> = [];
 
   if (__DEVELOPMENT__) {
     devPlugins.push(new ReactRefreshWebpackPlugin());
+  }
+
+  if (__ANALYSE__) {
+    utilityPlugins.push(new BundleAnalyzerPlugin());
   }
 
   return {
@@ -142,6 +154,7 @@ const config: ConfigFn = (env, argv) => {
     // @TODO Webpack plugins https://webpack.js.org/configuration/plugins/
     // @TODO Webpack perf https://webpack.js.org/configuration/plugins/
     // @TODO Webpack cache for CI  https://webpack.js.org/configuration/cache/#setup-cache-in-cicd-system
+    // @TODO add process and may be dashboard in terminal
 
     devServer: {
       client: {
@@ -158,7 +171,7 @@ const config: ConfigFn = (env, argv) => {
       open: false,
     },
 
-    // target: 'browserslist',
+    target: 'browserslist',
 
     plugins: [
       new HtmlWebpackPlugin({
@@ -167,6 +180,7 @@ const config: ConfigFn = (env, argv) => {
       }),
       new webpack.DefinePlugin({
         __DEVELOPMENT__,
+        __PRODUCTION__,
       }),
       new DotEnv({
         path: './packages/web/.env.development',
@@ -179,6 +193,7 @@ const config: ConfigFn = (env, argv) => {
       new MiniCssExtractPlugin({
         filename: __DEVELOPMENT__ ? 'styles.css' : 'styles-[contenthash].css',
       }),
+      ...utilityPlugins,
       ...devPlugins,
     ],
   };

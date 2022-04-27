@@ -13,7 +13,8 @@
     "lint": "lerna run lint",
     "precommit": "lint-staged",
     "serve": "webpack-dev-server --mode development --stats-error-details",
-    "build-web": "webpack --mode production"
+    "build:analyze": "webpack --mode production --env analyze",
+    "build:prod": "webpack --mode production"
   },
   "devDependencies": {
     "@babel/preset-react": "^7.16.7",
@@ -25,6 +26,7 @@
     "@rushstack/eslint-patch": "^1.1.0",
     "@types/node": "^17.0.23",
     "@types/webpack": "^5.28.0",
+    "@types/webpack-bundle-analyzer": "^4.4.1",
     "crypto-browserify": "^3.12.0",
     "css-loader": "^6.7.1",
     "dotenv-webpack": "^7.1.0",
@@ -51,7 +53,9 @@
     "*.{ts,tsx}": "eslint --cache --fix",
     "*.{js,json,jsx,html,css,md}": "prettier --write"
   },
-  "dependencies": {},
+  "dependencies": {
+    "webpack-bundle-analyzer": "^4.5.0"
+  },
   "browserslist": [
     "defaults"
   ]
