@@ -1,6 +1,7 @@
 // @ts-ignore
 import ReactRefreshWebpackPlugin from '@pmmmwh/react-refresh-webpack-plugin';
 import CompressionPlugin from 'compression-webpack-plugin';
+import CssMinimizerPlugin from 'css-minimizer-webpack-plugin';
 // @ts-ignore
 import DotEnv from 'dotenv-webpack';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
@@ -31,6 +32,7 @@ type ArgV = {
 type ConfigFn = (env: CustomEnv, argv: ArgV) => Configuration;
 
 const MAX_CHUNK_SIZE = 300000;
+const DEV_PORT = 9000;
 
 const config: ConfigFn = (env, argv) => {
   const __DEVELOPMENT__ = argv.mode === 'development';
@@ -56,6 +58,12 @@ const config: ConfigFn = (env, argv) => {
         },
         threshold: 10240,
         minRatio: 0.8,
+      }),
+      new webpack.optimize.LimitChunkCountPlugin({
+        maxChunks: 10,
+      }),
+      new MiniCssExtractPlugin({
+        filename: __DEVELOPMENT__ ? 'styles.css' : 'styles-[contenthash].css',
       }),
     );
   }
@@ -89,8 +97,8 @@ const config: ConfigFn = (env, argv) => {
     optimization: {
       nodeEnv: argv.mode,
       runtimeChunk: 'single',
-      minimize: !__DEVELOPMENT__,
-      minimizer: __DEVELOPMENT__ ? [] : [new TerserPlugin()],
+      minimize: __PRODUCTION__,
+      minimizer: __PRODUCTION__ ? [] : [new TerserPlugin(), new CssMinimizerPlugin()],
       splitChunks: {
         maxSize: __PRODUCTION__ ? MAX_CHUNK_SIZE : undefined,
         cacheGroups: {
@@ -195,7 +203,7 @@ const config: ConfigFn = (env, argv) => {
       },
       historyApiFallback: true,
       compress: true,
-      port: 9000,
+      port: DEV_PORT,
       hot: true,
       open: false,
     },
@@ -207,21 +215,19 @@ const config: ConfigFn = (env, argv) => {
         title: 'Solana Wallet',
         template: path.join(__dirname + '/packages/web/index.html'),
       }),
-      new webpack.DefinePlugin({
-        __DEVELOPMENT__,
-        __PRODUCTION__,
-      }),
       new DotEnv({
         path: './packages/web/.env.development',
         ignoreStub: true,
       }),
+      new webpack.DefinePlugin({
+        __DEVELOPMENT__,
+        __PRODUCTION__,
+      }),
       new webpack.ProvidePlugin({
-        process: 'process/browser.js',
+        // process: 'process/browser.js',
         Buffer: ['buffer', 'Buffer'],
       }),
-      new MiniCssExtractPlugin({
-        filename: __DEVELOPMENT__ ? 'styles.css' : 'styles-[contenthash].css',
-      }),
+      new webpack.ProgressPlugin(),
       ...utilityPlugins,
       ...devPlugins,
       ...prodPlugins,
