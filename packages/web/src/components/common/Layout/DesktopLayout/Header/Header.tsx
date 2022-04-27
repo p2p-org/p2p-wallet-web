@@ -3,6 +3,7 @@ import { Link, NavLink } from 'react-router-dom';
 
 import { styled } from '@linaria/react';
 import { useWallet } from '@p2p-wallet-web/core';
+import { zIndexes } from '@p2p-wallet-web/ui';
 
 import logo from 'assets/images/logo.png';
 import { COLUMN_LEFT_WIDTH, COLUMNS_GRID_GUTTER } from 'components/common/Layout';
@@ -15,7 +16,7 @@ import { HEADER_HEIGHT } from './constants';
 const Wrapper = styled.header`
   position: sticky;
   top: 0;
-  z-index: 100;
+  z-index: ${zIndexes.nav};
 
   width: 100%;
   height: ${HEADER_HEIGHT}px;

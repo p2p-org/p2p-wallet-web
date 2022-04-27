@@ -25,16 +25,9 @@ const ModalContainer = styled.div`
   right: 0;
   bottom: 0;
   left: 0;
-  z-index: 1;
 
   overflow-y: auto;
   overscroll-behavior: none;
-
-  /* Above background */
-
-  &:last-child {
-    z-index: 2;
-  }
 `;
 
 const ModalWrapper = styled.div`
@@ -50,7 +43,6 @@ const ModalBackground = styled.div`
   right: 0;
   bottom: 0;
   left: 0;
-  z-index: 2;
 
   background-color: rgba(0, 0, 0, 0.6);
 
