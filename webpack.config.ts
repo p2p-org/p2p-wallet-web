@@ -98,7 +98,7 @@ const config: ConfigFn = (env, argv) => {
       nodeEnv: argv.mode,
       runtimeChunk: 'single',
       minimize: __PRODUCTION__,
-      minimizer: __PRODUCTION__ ? [] : [new TerserPlugin(), new CssMinimizerPlugin()],
+      minimizer: __PRODUCTION__ ? [new TerserPlugin(), new CssMinimizerPlugin()] : [],
       splitChunks: {
         maxSize: __PRODUCTION__ ? MAX_CHUNK_SIZE : undefined,
         cacheGroups: {
@@ -190,7 +190,6 @@ const config: ConfigFn = (env, argv) => {
     devtool: __DEVELOPMENT__ ? 'eval-cheap-module-source-map' : 'source-map',
 
     // @TODO Webpack cache https://webpack.js.org/configuration/cache/#cache
-    // @TODO Webpack plugins https://webpack.js.org/configuration/plugins/
     // @TODO Webpack cache for CI  https://webpack.js.org/configuration/cache/#setup-cache-in-cicd-system
 
     devServer: {
