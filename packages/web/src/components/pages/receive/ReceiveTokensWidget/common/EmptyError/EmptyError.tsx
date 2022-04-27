@@ -1,9 +1,9 @@
 import type { FC, HTMLAttributes } from 'react';
-import { forwardRef } from 'react';
 import * as React from 'react';
+import { forwardRef } from 'react';
 
 import { styled } from '@linaria/react';
-import { theme } from '@p2p-wallet-web/ui/src/styles';
+import { theme } from '@p2p-wallet-web/ui';
 
 import { Icon } from 'components/ui';
 

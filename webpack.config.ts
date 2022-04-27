@@ -41,6 +41,30 @@ const config: ConfigFn = (env, argv) => {
   const utilityPlugins: Array<WebpackPluginInstance> = [];
   const prodPlugins: Array<WebpackPluginInstance> = [];
 
+  const webAliases = {
+    constants: path.resolve(__dirname, './packages/web/src/constants'),
+    config: path.resolve(__dirname, './packages/web/src/config'),
+    utils: path.resolve(__dirname, './packages/web/src/utils'),
+    lib: path.resolve(__dirname, './packages/web/src/lib'),
+    store: path.resolve(__dirname, './packages/web/src/store'),
+    api: path.resolve(__dirname, './packages/web/src/api'),
+    app: path.resolve(__dirname, './packages/web/src/app'),
+    pages: path.resolve(__dirname, './packages/web/src/pages'),
+    components: path.resolve(__dirname, './packages/web/src/components'),
+    assets: path.resolve(__dirname, './packages/web/src/assets'),
+    styles: path.resolve(__dirname, './packages/web/src/styles'),
+  };
+  const packageAliases: object = {
+    '@p2p-wallet-web/core': path.resolve(__dirname, './packages/core/src'),
+    '@p2p-wallet-web/sail': path.resolve(__dirname, './packages/sail/src'),
+    '@p2p-wallet-web/token-utils': path.resolve(__dirname, './packages/token-utils/src'),
+    '@p2p-wallet-web/ui': path.resolve(__dirname, './packages/ui/src'),
+    '@p2p-wallet-web/ui/css/nprogress.css': path.resolve(
+      __dirname,
+      './packages/ui/css/nprogress.css',
+    ),
+  };
+
   if (__PRODUCTION__) {
     prodPlugins.push(
       new CompressionPlugin({
@@ -170,17 +194,8 @@ const config: ConfigFn = (env, argv) => {
         Buffer: require.resolve('buffer'),
       },
       alias: {
-        constants: path.resolve(__dirname, './packages/web/src/constants'),
-        config: path.resolve(__dirname, './packages/web/src/config'),
-        utils: path.resolve(__dirname, './packages/web/src/utils'),
-        lib: path.resolve(__dirname, './packages/web/src/lib'),
-        store: path.resolve(__dirname, './packages/web/src/store'),
-        api: path.resolve(__dirname, './packages/web/src/api'),
-        app: path.resolve(__dirname, './packages/web/src/app'),
-        pages: path.resolve(__dirname, './packages/web/src/pages'),
-        components: path.resolve(__dirname, './packages/web/src/components'),
-        assets: path.resolve(__dirname, './packages/web/src/assets'),
-        styles: path.resolve(__dirname, './packages/web/src/styles'),
+        ...webAliases,
+        ...packageAliases,
       },
     },
 
@@ -221,7 +236,7 @@ const config: ConfigFn = (env, argv) => {
         __PRODUCTION__,
       }),
       new webpack.ProvidePlugin({
-        // process: 'process/browser.js',
+        process: 'process/browser.js',
         Buffer: ['buffer', 'Buffer'],
       }),
       new webpack.ProgressPlugin(),
