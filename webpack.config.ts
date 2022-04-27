@@ -19,6 +19,7 @@ interface Configuration extends WebpackConfiguration, WebpackDevServerConfigurat
 
 type CustomEnv = {
   analyze: boolean;
+  name: string;
 };
 
 type ArgV = {
@@ -31,6 +32,7 @@ const config: ConfigFn = (env, argv) => {
   const __DEVELOPMENT__ = argv.mode === 'development';
   const __PRODUCTION__ = argv.mode === 'production';
   const __ANALYSE__ = env.analyze;
+  const __PACKAGE_NAME__ = env.name;
 
   const devPlugins: Array<WebpackPluginInstance> = [];
   const utilityPlugins: Array<WebpackPluginInstance> = [];
@@ -44,11 +46,17 @@ const config: ConfigFn = (env, argv) => {
   }
 
   return {
+    bail: __PRODUCTION__,
+
+    name: __PACKAGE_NAME__,
+
     mode: argv.mode,
 
     entry: path.resolve(__dirname, './packages/web/src/index.tsx'),
 
     // @TODO output for library https://webpack.js.org/configuration/output/#outputlibrary
+    // @TODO https://webpack.js.org/guides/author-libraries/
+    // set up sideeffect as well for the libs
     output: {
       path: path.resolve(__dirname, 'packages/web/public'),
       filename: __DEVELOPMENT__ ? '[name].[contenthash].js' : '[contenthash].js',
@@ -73,8 +81,7 @@ const config: ConfigFn = (env, argv) => {
     },
 
     performance: {
-      // @FIXME
-      // hints: __DEVELOPMENT__ ? 'warning' : 'error',
+      hints: __PRODUCTION__ ? 'error' : 'warning',
     },
 
     module: {
