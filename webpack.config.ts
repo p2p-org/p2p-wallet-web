@@ -1,5 +1,6 @@
 // @ts-ignore
 import ReactRefreshWebpackPlugin from '@pmmmwh/react-refresh-webpack-plugin';
+import CompressionPlugin from 'compression-webpack-plugin';
 // @ts-ignore
 import DotEnv from 'dotenv-webpack';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
@@ -12,6 +13,7 @@ import type { Configuration as WebpackConfiguration, WebpackPluginInstance } fro
 import webpack from 'webpack';
 import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
 import type { Configuration as WebpackDevServerConfiguration } from 'webpack-dev-server';
+import zlib from 'zlib';
 
 interface Configuration extends WebpackConfiguration, WebpackDevServerConfiguration {
   devServer?: WebpackDevServerConfiguration;
@@ -38,6 +40,25 @@ const config: ConfigFn = (env, argv) => {
 
   const devPlugins: Array<WebpackPluginInstance> = [];
   const utilityPlugins: Array<WebpackPluginInstance> = [];
+  const prodPlugins: Array<WebpackPluginInstance> = [];
+
+  if (__PRODUCTION__) {
+    prodPlugins.push(
+      new CompressionPlugin({
+        filename: '[path][base].br',
+        algorithm: 'brotliCompress',
+        test: /\.(js|css|svg)$/,
+        compressionOptions: {
+          // @ts-ignore
+          params: {
+            [zlib.constants.BROTLI_PARAM_QUALITY]: 11,
+          },
+        },
+        threshold: 10240,
+        minRatio: 0.8,
+      }),
+    );
+  }
 
   if (__DEVELOPMENT__) {
     devPlugins.push(new ReactRefreshWebpackPlugin());
@@ -162,9 +183,7 @@ const config: ConfigFn = (env, argv) => {
 
     // @TODO Webpack cache https://webpack.js.org/configuration/cache/#cache
     // @TODO Webpack plugins https://webpack.js.org/configuration/plugins/
-    // @TODO Webpack perf https://webpack.js.org/configuration/plugins/
     // @TODO Webpack cache for CI  https://webpack.js.org/configuration/cache/#setup-cache-in-cicd-system
-    // @TODO add process and may be dashboard in terminal
 
     devServer: {
       client: {
@@ -205,6 +224,7 @@ const config: ConfigFn = (env, argv) => {
       }),
       ...utilityPlugins,
       ...devPlugins,
+      ...prodPlugins,
     ],
   };
 };
