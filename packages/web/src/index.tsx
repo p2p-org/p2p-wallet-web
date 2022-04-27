@@ -1,7 +1,7 @@
 // @FIXME
 // import './wdyr';
 import 'sanitize.css';
-import '@p2p-wallet-web/ui/css/nprogress.css';
+import './css/nprogress.css';
 import 'react-loading-skeleton/dist/skeleton.css';
 
 import * as React from 'react';

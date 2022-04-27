@@ -59,10 +59,6 @@ const config: ConfigFn = (env, argv) => {
     '@p2p-wallet-web/sail': path.resolve(__dirname, './packages/sail/src'),
     '@p2p-wallet-web/token-utils': path.resolve(__dirname, './packages/token-utils/src'),
     '@p2p-wallet-web/ui': path.resolve(__dirname, './packages/ui/src'),
-    '@p2p-wallet-web/ui/css/nprogress.css': path.resolve(
-      __dirname,
-      './packages/ui/css/nprogress.css',
-    ),
   };
 
   if (__PRODUCTION__) {
@@ -200,8 +196,6 @@ const config: ConfigFn = (env, argv) => {
     },
 
     devtool: __DEVELOPMENT__ ? 'eval-cheap-module-source-map' : 'source-map',
-
-    // @TODO Webpack cache for CI  https://webpack.js.org/configuration/cache/#setup-cache-in-cicd-system
 
     devServer: {
       client: {
