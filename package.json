@@ -12,7 +12,7 @@
     "deploy": "lerna run deploy",
     "lint": "lerna run lint",
     "precommit": "lint-staged",
-    "serve": "webpack-dev-server --mode development --stats-error-details --env name='p2p-wallet-web'",
+    "serve": "webpack-dev-server --mode development --env name='p2p-wallet-web'",
     "build:analyze": "webpack --mode production --env analyze --env name='p2p-wallet-web'",
     "build:prod": "webpack --mode production --env name='p2p-wallet-web'"
   },
@@ -24,6 +24,7 @@
     "@p2p-wallet-web/eslint-config-react": "^1.0.0",
     "@pmmmwh/react-refresh-webpack-plugin": "^0.5.5",
     "@rushstack/eslint-patch": "^1.1.0",
+    "@types/dotenv-webpack": "^7.0.3",
     "@types/node": "^17.0.23",
     "@types/webpack": "^5.28.0",
     "@types/webpack-bundle-analyzer": "^4.4.1",

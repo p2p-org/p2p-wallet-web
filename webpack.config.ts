@@ -1,15 +1,11 @@
-// @ts-ignore
 import ReactRefreshWebpackPlugin from '@pmmmwh/react-refresh-webpack-plugin';
 import CompressionPlugin from 'compression-webpack-plugin';
 import CssMinimizerPlugin from 'css-minimizer-webpack-plugin';
-// @ts-ignore
 import DotEnv from 'dotenv-webpack';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import path from 'path';
-// @ts-ignore
 import TerserPlugin from 'terser-webpack-plugin';
-// @ts-ignore
 import type { Configuration as WebpackConfiguration, WebpackPluginInstance } from 'webpack';
 import webpack from 'webpack';
 import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
@@ -33,6 +29,7 @@ type ConfigFn = (env: CustomEnv, argv: ArgV) => Configuration;
 
 const MAX_CHUNK_SIZE = 300000;
 const DEV_PORT = 9000;
+const APP_TITLE = 'Solana Wallet';
 
 const config: ConfigFn = (env, argv) => {
   const __DEVELOPMENT__ = argv.mode === 'development';
@@ -189,7 +186,6 @@ const config: ConfigFn = (env, argv) => {
 
     devtool: __DEVELOPMENT__ ? 'eval-cheap-module-source-map' : 'source-map',
 
-    // @TODO Webpack cache https://webpack.js.org/configuration/cache/#cache
     // @TODO Webpack cache for CI  https://webpack.js.org/configuration/cache/#setup-cache-in-cicd-system
 
     devServer: {
@@ -207,11 +203,13 @@ const config: ConfigFn = (env, argv) => {
       open: false,
     },
 
+    stats: __PRODUCTION__ ? 'errors-warnings' : 'normal',
+
     target: 'browserslist',
 
     plugins: [
       new HtmlWebpackPlugin({
-        title: 'Solana Wallet',
+        title: APP_TITLE,
         template: path.join(__dirname + '/packages/web/index.html'),
       }),
       new DotEnv({
