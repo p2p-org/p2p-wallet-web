@@ -19,6 +19,7 @@ export const ChooseBuyTokenMobileModal: FC<ModalPropsType> = ({ close }) => {
   const { tokenConfigs } = useConfig();
   const tokenSOL = useToken(tokenConfigs['SOL']?.mint);
   const tokenUSDC = useToken(tokenConfigs['USDC']?.mint);
+  //tokenSOL?.info.extensions?.coingeckoId;
 
   const tokenAccountList = useUserAssociatedTokenAccountsWithNativeSOLOverride([
     tokenSOL,
