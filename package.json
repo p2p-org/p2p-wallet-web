@@ -12,7 +12,8 @@
     "deploy": "lerna run deploy",
     "lint": "lerna run lint",
     "precommit": "lint-staged",
-    "serve": "webpack-dev-server --mode development --stats-error-details"
+    "serve": "webpack-dev-server --mode development --stats-error-details",
+    "build-web": "webpack --mode production"
   },
   "devDependencies": {
     "@babel/preset-react": "^7.16.7",
@@ -50,5 +51,8 @@
     "*.{ts,tsx}": "eslint --cache --fix",
     "*.{js,json,jsx,html,css,md}": "prettier --write"
   },
-  "dependencies": {}
+  "dependencies": {},
+  "browserslist": [
+    "defaults"
+  ]
 }

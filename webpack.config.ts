@@ -19,10 +19,6 @@ interface Configuration extends WebpackConfiguration, WebpackDevServerConfigurat
 type ConfigFn = (env: any, argv: any) => Configuration;
 
 // @TODO add process and may be dashboard in terminal
-// PROD checks:
-// -minimazation
-// -filenames (contenthash)
-// -cache for CI  https://webpack.js.org/configuration/cache/#setup-cache-in-cicd-system
 // target browserlist for prod
 
 // @ts-ignore
@@ -65,7 +61,8 @@ const config: ConfigFn = (env, argv) => {
     },
 
     performance: {
-      hints: __DEVELOPMENT__ ? 'warning' : 'error',
+      // @FIXME
+      // hints: __DEVELOPMENT__ ? 'warning' : 'error',
     },
 
     module: {
@@ -139,11 +136,12 @@ const config: ConfigFn = (env, argv) => {
       },
     },
 
-    devtool: __DEVELOPMENT__ ? 'eval-cheap-module-source-map' : 'none',
+    devtool: __DEVELOPMENT__ ? 'eval-cheap-module-source-map' : 'source-map',
 
     // @TODO Webpack cache https://webpack.js.org/configuration/cache/#cache
     // @TODO Webpack plugins https://webpack.js.org/configuration/plugins/
     // @TODO Webpack perf https://webpack.js.org/configuration/plugins/
+    // @TODO Webpack cache for CI  https://webpack.js.org/configuration/cache/#setup-cache-in-cicd-system
 
     devServer: {
       client: {
@@ -160,7 +158,7 @@ const config: ConfigFn = (env, argv) => {
       open: false,
     },
 
-    target: 'web',
+    // target: 'browserslist',
 
     plugins: [
       new HtmlWebpackPlugin({
