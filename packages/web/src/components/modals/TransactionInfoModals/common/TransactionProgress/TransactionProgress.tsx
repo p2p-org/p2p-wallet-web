@@ -2,7 +2,7 @@ import type { FC } from 'react';
 import { useEffect, useState } from 'react';
 
 import { styled } from '@linaria/react';
-import { theme, zIndexes } from '@p2p-wallet-web/ui/dist/esm';
+import { theme, zIndexes } from '@p2p-wallet-web/ui';
 import classNames from 'classnames';
 
 import { Icon } from 'components/ui';
