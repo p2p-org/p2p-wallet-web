@@ -82,7 +82,8 @@ const config: ConfigFn = (env, argv) => {
         maxChunks: 10,
       }),
       new MiniCssExtractPlugin({
-        filename: __DEVELOPMENT__ ? 'styles.css' : 'styles-[contenthash].css',
+        filename: 'styles-[contenthash].css',
+        ignoreOrder: true,
       }),
     );
   }
