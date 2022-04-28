@@ -54,6 +54,8 @@ const config: ConfigFn = (env, argv) => {
     assets: path.resolve(__dirname, './packages/web/src/assets'),
     styles: path.resolve(__dirname, './packages/web/src/styles'),
   };
+  // @TODO test it
+  // @FIXME chunks loading problems
   const packageAliases: object = {
     '@p2p-wallet-web/core': path.resolve(__dirname, './packages/core/src'),
     '@p2p-wallet-web/sail': path.resolve(__dirname, './packages/sail/src'),
