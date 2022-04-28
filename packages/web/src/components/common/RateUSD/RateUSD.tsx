@@ -4,6 +4,7 @@ import Skeleton from 'react-loading-skeleton';
 import { styled } from '@linaria/react';
 
 import { useMarketData } from 'app/contexts';
+import { formatNumberToUSD } from 'utils/format';
 
 const Wrapper = styled.div``;
 
@@ -23,7 +24,7 @@ export const RateUSD: FunctionComponent<Props> = ({ symbol = '', ...props }) => 
       {rate.loading ? (
         <Skeleton width={50} />
       ) : rate.data ? (
-        new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(rate.data)
+        formatNumberToUSD(rate.data)
       ) : undefined}
     </Wrapper>
   );

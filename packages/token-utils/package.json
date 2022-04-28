@@ -1,0 +1,22 @@
+{
+  "name": "@p2p-wallet-web/token-utils",
+  "version": "1.0.0",
+  "license": "MIT",
+  "main": "dist/cjs/index.js",
+  "module": "dist/esm/index.js",
+  "files": [
+    "dist/"
+  ],
+  "scripts": {
+    "build": "rm -fr dist/ && tsc && tsc -P tsconfig.cjs.json",
+    "watch": "rm -fr dist/ && tsc && tsc -P tsconfig.cjs.json -w"
+  },
+  "dependencies": {
+  },
+  "devDependencies": {
+    "@saberhq/token-utils": "^1.12.27"
+  },
+  "peerDependencies": {
+    "@saberhq/token-utils": "^1.12.27"
+  }
+}

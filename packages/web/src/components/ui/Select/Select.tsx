@@ -2,11 +2,13 @@ import type { FunctionComponent } from 'react';
 import { Children, cloneElement, isValidElement, useEffect, useRef, useState } from 'react';
 
 import { styled } from '@linaria/react';
-import { shadows, theme } from '@p2p-wallet-web/ui';
+import { shadows, theme, useIsMobile } from '@p2p-wallet-web/ui';
 import classNames from 'classnames';
 
 import { Loader } from 'components/common/Loader';
 import { Icon } from 'components/ui';
+
+import { SelectListMobile } from './SelectListMobile';
 
 const Wrapper = styled.div`
   position: relative;
@@ -85,7 +87,7 @@ const DropDownList = styled.div`
   padding: 8px;
 
   background: ${theme.colors.bg.primary};
-  border-radius: 12px;
+  border-radius: 8px;
   ${shadows.notification};
 `;
 
@@ -95,6 +97,7 @@ type Props = {
   onToggle?: (isOpen: boolean) => void;
   className?: string;
   flat?: boolean;
+  mobileListTitle?: string;
 };
 
 export const Select: FunctionComponent<Props> = ({
@@ -104,9 +107,12 @@ export const Select: FunctionComponent<Props> = ({
   onToggle,
   className,
   flat,
+  mobileListTitle,
 }) => {
   const selectorRef = useRef<HTMLDivElement>(null);
   const [isOpen, setIsOpen] = useState(false);
+
+  const isMobile = useIsMobile();
 
   const handleAwayClick = (e: MouseEvent) => {
     if (!selectorRef.current?.contains(e.target as HTMLDivElement)) {
@@ -133,6 +139,10 @@ export const Select: FunctionComponent<Props> = ({
     }
   };
 
+  const handleMobileListCloseByWrapper = () => {
+    handleSelectorClick();
+  };
+
   const items = Children.map(children, (child) => {
     if (isValidElement(child)) {
       return cloneElement(child, { close: handleSelectorClick });
@@ -146,7 +156,18 @@ export const Select: FunctionComponent<Props> = ({
         <Value>{value}</Value>
         <CaretWrapper>{isLoading ? <Loader size="24" /> : <CaretIcon name="caret" />}</CaretWrapper>
       </Selector>
-      {isOpen ? <DropDownList>{items}</DropDownList> : undefined}
+      {isOpen ? (
+        isMobile ? (
+          <SelectListMobile
+            title={mobileListTitle}
+            onCloseByWrapper={handleMobileListCloseByWrapper}
+          >
+            {items}
+          </SelectListMobile>
+        ) : (
+          <DropDownList>{items}</DropDownList>
+        )
+      ) : undefined}
     </Wrapper>
   );
 };

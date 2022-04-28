@@ -1,26 +1,86 @@
 import { styled } from '@linaria/react';
-import { rgba } from 'polished';
+import { theme, up } from '@p2p-wallet-web/ui';
+import { zIndexes } from '@p2p-wallet-web/ui/dist/esm';
 
 import { Button, Icon } from 'components/ui';
+import { Content as ModalContent, Modal } from 'components/ui/Modal';
 
-export const Wrapper = styled.div`
+export const StatusColors = styled.div`
+  &.isProcessing {
+    background: ${theme.colors.system.warningMain};
+  }
+
+  &.isSuccess {
+    background: ${theme.colors.system.successMain};
+  }
+
+  &.isError {
+    background: ${theme.colors.system.errorMain};
+  }
+`;
+
+export const WrapperModal = styled(Modal)`
+  display: flex;
+  flex-direction: column;
+  justify-content: stretch;
+  padding: 0;
+  overflow: scroll;
+
+  background: ${theme.colors.bg.primary};
+
+  border-radius: 15px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+
+  ${ModalContent} {
+    ${up.tablet} {
+      width: 524px;
+    }
+
+    padding: 0;
+  }
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+`;
+
+export const ProgressWrapper = styled.div`
   position: relative;
 
   display: flex;
-  flex-basis: 524px;
-  flex-direction: column;
-  overflow: hidden;
+  align-items: center;
+  justify-content: center;
 
-  background: #fff;
+  height: 55px;
+`;
 
-  border-radius: 15px;
+export const BlockWrapper = styled(StatusColors)`
+  z-index: ${zIndexes.top};
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 55px;
+  height: 55px;
+
+  border-radius: 40%;
+`;
+
+export const OtherIcon = styled(Icon)`
+  width: 24px;
+  height: 24px;
+
+  color: ${theme.colors.textIcon.buttonPrimary};
 `;
 
 export const Header = styled.div`
   position: relative;
 
-  padding: 26px 20px 50px;
-
+  color: ${theme.colors.textIcon.primary};
+  font-weight: 500;
+  font-size: 24px;
+  font-style: normal;
+  line-height: 140%;
   text-align: center;
 `;
 
@@ -35,7 +95,7 @@ export const Title = styled.div`
 `;
 
 export const Desc = styled.div`
-  color: #a3a5ba;
+  color: ${theme.colors.bg.buttonDisabled};
   font-weight: 600;
   font-size: 16px;
   line-height: 100%;
@@ -43,8 +103,8 @@ export const Desc = styled.div`
 
 export const CloseWrapper = styled.div`
   position: absolute;
-  top: 15px;
-  right: 15px;
+  top: 0;
+  right: 0;
 
   display: flex;
   align-items: center;
@@ -52,7 +112,8 @@ export const CloseWrapper = styled.div`
   width: 32px;
   height: 32px;
 
-  background: #f6f6f8;
+  color: ${theme.colors.bg.buttonPrimary};
+
   border-radius: 8px;
 
   cursor: pointer;
@@ -61,56 +122,21 @@ export const CloseWrapper = styled.div`
 export const CloseIcon = styled(Icon)`
   width: 16px;
   height: 16px;
-
-  color: #a3a5ba;
-`;
-
-export const BlockWrapper = styled.div`
-  position: absolute;
-  bottom: -28px;
-  left: 50%;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 55px;
-  height: 55px;
-  margin-left: -27px;
-
-  background: #5887ff;
-  border-radius: 12px;
-
-  &.isProcessing {
-    background: #ffd177;
-  }
-
-  &.isSuccess {
-    background: #77db7c;
-  }
-
-  &.isError {
-    background: #f77;
-  }
 `;
 
 export const CheckmarkIcon = styled(Icon)`
-  width: 45px;
-  height: 45px;
+  width: 24px;
+  height: 24px;
 
-  color: #fff;
+  color: ${theme.colors.textIcon.buttonPrimary};
 `;
 
-export const OtherIcon = styled(Icon)`
-  width: 37px;
-  height: 37px;
+export const TransactionLabel = styled(StatusColors)`
+  display: block;
+  width: 8px;
+  height: 8px;
 
-  color: #fff;
-`;
-
-export const ProgressWrapper = styled.div`
-  height: 1px;
-
-  background: rgba(0, 0, 0, 0.05);
+  margin-right: 8px;
 `;
 
 export const Content = styled.div`
@@ -134,7 +160,7 @@ export const ValueCurrency = styled.div`
 export const ValueOriginal = styled.div`
   margin-top: 4px;
 
-  color: #a3a5ba;
+  color: ${theme.colors.bg.buttonDisabled};
   font-weight: 600;
   font-size: 16px;
   line-height: 120%;
@@ -176,7 +202,7 @@ export const SwapBlock = styled.div`
   height: 32px;
   margin: 6px 26px 0;
 
-  background: #f6f6f8;
+  background: ${theme.colors.bg.buttonSecondary};
   border-radius: 12px;
 `;
 
@@ -184,7 +210,7 @@ export const SwapIcon = styled(Icon)`
   width: 24px;
   height: 24px;
 
-  color: #a3a5ba;
+  color: ${theme.colors.bg.buttonDisabled};
 `;
 
 export const SwapAmount = styled.div`
@@ -202,16 +228,16 @@ export const FieldWrapper = styled.div`
   padding: 16px 30px;
 
   &:first-child {
-    border-top: 1px solid ${rgba('#000', 0.05)};
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
   }
 
   &:not(:last-child) {
-    border-bottom: 1px solid ${rgba('#000', 0.05)};
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
   }
 `;
 
 export const FieldTitle = styled.div`
-  color: #a3a5ba;
+  color: ${theme.colors.bg.buttonDisabled};
   font-weight: 600;
   font-size: 14px;
   line-height: 21px;
@@ -231,7 +257,7 @@ export const ShareIcon = styled(Icon)`
   width: 24px;
   height: 24px;
 
-  color: #a3a5ba;
+  color: ${theme.colors.bg.buttonDisabled};
 `;
 
 export const ShareWrapper = styled.div`
@@ -248,10 +274,10 @@ export const ShareWrapper = styled.div`
   cursor: pointer;
 
   &:hover {
-    background: #eff3ff;
+    background: ${theme.colors.bg.activePrimary};
 
     ${ShareIcon} {
-      color: #5887ff;
+      color: ${theme.colors.textIcon.active};
     }
   }
 `;
@@ -259,9 +285,10 @@ export const ShareWrapper = styled.div`
 export const Footer = styled.div`
   display: flex;
   align-items: center;
+  justify-content: center;
   padding: 24px 20px;
 
-  border-top: 1px solid ${rgba('#000', 0.05)};
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
 
   & > :not(:last-child) {
     margin-right: 16px;
@@ -276,4 +303,10 @@ export const ButtonExplorer = styled(Button)`
   font-weight: 600;
   font-size: 14px;
   line-height: 150%;
+`;
+
+export const Section = styled.div`
+  display: flex;
+  flex-direction: column;
+  padding: 12px 20px;
 `;

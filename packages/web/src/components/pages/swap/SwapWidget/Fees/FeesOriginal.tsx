@@ -21,12 +21,13 @@ import type {
   UseSwap,
 } from 'app/contexts';
 import { useConfig } from 'app/contexts/solana/swap';
-import { formatBigNumber, formatNumberToUSD } from 'app/contexts/solana/swap/utils/format';
+import { formatBigNumber } from 'app/contexts/solana/swap/utils/format';
 import { CompensationFee } from 'components/common/CompensationFee';
 import { FeeTransactionTooltip } from 'components/common/TransactionDetails/FeeTransactinTooltip';
 import { Accordion, Icon } from 'components/ui';
 import { AccordionTitle } from 'components/ui/AccordionDetails/AccordionTitle';
 import { ListWrapper, Row, Text } from 'components/ui/AccordionDetails/common';
+import { formatNumber, getNumberFromFormattedNumber } from 'utils/format';
 
 import { useShowSettings } from '../../hooks/useShowSettings';
 import { AmountUSDStyled } from '../AmountUSD';
@@ -74,6 +75,7 @@ export const FeesOriginal: FC<FeesOriginalProps> = ({
   priceInfo,
   feeCompensationInfo,
   forPage,
+  open,
 }) => {
   const { wallet, connection } = solanaProvider;
   const { programIds, tokenConfigs } = useConfig();
@@ -208,7 +210,7 @@ export const FeesOriginal: FC<FeesOriginalProps> = ({
       const price = asyncPrices.value?.[tokenName];
 
       if (price) {
-        sum += Number(amount) * price;
+        sum += getNumberFromFormattedNumber(amount) * price;
       }
 
       return sum;
@@ -235,6 +237,7 @@ export const FeesOriginal: FC<FeesOriginalProps> = ({
   }, [tokenNames, transactionFee.result, feePools, asyncPrices.value]);
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  /*
   const renderTransactionFee = () => {
     if (transactionFee.result) {
       return (
@@ -248,6 +251,7 @@ export const FeesOriginal: FC<FeesOriginalProps> = ({
 
     return "Can't calculate";
   };
+  */
 
   const details = useMemo(() => {
     let receiveAmount;
@@ -294,10 +298,36 @@ export const FeesOriginal: FC<FeesOriginalProps> = ({
   const getTokenPrice = (isReverse: boolean) => {
     const one = new Decimal(1);
 
-    return (isReverse ? one.div(trade.getExchangeRate()) : trade.getExchangeRate())
-      .toSignificantDigits(TOKEN_AMOUNT_SIGNIFICANT_DIGITS)
-      .toString();
+    return formatNumber(
+      (isReverse ? one.div(trade.getExchangeRate()) : trade.getExchangeRate())
+        .toSignificantDigits(TOKEN_AMOUNT_SIGNIFICANT_DIGITS)
+        .toString(),
+    );
   };
+
+  const accountCreationFee = formatBigNumber(
+    networkFees.accountRentExemption,
+    tokenConfigs['SOL'].decimals,
+    FEE_SIGNIFICANT_DIGITS,
+  );
+
+  const inputTokenPrice = new u64(
+    Math.pow(ONE_TOKEN_BASE, tokenConfigs[trade.inputTokenName]?.decimals as number),
+  );
+
+  const outputTokenPrice = new u64(
+    Math.pow(ONE_TOKEN_BASE, tokenConfigs[trade.outputTokenName]?.decimals as number),
+  );
+
+  const elSlippage = forPage && (
+    <Row>
+      <Text className="gray">Max price slippage</Text>
+      <Text>
+        {trade.slippageTolerance.toString()}%{' '}
+        {forPage ? <PenIcon name="pen" onClick={handleShowSettings}></PenIcon> : undefined}
+      </Text>
+    </Row>
+  );
 
   const elCompensationFee =
     forPage &&
@@ -316,18 +346,35 @@ export const FeesOriginal: FC<FeesOriginalProps> = ({
     </ListWrapper>
   );
 
-  const accountCreationFee = formatBigNumber(
-    networkFees.accountRentExemption,
-    tokenConfigs['SOL'].decimals,
-    FEE_SIGNIFICANT_DIGITS,
-  );
-
-  const inputTokenPrice = new u64(
-    Math.pow(ONE_TOKEN_BASE, tokenConfigs[trade.inputTokenName]?.decimals as number),
-  );
-
-  const outputTokenPrice = new u64(
-    Math.pow(ONE_TOKEN_BASE, tokenConfigs[trade.outputTokenName]?.decimals as number),
+  const elTokenPrices = forPage && (
+    <ListWrapper>
+      <Row>
+        <Text className="gray">1 {trade.inputTokenName} price</Text>
+        <Text className={classNames({ grid: isMobile })}>
+          {getTokenPrice(false)} {trade.outputTokenName}
+          <Text className="flex-end">
+            <AmountUSDStyled
+              prefix={'~'}
+              amount={inputTokenPrice}
+              tokenName={trade.inputTokenName}
+            />
+          </Text>
+        </Text>
+      </Row>
+      <Row>
+        <Text className="gray">1 {trade.outputTokenName} price</Text>
+        <Text className={classNames({ grid: isMobile })}>
+          {getTokenPrice(true)} {trade.inputTokenName}
+          <Text className="flex-end">
+            <AmountUSDStyled
+              prefix={'~'}
+              amount={outputTokenPrice}
+              tokenName={trade.outputTokenName}
+            />
+          </Text>
+        </Text>
+      </Row>
+    </ListWrapper>
   );
 
   return (
@@ -339,45 +386,12 @@ export const FeesOriginal: FC<FeesOriginalProps> = ({
           titleBottomValue={details.totlalAmount || ''}
         />
       }
-      open
+      open={open}
       noContentPadding
     >
+      {elTokenPrices}
       <ListWrapper>
-        <Row>
-          <Text className="gray">1 {trade.inputTokenName} price</Text>
-          <Text className={classNames({ grid: isMobile })}>
-            {getTokenPrice(false)} {trade.outputTokenName}
-            <Text className="flex-end">
-              <AmountUSDStyled
-                prefix={'~'}
-                amount={inputTokenPrice}
-                tokenName={trade.inputTokenName}
-              />
-            </Text>
-          </Text>
-        </Row>
-        <Row>
-          <Text className="gray">1 {trade.outputTokenName} price</Text>
-          <Text className={classNames({ grid: isMobile })}>
-            {getTokenPrice(true)} {trade.inputTokenName}
-            <Text className="flex-end">
-              <AmountUSDStyled
-                prefix={'~'}
-                amount={outputTokenPrice}
-                tokenName={trade.outputTokenName}
-              />
-            </Text>
-          </Text>
-        </Row>
-      </ListWrapper>
-      <ListWrapper>
-        <Row>
-          <Text className="gray">Max price slippage</Text>
-          <Text>
-            {trade.slippageTolerance.toString()}%{' '}
-            {forPage ? <PenIcon name="pen" onClick={handleShowSettings}></PenIcon> : undefined}
-          </Text>
-        </Row>
+        {elSlippage}
         <Row>
           <Text className="gray">Receive at least</Text>
           <Text className={classNames({ grid: isMobile })}>

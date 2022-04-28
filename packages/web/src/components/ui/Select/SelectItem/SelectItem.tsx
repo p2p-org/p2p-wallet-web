@@ -1,7 +1,7 @@
 import type { FunctionComponent } from 'react';
 
 import { styled } from '@linaria/react';
-import { borders, theme } from '@p2p-wallet-web/ui';
+import { theme, up } from '@p2p-wallet-web/ui';
 import classNames from 'classnames';
 
 import { Icon } from 'components/ui';
@@ -16,13 +16,23 @@ const Value = styled.div`
   font-size: 14px;
   line-height: 140%;
   letter-spacing: 0.01em;
+
+  ${up.tablet} {
+    font-size: 16px;
+  }
 `;
 
 const CheckIcon = styled(Icon)`
-  width: 24px;
-  height: 24px;
+  width: 16px;
+  height: 16px;
+  margin-left: 4px;
 
   color: transparent;
+
+  ${up.tablet} {
+    width: 24px;
+    height: 24px;
+  }
 `;
 
 const Wrapper = styled.div`
@@ -35,18 +45,13 @@ const Wrapper = styled.div`
   cursor: pointer;
 
   &:hover {
-    ${CheckIcon} {
-      color: #a3a5ba;
-    }
+    background: ${theme.colors.bg.activePrimary};
+    border-color: ${theme.colors.textIcon.links};
   }
 
   &.isSelected {
-    background: ${theme.colors.bg.activePrimary};
-    ${borders.linksRGBA}
-
     ${Value} {
-      font-weight: bold;
-      font-size: 16px;
+      font-weight: 700;
     }
 
     ${CheckIcon} {

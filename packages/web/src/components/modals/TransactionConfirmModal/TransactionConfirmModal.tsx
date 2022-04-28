@@ -34,6 +34,7 @@ const ModalTitle = styled.div`
   font-weight: 500;
   font-size: 24px;
   line-height: 140%;
+  text-align: center;
 `;
 
 const SubTitle = styled.span`
@@ -201,6 +202,7 @@ export const TransactionConfirmModal: FunctionComponent<
           params={params as TransferParams}
           sendState={sendState}
           userFreeFeeLimits={userFreeFeeLimits}
+          networkFees={networkFees}
           btcAddress={btcAddress}
         />
       ) : undefined}
@@ -214,13 +216,18 @@ export const TransactionConfirmModal: FunctionComponent<
           priceInfo={priceInfo}
           solanaProvider={solanaProvider}
           networkFees={networkFees}
+          showTitle={true}
         />
       ) : undefined}
 
       {isSecretKeyWallet ? (
         <Section className="password">
           <SubTitle>Enter password to confirm</SubTitle>
-          <PasswordInputStyled value={password} onChange={handlePasswordChange} />
+          <PasswordInputStyled
+            value={password}
+            onChange={handlePasswordChange}
+            isError={hasError}
+          />
           {hasError ? <ErrorHint error="Incorrect password, try again" noIcon /> : undefined}
         </Section>
       ) : undefined}

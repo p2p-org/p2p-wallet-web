@@ -166,7 +166,7 @@ export const Settings: FunctionComponent = () => {
               <Item>
                 <ItemTitle>Currency</ItemTitle>
                 <ItemAction>
-                  <Select value={settings.currency}>
+                  <Select value={settings.currency} mobileListTitle="Choose currency">
                     {CURRENCIES.map(({ ticker, name, symbol }) => (
                       <SelectItem
                         key={ticker}
@@ -185,7 +185,7 @@ export const Settings: FunctionComponent = () => {
               <Item>
                 <ItemTitle>Appearance</ItemTitle>
                 <ItemAction>
-                  <Select value={settings.appearance}>
+                  <Select value={settings.appearance} mobileListTitle="Choose appearance">
                     {APPEARANCE.map((value) => (
                       <SelectItem
                         key={value}

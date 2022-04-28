@@ -1,6 +1,6 @@
 import type { FunctionComponent } from 'react';
-import { useEffect, useMemo, useRef, useState } from 'react';
 import * as React from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation } from 'react-router';
 import { animated, useSpring, useTransition } from 'react-spring';
 
@@ -11,7 +11,6 @@ import { useDrag } from '@use-gesture/react';
 import BezierEasing from 'bezier-easing';
 import classNames from 'classnames';
 
-import { MOBILE_FOOTER_TABS_HEIGHT } from 'components/common/Layout';
 import { Icon } from 'components/ui';
 
 // eslint-disable-next-line @typescript-eslint/no-magic-numbers
@@ -23,12 +22,13 @@ const DRAG_MOVEMENT_THRESHOLD = 300;
 const DRAG_VELOCITY_THRESHOLD = 3;
 
 const StyledDialogContent = styled(({ ...props }) => <AnimatedDialogContent {...props} />)`
+  max-height: calc(100vh - 80px);
+
   overflow-y: ${({ mobile }) => (mobile ? 'scroll' : 'hidden')};
 
   &[data-reach-dialog-content] {
     position: fixed;
     right: 0;
-    bottom: ${MOBILE_FOOTER_TABS_HEIGHT}px;
 
     display: flex;
     flex-direction: column;
@@ -53,10 +53,13 @@ const StyledDialogContent = styled(({ ...props }) => <AnimatedDialogContent {...
       width: unset;
       height: unset;
       margin: 0;
-      overflow-y: hidden;
 
       border-radius: 12px;
     }
+  }
+
+  &:focus-visible {
+    outline: none;
   }
 `;
 
@@ -181,7 +184,7 @@ const CloseIcon = styled(Icon)`
   cursor: pointer;
 `;
 
-const Content = styled.div`
+export const Content = styled.div`
   padding: 0 16px;
 
   ${up.tablet} {
@@ -202,20 +205,20 @@ const Footer = styled.div`
   }
 `;
 
-type Props = {
+export type ModalProps = {
   title?: React.ReactNode;
   description?: React.ReactNode;
   footer?: React.ReactNode;
   iconName?: string;
   iconBgClassName?: string;
 
-  noDelimiter: boolean;
+  noDelimiter?: boolean;
   close: () => void;
   doNotCloseOnPathChangeMobile?: boolean;
   className?: string;
 };
 
-export const Modal: FunctionComponent<Props> = ({
+export const Modal: FunctionComponent<ModalProps> = ({
   title,
   description,
   footer,

@@ -11,11 +11,12 @@ import {
   useFeeCompensation,
   useFreeFeeLimits,
   useModals,
+  useNetworkFees,
   useSendState,
   useTransferAction,
 } from 'app/contexts';
 import type { TransactionConfirmModalProps } from 'components/modals/TransactionConfirmModal/TransactionConfirmModal';
-import type { TransactionStatusModalProps } from 'components/modals/TransactionInfoModals/TransactionStatusModal/TransactionStatusModal';
+import type { TransactionStatusModalProps } from 'components/modals/TransactionInfoModals/TransactionStatusSendModal/TransactionStatusModal';
 import { Button, Icon } from 'components/ui';
 import { trackEvent } from 'utils/analytics';
 
@@ -32,6 +33,12 @@ interface Props {
 
 export const SendButtonSolana: FC<Props> = ({ primary, disabled }) => {
   const { openModal } = useModals();
+  const sendState = useSendState();
+  const transferAction = useTransferAction();
+  const { compensationParams } = useFeeCompensation();
+  const { userFreeFeeLimits } = useFreeFeeLimits();
+  const destinationTokenAccount = useTokenAccount(usePubkey(sendState.destinationAddress));
+  const networkFees = useNetworkFees();
   const {
     fromAmount,
     fromTokenAccount,
@@ -43,12 +50,7 @@ export const SendButtonSolana: FC<Props> = ({ primary, disabled }) => {
     destinationAccount,
     hasBalance,
     details,
-  } = useSendState();
-  const transferAction = useTransferAction();
-  const { compensationParams } = useFeeCompensation();
-  const { userFreeFeeLimits } = useFreeFeeLimits();
-
-  const destinationTokenAccount = useTokenAccount(usePubkey(destinationAddress));
+  } = sendState;
 
   const handleSubmit = async () => {
     if (!fromTokenAccount?.key || !fromTokenAccount?.balance || !parsedAmount) {
@@ -93,6 +95,7 @@ export const SendButtonSolana: FC<Props> = ({ primary, disabled }) => {
         },
         sendState: { fromTokenAccount, destinationAccount, details },
         userFreeFeeLimits,
+        networkFees,
       } as TransactionConfirmModalProps,
     );
 
@@ -115,14 +118,22 @@ export const SendButtonSolana: FC<Props> = ({ primary, disabled }) => {
         sum: parsedAmount.asNumber,
       });
 
-      await openModal<void, TransactionStatusModalProps>(ModalType.SHOW_MODAL_TRANSACTION_STATUS, {
-        type: 'send',
-        action,
-        params: {
-          source: fromTokenAccount,
-          amount: parsedAmount,
+      await openModal<void, TransactionStatusModalProps>(
+        ModalType.SHOW_MODAL_TRANSACTION_STATUS_SEND,
+        {
+          type: 'send',
+          action,
+          params: {
+            source: fromTokenAccount,
+            destination: new PublicKey(destinationAddress),
+            amount: parsedAmount,
+            username: resolvedAddress ? toPublicKey : '',
+          },
+          sendState,
+          userFreeFeeLimits,
+          networkFees,
         },
-      });
+      );
     } finally {
       setIsExecuting(false);
     }

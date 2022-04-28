@@ -6,6 +6,7 @@ import { theme, up } from '@p2p-wallet-web/ui';
 
 import { useUsername } from 'app/contexts';
 import { useTotalBalance } from 'components/pages/home/TopWithBalance/common/TotalBalance/hooks/useTotalBalance';
+import { formatNumberToUSD } from 'utils/format';
 
 const Wrapper = styled.div``;
 
@@ -47,9 +48,7 @@ const Balance = styled.div`
   font-feature-settings: 'tnum' on, 'lnum' on;
 `;
 
-interface Props {}
-
-export const TotalBalance: FC<Props> = () => {
+export const TotalBalance: FC = () => {
   const { totalBalance, isLoading } = useTotalBalance();
   const { username, domain } = useUsername();
 
@@ -67,13 +66,7 @@ export const TotalBalance: FC<Props> = () => {
           )}
         </Title>
         <Balance>
-          {isLoading ? (
-            <Skeleton width={100} height={30} />
-          ) : (
-            new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(
-              totalBalance,
-            )
-          )}
+          {isLoading ? <Skeleton width={100} height={30} /> : formatNumberToUSD(totalBalance)}
         </Balance>
       </BalanceWrapper>
     </Wrapper>

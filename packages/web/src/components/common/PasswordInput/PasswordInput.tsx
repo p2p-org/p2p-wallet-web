@@ -3,38 +3,41 @@ import { useState } from 'react';
 import * as React from 'react';
 
 import { styled } from '@linaria/react';
+import { theme } from '@p2p-wallet-web/ui';
 import classNames from 'classnames';
 
 import { Icon } from 'components/ui';
 
 const WrapperLabel = styled.label`
+  position: relative;
+
   display: flex;
   align-items: center;
   height: 54px;
   padding: 0 15px;
 
-  background: #f6f6f8;
-  border: 1px solid transparent;
+  border: 1px solid ${theme.colors.stroke.primary};
   border-radius: 12px;
   cursor: text;
 
   &.isFocused {
-    background: #fff;
-    border-color: #5887ff;
+    background: ${theme.colors.bg.primary};
+    border-color: ${theme.colors.textIcon.active};
+    caret-color: ${theme.colors.textIcon.active};
   }
 
-  &.error {
-    border-color: #f43d3d;
+  &.isError {
+    border-color: ${theme.colors.system.errorMain};
   }
 `;
 
 const Input = styled.input`
   flex: 1;
 
-  color: #161616;
+  color: ${theme.colors.textIcon.primary};
   font-weight: 500;
   font-size: 16px;
-  font-family: 'Aktiv Grotesk Corp', sans-serif;
+  font-family: 'Inter', sans-serif;
   line-height: 22px;
 
   background: transparent;
@@ -44,8 +47,13 @@ const Input = styled.input`
   appearance: none;
 
   &::placeholder {
-    color: #1616164c;
-    font-weight: 400;
+    color: ${theme.colors.textIcon.tertiary};
+
+    font-weight: 500;
+    font-size: 16px;
+    font-family: 'Inter', sans-serif;
+    font-style: normal;
+    line-height: 140%;
   }
 `;
 
@@ -57,18 +65,19 @@ const EyeIcon = styled(Icon)`
   width: 24px;
   height: 24px;
 
-  color: #c0c1cb;
+  color: ${theme.colors.textIcon.buttonSecondary};
 `;
 
 const REGEX_PASSWORD = /[^\w!"#$%&'()*+,./:;<=>?@[\\\]^`{|}~-]+/g;
 
 type Props = {
   onChange: (password: string) => void;
+  isError: boolean;
 };
 
 export const PasswordInput: FC<
   Props & Omit<React.InputHTMLAttributes<HTMLInputElement>, 'type' | 'onChange'>
-> = ({ onChange, onFocus, onBlur, className, ...props }) => {
+> = ({ onChange, onFocus, onBlur, className, isError, ...props }) => {
   const [isShowPassword, setIsShowPassword] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
 
@@ -98,10 +107,11 @@ export const PasswordInput: FC<
   };
 
   return (
-    <WrapperLabel className={classNames(className, { isFocused })}>
+    <WrapperLabel className={classNames(className, { isFocused, isError })}>
       <Input
         type={isShowPassword ? 'input' : 'password'}
         {...props}
+        placeholder={'Password'}
         onChange={handleChange}
         onFocus={handleFocus}
         onBlur={handleBlur}

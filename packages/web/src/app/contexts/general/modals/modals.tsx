@@ -1,9 +1,10 @@
-import { Suspense, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import * as React from 'react';
+import { Suspense, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
 import { styled } from '@linaria/react';
 import type { LoadableComponent } from '@loadable/component';
 import loadable from '@loadable/component';
+import { zIndexes } from '@p2p-wallet-web/ui';
 
 import type { ModalPropsType } from 'app/contexts/general/modals/types';
 import { ModalType } from 'app/contexts/general/modals/types';
@@ -12,7 +13,7 @@ const Wrapper = styled.div`
   position: fixed;
   top: 0;
   left: 0;
-  z-index: 30;
+  z-index: ${zIndexes.modal};
 
   width: 100vw;
   height: 100vh;
@@ -24,15 +25,9 @@ const ModalContainer = styled.div`
   right: 0;
   bottom: 0;
   left: 0;
-  z-index: 1;
 
   overflow-y: auto;
   overscroll-behavior: none;
-
-  /* Above background */
-  &:last-child {
-    z-index: 2;
-  }
 `;
 
 const ModalWrapper = styled.div`
@@ -40,7 +35,6 @@ const ModalWrapper = styled.div`
   align-items: center;
   justify-content: center;
   min-height: 100%;
-  padding: 10px 0;
 `;
 
 const ModalBackground = styled.div`
@@ -49,7 +43,6 @@ const ModalBackground = styled.div`
   right: 0;
   bottom: 0;
   left: 0;
-  z-index: 2;
 
   background-color: rgba(0, 0, 0, 0.6);
 
@@ -77,8 +70,12 @@ const modalsMap = new Map<ModalType, LoadableComponent<ModalPropsType & any>>([
     loadable(() => import('components/modals/TransactionInfoModals/TransactionDetailsModal')),
   ],
   [
-    ModalType.SHOW_MODAL_TRANSACTION_STATUS,
-    loadable(() => import('components/modals/TransactionInfoModals/TransactionStatusModal')),
+    ModalType.SHOW_MODAL_TRANSACTION_STATUS_SEND,
+    loadable(() => import('components/modals/TransactionInfoModals/TransactionStatusSendModal')),
+  ],
+  [
+    ModalType.SHOW_MODAL_TRANSACTION_STATUS_SWAP,
+    loadable(() => import('components/modals/TransactionInfoModals/TransactionStatusSwapModal')),
   ],
   [
     ModalType.SHOW_MODAL_CLOSE_TOKEN_ACCOUNT,
@@ -92,11 +89,15 @@ const modalsMap = new Map<ModalType, LoadableComponent<ModalPropsType & any>>([
     ModalType.SHOW_MODAL_CHOOSE_BUY_TOKEN_MOBILE,
     loadable(() => import('components/modals/ChooseBuyTokenMobileModal')),
   ],
+  [
+    ModalType.SHOW_MODAL_SELECT_LIST_MOBILE,
+    loadable(() => import('components/modals/SelectListMobileModal')),
+  ],
   [ModalType.SHOW_MODAL_ERROR, loadable(() => import('components/modals/ErrorModal'))],
 ]);
 
 const promises = new Map();
-let modalId = 0;
+let modalIdCounter = 0;
 
 const ModalsContext = React.createContext<{
   openModal: <T, S extends {}>(modalType: ModalType, props?: S) => Promise<T | void>;
@@ -113,30 +114,31 @@ export function ModalsProvider({ children = null as any }) {
 
   const setPageScroll = (overflow: 'hidden' | 'scroll') =>
     (document.documentElement.style.overflow = overflow);
+
   useEffect(() => {
     setPageScroll(modals.length ? 'hidden' : 'scroll');
   }, [modals.length]);
 
-  const openModal = useCallback(async (modalType: ModalType, props?: any): Promise<any> => {
-    ++modalId;
+  const openModal = useCallback((modalType: ModalType, props?: any) => {
+    ++modalIdCounter;
 
     setModals((state) => [
       ...state,
       {
         modalType,
-        modalId,
+        modalId: modalIdCounter,
         props,
       },
     ]);
 
     const promise = new Promise((resolve) => {
-      promises.set(modalId, {
-        modalId,
+      promises.set(modalIdCounter, {
+        modalId: modalIdCounter,
         resolve,
       });
     });
 
-    promise.modalId = modalId;
+    promise.modalId = modalIdCounter;
 
     return promise;
   }, []);
@@ -154,8 +156,12 @@ export function ModalsProvider({ children = null as any }) {
   }, []);
 
   const closeTopModal = useCallback(() => {
-    setModals((state) => state.slice(0, state.length - 1));
-  }, []);
+    if (!modals.length) {
+      return;
+    }
+
+    closeModal(modals[modals.length - 1].modalId);
+  }, [modals]);
 
   const handleWrapperClick = useCallback(
     (e: React.MouseEvent<HTMLDivElement>) => {
@@ -178,7 +184,7 @@ export function ModalsProvider({ children = null as any }) {
       }
 
       return (
-        <Suspense fallback={null} key={modalId}>
+        <Suspense fallback={null} key={modal.modalId}>
           <ModalContainer>
             <ModalWrapper onMouseDown={handleWrapperClick}>
               <ModalComponent

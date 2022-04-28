@@ -193,7 +193,7 @@ export const FeePaySelector: FC<Props> = ({ tokenAccounts, onTokenAccountChange,
           </div>
           <InfoWrapper>
             <Line>
-              <Text className="gray">USDC account creation:</Text> <Text>~$0.5</Text>
+              <Text className="gray">USDC account creation:</Text> <Text>~$0.50</Text>
             </Line>
             <Line>
               <Text className="gray">Pay with:</Text> <Text>0.509 USDC</Text>
