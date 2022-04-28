@@ -1,10 +1,7 @@
 name: Deploy Develop
 
-on:
-  push:
-    branches:
-      - develop
-      - fix/ci_webpack_fail
+on: [push, pull_request]
+
 
 jobs:
   deploy:
