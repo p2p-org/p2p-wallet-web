@@ -1,4 +1,4 @@
-name: Deploy Develop
+name: Test PR
 
 on:
   pull_request:
@@ -7,7 +7,7 @@ on:
       - edited
 
 jobs:
-  deploy:
+  test:
     runs-on: ubuntu-latest
     environment: development
     name: Test PR
