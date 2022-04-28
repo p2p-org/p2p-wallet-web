@@ -1,6 +1,5 @@
 import { styled } from '@linaria/react';
-import { theme, up } from '@p2p-wallet-web/ui';
-import { zIndexes } from '@p2p-wallet-web/ui/dist/esm';
+import { theme, up, zIndexes } from '@p2p-wallet-web/ui';
 
 import { Button, Icon } from 'components/ui';
 import { Content as ModalContent, Modal } from 'components/ui/Modal';
