@@ -34,6 +34,7 @@ const ModalTitle = styled.div`
   font-weight: 500;
   font-size: 24px;
   line-height: 140%;
+  text-align: center;
 `;
 
 const SubTitle = styled.span`
@@ -215,6 +216,7 @@ export const TransactionConfirmModal: FunctionComponent<
           priceInfo={priceInfo}
           solanaProvider={solanaProvider}
           networkFees={networkFees}
+          showTitle={true}
         />
       ) : undefined}
 

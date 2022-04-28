@@ -1,64 +1,71 @@
 import type { FunctionComponent } from 'react';
 import { useEffect, useState } from 'react';
 
-import { useConnectionContext, useTransaction, useWallet } from '@p2p-wallet-web/core';
+import { useTransaction, useWallet } from '@p2p-wallet-web/core';
+import { useConnectionContext } from '@saberhq/use-solana';
 
 import type { ModalPropsType } from 'app/contexts';
 import { ToastManager } from 'components/common/ToastManager';
-import { Swap } from 'components/modals/TransactionConfirmModal/Swap';
-import type { FeesOriginalProps } from 'components/pages/swap/SwapWidget/Fees/FeesOriginal';
+import type { TransactionDetailsProps } from 'components/common/TransactionDetails';
 import { trackEvent } from 'utils/analytics';
+import { transferNotification } from 'utils/transactionNotifications';
 
+import { Send } from '../../TransactionConfirmModal/Send/Send';
 import { DateHeader, SolanaExplorerLink, TransactionProgress } from '../common';
 import { CloseIcon, CloseWrapper, Header, Section, WrapperModal } from '../common/styled';
-import type { SwapParams } from '../TransactionStatusSendModal/Swap';
+import type { TransferParams } from './Send';
 
-const DEFAULT_TRANSACTION_ERROR = 'Transaction error';
-
-type SwapActionType = () => Promise<string>;
-
-type ModalProps = {
-  action: SwapActionType;
-  params: SwapParams;
+export type TransactionStatusModalProps = TransactionDetailsProps & {
+  action: () => Promise<string>;
+  params: TransferParams;
 };
 
-export type TransactionStatusModalProps = FeesOriginalProps & ModalProps;
-
+export const INITIAL_PROGRESS = 5;
+const ADDRESS_CHARS_SHOW = 4;
+const DEFAULT_TRANSACTION_ERROR = 'Transaction error';
 const CHECK_TRANSACTION_INTERVAL = 3000;
 
-export const TransactionStatusModal: FunctionComponent<
+export const TransactionStatusSendModal: FunctionComponent<
   ModalPropsType<string | null> & TransactionStatusModalProps
-> = ({
-  action,
-  close,
-  userTokenAccounts,
-  priceInfo,
-  solanaProvider,
-  swapInfo,
-  feeLimitsInfo,
-  feeCompensationInfo,
-  networkFees,
-  params,
-}) => {
+> = ({ type, action, params, sendState, userFreeFeeLimits, networkFees, close }) => {
   const { provider } = useWallet();
 
+  const { network } = useConnectionContext();
   const [isExecuting, setIsExecuting] = useState(false);
-  const [signature, setSignature] = useState<string>('');
-  const transaction = useTransaction(signature);
+  const [signature, setSignature] = useState<string | null>(null);
+  const transaction = useTransaction(signature as string);
   const [transactionError, setTransactionError] = useState(
     transaction?.raw?.meta?.err ? DEFAULT_TRANSACTION_ERROR : '',
   );
-  const { network } = useConnectionContext();
 
   const executeAction = async () => {
     try {
       setIsExecuting(true);
 
-      const resultSignature = await action();
-      setSignature(resultSignature);
+      switch (type) {
+        case 'send': {
+          const resultSignature = await action();
+          setSignature(resultSignature);
+
+          transferNotification({
+            header: 'Sent',
+            text: `- ${params.amount.formatUnits()}`,
+            symbol: params.amount.token.symbol,
+          });
+
+          break;
+        }
+        default:
+          throw new Error('Wrong type');
+      }
     } catch (error) {
+      // setTransactionError((error as Error).message);
       setIsExecuting(false);
-      setTransactionError(DEFAULT_TRANSACTION_ERROR);
+
+      if (type === 'send') {
+        ToastManager.error(type, (error as Error).message);
+        setTransactionError(DEFAULT_TRANSACTION_ERROR);
+      }
     }
   };
 
@@ -78,7 +85,7 @@ export const TransactionStatusModal: FunctionComponent<
           commitment: 'confirmed',
         });
         if (trx) {
-          if (trx?.meta?.err) {
+          if (trx.meta?.err) {
             setTransactionError(DEFAULT_TRANSACTION_ERROR);
           } else if (transactionError) {
             setTransactionError('');
@@ -87,7 +94,7 @@ export const TransactionStatusModal: FunctionComponent<
           setTimeout(mount, CHECK_TRANSACTION_INTERVAL);
         }
       } catch (error) {
-        setTransactionError((error as Error).message);
+        // setTransactionError((error as Error).message);
         ToastManager.error((error as Error).message);
       } finally {
         setIsExecuting(false);
@@ -98,20 +105,29 @@ export const TransactionStatusModal: FunctionComponent<
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [signature]);
 
+  const isProcessing = (!signature || !transaction?.key) && !transactionError;
+  const isSuccess = Boolean(signature && transaction?.key && !transactionError);
+  const isError = Boolean(transactionError);
+
+  const shortAddress = sendState?.destinationAddress.replace(
+    sendState?.destinationAddress.substring(
+      ADDRESS_CHARS_SHOW,
+      sendState?.destinationAddress.length - ADDRESS_CHARS_SHOW,
+    ),
+    '...',
+  );
+
   const handleCloseClick = () => {
-    trackEvent('swap_close_click', { transactionConfirmed: !isExecuting });
+    trackEvent('send_close_click', { transactionConfirmed: !isExecuting });
 
     close(signature);
   };
-  const isError = Boolean(transactionError);
-  const isProcessing = (!signature || !transaction?.key) && !isError;
-  const isSuccess = Boolean(signature && transaction?.key && !isError);
 
   return (
     <WrapperModal close={handleCloseClick}>
       <Section>
         <Header>
-          {swapInfo.trade.inputTokenName} → {swapInfo.trade.outputTokenName}
+          {params.amount.token.symbol} → {shortAddress}
           <CloseWrapper onClick={handleCloseClick}>
             <CloseIcon name="close" />
           </CloseWrapper>
@@ -123,27 +139,21 @@ export const TransactionStatusModal: FunctionComponent<
         isProcessing={isProcessing}
         isSuccess={isSuccess}
         isExecuting={isExecuting}
-        label={'Swap status:'}
+        label={'Transaction status:'}
       />
       <Section>
-        <Swap
+        <Send
+          sendState={sendState}
+          userFreeFeeLimits={userFreeFeeLimits}
           params={params}
-          userTokenAccounts={userTokenAccounts}
-          priceInfo={priceInfo}
-          solanaProvider={solanaProvider}
-          feeLimitsInfo={feeLimitsInfo}
-          feeCompensationInfo={feeCompensationInfo}
           networkFees={networkFees}
-          swapInfo={swapInfo}
-          forPage={false}
-          showTitle={false}
         />
       </Section>
       <SolanaExplorerLink
         signature={signature}
         network={network}
         amplitudeAction={{
-          name: 'swap_explorer_click',
+          name: 'send_explorer_click',
           data: { transactionConfirmed: !isExecuting },
         }}
       />

@@ -9,7 +9,9 @@ export const Section = styled.div`
   padding: 20px 0;
 
   &.swap {
-    padding: 20px 0 0;
+    position: relative;
+
+    padding: 0;
   }
 
   &.send {
@@ -101,6 +103,7 @@ export const InfoValue = styled.div`
 
 export const Subtitle = styled.div`
   margin-top: 16px;
+  margin-bottom: 16px;
   margin-left: 20px;
 
   font-weight: 500;
@@ -109,14 +112,12 @@ export const Subtitle = styled.div`
 `;
 
 export const Wrapper = styled.div`
-  position: relative;
-
   margin-bottom: 8px;
 `;
 
 export const FromToWrapper = styled.div`
   position: absolute;
-  top: 107px;
+  top: 64px;
   left: 27px;
 
   width: 32px;

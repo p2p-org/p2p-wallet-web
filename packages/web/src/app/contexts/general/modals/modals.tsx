@@ -1,9 +1,10 @@
-import { Suspense, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import * as React from 'react';
+import { Suspense, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
 import { styled } from '@linaria/react';
 import type { LoadableComponent } from '@loadable/component';
 import loadable from '@loadable/component';
+import { zIndexes } from '@p2p-wallet-web/ui';
 
 import type { ModalPropsType } from 'app/contexts/general/modals/types';
 import { ModalType } from 'app/contexts/general/modals/types';
@@ -12,7 +13,7 @@ const Wrapper = styled.div`
   position: fixed;
   top: 0;
   left: 0;
-  z-index: 30;
+  z-index: ${zIndexes.modal};
 
   width: 100vw;
   height: 100vh;
@@ -24,15 +25,9 @@ const ModalContainer = styled.div`
   right: 0;
   bottom: 0;
   left: 0;
-  z-index: 1;
 
   overflow-y: auto;
   overscroll-behavior: none;
-
-  /* Above background */
-  &:last-child {
-    z-index: 2;
-  }
 `;
 
 const ModalWrapper = styled.div`
@@ -40,7 +35,6 @@ const ModalWrapper = styled.div`
   align-items: center;
   justify-content: center;
   min-height: 100%;
-  padding: 10px 0;
 `;
 
 const ModalBackground = styled.div`
@@ -49,7 +43,6 @@ const ModalBackground = styled.div`
   right: 0;
   bottom: 0;
   left: 0;
-  z-index: 2;
 
   background-color: rgba(0, 0, 0, 0.6);
 
@@ -77,8 +70,8 @@ const modalsMap = new Map<ModalType, LoadableComponent<ModalPropsType & any>>([
     loadable(() => import('components/modals/TransactionInfoModals/TransactionDetailsModal')),
   ],
   [
-    ModalType.SHOW_MODAL_TRANSACTION_STATUS,
-    loadable(() => import('components/modals/TransactionInfoModals/TransactionStatusModal')),
+    ModalType.SHOW_MODAL_TRANSACTION_STATUS_SEND,
+    loadable(() => import('components/modals/TransactionInfoModals/TransactionStatusSendModal')),
   ],
   [
     ModalType.SHOW_MODAL_TRANSACTION_STATUS_SWAP,

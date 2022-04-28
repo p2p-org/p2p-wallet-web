@@ -1,15 +1,29 @@
 import { styled } from '@linaria/react';
-import { theme, zIndexes } from '@p2p-wallet-web/ui';
+import { theme, up } from '@p2p-wallet-web/ui';
+import { zIndexes } from '@p2p-wallet-web/ui/dist/esm';
 
 import { Button, Icon } from 'components/ui';
+import { Content as ModalContent, Modal } from 'components/ui/Modal';
 
-import { INITIAL_PROGRESS } from '../TransactionStatusModal/TransactionStatusModal';
+export const StatusColors = styled.div`
+  &.isProcessing {
+    background: ${theme.colors.system.warningMain};
+  }
 
-export const Wrapper = styled.div`
+  &.isSuccess {
+    background: ${theme.colors.system.successMain};
+  }
+
+  &.isError {
+    background: ${theme.colors.system.errorMain};
+  }
+`;
+
+export const WrapperModal = styled(Modal)`
   display: flex;
   flex-direction: column;
   justify-content: stretch;
-  width: 524px;
+  padding: 0;
   overflow: scroll;
 
   background: ${theme.colors.bg.primary};
@@ -17,9 +31,46 @@ export const Wrapper = styled.div`
   border-radius: 15px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
 
+  ${ModalContent} {
+    ${up.tablet} {
+      width: 524px;
+    }
+
+    padding: 0;
+  }
+
   &::-webkit-scrollbar {
     display: none;
   }
+`;
+
+export const ProgressWrapper = styled.div`
+  position: relative;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  height: 55px;
+`;
+
+export const BlockWrapper = styled(StatusColors)`
+  z-index: ${zIndexes.top};
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 55px;
+  height: 55px;
+
+  border-radius: 40%;
+`;
+
+export const OtherIcon = styled(Icon)`
+  width: 24px;
+  height: 24px;
+
+  color: ${theme.colors.textIcon.buttonPrimary};
 `;
 
 export const Header = styled.div`
@@ -78,114 +129,6 @@ export const CheckmarkIcon = styled(Icon)`
   height: 24px;
 
   color: ${theme.colors.textIcon.buttonPrimary};
-`;
-
-export const OtherIcon = styled(Icon)`
-  width: 24px;
-  height: 24px;
-
-  color: ${theme.colors.textIcon.buttonPrimary};
-`;
-
-export const ProgressWrapper = styled.div`
-  position: relative;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  height: 55px;
-`;
-
-const StatusColors = styled.div`
-  &.isProcessing {
-    background: ${theme.colors.system.warningMain};
-  }
-
-  &.isSuccess {
-    background: ${theme.colors.system.successMain};
-  }
-
-  &.isError {
-    background: ${theme.colors.system.errorMain};
-  }
-`;
-
-export const ProgressLine = styled.div`
-  position: absolute;
-
-  left: 0;
-
-  z-index: ${zIndexes.middle};
-
-  width: ${INITIAL_PROGRESS}%;
-  height: 2px;
-
-  background: ${theme.colors.bg.buttonPrimary};
-
-  transition: width 0.15s;
-
-  &.isSuccess {
-    background: ${theme.colors.system.successMain};
-  }
-
-  &.isError {
-    background: ${theme.colors.system.errorMain};
-  }
-`;
-
-export const ProgressStub = styled.div`
-  position: absolute;
-
-  left: 0;
-
-  z-index: ${zIndexes.bottom};
-
-  width: 100%;
-  height: 1px;
-
-  background: ${theme.colors.stroke.secondary};
-`;
-
-export const BlockWrapper = styled(StatusColors)`
-  z-index: ${zIndexes.top};
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 55px;
-  height: 55px;
-
-  border-radius: 40%;
-`;
-
-export const TransactionStatus = styled.div`
-  display: flex;
-  align-items: center;
-
-  margin-left: 20px;
-
-  color: ${theme.colors.textIcon.primary};
-
-  font-weight: 500;
-  font-size: 16px;
-  line-height: 140%;
-`;
-
-export const TransactionBadge = styled.div`
-  display: flex;
-  align-items: center;
-
-  margin-left: 4px;
-  padding: 5px 12px;
-
-  color: ${theme.colors.textIcon.secondary};
-
-  font-weight: 500;
-  font-size: 12px;
-
-  background: ${theme.colors.bg.secondary};
-  border-radius: 4px;
 `;
 
 export const TransactionLabel = styled(StatusColors)`
@@ -366,44 +309,4 @@ export const Section = styled.div`
   display: flex;
   flex-direction: column;
   padding: 12px 20px;
-`;
-
-export const DateHeader = styled.div`
-  display: flex;
-  justify-content: center;
-
-  color: ${theme.colors.textIcon.secondary};
-
-  font-weight: 500;
-  font-size: 14px;
-  line-height: 120%;
-
-  & > *:not(:first-child) {
-    margin-left: 4px;
-  }
-`;
-
-export const Time = styled.div`
-  color: ${theme.colors.textIcon.primary};
-`;
-
-export const GoToExplorerIcon = styled(Icon)`
-  width: 24px;
-  height: 24px;
-  margin-right: 8px;
-`;
-
-export const GoToExplorerLink = styled.a`
-  display: inline-flex;
-  align-items: center;
-
-  font-weight: 500;
-  font-size: 16px;
-  line-height: 140%;
-
-  text-decoration: none;
-
-  &.isDisabled {
-    pointer-events: none;
-  }
 `;
