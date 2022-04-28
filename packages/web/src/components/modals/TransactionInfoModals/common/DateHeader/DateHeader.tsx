@@ -1,7 +1,7 @@
 import type { FC } from 'react';
 
 import { styled } from '@linaria/react';
-import { theme } from '@p2p-wallet-web/ui/dist/esm';
+import { theme } from '@p2p-wallet-web/ui';
 import dayjs from 'dayjs';
 
 export const Time = styled.div`
