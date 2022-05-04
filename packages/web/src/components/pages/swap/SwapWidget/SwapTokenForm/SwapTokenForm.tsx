@@ -628,7 +628,8 @@ export const SwapTokenForm: FC<Props> = ({
               {receiveAmount} {trade.outputTokenName}
               <Text className="gray inline-flex">
                 <AmountUSDStyled
-                  prefix="~"
+                  prefix="(~"
+                  postfix=")"
                   amount={trade.getOutputAmount()}
                   tokenName={trade.outputTokenName}
                 />

@@ -19,12 +19,14 @@ type Props = {
   style?: CSSProperties;
   className?: string;
   prefix?: ReactElement | string;
+  postfix?: ReactElement | string;
 };
 
 export const AmountUSD: FunctionComponent<Props> = ({
   amount = new u64(0),
   tokenName = '',
   prefix,
+  postfix,
   ...props
 }) => {
   const { tokenConfigs } = useConfig();
@@ -43,10 +45,15 @@ export const AmountUSD: FunctionComponent<Props> = ({
     );
   }, [tokenName, rate.data, amount, tokenConfigs]);
 
+  if (!usdValue) {
+    return null;
+  }
+
   return (
     <Wrapper title="Amount in USD" {...props}>
       {prefix}
       {usdValue}
+      {postfix}
     </Wrapper>
   );
 };

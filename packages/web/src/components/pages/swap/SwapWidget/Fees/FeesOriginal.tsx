@@ -200,7 +200,8 @@ export const FeesOriginal: FC<FeesOriginalProps> = ({
           {getTokenPrice(false)} {trade.outputTokenName}
           <Text className="flex-end">
             <AmountUSDStyled
-              prefix={'~'}
+              prefix="(~"
+              postfix=")"
               amount={inputTokenPrice}
               tokenName={trade.inputTokenName}
             />
@@ -213,7 +214,8 @@ export const FeesOriginal: FC<FeesOriginalProps> = ({
           {getTokenPrice(true)} {trade.inputTokenName}
           <Text className="flex-end">
             <AmountUSDStyled
-              prefix={'~'}
+              prefix="(~"
+              postfix=")"
               amount={outputTokenPrice}
               tokenName={trade.outputTokenName}
             />
@@ -244,7 +246,8 @@ export const FeesOriginal: FC<FeesOriginalProps> = ({
             {minReceiveAmount} {swapInfo.trade.outputTokenName}
             <Text className="flex-end">
               <AmountUSDStyled
-                prefix={'~'}
+                prefix="(~"
+                postfix=")"
                 amount={swapInfo.trade.getMinimumOutputAmount()}
                 tokenName={swapInfo.trade.outputTokenName}
               />
@@ -267,7 +270,8 @@ export const FeesOriginal: FC<FeesOriginalProps> = ({
               {accountCreationFee} SOL
               <Text className="flex-end">
                 <AmountUSDStyled
-                  prefix={'~'}
+                  prefix="(~"
+                  postfix=")"
                   amount={networkFees.accountRentExemption}
                   tokenName={'SOL'}
                 />

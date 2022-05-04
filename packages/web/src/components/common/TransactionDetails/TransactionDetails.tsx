@@ -53,7 +53,8 @@ export const TransactionDetails: FC<TransactionDetailsProps> = ({
           <TokenAndUsd>
             <Text>{sendState.details.receiveAmount}</Text>
             <AmountUSDStyled
-              prefix="~"
+              prefix="(~"
+              postfix=")"
               amount={sendState.parsedAmount?.toU64() || amount}
               tokenName={sendState.fromTokenAccount?.balance?.token.symbol}
             />
@@ -79,7 +80,8 @@ export const TransactionDetails: FC<TransactionDetailsProps> = ({
             <TokenAndUsd>
               <Text>{sendState.details.accountCreationAmount}</Text>
               <AmountUSDStyled
-                prefix="~"
+                prefix="(~"
+                postfix=")"
                 amount={networkFees?.accountRentExemption}
                 tokenName={sendState.fromTokenAccount?.balance?.token.symbol}
               />
@@ -93,7 +95,8 @@ export const TransactionDetails: FC<TransactionDetailsProps> = ({
           <TokenAndUsd>
             <Text>{sendState.details.totalAmount}</Text>
             <AmountUSDStyled
-              prefix="~"
+              prefix="(~"
+              postfix=")"
               amount={sendState.parsedAmount?.toU64() || amount}
               tokenName={sendState.fromTokenAccount?.balance?.token.symbol}
             />
