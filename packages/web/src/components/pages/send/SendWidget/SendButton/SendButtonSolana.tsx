@@ -16,7 +16,7 @@ import {
   useTransferAction,
 } from 'app/contexts';
 import type { TransactionConfirmModalProps } from 'components/modals/TransactionConfirmModal/TransactionConfirmModal';
-import type { TransactionStatusModalProps } from 'components/modals/TransactionInfoModals/TransactionStatusModal/TransactionStatusModal';
+import type { TransactionStatusModalProps } from 'components/modals/TransactionInfoModals/TransactionStatusSendModal/TransactionStatusModal';
 import { Button, Icon } from 'components/ui';
 import { trackEvent } from 'utils/analytics';
 
@@ -118,19 +118,22 @@ export const SendButtonSolana: FC<Props> = ({ primary, disabled }) => {
         sum: parsedAmount.asNumber,
       });
 
-      await openModal<void, TransactionStatusModalProps>(ModalType.SHOW_MODAL_TRANSACTION_STATUS, {
-        type: 'send',
-        action,
-        params: {
-          source: fromTokenAccount,
-          destination: new PublicKey(destinationAddress),
-          amount: parsedAmount,
-          username: resolvedAddress ? toPublicKey : '',
+      await openModal<void, TransactionStatusModalProps>(
+        ModalType.SHOW_MODAL_TRANSACTION_STATUS_SEND,
+        {
+          type: 'send',
+          action,
+          params: {
+            source: fromTokenAccount,
+            destination: new PublicKey(destinationAddress),
+            amount: parsedAmount,
+            username: resolvedAddress ? toPublicKey : '',
+          },
+          sendState,
+          userFreeFeeLimits,
+          networkFees,
         },
-        sendState,
-        userFreeFeeLimits,
-        networkFees,
-      });
+      );
     } finally {
       setIsExecuting(false);
     }

@@ -31,6 +31,7 @@ export type SwapParams = {
 
 interface Props {
   params: SwapParams;
+  showTitle: boolean;
 }
 
 export const Swap: FC<Props & FeesOriginalProps> = ({
@@ -40,15 +41,17 @@ export const Swap: FC<Props & FeesOriginalProps> = ({
   feeLimitsInfo,
   networkFees,
   feeCompensationInfo,
+  showTitle,
 }) => {
   const { tokenConfigs } = useConfig();
   const inputDecimals = tokenConfigs[inputTokenName]?.decimals || 0;
   const outputDecimals = tokenConfigs[outputTokenName]?.decimals || 0;
   const minReceiveAmount = formatBigNumber(swapInfo.trade.getMinimumOutputAmount(), outputDecimals);
+  const outputAmount = formatBigNumber(swapInfo.trade.getOutputAmount(), outputDecimals);
 
   return (
     <Wrapper>
-      <Subtitle>You are going to swap</Subtitle>
+      {showTitle && <Subtitle>You are going to swap</Subtitle>}
       <Section className="swap">
         <FieldInfo>
           <TokenAvatar symbol={inputTokenName} size={44} />
@@ -57,29 +60,25 @@ export const Swap: FC<Props & FeesOriginalProps> = ({
               {formatBigNumber(inputAmount, inputDecimals)} {inputTokenName}
             </InfoTitle>
             <InfoValue>
-              <AmountUSD
-                prefix={'~'}
-                amount={swapInfo.trade.getInputAmount()}
-                tokenName={swapInfo.trade.inputTokenName}
-              />
+              <AmountUSD prefix={'~'} amount={inputAmount} tokenName={inputTokenName} />
             </InfoValue>
           </InfoWrapper>
         </FieldInfo>
+        <FromToWrapper>
+          <Overlay>
+            <Icon name={'arrow-down'} />
+          </Overlay>
+        </FromToWrapper>
       </Section>
-      <FromToWrapper>
-        <Overlay>
-          <Icon name={'arrow-down'} />
-        </Overlay>
-      </FromToWrapper>
       <Section className="top">
         <FieldInfo>
           <TokenAvatar symbol={outputTokenName} size={44} />
           <InfoWrapper>
             <InfoTitle>
-              {formatBigNumber(swapInfo.trade.getOutputAmount(), outputDecimals)} {outputTokenName}
+              {outputAmount} {outputTokenName}
             </InfoTitle>
             <InfoValue>
-              Receive at least: {minReceiveAmount} {swapInfo.trade.outputTokenName}
+              Receive at least: {minReceiveAmount} {outputTokenName}
             </InfoValue>
           </InfoWrapper>
         </FieldInfo>

@@ -7,6 +7,8 @@ import { useSolana } from '@saberhq/use-solana';
 import { useFeeCompensation, useFreeFeeLimits, useNetworkFees } from 'app/contexts';
 import { ModalType, useModals } from 'app/contexts/general/modals';
 import { ButtonState, useSwap } from 'app/contexts/solana/swap';
+import type { TransactionConfirmModalProps } from 'components/modals/TransactionConfirmModal/TransactionConfirmModal';
+import type { TransactionStatusModalProps } from 'components/modals/TransactionInfoModals/TransactionStatusSwapModal';
 import { Button, Icon } from 'components/ui';
 import { trackEvent } from 'utils/analytics';
 
@@ -30,28 +32,30 @@ export const SwapButtonOriginal: FC = () => {
   const handleSwapClick = async () => {
     trackEvent('Swap_Verification_Invoked');
 
-    const result = await openModal<boolean>(ModalType.SHOW_MODAL_TRANSACTION_CONFIRM, {
-      type: 'swap',
-      params: {
-        inputTokenName: trade.inputTokenName,
-        outputTokenName: trade.outputTokenName,
-        inputAmount: trade.getInputAmount(),
-        minimumOutputAmount: trade.getMinimumOutputAmount(),
+    const result = await openModal<boolean, TransactionConfirmModalProps>(
+      ModalType.SHOW_MODAL_TRANSACTION_CONFIRM,
+      {
+        type: 'swap',
+        params: {
+          inputTokenName: trade.inputTokenName,
+          outputTokenName: trade.outputTokenName,
+          inputAmount: trade.getInputAmount(),
+          minimumOutputAmount: trade.getMinimumOutputAmount(),
+        },
+        swapInfo,
+        userTokenAccounts,
+        feeCompensationInfo,
+        feeLimitsInfo,
+        solanaProvider,
+        networkFees,
       },
-      swapInfo,
-      userTokenAccounts,
-      feeCompensationInfo,
-      feeLimitsInfo,
-      solanaProvider,
-      networkFees,
-    });
+    );
 
     if (!result) {
       return false;
     }
 
-    openModal(ModalType.SHOW_MODAL_TRANSACTION_STATUS_SWAP, {
-      type: 'swap',
+    openModal<boolean, TransactionStatusModalProps>(ModalType.SHOW_MODAL_TRANSACTION_STATUS_SWAP, {
       action: onSwap,
       params: {
         inputTokenName: trade.inputTokenName,
@@ -59,6 +63,12 @@ export const SwapButtonOriginal: FC = () => {
         inputAmount: trade.getInputAmount(),
         minimumOutputAmount: trade.getMinimumOutputAmount(),
       },
+      userTokenAccounts,
+      feeCompensationInfo,
+      feeLimitsInfo,
+      solanaProvider,
+      networkFees,
+      swapInfo,
     });
   };
 

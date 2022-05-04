@@ -13,8 +13,8 @@ import { AccordionTitle } from 'components/ui/AccordionDetails/AccordionTitle';
 import { ListWrapper, Row, Text } from 'components/ui/AccordionDetails/common';
 
 export interface TransactionDetailsProps {
-  sendState: UseSendState;
-  userFreeFeeLimits: typeof INITIAL_USER_FREE_FEE_LIMITS;
+  sendState?: UseSendState;
+  userFreeFeeLimits?: typeof INITIAL_USER_FREE_FEE_LIMITS;
   networkFees: NetworkFees;
   btcAddress?: string;
   isOpen?: boolean;
@@ -41,7 +41,7 @@ export const TransactionDetails: FC<TransactionDetailsProps> = ({
         <AccordionTitle
           title="Transaction details"
           titleBottomName="Total"
-          titleBottomValue={sendState.details.totalAmount || ''}
+          titleBottomValue={sendState?.details.totalAmount || ''}
         />
       }
       open={false}
@@ -51,12 +51,12 @@ export const TransactionDetails: FC<TransactionDetailsProps> = ({
         <Row>
           <Text className="gray">Receive</Text>
           <TokenAndUsd>
-            <Text>{sendState.details.receiveAmount}</Text>
+            <Text>{sendState?.details.receiveAmount}</Text>
             <AmountUSDStyled
               prefix="(~"
               postfix=")"
-              amount={sendState.parsedAmount?.toU64() || amount}
-              tokenName={sendState.fromTokenAccount?.balance?.token.symbol}
+              amount={sendState?.parsedAmount?.toU64() || amount}
+              tokenName={sendState?.fromTokenAccount?.balance?.token.symbol}
             />
           </TokenAndUsd>
         </Row>
@@ -67,14 +67,16 @@ export const TransactionDetails: FC<TransactionDetailsProps> = ({
               Free{' '}
               <Text className="green inline-flex">
                 (Paid by P2P.org)
-                <FeeTransactionTooltip userFreeFeeLimits={userFreeFeeLimits} />
+                {userFreeFeeLimits && (
+                  <FeeTransactionTooltip userFreeFeeLimits={userFreeFeeLimits} />
+                )}
               </Text>
             </Text>
           ) : (
             <Text>1</Text>
           )}
         </Row>
-        {sendState.details.accountCreationAmount ? (
+        {sendState?.details.accountCreationAmount ? (
           <Row>
             <Text className="gray">{sendState.destinationAccount?.symbol} account creation</Text>
             <TokenAndUsd>
@@ -93,12 +95,12 @@ export const TransactionDetails: FC<TransactionDetailsProps> = ({
         <Row>
           <Text>Total</Text>
           <TokenAndUsd>
-            <Text>{sendState.details.totalAmount}</Text>
+            <Text>{sendState?.details.totalAmount}</Text>
             <AmountUSDStyled
               prefix="(~"
               postfix=")"
-              amount={sendState.parsedAmount?.toU64() || amount}
-              tokenName={sendState.fromTokenAccount?.balance?.token.symbol}
+              amount={sendState?.parsedAmount?.toU64() || amount}
+              tokenName={sendState?.fromTokenAccount?.balance?.token.symbol}
             />
           </TokenAndUsd>
         </Row>

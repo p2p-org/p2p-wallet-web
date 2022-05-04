@@ -83,7 +83,7 @@ export interface UseSwap {
   intermediateTokenName: string | undefined;
   intermediateTokenPrice: number | undefined;
   buttonState: ButtonState;
-  onSwap: () => Promise<string | undefined>;
+  onSwap: () => Promise<string>;
 
   feeAmount: u64 | undefined;
 }
@@ -235,12 +235,12 @@ const useSwapInternal = (props: UseSwapArgs = {}): UseSwap => {
   // Update trade instance when pool data refreshes
   useEffect(() => {
     if (asyncPools.value) {
-      setTrade((tradeObj) => tradeObj.updatePools(asyncPools.value));
+      setTrade((currentTrade) => currentTrade.updatePools(asyncPools.value));
     }
   }, [asyncPools]);
 
   useEffect(() => {
-    setTrade((tradeObj) => tradeObj.updateSlippageTolerance(slippageTolerance));
+    setTrade((currentTrade) => currentTrade.updateSlippageTolerance(slippageTolerance));
   }, [slippageTolerance]);
 
   const feeAmount: u64 | undefined = useMemo(() => {
