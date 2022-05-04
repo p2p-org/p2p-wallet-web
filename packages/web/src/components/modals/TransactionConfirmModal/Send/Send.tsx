@@ -93,6 +93,7 @@ export const Send: FC<Props & TransactionDetailsProps> = ({
   btcAddress,
 }) => {
   const address = params.destination?.toBase58?.() || btcAddress;
+  const isFullName = /\w*\.\w+/.test(params.username || '');
 
   return (
     <Section className="send">
@@ -123,7 +124,7 @@ export const Send: FC<Props & TransactionDetailsProps> = ({
             {params.username ? (
               <Username>
                 <To>To</To>
-                {params.username}
+                {isFullName ? params.username : `${params.username}.p2p.sol`}
               </Username>
             ) : (
               <InfoTitle className="secondary">To address</InfoTitle>
