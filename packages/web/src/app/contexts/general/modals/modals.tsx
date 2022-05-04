@@ -9,47 +9,33 @@ import { zIndexes } from '@p2p-wallet-web/ui';
 import type { ModalPropsType } from 'app/contexts/general/modals/types';
 import { ModalType } from 'app/contexts/general/modals/types';
 
-const Wrapper = styled.div`
+const Wrapper = styled.div<PresetProp>`
   position: fixed;
   top: 0;
+  right: 0;
+  bottom: ${(props) => (props.preset === 'nav' ? '57px' : 0)};
   left: 0;
   z-index: ${zIndexes.modal};
 
-  width: 100vw;
-  height: 100vh;
-`;
-
-const ModalContainer = styled.div`
-  position: fixed;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-
-  overflow-y: auto;
-  overscroll-behavior: none;
-`;
-
-const ModalWrapper = styled.div`
   display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 100%;
-`;
-
-const ModalBackground = styled.div`
-  position: fixed;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
+  flex-direction: column;
 
   background-color: rgba(0, 0, 0, 0.6);
 
   user-select: none;
 `;
 
+const ModalWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+`;
+
 type ModalState = { modalType: ModalType; modalId: number; props: any };
+type PresetProp = {
+  preset?: 'nav' | 'regular';
+};
 
 const modalsMap = new Map<ModalType, LoadableComponent<ModalPropsType & any>>([
   // [SHOW_MODAL_ADD_COIN, loadable(() => import('components/modals/__AddCoinModal'))],
@@ -100,7 +86,7 @@ const promises = new Map();
 let modalIdCounter = 0;
 
 const ModalsContext = React.createContext<{
-  openModal: <T, S extends {}>(modalType: ModalType, props?: S) => Promise<T | void>;
+  openModal: <T, S extends PresetProp>(modalType: ModalType, props?: S) => Promise<T | void>;
   closeModal: (modalId: number) => void;
   closeTopModal: () => void;
 }>({
@@ -185,19 +171,19 @@ export function ModalsProvider({ children = null as any }) {
 
       return (
         <Suspense fallback={null} key={modal.modalId}>
-          <ModalContainer>
-            <ModalWrapper onMouseDown={handleWrapperClick}>
-              <ModalComponent
-                {...modal.props}
-                key={modal.modalId}
-                close={(result?: any) => closeModal(modal.modalId, result)}
-              />
-            </ModalWrapper>
-          </ModalContainer>
+          <ModalWrapper onMouseDown={handleWrapperClick}>
+            <ModalComponent
+              {...modal.props}
+              key={modal.modalId}
+              close={(result?: any) => closeModal(modal.modalId, result)}
+            />
+          </ModalWrapper>
         </Suspense>
       );
     });
   }, [modals, handleWrapperClick, closeModal]);
+
+  const topPreset: PresetProp['preset'] = modals[modals.length - 1]?.props?.preset || 'regular';
 
   return (
     <ModalsContext.Provider
@@ -209,10 +195,7 @@ export function ModalsProvider({ children = null as any }) {
     >
       {children}
       {preparedModals.length > 0 ? (
-        <Wrapper>
-          <ModalBackground />
-          {preparedModals}
-        </Wrapper>
+        <Wrapper preset={topPreset}>{preparedModals}</Wrapper>
       ) : undefined}
     </ModalsContext.Provider>
   );

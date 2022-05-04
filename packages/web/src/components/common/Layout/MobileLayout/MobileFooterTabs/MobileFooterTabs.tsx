@@ -77,7 +77,7 @@ export const MobileFooterTabs: FC = () => {
 
   const handleActionsClick = (e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
-    openModal(ModalType.SHOW_MODAL_ACTIONS_MOBILE);
+    openModal(ModalType.SHOW_MODAL_ACTIONS_MOBILE, { preset: 'nav' });
   };
 
   const handleFeedbackClick = (e: React.MouseEvent<HTMLDivElement>) => {
