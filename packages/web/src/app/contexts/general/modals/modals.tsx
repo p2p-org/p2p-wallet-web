@@ -33,9 +33,7 @@ const ModalWrapper = styled.div`
 `;
 
 type ModalState = { modalType: ModalType; modalId: number; props: any };
-type PresetProp = {
-  preset?: 'nav' | 'regular';
-};
+type Presets = 'nav' | 'regular';
 
 const modalsMap = new Map<ModalType, LoadableComponent<ModalPropsType & any>>([
   // [SHOW_MODAL_ADD_COIN, loadable(() => import('components/modals/__AddCoinModal'))],
@@ -85,8 +83,17 @@ const modalsMap = new Map<ModalType, LoadableComponent<ModalPropsType & any>>([
 const promises = new Map();
 let modalIdCounter = 0;
 
+const getPreset = (modal?: ModalType) => {
+  switch (modal) {
+    case ModalType.SHOW_MODAL_ACTIONS_MOBILE:
+      return 'nav';
+    default:
+      return 'regular';
+  }
+};
+
 const ModalsContext = React.createContext<{
-  openModal: <T, S extends PresetProp>(modalType: ModalType, props?: S) => Promise<T | void>;
+  openModal: <T, S extends {}>(modalType: ModalType, props?: S) => Promise<T | void>;
   closeModal: (modalId: number) => void;
   closeTopModal: () => void;
 }>({
@@ -183,7 +190,7 @@ export function ModalsProvider({ children = null as any }) {
     });
   }, [modals, handleWrapperClick, closeModal]);
 
-  const topPreset: PresetProp['preset'] = modals[modals.length - 1]?.props?.preset || 'regular';
+  const preset = getPreset(modals.at(-1)?.modalType);
 
   return (
     <ModalsContext.Provider
@@ -194,9 +201,7 @@ export function ModalsProvider({ children = null as any }) {
       }}
     >
       {children}
-      {preparedModals.length > 0 ? (
-        <Wrapper preset={topPreset}>{preparedModals}</Wrapper>
-      ) : undefined}
+      {preparedModals.length > 0 ? <Wrapper preset={preset}>{preparedModals}</Wrapper> : undefined}
     </ModalsContext.Provider>
   );
 }
