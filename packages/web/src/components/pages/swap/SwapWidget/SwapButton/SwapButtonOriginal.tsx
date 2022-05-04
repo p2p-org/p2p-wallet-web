@@ -2,7 +2,6 @@ import type { FC } from 'react';
 
 import { styled } from '@linaria/react';
 import { useUserTokenAccounts } from '@p2p-wallet-web/core';
-import { useSolana } from '@saberhq/use-solana';
 
 import { useFeeCompensation, useFreeFeeLimits, useNetworkFees } from 'app/contexts';
 import { ModalType, useModals } from 'app/contexts/general/modals';
@@ -22,7 +21,6 @@ const SwapIcon = styled(Icon)`
 export const SwapButtonOriginal: FC = () => {
   const { openModal } = useModals();
   const networkFees = useNetworkFees();
-  const solanaProvider = useSolana();
   const { buttonState, trade, onSwap } = useSwap();
   const swapInfo = useSwap();
   const userTokenAccounts = useUserTokenAccounts();
@@ -46,7 +44,6 @@ export const SwapButtonOriginal: FC = () => {
         userTokenAccounts,
         feeCompensationInfo,
         feeLimitsInfo,
-        solanaProvider,
         networkFees,
       },
     );
@@ -66,7 +63,6 @@ export const SwapButtonOriginal: FC = () => {
       userTokenAccounts,
       feeCompensationInfo,
       feeLimitsInfo,
-      solanaProvider,
       networkFees,
       swapInfo,
     });
