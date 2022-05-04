@@ -89,7 +89,6 @@ export const TransactionConfirmModal: FunctionComponent<
   userFreeFeeLimits,
   feeCompensationInfo,
   feeLimitsInfo,
-  priceInfo,
   solanaProvider,
   networkFees,
 }) => {
@@ -212,7 +211,6 @@ export const TransactionConfirmModal: FunctionComponent<
           userTokenAccounts={userTokenAccounts}
           feeCompensationInfo={feeCompensationInfo}
           feeLimitsInfo={feeLimitsInfo}
-          priceInfo={priceInfo}
           solanaProvider={solanaProvider}
           networkFees={networkFees}
         />

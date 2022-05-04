@@ -39,8 +39,6 @@ export const Swap: FC<Props & FeesOriginalProps> = ({
   userTokenAccounts,
   feeLimitsInfo,
   networkFees,
-  solanaProvider,
-  priceInfo,
   feeCompensationInfo,
 }) => {
   const { tokenConfigs } = useConfig();
@@ -91,8 +89,6 @@ export const Swap: FC<Props & FeesOriginalProps> = ({
         userTokenAccounts={userTokenAccounts}
         feeCompensationInfo={feeCompensationInfo}
         feeLimitsInfo={feeLimitsInfo}
-        priceInfo={priceInfo}
-        solanaProvider={solanaProvider}
         networkFees={networkFees}
         open={false}
         forPage={false}

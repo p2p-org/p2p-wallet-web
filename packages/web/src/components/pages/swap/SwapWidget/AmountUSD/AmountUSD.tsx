@@ -6,7 +6,8 @@ import { styled } from '@linaria/react';
 import { ZERO } from '@orca-so/sdk';
 import { u64 } from '@solana/spl-token';
 
-import { useConfig, usePrice } from 'app/contexts/solana/swap';
+import { useMarketData } from 'app/contexts';
+import { useConfig } from 'app/contexts/solana/swap';
 import { getUSDValue } from 'app/contexts/solana/swap/utils/format';
 import { formatNumberToUSD } from 'utils/format';
 
@@ -29,18 +30,18 @@ export const AmountUSD: FunctionComponent<Props> = ({
   const { tokenConfigs } = useConfig();
   const [usdValue, setUSDValue] = useState('');
 
-  const { useAsyncMergedPrices } = usePrice();
-  const asyncPrices = useAsyncMergedPrices();
-  const price = asyncPrices.value?.[tokenName];
+  const rate = useMarketData(tokenName);
 
   useEffect(() => {
-    if (amount.eq(ZERO) || !price) {
+    if (amount.eq(ZERO) || !rate.data) {
       setUSDValue('');
       return;
     }
 
-    setUSDValue(formatNumberToUSD(getUSDValue(amount, tokenConfigs[tokenName].decimals, price)));
-  }, [tokenName, price, amount, tokenConfigs]);
+    setUSDValue(
+      formatNumberToUSD(getUSDValue(amount, tokenConfigs[tokenName].decimals, rate.data)),
+    );
+  }, [tokenName, rate.data, amount, tokenConfigs]);
 
   return (
     <Wrapper title="Amount in USD" {...props}>

@@ -8,14 +8,11 @@ const CHUNK_AMOUNT = 50;
 const BATCH_SCHEDULE_MILLISECONDS = 500;
 
 async function batchFunction(coingeckoIds: readonly string[]): Promise<(Market | null)[]> {
-  //console.log(`Fetching markets: ${coingeckoIds.join(', ')}`);
-
   const chunks = splitEvery(CHUNK_AMOUNT, coingeckoIds);
 
   const marketsChunked = await Promise.all(
     chunks.map(async (chunk) => {
       const path = `${COIN_GECKO_API_URL}/simple/price`.concat(
-        // const path = `http://1.2.3.4/simple/price`.concat(
         `?ids=${chunk.join(',')}&vs_currencies=${BASE_CURRENCY}`,
       );
 
@@ -33,7 +30,6 @@ async function batchFunction(coingeckoIds: readonly string[]): Promise<(Market |
 
   // map over ids array and pick the characters in order
   // null indicates not found
-  //console.log(markets);
   return coingeckoIds.map((id) => markets?.[id.toLowerCase()]?.[BASE_CURRENCY] ?? null);
 }
 

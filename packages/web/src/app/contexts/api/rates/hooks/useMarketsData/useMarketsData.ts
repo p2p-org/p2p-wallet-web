@@ -10,11 +10,7 @@ import { useConfig } from 'app/contexts';
 import { marketLoader } from './marketLoader';
 
 // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-const ONE_MINUTE = 1000 * 60;
-// eslint-disable-next-line @typescript-eslint/no-magic-numbers
-const TEN_SECONDS = 1000 * 10;
-// eslint-disable-next-line @typescript-eslint/no-magic-numbers
-const TEN_MINUTES = 1000 * 60 * 10;
+const THIRTY_SECONDS = 1000 * 30;
 
 export const useMarketsData = (symbols: (string | null | undefined)[]): Markets => {
   const { tokenConfigs } = useConfig();
@@ -35,9 +31,7 @@ export const useMarketsData = (symbols: (string | null | undefined)[]): Markets 
       queryKey: ['market', coingeckoId],
       queryFn: () => (coingeckoId ? marketLoader.load(coingeckoId) : null),
       suspense: true,
-      refetchInterval: ONE_MINUTE,
-      staleTime: TEN_SECONDS,
-      cacheTime: TEN_MINUTES,
+      refetchInterval: THIRTY_SECONDS,
     })),
   );
 
