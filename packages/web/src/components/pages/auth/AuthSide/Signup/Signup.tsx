@@ -38,6 +38,8 @@ const BackStyled = styled(Back)`
   left: 0;
 `;
 
+const MNEMONIC_STRENGTH = 256;
+
 type PageTypes = 'mnemonic' | 'paste' | 'password';
 
 const backToPage: {
@@ -56,10 +58,10 @@ type Props = {
 export const Signup: FC<Props> = ({ next }) => {
   const [page, setPage] = useState<PageTypes>('mnemonic');
 
-  const mnemonic = useMemo(() => bip39.generateMnemonic(256), []);
+  const mnemonic = useMemo(() => bip39.generateMnemonic(MNEMONIC_STRENGTH), []);
 
   useEffect(() => {
-    trackEvent('signup_open');
+    trackEvent('Splash_Viewed', { Splash_Campaign: null });
   }, []);
 
   const handleBackClick = () => {
