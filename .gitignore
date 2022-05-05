@@ -16,6 +16,7 @@ coverage/
 # production
 build/
 dist/
+packages/web/public/**
 
 # misc
 .DS_Store

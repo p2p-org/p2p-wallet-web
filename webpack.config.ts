@@ -3,6 +3,7 @@ import CompressionPlugin from 'compression-webpack-plugin';
 import CssMinimizerPlugin from 'css-minimizer-webpack-plugin';
 import DotEnv from 'dotenv-webpack';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
+import ImageMinimizerPlugin from 'image-minimizer-webpack-plugin';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import path from 'path';
 import TerserPlugin from 'terser-webpack-plugin';
@@ -112,13 +113,33 @@ const config: ConfigFn = (env, argv) => {
       path: path.resolve(__dirname, 'packages/web/public'),
       filename: __DEVELOPMENT__ ? '[name].[contenthash].js' : '[contenthash].js',
       chunkFilename: __DEVELOPMENT__ ? '[id]-[contenthash].chunk.js' : '[contenthash].chunk.js',
+      assetModuleFilename: '[name]-[contenthash][ext]',
     },
 
     optimization: {
       nodeEnv: argv.mode,
       runtimeChunk: 'single',
       minimize: __PRODUCTION__,
-      minimizer: __PRODUCTION__ ? [new TerserPlugin(), new CssMinimizerPlugin()] : [],
+      minimizer: __PRODUCTION__
+        ? [
+            new TerserPlugin(),
+            new CssMinimizerPlugin(),
+            new ImageMinimizerPlugin({
+              loader: false,
+              minimizer: {
+                implementation: ImageMinimizerPlugin.imageminMinify,
+                options: {
+                  plugins: [
+                    'imagemin-gifsicle',
+                    'imagemin-mozjpeg',
+                    'imagemin-pngquant',
+                    'imagemin-svgo',
+                  ],
+                },
+              },
+            }),
+          ]
+        : [],
       splitChunks: {
         maxSize: __PRODUCTION__ ? MAX_CHUNK_SIZE : undefined,
         cacheGroups: {
