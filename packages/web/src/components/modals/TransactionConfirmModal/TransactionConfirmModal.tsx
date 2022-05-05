@@ -228,7 +228,7 @@ export const TransactionConfirmModal: FunctionComponent<
             onChange={handlePasswordChange}
             isError={hasError}
           />
-          {hasError ? <ErrorHint error="Incorrect password, try again" noIcon /> : undefined}
+          {hasError ? <ErrorHint error="The password is not correct" noIcon /> : undefined}
         </Section>
       ) : undefined}
     </WrapperModal>
