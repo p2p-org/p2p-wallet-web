@@ -108,7 +108,7 @@ export const TransactionStatusModal: FunctionComponent<
   const isSuccess = Boolean(signature && transaction?.key && !isError);
 
   return (
-    <WrapperModal close={handleCloseClick}>
+    <WrapperModal close={handleCloseClick} noDelimiter>
       <Section>
         <Header>
           {swapInfo.trade.inputTokenName} → {swapInfo.trade.outputTokenName}
