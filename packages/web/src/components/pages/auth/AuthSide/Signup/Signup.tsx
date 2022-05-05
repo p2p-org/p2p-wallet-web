@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import { styled } from '@linaria/react';
 import { DERIVATION_PATH, mnemonicToSeed } from '@p2p-wallet-web/core';
@@ -7,7 +7,6 @@ import * as bip39 from 'bip39';
 
 import { Password } from 'components/pages/auth/AuthSide/common/Password';
 import { Paste } from 'components/pages/auth/AuthSide/Signup/Paste';
-import { trackEvent } from 'utils/analytics';
 
 import { Back } from '../common/Back';
 import type { DataType } from '../types';
@@ -59,10 +58,6 @@ export const Signup: FC<Props> = ({ next }) => {
   const [page, setPage] = useState<PageTypes>('mnemonic');
 
   const mnemonic = useMemo(() => bip39.generateMnemonic(MNEMONIC_STRENGTH), []);
-
-  useEffect(() => {
-    trackEvent('Splash_Viewed', { Splash_Campaign: null });
-  }, []);
 
   const handleBackClick = () => {
     setPage((state) => backToPage[state]);
