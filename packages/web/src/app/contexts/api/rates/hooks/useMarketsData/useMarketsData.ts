@@ -1,11 +1,10 @@
 import { useMemo } from 'react';
 import { useQueries } from 'react-query';
 
-import { useTokens } from '@p2p-wallet-web/core';
+import { useTokensContext } from '@p2p-wallet-web/core';
 import { zip } from 'ramda';
 
 import type { Market, Markets } from 'app/contexts';
-import { useConfig } from 'app/contexts';
 
 import { marketLoader } from './marketLoader';
 
@@ -13,17 +12,11 @@ import { marketLoader } from './marketLoader';
 const THIRTY_SECONDS = 1000 * 30;
 
 export const useMarketsData = (symbols: (string | null | undefined)[]): Markets => {
-  const { tokenConfigs } = useConfig();
-  const mints = useMemo(
-    () => symbols.map((symbol) => tokenConfigs[symbol]?.mint),
-    [symbols, tokenConfigs],
-  );
-
-  const tokens = useTokens(mints);
+  const { tokenNameMap } = useTokensContext();
 
   const coingeckoIds = useMemo(
-    () => tokens.map((token) => token?.info.extensions?.coingeckoId),
-    [tokens],
+    () => symbols.map((symbol) => tokenNameMap[symbol]?.info.extensions?.coingeckoId),
+    [symbols, tokenNameMap],
   );
 
   const markets = useQueries<Market[]>(
