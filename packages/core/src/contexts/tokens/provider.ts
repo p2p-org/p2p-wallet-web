@@ -1,8 +1,8 @@
 import { createContainer } from 'unstated-next';
-import { useConnectionContext } from "../solana";
-import { networkToChainId, Token } from "@saberhq/token-utils";
-import { useMemo } from "react";
-import { makeTokenMap } from "./utils/makeTokenMap";
+import { useConnectionContext } from '../solana';
+import { networkToChainId, Token } from '@saberhq/token-utils';
+import { useMemo } from 'react';
+import { makeTokenMap } from './utils/makeTokenMap';
 
 const PRIMARY_SYMBOLS = ['SOL', 'USDC', 'BTC', 'USDT', 'ETH'];
 
@@ -29,12 +29,11 @@ const useTokensInternal = (): UseTokens => {
   }, [chainId, standardTokenMap]);
 
   const tokenNameMap = useMemo(() => {
-      return Object.values(tokenMap).reduce((acc, token) => {
-        acc[token.symbol] = token;
-        return acc;
-      }, {} as TokenMap);
-    }
-    , [tokenMap]);
+    return Object.values(tokenMap).reduce((acc, token) => {
+      acc[token.symbol] = token;
+      return acc;
+    }, {} as TokenMap);
+  }, [tokenMap]);
 
   const tokens = useMemo(() => {
     const newTokenMap = { ...tokenMap };
