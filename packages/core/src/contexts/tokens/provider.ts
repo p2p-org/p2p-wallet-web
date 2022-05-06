@@ -30,7 +30,7 @@ const useTokensInternal = (): UseTokens => {
 
   const tokenNameMap = useMemo(() => {
     return Object.values(tokenMap).reduce((acc, token) => {
-      acc[token.symbol] = token;
+      acc[token.symbol.toUpperCase()] = token;
       return acc;
     }, {} as TokenMap);
   }, [tokenMap]);
