@@ -5,9 +5,9 @@ import { useSolana, useStorage } from '@p2p-wallet-web/core';
 import { u64 } from '@solana/spl-token';
 import { createContainer } from 'unstated-next';
 
-import { useFeeCompensation, useFeeRelayer } from 'app/contexts';
+import { useFeeCompensation, useFeeRelayer, useMarketsData } from 'app/contexts';
 import type { UserTokenAccountMap } from 'app/contexts/solana/swap';
-import { useConfig, usePools, usePrice, useUser } from 'app/contexts/solana/swap';
+import { useConfig, usePools, useUser } from 'app/contexts/solana/swap';
 import SlippageTolerance from 'app/contexts/solana/swap/models/SlippageTolerance';
 import Trade from 'app/contexts/solana/swap/models/Trade';
 import { getMaxAge } from 'app/contexts/solana/swap/utils/AsyncCache';
@@ -171,13 +171,16 @@ const useSwapInternal = (props: UseSwapArgs = {}): UseSwap => {
   const outputUserTokenAccount = asyncStandardTokenAccounts.value?.[trade.outputTokenName];
   const solUserTokenAccount = asyncStandardTokenAccounts.value?.['SOL'];
 
-  const { useAsyncMergedPrices } = usePrice();
-  const asyncPrices = useAsyncMergedPrices();
-  const inputTokenPrice = asyncPrices.value?.[trade.inputTokenName];
-  const outputTokenPrice = asyncPrices.value?.[trade.outputTokenName];
-  const intermediateTokenPrice = intermediateTokenName
-    ? asyncPrices.value?.[intermediateTokenName]
-    : undefined;
+  const symbols = useMemo(
+    () => [trade.inputTokenName, trade.outputTokenName, intermediateTokenName],
+    [trade.inputTokenName, trade.outputTokenName, intermediateTokenName],
+  );
+
+  const rates = useMarketsData(symbols);
+
+  const inputTokenPrice = rates[inputTokenName];
+  const outputTokenPrice = rates[outputTokenName];
+  const intermediateTokenPrice = rates[intermediateTokenName];
 
   const minSolBalanceRequired = minSolBalanceForSwap(
     tokenConfigs['SOL'].decimals,

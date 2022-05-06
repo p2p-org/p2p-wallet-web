@@ -32,8 +32,6 @@ export const TransactionStatusModal: FunctionComponent<
   action,
   close,
   userTokenAccounts,
-  priceInfo,
-  solanaProvider,
   swapInfo,
   feeLimitsInfo,
   feeCompensationInfo,
@@ -129,8 +127,6 @@ export const TransactionStatusModal: FunctionComponent<
         <Swap
           params={params}
           userTokenAccounts={userTokenAccounts}
-          priceInfo={priceInfo}
-          solanaProvider={solanaProvider}
           feeLimitsInfo={feeLimitsInfo}
           feeCompensationInfo={feeCompensationInfo}
           networkFees={networkFees}
