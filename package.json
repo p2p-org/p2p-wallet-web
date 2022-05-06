@@ -11,10 +11,7 @@
     "predeploy": "npm run build",
     "deploy": "lerna run deploy",
     "lint": "lerna run lint",
-    "precommit": "lint-staged",
-    "serve": "webpack-dev-server --mode development --env name='p2p-wallet-web'",
-    "build:analyze": "webpack --mode production --env analyze --env name='p2p-wallet-web'",
-    "build:prod": "webpack --mode production --env name='p2p-wallet-web'"
+    "precommit": "lint-staged"
   },
   "devDependencies": {
     "@babel/preset-react": "^7.16.7",
@@ -65,8 +62,5 @@
   },
   "dependencies": {
     "webpack-bundle-analyzer": "^4.5.0"
-  },
-  "browserslist": [
-    "defaults"
-  ]
+  }
 }
