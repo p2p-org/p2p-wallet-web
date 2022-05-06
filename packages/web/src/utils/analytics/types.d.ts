@@ -51,13 +51,16 @@ type ReceiveComplexActions =
       data: { Receive_Network: 'solana' | 'bitcoin' };
     };
 
+type OnboardingComplexAction = { name: 'Splash_Viewed'; data: { Splash_Campaign: string | null } };
+
 export type AmplitudeActions =
   | SendSimpleActions
   | SwapSimpleActions
   | BuySimpleActions
   | AuthSimpleActions
   | StoreSimpleActions
-  | ReceiveComplexActions;
+  | ReceiveComplexActions
+  | OnboardingComplexAction;
 
 export type TrackEventType = {
   /*
