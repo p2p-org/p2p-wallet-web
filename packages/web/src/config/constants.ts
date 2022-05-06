@@ -2,6 +2,9 @@ import type { Network } from '@saberhq/solana-contrib';
 import type { HttpHeaders } from '@solana/web3.js';
 import { clusterApiUrl } from '@solana/web3.js';
 
+import type { featureFlags } from 'config/featureFlags';
+import { FEATURE_NETWORKS } from 'config/featureFlags';
+
 export const isDev = process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test';
 
 export const localMnemonic = isDev && process.env.REACT_APP_APP_LOCAL_WALLET_MNEMONIC;
@@ -14,9 +17,15 @@ export type NetworkObj = {
   wsEndpoint?: string;
   wsEndpointLabel?: string;
   httpHeaders?: HttpHeaders;
+  feature?: keyof typeof featureFlags;
 };
 
-export type NetworkNameType = 'serum-mainnet' | 'p2p-rpcpool' | 'solana-mainnet' | 'solana-testnet';
+export type NetworkNameType =
+  | 'serum-mainnet'
+  | 'p2p-rpcpool'
+  | 'solana-mainnet'
+  | 'solana-devnet'
+  | 'solana-testnet';
 
 type NetworksByNameType = {
   // eslint-disable-next-line no-unused-vars
@@ -39,9 +48,16 @@ export const NETWORKS: NetworksByNameType = {
     network: 'mainnet-beta',
     endpoint: `${clusterApiUrl('mainnet-beta')}/`,
   },
+  'solana-devnet': {
+    name: 'solana-devnet',
+    network: 'devnet',
+    feature: FEATURE_NETWORKS,
+    endpoint: `${clusterApiUrl('devnet')}/`,
+  },
   'solana-testnet': {
     name: 'solana-testnet',
     network: 'testnet',
+    feature: FEATURE_NETWORKS,
     endpoint: `${clusterApiUrl('testnet')}/`,
   },
 };
