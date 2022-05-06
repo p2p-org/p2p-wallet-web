@@ -3,14 +3,13 @@ import type { FunctionComponent } from 'react';
 import { styled } from '@linaria/react';
 import { useWallet } from '@p2p-wallet-web/core';
 import { theme } from '@p2p-wallet-web/ui';
-import { useFeature } from 'flagged';
+import { useFeatures } from 'flagged';
 import { rgba } from 'polished';
 
 import { WidgetPage } from 'components/common/WidgetPage';
 import { RadioButton } from 'components/ui';
 import type { NetworkObj } from 'config/constants';
 import { NETWORKS } from 'config/constants';
-import { FEATURE_DEVNET } from 'config/featureFlags';
 import { trackEvent } from 'utils/analytics';
 
 const RadioButtonsWrapper = styled.div`
@@ -49,7 +48,7 @@ const RadioButtonItem = styled.div`
 
 export const Network: FunctionComponent = () => {
   const { endpoint, setEndpoints, setNetwork } = useWallet();
-  const devNetFeature = useFeature(FEATURE_DEVNET);
+  const features = useFeatures();
 
   const handleChange = (value: NetworkObj) => {
     trackEvent('settings_network_click', { endpoint: value.endpoint });
@@ -62,8 +61,8 @@ export const Network: FunctionComponent = () => {
   };
 
   const visibleNetworks = Object.values(NETWORKS).filter((description) => {
-    if (description.network === 'devnet') {
-      return devNetFeature;
+    if (description.feature) {
+      return features[description.feature];
     }
 
     return true;
