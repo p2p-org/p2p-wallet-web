@@ -1,9 +1,11 @@
-import { Suspense, useCallback, useContext, useMemo, useState } from 'react';
 import * as React from 'react';
+import { Suspense, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
 import { styled } from '@linaria/react';
 import type { LoadableComponent } from '@loadable/component';
 import loadable from '@loadable/component';
+import { zIndexes } from '@p2p-wallet-web/ui';
+import classNames from 'classnames';
 
 import type { ModalPropsType } from 'app/contexts/general/modals/types';
 import { ModalType } from 'app/contexts/general/modals/types';
@@ -11,27 +13,20 @@ import { ModalType } from 'app/contexts/general/modals/types';
 const Wrapper = styled.div`
   position: fixed;
   top: 0;
-  left: 0;
-  z-index: 30;
-
-  width: 100vw;
-  height: 100vh;
-`;
-
-const ModalContainer = styled.div`
-  position: fixed;
-  top: 0;
   right: 0;
   bottom: 0;
   left: 0;
-  z-index: 1;
+  z-index: ${zIndexes.modal};
 
-  overflow-y: auto;
-  overscroll-behavior: none;
+  display: flex;
+  flex-direction: column;
 
-  /* Above background */
-  &:last-child {
-    z-index: 2;
+  background-color: rgba(0, 0, 0, 0.6);
+
+  user-select: none;
+
+  &.nav {
+    bottom: 57px;
   }
 `;
 
@@ -39,24 +34,12 @@ const ModalWrapper = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 100%;
-  padding: 10px 0;
-`;
-
-const ModalBackground = styled.div`
-  position: fixed;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  z-index: 2;
-
-  background-color: rgba(0, 0, 0, 0.6);
-
-  user-select: none;
+  height: 100%;
 `;
 
 type ModalState = { modalType: ModalType; modalId: number; props: any };
+type GetPresetFn = (modal?: ModalType) => Preset;
+type Preset = 'nav' | 'regular';
 
 const modalsMap = new Map<ModalType, LoadableComponent<ModalPropsType & any>>([
   // [SHOW_MODAL_ADD_COIN, loadable(() => import('components/modals/__AddCoinModal'))],
@@ -77,8 +60,12 @@ const modalsMap = new Map<ModalType, LoadableComponent<ModalPropsType & any>>([
     loadable(() => import('components/modals/TransactionInfoModals/TransactionDetailsModal')),
   ],
   [
-    ModalType.SHOW_MODAL_TRANSACTION_STATUS,
-    loadable(() => import('components/modals/TransactionInfoModals/TransactionStatusModal')),
+    ModalType.SHOW_MODAL_TRANSACTION_STATUS_SEND,
+    loadable(() => import('components/modals/TransactionInfoModals/TransactionStatusSendModal')),
+  ],
+  [
+    ModalType.SHOW_MODAL_TRANSACTION_STATUS_SWAP,
+    loadable(() => import('components/modals/TransactionInfoModals/TransactionStatusSwapModal')),
   ],
   [
     ModalType.SHOW_MODAL_CLOSE_TOKEN_ACCOUNT,
@@ -92,18 +79,31 @@ const modalsMap = new Map<ModalType, LoadableComponent<ModalPropsType & any>>([
     ModalType.SHOW_MODAL_CHOOSE_BUY_TOKEN_MOBILE,
     loadable(() => import('components/modals/ChooseBuyTokenMobileModal')),
   ],
+  [
+    ModalType.SHOW_MODAL_SELECT_LIST_MOBILE,
+    loadable(() => import('components/modals/SelectListMobileModal')),
+  ],
   [ModalType.SHOW_MODAL_ERROR, loadable(() => import('components/modals/ErrorModal'))],
 ]);
 
 const promises = new Map();
-let modalId = 0;
+let modalIdCounter = 0;
+
+const getPreset: GetPresetFn = (modal) => {
+  switch (modal) {
+    case ModalType.SHOW_MODAL_ACTIONS_MOBILE:
+      return 'nav';
+    default:
+      return 'regular';
+  }
+};
 
 const ModalsContext = React.createContext<{
-  openModal: <T, S = any>(modalType: ModalType, props?: S) => Promise<T>;
+  openModal: <T, S extends {}>(modalType: ModalType, props?: S) => Promise<T | void>;
   closeModal: (modalId: number) => void;
   closeTopModal: () => void;
 }>({
-  openModal: (): Promise<void> => Promise.resolve(),
+  openModal: () => Promise.resolve(),
   closeModal: () => {},
   closeTopModal: () => {},
 });
@@ -111,26 +111,33 @@ const ModalsContext = React.createContext<{
 export function ModalsProvider({ children = null as any }) {
   const [modals, setModals] = useState<ModalState[]>([]);
 
-  const openModal = useCallback(async (modalType: ModalType, props?: any): Promise<any> => {
-    ++modalId;
+  const setPageScroll = (overflow: 'hidden' | 'scroll') =>
+    (document.documentElement.style.overflow = overflow);
+
+  useEffect(() => {
+    setPageScroll(modals.length ? 'hidden' : 'scroll');
+  }, [modals.length]);
+
+  const openModal = useCallback((modalType: ModalType, props?: any) => {
+    ++modalIdCounter;
 
     setModals((state) => [
       ...state,
       {
         modalType,
-        modalId,
+        modalId: modalIdCounter,
         props,
       },
     ]);
 
     const promise = new Promise((resolve) => {
-      promises.set(modalId, {
-        modalId,
+      promises.set(modalIdCounter, {
+        modalId: modalIdCounter,
         resolve,
       });
     });
 
-    promise.modalId = modalId;
+    promise.modalId = modalIdCounter;
 
     return promise;
   }, []);
@@ -148,8 +155,12 @@ export function ModalsProvider({ children = null as any }) {
   }, []);
 
   const closeTopModal = useCallback(() => {
-    setModals((state) => state.slice(0, state.length - 1));
-  }, []);
+    if (!modals.length) {
+      return;
+    }
+
+    closeModal(modals[modals.length - 1].modalId);
+  }, [modals]);
 
   const handleWrapperClick = useCallback(
     (e: React.MouseEvent<HTMLDivElement>) => {
@@ -172,20 +183,20 @@ export function ModalsProvider({ children = null as any }) {
       }
 
       return (
-        <Suspense fallback={null} key={modalId}>
-          <ModalContainer>
-            <ModalWrapper onMouseDown={handleWrapperClick}>
-              <ModalComponent
-                {...modal.props}
-                key={modal.modalId}
-                close={(result?: any) => closeModal(modal.modalId, result)}
-              />
-            </ModalWrapper>
-          </ModalContainer>
+        <Suspense fallback={null} key={modal.modalId}>
+          <ModalWrapper onMouseDown={handleWrapperClick}>
+            <ModalComponent
+              {...modal.props}
+              key={modal.modalId}
+              close={(result?: any) => closeModal(modal.modalId, result)}
+            />
+          </ModalWrapper>
         </Suspense>
       );
     });
   }, [modals, handleWrapperClick, closeModal]);
+
+  const preset = getPreset(modals.at(-1)?.modalType);
 
   return (
     <ModalsContext.Provider
@@ -197,10 +208,7 @@ export function ModalsProvider({ children = null as any }) {
     >
       {children}
       {preparedModals.length > 0 ? (
-        <Wrapper>
-          <ModalBackground />
-          {preparedModals}
-        </Wrapper>
+        <Wrapper className={classNames(preset)}>{preparedModals}</Wrapper>
       ) : undefined}
     </ModalsContext.Provider>
   );

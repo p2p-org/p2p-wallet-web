@@ -1,6 +1,6 @@
+import type { TokenAmount } from '@p2p-wallet-web/token-utils';
 import type { AugmentedProvider } from '@saberhq/solana-contrib';
 import { TransactionEnvelope } from '@saberhq/solana-contrib';
-import type { TokenAmount } from '@saberhq/token-utils';
 import {
   ASSOCIATED_TOKEN_PROGRAM_ID,
   Token as SPLToken,
@@ -71,7 +71,7 @@ const transferSol = (
   provider: AugmentedProvider,
   params: TransferParameters,
 ): TransactionEnvelope => {
-  console.log('Transfer SOL amount', params.amount);
+  //console.log('Transfer SOL amount', params.amount);
 
   const transferInstruction = SystemProgram.transfer({
     fromPubkey: params.source,

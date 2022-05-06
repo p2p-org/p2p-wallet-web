@@ -1,10 +1,11 @@
 import { ZERO } from '@orca-so/sdk';
 import { u64 } from '@solana/spl-token';
 
-import { countDecimals } from './math';
+import { formatNumber, getNumberFromFormattedNumber } from 'utils/format';
 
 const floatRegex = /^(\d*)?(\.)?(\d*)?$/;
 const MAX_SIGNIFICANT_DIGITS = 5;
+const BASE = 10;
 
 export function parseString(amount: string, decimals: number): u64 {
   const matches = floatRegex.exec(amount);
@@ -17,7 +18,7 @@ export function parseString(amount: string, decimals: number): u64 {
   const fractions = matches[3]
     ? new u64(matches[3].substring(0, decimals).padEnd(decimals, '0'))
     : ZERO;
-  const base = new u64(10).pow(new u64(decimals));
+  const base = new u64(BASE).pow(new u64(decimals));
   const result = integers.mul(base).add(fractions);
   return new u64(result.toString());
 }
@@ -35,11 +36,11 @@ export function formatBigNumber(
   decimals: number,
   maxSignificantDigits = MAX_SIGNIFICANT_DIGITS,
 ): string {
-  const base = new u64(10).pow(new u64(decimals));
+  const base = new u64(BASE).pow(new u64(decimals));
   const integers = amount.div(base);
   const fractions = amount.umod(base);
   if (fractions.isZero()) {
-    return integers.toString();
+    return formatNumber(integers.toString());
   }
 
   const significantDigits = amount.toString().replace(/^0+/, '').replace(/0+$/, '').length;
@@ -55,10 +56,10 @@ export function formatBigNumber(
     .substring(0, numFractionDigits);
 
   if (!fractionsString.length) {
-    return integers.toString();
+    return formatNumber(integers.toString());
   }
 
-  return `${integers.toString()}.${fractionsString}`;
+  return formatNumber(`${integers.toString()}.${fractionsString}`);
 }
 
 export function getUSDValue(amount: u64, decimals: number, price: number): number {
@@ -66,29 +67,5 @@ export function getUSDValue(amount: u64, decimals: number, price: number): numbe
 }
 
 export function getNumber(amount: u64, decimals: number): number {
-  return parseFloat(formatBigNumber(amount, decimals));
-}
-
-export function formatNumberToUSD(
-  amount: number,
-  options: { showCents: boolean } = { showCents: true },
-) {
-  const numFractionDigits = options.showCents ? 2 : 0;
-  const numWithFixedFractionDigits = amount.toFixed(numFractionDigits);
-  if (numWithFixedFractionDigits === '0' || numWithFixedFractionDigits === '0.00') {
-    const numWithFixedSigFigs = amount.toPrecision(3);
-    const numDecimals = countDecimals(numWithFixedSigFigs);
-    return amount.toLocaleString('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: numDecimals,
-      maximumFractionDigits: numDecimals,
-    });
-  }
-  return amount.toLocaleString('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    minimumFractionDigits: 0,
-    maximumFractionDigits: numFractionDigits,
-  });
+  return getNumberFromFormattedNumber(formatBigNumber(amount, decimals));
 }

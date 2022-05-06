@@ -1,6 +1,7 @@
 import { useCallback, useMemo } from "react";
 
-import { RAW_SOL, TokenAmount } from "@saberhq/token-utils";
+import { TokenAmount } from "@p2p-wallet-web/token-utils";
+import { RAW_SOL } from "@saberhq/token-utils";
 import { useConnectedWallet, useConnectionContext } from "@saberhq/use-solana";
 import type { AccountInfo } from "@solana/web3.js";
 

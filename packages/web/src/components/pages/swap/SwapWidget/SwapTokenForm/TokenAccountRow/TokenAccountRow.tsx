@@ -5,7 +5,7 @@ import { useTokensContext } from '@p2p-wallet-web/core';
 
 import { useConfig } from 'app/contexts/solana/swap';
 import type TokenAccount from 'app/contexts/solana/swap/models/TokenAccount';
-import { getNumber } from 'app/contexts/solana/swap/utils/format';
+import { formatBigNumber } from 'app/contexts/solana/swap/utils/format';
 import { TokenAvatar } from 'components/common/TokenAvatar';
 import { shortAddress } from 'utils/tokens';
 
@@ -91,7 +91,8 @@ export const TokenAccountRow: FC<Props> = ({ tokenAccount, onClick, className })
           <Bottom>
             <div>{tokenNameFull}</div>
             <div>
-              {getNumber(tokenAccount.getAmount(), tokenConfigs[tokenName].decimals)} {tokenName}
+              {formatBigNumber(tokenAccount.getAmount(), tokenConfigs[tokenName].decimals)}{' '}
+              {tokenName}
             </div>
           </Bottom>
         </Info>

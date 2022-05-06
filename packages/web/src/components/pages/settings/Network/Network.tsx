@@ -2,6 +2,8 @@ import type { FunctionComponent } from 'react';
 
 import { styled } from '@linaria/react';
 import { useWallet } from '@p2p-wallet-web/core';
+import { theme } from '@p2p-wallet-web/ui';
+import { useFeatures } from 'flagged';
 import { rgba } from 'polished';
 
 import { WidgetPage } from 'components/common/WidgetPage';
@@ -10,16 +12,13 @@ import type { NetworkObj } from 'config/constants';
 import { NETWORKS } from 'config/constants';
 import { trackEvent } from 'utils/analytics';
 
-// const URL_REGEX = new RegExp(
-//   /https?:\/\/(?:w{1,3}\.)?[^\s.]+(?:\.[a-z]+)*(?::\d+)?((?:\/\w+)|(?:-\w+))*\/?(?![^<]*(?:<\/\w+>|\/?>))/,
-// );
-
 const RadioButtonsWrapper = styled.div`
   position: relative;
 
   padding: 0 10px;
 `;
 
+/* eslint-disable @typescript-eslint/no-magic-numbers */
 const RadioButtonItem = styled.div`
   position: relative;
 
@@ -31,7 +30,7 @@ const RadioButtonItem = styled.div`
   cursor: pointer;
 
   &:hover {
-    background: #f6f6f8;
+    background: ${theme.colors.bg.secondary};
   }
 
   &::after {
@@ -45,33 +44,11 @@ const RadioButtonItem = styled.div`
     content: '';
   }
 `;
-
-// const AddCustomUrlWrapper = styled.div`
-//   padding: 20px;
-// `;
-//
-// const AddUrlWrapper = styled.div``;
-//
-// const Text = styled.div`
-//   margin-bottom: 16px;
-//
-//   color: #a3a5ba;
-//   font-weight: 600;
-//   font-size: 16px;
-// `;
-//
-// const Buttons = styled.div`
-//   padding: 24px 0 0;
-//
-//   button:first-child {
-//     margin-right: 10px;
-//   }
-// `;
+/* eslint-enable @typescript-eslint/no-magic-numbers */
 
 export const Network: FunctionComponent = () => {
-  // const [isOpenAddUrl, setIsOpenAddUrl] = useState(false);
-  // const [customUrl, setCustomUrl] = useState('');
   const { endpoint, setEndpoints, setNetwork } = useWallet();
+  const features = useFeatures();
 
   const handleChange = (value: NetworkObj) => {
     trackEvent('settings_network_click', { endpoint: value.endpoint });
@@ -83,8 +60,16 @@ export const Network: FunctionComponent = () => {
     });
   };
 
+  const visibleNetworks = Object.values(NETWORKS).filter((description) => {
+    if (description.feature) {
+      return features[description.feature];
+    }
+
+    return true;
+  });
+
   const renderClustersRadioButtons = () =>
-    Object.values(NETWORKS).map((networkItem) => {
+    visibleNetworks.map((networkItem) => {
       return (
         <RadioButtonItem key={networkItem.name}>
           <RadioButton
@@ -97,51 +82,6 @@ export const Network: FunctionComponent = () => {
       );
     });
 
-  // const renderCustomClustersRadioButtons = () => {
-  //   const { custom } = network;
-  //
-  //   if (!custom) {
-  //     return null;
-  //   }
-  //
-  //   return Object.entries(custom).map((entry) => {
-  //     const [key, url] = entry;
-  //     return (
-  //       <RadioButtonItem key={key}>
-  //         <RadioButton
-  //           label={url}
-  //           value={key}
-  //           checked={key === network.current}
-  //           onChange={handleChange}
-  //         />
-  //       </RadioButtonItem>
-  //     );
-  //   });
-  // };
-
-  // const handleOpenAddUrl = () => {
-  //   setIsOpenAddUrl(!isOpenAddUrl);
-  // };
-  //
-  // const handleCustomUrl = (value: string) => {
-  //   setCustomUrl(value);
-  // };
-
-  // const handleSaveButtonClick = () => {
-  //   const newSettings = mergeDeepRight(network, {
-  //     custom: { [`custom-${new Date().getTime()}`]: customUrl },
-  //   });
-  //
-  //   dispatch(updateSettings({ network: newSettings }));
-  //   setCustomUrl('');
-  //   setIsOpenAddUrl(!isOpenAddUrl);
-  // };
-
-  // const handleCloseButton = () => {
-  //   setCustomUrl('');
-  //   setIsOpenAddUrl(!isOpenAddUrl);
-  // };
-
   return (
     <WidgetPage icon="branch" title="Network">
       <RadioButtonsWrapper>
@@ -150,29 +90,6 @@ export const Network: FunctionComponent = () => {
           {/* {renderCustomClustersRadioButtons()} */}
         </>
       </RadioButtonsWrapper>
-      {/*<AddCustomUrlWrapper>*/}
-      {/*  {isOpenAddUrl ? (*/}
-      {/*    <AddUrlWrapper>*/}
-      {/*      <Text>*/}
-      {/*        If you are a developer you can add your node address for test or as a main working*/}
-      {/*        node in a wallet.*/}
-      {/*      </Text>*/}
-      {/*      <Input name="customUrl" value={customUrl} onChange={handleCustomUrl} />*/}
-      {/*      <Buttons>*/}
-      {/*        <Button primary disabled={!URL_REGEX.test(customUrl)} onClick={handleSaveButtonClick}>*/}
-      {/*          Save*/}
-      {/*        </Button>*/}
-      {/*        <Button light onClick={handleCloseButton}>*/}
-      {/*          Cancel*/}
-      {/*        </Button>*/}
-      {/*      </Buttons>*/}
-      {/*    </AddUrlWrapper>*/}
-      {/*  ) : (*/}
-      {/*    <Button light onClick={handleOpenAddUrl}>*/}
-      {/*      + Add custom URL*/}
-      {/*    </Button>*/}
-      {/*  )}*/}
-      {/*</AddCustomUrlWrapper>*/}
     </WidgetPage>
   );
 };

@@ -1,6 +1,6 @@
 import type { FC } from 'react';
 
-import type { TokenAmount } from '@saberhq/token-utils';
+import type { TokenAmount } from '@p2p-wallet-web/token-utils';
 import type { u64 } from '@solana/spl-token';
 
 import type { ModalPropsType } from 'app/contexts';

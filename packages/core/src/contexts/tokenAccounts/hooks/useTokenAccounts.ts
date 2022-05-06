@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 
 import { TOKEN_ACCOUNT_PARSER, useAccountsData } from '@p2p-wallet-web/sail';
-import { RAW_SOL_MINT, TokenAmount } from '@saberhq/token-utils';
+import { RAW_SOL_MINT } from '@saberhq/token-utils';
 import { TOKEN_PROGRAM_ID } from '@solana/spl-token';
 import type { PublicKey } from '@solana/web3.js';
 import { zip } from 'ramda';
@@ -10,6 +10,7 @@ import { SYSTEM_PROGRAM_ID } from '../../../constants/publicKeys';
 import type { TokenAccount } from '../models';
 import { useWallet } from '@saberhq/use-solana';
 import { useTokens } from '../../tokens';
+import { TokenAmount } from '@p2p-wallet-web/token-utils';
 
 export const useTokenAccounts = (
   publicKeys: (PublicKey | null | undefined)[] = [],

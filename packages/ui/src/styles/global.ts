@@ -14,7 +14,7 @@ export const globalCss = css`
     }
 
     body {
-      ${light}
+      ${light};
     }
 
     // body[data-theme='light'] {
@@ -69,6 +69,10 @@ export const globalCss = css`
     & ::-webkit-scrollbar-thumb {
       background: rgba(0, 0, 0, 0.2);
       border-radius: 4px;
+    }
+
+    input:-webkit-autofill {
+      -webkit-box-shadow: 0 0 0px 1000px ${theme.colors.bg.primary} inset;
     }
   }
 `;

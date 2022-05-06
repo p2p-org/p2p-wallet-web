@@ -2,17 +2,16 @@ import type { FC } from 'react';
 
 import { styled } from '@linaria/react';
 import type { TokenAccount } from '@p2p-wallet-web/core';
+import type { TokenAmount } from '@p2p-wallet-web/token-utils';
 import { theme } from '@p2p-wallet-web/ui';
-import type { TokenAmount } from '@saberhq/token-utils';
 import type { PublicKey } from '@solana/web3.js';
-import { Feature } from 'flagged';
 
 import { AddressText } from 'components/common/AddressText';
 import { AmountUSD } from 'components/common/AmountUSD';
 import { TokenAvatar } from 'components/common/TokenAvatar';
+import type { TransactionDetailsProps } from 'components/common/TransactionDetails';
 import { TransactionDetails } from 'components/common/TransactionDetails';
 import { Icon } from 'components/ui';
-import { FEATURE_TRANSACTION_DETAILS_ACCORDION } from 'config/featureFlags';
 
 import {
   FieldInfo,
@@ -21,6 +20,7 @@ import {
   InfoValue,
   InfoWrapper,
   Section,
+  To,
   Username,
   WalletIcon,
 } from '../common/styled';
@@ -85,7 +85,16 @@ interface Props {
   params: TransferParams;
 }
 
-export const Send: FC<Props> = ({ params }) => {
+export const Send: FC<Props & TransactionDetailsProps> = ({
+  params,
+  sendState,
+  userFreeFeeLimits,
+  networkFees,
+  btcAddress,
+}) => {
+  const address = params.destination?.toBase58?.() || btcAddress;
+  const isFullName = /\w*\.\w+/.test(params.username || '');
+
   return (
     <Section className="send">
       <div>
@@ -113,20 +122,24 @@ export const Send: FC<Props> = ({ params }) => {
           </IconWrapper>
           <InfoWrapper>
             {params.username ? (
-              <Username>{params.username}</Username>
+              <Username>
+                <To>To</To>
+                {isFullName ? params.username : `${params.username}.p2p.sol`}
+              </Username>
             ) : (
               <InfoTitle className="secondary">To address</InfoTitle>
             )}
-            <InfoValue>
-              <AddressText address={params.destination.toBase58()} medium />
-            </InfoValue>
+            <InfoValue>{address && <AddressText address={address} medium />}</InfoValue>
           </InfoWrapper>
         </FieldInfo>
       </div>
 
-      <Feature name={FEATURE_TRANSACTION_DETAILS_ACCORDION}>
-        <TransactionDetails />
-      </Feature>
+      <TransactionDetails
+        sendState={sendState}
+        userFreeFeeLimits={userFreeFeeLimits}
+        networkFees={networkFees}
+        amount={params.amount.toU64()}
+      />
     </Section>
   );
 };

@@ -1,6 +1,7 @@
 import { styled } from '@linaria/react';
 import { theme } from '@p2p-wallet-web/ui';
 
+import type { IconProps } from 'components/ui';
 import { Icon } from 'components/ui';
 
 export const Section = styled.div`
@@ -8,7 +9,9 @@ export const Section = styled.div`
   padding: 20px 0;
 
   &.swap {
-    padding: 20px 0 0;
+    position: relative;
+
+    padding: 0;
   }
 
   &.send {
@@ -22,7 +25,7 @@ export const Section = styled.div`
 `;
 
 export const SectionTitle = styled.div`
-  color: #a3a5ba;
+  color: ${theme.colors.bg.buttonDisabled};
   font-weight: 600;
   font-size: 14px;
   line-height: 140%;
@@ -37,7 +40,7 @@ export const FieldInfo = styled.div`
   border-radius: 12px;
 `;
 
-export const WalletIcon = styled(Icon)`
+export const WalletIcon = styled<IconProps>(Icon)`
   width: 24px;
   height: 24px;
 
@@ -78,7 +81,14 @@ export const InfoTitle = styled.div`
 
 export const Username = styled(InfoTitle)`
   color: #000;
-  font-size: 16px;
+  font-weight: 500;
+  font-size: 14px;
+`;
+
+export const To = styled.span`
+  margin-right: 4px;
+
+  color: ${theme.colors.textIcon.secondary};
 `;
 
 export const InfoValue = styled.div`
@@ -89,4 +99,53 @@ export const InfoValue = styled.div`
   font-size: 14px;
   line-height: 120%;
   letter-spacing: 0.01em;
+`;
+
+export const Subtitle = styled.div`
+  margin-top: 16px;
+  margin-bottom: 16px;
+  margin-left: 20px;
+
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 140%;
+`;
+
+export const Wrapper = styled.div`
+  margin-bottom: 8px;
+`;
+
+export const FromToWrapper = styled.div`
+  position: absolute;
+  top: 64px;
+  left: 27px;
+
+  width: 32px;
+  height: 32px;
+
+  color: ${theme.colors.textIcon.active};
+
+  background: ${theme.colors.bg.primary};
+
+  border: 1px solid ${theme.colors.stroke.secondary};
+  border-radius: 40%;
+
+  svg {
+    width: 20px;
+    height: 20px;
+  }
+`;
+
+export const Overlay = styled.div`
+  position: absolute;
+  top: 5px;
+  left: -2px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 19px;
+
+  background: ${theme.colors.bg.primary};
 `;

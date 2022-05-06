@@ -1,14 +1,16 @@
 import type { FC } from 'react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import * as React from 'react';
 
 import { styled } from '@linaria/react';
-import { u64 } from '@solana/spl-token';
+import { ZERO } from '@orca-so/sdk';
+import { theme, up } from '@p2p-wallet-web/ui';
+import type { u64 } from '@solana/spl-token';
 import classNames from 'classnames';
 import throttle from 'lodash.throttle';
 
+import { useMarketsData } from 'app/contexts';
 import type { UserTokenAccountMap } from 'app/contexts/solana/swap';
-import { useConfig, usePrice, useSwap } from 'app/contexts/solana/swap';
+import { useConfig, useSwap } from 'app/contexts/solana/swap';
 import type TokenAccount from 'app/contexts/solana/swap/models/TokenAccount';
 import type Trade from 'app/contexts/solana/swap/models/Trade';
 import { formatBigNumber, getUSDValue, parseString } from 'app/contexts/solana/swap/utils/format';
@@ -17,11 +19,13 @@ import { Empty } from 'components/common/Empty';
 import { SlideContainer } from 'components/common/SlideContainer';
 import { TokenAvatar } from 'components/common/TokenAvatar';
 import { Icon } from 'components/ui';
+import { Row, Text } from 'components/ui/AccordionDetails/common';
 import { InputAmount } from 'components/ui/InputAmount';
 import { SearchInput } from 'components/ui/SearchInput';
+import { getNumberFromFormattedNumber } from 'utils/format';
 import { shortAddress } from 'utils/tokens';
 
-import { AmountUSD } from '../AmountUSD/AmountUSD';
+import { AmountUSDStyled } from '../AmountUSD';
 import { TokenAccountRow } from './TokenAccountRow';
 import { TokenRow } from './TokenRow';
 
@@ -35,26 +39,46 @@ const Wrapper = styled.div`
   padding: 16px 20px;
 
   border: 1px solid #f6f6f8;
-  border-radius: 12px;
+  border-radius: 0 0 12px 12px;
+
+  &:first-child {
+    padding-bottom: 32px;
+
+    border-radius: 12px 12px 0 0;
+
+    ${up.tablet} {
+      padding-bottom: 16px;
+    }
+  }
 `;
 
 const TopWrapper = styled.div`
   display: flex;
   justify-content: space-between;
+
+  margin-bottom: 8px;
 `;
 
-const FromTitle = styled.div`
-  color: #000;
-  font-weight: 600;
+const MainWrapper = styled.div`
+  display: flex;
+  justify-content: space-between;
+`;
+
+const BottomWrapper = styled.div`
+  margin-top: 12px;
+`;
+
+const FromToTitle = styled.div`
+  color: ${theme.colors.textIcon.primary};
+  font-weight: 500;
   font-size: 16px;
-  line-height: 24px;
+  line-height: 140%;
+  letter-spacing: 0.01em;
 `;
 
 const AllBalance = styled.div`
   display: flex;
   align-items: center;
-
-  color: #5887ff;
 
   cursor: pointer;
 
@@ -63,16 +87,13 @@ const AllBalance = styled.div`
 
     pointer-events: none;
   }
-
-  &.error {
-    color: #f43d3d;
-  }
 `;
 
-const MainWrapper = styled.div`
-  display: flex;
+const Max = styled.div`
+  margin-left: 8px;
 
-  margin-top: 8px;
+  color: ${theme.colors.textIcon.active};
+  text-transform: uppercase;
 `;
 
 const WalletTokenIcon = styled(Icon)`
@@ -85,7 +106,11 @@ const WalletTokenIcon = styled(Icon)`
 const WalletBalanceIcon = styled(Icon)`
   width: 20px;
   height: 20px;
-  margin-right: 5px;
+  margin-right: 4px;
+`;
+
+const TokenSelector = styled.div`
+  display: flex;
 `;
 
 const TokenAvatarWrapper = styled.div`
@@ -107,30 +132,16 @@ const TokenAvatarWrapper = styled.div`
   }
 `;
 
-const InfoWrapper = styled.div`
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  min-width: 0;
-
-  margin-left: 12px;
-`;
-
-const SpecifyTokenWrapper = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  height: 44px;
-`;
-
 const TokenName = styled.div`
   max-width: 200px;
+
+  margin: auto 0;
   overflow: hidden;
 
-  color: #000;
-  font-weight: 600;
-  font-size: 24px;
-  line-height: 140%;
+  color: ${theme.colors.textIcon.primary};
+  font-weight: 500;
+  font-size: 20px;
+  line-height: 100%;
 
   white-space: nowrap;
   text-overflow: ellipsis;
@@ -144,47 +155,37 @@ const ChevronWrapper = styled.div`
   display: flex;
   align-items: center;
 
-  margin-left: 26px;
+  width: 24px;
+  height: 24px;
+  margin-left: 4px;
 `;
 
 const ChevronIcon = styled(Icon)`
-  width: 24px;
-  height: 24px;
-
-  color: #000;
+  color: ${theme.colors.textIcon.secondary};
 `;
 
 const TokenWrapper = styled.div`
   display: flex;
-  min-width: 0;
+  align-items: center;
+  margin-left: 8px;
 
   cursor: pointer;
 
   &.isOpen {
     ${TokenName}, ${ChevronIcon} {
-      color: #5887ff;
+      color: ${theme.colors.textIcon.active};
     }
   }
 `;
 
-const BalanceWrapper = styled.div`
-  display: flex;
-  justify-content: flex-end;
-  height: 24px;
-`;
-
 const BalanceText = styled.div`
   display: flex;
-  align-items: center;
 
-  color: #a3a5ba;
-  font-weight: 600;
+  color: ${theme.colors.textIcon.secondary};
+  font-weight: 500;
   font-size: 16px;
-  line-height: 24px;
-`;
-
-const AmountUSDStyled = styled(AmountUSD)`
-  margin-left: 3px;
+  line-height: 140%;
+  letter-spacing: 0.01em;
 `;
 
 const DropDownListContainer = styled.div`
@@ -306,6 +307,7 @@ const InputWrapper = styled.div`
 `;
 
 const SCROLL_THRESHOLD = 15;
+const THROTTLE_MILLISECONDS = 100;
 
 function matchesFilter(str: string, filter: string) {
   return str.toLowerCase().indexOf(filter.toLowerCase().trim()) >= 0;
@@ -327,7 +329,6 @@ interface Props {
 }
 
 export const SwapTokenForm: FC<Props> = ({
-  trade,
   isInput,
   tokenName,
   setTokenName,
@@ -345,13 +346,10 @@ export const SwapTokenForm: FC<Props> = ({
   const listRef = useRef<HTMLDivElement>(null);
 
   const { tokenConfigs, mintToTokenName } = useConfig();
-  const { asyncStandardTokenAccounts } = useSwap();
+  const { asyncStandardTokenAccounts, trade } = useSwap();
   const [isOpen, setIsOpen] = useState(false);
   const [filter, setFilter] = useState('');
   const [scrollTop, setScrollTop] = useState(0);
-
-  const { useAsyncMergedPrices } = usePrice();
-  const asyncPrices = useAsyncMergedPrices();
 
   const hasAsyncStandardTokenAccounts = !!asyncStandardTokenAccounts;
 
@@ -359,7 +357,7 @@ export const SwapTokenForm: FC<Props> = ({
 
   const boxShadow = useMemo(() => {
     return `0 5px 10px rgba(56, 60, 71, ${
-      scrollTop >= SCROLL_THRESHOLD ? '0.05' : 0.003 * scrollTop
+      scrollTop >= SCROLL_THRESHOLD ? '0.05' : Number('0.003') * scrollTop
     }`;
   }, [scrollTop]);
 
@@ -390,7 +388,7 @@ export const SwapTokenForm: FC<Props> = ({
     } else {
       setScrollTop(SCROLL_THRESHOLD);
     }
-  }, 100);
+  }, THROTTLE_MILLISECONDS);
 
   useEffect(() => {
     const element = listRef.current;
@@ -431,17 +429,24 @@ export const SwapTokenForm: FC<Props> = ({
     setIsOpen(false);
 
     const mintAddress = nextTokenAccount.accountInfo.mint.toBase58();
-    const tokenName = mintToTokenName[mintAddress];
-    setTokenName(tokenName);
+    const tokenN = mintToTokenName[mintAddress];
+    setTokenName(tokenN);
   };
 
   const handleTokenClick = useCallback(
-    (tokenName: string) => {
+    (tokenN: string) => {
       setIsOpen(false);
-      setTokenName(tokenName);
+      setTokenName(tokenN);
     },
     [setTokenName],
   );
+
+  const symbols = useMemo(
+    () => Object.keys(asyncStandardTokenAccounts || {}),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [hasAsyncStandardTokenAccounts],
+  );
+  const rates = useMarketsData(symbols);
 
   const filteredTokenAccounts = useMemo((): TokenAccount[] => {
     if (!asyncStandardTokenAccounts) {
@@ -449,8 +454,8 @@ export const SwapTokenForm: FC<Props> = ({
     }
 
     const tokenAccounts = Object.entries(asyncStandardTokenAccounts).reduce(
-      (tokenAccountMap, [tokenName, tokenAccount]) => {
-        tokenAccountMap[tokenName] = tokenAccount;
+      (tokenAccountMap, [tokenN, tokenAccount]) => {
+        tokenAccountMap[tokenN] = tokenAccount;
         return tokenAccountMap;
       },
       {} as UserTokenAccountMap,
@@ -490,31 +495,21 @@ export const SwapTokenForm: FC<Props> = ({
         const mintAddressB = b.accountInfo.mint.toBase58();
         const tokenSymbolB = mintToTokenName[mintAddressB];
 
-        // const aUSD = toDecimal(a.getAmount())
-        //   .div(10 ** tokenConfigs[tokenSymbolA].decimals)
-        //   .toDecimalPlaces(tokenConfigs[tokenSymbolA].decimals);
-        //
-        // const bUSD = toDecimal(b.getAmount())
-        //   .div(10 ** tokenConfigs[tokenSymbolB].decimals)
-        //   .toDecimalPlaces(tokenConfigs[tokenSymbolB].decimals);
-        // return aUSD.cmp(bUSD);
-
         const aUSD = getUSDValue(
           a.getAmount(),
           tokenConfigs[tokenSymbolA].decimals,
-          asyncPrices.value?.[tokenSymbolA] || 0,
+          rates[tokenSymbolA] || 0,
         );
         const bUSD = getUSDValue(
           b.getAmount(),
           tokenConfigs[tokenSymbolB].decimals,
-          asyncPrices.value?.[tokenSymbolB] || 0,
+          rates[tokenSymbolB] || 0,
         );
 
         return bUSD < aUSD ? -1 : a === b ? 0 : 1;
       });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
-    asyncPrices.value,
     hasAsyncStandardTokenAccounts,
     filter,
     isInput,
@@ -522,6 +517,7 @@ export const SwapTokenForm: FC<Props> = ({
     pairTokenName,
     tokenConfigs,
     tokenName,
+    rates,
   ]);
 
   const filteredTokens = useMemo(
@@ -551,73 +547,97 @@ export const SwapTokenForm: FC<Props> = ({
     [tokenConfigs, pairTokenName, tokenName, filter, filteredTokenAccounts],
   );
 
+  const receiveAmount = useMemo(() => {
+    const outputDecimals = tokenConfigs[trade.outputTokenName]?.decimals || 0;
+    return formatBigNumber(trade.getMinimumOutputAmount(), outputDecimals);
+  }, [trade, tokenConfigs]);
+
   return (
     <Wrapper className={className}>
       <TopWrapper>
-        <FromTitle>{isInput ? 'From' : 'To'} </FromTitle>
+        <FromToTitle>{isInput ? 'From' : 'To'} </FromToTitle>
         <BalanceText>
           {maxAmount ? (
             isInput ? (
               <AllBalance
                 onClick={() => setAmount(maxAmount)}
-                className={classNames({ disabled, error: !maxAmount })}
+                className={classNames({
+                  disabled,
+                  error: !maxAmount,
+                })}
               >
                 <WalletBalanceIcon name="wallet" />
-                {formatBigNumber(maxAmount, tokenConfigs[tokenName].decimals)} {tokenName}
+                {formatBigNumber(maxAmount, tokenConfigs[tokenName].decimals)}
+                <Max>MAX</Max>
               </AllBalance>
             ) : (
               <>
                 <WalletBalanceIcon name="wallet" />
-                {formatBigNumber(maxAmount || new u64(0), tokenConfigs[tokenName].decimals)}{' '}
-                {tokenName}
+                {formatBigNumber(maxAmount, tokenConfigs[tokenName].decimals)} {tokenName}
               </>
             )
           ) : undefined}
         </BalanceText>
       </TopWrapper>
       <MainWrapper>
-        <TokenAvatarWrapper className={classNames({ isOpen: isOpen && !tokenName })}>
-          {tokenName ? (
-            <TokenAvatar address={tokenInfo?.mint.toString()} size={44} />
-          ) : (
-            <WalletTokenIcon name="wallet" />
-          )}
-        </TokenAvatarWrapper>
-        <InfoWrapper>
-          <SpecifyTokenWrapper>
-            <TokenWrapper
-              ref={selectorRef}
-              onClick={handleSelectorClick}
-              className={classNames({ isOpen })}
-            >
-              <TokenName title={tokenInfo?.mint.toString()}>
-                {tokenName || (tokenInfo?.mint && shortAddress(tokenInfo.mint.toString())) || (
-                  <EmptyName>—</EmptyName>
-                )}
-              </TokenName>
-              <ChevronWrapper>
-                <ChevronIcon name="arrow-triangle" />
-              </ChevronWrapper>
-            </TokenWrapper>
-            <InputWrapper>
-              <InputAmount
-                placeholder={Number(0).toFixed(tokenInfo?.decimals || 0)}
-                value={formatBigNumber(amount, tokenInfo?.decimals || 0)}
-                onChange={handleAmountChange}
-                disabled={disabled || disabledInput}
-              />
-              {isFeeSubtracted ? <AccountCreationFeeTooltip /> : undefined}
-            </InputWrapper>
-          </SpecifyTokenWrapper>
-          <BalanceWrapper>
-            {!amount.eqn(0) ? (
-              <BalanceText>
-                ≈ <AmountUSDStyled amount={amount} tokenName={tokenName} />
-              </BalanceText>
-            ) : undefined}
-          </BalanceWrapper>
-        </InfoWrapper>
+        <TokenSelector>
+          <TokenAvatarWrapper className={classNames({ isOpen: isOpen && !tokenName })}>
+            {tokenName ? (
+              <TokenAvatar address={tokenInfo?.mint.toString()} size={44} />
+            ) : (
+              <WalletTokenIcon name="wallet" />
+            )}
+          </TokenAvatarWrapper>
+          <TokenWrapper
+            ref={selectorRef}
+            onClick={handleSelectorClick}
+            className={classNames({ isOpen })}
+          >
+            <TokenName title={tokenInfo?.mint.toString()}>
+              {tokenName || (tokenInfo?.mint && shortAddress(tokenInfo.mint.toString())) || (
+                <EmptyName>—</EmptyName>
+              )}
+            </TokenName>
+            <ChevronWrapper>
+              <ChevronIcon name="arrow-triangle" />
+            </ChevronWrapper>
+          </TokenWrapper>
+        </TokenSelector>
+        <InputWrapper>
+          <InputAmount
+            placeholder={Number(0).toFixed(tokenInfo?.decimals || 0)}
+            value={getNumberFromFormattedNumber(formatBigNumber(amount, tokenInfo?.decimals || 0))}
+            onChange={handleAmountChange}
+            disabled={disabled || disabledInput}
+          />
+          {isFeeSubtracted ? <AccountCreationFeeTooltip /> : undefined}
+        </InputWrapper>
+        {/* <BalanceWrapper>
+          {!amount.eqn(0) ? (
+            <BalanceText>
+              ≈ <AmountUSDStyled amount={amount} tokenName={tokenName} />
+            </BalanceText>
+          ) : undefined}
+        </BalanceWrapper> */}
       </MainWrapper>
+      {!isInput && !trade.getOutputAmount().eq(ZERO) ? (
+        <BottomWrapper>
+          <Row>
+            <Text className="gray">Receive at least:</Text>
+            <Text>
+              {receiveAmount} {trade.outputTokenName}
+              <Text className="gray inline-flex">
+                <AmountUSDStyled
+                  prefix="(~"
+                  postfix=")"
+                  amount={trade.getOutputAmount()}
+                  tokenName={trade.outputTokenName}
+                />
+              </Text>
+            </Text>
+          </Row>
+        </BottomWrapper>
+      ) : undefined}
       {isOpen ? (
         <DropDownListContainer ref={dropdownRef}>
           <DropDownHeader

@@ -14,16 +14,19 @@ import change from './assets/change-icon.svg';
 import checkmark from './assets/checkmark-icon.svg';
 import chevron1 from './assets/chevron-1-icon.svg';
 import chevronRounded from './assets/chevron-rounded-icon.svg';
+import clockSend from './assets/clock-send-icon.svg';
 import close from './assets/close-icon.svg';
 import currency from './assets/currency-icon.svg';
 import db from './assets/db-icon.svg';
 import error from './assets/error-icon.svg';
+import errorSend from './assets/error-send-icon.svg';
 import freeTx from './assets/free-tx-icon.svg';
 import lock from './assets/lock-icon.svg';
 import logout from './assets/logout-icon.svg';
 import more from './assets/more-icon.svg';
 import appStore from './assets/new/app-store-icon.svg';
 import arrowDown from './assets/new/arrow-down-icon.svg';
+import arrowLeft from './assets/new/arrow-left-icon.svg';
 import arrowSwap from './assets/new/arrow-swap-icon.svg';
 import bottom from './assets/new/bottom-icon.svg';
 import caret from './assets/new/caret-icon.svg';
@@ -47,6 +50,7 @@ import roundStop from './assets/new/round-stop-icon.svg';
 import search from './assets/new/search-icon.svg';
 import sendMessage from './assets/new/send-message-icon.svg';
 import storeIcon from './assets/new/store-icon.svg';
+import swapBordered from './assets/new/swap-bordered-icon.svg';
 import swap from './assets/new/swap-icon.svg';
 import top from './assets/new/top-icon.svg';
 import wallet from './assets/new/wallet-icon.svg';
@@ -58,6 +62,7 @@ import reload from './assets/reload-icon.svg';
 import searchOld from './assets/search-icon.svg';
 import settings from './assets/settings-icon.svg';
 import success from './assets/success-icon.svg';
+import successSend from './assets/success-send-icon.svg';
 import sun from './assets/sun-icon.svg';
 import timer from './assets/timer-icon.svg';
 import walletOld from './assets/wallet-icon.svg';
@@ -88,6 +93,7 @@ const iconsMap = new Map<string, string>([
   ['info', info],
   ['more', more],
   ['arrow-down', arrowDown],
+  ['arrow-left', arrowLeft],
   ['eye-hide', eyeHide],
   ['eye', eye],
   ['external', external],
@@ -98,6 +104,7 @@ const iconsMap = new Map<string, string>([
   ['success', success],
   ['sun', sun],
   ['swap', swap],
+  ['swap-bordered', swapBordered],
   ['timer', timer],
   ['wallet', wallet],
   ['lock', lock],
@@ -121,9 +128,12 @@ const iconsMap = new Map<string, string>([
   ['opposite-arrows', oppositeArrows],
   ['store-icon', storeIcon],
   ['arrow-swap', arrowSwap],
+  ['clock-send', clockSend],
+  ['success-send', successSend],
+  ['error-send', errorSend],
 ]);
 
-interface Props extends HTMLAttributes<HTMLOrSVGElement> {
+export interface IconProps extends HTMLAttributes<HTMLOrSVGElement> {
   name: string;
   size?: string | number;
   height?: string | number;
@@ -132,7 +142,7 @@ interface Props extends HTMLAttributes<HTMLOrSVGElement> {
   className?: string;
 }
 
-export const Icon: FC<Props> = ({ name, size, height, width, ...props }) => {
+export const Icon: FC<IconProps> = ({ name, size, height, width, ...props }) => {
   const validProps: {
     [prop: string]: never;
   } = {};
@@ -151,13 +161,7 @@ export const Icon: FC<Props> = ({ name, size, height, width, ...props }) => {
   }
 
   return (
-    <svg
-      {...validProps}
-      viewBox={icon.viewBox}
-      height={size || height}
-      width={size || width}
-      {...props}
-    >
+    <svg {...validProps} viewBox={icon.viewBox} height={size || height} width={size || width}>
       <use xlinkHref={`#${icon.id}`} />
     </svg>
   );

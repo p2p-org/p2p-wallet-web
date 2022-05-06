@@ -85,7 +85,7 @@ const TokenWrapper = styled.div`
 
   &.isOpen {
     ${TokenName}, ${ChevronIcon} {
-      color: #5887ff;
+      color: ${theme.colors.textIcon.active};
     }
   }
 `;

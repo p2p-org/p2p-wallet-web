@@ -1,28 +1,40 @@
 import { useMemo } from 'react';
 import { useQueries } from 'react-query';
 
+import { useTokensContext } from '@p2p-wallet-web/core';
 import { zip } from 'ramda';
 
 import type { Market, Markets } from 'app/contexts';
 
 import { marketLoader } from './marketLoader';
 
-export const useMarketsData = (keys: (string | null | undefined)[]): Markets => {
+// eslint-disable-next-line @typescript-eslint/no-magic-numbers
+const THIRTY_SECONDS = 1000 * 30;
+
+export const useMarketsData = (symbols: (string | null | undefined)[]): Markets => {
+  const { tokenNameMap } = useTokensContext();
+
+  const coingeckoIds = useMemo(
+    () => symbols.map((symbol) => tokenNameMap[symbol]?.info.extensions?.coingeckoId),
+    [symbols, tokenNameMap],
+  );
+
   const markets = useQueries<Market[]>(
-    keys.map((key) => ({
-      queryKey: ['market', key?.toUpperCase()],
-      queryFn: () => (key ? marketLoader.load(key.toUpperCase()) : null),
+    coingeckoIds.map((coingeckoId) => ({
+      queryKey: ['market', coingeckoId],
+      queryFn: () => (coingeckoId ? marketLoader.load(coingeckoId) : null),
       suspense: true,
+      refetchInterval: THIRTY_SECONDS,
     })),
   );
 
   return useMemo(() => {
-    return zip(keys, markets).reduce((acc, [key, market]) => {
-      if (key) {
-        acc[key.toUpperCase()] = market.data ?? null;
+    return zip(symbols, markets).reduce((acc, [symbol, market]) => {
+      if (symbol) {
+        acc[symbol.toUpperCase()] = market.data ?? null;
       }
 
       return acc;
     }, <Markets>{});
-  }, [keys, markets]);
+  }, [symbols, markets]);
 };

@@ -1,33 +1,58 @@
 import type { FC } from 'react';
 
+import { styled } from '@linaria/react';
+import { useUserTokenAccounts } from '@p2p-wallet-web/core';
+
+import { useFeeCompensation, useFreeFeeLimits, useNetworkFees } from 'app/contexts';
 import { ModalType, useModals } from 'app/contexts/general/modals';
 import { ButtonState, useSwap } from 'app/contexts/solana/swap';
-import { Button } from 'components/ui';
+import type { TransactionConfirmModalProps } from 'components/modals/TransactionConfirmModal/TransactionConfirmModal';
+import type { TransactionStatusModalProps } from 'components/modals/TransactionInfoModals/TransactionStatusSwapModal';
+import { Button, Icon } from 'components/ui';
 import { trackEvent } from 'utils/analytics';
+
+const SwapIcon = styled(Icon)`
+  width: 24px;
+  height: 24px;
+
+  margin-right: 8px;
+`;
 
 export const SwapButtonOriginal: FC = () => {
   const { openModal } = useModals();
+  const networkFees = useNetworkFees();
   const { buttonState, trade, onSwap } = useSwap();
+  const swapInfo = useSwap();
+  const userTokenAccounts = useUserTokenAccounts();
+  const feeCompensationInfo = useFeeCompensation();
+  const feeLimitsInfo = useFreeFeeLimits();
 
   const handleSwapClick = async () => {
     trackEvent('Swap_Verification_Invoked');
 
-    const result = await openModal<boolean>(ModalType.SHOW_MODAL_TRANSACTION_CONFIRM, {
-      type: 'swap',
-      params: {
-        inputTokenName: trade.inputTokenName,
-        outputTokenName: trade.outputTokenName,
-        inputAmount: trade.getInputAmount(),
-        minimumOutputAmount: trade.getMinimumOutputAmount(),
+    const result = await openModal<boolean, TransactionConfirmModalProps>(
+      ModalType.SHOW_MODAL_TRANSACTION_CONFIRM,
+      {
+        type: 'swap',
+        params: {
+          inputTokenName: trade.inputTokenName,
+          outputTokenName: trade.outputTokenName,
+          inputAmount: trade.getInputAmount(),
+          minimumOutputAmount: trade.getMinimumOutputAmount(),
+        },
+        swapInfo,
+        userTokenAccounts,
+        feeCompensationInfo,
+        feeLimitsInfo,
+        networkFees,
       },
-    });
+    );
 
     if (!result) {
       return false;
     }
 
-    openModal(ModalType.SHOW_MODAL_TRANSACTION_STATUS, {
-      type: 'swap',
+    openModal<boolean, TransactionStatusModalProps>(ModalType.SHOW_MODAL_TRANSACTION_STATUS_SWAP, {
       action: onSwap,
       params: {
         inputTokenName: trade.inputTokenName,
@@ -35,6 +60,11 @@ export const SwapButtonOriginal: FC = () => {
         inputAmount: trade.getInputAmount(),
         minimumOutputAmount: trade.getMinimumOutputAmount(),
       },
+      userTokenAccounts,
+      feeCompensationInfo,
+      feeLimitsInfo,
+      networkFees,
+      swapInfo,
     });
   };
 
@@ -48,7 +78,8 @@ export const SwapButtonOriginal: FC = () => {
     case ButtonState.Exchange:
       return (
         <Button primary big full onClick={handleSwapClick}>
-          Swap
+          <SwapIcon name="swap" />
+          Swap {swapInfo.trade.inputTokenName} → {swapInfo.trade.outputTokenName}
         </Button>
       );
     case ButtonState.Retry:

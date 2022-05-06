@@ -3,11 +3,15 @@ import { theme } from '@p2p-wallet-web/ui';
 
 export const ListWrapper = styled.div`
   display: grid;
-  grid-gap: 4px;
-  padding: 16px 20px;
+  grid-gap: 8px;
+  padding: 20px;
+
+  &.flat {
+    padding: 0 20px;
+  }
 
   &.total {
-    padding: 26px 20px;
+    padding: 23px 20px;
   }
 
   &:not(:last-child) {
@@ -35,7 +39,7 @@ export const Row = styled.div`
 `;
 
 export const Text = styled.div`
-  display: inline-block;
+  display: inline-flex;
 
   color: ${theme.colors.textIcon.primary};
   font-weight: 500;
@@ -45,6 +49,15 @@ export const Text = styled.div`
 
   &.inline-flex {
     display: inline-flex;
+  }
+
+  &.flex-end {
+    justify-content: flex-end;
+  }
+
+  &.grid {
+    display: grid;
+    flex-shrink: 0;
   }
 
   &.gray {

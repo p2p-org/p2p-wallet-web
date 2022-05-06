@@ -1,6 +1,6 @@
 import type { FunctionComponent } from 'react';
-import { useEffect, useMemo, useRef, useState } from 'react';
 import * as React from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation } from 'react-router';
 import { animated, useSpring, useTransition } from 'react-spring';
 
@@ -11,30 +11,33 @@ import { useDrag } from '@use-gesture/react';
 import BezierEasing from 'bezier-easing';
 import classNames from 'classnames';
 
-import { MOBILE_FOOTER_TABS_HEIGHT } from 'components/common/Layout';
 import { Icon } from 'components/ui';
 
+// eslint-disable-next-line @typescript-eslint/no-magic-numbers
 const easing = BezierEasing(0.7, -0.4, 0.4, 1.4);
 
 const AnimatedDialogContent = animated(DialogContent);
 
+const DRAG_MOVEMENT_THRESHOLD = 300;
+const DRAG_VELOCITY_THRESHOLD = 3;
+
 const StyledDialogContent = styled(({ ...props }) => <AnimatedDialogContent {...props} />)`
+  max-height: calc(100vh - 80px);
+
   overflow-y: ${({ mobile }) => (mobile ? 'scroll' : 'hidden')};
 
   &[data-reach-dialog-content] {
     position: fixed;
     right: 0;
-    bottom: ${MOBILE_FOOTER_TABS_HEIGHT}px;
 
     display: flex;
     flex-direction: column;
     align-self: flex-end;
     width: 100%;
-    max-height: 80vh;
     margin: 0;
     padding: 0;
     overflow-x: hidden;
-    overflow-y: auto;
+    overflow-y: scroll;
 
     background: ${theme.colors.bg.primary};
     border-radius: 18px 18px 0 0;
@@ -50,10 +53,13 @@ const StyledDialogContent = styled(({ ...props }) => <AnimatedDialogContent {...
       width: unset;
       height: unset;
       margin: 0;
-      overflow-y: hidden;
 
       border-radius: 12px;
     }
+  }
+
+  &:focus-visible {
+    outline: none;
   }
 `;
 
@@ -178,7 +184,7 @@ const CloseIcon = styled(Icon)`
   cursor: pointer;
 `;
 
-const Content = styled.div`
+export const Content = styled.div`
   padding: 0 16px;
 
   ${up.tablet} {
@@ -199,20 +205,20 @@ const Footer = styled.div`
   }
 `;
 
-type Props = {
+export type ModalProps = {
   title?: React.ReactNode;
   description?: React.ReactNode;
   footer?: React.ReactNode;
   iconName?: string;
   iconBgClassName?: string;
 
-  noDelimiter: boolean;
+  noDelimiter?: boolean;
   close: () => void;
   doNotCloseOnPathChangeMobile?: boolean;
   className?: string;
 };
 
-export const Modal: FunctionComponent<Props> = ({
+export const Modal: FunctionComponent<ModalProps> = ({
   title,
   description,
   footer,
@@ -270,7 +276,10 @@ export const Modal: FunctionComponent<Props> = ({
     set({
       y: state.down ? state.movement[1] : 0,
     });
-    if (state.movement[1] > 300 || (state.velocity[1] > 3 && state.direction[1] > 0)) {
+    if (
+      state.movement[1] > DRAG_MOVEMENT_THRESHOLD ||
+      (state.velocity[1] > DRAG_VELOCITY_THRESHOLD && state.direction[1] > 0)
+    ) {
       close();
     }
   });

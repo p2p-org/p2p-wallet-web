@@ -36,17 +36,18 @@ const Content = styled.div`
 
 type Props = {
   breadcrumb?: BreadcrumbType;
+  action?: React.ReactNode;
   children: React.ReactNode;
 };
 
-export const MobileLayoutOrigin: FunctionComponent<Props> = ({ breadcrumb, children }) => {
+export const MobileLayoutOrigin: FunctionComponent<Props> = ({ action, children }) => {
   const { connected } = useWallet();
 
   return (
     <Wrapper>
       <Container>
         <ScrollFixStyled>
-          <MobileHeader />
+          <MobileHeader action={action} />
           {connected ? <Content>{children}</Content> : undefined}
         </ScrollFixStyled>
       </Container>

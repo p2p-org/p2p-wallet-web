@@ -5,14 +5,21 @@ import type { u64 } from '@solana/spl-token';
 import { useConfig } from 'app/contexts/solana/swap';
 import { formatBigNumber } from 'app/contexts/solana/swap/utils/format';
 import { TokenAvatar } from 'components/common/TokenAvatar';
+import { AmountUSD } from 'components/pages/swap/SwapWidget/AmountUSD';
+import type { FeesOriginalProps } from 'components/pages/swap/SwapWidget/Fees/FeesOriginal';
+import { FeesOriginal } from 'components/pages/swap/SwapWidget/Fees/FeesOriginal';
+import { Icon } from 'components/ui';
 
 import {
   FieldInfo,
+  FromToWrapper,
   InfoTitle,
   InfoValue,
   InfoWrapper,
+  Overlay,
   Section,
-  SectionTitle,
+  Subtitle,
+  Wrapper,
 } from '../common/styled';
 
 export type SwapParams = {
@@ -24,53 +31,67 @@ export type SwapParams = {
 
 interface Props {
   params: SwapParams;
+  showTitle: boolean;
 }
 
-export const Swap: FC<Props> = ({
-  params: { inputTokenName, outputTokenName, inputAmount, minimumOutputAmount },
+export const Swap: FC<Props & FeesOriginalProps> = ({
+  params: { inputTokenName, outputTokenName, inputAmount },
+  swapInfo,
+  userTokenAccounts,
+  feeLimitsInfo,
+  networkFees,
+  feeCompensationInfo,
+  showTitle,
 }) => {
   const { tokenConfigs } = useConfig();
+  const inputDecimals = tokenConfigs[inputTokenName]?.decimals || 0;
+  const outputDecimals = tokenConfigs[outputTokenName]?.decimals || 0;
+  const minReceiveAmount = formatBigNumber(swapInfo.trade.getMinimumOutputAmount(), outputDecimals);
+  const outputAmount = formatBigNumber(swapInfo.trade.getOutputAmount(), outputDecimals);
 
   return (
-    <>
+    <Wrapper>
+      {showTitle && <Subtitle>You are going to swap</Subtitle>}
       <Section className="swap">
-        <SectionTitle>From</SectionTitle>
         <FieldInfo>
           <TokenAvatar symbol={inputTokenName} size={44} />
           <InfoWrapper>
-            <InfoTitle>Check the amount</InfoTitle>
+            <InfoTitle>
+              {formatBigNumber(inputAmount, inputDecimals)} {inputTokenName}
+            </InfoTitle>
             <InfoValue>
-              {formatBigNumber(inputAmount, tokenConfigs[inputTokenName].decimals)} {inputTokenName}
+              <AmountUSD prefix={'~'} amount={inputAmount} tokenName={inputTokenName} />
             </InfoValue>
           </InfoWrapper>
         </FieldInfo>
+        <FromToWrapper>
+          <Overlay>
+            <Icon name={'arrow-down'} />
+          </Overlay>
+        </FromToWrapper>
       </Section>
       <Section className="top">
-        <SectionTitle>To</SectionTitle>
         <FieldInfo>
           <TokenAvatar symbol={outputTokenName} size={44} />
           <InfoWrapper>
-            <InfoTitle>Minimum receive</InfoTitle>
+            <InfoTitle>
+              {outputAmount} {outputTokenName}
+            </InfoTitle>
             <InfoValue>
-              {formatBigNumber(minimumOutputAmount, tokenConfigs[outputTokenName].decimals)}{' '}
-              {outputTokenName}
+              Receive at least: {minReceiveAmount} {outputTokenName}
             </InfoValue>
           </InfoWrapper>
         </FieldInfo>
-        {/*<FieldInfo>*/}
-        {/*  <IconWrapper>*/}
-        {/*    <WalletIcon name="wallet" />*/}
-        {/*  </IconWrapper>*/}
-        {/*  <InfoWrapper>*/}
-        {/*    <InfoTitle>Destination wallet</InfoTitle>*/}
-        {/*    <InfoValue>*/}
-        {/*      {(params as SwapParams).secondTokenAccount*/}
-        {/*        ? (params as SwapParams).secondTokenAccount.address.toBase58()*/}
-        {/*        : 'Will be created after transaction processing'}*/}
-        {/*    </InfoValue>*/}
-        {/*  </InfoWrapper>*/}
-        {/*</FieldInfo>*/}
       </Section>
-    </>
+      <FeesOriginal
+        swapInfo={swapInfo}
+        userTokenAccounts={userTokenAccounts}
+        feeCompensationInfo={feeCompensationInfo}
+        feeLimitsInfo={feeLimitsInfo}
+        networkFees={networkFees}
+        open={false}
+        forPage={false}
+      />
+    </Wrapper>
   );
 };

@@ -39,9 +39,10 @@ const BottomWrapper = styled.div`
 
 type Props = {
   forwardedRef?: React.Ref<HTMLDivElement>;
-  icon: string;
-  title: string;
+  icon?: string;
+  title: string | string[];
   action?: React.ReactNode;
+  backTo?: string;
   children?: React.ReactNode;
   bottom?: React.ReactNode;
   className?: string;
@@ -52,6 +53,7 @@ const WidgetPageWithBottomOriginal: FunctionComponent<Props> = ({
   icon,
   title,
   action,
+  backTo,
   children,
   bottom,
   className,
@@ -64,6 +66,7 @@ const WidgetPageWithBottomOriginal: FunctionComponent<Props> = ({
       icon={icon}
       action={action}
       className={className}
+      backTo={backTo}
       {...props}
     >
       <Wrapper>

@@ -3,7 +3,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { ZERO } from '@orca-so/sdk';
 import type { TokenAccount } from '@p2p-wallet-web/core';
 import { useUserTokenAccounts } from '@p2p-wallet-web/core';
-import { TokenAmount } from '@saberhq/token-utils';
+import { TokenAmount } from '@p2p-wallet-web/token-utils';
 import { u64 } from '@solana/spl-token';
 import { createContainer } from 'unstated-next';
 
@@ -133,7 +133,7 @@ const useFeeCompensationInternal = () => {
     }
 
     if (!isPayInSol && userRelayAccount && !userRelayAccount.exist) {
-      total = total.add(RELAY_ACCOUNT_RENT_EXEMPTION as u64);
+      total = total.add(RELAY_ACCOUNT_RENT_EXEMPTION);
     }
 
     return new u64(total.toArray());
@@ -247,7 +247,7 @@ const useFeeCompensationInternal = () => {
     }
 
     if (userRelayAccount && !userRelayAccount.exist) {
-      state.totalFee = state.totalFee.add(RELAY_ACCOUNT_RENT_EXEMPTION as u64);
+      state.totalFee = state.totalFee.add(RELAY_ACCOUNT_RENT_EXEMPTION);
       state.estimatedFee.relayAccountRent = RELAY_ACCOUNT_RENT_EXEMPTION;
       state.needCreateRelayAccount = true;
       state.topUpCompensationFee = state.topUpCompensationFee.add(RELAY_ACCOUNT_RENT_EXEMPTION);
