@@ -17,9 +17,9 @@
     "lint:prettier": "pretty-quick --staged",
     "lint:staged": "lint-staged",
     "precommit": "yarn lint:es && yarn lint:type && yarn lint:prettier",
-    "serve": "webpack-dev-server --mode development --env name='p2p-wallet-web' --config '../configs/webpack.config.ts'",
-    "build:analyze": "webpack --mode production --env analyze --env name='p2p-wallet-web' --config '../configs/webpack.config.ts'",
-    "build:prod": "webpack --mode production --env name='p2p-wallet-web' --config '../configs/webpack.config.ts'"
+    "serve": "webpack-dev-server --mode development --env name='p2p-wallet-web' --config '../../configs/webpack.config.ts'",
+    "build:analyze": "webpack --mode production --env analyze --env name='p2p-wallet-web' --config '../../configs/webpack.config.ts'",
+    "build:prod": "webpack --mode production --env name='p2p-wallet-web' --config '../../configs/webpack.config.ts'"
   },
   "dependencies": {
     "@emotion/is-prop-valid": "^0.8.8",

@@ -31,8 +31,7 @@ type ConfigFn = (env: CustomEnv, argv: ArgV) => Configuration;
 const MAX_CHUNK_SIZE = 300000;
 const DEV_PORT = 9000;
 const APP_TITLE = 'Solana Wallet';
-const WEB_PATH = path.resolve(__dirname, '../web/');
-const PACKAGES_PATH = path.resolve(__dirname, '../');
+const WEB_PATH = path.resolve(__dirname, '../packages/web/');
 
 const config: ConfigFn = (env, argv) => {
   const __DEVELOPMENT__ = argv.mode === 'development';
@@ -49,24 +48,24 @@ const config: ConfigFn = (env, argv) => {
   const prodPlugins: Array<WebpackPluginInstance> = [];
 
   const webAliases = {
-    constants: path.resolve(PACKAGES_PATH, '/constants'),
-    config: path.resolve(PACKAGES_PATH, '/config'),
-    utils: path.resolve(PACKAGES_PATH, '/utils'),
-    lib: path.resolve(PACKAGES_PATH, '/lib'),
-    store: path.resolve(PACKAGES_PATH, '/store'),
-    api: path.resolve(PACKAGES_PATH, '/api'),
-    app: path.resolve(PACKAGES_PATH, '/app'),
-    pages: path.resolve(PACKAGES_PATH, '/pages'),
-    components: path.resolve(PACKAGES_PATH, '/components'),
-    assets: path.resolve(PACKAGES_PATH, '/assets'),
-    styles: path.resolve(PACKAGES_PATH, '/styles'),
+    constants: path.resolve(__dirname, '../packages/web/src/constants'),
+    config: path.resolve(__dirname, '../packages/web/src/config'),
+    utils: path.resolve(__dirname, '../packages/web/src/utils'),
+    lib: path.resolve(__dirname, '../packages/web/src/lib'),
+    store: path.resolve(__dirname, '../packages/web/src/store'),
+    api: path.resolve(__dirname, '../packages/web/src/api'),
+    app: path.resolve(__dirname, '../packages/web/src/app'),
+    pages: path.resolve(__dirname, '../packages/web/src/pages'),
+    components: path.resolve(__dirname, '../packages/web/src/components'),
+    assets: path.resolve(__dirname, '../packages/web/src/assets'),
+    styles: path.resolve(__dirname, '../packages/web/src/styles'),
   };
 
   const packageAliases: object = {
-    '@p2p-wallet-web/core': path.resolve(PACKAGES_PATH, '/core/src'),
-    '@p2p-wallet-web/sail': path.resolve(PACKAGES_PATH, '/sail/src'),
-    '@p2p-wallet-web/token-utils': path.resolve(PACKAGES_PATH, '/token-utils/src'),
-    '@p2p-wallet-web/ui': path.resolve(PACKAGES_PATH, '/ui/src'),
+    '@p2p-wallet-web/core': path.resolve(__dirname, '../packages/core/src'),
+    '@p2p-wallet-web/sail': path.resolve(__dirname, '../packages/sail/src'),
+    '@p2p-wallet-web/token-utils': path.resolve(__dirname, '../packages/token-utils/src'),
+    '@p2p-wallet-web/ui': path.resolve(__dirname, '../packages/ui/src'),
   };
 
   if (__PRODUCTION__) {
