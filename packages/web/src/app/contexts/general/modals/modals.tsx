@@ -5,15 +5,16 @@ import { styled } from '@linaria/react';
 import type { LoadableComponent } from '@loadable/component';
 import loadable from '@loadable/component';
 import { zIndexes } from '@p2p-wallet-web/ui';
+import classNames from 'classnames';
 
 import type { ModalPropsType } from 'app/contexts/general/modals/types';
 import { ModalType } from 'app/contexts/general/modals/types';
 
-const Wrapper = styled.div<PresetProp>`
+const Wrapper = styled.div`
   position: fixed;
   top: 0;
   right: 0;
-  bottom: ${(props) => (props.preset === 'nav' ? '57px' : 0)};
+  bottom: 0;
   left: 0;
   z-index: ${zIndexes.modal};
 
@@ -23,6 +24,10 @@ const Wrapper = styled.div<PresetProp>`
   background-color: rgba(0, 0, 0, 0.6);
 
   user-select: none;
+
+  &.nav {
+    bottom: 57px;
+  }
 `;
 
 const ModalWrapper = styled.div`
@@ -33,7 +38,8 @@ const ModalWrapper = styled.div`
 `;
 
 type ModalState = { modalType: ModalType; modalId: number; props: any };
-type Presets = 'nav' | 'regular';
+type GetPresetFn = (modal?: ModalType) => Preset;
+type Preset = 'nav' | 'regular';
 
 const modalsMap = new Map<ModalType, LoadableComponent<ModalPropsType & any>>([
   // [SHOW_MODAL_ADD_COIN, loadable(() => import('components/modals/__AddCoinModal'))],
@@ -83,7 +89,7 @@ const modalsMap = new Map<ModalType, LoadableComponent<ModalPropsType & any>>([
 const promises = new Map();
 let modalIdCounter = 0;
 
-const getPreset = (modal?: ModalType) => {
+const getPreset: GetPresetFn = (modal) => {
   switch (modal) {
     case ModalType.SHOW_MODAL_ACTIONS_MOBILE:
       return 'nav';
@@ -201,7 +207,9 @@ export function ModalsProvider({ children = null as any }) {
       }}
     >
       {children}
-      {preparedModals.length > 0 ? <Wrapper preset={preset}>{preparedModals}</Wrapper> : undefined}
+      {preparedModals.length > 0 ? (
+        <Wrapper className={classNames(preset)}>{preparedModals}</Wrapper>
+      ) : undefined}
     </ModalsContext.Provider>
   );
 }
