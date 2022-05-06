@@ -31,7 +31,8 @@ type ConfigFn = (env: CustomEnv, argv: ArgV) => Configuration;
 const MAX_CHUNK_SIZE = 300000;
 const DEV_PORT = 9000;
 const APP_TITLE = 'Solana Wallet';
-const WEB_PATH = path.resolve(__dirname, '../packages/web/');
+const WEB_PATH = path.resolve(__dirname, '../packages/web');
+const PACKAGE_PATH = path.resolve(__dirname, '../packages');
 
 const config: ConfigFn = (env, argv) => {
   const __DEVELOPMENT__ = argv.mode === 'development';
@@ -48,24 +49,24 @@ const config: ConfigFn = (env, argv) => {
   const prodPlugins: Array<WebpackPluginInstance> = [];
 
   const webAliases = {
-    constants: path.resolve(__dirname, '../packages/web/src/constants'),
-    config: path.resolve(__dirname, '../packages/web/src/config'),
-    utils: path.resolve(__dirname, '../packages/web/src/utils'),
-    lib: path.resolve(__dirname, '../packages/web/src/lib'),
-    store: path.resolve(__dirname, '../packages/web/src/store'),
-    api: path.resolve(__dirname, '../packages/web/src/api'),
-    app: path.resolve(__dirname, '../packages/web/src/app'),
-    pages: path.resolve(__dirname, '../packages/web/src/pages'),
-    components: path.resolve(__dirname, '../packages/web/src/components'),
-    assets: path.resolve(__dirname, '../packages/web/src/assets'),
-    styles: path.resolve(__dirname, '../packages/web/src/styles'),
+    constants: path.join(WEB_PATH, '/src/constants'),
+    config: path.resolve(WEB_PATH, '/src/config'),
+    utils: path.resolve(WEB_PATH, '/src/utils'),
+    lib: path.resolve(WEB_PATH, '/src/lib'),
+    store: path.resolve(WEB_PATH, '/src/store'),
+    api: path.resolve(WEB_PATH, '/src/api'),
+    app: path.resolve(WEB_PATH, '/src/app'),
+    pages: path.resolve(WEB_PATH, '/src/pages'),
+    components: path.resolve(WEB_PATH, '/src/components'),
+    assets: path.resolve(WEB_PATH, '/src/assets'),
+    styles: path.resolve(WEB_PATH, '/src/styles'),
   };
 
   const packageAliases: object = {
-    '@p2p-wallet-web/core': path.resolve(__dirname, '../packages/core/src'),
-    '@p2p-wallet-web/sail': path.resolve(__dirname, '../packages/sail/src'),
-    '@p2p-wallet-web/token-utils': path.resolve(__dirname, '../packages/token-utils/src'),
-    '@p2p-wallet-web/ui': path.resolve(__dirname, '../packages/ui/src'),
+    '@p2p-wallet-web/core': path.join(PACKAGE_PATH, '/core/src'),
+    '@p2p-wallet-web/sail': path.join(PACKAGE_PATH, '/sail/src'),
+    '@p2p-wallet-web/token-utils': path.join(PACKAGE_PATH, '/token-utils/src'),
+    '@p2p-wallet-web/ui': path.join(PACKAGE_PATH, '/ui/src'),
   };
 
   if (__PRODUCTION__) {
@@ -109,13 +110,13 @@ const config: ConfigFn = (env, argv) => {
 
     mode: argv.mode,
 
-    entry: path.resolve(__dirname, WEB_PATH, 'src/index.tsx'),
+    entry: path.resolve(__dirname, WEB_PATH, '/src/index.tsx'),
 
     // @TODO output for library https://webpack.js.org/configuration/output/#outputlibrary
     // @TODO https://webpack.js.org/guides/author-libraries/
     // set up sideeffect as well for the libs
     output: {
-      path: path.resolve(__dirname, WEB_PATH, 'public'),
+      path: path.resolve(__dirname, WEB_PATH, '/public'),
       filename: __DEVELOPMENT__ ? '[name].[contenthash].js' : '[contenthash].js',
       chunkFilename: __DEVELOPMENT__ ? '[id]-[contenthash].chunk.js' : '[contenthash].chunk.js',
       assetModuleFilename: '[name]-[contenthash][ext]',
@@ -255,7 +256,7 @@ const config: ConfigFn = (env, argv) => {
 
           {
             title: APP_TITLE,
-            template: path.join(__dirname + '/index.html'),
+            template: path.join(WEB_PATH + '/index.html'),
           },
           __PRODUCTION__ && {
             minify: {
@@ -274,8 +275,7 @@ const config: ConfigFn = (env, argv) => {
         ),
       ),
       new DotEnv({
-        // path: './packages/web/.env.development',
-        path: path.resolve(WEB_PATH, '.env.development'),
+        path: path.join(WEB_PATH, '/.env.development'),
         ignoreStub: true,
       }),
       new webpack.DefinePlugin({
