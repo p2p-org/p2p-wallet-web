@@ -38,6 +38,10 @@ const config: ConfigFn = (env, argv) => {
   const __ANALYSE__ = env.analyze;
   const __PACKAGE_NAME__ = env.name;
 
+  // @ts-ignore
+  process.env.NODE_ENV = argv.mode;
+  process.env.BABEL_ENV = argv.mode;
+
   const devPlugins: Array<WebpackPluginInstance> = [];
   const utilityPlugins: Array<WebpackPluginInstance> = [];
   const prodPlugins: Array<WebpackPluginInstance> = [];
@@ -55,8 +59,7 @@ const config: ConfigFn = (env, argv) => {
     assets: path.resolve(__dirname, './packages/web/src/assets'),
     styles: path.resolve(__dirname, './packages/web/src/styles'),
   };
-  // @TODO test it
-  // @FIXME chunks loading problems
+
   const packageAliases: object = {
     '@p2p-wallet-web/core': path.resolve(__dirname, './packages/core/src'),
     '@p2p-wallet-web/sail': path.resolve(__dirname, './packages/sail/src'),
@@ -117,7 +120,7 @@ const config: ConfigFn = (env, argv) => {
     },
 
     optimization: {
-      nodeEnv: argv.mode,
+      // nodeEnv: argv.mode,
       runtimeChunk: 'single',
       minimize: __PRODUCTION__,
       minimizer: __PRODUCTION__
@@ -182,7 +185,10 @@ const config: ConfigFn = (env, argv) => {
             },
             {
               loader: 'css-loader',
-              options: { sourceMap: __DEVELOPMENT__ },
+              options: {
+                sourceMap: __DEVELOPMENT__,
+                // @TODO in the case of css-modules use getLocalIndent
+              },
             },
           ],
         },
@@ -236,15 +242,35 @@ const config: ConfigFn = (env, argv) => {
       open: false,
     },
 
-    stats: __PRODUCTION__ ? 'errors-warnings' : 'normal',
+    stats: __PRODUCTION__ ? 'errors-only' : 'normal',
 
     target: 'browserslist',
 
     plugins: [
-      new HtmlWebpackPlugin({
-        title: APP_TITLE,
-        template: path.join(__dirname + '/packages/web/index.html'),
-      }),
+      new HtmlWebpackPlugin(
+        Object.assign(
+          {},
+
+          {
+            title: APP_TITLE,
+            template: path.join(__dirname + '/packages/web/index.html'),
+          },
+          __PRODUCTION__ && {
+            minify: {
+              removeComments: true,
+              collapseWhitespace: true,
+              removeRedundantAttributes: true,
+              useShortDoctype: true,
+              removeEmptyAttributes: true,
+              removeStyleLinkTypeAttributes: true,
+              keepClosingSlash: true,
+              minifyJS: true,
+              minifyCSS: true,
+              minifyURLs: true,
+            },
+          },
+        ),
+      ),
       new DotEnv({
         path: './packages/web/.env.development',
         ignoreStub: true,
