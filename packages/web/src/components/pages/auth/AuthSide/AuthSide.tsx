@@ -1,11 +1,12 @@
 import type { FC } from 'react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useHistory } from 'react-router';
 import { NavLink, Route, Switch, useLocation } from 'react-router-dom';
 
 import { styled } from '@linaria/react';
 import { useWallet } from '@p2p-wallet-web/core';
 
+import { trackEventUniversal } from 'utils/analytics';
 import { useUpdateEffect } from 'utils/hooks/useUpdateEffect';
 
 import { LoaderWide } from '../../../common/LoaderWide';
@@ -95,6 +96,10 @@ export const AuthSide: FC = () => {
       });
     }
   }, [connected]);
+
+  useEffect(() => {
+    trackEventUniversal({ name: 'Splash_Viewed', data: { Splash_Campaign: null } });
+  }, []);
 
   const next = (nextData: DataType) => {
     setData(nextData);
