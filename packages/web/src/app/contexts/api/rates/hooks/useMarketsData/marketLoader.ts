@@ -1,19 +1,20 @@
 import DataLoader from 'dataloader';
 import { mergeAll, splitEvery } from 'ramda';
 
-import type { Market, OrderbooksCryptoCompareResponse } from '../../';
-import { BASE_CURRENCY, CRYPTO_COMPARE_API_KEY, CRYPTO_COMPARE_API_URL } from '../../constants';
+import type { Market, OrderbooksCoinGeckoResponse } from '../../';
+import { BASE_CURRENCY, COIN_GECKO_API_URL } from '../../constants';
 
-async function batchFunction(symbols: readonly string[]): Promise<(Market | null)[]> {
-  console.log(`Fetching markets: ${symbols.join(', ')}`);
+const CHUNK_AMOUNT = 50;
+const BATCH_SCHEDULE_MILLISECONDS = 500;
 
-  const chunks = splitEvery(50, symbols);
+async function batchFunction(coingeckoIds: readonly string[]): Promise<(Market | null)[]> {
+  const chunks = splitEvery(CHUNK_AMOUNT, coingeckoIds);
 
   const marketsChunked = await Promise.all(
     chunks.map(async (chunk) => {
-      const path = `${CRYPTO_COMPARE_API_URL}/pricemulti`
-        .concat(`?api_key=${CRYPTO_COMPARE_API_KEY}`)
-        .concat(`&fsyms=${chunk.join(',')}&tsyms=${BASE_CURRENCY}`);
+      const path = `${COIN_GECKO_API_URL}/simple/price`.concat(
+        `?ids=${chunk.join(',')}&vs_currencies=${BASE_CURRENCY}`,
+      );
 
       const res = await fetch(path);
 
@@ -21,7 +22,7 @@ async function batchFunction(symbols: readonly string[]): Promise<(Market | null
         throw new Error('getRatesMarkets something wrong');
       }
 
-      return (await res.json()) as OrderbooksCryptoCompareResponse;
+      return (await res.json()) as OrderbooksCoinGeckoResponse;
     }),
   );
 
@@ -29,11 +30,11 @@ async function batchFunction(symbols: readonly string[]): Promise<(Market | null
 
   // map over ids array and pick the characters in order
   // null indicates not found
-  return symbols.map((symbol) => markets?.[symbol]?.[BASE_CURRENCY] ?? null);
+  return coingeckoIds.map((id) => markets?.[id.toLowerCase()]?.[BASE_CURRENCY] ?? null);
 }
 
 export const marketLoader = new DataLoader<string, Market>(batchFunction, {
   cache: false,
   // aggregate all requests over 500ms
-  batchScheduleFn: (callback) => setTimeout(callback, 500),
+  batchScheduleFn: (callback) => setTimeout(callback, BATCH_SCHEDULE_MILLISECONDS),
 });

@@ -21,7 +21,7 @@ export type Candles = {
   [pair: string]: CandleRate[];
 };
 
-export type OrderbooksCryptoCompareResponse = {
+export type OrderbooksCoinGeckoResponse = {
   [market: string]: {
     [currency: string]: number;
   };
