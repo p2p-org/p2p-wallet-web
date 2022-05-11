@@ -2,7 +2,7 @@ import type { Blockchain } from 'app/contexts';
 
 export type SelectItemBlockchainType = {
   key: Blockchain;
-  icon: string;
+  symbol: 'SOL' | 'renBTC';
   title: string;
   feeTitle: string;
   feeValue: string;

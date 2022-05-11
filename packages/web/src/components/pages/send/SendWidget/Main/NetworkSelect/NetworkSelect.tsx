@@ -2,43 +2,15 @@ import type { FC } from 'react';
 import React, { useState } from 'react';
 
 import { styled } from '@linaria/react';
-import { theme } from '@p2p-wallet-web/ui';
+import { theme, up } from '@p2p-wallet-web/ui';
 
 import { Blockchain, useSendState } from 'app/contexts';
+import { Item } from 'components/pages/send/SendWidget/Main/NetworkSelect/Item';
 import type {
   HandleSelectChangeParamType,
   SelectItemType,
 } from 'components/pages/send/SendWidget/Main/NetworkSelect/types';
 import { Select, SelectItem } from 'components/ui';
-
-const Row: FC = ({ children }) => {
-  return <>{children}</>;
-};
-
-const SELECT_VALUES: SelectItemType[] = [
-  {
-    key: 'auto',
-    icon: '',
-    title: 'Match automatically',
-  },
-  {
-    key: Blockchain.solana,
-    icon: '',
-    title: 'Solana network',
-    feeTitle: 'Transfer fees',
-    feeValue: '$0',
-  },
-  {
-    key: 'notification',
-  },
-  {
-    key: Blockchain.bitcoin,
-    icon: '',
-    title: 'Bitcoin network',
-    feeTitle: 'Fees',
-    feeValue: '0.0002 renBTC + 0.0002 SOL',
-  },
-];
 
 const NotificationWrapper = styled.div`
   padding: 16px 20px;
@@ -51,7 +23,36 @@ const NotificationWrapper = styled.div`
 
   border: 1px solid ${theme.colors.system.successMain};
   border-radius: 12px;
+
+  ${up.tablet} {
+    font-size: 14px;
+  }
 `;
+
+const SELECT_VALUES: SelectItemType[] = [
+  {
+    key: 'auto',
+    icon: '',
+    title: 'Match automatically',
+  },
+  {
+    key: Blockchain.solana,
+    symbol: 'SOL',
+    title: 'Solana network',
+    feeTitle: 'Transfer fees:',
+    feeValue: '$0',
+  },
+  {
+    key: 'notification',
+  },
+  {
+    key: Blockchain.bitcoin,
+    symbol: 'renBTC',
+    title: 'Bitcoin network',
+    feeTitle: 'Fees:',
+    feeValue: '0.0002 renBTC + 0.0002 SOL',
+  },
+];
 
 const notificationEl = () => {
   return (
@@ -90,7 +91,7 @@ export const NetworkSelect: FC = () => {
               isSelected={item.key === selectValue}
               onItemClick={() => handleSelectChange(item)}
             >
-              <Row>{item.title}</Row>
+              <Item item={item} />
             </SelectItem>
           ),
         )}
