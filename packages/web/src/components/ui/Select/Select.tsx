@@ -73,10 +73,6 @@ const Selector = styled.div`
   }
 `;
 
-const CaretWrapper = styled.div`
-  margin-right: 4px;
-`;
-
 const DropDownList = styled.div`
   position: absolute;
   right: 0;
@@ -154,7 +150,7 @@ export const Select: FunctionComponent<Props> = ({
     <Wrapper ref={selectorRef} className={className}>
       <Selector onClick={handleSelectorClick} className={classNames({ isOpen, flat })}>
         <Value>{value}</Value>
-        <CaretWrapper>{isLoading ? <Loader size="24" /> : <CaretIcon name="caret" />}</CaretWrapper>
+        {isLoading ? <Loader size="24" /> : <CaretIcon name="caret" />}
       </Selector>
       {isOpen ? (
         isMobile ? (
