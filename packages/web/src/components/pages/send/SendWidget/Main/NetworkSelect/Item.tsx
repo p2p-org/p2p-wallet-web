@@ -6,7 +6,7 @@ import classNames from 'classnames';
 
 import { Blockchain } from 'app/contexts';
 import { TokenAvatarStyled } from 'components/common/TokenAccountRowContent';
-import type { HandleSelectChangeParamType } from 'components/pages/send/SendWidget/Main/NetworkSelect/types';
+import type { SelectItemValueType } from 'components/pages/send/SendWidget/Main/NetworkSelect/types';
 import { Icon } from 'components/ui';
 
 const Content = styled.div`
@@ -35,12 +35,12 @@ const AvatarIcon = styled(Icon)`
   color: ${theme.colors.textIcon.secondary};
 `;
 
-const NetworkInfo = styled.div`
+const InfoWrapper = styled.div`
   display: flex;
   flex-direction: column;
 `;
 
-const NetworkTitle = styled.div`
+const FirstLineWrapper = styled.div`
   color: ${theme.colors.textIcon.primary};
 
   font-weight: 500;
@@ -52,12 +52,12 @@ const NetworkTitle = styled.div`
   }
 `;
 
-const FeeWrapper = styled.div`
+const SecondLineWrapper = styled.div`
   display: grid;
   grid-template-columns: max-content 1fr;
 `;
 
-const FeeTitle = styled.div`
+const SecondLineTitle = styled.div`
   color: ${theme.colors.textIcon.secondary};
 
   font-weight: 500;
@@ -65,7 +65,7 @@ const FeeTitle = styled.div`
   line-height: 140%;
 `;
 
-const FeeValue = styled.div`
+const SecondLineValue = styled.div`
   margin-left: 4px;
 
   color: ${theme.colors.textIcon.primary};
@@ -81,7 +81,7 @@ const FeeValue = styled.div`
   }
 `;
 
-const avatarEl = (item: HandleSelectChangeParamType) => {
+const avatarEl = (item: SelectItemValueType) => {
   if (item.key === 'auto') {
     return (
       <AvatarWrapper>
@@ -93,34 +93,61 @@ const avatarEl = (item: HandleSelectChangeParamType) => {
   return <TokenAvatarStyled symbol={item.symbol} size={44} />;
 };
 
-const feeEl = (item: HandleSelectChangeParamType) => {
+const firstLineEl = (item: SelectItemValueType, forValue?: boolean) => {
+  let title = '';
+
+  if (item.key === 'auto' && forValue) {
+    title = item.forValue.title;
+  } else {
+    title = item.title;
+  }
+
+  return <FirstLineWrapper>{title}</FirstLineWrapper>;
+};
+
+const secondLineEl = (item: SelectItemValueType, forValue?: boolean) => {
+  let title = null;
+  let value = null;
+
   if (item.key === 'auto') {
+    if (forValue) {
+      title = item.forValue.description;
+    }
+  } else {
+    title = item.feeTitle;
+    value = item.feeValue;
+  }
+
+  if (!title) {
     return null;
   }
 
   return (
-    <FeeWrapper>
-      <FeeTitle>{item.feeTitle}</FeeTitle>
-      <FeeValue className={classNames({ solana: item.key === Blockchain.solana })}>
-        {item.feeValue}
-      </FeeValue>
-    </FeeWrapper>
+    <SecondLineWrapper>
+      <SecondLineTitle>{title}</SecondLineTitle>
+      {value ? (
+        <SecondLineValue className={classNames({ solana: item.key === Blockchain.solana })}>
+          {value}
+        </SecondLineValue>
+      ) : null}
+    </SecondLineWrapper>
   );
 };
 
 type RowPropsType = {
-  item: HandleSelectChangeParamType;
+  item: SelectItemValueType;
+  forValue?: boolean;
 };
 
-export const Item: FC<RowPropsType> = ({ item }) => {
+export const Item: FC<RowPropsType> = ({ item, forValue }) => {
   return (
     <>
       {avatarEl(item)}
       <Content>
-        <NetworkInfo>
-          <NetworkTitle>{item.title}</NetworkTitle>
-          {feeEl(item)}
-        </NetworkInfo>
+        <InfoWrapper>
+          {firstLineEl(item, forValue)}
+          {secondLineEl(item, forValue)}
+        </InfoWrapper>
       </Content>
     </>
   );

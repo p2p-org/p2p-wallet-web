@@ -7,8 +7,8 @@ import { theme, up } from '@p2p-wallet-web/ui';
 import { Blockchain, useSendState } from 'app/contexts';
 import { Item } from 'components/pages/send/SendWidget/Main/NetworkSelect/Item';
 import type {
-  HandleSelectChangeParamType,
   SelectItemType,
+  SelectItemValueType,
 } from 'components/pages/send/SendWidget/Main/NetworkSelect/types';
 import { Select, SelectItem } from 'components/ui';
 
@@ -29,11 +29,15 @@ const NotificationWrapper = styled.div`
   }
 `;
 
-const SELECT_VALUES: SelectItemType[] = [
+const SELECT_ITEMS: SelectItemType[] = [
   {
     key: 'auto',
     icon: '',
     title: 'Match automatically',
+    forValue: {
+      title: 'The network',
+      description: 'Will be matched automatically',
+    },
   },
   {
     key: Blockchain.solana,
@@ -69,7 +73,7 @@ export const NetworkSelect: FC = () => {
 
   const selectValue = isAutomatchNetwork ? 'auto' : blockchain;
 
-  const handleSelectChange = (item: HandleSelectChangeParamType) => {
+  const handleSelectChange = (item: SelectItemValueType) => {
     if (item.key === 'auto') {
       setIsAutomatchNetwork(true);
       return;
@@ -79,16 +83,19 @@ export const NetworkSelect: FC = () => {
     setBlockchain(item.key);
   };
 
+  const currentItem = SELECT_ITEMS.find((item) => item.key === selectValue) as SelectItemValueType;
+  const value = <Item item={currentItem} forValue={true} />;
+
   return (
     <>
-      <Select value={selectValue} mobileListTitle="Choose the network">
-        {SELECT_VALUES.map((item) =>
+      <Select value={value} mobileListTitle="Choose the network">
+        {SELECT_ITEMS.map((item) =>
           item.key === 'notification' ? (
             <React.Fragment key={item.key}>{notificationEl()}</React.Fragment>
           ) : (
             <SelectItem
               key={item.key}
-              isSelected={item.key === selectValue}
+              isSelected={item === currentItem}
               onItemClick={() => handleSelectChange(item)}
             >
               <Item item={item} />

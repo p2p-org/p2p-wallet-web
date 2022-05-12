@@ -12,6 +12,10 @@ export type SelectItemAutoType = {
   key: 'auto';
   icon: string;
   title: string;
+  forValue: {
+    title: string;
+    description: string;
+  };
 };
 
 export type SelectItemNotificationType = {
@@ -23,4 +27,4 @@ export type SelectItemType =
   | SelectItemBlockchainType
   | SelectItemNotificationType;
 
-export type HandleSelectChangeParamType = Exclude<SelectItemType, SelectItemNotificationType>;
+export type SelectItemValueType = Exclude<SelectItemType, SelectItemNotificationType>;
