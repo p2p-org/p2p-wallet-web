@@ -1,6 +1,8 @@
 module.exports = {
   presets: [['react-app', { flow: false, typescript: true, runtime: 'automatic' }], '@linaria'],
   plugins: [
+    'babel-plugin-transform-typescript-metadata',
+    ["@babel/plugin-proposal-decorators", { legacy: true }],
     ['@babel/plugin-proposal-private-methods', { loose: true }],
     ['@babel/plugin-proposal-class-properties', { loose: true }],
     ['@babel/plugin-proposal-private-property-in-object', { loose: true }],
@@ -9,6 +11,7 @@ module.exports = {
       {
         root: ['./src'],
         alias: {
+          new: './src/new',
           constants: './src/constants',
           config: './src/config',
           utils: './src/utils',

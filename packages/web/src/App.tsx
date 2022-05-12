@@ -12,6 +12,7 @@ import { Auth } from 'pages/Auth';
 import { Buy } from 'pages/Buy';
 import { Home } from 'pages/Home';
 import { Landing } from 'pages/Landing';
+import { New } from 'pages/New';
 import { Receive } from 'pages/Receive';
 import { Send } from 'pages/Send';
 import { Settings } from 'pages/Settings';
@@ -34,6 +35,7 @@ const App: React.FC = () => {
           <Switch>
             <Route path="/" component={Landing} exact />
             <Route path="/:type(signup|login)" component={Auth} exact />
+            <AuthRequiredRoute path="/new" component={New} />
             <AuthRequiredRoute path="/wallets" component={Home} />
             <AuthRequiredRoute path="/wallet/:publicKey/settings" component={WalletSettings} />
             <AuthRequiredRoute path="/wallet/:publicKey" exact component={Wallet} />

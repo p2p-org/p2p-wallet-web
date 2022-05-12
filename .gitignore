@@ -39,4 +39,4 @@ workers-site
 
 # dashed files and folders
 __*/
-__*
+__*.*

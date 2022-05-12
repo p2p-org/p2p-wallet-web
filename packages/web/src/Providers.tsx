@@ -24,7 +24,16 @@ import {
 } from 'app/contexts';
 import { ToastManager } from 'components/common/ToastManager';
 import { Providers as SwapProviders } from 'components/pages/swap/Providers';
+import { DI_KEYS } from 'new/core/Constants';
+import DependencyContext, { DependencyService } from 'new/services/injection/DependencyContext';
 import { LockAndMintProvider } from 'utils/providers/LockAndMintProvider';
+
+const solanaNetwork = process.env.REACT_APP_SOLANA_NETWORK;
+const solanaRpcHost = process.env.REACT_APP_SOLANA_RPC_HOST;
+
+console.log('~~~ Index Props: ', solanaNetwork, solanaRpcHost);
+DependencyService.registerValue(DI_KEYS.SOLANA_NETWORK, solanaNetwork);
+DependencyService.registerValue(DI_KEYS.SOLANA_RPC_HOST, solanaRpcHost);
 
 const onConnect = (wallet: ConnectedWallet) => {
   const walletPublicKey = wallet.publicKey.toBase58();
@@ -92,7 +101,11 @@ export const Providers: FC = ({ children }) => {
                   <LockAndMintProvider>
                     <FeeRelayerProvider>
                       <SwapProviders>
-                        <ModalsProvider>{children}</ModalsProvider>
+                        <ModalsProvider>
+                          <DependencyContext.Provider value={DependencyService.container()}>
+                            {children}
+                          </DependencyContext.Provider>
+                        </ModalsProvider>
                       </SwapProviders>
                     </FeeRelayerProvider>
                   </LockAndMintProvider>

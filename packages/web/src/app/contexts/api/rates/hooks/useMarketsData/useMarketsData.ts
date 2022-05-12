@@ -15,7 +15,15 @@ export const useMarketsData = (symbols: (string | null | undefined)[]): Markets 
   const { tokenNameMap } = useTokensContext();
 
   const coingeckoIds = useMemo(
-    () => symbols.map((symbol) => tokenNameMap[symbol]?.info.extensions?.coingeckoId),
+    () =>
+      symbols.map((symbol) => {
+        const symbolUpper = symbol?.toUpperCase();
+        if (symbolUpper === 'SOL') {
+          return 'solana';
+        } else {
+          return tokenNameMap[symbolUpper]?.info.extensions?.coingeckoId;
+        }
+      }),
     [symbols, tokenNameMap],
   );
 

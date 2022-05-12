@@ -13,7 +13,6 @@ import { ErrorHint } from 'components/common/ErrorHint';
 import { ToastManager } from 'components/common/ToastManager';
 import { Button } from 'components/pages/auth/AuthSide/common/Button';
 import { localMnemonic } from 'config/constants';
-import { trackEvent } from 'utils/analytics';
 import { useTrackEventOnce } from 'utils/hooks/useTrackEventOnce';
 
 const Wrapper = styled.div``;
@@ -143,6 +142,8 @@ const MnemonicTextarea = styled.textarea`
   }
 `;
 
+const VALIDATE_MNEMONIC_THROTTLE_TIMEOUTE = 100;
+
 type Props = {
   setIsLoading: (isLoading: boolean) => void;
   next: (mnemonic: string) => void;
@@ -154,10 +155,6 @@ export const Main: FC<Props> = ({ setIsLoading, next }) => {
   const { activate } = useWallet();
   const [mnemonic, setMnemonic] = useState(localMnemonic || '');
   const [hasError, setHasError] = useState(false);
-
-  useEffect(() => {
-    trackEvent('login_open');
-  }, []);
 
   useEffect(() => {
     if (mnemonicRef.current) {
@@ -195,7 +192,7 @@ export const Main: FC<Props> = ({ setIsLoading, next }) => {
         setHasError(true);
       }
     },
-    100,
+    VALIDATE_MNEMONIC_THROTTLE_TIMEOUTE,
     { leading: false, trailing: true },
   );
 

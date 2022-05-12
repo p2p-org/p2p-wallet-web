@@ -57,14 +57,14 @@ module.exports = {
           ['^react'], // react
           ['^[^\\.]'], // non-local imports
           [
-            '^constants|^config|^lib|^utils|^types.ts|^store|^api|^app|^pages|^components|^styles|^assets',
+            '^constants|^config|^lib|^utils|^types.ts|^store|^api|^app|^pages|^components|^new|^styles|^assets',
           ], // internal
           ['^\\.'], // local imports
         ],
       },
     ],
     "@typescript-eslint/no-magic-numbers": [
-      "error",
+      "warn",
       {
         ignore: [-1, 0, 1],
         ignoreEnums: true,
@@ -74,9 +74,9 @@ module.exports = {
     ],
 
     '@typescript-eslint/no-explicit-any': 'error',
-    '@typescript-eslint/no-shadow': 'error',
+    '@typescript-eslint/no-shadow': 'warn',
     "@typescript-eslint/await-thenable": "error",
-    "@typescript-eslint/no-non-null-assertion": "error",
+    "@typescript-eslint/no-non-null-assertion": 'warn',
     "@typescript-eslint/no-for-in-array": "error",
     "@typescript-eslint/no-unnecessary-type-assertion": "error",
     "@typescript-eslint/prefer-as-const": "error",

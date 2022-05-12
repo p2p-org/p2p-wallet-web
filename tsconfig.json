@@ -2,7 +2,7 @@
   "extends": "./packages/tsconfig/tsconfig.react.json",
   "compilerOptions": {
     "jsx": "react",
-    "types": ["jest"]
+    "types": ["jest-expect-message"]
   },
   "references": [
     { "path": "packages/core" },
