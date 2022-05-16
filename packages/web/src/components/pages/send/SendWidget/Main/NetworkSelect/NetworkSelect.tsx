@@ -58,6 +58,10 @@ const SELECT_ITEMS: SelectItemType[] = [
   },
 ];
 
+const valueEl = (currentItem: SelectItemValueType, isAddressNotMatchNetwork?: boolean) => (
+  <Item item={currentItem} forValue={true} isAddressNotMatchNetwork={isAddressNotMatchNetwork} />
+);
+
 const notificationEl = () => {
   return (
     <NotificationWrapper>
@@ -89,13 +93,13 @@ export const NetworkSelect: FC = () => {
 
   const selectValue = isAutomatchNetwork ? 'auto' : blockchain;
   const currentItem = SELECT_ITEMS.find((item) => item.key === selectValue) as SelectItemValueType;
-  const value = (
-    <Item item={currentItem} forValue={true} isAddressNotMatchNetwork={isAddressNotMatchNetwork} />
-  );
 
   return (
     <>
-      <Select value={value} mobileListTitle="Choose the network">
+      <Select
+        value={valueEl(currentItem, isAddressNotMatchNetwork)}
+        mobileListTitle="Choose the network"
+      >
         {SELECT_ITEMS.map((item) =>
           item.key === 'notification' ? (
             <React.Fragment key={item.key}>{notificationEl()}</React.Fragment>

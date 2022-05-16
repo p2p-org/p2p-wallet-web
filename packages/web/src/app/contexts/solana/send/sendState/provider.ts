@@ -168,7 +168,7 @@ const useSendStateInternal = (): UseSendState => {
     }
 
     return false;
-  }, [isRenBTC, isAutomatchNetwork, isAddressInvalid, destinationAddress, renNetwork]);
+  }, [isRenBTC, isAutomatchNetwork, isAddressInvalid, destinationAddress, blockchain, renNetwork]);
 
   useEffect(() => {
     if (tokenAccount?.balance) {
