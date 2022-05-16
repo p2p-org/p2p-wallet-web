@@ -2,17 +2,11 @@ import { Bitcoin } from '@renproject/chains-bitcoin';
 import type { RenNetwork } from '@renproject/interfaces';
 import { PublicKey } from '@solana/web3.js';
 
-import type { Blockchain } from 'app/contexts';
-
 const SOL_REGEXP = /[1-9A-HJ-NP-Za-km-z]{32,44}/;
 const BTC_REGEXP =
   /(bc|tb)(0([ac-hj-np-z02-9]{39}|[ac-hj-np-z02-9]{59})|1[ac-hj-np-z02-9]{8,87})|([13]|[mn2])[a-km-zA-HJ-NP-Z1-9]{25,39}/;
 
-export const isValidAddress = (
-  blockchain: Blockchain,
-  address: string,
-  renNetwork: RenNetwork,
-): boolean => {
+export const isValidAddress = (address: string, renNetwork: RenNetwork): boolean => {
   return isValidSolanaAddress(address) || isValidBitcoinAddress(address, renNetwork);
 };
 

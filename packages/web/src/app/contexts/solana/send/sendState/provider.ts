@@ -121,11 +121,11 @@ const useSendStateInternal = (): UseSendState => {
 
   const isAddressInvalid = useMemo(() => {
     if (destinationAddress.length) {
-      return !isValidAddress(blockchain, destinationAddress, renNetwork);
+      return !isValidAddress(destinationAddress, renNetwork);
     }
 
     return false;
-  }, [blockchain, destinationAddress, renNetwork]);
+  }, [destinationAddress, renNetwork]);
 
   useEffect(() => {
     if (isRenBTC) {
