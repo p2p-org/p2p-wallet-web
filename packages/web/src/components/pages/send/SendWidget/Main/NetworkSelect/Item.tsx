@@ -26,6 +26,10 @@ const AvatarWrapper = styled.div`
 
   background: ${theme.colors.bg.secondary};
   border-radius: 12px;
+
+  &.warning {
+    background-color: ${theme.colors.system.warningBg};
+  }
 `;
 
 const AvatarIcon = styled(Icon)`
@@ -33,6 +37,10 @@ const AvatarIcon = styled(Icon)`
   height: 24px;
 
   color: ${theme.colors.textIcon.secondary};
+
+  .warning & {
+    color: ${theme.colors.system.warningMain};
+  }
 `;
 
 const InfoWrapper = styled.div`
@@ -81,11 +89,17 @@ const SecondLineValue = styled.div`
   }
 `;
 
-const avatarEl = (item: SelectItemValueType) => {
-  if (item.key === 'auto') {
+const avatarEl = (
+  item: SelectItemValueType,
+  forValue?: boolean,
+  isAddressNotMatchNetwork?: boolean,
+) => {
+  if (item.key === 'auto' || (forValue && isAddressNotMatchNetwork)) {
+    const showWarning = item.key !== 'auto';
+
     return (
-      <AvatarWrapper>
-        <AvatarIcon name={'rocket'} />
+      <AvatarWrapper className={classNames({ warning: showWarning })}>
+        <AvatarIcon name={showWarning ? 'warning' : 'rocket'} />
       </AvatarWrapper>
     );
   }
@@ -137,12 +151,13 @@ const secondLineEl = (item: SelectItemValueType, forValue?: boolean) => {
 type RowPropsType = {
   item: SelectItemValueType;
   forValue?: boolean;
+  isAddressNotMatchNetwork?: boolean;
 };
 
-export const Item: FC<RowPropsType> = ({ item, forValue }) => {
+export const Item: FC<RowPropsType> = ({ item, forValue, isAddressNotMatchNetwork }) => {
   return (
     <>
-      {avatarEl(item)}
+      {avatarEl(item, forValue, isAddressNotMatchNetwork)}
       <Content>
         <InfoWrapper>
           {firstLineEl(item, forValue)}

@@ -146,7 +146,7 @@ export const Main: FC = () => {
         />
       </Feature>
 
-      <TransactionDetails />
+      {false ? <TransactionDetails /> : null}
     </>
   );
 };

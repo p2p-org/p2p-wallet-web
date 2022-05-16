@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import React, { useState } from 'react';
+import React from 'react';
 
 import { styled } from '@linaria/react';
 import { theme, up } from '@p2p-wallet-web/ui';
@@ -68,14 +68,18 @@ const notificationEl = () => {
 };
 
 export const NetworkSelect: FC = () => {
-  const { blockchain, setBlockchain } = useSendState();
-  const [isAutomatchNetwork, setIsAutomatchNetwork] = useState(true);
-
-  const selectValue = isAutomatchNetwork ? 'auto' : blockchain;
+  const {
+    blockchain,
+    setBlockchain,
+    isAutomatchNetwork,
+    setIsAutomatchNetwork,
+    isAddressNotMatchNetwork,
+  } = useSendState();
 
   const handleSelectChange = (item: SelectItemValueType) => {
     if (item.key === 'auto') {
       setIsAutomatchNetwork(true);
+      setBlockchain(Blockchain.solana);
       return;
     }
 
@@ -83,8 +87,11 @@ export const NetworkSelect: FC = () => {
     setBlockchain(item.key);
   };
 
+  const selectValue = isAutomatchNetwork ? 'auto' : blockchain;
   const currentItem = SELECT_ITEMS.find((item) => item.key === selectValue) as SelectItemValueType;
-  const value = <Item item={currentItem} forValue={true} />;
+  const value = (
+    <Item item={currentItem} forValue={true} isAddressNotMatchNetwork={isAddressNotMatchNetwork} />
+  );
 
   return (
     <>

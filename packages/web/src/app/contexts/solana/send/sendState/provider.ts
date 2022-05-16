@@ -10,7 +10,7 @@ import type { RenNetwork } from '@renproject/interfaces';
 import { PublicKey } from '@solana/web3.js';
 import { createContainer } from 'unstated-next';
 
-import { isValidSolanaAddress, useFeeCompensation } from 'app/contexts';
+import { isValidBitcoinAddress, isValidSolanaAddress, useFeeCompensation } from 'app/contexts';
 import type { DestinationAccount } from 'app/contexts/api/feeRelayer/types';
 import { useRenNetwork } from 'utils/hooks/renBridge/useNetwork';
 
@@ -41,6 +41,11 @@ export interface UseSendState {
 
   blockchain: Blockchain;
   setBlockchain: (v: Blockchain) => void;
+
+  isAutomatchNetwork: boolean;
+  setIsAutomatchNetwork: (v: boolean) => void;
+
+  isAddressNotMatchNetwork: boolean;
 
   renNetwork: RenNetwork;
 
@@ -99,6 +104,7 @@ const useSendStateInternal = (): UseSendState => {
   const [isResolvingAddress, setIsResolvingAddress] = useState(false);
 
   const [blockchain, setBlockchain] = useState<Blockchain>(BLOCKCHAINS[0]);
+  const [isAutomatchNetwork, setIsAutomatchNetwork] = useState(true);
 
   const renNetwork = useRenNetwork();
 
@@ -108,6 +114,61 @@ const useSendStateInternal = (): UseSendState => {
   const [isInitBurnAndRelease, setIsInitBurnAndRelease] = useState(false);
 
   const [destinationAccount, setDestinationAccount] = useState<DestinationAccount | null>(null);
+
+  const destinationAddress = resolvedAddress || toPublicKey;
+
+  const isRenBTC = fromTokenAccount?.balance?.token.symbol === 'renBTC';
+
+  const isAddressInvalid = useMemo(() => {
+    if (destinationAddress.length) {
+      return !isValidAddress(blockchain, destinationAddress, renNetwork);
+    }
+
+    return false;
+  }, [blockchain, destinationAddress, renNetwork]);
+
+  useEffect(() => {
+    if (isRenBTC) {
+      setIsAutomatchNetwork(true);
+      setBlockchain(Blockchain.solana);
+    }
+  }, [isRenBTC]);
+
+  useEffect(() => {
+    if (!isRenBTC) {
+      return;
+    }
+
+    if (isAutomatchNetwork) {
+      if (isValidSolanaAddress(destinationAddress)) {
+        setBlockchain(Blockchain.solana);
+        setIsAutomatchNetwork(false);
+      } else if (isValidBitcoinAddress(destinationAddress, renNetwork)) {
+        setBlockchain(Blockchain.bitcoin);
+        setIsAutomatchNetwork(false);
+      }
+    }
+  }, [isRenBTC, isAutomatchNetwork, destinationAddress, renNetwork]);
+
+  const isAddressNotMatchNetwork = useMemo(() => {
+    if (!isRenBTC) {
+      return false;
+    }
+
+    if (!isAutomatchNetwork) {
+      if (!isAddressInvalid) {
+        if (
+          (isValidBitcoinAddress(destinationAddress, renNetwork) &&
+            blockchain !== Blockchain.bitcoin) ||
+          (isValidSolanaAddress(destinationAddress) && blockchain !== Blockchain.solana)
+        ) {
+          return true;
+        }
+      }
+    }
+
+    return false;
+  }, [isRenBTC, isAutomatchNetwork, isAddressInvalid, destinationAddress, renNetwork]);
 
   useEffect(() => {
     if (tokenAccount?.balance) {
@@ -123,16 +184,6 @@ const useSendStateInternal = (): UseSendState => {
       setBlockchain(BLOCKCHAINS[0]);
     }
   }, [setFromToken, tokenAccount]);
-
-  const destinationAddress = resolvedAddress || toPublicKey;
-
-  const isAddressInvalid = useMemo(() => {
-    if (destinationAddress.length) {
-      return !isValidAddress(blockchain, destinationAddress, renNetwork);
-    }
-
-    return false;
-  }, [blockchain, destinationAddress, renNetwork]);
 
   useEffect(() => {
     const resolve = async () => {
@@ -179,8 +230,6 @@ const useSendStateInternal = (): UseSendState => {
   useEffect(() => {
     setAccountsCount(destinationAccount?.isNeedCreate ? 1 : 0);
   }, [destinationAccount?.isNeedCreate, setAccountsCount]);
-
-  const isRenBTC = fromTokenAccount?.balance?.token.symbol === 'renBTC';
 
   const feeAmount: TokenAmount | undefined = useMemo(() => {
     if (estimatedFeeAmount.totalLamports.eq(ZERO)) {
@@ -278,6 +327,9 @@ const useSendStateInternal = (): UseSendState => {
     setResolvedAddress,
     blockchain,
     setBlockchain,
+    isAutomatchNetwork,
+    setIsAutomatchNetwork,
+    isAddressNotMatchNetwork,
     renNetwork,
     isExecuting,
     setIsExecuting,
