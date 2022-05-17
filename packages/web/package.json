@@ -41,7 +41,7 @@
     "@renproject/ren": "^2.5.1",
     "@renproject/ren-tx": "^2.5.1",
     "@saberhq/solana-contrib": "^1.12.27",
-    "@saberhq/token-utils": "^1.12.27",
+    "@saberhq/token-utils": "^1.13.6",
     "@saberhq/use-solana": "^1.12.27",
     "@solana/spl-token": "^0.1.8",
     "@solana/spl-token-registry": "^0.2.2153",
