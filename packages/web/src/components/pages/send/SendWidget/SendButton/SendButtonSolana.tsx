@@ -50,6 +50,7 @@ export const SendButtonSolana: FC<Props> = ({ primary, disabled }) => {
     destinationAccount,
     hasBalance,
     details,
+    isAddressNotMatchNetwork,
   } = sendState;
 
   const handleSubmit = async () => {
@@ -152,6 +153,10 @@ export const SendButtonSolana: FC<Props> = ({ primary, disabled }) => {
       return 'Choose the recipient';
     }
 
+    if (isAddressNotMatchNetwork) {
+      return 'Change the network or the address';
+    }
+
     return (
       <>
         <SendIcon name="top" />
@@ -164,6 +169,7 @@ export const SendButtonSolana: FC<Props> = ({ primary, disabled }) => {
     fromTokenAccount?.balance,
     hasBalance,
     details.totalAmountToShow,
+    isAddressNotMatchNetwork,
   ]);
 
   return (
