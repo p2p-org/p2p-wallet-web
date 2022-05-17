@@ -39,6 +39,8 @@ const Title = styled.div`
   letter-spacing: 0.01em;
 `;
 
+const LAMPORTS_PER_USDC = 1000000;
+
 export const Inputs: FC = () => {
   const {
     currency: { symbol },
@@ -59,8 +61,10 @@ export const Inputs: FC = () => {
       ? Number(buyQuote?.quoteCurrencyAmount)
       : Number(buyQuote?.baseCurrencyAmount)) || 0;
 
+  const laportsMultiplier = symbol === 'SOL' ? LAMPORTS_PER_SOL : LAMPORTS_PER_USDC;
+
   const buttonAmountFormatted = isBaseAmountType
-    ? new TokenAmount(token, buttonAmount * LAMPORTS_PER_SOL).formatUnits()
+    ? new TokenAmount(token, buttonAmount * laportsMultiplier).formatUnits()
     : formatNumberToUSD(buttonAmount, { alwaysShowCents: false });
 
   return (
