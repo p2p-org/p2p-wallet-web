@@ -83,7 +83,7 @@ export const SendButtonBitcoin: FC<Props> = ({ primary, disabled, onInitBurnAndR
     return (
       <>
         <SendIcon name="top" />
-        'Send now'
+        Send now
       </>
     );
   }, [sendState.isAddressNotMatchNetwork]);
