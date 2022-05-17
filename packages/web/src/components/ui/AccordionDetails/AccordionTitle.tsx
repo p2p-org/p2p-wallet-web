@@ -1,4 +1,4 @@
-import type { FC } from 'react';
+import type { FC, ReactElement } from 'react';
 
 import { styled } from '@linaria/react';
 import { theme } from '@p2p-wallet-web/ui';
@@ -31,9 +31,24 @@ const AccordionTitleSecondaryValue = styled.div`
   color: ${theme.colors.textIcon.primary};
 `;
 
+const titleBottomNameEl = (
+  titleBottomName: string | ReactElement,
+  titleBottomValue?: string | ReactElement,
+) => (
+  <>
+    {titleBottomName}
+    {titleBottomValue ? ':' : null}
+  </>
+);
+
+const titleBottomValueEl = (titleBottomValue: string) =>
+  titleBottomValue ? (
+    <AccordionTitleSecondaryValue>{titleBottomValue}</AccordionTitleSecondaryValue>
+  ) : null;
+
 interface Props {
   title: string;
-  titleBottomName: string;
+  titleBottomName: string | ReactElement;
   titleBottomValue: string;
 }
 
@@ -42,8 +57,8 @@ export const AccordionTitle: FC<Props> = ({ title, titleBottomName, titleBottomV
     <AccordionTitleWrapper>
       <AccordionTitlePrimary>{title}</AccordionTitlePrimary>
       <AccordionTitleSecondary>
-        {titleBottomName}:
-        <AccordionTitleSecondaryValue>{titleBottomValue}</AccordionTitleSecondaryValue>
+        {titleBottomNameEl(titleBottomName, titleBottomValue)}
+        {titleBottomValueEl(titleBottomValue)}
       </AccordionTitleSecondary>
     </AccordionTitleWrapper>
   );
