@@ -59,6 +59,8 @@ const SELECT_ITEMS: SelectItemType[] = [
   },
 ];
 
+const SELECT_ITEMS_WITHOUT_AUTO = SELECT_ITEMS.slice(1);
+
 const valueEl = (currentItem: SelectItemValueType, isAddressNotMatchNetwork?: boolean) => (
   <Item item={currentItem} forValue={true} isAddressNotMatchNetwork={isAddressNotMatchNetwork} />
 );
@@ -79,6 +81,8 @@ export const NetworkSelect: FC = () => {
     isAutomatchNetwork,
     setIsAutomatchNetwork,
     isAddressNotMatchNetwork,
+    isAddressInvalid,
+    destinationAddress,
   } = useSendState();
 
   const handleSelectChange = (item: SelectItemValueType) => {
@@ -94,6 +98,10 @@ export const NetworkSelect: FC = () => {
 
   const selectValue = isAutomatchNetwork ? 'auto' : blockchain;
   const currentItem = SELECT_ITEMS.find((item) => item.key === selectValue) as SelectItemValueType;
+  const selectItemsList =
+    !isAutomatchNetwork && destinationAddress.length && !isAddressInvalid
+      ? SELECT_ITEMS_WITHOUT_AUTO
+      : SELECT_ITEMS;
 
   return (
     <>
@@ -101,7 +109,7 @@ export const NetworkSelect: FC = () => {
         value={valueEl(currentItem, isAddressNotMatchNetwork)}
         mobileListTitle="Choose the network"
       >
-        {SELECT_ITEMS.map((item) =>
+        {selectItemsList.map((item) =>
           item.key === 'notification' ? (
             <React.Fragment key={item.key}>{notificationEl()}</React.Fragment>
           ) : (
