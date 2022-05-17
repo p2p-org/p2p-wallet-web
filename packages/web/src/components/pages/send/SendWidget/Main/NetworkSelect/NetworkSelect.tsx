@@ -13,6 +13,7 @@ import type {
 import { Select, SelectItem } from 'components/ui';
 
 const NotificationWrapper = styled.div`
+  margin: 0 12px;
   padding: 16px 20px;
 
   font-weight: 400;
