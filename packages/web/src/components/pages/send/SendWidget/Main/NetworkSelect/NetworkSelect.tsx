@@ -52,7 +52,7 @@ const SELECT_ITEMS: SelectItemType[] = [
   },
   {
     key: Blockchain.bitcoin,
-    symbol: 'renBTC',
+    symbol: 'BTC',
     title: 'Bitcoin network',
     feeTitle: 'Fees:',
     feeValue: '0.0002 renBTC + 0.0002 SOL',
