@@ -30,6 +30,8 @@ const useTokensInternal = (): UseTokens => {
 
   const tokenNameMap = useMemo(() => {
     return Object.values(tokenMap).reduce((acc, token) => {
+      if (token.info.name === 'Lunaria') return acc; // hardcoded 101 chain Lunaria exception
+
       acc[token.symbol.toUpperCase()] = token;
       return acc;
     }, {} as TokenMap);
