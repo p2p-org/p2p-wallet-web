@@ -8,7 +8,7 @@ import classNames from 'classnames';
 import { Loader } from 'components/common/Loader';
 import { Icon } from 'components/ui';
 
-import { SelectListMobile } from './SelectListMobile';
+import { ListMobile } from './ListMobile';
 
 const Wrapper = styled.div`
   position: relative;
@@ -73,14 +73,20 @@ const Selector = styled.div`
   }
 `;
 
-const CaretWrapper = styled.div`
-  margin-right: 4px;
+const ItemsMobileWrapper = styled.div`
+  display: grid;
+  grid-row-gap: 12px;
+
+  padding: 18px 2px;
 `;
 
 const DropDownList = styled.div`
   position: absolute;
   right: 0;
   z-index: 1;
+
+  display: grid;
+  grid-row-gap: 8px;
 
   width: 100%;
   min-width: 204px;
@@ -154,16 +160,13 @@ export const Select: FunctionComponent<Props> = ({
     <Wrapper ref={selectorRef} className={className}>
       <Selector onClick={handleSelectorClick} className={classNames({ isOpen, flat })}>
         <Value>{value}</Value>
-        <CaretWrapper>{isLoading ? <Loader size="24" /> : <CaretIcon name="caret" />}</CaretWrapper>
+        {isLoading ? <Loader size="24" /> : <CaretIcon name="caret" />}
       </Selector>
       {isOpen ? (
         isMobile ? (
-          <SelectListMobile
-            title={mobileListTitle}
-            onCloseByWrapper={handleMobileListCloseByWrapper}
-          >
-            {items}
-          </SelectListMobile>
+          <ListMobile title={mobileListTitle} onCloseByWrapper={handleMobileListCloseByWrapper}>
+            <ItemsMobileWrapper>{items}</ItemsMobileWrapper>
+          </ListMobile>
         ) : (
           <DropDownList>{items}</DropDownList>
         )

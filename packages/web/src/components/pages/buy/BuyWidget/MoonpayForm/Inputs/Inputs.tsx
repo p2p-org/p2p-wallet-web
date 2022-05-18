@@ -4,7 +4,6 @@ import { styled } from '@linaria/react';
 import { useToken } from '@p2p-wallet-web/core';
 import { TokenAmount } from '@p2p-wallet-web/token-utils';
 import { borders, theme } from '@p2p-wallet-web/ui';
-import { LAMPORTS_PER_SOL } from '@solana/web3.js';
 
 import { useBuyState, useConfig } from 'app/contexts';
 import { TokenAvatar } from 'components/common/TokenAvatar';
@@ -55,12 +54,10 @@ export const Inputs: FC = () => {
   const prefix = isBaseAmountType ? '$' : <TokenAvatar symbol={symbol} size={32} />;
 
   const buttonAmount =
-    (isBaseAmountType
-      ? Number(buyQuote?.quoteCurrencyAmount)
-      : Number(buyQuote?.baseCurrencyAmount)) || 0;
+    Number(isBaseAmountType ? buyQuote?.quoteCurrencyAmount : buyQuote?.baseCurrencyAmount) || 0;
 
   const buttonAmountFormatted = isBaseAmountType
-    ? new TokenAmount(token, buttonAmount * LAMPORTS_PER_SOL).formatUnits()
+    ? TokenAmount.parse(token, buttonAmount.toString()).formatUnits()
     : formatNumberToUSD(buttonAmount, { alwaysShowCents: false });
 
   return (

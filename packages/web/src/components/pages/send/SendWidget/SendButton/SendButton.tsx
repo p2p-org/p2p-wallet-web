@@ -20,6 +20,7 @@ export const SendButton: FC = () => {
     isExecuting,
     isAddressInvalid,
     setIsInitBurnAndRelease,
+    isAddressNotMatchNetwork,
   } = useSendState();
   const { estimatedFeeAmount } = useFeeCompensation();
 
@@ -36,6 +37,7 @@ export const SendButton: FC = () => {
     !destinationAddress ||
     isValidAmount(fromAmount) ||
     isAddressInvalid ||
+    isAddressNotMatchNetwork ||
     !hasBalance;
 
   if (blockchain === 'bitcoin') {
