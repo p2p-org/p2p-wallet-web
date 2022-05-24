@@ -9,7 +9,6 @@ import path from 'path';
 import TerserPlugin from 'terser-webpack-plugin';
 import type { Configuration as WebpackConfiguration, WebpackPluginInstance } from 'webpack';
 import webpack from 'webpack';
-import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
 import type { Configuration as WebpackDevServerConfiguration } from 'webpack-dev-server';
 import zlib from 'zlib';
 
@@ -37,7 +36,6 @@ const PACKAGE_PATH = path.resolve(__dirname, '../packages');
 const config: ConfigFn = (env, argv) => {
   const __DEVELOPMENT__ = argv.mode === 'development';
   const __PRODUCTION__ = argv.mode === 'production';
-  const __ANALYSE__ = env.analyze;
   const __PACKAGE_NAME__ = env.name;
 
   // @ts-ignore
@@ -98,11 +96,6 @@ const config: ConfigFn = (env, argv) => {
     devPlugins.push(new ReactRefreshWebpackPlugin());
   }
 
-  // @TODO try out the --analize flag
-  if (__ANALYSE__) {
-    utilityPlugins.push(new BundleAnalyzerPlugin());
-  }
-
   return {
     bail: __PRODUCTION__,
 
@@ -112,18 +105,14 @@ const config: ConfigFn = (env, argv) => {
 
     entry: path.resolve(__dirname, WEB_PATH, '/src/index.tsx'),
 
-    // @TODO output for library https://webpack.js.org/configuration/output/#outputlibrary
-    // @TODO https://webpack.js.org/guides/author-libraries/
-    // set up sideeffect as well for the libs
     output: {
-      path: path.resolve(__dirname, WEB_PATH, '/public'),
+      path: path.resolve(__dirname, WEB_PATH, 'public'),
       filename: __DEVELOPMENT__ ? '[name].[contenthash].js' : '[contenthash].js',
       chunkFilename: __DEVELOPMENT__ ? '[id]-[contenthash].chunk.js' : '[contenthash].chunk.js',
       assetModuleFilename: '[name]-[contenthash][ext]',
     },
 
     optimization: {
-      // nodeEnv: argv.mode,
       runtimeChunk: 'single',
       minimize: __PRODUCTION__,
       minimizer: __PRODUCTION__
