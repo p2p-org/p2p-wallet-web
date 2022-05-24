@@ -46,6 +46,7 @@ import pen from './assets/new/pen-icon.svg';
 import plus from './assets/new/plus-icon.svg';
 import qr from './assets/new/qr-icon.svg';
 import question from './assets/new/question-icon.svg';
+import rocket from './assets/new/rocket-icon.svg';
 import roundStop from './assets/new/round-stop-icon.svg';
 import search from './assets/new/search-icon.svg';
 import sendMessage from './assets/new/send-message-icon.svg';
@@ -131,6 +132,7 @@ const iconsMap = new Map<string, string>([
   ['clock-send', clockSend],
   ['success-send', successSend],
   ['error-send', errorSend],
+  ['rocket', rocket],
 ]);
 
 export interface IconProps extends HTMLAttributes<HTMLOrSVGElement> {

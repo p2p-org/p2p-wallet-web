@@ -32,8 +32,6 @@ export const TransactionStatusModal: FunctionComponent<
   action,
   close,
   userTokenAccounts,
-  priceInfo,
-  solanaProvider,
   swapInfo,
   feeLimitsInfo,
   feeCompensationInfo,
@@ -108,7 +106,7 @@ export const TransactionStatusModal: FunctionComponent<
   const isSuccess = Boolean(signature && transaction?.key && !isError);
 
   return (
-    <WrapperModal close={handleCloseClick}>
+    <WrapperModal close={handleCloseClick} noDelimiter>
       <Section>
         <Header>
           {swapInfo.trade.inputTokenName} → {swapInfo.trade.outputTokenName}
@@ -129,8 +127,6 @@ export const TransactionStatusModal: FunctionComponent<
         <Swap
           params={params}
           userTokenAccounts={userTokenAccounts}
-          priceInfo={priceInfo}
-          solanaProvider={solanaProvider}
           feeLimitsInfo={feeLimitsInfo}
           feeCompensationInfo={feeCompensationInfo}
           networkFees={networkFees}

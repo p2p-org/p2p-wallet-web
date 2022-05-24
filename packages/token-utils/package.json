@@ -14,9 +14,9 @@
   "dependencies": {
   },
   "devDependencies": {
-    "@saberhq/token-utils": "^1.12.27"
+    "@saberhq/token-utils": "^1.13.6"
   },
   "peerDependencies": {
-    "@saberhq/token-utils": "^1.12.27"
+    "@saberhq/token-utils": "^1.13.6"
   }
 }

@@ -5,6 +5,7 @@ import { styled } from '@linaria/react';
 import type { LoadableComponent } from '@loadable/component';
 import loadable from '@loadable/component';
 import { zIndexes } from '@p2p-wallet-web/ui';
+import classNames from 'classnames';
 
 import type { ModalPropsType } from 'app/contexts/general/modals/types';
 import { ModalType } from 'app/contexts/general/modals/types';
@@ -12,44 +13,33 @@ import { ModalType } from 'app/contexts/general/modals/types';
 const Wrapper = styled.div`
   position: fixed;
   top: 0;
-  left: 0;
-  z-index: ${zIndexes.modal};
-
-  width: 100vw;
-  height: 100vh;
-`;
-
-const ModalContainer = styled.div`
-  position: fixed;
-  top: 0;
   right: 0;
   bottom: 0;
   left: 0;
+  z-index: ${zIndexes.modal};
 
-  overflow-y: auto;
-  overscroll-behavior: none;
+  display: flex;
+  flex-direction: column;
+
+  background-color: rgba(0, 0, 0, 0.6);
+
+  user-select: none;
+
+  &.nav {
+    bottom: 57px;
+  }
 `;
 
 const ModalWrapper = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 100%;
-`;
-
-const ModalBackground = styled.div`
-  position: fixed;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-
-  background-color: rgba(0, 0, 0, 0.6);
-
-  user-select: none;
+  height: 100%;
 `;
 
 type ModalState = { modalType: ModalType; modalId: number; props: any };
+type GetPresetFn = (modal?: ModalType) => Preset;
+type Preset = 'nav' | 'regular';
 
 const modalsMap = new Map<ModalType, LoadableComponent<ModalPropsType & any>>([
   // [SHOW_MODAL_ADD_COIN, loadable(() => import('components/modals/__AddCoinModal'))],
@@ -98,6 +88,15 @@ const modalsMap = new Map<ModalType, LoadableComponent<ModalPropsType & any>>([
 
 const promises = new Map();
 let modalIdCounter = 0;
+
+const getPreset: GetPresetFn = (modal) => {
+  switch (modal) {
+    case ModalType.SHOW_MODAL_ACTIONS_MOBILE:
+      return 'nav';
+    default:
+      return 'regular';
+  }
+};
 
 const ModalsContext = React.createContext<{
   openModal: <T, S extends {}>(modalType: ModalType, props?: S) => Promise<T | void>;
@@ -185,19 +184,19 @@ export function ModalsProvider({ children = null as any }) {
 
       return (
         <Suspense fallback={null} key={modal.modalId}>
-          <ModalContainer>
-            <ModalWrapper onMouseDown={handleWrapperClick}>
-              <ModalComponent
-                {...modal.props}
-                key={modal.modalId}
-                close={(result?: any) => closeModal(modal.modalId, result)}
-              />
-            </ModalWrapper>
-          </ModalContainer>
+          <ModalWrapper onMouseDown={handleWrapperClick}>
+            <ModalComponent
+              {...modal.props}
+              key={modal.modalId}
+              close={(result?: any) => closeModal(modal.modalId, result)}
+            />
+          </ModalWrapper>
         </Suspense>
       );
     });
   }, [modals, handleWrapperClick, closeModal]);
+
+  const preset = getPreset(modals.at(-1)?.modalType);
 
   return (
     <ModalsContext.Provider
@@ -209,10 +208,7 @@ export function ModalsProvider({ children = null as any }) {
     >
       {children}
       {preparedModals.length > 0 ? (
-        <Wrapper>
-          <ModalBackground />
-          {preparedModals}
-        </Wrapper>
+        <Wrapper className={classNames(preset)}>{preparedModals}</Wrapper>
       ) : undefined}
     </ModalsContext.Provider>
   );

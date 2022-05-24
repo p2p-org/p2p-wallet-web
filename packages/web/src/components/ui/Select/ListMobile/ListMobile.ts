@@ -8,7 +8,7 @@ type Props = {
   onCloseByWrapper: () => void;
 };
 
-export const SelectListMobile: FC<Props> = ({ children, title, onCloseByWrapper }) => {
+export const ListMobile: FC<Props> = ({ children, title, onCloseByWrapper }) => {
   const { openModal, closeModal } = useModals();
 
   useEffect(() => {

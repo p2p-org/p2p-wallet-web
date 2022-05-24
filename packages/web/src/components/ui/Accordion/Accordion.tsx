@@ -50,8 +50,8 @@ const Right = styled.div`
 `;
 
 const ChevronIcon = styled(Icon)`
-  width: 20px;
-  height: 20px;
+  width: 24px;
+  height: 24px;
 
   color: ${theme.colors.textIcon.secondary};
 

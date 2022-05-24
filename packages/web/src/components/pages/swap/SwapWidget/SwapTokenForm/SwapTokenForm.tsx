@@ -8,8 +8,9 @@ import type { u64 } from '@solana/spl-token';
 import classNames from 'classnames';
 import throttle from 'lodash.throttle';
 
+import { useMarketsData } from 'app/contexts';
 import type { UserTokenAccountMap } from 'app/contexts/solana/swap';
-import { useConfig, usePrice, useSwap } from 'app/contexts/solana/swap';
+import { useConfig, useSwap } from 'app/contexts/solana/swap';
 import type TokenAccount from 'app/contexts/solana/swap/models/TokenAccount';
 import type Trade from 'app/contexts/solana/swap/models/Trade';
 import { formatBigNumber, getUSDValue, parseString } from 'app/contexts/solana/swap/utils/format';
@@ -21,7 +22,7 @@ import { Icon } from 'components/ui';
 import { Row, Text } from 'components/ui/AccordionDetails/common';
 import { InputAmount } from 'components/ui/InputAmount';
 import { SearchInput } from 'components/ui/SearchInput';
-import { getNumberFromFormattedNumber } from 'utils/format';
+import { trimFormattedNumber } from 'utils/format';
 import { shortAddress } from 'utils/tokens';
 
 import { AmountUSDStyled } from '../AmountUSD';
@@ -350,9 +351,6 @@ export const SwapTokenForm: FC<Props> = ({
   const [filter, setFilter] = useState('');
   const [scrollTop, setScrollTop] = useState(0);
 
-  const { useAsyncMergedPrices } = usePrice();
-  const asyncPrices = useAsyncMergedPrices();
-
   const hasAsyncStandardTokenAccounts = !!asyncStandardTokenAccounts;
 
   const tokenInfo = tokenConfigs[tokenName];
@@ -443,6 +441,13 @@ export const SwapTokenForm: FC<Props> = ({
     [setTokenName],
   );
 
+  const symbols = useMemo(
+    () => Object.keys(asyncStandardTokenAccounts || {}),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [hasAsyncStandardTokenAccounts],
+  );
+  const rates = useMarketsData(symbols);
+
   const filteredTokenAccounts = useMemo((): TokenAccount[] => {
     if (!asyncStandardTokenAccounts) {
       return [];
@@ -490,31 +495,21 @@ export const SwapTokenForm: FC<Props> = ({
         const mintAddressB = b.accountInfo.mint.toBase58();
         const tokenSymbolB = mintToTokenName[mintAddressB];
 
-        // const aUSD = toDecimal(a.getAmount())
-        //   .div(10 ** tokenConfigs[tokenSymbolA].decimals)
-        //   .toDecimalPlaces(tokenConfigs[tokenSymbolA].decimals);
-        //
-        // const bUSD = toDecimal(b.getAmount())
-        //   .div(10 ** tokenConfigs[tokenSymbolB].decimals)
-        //   .toDecimalPlaces(tokenConfigs[tokenSymbolB].decimals);
-        // return aUSD.cmp(bUSD);
-
         const aUSD = getUSDValue(
           a.getAmount(),
           tokenConfigs[tokenSymbolA].decimals,
-          asyncPrices.value?.[tokenSymbolA] || 0,
+          rates[tokenSymbolA] || 0,
         );
         const bUSD = getUSDValue(
           b.getAmount(),
           tokenConfigs[tokenSymbolB].decimals,
-          asyncPrices.value?.[tokenSymbolB] || 0,
+          rates[tokenSymbolB] || 0,
         );
 
         return bUSD < aUSD ? -1 : a === b ? 0 : 1;
       });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
-    asyncPrices.value,
     hasAsyncStandardTokenAccounts,
     filter,
     isInput,
@@ -522,6 +517,7 @@ export const SwapTokenForm: FC<Props> = ({
     pairTokenName,
     tokenConfigs,
     tokenName,
+    rates,
   ]);
 
   const filteredTokens = useMemo(
@@ -610,7 +606,7 @@ export const SwapTokenForm: FC<Props> = ({
         <InputWrapper>
           <InputAmount
             placeholder={Number(0).toFixed(tokenInfo?.decimals || 0)}
-            value={getNumberFromFormattedNumber(formatBigNumber(amount, tokenInfo?.decimals || 0))}
+            value={trimFormattedNumber(formatBigNumber(amount, tokenInfo?.decimals || 0))}
             onChange={handleAmountChange}
             disabled={disabled || disabledInput}
           />
@@ -632,7 +628,8 @@ export const SwapTokenForm: FC<Props> = ({
               {receiveAmount} {trade.outputTokenName}
               <Text className="gray inline-flex">
                 <AmountUSDStyled
-                  prefix="~"
+                  prefix="(~"
+                  postfix=")"
                   amount={trade.getOutputAmount()}
                   tokenName={trade.outputTokenName}
                 />

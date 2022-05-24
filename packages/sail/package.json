@@ -45,7 +45,7 @@
     "@rushstack/eslint-patch": "^1.1.0",
     "@saberhq/anchor-contrib": "^1.12.27",
     "@saberhq/solana-contrib": "^1.12.27",
-    "@saberhq/token-utils": "^1.12.27",
+    "@saberhq/token-utils": "^1.13.6",
     "@saberhq/use-solana": "^1.12.27",
     "@solana/web3.js": "^1.31.0",
     "@types/lodash.chunk": "^4.2.6",
