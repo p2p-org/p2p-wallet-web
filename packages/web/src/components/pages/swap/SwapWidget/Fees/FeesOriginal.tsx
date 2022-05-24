@@ -10,11 +10,10 @@ import { u64 } from '@solana/spl-token';
 import classNames from 'classnames';
 import Decimal from 'decimal.js';
 
-import type { useFeeCompensation, useFreeFeeLimits, useNetworkFees, UseSwap } from 'app/contexts';
+import type { useFeeCompensation, useNetworkFees, UseSwap } from 'app/contexts';
 import { useConfig } from 'app/contexts/solana/swap';
 import { formatBigNumber } from 'app/contexts/solana/swap/utils/format';
 import { CompensationFee } from 'components/common/CompensationFee';
-import { FeeTransactionTooltip } from 'components/common/TransactionDetails/FeeTransactinTooltip';
 import { Accordion, Icon } from 'components/ui';
 import { AccordionTitle } from 'components/ui/AccordionDetails/AccordionTitle';
 import { ListWrapper, Row, Text } from 'components/ui/AccordionDetails/common';
@@ -46,7 +45,6 @@ const ONE_TOKEN_BASE = 10;
 export interface FeesOriginalProps {
   userTokenAccounts: ReturnType<typeof useUserTokenAccounts>;
   feeCompensationInfo: ReturnType<typeof useFeeCompensation>;
-  feeLimitsInfo: ReturnType<typeof useFreeFeeLimits>;
   networkFees: ReturnType<typeof useNetworkFees>;
   swapInfo: UseSwap;
   open?: boolean;
@@ -54,7 +52,6 @@ export interface FeesOriginalProps {
 }
 
 export const FeesOriginal: FC<FeesOriginalProps> = ({
-  feeLimitsInfo,
   swapInfo,
   networkFees,
   userTokenAccounts,
@@ -65,8 +62,11 @@ export const FeesOriginal: FC<FeesOriginalProps> = ({
   const { tokenConfigs } = useConfig();
   const { trade, asyncStandardTokenAccounts } = swapInfo;
   const { setFromToken, compensationState, feeToken, feeAmountInToken } = feeCompensationInfo;
-  const { userFreeFeeLimits } = feeLimitsInfo;
   const isMobile = useIsMobile();
+
+  /*const {
+    settings: { useFreeTransactions },
+  } = useSettings();*/
 
   const { handleShowSettings } = useShowSettings();
 
@@ -256,12 +256,17 @@ export const FeesOriginal: FC<FeesOriginalProps> = ({
         </Row>
         <Row>
           <Text className="gray">Transaction fee</Text>
-          <Text>
-            Free{' '}
-            <Text className="green inline-flex">
-              (Paid by P2P.org) <FeeTransactionTooltip userFreeFeeLimits={userFreeFeeLimits} />
+          {/*useFreeTransactions ? (
+            <Text>
+              Free{' '}
+              <Text className="green inline-flex">
+                (Paid by P2P.org) <FeeTransactionTooltip userFreeFeeLimits={userFreeFeeLimits} />
+              </Text>
             </Text>
-          </Text>
+          ) : (
+            <Text>1</Text>
+          )*/}
+          <Text>5000 lamport</Text>
         </Row>
         {tokenNames?.map((tokenName) => (
           <Row key={tokenName}>

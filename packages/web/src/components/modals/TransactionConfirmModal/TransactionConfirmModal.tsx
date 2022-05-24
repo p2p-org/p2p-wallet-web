@@ -87,10 +87,7 @@ export const TransactionConfirmModal: FunctionComponent<
   swapInfo,
   sendState,
   userTokenAccounts,
-  userFreeFeeLimits,
   feeCompensationInfo,
-  feeLimitsInfo,
-  solanaProvider,
   networkFees,
 }) => {
   const { walletProviderInfo } = useWallet();
@@ -200,7 +197,6 @@ export const TransactionConfirmModal: FunctionComponent<
         <Send
           params={params as TransferParams}
           sendState={sendState}
-          userFreeFeeLimits={userFreeFeeLimits}
           networkFees={networkFees}
           btcAddress={btcAddress}
         />
@@ -211,8 +207,6 @@ export const TransactionConfirmModal: FunctionComponent<
           swapInfo={swapInfo}
           userTokenAccounts={userTokenAccounts}
           feeCompensationInfo={feeCompensationInfo}
-          feeLimitsInfo={feeLimitsInfo}
-          solanaProvider={solanaProvider}
           networkFees={networkFees}
           showTitle={true}
         />

@@ -11,7 +11,7 @@ const DEFAULT_MAIN_SETTINGS: MainSettings = {
   currency: 'USD',
   appearance: 'system',
   isZeroBalancesHidden: true,
-  useFreeTransactions: true,
+  useFreeTransactions: false,
 
   usernameBannerHiddenByUser: false,
 };

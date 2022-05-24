@@ -88,7 +88,6 @@ interface Props {
 export const Send: FC<Props & TransactionDetailsProps> = ({
   params,
   sendState,
-  userFreeFeeLimits,
   networkFees,
   btcAddress,
 }) => {
@@ -136,7 +135,6 @@ export const Send: FC<Props & TransactionDetailsProps> = ({
 
       <TransactionDetails
         sendState={sendState}
-        userFreeFeeLimits={userFreeFeeLimits}
         networkFees={networkFees}
         amount={params.amount.toU64()}
       />

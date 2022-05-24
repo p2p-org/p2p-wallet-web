@@ -38,7 +38,6 @@ export const Swap: FC<Props & FeesOriginalProps> = ({
   params: { inputTokenName, outputTokenName, inputAmount },
   swapInfo,
   userTokenAccounts,
-  feeLimitsInfo,
   networkFees,
   feeCompensationInfo,
   showTitle,
@@ -87,7 +86,6 @@ export const Swap: FC<Props & FeesOriginalProps> = ({
         swapInfo={swapInfo}
         userTokenAccounts={userTokenAccounts}
         feeCompensationInfo={feeCompensationInfo}
-        feeLimitsInfo={feeLimitsInfo}
         networkFees={networkFees}
         open={false}
         forPage={false}

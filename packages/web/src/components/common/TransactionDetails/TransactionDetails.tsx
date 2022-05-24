@@ -4,9 +4,6 @@ import { styled } from '@linaria/react';
 import type { u64 } from '@saberhq/token-utils';
 
 import type { NetworkFees, UseSendState } from 'app/contexts';
-import { useSettings } from 'app/contexts';
-import type { INITIAL_USER_FREE_FEE_LIMITS } from 'app/contexts/api/feeRelayer/utils';
-import { FeeTransactionTooltip } from 'components/common/TransactionDetails/FeeTransactinTooltip';
 import { AmountUSDStyled } from 'components/pages/swap/SwapWidget/AmountUSD';
 import { Accordion } from 'components/ui';
 import { AccordionTitle } from 'components/ui/AccordionDetails/AccordionTitle';
@@ -14,7 +11,6 @@ import { ListWrapper, Row, Text } from 'components/ui/AccordionDetails/common';
 
 export interface TransactionDetailsProps {
   sendState?: UseSendState;
-  userFreeFeeLimits?: typeof INITIAL_USER_FREE_FEE_LIMITS;
   networkFees: NetworkFees;
   btcAddress?: string;
   isOpen?: boolean;
@@ -27,13 +23,12 @@ const TokenAndUsd = styled.div`
 
 export const TransactionDetails: FC<TransactionDetailsProps> = ({
   sendState,
-  userFreeFeeLimits,
   networkFees,
   amount,
 }) => {
-  const {
+  /*const {
     settings: { useFreeTransactions },
-  } = useSettings();
+  } = useSettings();*/
 
   return (
     <Accordion
@@ -62,19 +57,17 @@ export const TransactionDetails: FC<TransactionDetailsProps> = ({
         </Row>
         <Row>
           <Text className="gray">Transaction fee</Text>
-          {useFreeTransactions ? (
+          {/*useFreeTransactions ? (
             <Text>
               Free{' '}
               <Text className="green inline-flex">
-                (Paid by P2P.org)
-                {userFreeFeeLimits && (
-                  <FeeTransactionTooltip userFreeFeeLimits={userFreeFeeLimits} />
-                )}
+                (Paid by P2P.org) <FeeTransactionTooltip userFreeFeeLimits={userFreeFeeLimits} />
               </Text>
             </Text>
           ) : (
             <Text>1</Text>
-          )}
+          )*/}
+          <Text>5000 lamport</Text>
         </Row>
         {sendState?.details.accountCreationAmount ? (
           <Row>
