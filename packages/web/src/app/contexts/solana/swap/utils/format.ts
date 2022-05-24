@@ -63,9 +63,5 @@ export function formatBigNumber(
 }
 
 export function getUSDValue(amount: u64, decimals: number, price: number): number {
-  return getNumber(amount, decimals) * price;
-}
-
-export function getNumber(amount: u64, decimals: number): number {
-  return getNumberFromFormattedNumber(formatBigNumber(amount, decimals));
+  return getNumberFromFormattedNumber(formatBigNumber(amount, decimals)) * price;
 }

@@ -3,7 +3,7 @@ import { useEffect } from 'react';
 
 import { useSolana } from '@p2p-wallet-web/core';
 
-import { checkUserHasTokenAccount, isValidAddress, useSendState } from 'app/contexts';
+import { checkUserHasTokenAccount, isValidSolanaAddress, useSendState } from 'app/contexts';
 import { useTrackEventOpen } from 'app/hooks/metrics';
 import { WidgetPageWithBottom } from 'components/common/WidgetPageWithBottom';
 import { Main } from 'components/pages/send/SendWidget/Main';
@@ -30,9 +30,9 @@ export const SendWidget: FunctionComponent = () => {
     let pubKey: string | null = '';
     const isSolanaNetwork = blockchain === 'solana';
 
-    if (isValidAddress(blockchain, toPublicKey, renNetwork)) {
+    if (isValidSolanaAddress(toPublicKey)) {
       pubKey = toPublicKey;
-    } else if (isValidAddress(blockchain, resolvedAddress ?? '', renNetwork)) {
+    } else if (isValidSolanaAddress(resolvedAddress ?? '')) {
       pubKey = resolvedAddress;
     }
 

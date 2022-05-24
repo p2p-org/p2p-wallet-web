@@ -1,5 +1,8 @@
 import type { FC } from 'react';
 
+import { styled } from '@linaria/react';
+import { theme } from '@p2p-wallet-web/ui';
+
 import { useFreeFeeLimits, useSendState, useSettings } from 'app/contexts';
 import { CompensationFee } from 'components/common/CompensationFee';
 import { FeeTransactionTooltip } from 'components/common/TransactionDetails/FeeTransactinTooltip';
@@ -7,11 +10,26 @@ import { Accordion } from 'components/ui';
 import { AccordionTitle } from 'components/ui/AccordionDetails/AccordionTitle';
 import { ListWrapper, Row, Text } from 'components/ui/AccordionDetails/common';
 
+const AddressNotMatchError = styled.span`
+  color: ${theme.colors.system.errorMain};
+`;
+
+const titleBottomNameEl = (isAddressNotMatchNetwork: boolean) =>
+  isAddressNotMatchNetwork ? (
+    <AddressNotMatchError>The address and the network don’t match</AddressNotMatchError>
+  ) : (
+    'Total'
+  );
+
+const titleBottomValueEl = (isAddressNotMatchNetwork: boolean, detailsTotalAmount: string) =>
+  isAddressNotMatchNetwork ? '' : detailsTotalAmount;
+
 export const TransactionDetails: FC = () => {
   const {
     settings: { useFreeTransactions },
   } = useSettings();
-  const { fromTokenAccount, destinationAccount, details } = useSendState();
+  const { fromTokenAccount, destinationAccount, details, isAddressNotMatchNetwork } =
+    useSendState();
   const { userFreeFeeLimits } = useFreeFeeLimits();
 
   if (!details.receiveAmount) {
@@ -23,8 +41,8 @@ export const TransactionDetails: FC = () => {
       title={
         <AccordionTitle
           title="Transaction details"
-          titleBottomName="Total"
-          titleBottomValue={details.totalAmount || ''}
+          titleBottomName={titleBottomNameEl(isAddressNotMatchNetwork)}
+          titleBottomValue={titleBottomValueEl(isAddressNotMatchNetwork, details.totalAmount || '')}
         />
       }
       open
