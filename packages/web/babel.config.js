@@ -6,8 +6,6 @@ module.exports = {
       '@babel/preset-react',
       {
         runtime: 'automatic',
-        // @TODO check out what this does
-       // development: process.env.BABEL_ENV === 'development',
       },
     ],
     '@linaria',
