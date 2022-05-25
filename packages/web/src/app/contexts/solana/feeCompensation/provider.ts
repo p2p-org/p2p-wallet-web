@@ -24,7 +24,7 @@ export type EstimatedFeeAmount = {
   totalLamports: u64;
 };
 
-export type SEND_TRANSACTION_METHOD = 'feeRelayer' | 'blockchain';
+export type SEND_TRANSACTION_METHOD = 'blockchain';
 
 export type FeeCompensationState = {
   totalFee: u64;

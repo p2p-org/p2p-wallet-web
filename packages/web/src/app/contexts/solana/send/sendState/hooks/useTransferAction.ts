@@ -3,14 +3,11 @@ import { useCallback } from 'react';
 import { useSolana, useWallet } from '@p2p-wallet-web/core';
 import { useSail } from '@p2p-wallet-web/sail';
 
-import { useFeeCompensation, useSettings } from 'app/contexts';
+import { useFeeCompensation } from 'app/contexts';
 import type { RelayTransferParams } from 'app/contexts/api/feeRelayer/types';
 import { transfer } from 'app/instructions';
 
 export const useTransferAction = () => {
-  const {
-    settings: { useFreeTransactions },
-  } = useSettings();
   const { providerMut } = useSolana();
   const { publicKey } = useWallet();
   const { handleTX } = useSail();
@@ -51,7 +48,6 @@ export const useTransferAction = () => {
       handleTX,
       providerMut,
       publicKey,
-      useFreeTransactions,
     ],
   );
 };
