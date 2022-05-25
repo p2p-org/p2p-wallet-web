@@ -78,7 +78,7 @@ const config: ConfigFn = (env, argv) => {
   }
 
   if (__DEVELOPMENT__) {
-    devPlugins.push(new ReactRefreshWebpackPlugin());
+    devPlugins.push(new ReactRefreshWebpackPlugin({ overlay: false }));
   }
 
   return {
@@ -215,7 +215,7 @@ const config: ConfigFn = (env, argv) => {
       open: true,
     },
 
-    stats: __PRODUCTION__ ? 'errors-only' : 'none',
+    stats: 'errors-only',
 
     target: 'browserslist',
 
