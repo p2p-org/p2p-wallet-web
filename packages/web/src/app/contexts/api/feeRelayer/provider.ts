@@ -78,7 +78,7 @@ const useFeeRelayerInternal = (): FeeRelayerService => {
   }
 
   const isMainnet = network === 'mainnet-beta';
-  const feeRelayerURL: string = isMainnet ? feeRelayerUrl : (feeRelayerUrl as string) + '/v2';
+  const feeRelayerURL: string = isMainnet ? feeRelayerUrl : feeRelayerUrl + '/v2';
 
   const createAndSignTransaction = useCallback(
     async (

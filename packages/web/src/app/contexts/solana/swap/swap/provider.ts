@@ -5,7 +5,7 @@ import { useSolana, useStorage } from '@p2p-wallet-web/core';
 import { u64 } from '@solana/spl-token';
 import { createContainer } from 'unstated-next';
 
-import { useFeeCompensation, useFeeRelayer, useMarketsData } from 'app/contexts';
+import { useFeeCompensation, useMarketsData } from 'app/contexts';
 import type { UserTokenAccountMap } from 'app/contexts/solana/swap';
 import { useConfig, usePools, useUser } from 'app/contexts/solana/swap';
 import SlippageTolerance from 'app/contexts/solana/swap/models/SlippageTolerance';
@@ -99,7 +99,6 @@ export type UseSwapArgs = {
 const useSwapInternal = (props: UseSwapArgs = {}): UseSwap => {
   const { wallet, connection } = useSolana();
   const { programIds, tokenConfigs, routeConfigs } = useConfig();
-  const { relayTopUpWithSwap, userSetupSwap, userSwap } = useFeeRelayer();
   const {
     estimatedFeeAmount,
     compensationState,
@@ -369,45 +368,17 @@ const useSwapInternal = (props: UseSwapArgs = {}): UseSwap => {
       ...notificationParams,
     });
 
-    const isFreeTransactions = true; // TODO get from settings
     let executeSetup, executeSwap, txSignatureSwap;
     try {
-      if (!isFreeTransactions) {
-        ({ executeSetup, executeSwap, txSignatureSwap } = await trade.confirmExchange(
-          connection,
-          tokenConfigs,
-          programIds,
-          wallet,
-          inputUserTokenPublicKey,
-          intermediateTokenPublicKey?.account,
-          outputUserTokenAccount?.account,
-        ));
-      } else {
-        const { userSwapArgs, setupSwapArgs } = await trade.prepareExchangeTransactionsArgs(
-          connection,
-          tokenConfigs,
-          programIds,
-          wallet.publicKey,
-          inputUserTokenPublicKey,
-          intermediateTokenPublicKey?.account,
-          outputUserTokenAccount?.account,
-        );
-
-        if (setupSwapArgs) {
-          executeSetup = async () =>
-            await userSetupSwap(setupSwapArgs, {
-              feeAmount: compensationState?.nextTransactionFee,
-              feeToken,
-            });
-        }
-
-        executeSwap = async () => {
-          txSignatureSwap = await userSwap(userSwapArgs, {
-            feeAmount: compensationState?.nextTransactionFee,
-            feeToken,
-          });
-        };
-      }
+      ({ executeSetup, executeSwap, txSignatureSwap } = await trade.confirmExchange(
+        connection,
+        tokenConfigs,
+        programIds,
+        wallet,
+        inputUserTokenPublicKey,
+        intermediateTokenPublicKey?.account,
+        outputUserTokenAccount?.account,
+      ));
 
       // setSolanaExplorerLink(getExplorerUrl('tx', txSignature, cluster));
     } catch (e) {
@@ -428,7 +399,7 @@ const useSwapInternal = (props: UseSwapArgs = {}): UseSwap => {
     setButtonState(() => ButtonState.SendingTransaction);
 
     if (compensationState.needTopUp && feeToken) {
-      try {
+      /*try {
         await relayTopUpWithSwap({
           feeAmount: compensationState.topUpCompensationFee,
           feeToken,
@@ -446,7 +417,7 @@ const useSwapInternal = (props: UseSwapArgs = {}): UseSwap => {
           text: e.message,
         });
         return;
-      }
+      }*/
     }
 
     if (executeSetup) {
@@ -532,11 +503,8 @@ const useSwapInternal = (props: UseSwapArgs = {}): UseSwap => {
     outputUserTokenAccount?.account,
     programIds,
     refreshStandardTokenAccounts,
-    relayTopUpWithSwap,
     tokenConfigs,
     trade,
-    userSetupSwap,
-    userSwap,
     wallet,
   ]);
 
