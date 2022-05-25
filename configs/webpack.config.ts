@@ -26,7 +26,7 @@ type ArgV = {
 type ConfigFn = (env: CustomEnv, argv: ArgV) => Configuration;
 
 const MAX_CHUNK_SIZE = 300000;
-const DEV_PORT = 9000;
+const DEV_PORT = 3000;
 const APP_TITLE = 'Solana Wallet';
 const WEB_PATH = path.resolve(__dirname, '../packages/web');
 const PACKAGE_PATH = path.resolve(__dirname, '../packages');
@@ -206,20 +206,16 @@ const config: ConfigFn = (env, argv) => {
 
     devServer: {
       client: {
-        overlay: {
-          errors: true,
-          warnings: false,
-        },
-        progress: true,
+        overlay: false,
       },
       historyApiFallback: true,
       compress: true,
       port: DEV_PORT,
       hot: true,
-      open: false,
+      open: true,
     },
 
-    stats: __PRODUCTION__ ? 'errors-only' : 'normal',
+    stats: __PRODUCTION__ ? 'errors-only' : 'none',
 
     target: 'browserslist',
 
