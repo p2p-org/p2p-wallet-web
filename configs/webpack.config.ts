@@ -1,5 +1,4 @@
 import ReactRefreshWebpackPlugin from '@pmmmwh/react-refresh-webpack-plugin';
-import CompressionPlugin from 'compression-webpack-plugin';
 import CssMinimizerPlugin from 'css-minimizer-webpack-plugin';
 import DotEnv from 'dotenv-webpack';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
@@ -10,7 +9,6 @@ import TerserPlugin from 'terser-webpack-plugin';
 import type { Configuration as WebpackConfiguration, WebpackPluginInstance } from 'webpack';
 import webpack from 'webpack';
 import type { Configuration as WebpackDevServerConfiguration } from 'webpack-dev-server';
-import zlib from 'zlib';
 
 interface Configuration extends WebpackConfiguration, WebpackDevServerConfiguration {
   devServer?: WebpackDevServerConfiguration;
@@ -69,19 +67,6 @@ const config: ConfigFn = (env, argv) => {
 
   if (__PRODUCTION__) {
     prodPlugins.push(
-      new CompressionPlugin({
-        filename: '[path][base].br',
-        algorithm: 'brotliCompress',
-        test: /\.(js|css|svg)$/,
-        compressionOptions: {
-          // @ts-ignore
-          params: {
-            [zlib.constants.BROTLI_PARAM_QUALITY]: 11,
-          },
-        },
-        threshold: 10240,
-        minRatio: 0.8,
-      }),
       new webpack.optimize.LimitChunkCountPlugin({
         maxChunks: 10,
       }),
