@@ -7,7 +7,7 @@ import { TokenAmount } from '@p2p-wallet-web/token-utils';
 import { u64 } from '@solana/spl-token';
 import { createContainer } from 'unstated-next';
 
-import { useFeeRelayer, useFreeFeeLimits, useNetworkFees } from 'app/contexts';
+import { useFeeRelayer, useNetworkFees } from 'app/contexts';
 import type {
   CompensationParams,
   CompensationSwapParams,
@@ -45,7 +45,6 @@ const useFeeCompensationInternal = () => {
   const userTokenAccounts = useUserTokenAccounts();
   const { getUserRelayAccount } = useFeeRelayer();
   const networkFees = useNetworkFees();
-  const { userFreeFeeLimits } = useFreeFeeLimits();
 
   const [fromTokenAccount, setFromTokenAccount] = useState<TokenAccount | null | undefined>(null);
 
@@ -228,23 +227,21 @@ const useFeeCompensationInternal = () => {
       state.nextTransactionFee = state.nextTransactionFee.add(accountRent);
     }
 
-    if (!userFreeFeeLimits.hasFreeTransactions) {
-      const transactionFee: u64 = networkFees.lamportsPerSignature.mul(
-        new u64(topUpSignaturesCount),
-      );
-      state.totalFee = state.totalFee.add(transactionFee);
-      state.estimatedFee.transactionFee = transactionFee;
-      state.topUpCompensationFee = state.topUpCompensationFee.add(transactionFee);
+    // if (!userFreeFeeLimits.hasFreeTransactions) {
+    const transactionFee: u64 = networkFees.lamportsPerSignature.mul(new u64(topUpSignaturesCount));
+    state.totalFee = state.totalFee.add(transactionFee);
+    state.estimatedFee.transactionFee = transactionFee;
+    state.topUpCompensationFee = state.topUpCompensationFee.add(transactionFee);
 
-      if (signaturesCount > 0) {
-        const nextTransactionFee: u64 = networkFees.lamportsPerSignature.mul(
-          new u64(signaturesCount),
-        );
-        state.totalFee = state.totalFee.add(nextTransactionFee);
-        state.estimatedFee.nextTransactionFee = nextTransactionFee;
-        state.nextTransactionFee = state.nextTransactionFee.add(nextTransactionFee);
-      }
+    if (signaturesCount > 0) {
+      const nextTransactionFee: u64 = networkFees.lamportsPerSignature.mul(
+        new u64(signaturesCount),
+      );
+      state.totalFee = state.totalFee.add(nextTransactionFee);
+      state.estimatedFee.nextTransactionFee = nextTransactionFee;
+      state.nextTransactionFee = state.nextTransactionFee.add(nextTransactionFee);
     }
+    // }
 
     if (userRelayAccount && !userRelayAccount.exist) {
       state.totalFee = state.totalFee.add(RELAY_ACCOUNT_RENT_EXEMPTION);
@@ -260,15 +257,15 @@ const useFeeCompensationInternal = () => {
       }
     }
 
-    if (
+    /*if (
       (!userFreeFeeLimits.hasFreeTransactions &&
         accountsCount === 0 &&
         feeToken?.balance?.token.isRawSOL) ||
       (!userFreeFeeLimits.hasFreeTransactions && feeToken?.balance?.token.isRawSOL)
-    ) {
-      state.sendMethod = 'blockchain' as SEND_TRANSACTION_METHOD;
-      state.nextTransactionFee = ZERO;
-    }
+    ) {*/
+    state.sendMethod = 'blockchain' as SEND_TRANSACTION_METHOD;
+    state.nextTransactionFee = ZERO;
+    // }
 
     return {
       ...state,
@@ -282,7 +279,7 @@ const useFeeCompensationInternal = () => {
         nextTransactionFee: new u64(state.estimatedFee.nextTransactionFee.toArray()),
       },
     };
-  }, [accountsCount, feeToken, networkFees, signaturesCount, userFreeFeeLimits, userRelayAccount]);
+  }, [accountsCount, feeToken, networkFees, signaturesCount, userRelayAccount]);
 
   return {
     feeToken,
