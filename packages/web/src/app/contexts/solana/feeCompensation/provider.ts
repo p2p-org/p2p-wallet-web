@@ -7,7 +7,7 @@ import { TokenAmount } from '@p2p-wallet-web/token-utils';
 import { u64 } from '@solana/spl-token';
 import { createContainer } from 'unstated-next';
 
-import { useFeeRelayer, useNetworkFees } from 'app/contexts';
+import { useNetworkFees } from 'app/contexts';
 import type {
   CompensationParams,
   CompensationSwapParams,
@@ -43,7 +43,6 @@ export type FeeCompensationState = {
 
 const useFeeCompensationInternal = () => {
   const userTokenAccounts = useUserTokenAccounts();
-  const { getUserRelayAccount } = useFeeRelayer();
   const networkFees = useNetworkFees();
 
   const [fromTokenAccount, setFromTokenAccount] = useState<TokenAccount | null | undefined>(null);
@@ -58,7 +57,7 @@ const useFeeCompensationInternal = () => {
     null,
   );
 
-  const [userRelayAccount, setUserRelayAccount] = useState<UserRelayAccount | null>(null);
+  const [userRelayAccount, _] = useState<UserRelayAccount | null>(null);
 
   const [solTokenAccount] = useMemo(
     () => userTokenAccounts.filter((token) => token.balance?.token.isRawSOL),
@@ -78,7 +77,7 @@ const useFeeCompensationInternal = () => {
     }
   }, [feeToken]);
 
-  useEffect(() => {
+  /*useEffect(() => {
     const checkUserRelayAccount = async () => {
       const account = await getUserRelayAccount();
       setUserRelayAccount(account);
@@ -87,7 +86,7 @@ const useFeeCompensationInternal = () => {
     if (!userRelayAccount && accountsCount > 0) {
       void checkUserRelayAccount();
     }
-  }, [accountsCount, getUserRelayAccount, userRelayAccount]);
+  }, [accountsCount, getUserRelayAccount, userRelayAccount]);*/
 
   const feeTokenAccounts = useMemo(() => {
     const tokens: TokenAccount[] = [];
