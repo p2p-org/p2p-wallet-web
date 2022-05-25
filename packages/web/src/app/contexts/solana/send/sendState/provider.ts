@@ -236,12 +236,8 @@ const useSendStateInternal = (): UseSendState => {
       return;
     }
 
-    if (fromTokenAccount?.balance?.token.isRawSOL) {
-      return estimatedFeeAmount.accountsCreation.sol;
-    } else if (!estimatedFeeAmount.accountsCreation.feeToken?.token.isRawSOL) {
-      return estimatedFeeAmount.accountsCreation.feeToken;
-    }
-  }, [estimatedFeeAmount, fromTokenAccount]);
+    return estimatedFeeAmount.accountsCreation.sol;
+  }, [estimatedFeeAmount]);
 
   const hasBalance = useMemo(() => {
     if (!tokenAccount?.balance) {

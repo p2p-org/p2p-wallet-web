@@ -4,7 +4,6 @@ import { styled } from '@linaria/react';
 import { theme } from '@p2p-wallet-web/ui';
 
 import { useSendState } from 'app/contexts';
-import { CompensationFee } from 'components/common/CompensationFee';
 import { Accordion } from 'components/ui';
 import { AccordionTitle } from 'components/ui/AccordionDetails/AccordionTitle';
 import { ListWrapper, Row, Text } from 'components/ui/AccordionDetails/common';
@@ -27,8 +26,7 @@ export const TransactionDetails: FC = () => {
   /*const {
     settings: { useFreeTransactions },
   } = useSettings();*/
-  const { fromTokenAccount, destinationAccount, details, isAddressNotMatchNetwork } =
-    useSendState();
+  const { destinationAccount, details, isAddressNotMatchNetwork } = useSendState();
 
   if (!details.receiveAmount) {
     return null;
@@ -77,13 +75,13 @@ export const TransactionDetails: FC = () => {
             </Text>
           </Row>
         ) : undefined}
-        {!fromTokenAccount?.balance?.token.isRawSOL ? (
+        {/*!fromTokenAccount?.balance?.token.isRawSOL ? (
           <CompensationFee
             type="send"
             isShow={!fromTokenAccount?.balance?.token.isRawSOL}
             accountSymbol={destinationAccount?.symbol || ''}
           />
-        ) : undefined}
+        ) : undefined*/}
       </ListWrapper>
       <ListWrapper className="total">
         <Row>

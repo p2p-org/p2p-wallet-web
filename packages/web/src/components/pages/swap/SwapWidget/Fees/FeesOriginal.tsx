@@ -13,7 +13,6 @@ import Decimal from 'decimal.js';
 import type { useFeeCompensation, useNetworkFees, UseSwap } from 'app/contexts';
 import { useConfig } from 'app/contexts/solana/swap';
 import { formatBigNumber } from 'app/contexts/solana/swap/utils/format';
-import { CompensationFee } from 'components/common/CompensationFee';
 import { Accordion, Icon } from 'components/ui';
 import { AccordionTitle } from 'components/ui/AccordionDetails/AccordionTitle';
 import { ListWrapper, Row, Text } from 'components/ui/AccordionDetails/common';
@@ -175,13 +174,13 @@ export const FeesOriginal: FC<FeesOriginalProps> = ({
     </Row>
   );
 
-  const elCompensationFee =
+  /*const elCompensationFee =
     forPage &&
     (trade.inputTokenName !== 'SOL' ? (
       <ListWrapper className="flat">
         <CompensationFee type="swap" isShow={true} />
       </ListWrapper>
-    ) : undefined);
+    ) : undefined);*/
 
   const elTotal = forPage && (
     <ListWrapper className="total">
@@ -285,7 +284,7 @@ export const FeesOriginal: FC<FeesOriginalProps> = ({
           </Row>
         ))}
       </ListWrapper>
-      {elCompensationFee}
+      {/*elCompensationFee*/}
       {elTotal}
     </Accordion>
   );

@@ -247,12 +247,8 @@ const useSwapInternal = (props: UseSwapArgs = {}): UseSwap => {
       return;
     }
 
-    if (!estimatedFeeAmount.accountsCreation.feeToken?.token.isRawSOL) {
-      return estimatedFeeAmount.accountsCreation.feeToken?.toU64();
-    } else if (inputTokenName === 'SOL') {
-      return estimatedFeeAmount.accountsCreation.sol?.toU64();
-    }
-  }, [estimatedFeeAmount, inputTokenName]);
+    return estimatedFeeAmount.accountsCreation.sol?.toU64();
+  }, [estimatedFeeAmount]);
 
   useEffect(() => {
     if (

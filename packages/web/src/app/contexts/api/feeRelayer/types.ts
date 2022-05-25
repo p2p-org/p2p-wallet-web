@@ -100,11 +100,6 @@ export type SignedTransaction = {
   signatures: TransactionSignatures;
 };
 
-export type UserRelayAccount = {
-  exist: boolean;
-  balance?: number;
-};
-
 export type SwapParams = {
   swapProgramId: PublicKey;
   swapAccount: PublicKey;
@@ -144,10 +139,7 @@ export type CompensationParams = {
   feeToken: TokenAccount | null | undefined;
   feeAmount: u64;
   feeAmountInToken: u64;
-  isRelayAccountExist: boolean;
   accountRentExemption: u64;
-  isNeedCompensationSwap: boolean;
-  topUpParams: CompensationSwapParams | null;
 };
 
 export type NextTransactionCompensation = {
