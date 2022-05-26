@@ -99,13 +99,7 @@ export type UseSwapArgs = {
 const useSwapInternal = (props: UseSwapArgs = {}): UseSwap => {
   const { wallet, connection } = useSolana();
   const { programIds, tokenConfigs, routeConfigs } = useConfig();
-  const {
-    estimatedFeeAmount,
-    compensationState,
-    compensationSwapData,
-    feeAmountInToken,
-    feeToken,
-  } = useFeeCompensation();
+  const { estimatedFeeAmount } = useFeeCompensation();
 
   const [inputTokenName, _setInputTokenName] = useState(props.inputTokenName ?? 'SOL');
   const _outputTokenName = props.outputTokenName
@@ -394,28 +388,6 @@ const useSwapInternal = (props: UseSwapArgs = {}): UseSwap => {
 
     setButtonState(() => ButtonState.SendingTransaction);
 
-    if (compensationState.needTopUp && feeToken) {
-      /*try {
-        await relayTopUpWithSwap({
-          feeAmount: compensationState.topUpCompensationFee,
-          feeToken,
-          feeAmountInToken,
-          needCreateRelayAccount: compensationState.needCreateRelayAccount,
-          topUpParams: compensationSwapData,
-        });
-      } catch (e) {
-        console.error(e);
-        setButtonState(ButtonState.Retry);
-        swapNotification({
-          header: 'Swap didn’t complete!',
-          status: 'error',
-          ...notificationParams,
-          text: e.message,
-        });
-        return;
-      }*/
-    }
-
     if (executeSetup) {
       try {
         await executeSetup();
@@ -486,11 +458,7 @@ const useSwapInternal = (props: UseSwapArgs = {}): UseSwap => {
   }, [
     asyncPools.value,
     asyncStandardTokenAccounts.value,
-    compensationState,
-    compensationSwapData,
     connection,
-    feeAmountInToken,
-    feeToken,
     fetchPool,
     inputTokenName,
     inputUserTokenAccount,

@@ -60,7 +60,6 @@ export const SendButtonBitcoin: FC<Props> = ({ primary, disabled, onInitBurnAndR
     const result = await openModal<boolean>(ModalType.SHOW_MODAL_TRANSACTION_CONFIRM, {
       type: 'send',
       params,
-      sendState,
       btcAddress: sendState.toPublicKey,
     });
 

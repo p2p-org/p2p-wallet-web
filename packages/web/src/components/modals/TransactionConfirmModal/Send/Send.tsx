@@ -85,12 +85,7 @@ interface Props {
   params: TransferParams;
 }
 
-export const Send: FC<Props & TransactionDetailsProps> = ({
-  params,
-  sendState,
-  networkFees,
-  btcAddress,
-}) => {
+export const Send: FC<Props & TransactionDetailsProps> = ({ params, sendState, btcAddress }) => {
   const address = params.destination?.toBase58?.() || btcAddress;
   const isFullName = /\w*\.\w+/.test(params.username || '');
 
@@ -133,11 +128,7 @@ export const Send: FC<Props & TransactionDetailsProps> = ({
         </FieldInfo>
       </div>
 
-      <TransactionDetails
-        sendState={sendState}
-        networkFees={networkFees}
-        amount={params.amount.toU64()}
-      />
+      <TransactionDetails sendState={sendState} amount={params.amount.toU64()} />
     </Section>
   );
 };

@@ -26,7 +26,7 @@ export const TransactionDetails: FC = () => {
   /*const {
     settings: { useFreeTransactions },
   } = useSettings();*/
-  const { destinationAccount, details, isAddressNotMatchNetwork } = useSendState();
+  const { details, isAddressNotMatchNetwork } = useSendState();
 
   if (!details.receiveAmount) {
     return null;
@@ -66,15 +66,14 @@ export const TransactionDetails: FC = () => {
           )*/}
           <Text>5000 lamport</Text>
         </Row>
-        {details.accountCreationAmount ? (
+        {/*details.accountCreationAmount ? (
           <Row>
             <Text className="gray">{destinationAccount?.symbol} account creation</Text>
             <Text>
               {details.accountCreationAmount}
-              {/* <Text className="gray">(~$0.5)</Text> */}
             </Text>
           </Row>
-        ) : undefined}
+        ) : undefined*/}
         {/*!fromTokenAccount?.balance?.token.isRawSOL ? (
           <CompensationFee
             type="send"

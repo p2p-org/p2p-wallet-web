@@ -3,7 +3,7 @@ import type { FC } from 'react';
 import { styled } from '@linaria/react';
 import type { u64 } from '@saberhq/token-utils';
 
-import type { NetworkFees, UseSendState } from 'app/contexts';
+import type { UseSendState } from 'app/contexts';
 import { AmountUSDStyled } from 'components/pages/swap/SwapWidget/AmountUSD';
 import { Accordion } from 'components/ui';
 import { AccordionTitle } from 'components/ui/AccordionDetails/AccordionTitle';
@@ -11,7 +11,6 @@ import { ListWrapper, Row, Text } from 'components/ui/AccordionDetails/common';
 
 export interface TransactionDetailsProps {
   sendState?: UseSendState;
-  networkFees: NetworkFees;
   btcAddress?: string;
   isOpen?: boolean;
   amount?: u64;
@@ -21,11 +20,7 @@ const TokenAndUsd = styled.div`
   display: flex;
 `;
 
-export const TransactionDetails: FC<TransactionDetailsProps> = ({
-  sendState,
-  networkFees,
-  amount,
-}) => {
+export const TransactionDetails: FC<TransactionDetailsProps> = ({ sendState, amount }) => {
   /*const {
     settings: { useFreeTransactions },
   } = useSettings();*/
@@ -69,7 +64,7 @@ export const TransactionDetails: FC<TransactionDetailsProps> = ({
           )*/}
           <Text>5000 lamport</Text>
         </Row>
-        {sendState?.details.accountCreationAmount ? (
+        {/*sendState?.details.accountCreationAmount ? (
           <Row>
             <Text className="gray">{sendState.destinationAccount?.symbol} account creation</Text>
             <TokenAndUsd>
@@ -82,7 +77,7 @@ export const TransactionDetails: FC<TransactionDetailsProps> = ({
               />
             </TokenAndUsd>
           </Row>
-        ) : undefined}
+        ) : undefined*/}
       </ListWrapper>
       <ListWrapper className="total">
         <Row>

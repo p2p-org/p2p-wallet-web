@@ -3,7 +3,6 @@ import { useCallback } from 'react';
 import { useSolana, useWallet } from '@p2p-wallet-web/core';
 import { useSail } from '@p2p-wallet-web/sail';
 
-import { useFeeCompensation } from 'app/contexts';
 import type { RelayTransferParams } from 'app/contexts/api/feeRelayer/types';
 import { transfer } from 'app/instructions';
 
@@ -11,8 +10,6 @@ export const useTransferAction = () => {
   const { providerMut } = useSolana();
   const { publicKey } = useWallet();
   const { handleTX } = useSail();
-  const { feeToken, feeAmountInToken, compensationSwapData, compensationState } =
-    useFeeCompensation();
 
   return useCallback(
     (params: RelayTransferParams) => async (): Promise<string> => {
@@ -40,14 +37,6 @@ export const useTransferAction = () => {
 
       return result.pending.signature;
     },
-    [
-      compensationState,
-      compensationSwapData,
-      feeAmountInToken,
-      feeToken,
-      handleTX,
-      providerMut,
-      publicKey,
-    ],
+    [handleTX, providerMut, publicKey],
   );
 };

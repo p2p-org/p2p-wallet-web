@@ -37,8 +37,6 @@ interface Props {
 export const Swap: FC<Props & FeesOriginalProps> = ({
   params: { inputTokenName, outputTokenName, inputAmount },
   swapInfo,
-  networkFees,
-  feeCompensationInfo,
   showTitle,
 }) => {
   const { tokenConfigs } = useConfig();
@@ -81,13 +79,7 @@ export const Swap: FC<Props & FeesOriginalProps> = ({
           </InfoWrapper>
         </FieldInfo>
       </Section>
-      <FeesOriginal
-        swapInfo={swapInfo}
-        feeCompensationInfo={feeCompensationInfo}
-        networkFees={networkFees}
-        open={false}
-        forPage={false}
-      />
+      <FeesOriginal swapInfo={swapInfo} open={false} forPage={false} />
     </Wrapper>
   );
 };

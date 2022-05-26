@@ -79,16 +79,7 @@ export type TransactionConfirmModalProps = TransactionDetailsProps &
 
 export const TransactionConfirmModal: FunctionComponent<
   ModalPropsType & TransactionConfirmModalProps
-> = ({
-  type,
-  params,
-  close,
-  btcAddress,
-  swapInfo,
-  sendState,
-  feeCompensationInfo,
-  networkFees,
-}) => {
+> = ({ type, params, close, btcAddress, swapInfo, sendState }) => {
   const { walletProviderInfo } = useWallet();
   const tryUnlockSeedAndMnemonic = useTryUnlockSeedAndMnemonic();
 
@@ -193,21 +184,10 @@ export const TransactionConfirmModal: FunctionComponent<
     >
       {type === 'send' ? <ActionTitle>You are going to send</ActionTitle> : undefined}
       {type === 'send' ? (
-        <Send
-          params={params as TransferParams}
-          sendState={sendState}
-          networkFees={networkFees}
-          btcAddress={btcAddress}
-        />
+        <Send params={params as TransferParams} sendState={sendState} btcAddress={btcAddress} />
       ) : undefined}
       {type === 'swap' ? (
-        <Swap
-          params={params as SwapParams}
-          swapInfo={swapInfo}
-          feeCompensationInfo={feeCompensationInfo}
-          networkFees={networkFees}
-          showTitle={true}
-        />
+        <Swap params={params as SwapParams} swapInfo={swapInfo} showTitle={true} />
       ) : undefined}
 
       {isSecretKeyWallet ? (

@@ -27,7 +27,7 @@ const CHECK_TRANSACTION_INTERVAL = 3000;
 
 export const TransactionStatusSendModal: FunctionComponent<
   ModalPropsType<string | null> & TransactionStatusModalProps
-> = ({ type, action, params, sendState, /*userFreeFeeLimits,*/ networkFees, close }) => {
+> = ({ type, action, params, sendState, close }) => {
   const { provider } = useWallet();
 
   const { network } = useConnectionContext();
@@ -142,7 +142,7 @@ export const TransactionStatusSendModal: FunctionComponent<
         label={'Transaction status:'}
       />
       <Section>
-        <Send sendState={sendState} params={params} networkFees={networkFees} />
+        <Send sendState={sendState} params={params} />
       </Section>
       <SolanaExplorerLink
         signature={signature}

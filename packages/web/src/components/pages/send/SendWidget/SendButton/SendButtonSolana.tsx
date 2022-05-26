@@ -6,16 +6,9 @@ import { useTokenAccount } from '@p2p-wallet-web/core';
 import { usePubkey } from '@p2p-wallet-web/sail';
 import { PublicKey } from '@solana/web3.js';
 
-import {
-  ModalType,
-  useFeeCompensation,
-  useModals,
-  useNetworkFees,
-  useSendState,
-  useTransferAction,
-} from 'app/contexts';
+import { ModalType, useModals, useSendState, useTransferAction } from 'app/contexts';
 import type { TransactionConfirmModalProps } from 'components/modals/TransactionConfirmModal/TransactionConfirmModal';
-import type { TransactionStatusModalProps } from 'components/modals/TransactionInfoModals/TransactionStatusSendModal/TransactionStatusModal';
+import type { TransactionStatusModalProps } from 'components/modals/TransactionInfoModals/TransactionStatusSendModal/TransactionStatusSendModal';
 import { Button, Icon } from 'components/ui';
 import { trackEvent } from 'utils/analytics';
 
@@ -34,9 +27,7 @@ export const SendButtonSolana: FC<Props> = ({ primary, disabled }) => {
   const { openModal } = useModals();
   const sendState = useSendState();
   const transferAction = useTransferAction();
-  const { compensationParams } = useFeeCompensation();
   const destinationTokenAccount = useTokenAccount(usePubkey(sendState.destinationAddress));
-  const networkFees = useNetworkFees();
   const {
     fromAmount,
     fromTokenAccount,
@@ -93,7 +84,6 @@ export const SendButtonSolana: FC<Props> = ({ primary, disabled }) => {
           username: resolvedAddress ? toPublicKey : '',
         },
         sendState: { fromTokenAccount, destinationAccount, details },
-        networkFees,
       } as TransactionConfirmModalProps,
     );
 
@@ -108,7 +98,6 @@ export const SendButtonSolana: FC<Props> = ({ primary, disabled }) => {
         fromTokenAccount,
         destinationAccount,
         amount: parsedAmount,
-        compensationParams,
       });
 
       trackEvent('send_send_click', {
@@ -128,7 +117,6 @@ export const SendButtonSolana: FC<Props> = ({ primary, disabled }) => {
             username: resolvedAddress ? toPublicKey : '',
           },
           sendState,
-          networkFees,
         },
       );
     } finally {

@@ -1,6 +1,6 @@
 import type { FC } from 'react';
 
-import { useFeeCompensation, useSendState } from 'app/contexts';
+import { useSendState } from 'app/contexts';
 
 import { SendButtonBitcoin } from './SendButtonBitcoin';
 import { SendButtonSolana } from './SendButtonSolana';
@@ -22,15 +22,10 @@ export const SendButton: FC = () => {
     setIsInitBurnAndRelease,
     isAddressNotMatchNetwork,
   } = useSendState();
-  const { estimatedFeeAmount } = useFeeCompensation();
 
-  const feeSolTokenAmount = estimatedFeeAmount.accountsCreation.sol;
-  const feeAmount = feeSolTokenAmount?.asNumber;
-  const isSPLPayed = 'SOL' === fromTokenAccount?.balance?.token?.symbol;
-  const tokenBalance = fromTokenAccount?.balance?.asNumber;
-  const maxAllowedAmount = isSPLPayed ? tokenBalance - Number(feeAmount) : tokenBalance;
+  const tokenBalance = fromTokenAccount?.balance?.asNumber || 0;
 
-  const hasBalance = fromTokenAccount?.balance ? maxAllowedAmount >= Number(fromAmount) : false;
+  const hasBalance = fromTokenAccount?.balance ? tokenBalance >= Number(fromAmount) : false;
 
   const isDisabledButton =
     isExecuting ||

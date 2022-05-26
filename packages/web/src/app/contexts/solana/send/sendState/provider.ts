@@ -1,16 +1,15 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
-import { ZERO } from '@orca-so/sdk';
 import type { TokenAccount } from '@p2p-wallet-web/core';
 import { tryParseTokenAmount, useTokenAccount, useWallet } from '@p2p-wallet-web/core';
-import { useNativeAccount, usePubkey } from '@p2p-wallet-web/sail';
+import { usePubkey } from '@p2p-wallet-web/sail';
 import { TokenAmount } from '@p2p-wallet-web/token-utils';
 import type { RenNetwork } from '@renproject/interfaces';
 import { PublicKey } from '@solana/web3.js';
 import { createContainer } from 'unstated-next';
 
-import { isValidBitcoinAddress, isValidSolanaAddress, useFeeCompensation } from 'app/contexts';
+import { isValidBitcoinAddress, isValidSolanaAddress } from 'app/contexts';
 import type { DestinationAccount } from 'app/contexts/api/feeRelayer/types';
 import { useRenNetwork } from 'utils/hooks/renBridge/useNetwork';
 
@@ -65,12 +64,10 @@ export interface UseSendState {
   destinationAccount: DestinationAccount | null;
   isResolvingAddress: boolean;
 
-  feeAmount: TokenAmount | undefined;
   hasBalance: boolean;
 
   details: {
     receiveAmount?: string;
-    accountCreationAmount?: string;
     totalAmount?: string;
     totalAmountToShow?: string;
   };
@@ -80,9 +77,6 @@ const useSendStateInternal = (): UseSendState => {
   const { publicKey } = useParams<{ publicKey: string }>();
   const { publicKey: publicKeySol } = useWallet();
   const { resolveAddress } = useResolveAddress();
-  const nativeAccount = useNativeAccount();
-  const { setAccountsCount, estimatedFeeAmount, compensationState, feeToken, feeAmountInToken } =
-    useFeeCompensation();
 
   const tokenAccount = useTokenAccount(usePubkey(publicKey ?? publicKeySol));
   const [fromTokenAccount, setFromTokenAccount] = useState<TokenAccount | null | undefined>(null);
@@ -220,34 +214,15 @@ const useSendStateInternal = (): UseSendState => {
     }
   }, [destinationAddress, fromTokenAccount, isAddressInvalid, resolveAddress]);
 
-  useEffect(() => {
-    setAccountsCount(destinationAccount?.isNeedCreate ? 1 : 0);
-  }, [destinationAccount?.isNeedCreate, setAccountsCount]);
-
-  const feeAmount: TokenAmount | undefined = useMemo(() => {
-    if (estimatedFeeAmount.totalLamports.eq(ZERO)) {
-      return;
-    }
-
-    return estimatedFeeAmount.accountsCreation.sol;
-  }, [estimatedFeeAmount]);
-
   const hasBalance = useMemo(() => {
     if (!tokenAccount?.balance) {
       return false;
     }
 
-    let tokenAccountBalance = tokenAccount.balance;
-
-    if (feeAmount) {
-      const balanceSubstractFee = tokenAccount.balance.toU64().sub(feeAmount.toU64());
-      tokenAccountBalance = balanceSubstractFee.gt(ZERO)
-        ? new TokenAmount(tokenAccount.balance.token, balanceSubstractFee)
-        : new TokenAmount(tokenAccount.balance.token, 0);
-    }
+    const tokenAccountBalance = tokenAccount.balance;
 
     return tokenAccountBalance ? tokenAccountBalance.asNumber >= Number(fromAmount) : false;
-  }, [feeAmount, fromAmount, tokenAccount]);
+  }, [fromAmount, tokenAccount]);
 
   const details = useMemo(() => {
     let receiveAmount;
@@ -258,50 +233,15 @@ const useSendStateInternal = (): UseSendState => {
       receiveAmount = parsedAmount.formatUnits();
     }
 
-    let totalAmount = receiveAmount;
-    let totalAmountToShow = receiveAmount;
-    let accountCreationAmount;
-
-    if (compensationState.totalFee.gt(ZERO)) {
-      if (feeToken?.balance?.token.isRawSOL && nativeAccount.nativeBalance) {
-        accountCreationAmount = new TokenAmount(
-          nativeAccount.nativeBalance.token,
-          compensationState.estimatedFee.accountRent,
-        ).formatUnits();
-
-        totalAmount += ` + ${accountCreationAmount}`;
-      } else {
-        if (feeToken && feeToken.balance) {
-          const accontCreationTokenAmount = new TokenAmount(
-            feeToken?.balance?.token,
-            feeAmountInToken,
-          );
-
-          accountCreationAmount = accontCreationTokenAmount.formatUnits();
-
-          totalAmount = parsedAmount
-            ? parsedAmount.add(accontCreationTokenAmount).formatUnits()
-            : accountCreationAmount;
-
-          totalAmountToShow = totalAmount;
-        }
-      }
-    }
+    const totalAmount = receiveAmount;
+    const totalAmountToShow = receiveAmount;
 
     return {
       receiveAmount,
-      accountCreationAmount,
       totalAmount,
       totalAmountToShow,
     };
-  }, [
-    compensationState,
-    feeAmountInToken,
-    feeToken,
-    fromTokenAccount,
-    nativeAccount,
-    parsedAmount,
-  ]);
+  }, [fromTokenAccount, parsedAmount]);
 
   return {
     fromTokenAccount,
@@ -330,7 +270,6 @@ const useSendStateInternal = (): UseSendState => {
     setIsInitBurnAndRelease,
     destinationAccount,
     isResolvingAddress,
-    feeAmount,
     hasBalance,
     details,
   };

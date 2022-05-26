@@ -66,7 +66,6 @@ export const Main: FC = () => {
     isExecuting,
     isRenBTC,
     isShowConfirmAddressSwitch,
-    feeAmount,
   } = useSendState();
 
   const tokenAccounts = useUserTokenAccounts();
@@ -119,7 +118,6 @@ export const Main: FC = () => {
           amount={fromAmount}
           onAmountChange={handleFromAmountChange}
           disabled={isDisabled}
-          feeAmount={feeAmount}
         />
       </FromWrapper>
 

@@ -28,7 +28,7 @@ const CHECK_TRANSACTION_INTERVAL = 3000;
 
 export const TransactionStatusModal: FunctionComponent<
   ModalPropsType<string | null> & TransactionStatusModalProps
-> = ({ action, close, swapInfo, feeCompensationInfo, networkFees, params }) => {
+> = ({ action, close, swapInfo, params }) => {
   const { provider } = useWallet();
 
   const [isExecuting, setIsExecuting] = useState(false);
@@ -115,14 +115,7 @@ export const TransactionStatusModal: FunctionComponent<
         label={'Swap status:'}
       />
       <Section>
-        <Swap
-          params={params}
-          feeCompensationInfo={feeCompensationInfo}
-          networkFees={networkFees}
-          swapInfo={swapInfo}
-          forPage={false}
-          showTitle={false}
-        />
+        <Swap params={params} swapInfo={swapInfo} forPage={false} showTitle={false} />
       </Section>
       <SolanaExplorerLink
         signature={signature}
