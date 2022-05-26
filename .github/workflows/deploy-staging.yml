@@ -49,7 +49,9 @@ jobs:
         with:
           source-dir: ./packages/web/build
           action: deploy
-          preview-branch: gh-pages-${{github.event.number}}
+#          preview-branch: gh-pages-${{github.event.number}}
+          preview-branch: gh-pages
+
 
       - name: Remove preview
         uses: rossjrw/pr-preview-action@v1
