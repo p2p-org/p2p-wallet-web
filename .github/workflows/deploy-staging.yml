@@ -13,8 +13,7 @@ concurrency: preview-${{ github.ref }}
 jobs:
   deploy_stage:
     runs-on: ubuntu-latest
-#    runs-on: self-hosted
-#    environment: production
+    environment: staging
     steps:
       - uses: actions/checkout@v2
 
