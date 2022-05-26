@@ -24,9 +24,9 @@ export const SendButton: FC = () => {
   } = useSendState();
   const { estimatedFeeAmount } = useFeeCompensation();
 
-  const feeToken = estimatedFeeAmount.accountsCreation.feeToken;
-  const feeAmount = feeToken?.asNumber;
-  const isSPLPayed = feeToken?.token?.info?.symbol === fromTokenAccount?.balance?.token?.symbol;
+  const feeSolTokenAmount = estimatedFeeAmount.accountsCreation.sol;
+  const feeAmount = feeSolTokenAmount?.asNumber;
+  const isSPLPayed = 'SOL' === fromTokenAccount?.balance?.token?.symbol;
   const tokenBalance = fromTokenAccount?.balance?.asNumber;
   const maxAllowedAmount = isSPLPayed ? tokenBalance - Number(feeAmount) : tokenBalance;
 

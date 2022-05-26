@@ -14,7 +14,6 @@ export type EstimatedFeeAmount = {
   accountsCreation: {
     lamports: u64;
     sol: TokenAmount | undefined;
-    feeToken: TokenAmount | undefined;
   };
   totalLamports: u64;
 };
@@ -94,14 +93,6 @@ const useFeeCompensationInternal = () => {
     return new TokenAmount(solTokenAccount.balance.token, accountsCreationLamports);
   }, [accountsCreationLamports, solTokenAccount]);
 
-  const accountsCreationFeeTokenAmount = useMemo(() => {
-    if (!(feeToken && feeToken.balance)) {
-      return undefined;
-    }
-
-    return new TokenAmount(feeToken.balance.token, ZERO);
-  }, [feeToken, feeAmountInToken]);
-
   const compensationParams: CompensationParams = useMemo(() => {
     return {
       feeToken,
@@ -116,11 +107,10 @@ const useFeeCompensationInternal = () => {
       accountsCreation: {
         lamports: accountsCreationLamports,
         sol: accountsCreationSolAmount,
-        feeToken: accountsCreationFeeTokenAmount,
       },
       totalLamports: accountsCreationLamports,
     };
-  }, [accountsCreationLamports, accountsCreationSolAmount, accountsCreationFeeTokenAmount]);
+  }, [accountsCreationLamports, accountsCreationSolAmount]);
 
   const compensationState: FeeCompensationState = useMemo(() => {
     const state = {

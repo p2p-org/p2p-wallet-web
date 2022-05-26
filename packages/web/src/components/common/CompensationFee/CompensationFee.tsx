@@ -51,7 +51,6 @@ export const CompensationFee: FC<{
         type={type}
         feeTokenAccounts={feeTokenAccounts}
         feeAmountInSol={estimatedFeeAmount.accountsCreation.sol}
-        feeTokenAmount={estimatedFeeAmount.accountsCreation.feeToken}
         onSelectToken={setFeeToken}
         value={feeToken}
         accountSymbol={accountSymbol}
