@@ -2,8 +2,13 @@ name: Deploy Staging
 
 #on: workflow_dispatch
 on:
-  push:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - closed
 
+concurrency: preview-${{ github.ref }}
 
 jobs:
   deploy_stage:
@@ -25,9 +30,10 @@ jobs:
 
       - name: Build site
         env:
+          CI: false
           PUBLIC_URL: ${{ secrets.PUBLIC_URL }}
           REACT_APP_BASENAME: ${{ secrets.REACT_APP_BASENAME }}
-          REACT_APP_CRYPTO_COMPARE_API_KEY: ${{ secrets.REACT_APP_CRYPTO_COMPARE_API_KEY }}
+          RECT_APP_CRYPTO_COMPARE_API_KEY: ${{ secrets.REACT_APP_CRYPTO_COMPARE_API_KEY }}
           REACT_APP_FEE_RELAYER_URL: ${{ secrets.REACT_APP_FEE_RELAYER_URL }}
           REACT_APP_SWAP_HOST_FEE_ADDRESS: ${{ secrets.REACT_APP_SWAP_HOST_FEE_ADDRESS }}
           REACT_APP_AMPLITUDE_API_KEY: ${{ secrets.REACT_APP_AMPLITUDE_API_KEY }}
@@ -36,3 +42,16 @@ jobs:
           REACT_APP_MOONPAY_API_KEY: ${{ secrets.REACT_APP_MOONPAY_API_KEY }}
           REACT_APP_MOONPAY_SIGNER_URL: ${{ secrets.REACT_APP_MOONPAY_SIGNER_URL }}
         run: yarn build
+
+      - name: Deploy preview
+        uses: rossjrw/pr-preview-action@v1
+        with:
+          source-dir: ./packages/web/build
+          action: deploy
+
+      - name: Remove preview
+        uses: rossjrw/pr-preview-action@v1
+        if: github.event.pull_request.merged == true || github.event.pull_request.closed == true
+        with:
+          source-dir: ./packages/web/build
+          action: remove
