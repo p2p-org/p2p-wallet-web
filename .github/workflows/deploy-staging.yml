@@ -2,8 +2,11 @@ name: Deploy Staging
 
 #on: workflow_dispatch
 on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
   push:
-
 
 jobs:
   deploy_stage:
@@ -25,6 +28,7 @@ jobs:
 
       - name: Build site
         env:
+          CI: false
           PUBLIC_URL: ${{ secrets.PUBLIC_URL }}
           REACT_APP_BASENAME: ${{ secrets.REACT_APP_BASENAME }}
           REACT_APP_CRYPTO_COMPARE_API_KEY: ${{ secrets.REACT_APP_CRYPTO_COMPARE_API_KEY }}

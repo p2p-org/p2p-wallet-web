@@ -4,7 +4,7 @@ on:
   pull_request:
     types:
       - opened
-      - edited
+      - synchronize
 
 jobs:
   test:
@@ -21,22 +21,3 @@ jobs:
             node_modules
             */*/node_modules
           key: ${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
-
-      - name: Install dependecies
-        run: yarn install --frozen-lockfile
-
-      - name: Build site
-        env:
-          # @FIXME in https://p2pvalidator.atlassian.net/browse/PWN-3411
-          CI: false
-          PUBLIC_URL: ${{ secrets.PUBLIC_URL }}
-          REACT_APP_BASENAME: ${{ secrets.REACT_APP_BASENAME }}
-          REACT_APP_CRYPTO_COMPARE_API_KEY: ${{ secrets.REACT_APP_CRYPTO_COMPARE_API_KEY }}
-          REACT_APP_FEE_RELAYER_URL: ${{ secrets.REACT_APP_FEE_RELAYER_URL }}
-          REACT_APP_SWAP_HOST_FEE_ADDRESS: ${{ secrets.REACT_APP_SWAP_HOST_FEE_ADDRESS }}
-          REACT_APP_AMPLITUDE_API_KEY: ${{ secrets.REACT_APP_AMPLITUDE_API_KEY }}
-          REACT_APP_TRANSAK_API_KEY: ${{ secrets.REACT_APP_TRANSAK_API_KEY }}
-          REACT_APP_INTERCOM_APP_ID: ${{ secrets.REACT_APP_INTERCOM_APP_ID }}
-          REACT_APP_MOONPAY_API_KEY: ${{ secrets.REACT_APP_MOONPAY_API_KEY }}
-          REACT_APP_MOONPAY_SIGNER_URL: ${{ secrets.REACT_APP_MOONPAY_SIGNER_URL }}
-        run: yarn build
