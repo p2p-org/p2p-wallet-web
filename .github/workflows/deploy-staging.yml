@@ -13,6 +13,7 @@ concurrency: preview-${{ github.ref }}
 jobs:
   deploy_stage:
     runs-on: ubuntu-latest
+#    runs-on: self-hosted
 #    environment: production
     steps:
       - uses: actions/checkout@v2
@@ -48,6 +49,7 @@ jobs:
         with:
           source-dir: ./packages/web/build
           action: deploy
+          preview-branch: gh-pages-${{github.event.number}}
 
       - name: Remove preview
         uses: rossjrw/pr-preview-action@v1
