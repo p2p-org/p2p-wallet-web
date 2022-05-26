@@ -81,14 +81,8 @@ const useSendStateInternal = (): UseSendState => {
   const { publicKey: publicKeySol } = useWallet();
   const { resolveAddress } = useResolveAddress();
   const nativeAccount = useNativeAccount();
-  const {
-    setFromToken,
-    setAccountsCount,
-    estimatedFeeAmount,
-    compensationState,
-    feeToken,
-    feeAmountInToken,
-  } = useFeeCompensation();
+  const { setAccountsCount, estimatedFeeAmount, compensationState, feeToken, feeAmountInToken } =
+    useFeeCompensation();
 
   const tokenAccount = useTokenAccount(usePubkey(publicKey ?? publicKeySol));
   const [fromTokenAccount, setFromTokenAccount] = useState<TokenAccount | null | undefined>(null);
@@ -173,7 +167,6 @@ const useSendStateInternal = (): UseSendState => {
   useEffect(() => {
     if (tokenAccount?.balance) {
       setFromTokenAccount(tokenAccount);
-      setFromToken(tokenAccount);
     }
 
     const tokenSymbol = tokenAccount?.balance?.token?.symbol;
@@ -183,7 +176,7 @@ const useSendStateInternal = (): UseSendState => {
     if (shouldUseSolanaNetwork) {
       setBlockchain(BLOCKCHAINS[0]);
     }
-  }, [setFromToken, tokenAccount]);
+  }, [tokenAccount]);
 
   useEffect(() => {
     const resolve = async () => {

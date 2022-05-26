@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import { ZERO } from '@orca-so/sdk';
 import type { TokenAccount } from '@p2p-wallet-web/core';
@@ -33,8 +33,6 @@ const useFeeCompensationInternal = () => {
   const userTokenAccounts = useUserTokenAccounts();
   const networkFees = useNetworkFees();
 
-  const [fromTokenAccount, setFromTokenAccount] = useState<TokenAccount | null | undefined>(null);
-
   const [accountsCount, setAccountsCount] = useState(0);
   const [signaturesCount, setSignaturesCount] = useState(0);
 
@@ -46,13 +44,6 @@ const useFeeCompensationInternal = () => {
     [userTokenAccounts],
   );
 
-  const setFromToken = useCallback(
-    (token: TokenAccount) => {
-      setFromTokenAccount(token);
-    },
-    [setFromTokenAccount],
-  );
-
   const feeTokenAccounts = useMemo(() => {
     const tokens: TokenAccount[] = [];
     if (solTokenAccount) {
@@ -60,7 +51,7 @@ const useFeeCompensationInternal = () => {
     }
 
     return tokens;
-  }, [fromTokenAccount, solTokenAccount, userTokenAccounts]);
+  }, [solTokenAccount]);
 
   const hasFeeToken = useMemo(() => {
     if (!feeToken) {
@@ -71,10 +62,10 @@ const useFeeCompensationInternal = () => {
   }, [feeToken, feeTokenAccounts]);
 
   useEffect(() => {
-    if (!feeToken || !hasFeeToken) {
-      setFeeToken(fromTokenAccount);
+    if ((!feeToken || !hasFeeToken) && solTokenAccount) {
+      setFeeToken(solTokenAccount);
     }
-  }, [feeToken, fromTokenAccount, hasFeeToken]);
+  }, [feeToken, solTokenAccount, hasFeeToken]);
 
   const accountsCreationLamports = useMemo(() => {
     let total = ZERO;
@@ -158,7 +149,6 @@ const useFeeCompensationInternal = () => {
     setFeeAmountInToken,
     feeAmountInToken,
     compensationParams,
-    setFromToken,
     setAccountsCount,
     estimatedFeeAmount,
     compensationState,

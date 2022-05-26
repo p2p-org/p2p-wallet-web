@@ -1,7 +1,6 @@
 import type { FC } from 'react';
 
 import { styled } from '@linaria/react';
-import { useUserTokenAccounts } from '@p2p-wallet-web/core';
 
 import { useFeeCompensation, useNetworkFees } from 'app/contexts';
 import { ModalType, useModals } from 'app/contexts/general/modals';
@@ -23,7 +22,6 @@ export const SwapButtonOriginal: FC = () => {
   const networkFees = useNetworkFees();
   const { buttonState, trade, onSwap } = useSwap();
   const swapInfo = useSwap();
-  const userTokenAccounts = useUserTokenAccounts();
   const feeCompensationInfo = useFeeCompensation();
 
   const handleSwapClick = async () => {
@@ -40,7 +38,6 @@ export const SwapButtonOriginal: FC = () => {
           minimumOutputAmount: trade.getMinimumOutputAmount(),
         },
         swapInfo,
-        userTokenAccounts,
         feeCompensationInfo,
         networkFees,
       },
@@ -58,7 +55,6 @@ export const SwapButtonOriginal: FC = () => {
         inputAmount: trade.getInputAmount(),
         minimumOutputAmount: trade.getMinimumOutputAmount(),
       },
-      userTokenAccounts,
       feeCompensationInfo,
       networkFees,
       swapInfo,

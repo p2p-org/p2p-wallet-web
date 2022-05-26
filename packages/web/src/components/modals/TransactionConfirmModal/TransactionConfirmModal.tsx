@@ -86,7 +86,6 @@ export const TransactionConfirmModal: FunctionComponent<
   btcAddress,
   swapInfo,
   sendState,
-  userTokenAccounts,
   feeCompensationInfo,
   networkFees,
 }) => {
@@ -205,7 +204,6 @@ export const TransactionConfirmModal: FunctionComponent<
         <Swap
           params={params as SwapParams}
           swapInfo={swapInfo}
-          userTokenAccounts={userTokenAccounts}
           feeCompensationInfo={feeCompensationInfo}
           networkFees={networkFees}
           showTitle={true}

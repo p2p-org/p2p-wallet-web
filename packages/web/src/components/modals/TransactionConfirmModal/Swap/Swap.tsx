@@ -37,7 +37,6 @@ interface Props {
 export const Swap: FC<Props & FeesOriginalProps> = ({
   params: { inputTokenName, outputTokenName, inputAmount },
   swapInfo,
-  userTokenAccounts,
   networkFees,
   feeCompensationInfo,
   showTitle,
@@ -84,7 +83,6 @@ export const Swap: FC<Props & FeesOriginalProps> = ({
       </Section>
       <FeesOriginal
         swapInfo={swapInfo}
-        userTokenAccounts={userTokenAccounts}
         feeCompensationInfo={feeCompensationInfo}
         networkFees={networkFees}
         open={false}

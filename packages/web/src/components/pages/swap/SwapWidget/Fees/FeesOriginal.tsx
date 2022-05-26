@@ -1,10 +1,7 @@
 import type { FC } from 'react';
-import { useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
 
 import { styled } from '@linaria/react';
-import type { useUserTokenAccounts } from '@p2p-wallet-web/core';
-import { useTokenAccount } from '@p2p-wallet-web/core';
-import { usePubkey } from '@p2p-wallet-web/sail';
 import { theme, useIsMobile } from '@p2p-wallet-web/ui';
 import { u64 } from '@solana/spl-token';
 import classNames from 'classnames';
@@ -42,7 +39,6 @@ const TOKEN_AMOUNT_SIGNIFICANT_DIGITS = 6;
 const ONE_TOKEN_BASE = 10;
 
 export interface FeesOriginalProps {
-  userTokenAccounts: ReturnType<typeof useUserTokenAccounts>;
   feeCompensationInfo: ReturnType<typeof useFeeCompensation>;
   networkFees: ReturnType<typeof useNetworkFees>;
   swapInfo: UseSwap;
@@ -53,14 +49,13 @@ export interface FeesOriginalProps {
 export const FeesOriginal: FC<FeesOriginalProps> = ({
   swapInfo,
   networkFees,
-  userTokenAccounts,
   feeCompensationInfo,
   forPage,
   open,
 }) => {
   const { tokenConfigs } = useConfig();
   const { trade, asyncStandardTokenAccounts } = swapInfo;
-  const { setFromToken, compensationState, feeToken, feeAmountInToken } = feeCompensationInfo;
+  const { compensationState, feeToken, feeAmountInToken } = feeCompensationInfo;
   const isMobile = useIsMobile();
 
   /*const {
@@ -69,26 +64,8 @@ export const FeesOriginal: FC<FeesOriginalProps> = ({
 
   const { handleShowSettings } = useShowSettings();
 
-  const [solTokenAccount] = useMemo(
-    () => userTokenAccounts.filter((token) => token.balance?.token.isRawSOL),
-    [userTokenAccounts],
-  );
-  const inputUserTokenAccount = useMemo(() => {
-    return asyncStandardTokenAccounts?.[trade.inputTokenName];
-  }, [asyncStandardTokenAccounts, trade.inputTokenName]);
-
-  const fromTokenAccount = useTokenAccount(usePubkey(inputUserTokenAccount?.account));
-
   const outputDecimals = tokenConfigs[swapInfo.trade.outputTokenName]?.decimals || 0;
   const minReceiveAmount = formatBigNumber(swapInfo.trade.getMinimumOutputAmount(), outputDecimals);
-
-  useEffect(() => {
-    if (fromTokenAccount?.balance) {
-      setFromToken(fromTokenAccount);
-    } else {
-      setFromToken(solTokenAccount);
-    }
-  }, [fromTokenAccount, setFromToken, solTokenAccount]);
 
   const tokenNames = useMemo(() => {
     if (!asyncStandardTokenAccounts) {

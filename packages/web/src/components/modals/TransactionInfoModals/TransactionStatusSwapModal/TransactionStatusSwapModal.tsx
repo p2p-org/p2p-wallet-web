@@ -28,7 +28,7 @@ const CHECK_TRANSACTION_INTERVAL = 3000;
 
 export const TransactionStatusModal: FunctionComponent<
   ModalPropsType<string | null> & TransactionStatusModalProps
-> = ({ action, close, userTokenAccounts, swapInfo, feeCompensationInfo, networkFees, params }) => {
+> = ({ action, close, swapInfo, feeCompensationInfo, networkFees, params }) => {
   const { provider } = useWallet();
 
   const [isExecuting, setIsExecuting] = useState(false);
@@ -117,7 +117,6 @@ export const TransactionStatusModal: FunctionComponent<
       <Section>
         <Swap
           params={params}
-          userTokenAccounts={userTokenAccounts}
           feeCompensationInfo={feeCompensationInfo}
           networkFees={networkFees}
           swapInfo={swapInfo}
