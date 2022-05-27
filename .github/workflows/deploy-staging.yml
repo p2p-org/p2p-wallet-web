@@ -31,8 +31,8 @@ jobs:
       - name: Build site
         env:
           CI: false
-          PUBLIC_URL: ${{ secrets.PUBLIC_URL }}
-          REACT_APP_BASENAME: ${{ secrets.REACT_APP_BASENAME }}
+          PUBLIC_URL: https://p2p-org.github.io/p2p-wallet-web/pr-preview/${{ github.event.pull_request.number }}/
+          REACT_APP_BASENAME: p2p-wallet-web/pr-preview/${{ github.event.pull_request.number }}/
           REACT_APP_CRYPTO_COMPARE_API_KEY: ${{ secrets.REACT_APP_CRYPTO_COMPARE_API_KEY }}
           REACT_APP_FEE_RELAYER_URL: ${{ secrets.REACT_APP_FEE_RELAYER_URL }}
           REACT_APP_SWAP_HOST_FEE_ADDRESS: ${{ secrets.REACT_APP_SWAP_HOST_FEE_ADDRESS }}

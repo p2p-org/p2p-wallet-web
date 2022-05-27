@@ -20,7 +20,6 @@
 
     Start Single Page Apps for GitHub Pages
     <script type="text/javascript">
-      console.log('FROM INDEX', process.env.REACT_APP_STAGING);
       // Single Page Apps for GitHub Pages
       // MIT License
       // https://github.com/rafgraph/spa-github-pages
@@ -31,7 +30,6 @@
       // When the single page app is loaded further down in this file,
       // the correct url will be waiting in the browser's history for
       // the single page app to route accordingly.
-      if (!process.env.REACT_APP_STAGING) {
         (function (l) {
           if (l.search[1] === '/') {
             var decoded = l.search
@@ -44,7 +42,6 @@
             window.history.replaceState(null, null, l.pathname.slice(0, -1) + decoded + l.hash);
           }
         })(window.location);
-      }
     </script>
     <!-- End Single Page Apps for GitHub Pages -->
   </head>
