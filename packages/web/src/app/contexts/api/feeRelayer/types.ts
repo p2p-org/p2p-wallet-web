@@ -1,5 +1,4 @@
 import type { TokenAccount } from '@p2p-wallet-web/core';
-import type { TokenAmount } from '@p2p-wallet-web/token-utils';
 import type { u64 } from '@solana/spl-token';
 import type { PublicKey, Transaction } from '@solana/web3.js';
 
@@ -135,30 +134,12 @@ export type DestinationAccount = {
   symbol?: string;
 };
 
-export type CompensationParams = {
-  feeToken: TokenAccount | null | undefined;
-  feeAmount: u64;
-  feeAmountInToken: u64;
-  accountRentExemption: u64;
-};
-
-export type NextTransactionCompensation = {
-  feeAmount: u64;
-  feeToken: TokenAccount;
-};
-
 export type RelayTopUpWithSwapArgs = {
   feeAmount: u64;
   feeToken: TokenAccount;
   feeAmountInToken: u64;
   needCreateRelayAccount: boolean;
   topUpParams: CompensationSwapParams | null;
-};
-
-export type RelayTransferParams = {
-  fromTokenAccount: TokenAccount;
-  destinationAccount: DestinationAccount;
-  amount: TokenAmount;
 };
 
 export type WSOLAccountParams = {

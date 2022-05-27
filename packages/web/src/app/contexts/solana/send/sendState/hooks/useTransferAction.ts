@@ -1,10 +1,18 @@
 import { useCallback } from 'react';
 
+import type { TokenAccount } from '@p2p-wallet-web/core';
 import { useSolana, useWallet } from '@p2p-wallet-web/core';
 import { useSail } from '@p2p-wallet-web/sail';
+import type { TokenAmount } from '@p2p-wallet-web/token-utils';
 
-import type { RelayTransferParams } from 'app/contexts/api/feeRelayer/types';
+import type { DestinationAccount } from 'app/contexts/api/feeRelayer/types';
 import { transfer } from 'app/instructions';
+
+type TransferParams = {
+  fromTokenAccount: TokenAccount;
+  destinationAccount: DestinationAccount;
+  amount: TokenAmount;
+};
 
 export const useTransferAction = () => {
   const { providerMut } = useSolana();
@@ -12,7 +20,7 @@ export const useTransferAction = () => {
   const { handleTX } = useSail();
 
   return useCallback(
-    (params: RelayTransferParams) => async (): Promise<string> => {
+    (params: TransferParams) => async (): Promise<string> => {
       if (!providerMut || !publicKey) {
         throw new Error('Provider not ready');
       }
