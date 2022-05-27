@@ -27,10 +27,9 @@ dayjs.extend(localizedFormat);
 
 const App: React.FC = () => {
   const Router = process.env.REACT_APP_STAGING ? HashRouter : BrowserRouter;
-  // console.log('++++++++', process.env.REACT_APP_STAGING);
 
   return (
-    <>
+    <div style={{ background: 'red' }}>
       <Router basename={process.env.REACT_APP_BASENAME}>
         <Providers>
           <Switch>
@@ -53,7 +52,7 @@ const App: React.FC = () => {
           <ToastManager anchor="left" renderToast={(props) => <NotifyToast {...props} />} />
         </Providers>
       </Router>
-    </>
+    </div>
   );
 };
 
