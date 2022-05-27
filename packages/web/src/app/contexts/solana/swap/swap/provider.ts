@@ -5,7 +5,7 @@ import { useSolana, useStorage } from '@p2p-wallet-web/core';
 import { u64 } from '@solana/spl-token';
 import { createContainer } from 'unstated-next';
 
-import { useFeeCompensation, useMarketsData } from 'app/contexts';
+import { useMarketsData } from 'app/contexts';
 import type { UserTokenAccountMap } from 'app/contexts/solana/swap';
 import { useConfig, usePools, useUser } from 'app/contexts/solana/swap';
 import SlippageTolerance from 'app/contexts/solana/swap/models/SlippageTolerance';
@@ -99,7 +99,6 @@ export type UseSwapArgs = {
 const useSwapInternal = (props: UseSwapArgs = {}): UseSwap => {
   const { wallet, connection } = useSolana();
   const { programIds, tokenConfigs, routeConfigs } = useConfig();
-  const { estimatedFeeAmount } = useFeeCompensation();
 
   const [inputTokenName, _setInputTokenName] = useState(props.inputTokenName ?? 'SOL');
   const _outputTokenName = props.outputTokenName
@@ -236,14 +235,6 @@ const useSwapInternal = (props: UseSwapArgs = {}): UseSwap => {
     setTrade((currentTrade) => currentTrade.updateSlippageTolerance(slippageTolerance));
   }, [slippageTolerance]);
 
-  const feeAmount: u64 | undefined = useMemo(() => {
-    if (estimatedFeeAmount.totalLamports.eq(ZERO)) {
-      return;
-    }
-
-    return estimatedFeeAmount.accountsCreation.sol?.toU64();
-  }, [estimatedFeeAmount]);
-
   useEffect(() => {
     if (
       buttonState === ButtonState.ConfirmWallet ||
@@ -268,17 +259,14 @@ const useSwapInternal = (props: UseSwapArgs = {}): UseSwap => {
           : solRemainingForFees.sub(inputAmount);
       }
 
-      let balanceSubstractFee = inputUserTokenAccount?.getAmount();
-      if (feeAmount) {
-        balanceSubstractFee = balanceSubstractFee?.sub(feeAmount);
-        balanceSubstractFee = balanceSubstractFee?.gt(ZERO) ? balanceSubstractFee : ZERO;
-      }
+      const inputTokenAmount = inputUserTokenAccount?.getAmount();
 
       if (inputAmount.eq(ZERO)) {
         setButtonState(ButtonState.ZeroInputValue);
       } else if (solRemainingForFees.lt(minSolBalanceRequired)) {
         setButtonState(ButtonState.NotEnoughSOL);
-      } else if (!balanceSubstractFee || balanceSubstractFee.lt(inputAmount)) {
+      } else if (!inputTokenAmount || inputTokenAmount.lt(inputAmount)) {
+        //TODO: здесь необходимо приплюсовать сумму коммисий
         setButtonState(ButtonState.InsufficientBalance);
       } else {
         if (trade.isPriceImpactHigh()) {
@@ -300,7 +288,6 @@ const useSwapInternal = (props: UseSwapArgs = {}): UseSwap => {
     outputUserTokenAccount,
     solUserTokenAccount,
     minSolBalanceRequired,
-    feeAmount,
   ]);
 
   useEffect(() => {
@@ -491,7 +478,6 @@ const useSwapInternal = (props: UseSwapArgs = {}): UseSwap => {
     intermediateTokenPrice,
     buttonState,
     onSwap,
-    feeAmount,
   };
 };
 

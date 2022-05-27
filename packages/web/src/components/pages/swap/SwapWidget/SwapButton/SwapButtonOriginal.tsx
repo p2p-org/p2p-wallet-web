@@ -2,7 +2,6 @@ import type { FC } from 'react';
 
 import { styled } from '@linaria/react';
 
-import { useFeeCompensation, useNetworkFees } from 'app/contexts';
 import { ModalType, useModals } from 'app/contexts/general/modals';
 import { ButtonState, useSwap } from 'app/contexts/solana/swap';
 import type { TransactionConfirmModalProps } from 'components/modals/TransactionConfirmModal/TransactionConfirmModal';
@@ -19,10 +18,8 @@ const SwapIcon = styled(Icon)`
 
 export const SwapButtonOriginal: FC = () => {
   const { openModal } = useModals();
-  const networkFees = useNetworkFees();
   const { buttonState, trade, onSwap } = useSwap();
   const swapInfo = useSwap();
-  const feeCompensationInfo = useFeeCompensation();
 
   const handleSwapClick = async () => {
     trackEvent('Swap_Verification_Invoked');
@@ -38,8 +35,6 @@ export const SwapButtonOriginal: FC = () => {
           minimumOutputAmount: trade.getMinimumOutputAmount(),
         },
         swapInfo,
-        feeCompensationInfo,
-        networkFees,
       },
     );
 
@@ -55,8 +50,6 @@ export const SwapButtonOriginal: FC = () => {
         inputAmount: trade.getInputAmount(),
         minimumOutputAmount: trade.getMinimumOutputAmount(),
       },
-      feeCompensationInfo,
-      networkFees,
       swapInfo,
     });
   };

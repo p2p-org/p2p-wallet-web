@@ -1,11 +1,3 @@
-import type { FC } from 'react';
-
-import { ZERO } from '@orca-so/sdk';
-
-import { useFeeCompensation } from 'app/contexts';
-
-import { FeeTokenSelector } from './FeeTokenSelector';
-
 /*const CompensationSwap: FC<{
   compensationAmount: u64;
   feeToken: TokenAccount;
@@ -28,6 +20,7 @@ import { FeeTokenSelector } from './FeeTokenSelector';
   return null;
 };*/
 
+/*
 export const CompensationFee: FC<{
   type: 'send' | 'swap';
   isShow?: boolean;
@@ -54,8 +47,9 @@ export const CompensationFee: FC<{
         accountSymbol={accountSymbol}
       />
       {feeToken && compensationState.needTopUp
-        ? null /*<CompensationSwap compensationAmount={compensationState.totalFee} feeToken={feeToken} />*/
+        ? <CompensationSwap compensationAmount={compensationState.totalFee} feeToken={feeToken} />
         : null}
     </>
   );
 };
+*/
