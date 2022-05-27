@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+import { HashRouter, BrowserRouter, Route, Switch } from 'react-router-dom';
 
 import dayjs from 'dayjs';
 import localizedFormat from 'dayjs/plugin/localizedFormat';
@@ -17,7 +17,6 @@ import { Send } from 'pages/Send';
 import { Settings } from 'pages/Settings';
 import { SettingsNetwork } from 'pages/SettingsNetwork';
 import { Swap } from 'pages/Swap';
-// import { SwapNew } from 'pages/SwapNew';
 import { Wallet } from 'pages/Wallet';
 import { WalletSettings } from 'pages/WalletSettings';
 import { AuthRequiredRoute } from 'utils/routes/UserRequiredRoute';
@@ -27,6 +26,9 @@ import { Providers } from './Providers';
 dayjs.extend(localizedFormat);
 
 const App: React.FC = () => {
+  const Router = process.env.NODE_ENV === 'test' ? HashRouter : BrowserRouter;
+  console.log(process.env, '++++++++++++++++++');
+
   return (
     <>
       <Router basename={process.env.REACT_APP_BASENAME}>
