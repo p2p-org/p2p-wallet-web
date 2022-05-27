@@ -27,7 +27,7 @@ dayjs.extend(localizedFormat);
 
 const App: React.FC = () => {
   const Router = process.env.REACT_APP_STAGING ? HashRouter : BrowserRouter;
-  console.log('++++++++', process.env.REACT_APP_STAGING);
+  // console.log('++++++++', process.env.REACT_APP_STAGING);
 
   return (
     <>
