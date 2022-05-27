@@ -10,7 +10,7 @@ import { PublicKey } from '@solana/web3.js';
 import { createContainer } from 'unstated-next';
 
 import { isValidBitcoinAddress, isValidSolanaAddress } from 'app/contexts';
-import type { DestinationAccount } from 'app/contexts/api/feeRelayer/types';
+import type { DestinationAccount } from 'app/contexts/solana/send/sendState/types';
 import { useRenNetwork } from 'utils/hooks/renBridge/useNetwork';
 
 import { useResolveAddress } from './hooks/useResolveAddress';

@@ -5,7 +5,7 @@ import { useSolana, useWallet } from '@p2p-wallet-web/core';
 import { useSail } from '@p2p-wallet-web/sail';
 import type { TokenAmount } from '@p2p-wallet-web/token-utils';
 
-import type { DestinationAccount } from 'app/contexts/api/feeRelayer/types';
+import type { DestinationAccount } from 'app/contexts/solana/send/sendState/types';
 import { transfer } from 'app/instructions';
 
 type TransferParams = {
