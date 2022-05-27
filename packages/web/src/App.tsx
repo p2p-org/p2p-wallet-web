@@ -26,8 +26,8 @@ import { Providers } from './Providers';
 dayjs.extend(localizedFormat);
 
 const App: React.FC = () => {
-  const Router = process.env.NODE_ENV === 'test' ? HashRouter : BrowserRouter;
-  console.log(process.env, '++++++++++++++++++');
+  const Router = process.env.REACT_APP_STAGING ? HashRouter : BrowserRouter;
+  console.log('++++++++', process.env.REACT_APP_STAGING);
 
   return (
     <>

@@ -31,7 +31,6 @@ jobs:
       - name: Build site
         env:
           CI: false
-          NODE_ENV: test
           PUBLIC_URL: ${{ secrets.PUBLIC_URL }}
           REACT_APP_BASENAME: ${{ secrets.REACT_APP_BASENAME }}
           REACT_APP_CRYPTO_COMPARE_API_KEY: ${{ secrets.REACT_APP_CRYPTO_COMPARE_API_KEY }}
@@ -42,6 +41,7 @@ jobs:
           REACT_APP_INTERCOM_APP_ID: ${{ secrets.REACT_APP_INTERCOM_APP_ID }}
           REACT_APP_MOONPAY_API_KEY: ${{ secrets.REACT_APP_MOONPAY_API_KEY }}
           REACT_APP_MOONPAY_SIGNER_URL: ${{ secrets.REACT_APP_MOONPAY_SIGNER_URL }}
+          REACT_APP_STAGING: true
         run: yarn build
 
       - name: Deploy preview
