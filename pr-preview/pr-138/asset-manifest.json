@@ -6,8 +6,8 @@
     "static/js/1.e81bd174.chunk.js": "https://p2p-org.github.io/p2p-wallet-web/pr-preview/pr-138/static/js/1.e81bd174.chunk.js",
     "static/js/1.e81bd174.chunk.js.map": "https://p2p-org.github.io/p2p-wallet-web/pr-preview/pr-138/static/js/1.e81bd174.chunk.js.map",
     "main.css": "https://p2p-org.github.io/p2p-wallet-web/pr-preview/pr-138/static/css/main.5bc8756b.chunk.css",
-    "main.js": "https://p2p-org.github.io/p2p-wallet-web/pr-preview/pr-138/static/js/main.66353e96.chunk.js",
-    "main.js.map": "https://p2p-org.github.io/p2p-wallet-web/pr-preview/pr-138/static/js/main.66353e96.chunk.js.map",
+    "main.js": "https://p2p-org.github.io/p2p-wallet-web/pr-preview/pr-138/static/js/main.4a7c0336.chunk.js",
+    "main.js.map": "https://p2p-org.github.io/p2p-wallet-web/pr-preview/pr-138/static/js/main.4a7c0336.chunk.js.map",
     "runtime-main.js": "https://p2p-org.github.io/p2p-wallet-web/pr-preview/pr-138/static/js/runtime-main.a8b9c445.js",
     "runtime-main.js.map": "https://p2p-org.github.io/p2p-wallet-web/pr-preview/pr-138/static/js/runtime-main.a8b9c445.js.map",
     "static/css/4.59b48f64.chunk.css": "https://p2p-org.github.io/p2p-wallet-web/pr-preview/pr-138/static/css/4.59b48f64.chunk.css",
@@ -88,6 +88,6 @@
     "static/css/4.59b48f64.chunk.css",
     "static/js/4.1d3ca155.chunk.js",
     "static/css/main.5bc8756b.chunk.css",
-    "static/js/main.66353e96.chunk.js"
+    "static/js/main.4a7c0336.chunk.js"
   ]
 }
