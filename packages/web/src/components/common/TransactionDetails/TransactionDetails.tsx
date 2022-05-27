@@ -50,9 +50,9 @@ export const TransactionDetails: FC<TransactionDetailsProps> = ({ sendState, amo
             />
           </TokenAndUsd>
         </Row>
-        <Row>
+        {/*<Row>
           <Text className="gray">Transaction fee</Text>
-          {/*useFreeTransactions ? (
+          {useFreeTransactions ? (
             <Text>
               Free{' '}
               <Text className="green inline-flex">
@@ -61,9 +61,9 @@ export const TransactionDetails: FC<TransactionDetailsProps> = ({ sendState, amo
             </Text>
           ) : (
             <Text>1</Text>
-          )*/}
+          )}
           <Text>5000 lamport</Text>
-        </Row>
+        </Row>*/}
         {/*sendState?.details.accountCreationAmount ? (
           <Row>
             <Text className="gray">{sendState.destinationAccount?.symbol} account creation</Text>

@@ -179,9 +179,9 @@ export const FeesOriginal: FC<FeesOriginalProps> = ({ swapInfo, forPage, open })
             </Text>
           </Text>
         </Row>
-        <Row>
+        {/*<Row>
           <Text className="gray">Transaction fee</Text>
-          {/*useFreeTransactions ? (
+          {useFreeTransactions ? (
             <Text>
               Free{' '}
               <Text className="green inline-flex">
@@ -190,9 +190,9 @@ export const FeesOriginal: FC<FeesOriginalProps> = ({ swapInfo, forPage, open })
             </Text>
           ) : (
             <Text>1</Text>
-          )*/}
+          )}
           <Text>5000 lamport</Text>
-        </Row>
+        </Row>*/}
         {/*tokenNames?.map((tokenName) => (
           <Row key={tokenName}>
             <Text className="gray">{tokenName} account creation</Text>

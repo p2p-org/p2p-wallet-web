@@ -52,9 +52,9 @@ export const TransactionDetails: FC = () => {
             {/* <Text className="gray">(~$150)</Text> */}
           </Text>
         </Row>
-        <Row>
+        {/*<Row>
           <Text className="gray">Transaction fee</Text>
-          {/*useFreeTransactions ? (
+          {useFreeTransactions ? (
             <Text>
               Free{' '}
               <Text className="green inline-flex">
@@ -63,9 +63,9 @@ export const TransactionDetails: FC = () => {
             </Text>
           ) : (
             <Text>1</Text>
-          )*/}
+          )}
           <Text>5000 lamport</Text>
-        </Row>
+        </Row>*/}
         {/*details.accountCreationAmount ? (
           <Row>
             <Text className="gray">{destinationAccount?.symbol} account creation</Text>
