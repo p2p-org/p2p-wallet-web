@@ -56,4 +56,5 @@ jobs:
         if: github.event.pull_request.merged == true || github.event.pull_request.closed == true
         with:
           source-dir: ./packages/web/build
+          preview-branch: gh-pages
           action: remove
