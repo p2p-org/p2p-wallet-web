@@ -40,9 +40,8 @@ jobs:
           REACT_APP_MOONPAY_SIGNER_URL: ${{ secrets.REACT_APP_MOONPAY_SIGNER_URL }}
         run: yarn build
 
-      - name: Publish
-        uses: peaceiris/actions-gh-pages@v3
+      - uses: JamesIves/github-pages-deploy-action@v4
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./packages/web/build
-          publish_branch: deploy-develop
+          branch: gh-pages # The branch the action should deploy to.
+          folder: ./packages/web/build
+          clean-exclude: pr-preview/
