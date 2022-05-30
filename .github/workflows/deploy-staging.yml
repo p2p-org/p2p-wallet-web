@@ -49,12 +49,3 @@ jobs:
           source-dir: ./packages/web/build
           action: deploy
           preview-branch: gh-pages
-
-
-      - name: Remove preview
-        uses: rossjrw/pr-preview-action@v1
-#        if: github.event.pull_request.merged == true || github.event.pull_request.closed == true
-        with:
-          source-dir: ./packages/web/build
-          preview-branch: gh-pages
-          action: remove
