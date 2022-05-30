@@ -1,15 +1,9 @@
 name: Deploy Develop
 
-#on:
-#  push:
-#    branches:
-#      - develop
 on:
-  pull_request:
-    types:
-      - opened
-      - synchronize
-      - closed
+  push:
+    branches:
+      - develop
 
 jobs:
   deploy:
