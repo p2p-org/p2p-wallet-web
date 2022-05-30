@@ -24,7 +24,9 @@
       // Otherwise, leave pathSegmentsToKeep as 0.
       var pathSegmentsToKeep = 1;
 
-      if (['wallet.p2p.org', 'pensive-ardinghelli-a75bf5.netlify.app'].includes(window.location.host)) {
+      if (
+        ['wallet.p2p.org', 'pensive-ardinghelli-a75bf5.netlify.app'].includes(window.location.host)
+      ) {
         pathSegmentsToKeep = 0;
       }
 
