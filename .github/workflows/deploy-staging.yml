@@ -47,5 +47,4 @@ jobs:
         uses: rossjrw/pr-preview-action@v1
         with:
           source-dir: ./packages/web/build
-          action: deploy
           preview-branch: gh-pages
