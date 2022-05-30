@@ -25,10 +25,8 @@ import { Providers } from './Providers';
 
 dayjs.extend(localizedFormat);
 
-// @FRIDAY fix router TS
-// add some kind of  content hash to notjo hard reload on a new deploy visit
 const App: React.FC = () => {
-  const Router = process.env.REACT_APP_STAGING ? HashRouter : BrowserRouter;
+  const Router: React.ElementType = process.env.REACT_APP_STAGING ? HashRouter : BrowserRouter;
 
   return (
     <>
