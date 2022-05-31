@@ -36,7 +36,7 @@ export interface UseConfig {
 const ORCA_WORKER_URL = 'https://orca.wallet.p2p.org/info';
 
 const useConfigInternal = (): UseConfig => {
-  const [orcaData, setOrcaData] = useState<CloudFlareOrcaCache | null>();
+  const [orcaData, setOrcaData] = useState<CloudFlareOrcaCache | null>(null);
 
   useEffect(() => {
     fetch(ORCA_WORKER_URL)
