@@ -22,11 +22,10 @@ export const useTotalBalance = () => {
 
         const rate = markets[tokenAccount?.balance?.token.symbol];
         if (rate) {
-          return tokenAccount.balance.asNumber * rate + prev;
+          prev += tokenAccount.balance.asNumber * rate;
         }
 
-        // Same as USD
-        return tokenAccount.balance.asNumber + prev;
+        return prev;
       }, 0),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [tokenAccounts, markets],
