@@ -39,20 +39,20 @@ export type PoolConfig = Pick<PoolJSON, 'tokenAName' | 'tokenBName'> & {
   poolTokenMint: PublicKey;
   tokenAccountA: PublicKey;
   tokenAccountB: PublicKey;
-  feeAccount: PublicKey;
   hostFeeAccount: PublicKey | null;
-  feeNumerator: u64;
-  feeDenominator: u64;
   ownerTradeFeeNumerator: u64;
   ownerTradeFeeDenominator: u64;
   ownerWithdrawFeeNumerator: u64;
   ownerWithdrawFeeDenominator: u64;
-  hostFeeNumerator: u64;
-  hostFeeDenominator: u64;
-  curveType: CurveType;
   amp: u64 | undefined;
   deprecated: boolean;
   programVersion: number;
+  hostFeeNumerator: u64;
+  hostFeeDenominator: u64;
+  curveType: CurveType;
+  feeNumerator: u64;
+  feeDenominator: u64;
+  feeAccount: PublicKey;
 };
 
 export type PoolConfigs = {
@@ -85,4 +85,23 @@ export type TokenConfigs = {
 // TokenPrices
 export type TokenPrices = {
   [symbol: string]: number;
+};
+
+type CloudFlareMeta = {
+  type: 'hot' | 'cold';
+  updatedAt: string;
+  version: string;
+};
+
+export type ProgramIds = 'serumTokenSwap' | 'tokenSwapV2' | 'tokenSwap' | 'token' | 'aquafarm';
+
+type CloudFlareData = {
+  tokens: Record<string, Pick<TokenJSON, 'mint' | 'name' | 'fetchPrice' | 'decimals'>>;
+  pools: Record<string, PoolJSON>;
+  programIds: Record<ProgramIds, string>;
+};
+
+export type CloudFlareOrcaCache = {
+  metadata: CloudFlareMeta;
+  value: CloudFlareData;
 };
