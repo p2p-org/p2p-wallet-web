@@ -1,15 +1,18 @@
-name: Deploy Develop
+name: Deploy Staging
 
 on:
-  push:
-    branches:
-      - develop
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - closed
+
+concurrency: preview-${{ github.ref }}
 
 jobs:
-  deploy:
+  deploy_stage:
     runs-on: ubuntu-latest
-    environment: development
-    name: Deploy
+    environment: staging
     steps:
       - uses: actions/checkout@v2
 
@@ -26,10 +29,9 @@ jobs:
 
       - name: Build site
         env:
-          # @FIXME in https://p2pvalidator.atlassian.net/browse/PWN-3411
           CI: false
-          PUBLIC_URL: ${{ secrets.PUBLIC_URL }}
-          REACT_APP_BASENAME: ${{ secrets.REACT_APP_BASENAME }}
+          PUBLIC_URL: https://p2p-org.github.io/p2p-wallet-web/pr-preview/pr-${{ github.event.pull_request.number }}/
+          REACT_APP_BASENAME: p2p-wallet-web/pr-preview/pr-${{ github.event.pull_request.number }}/
           REACT_APP_CRYPTO_COMPARE_API_KEY: ${{ secrets.REACT_APP_CRYPTO_COMPARE_API_KEY }}
           REACT_APP_FEE_RELAYER_URL: ${{ secrets.REACT_APP_FEE_RELAYER_URL }}
           REACT_APP_SWAP_HOST_FEE_ADDRESS: ${{ secrets.REACT_APP_SWAP_HOST_FEE_ADDRESS }}
@@ -38,10 +40,12 @@ jobs:
           REACT_APP_INTERCOM_APP_ID: ${{ secrets.REACT_APP_INTERCOM_APP_ID }}
           REACT_APP_MOONPAY_API_KEY: ${{ secrets.REACT_APP_MOONPAY_API_KEY }}
           REACT_APP_MOONPAY_SIGNER_URL: ${{ secrets.REACT_APP_MOONPAY_SIGNER_URL }}
+          REACT_APP_STAGING: true
         run: yarn build
 
-      - uses: JamesIves/github-pages-deploy-action@v4
+      - name: Deploy preview
+        uses: rossjrw/pr-preview-action@v1
         with:
-          branch: gh-pages # The branch the action should deploy to.
-          folder: ./packages/web/build
-          clean-exclude: pr-preview/
+          source-dir: ./packages/web/build
+          action: deploy
+          preview-branch: gh-pages
