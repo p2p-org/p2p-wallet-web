@@ -75,6 +75,26 @@ const config: ConfigFn = (env, argv) => {
         filename: 'styles-[contenthash].css',
         ignoreOrder: true,
       }),
+      // This is for passing secrets on CI in opposite to passing them from .env
+      new webpack.DefinePlugin({
+        'process.env': {
+          REACT_APP_AMPLITUDE_API_KEY: JSON.stringify(process.env.REACT_APP_AMPLITUDE_API_KEY),
+          REACT_APP_CRYPTO_COMPARE_API_KEY: JSON.stringify(
+            process.env.REACT_APP_CRYPTO_COMPARE_API_KEY,
+          ),
+          REACT_APP_FEE_RELAYER_URL: JSON.stringify(process.env.REACT_APP_FEE_RELAYER_URL),
+          REACT_APP_FIGMENT_DATAHUB_API_KEY: JSON.stringify(
+            process.env.REACT_APP_FIGMENT_DATAHUB_API_KEY,
+          ),
+          REACT_APP_INTERCOM_APP_ID: JSON.stringify(process.env.REACT_APP_INTERCOM_APP_ID),
+          REACT_APP_MOONPAY_API_KEY: JSON.stringify(process.env.REACT_APP_MOONPAY_API_KEY),
+          REACT_APP_MOONPAY_SIGNER_URL: JSON.stringify(process.env.REACT_APP_MOONPAY_SIGNER_URL),
+          REACT_APP_SWAP_HOST_FEE_ADDRESS: JSON.stringify(
+            process.env.REACT_APP_SWAP_HOST_FEE_ADDRESS,
+          ),
+          REACT_APP_TRANSAK_API_KEY: JSON.stringify(process.env.REACT_APP_TRANSAK_API_KEY),
+        },
+      }),
     );
   }
 
@@ -263,7 +283,6 @@ const config: ConfigFn = (env, argv) => {
           {
             from: path.join(WEB_PATH, '/public'),
             to: path.join(WEB_PATH, '/build'),
-            // toType: 'dir',
           },
         ],
       }),
