@@ -54,6 +54,7 @@ export interface UseSendState {
   isAddressInvalid: boolean;
 
   isRenBTC: boolean;
+  isRawSOL: boolean;
 
   isShowConfirmAddressSwitch: boolean;
   setIsShowConfirmAddressSwitch: (v: boolean) => void;
@@ -106,6 +107,7 @@ const useSendStateInternal = (): UseSendState => {
   const destinationAddress = resolvedAddress || toPublicKey;
 
   const isRenBTC = fromTokenAccount?.balance?.token.symbol === 'renBTC';
+  const isRawSOL = !!fromTokenAccount?.balance?.token.isRawSOL;
 
   const isAddressInvalid = useMemo(() => {
     if (destinationAddress.length) {
@@ -264,6 +266,7 @@ const useSendStateInternal = (): UseSendState => {
     setIsExecuting,
     isAddressInvalid,
     isRenBTC,
+    isRawSOL,
     isShowConfirmAddressSwitch,
     setIsShowConfirmAddressSwitch,
     isInitBurnAndRelease,

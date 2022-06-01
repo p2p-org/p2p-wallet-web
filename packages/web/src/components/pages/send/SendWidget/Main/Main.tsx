@@ -4,11 +4,13 @@ import { useHistory } from 'react-router';
 import { styled } from '@linaria/react';
 import type { TokenAccount } from '@p2p-wallet-web/core';
 import { useUserTokenAccounts } from '@p2p-wallet-web/core';
+import { TokenAmount } from '@p2p-wallet-web/token-utils';
 import { theme } from '@p2p-wallet-web/ui';
 import type { Token } from '@saberhq/token-utils';
 import { Feature } from 'flagged';
 
 import { useSendState } from 'app/contexts';
+import { useFeeCalculation } from 'app/contexts/solana/send/sendState/hooks/useFeeCalculation';
 import { FeePaySelector } from 'components/common/FeePaySelector';
 import { FEATURE_PAY_BY } from 'config/featureFlags';
 import { trackEvent } from 'utils/analytics';
@@ -65,8 +67,11 @@ export const Main: FC = () => {
     setFromAmount,
     isExecuting,
     isRenBTC,
+    isRawSOL,
     isShowConfirmAddressSwitch,
   } = useSendState();
+
+  const fees = useFeeCalculation();
 
   const tokenAccounts = useUserTokenAccounts();
 
@@ -87,13 +92,19 @@ export const Main: FC = () => {
   };
 
   const handleFromAmountChange = (minorAmount: string, type?: string) => {
-    setFromAmount(minorAmount);
+    let newAmount = minorAmount;
 
     if (type === 'available') {
-      trackEvent('send_available_click', { sum: Number(minorAmount) });
+      if (isRawSOL) {
+        const totalFeeSol = new TokenAmount(fromTokenAccount.balance.token, fees.totalFee);
+        newAmount = (Number(newAmount) - Number(totalFeeSol.toExact())).toString();
+      }
+      trackEvent('send_available_click', { sum: Number(newAmount) });
     } else {
-      trackEvent('send_amount_keydown', { sum: Number(minorAmount) });
+      trackEvent('send_amount_keydown', { sum: Number(newAmount) });
     }
+
+    setFromAmount(newAmount);
   };
 
   const handleFeeTokenAccountChange = (
