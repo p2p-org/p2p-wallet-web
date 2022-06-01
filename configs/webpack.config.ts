@@ -2,6 +2,7 @@ import ReactRefreshWebpackPlugin from '@pmmmwh/react-refresh-webpack-plugin';
 import CopyPlugin from 'copy-webpack-plugin';
 import CssMinimizerPlugin from 'css-minimizer-webpack-plugin';
 import DotEnv from 'dotenv-webpack';
+import FaviconsWebpackPlugin from 'favicons-webpack-plugin';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 import ImageMinimizerPlugin from 'image-minimizer-webpack-plugin';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
@@ -96,6 +97,7 @@ const config: ConfigFn = (env, argv) => {
           REACT_APP_STAGING: JSON.stringify(process.env.REACT_APP_STAGING),
         },
       }),
+      new FaviconsWebpackPlugin(path.join(WEB_PATH, '/public/favicon.icon')),
     );
   }
 

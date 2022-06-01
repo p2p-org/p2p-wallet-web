@@ -20,7 +20,6 @@ import { ToAddressInput } from './ToAddressInput';
 import { TransactionDetails } from './TransactionDetails';
 
 const FromWrapper = styled.div`
-  background: green;
   position: relative;
 
   display: flex;
