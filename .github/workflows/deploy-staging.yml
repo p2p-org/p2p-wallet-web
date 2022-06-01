@@ -29,6 +29,7 @@ jobs:
 
       - name: Build site
         env:
+#          @FIXME
           CI: false
           PUBLIC_URL: https://p2p-org.github.io/p2p-wallet-web/pr-preview/pr-${{ github.event.pull_request.number }}/
           REACT_APP_BASENAME: p2p-wallet-web/pr-preview/pr-${{ github.event.pull_request.number }}/

@@ -75,7 +75,7 @@ const config: ConfigFn = (env, argv) => {
         filename: 'styles-[contenthash].css',
         ignoreOrder: true,
       }),
-      // This is for passing secrets on CI in opposite to passing them from .env
+      // These ENVs are for passing secrets on CI in opposite to passing them from .env
       new webpack.DefinePlugin({
         'process.env': {
           REACT_APP_AMPLITUDE_API_KEY: JSON.stringify(process.env.REACT_APP_AMPLITUDE_API_KEY),
@@ -93,6 +93,7 @@ const config: ConfigFn = (env, argv) => {
             process.env.REACT_APP_SWAP_HOST_FEE_ADDRESS,
           ),
           REACT_APP_TRANSAK_API_KEY: JSON.stringify(process.env.REACT_APP_TRANSAK_API_KEY),
+          REACT_APP_STAGING: JSON.stringify(process.env.REACT_APP_STAGING),
         },
       }),
     );
@@ -265,6 +266,7 @@ const config: ConfigFn = (env, argv) => {
           },
         ),
       ),
+      // These ENVs are passed from local .env file (in opposite to those from CI secrets)
       new DotEnv({
         path: path.join(WEB_PATH, '/.env.development'),
         ignoreStub: true,
