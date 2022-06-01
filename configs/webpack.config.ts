@@ -1,4 +1,5 @@
 import ReactRefreshWebpackPlugin from '@pmmmwh/react-refresh-webpack-plugin';
+import CopyPlugin from 'copy-webpack-plugin';
 import CssMinimizerPlugin from 'css-minimizer-webpack-plugin';
 import DotEnv from 'dotenv-webpack';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
@@ -91,7 +92,7 @@ const config: ConfigFn = (env, argv) => {
     entry: path.resolve(__dirname, WEB_PATH, '/src/index.tsx'),
 
     output: {
-      path: path.resolve(__dirname, WEB_PATH, 'public'),
+      path: path.resolve(__dirname, WEB_PATH, 'build'),
       filename: __DEVELOPMENT__ ? '[name].[contenthash].js' : '[contenthash].js',
       chunkFilename: __DEVELOPMENT__ ? '[id]-[contenthash].chunk.js' : '[contenthash].chunk.js',
       assetModuleFilename: '[name]-[contenthash][ext]',
@@ -257,6 +258,15 @@ const config: ConfigFn = (env, argv) => {
         Buffer: ['buffer', 'Buffer'],
       }),
       new webpack.ProgressPlugin(),
+      new CopyPlugin({
+        patterns: [
+          {
+            from: path.join(WEB_PATH, '/public'),
+            to: path.join(WEB_PATH, '/build'),
+            // toType: 'dir',
+          },
+        ],
+      }),
       ...utilityPlugins,
       ...devPlugins,
       ...prodPlugins,
