@@ -99,6 +99,14 @@ const config: ConfigFn = (env, argv) => {
         },
       }),
       new CleanWebpackPlugin(),
+      new CopyPlugin({
+        patterns: [
+          {
+            from: path.join(WEB_PATH, '/public'),
+            to: path.join(WEB_PATH, '/build'),
+          },
+        ],
+      }),
     );
   }
 
@@ -253,6 +261,8 @@ const config: ConfigFn = (env, argv) => {
             title: APP_TITLE,
             template: path.join(WEB_PATH, '/index.html'),
             favicon: path.join(WEB_PATH, '/public/favicon.ico'),
+            base: process.env.PUBLIC_URL,
+            // filename: 'index.[contenthash].html',
           },
           __PRODUCTION__ && {
             minify: {
@@ -284,14 +294,6 @@ const config: ConfigFn = (env, argv) => {
         Buffer: ['buffer', 'Buffer'],
       }),
       new webpack.ProgressPlugin(),
-      new CopyPlugin({
-        patterns: [
-          {
-            from: path.join(WEB_PATH, '/public'),
-            to: path.join(WEB_PATH, '/build'),
-          },
-        ],
-      }),
       ...utilityPlugins,
       ...devPlugins,
       ...prodPlugins,

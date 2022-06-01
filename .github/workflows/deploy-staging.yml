@@ -10,6 +10,7 @@ on:
 concurrency: preview-${{ github.ref }}
 
 jobs:
+#  @TODO anohter job with preview remove only on closed
   deploy_stage:
     runs-on: ubuntu-latest
     environment: staging
