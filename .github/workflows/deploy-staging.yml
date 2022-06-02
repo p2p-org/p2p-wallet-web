@@ -30,8 +30,6 @@ jobs:
 
       - name: Build site
         env:
-          #          @FIXME
-          CI: false
           PUBLIC_URL: https://p2p-org.github.io/p2p-wallet-web/pr-preview/pr-${{ github.event.pull_request.number }}/
           REACT_APP_BASENAME: p2p-wallet-web/pr-preview/pr-${{ github.event.pull_request.number }}/
           REACT_APP_CRYPTO_COMPARE_API_KEY: ${{ secrets.REACT_APP_CRYPTO_COMPARE_API_KEY }}
@@ -52,7 +50,7 @@ jobs:
           action: deploy
           preview-branch: gh-pages
 
-  remove-preview:
+  remove_preview:
     if: github.event.action == 'closed' || github.event.pull_request.merged
     runs-on: ubuntu-latest
     environment: staging
