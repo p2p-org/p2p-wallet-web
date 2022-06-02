@@ -45,3 +45,4 @@ jobs:
           branch: gh-pages # The branch the action should deploy to.
           folder: ./packages/web/build
           clean-exclude: pr-preview/
+          force: false

@@ -10,7 +10,6 @@ on:
 concurrency: preview-${{ github.ref }}
 
 jobs:
-#  @TODO anohter job with preview remove only on closed
   deploy_stage:
     runs-on: ubuntu-latest
     environment: staging
@@ -30,7 +29,7 @@ jobs:
 
       - name: Build site
         env:
-#          @FIXME
+          #          @FIXME
           CI: false
           PUBLIC_URL: https://p2p-org.github.io/p2p-wallet-web/pr-preview/pr-${{ github.event.pull_request.number }}/
           REACT_APP_BASENAME: p2p-wallet-web/pr-preview/pr-${{ github.event.pull_request.number }}/
@@ -47,7 +46,22 @@ jobs:
 
       - name: Deploy preview
         uses: rossjrw/pr-preview-action@v1
+        if: github.event.action == 'open' || github.event.action == 'synchronize'
         with:
           source-dir: ./packages/web/build
           action: deploy
+          preview-branch: gh-pages
+
+  remove-preview:
+    if: github.event.action == 'closed' || github.event.pull_request.merged
+    runs-on: ubuntu-latest
+    environment: staging
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Clean up preview
+        uses: rossjrw/pr-preview-action@v1
+        with:
+          source-dir: ./packages/web/build
+          action: remove
           preview-branch: gh-pages
