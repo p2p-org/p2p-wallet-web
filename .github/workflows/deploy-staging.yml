@@ -10,7 +10,31 @@ on:
 concurrency: preview-${{ github.ref }}
 
 jobs:
+  test_pr:
+    runs-on: ubuntu-latest
+    environment: staging
+    name: Test PR
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Cache node_modules
+        uses: actions/cache@v2
+        with:
+          path: |
+            node_modules
+            */*/node_modules
+          key: ${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
+
+      - name: Install dependecies
+        run: yarn install --frozen-lockfile
+
+      - name: Run Test
+        run: | 
+             lerna run --concurrency 1 --stream lint:es --exclude-dependents
+             lerna run --concurrency 1 --stream lint:type --exclude-dependents
+
   deploy_stage:
+    needs: test_pr
     if: github.event.action == 'opened' || github.event.action == 'synchronize'
     runs-on: ubuntu-latest
     environment: staging
