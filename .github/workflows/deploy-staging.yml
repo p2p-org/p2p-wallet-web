@@ -11,6 +11,7 @@ concurrency: preview-${{ github.ref }}
 
 jobs:
   deploy_stage:
+    if: github.event.action == 'opened' || github.event.action == 'synchronize'
     runs-on: ubuntu-latest
     environment: staging
     steps:
@@ -46,7 +47,6 @@ jobs:
 
       - name: Deploy preview
         uses: rossjrw/pr-preview-action@v1
-        if: github.event.action == 'open' || github.event.action == 'synchronize'
         with:
           source-dir: ./packages/web/build
           action: deploy
