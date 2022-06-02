@@ -46,3 +46,7 @@ export const trimFormattedNumber = (valueStr: string) => {
 export const getNumberFromFormattedNumber = (valueStr: string) => {
   return Number(trimFormattedNumber(valueStr));
 };
+
+export const getNumberFromFormattedUSD = (valueStr: string) => {
+  return getNumberFromFormattedNumber(valueStr.replace('$', ''));
+};
