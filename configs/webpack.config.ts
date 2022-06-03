@@ -80,7 +80,6 @@ const config: ConfigFn = (env, argv) => {
       new webpack.DefinePlugin({
         'process.env': {
           REACT_APP_BASENAME: JSON.stringify(process.env.REACT_APP_BASENAME),
-          PUBLIC_URL: JSON.stringify(process.env.PUBLIC_URL),
           REACT_APP_AMPLITUDE_API_KEY: JSON.stringify(process.env.REACT_APP_AMPLITUDE_API_KEY),
           REACT_APP_CRYPTO_COMPARE_API_KEY: JSON.stringify(
             process.env.REACT_APP_CRYPTO_COMPARE_API_KEY,
@@ -97,6 +96,7 @@ const config: ConfigFn = (env, argv) => {
           ),
           REACT_APP_TRANSAK_API_KEY: JSON.stringify(process.env.REACT_APP_TRANSAK_API_KEY),
           REACT_APP_STAGING: JSON.stringify(process.env.REACT_APP_STAGING),
+          GITHUB_TOKEN: JSON.stringify(process.env.GITHUB_TOKEN),
         },
       }),
       new CleanWebpackPlugin(),
