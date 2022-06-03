@@ -4,9 +4,6 @@
   "private": true,
   "license": "MIT",
   "scripts": {
-    "start": "craco start",
-    "build": "craco build",
-    "test": "craco test",
     "deploy": "gh-pages -d build"
   },
   "dependencies": {

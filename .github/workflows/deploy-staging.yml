@@ -10,9 +10,97 @@ on:
 concurrency: preview-${{ github.ref }}
 
 jobs:
-  deploy_stage:
+  set_info:
+    if: github.event.action == 'opened'
     runs-on: ubuntu-latest
     environment: staging
+    name: Set Jira Info
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: tzkhan/pr-update-action@v2
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          base-branch-regex: '[a-z\d-_.\\/]+'
+          head-branch-regex: 'pwn-\d+'
+          title-update-action: 'prefix'
+          title-template: '[%headbranch%]'
+          body-template: |
+            🚀 [ JIRA TICKET ](https://p2pvalidator.atlassian.net/browse/%headbranch%)
+          body-update-action: 'prefix'
+          body-uppercase-base-match: false
+
+  lint_types:
+    runs-on: ubuntu-latest
+    environment: staging
+    name: Typecheck TS
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Cache node_modules
+        uses: actions/cache@v2
+        with:
+          path: |
+            node_modules
+            */*/node_modules
+          key: ${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
+
+      - name: Install dependecies
+        run: yarn install --frozen-lockfile
+
+      - name: Run Test
+        run: lerna run --concurrency 1 --stream lint:type --exclude-dependents
+
+  lint_es:
+    needs: lint_types
+    runs-on: ubuntu-latest
+    environment: staging
+    name: Lint ESLint
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Cache node_modules
+        uses: actions/cache@v2
+        with:
+          path: |
+            node_modules
+            */*/node_modules
+          key: ${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
+
+      - name: Install dependecies
+        run: yarn install --frozen-lockfile
+
+      - name: Run Test
+        run: lerna run --concurrency 1 --stream lint:es --exclude-dependents
+
+  lint_style:
+    needs: lint_es
+    runs-on: ubuntu-latest
+    environment: staging
+    name: Lint Stylelint
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Cache node_modules
+        uses: actions/cache@v2
+        with:
+          path: |
+            node_modules
+            */*/node_modules
+          key: ${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
+
+      - name: Install dependecies
+        run: yarn install --frozen-lockfile
+
+      - name: Run Test
+        run: lerna run --concurrency 1 --stream lint:style --exclude-dependents
+
+  deploy_stage:
+    needs: lint_style
+    if: github.event.action == 'opened' || github.event.action == 'synchronize'
+    runs-on: ubuntu-latest
+    environment: staging
+    name: Deploy PR preview
     steps:
       - uses: actions/checkout@v2
 
@@ -29,7 +117,6 @@ jobs:
 
       - name: Build site
         env:
-          CI: false
           PUBLIC_URL: https://p2p-org.github.io/p2p-wallet-web/pr-preview/pr-${{ github.event.pull_request.number }}/
           REACT_APP_BASENAME: p2p-wallet-web/pr-preview/pr-${{ github.event.pull_request.number }}/
           REACT_APP_CRYPTO_COMPARE_API_KEY: ${{ secrets.REACT_APP_CRYPTO_COMPARE_API_KEY }}
@@ -48,4 +135,19 @@ jobs:
         with:
           source-dir: ./packages/web/build
           action: deploy
+          preview-branch: gh-pages
+
+  remove_preview:
+    if: github.event.action == 'closed' || github.event.pull_request.merged
+    runs-on: ubuntu-latest
+    environment: staging
+    name: Remove PR preview
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Clean up preview
+        uses: rossjrw/pr-preview-action@v1
+        with:
+          source-dir: ./packages/web/build
+          action: remove
           preview-branch: gh-pages

@@ -26,8 +26,6 @@ jobs:
 
       - name: Build site
         env:
-          # @FIXME in https://p2pvalidator.atlassian.net/browse/PWN-3411
-          CI: false
           PUBLIC_URL: ${{ secrets.PUBLIC_URL }}
           REACT_APP_BASENAME: ${{ secrets.REACT_APP_BASENAME }}
           REACT_APP_CRYPTO_COMPARE_API_KEY: ${{ secrets.REACT_APP_CRYPTO_COMPARE_API_KEY }}
@@ -45,3 +43,4 @@ jobs:
           branch: gh-pages # The branch the action should deploy to.
           folder: ./packages/web/build
           clean-exclude: pr-preview/
+          force: false
