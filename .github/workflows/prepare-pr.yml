@@ -1,0 +1,28 @@
+name: Set PR Info
+
+on:
+  pull_request:
+    types:
+      - opened
+
+concurrency: prepare-info
+
+jobs:
+  set_info:
+    runs-on: ubuntu-latest
+    environment: staging
+    name: Assign Ticket
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: tzkhan/pr-update-action@v2
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          base-branch-regex: '[a-z\d-_.\\/]+'
+          head-branch-regex: 'pwn-\d+'
+          title-update-action: 'prefix'
+          title-template: '[%headbranch%]'
+          body-template: |
+            🚀 [ JIRA TICKET ](https://url/to/browse/ticket/%headbranch%)
+          body-update-action: 'prefix'
+          body-uppercase-base-match: false
