@@ -27,6 +27,10 @@ dayjs.extend(localizedFormat);
 
 const App: React.FC = () => {
   const Router: React.ElementType = process.env.REACT_APP_STAGING ? HashRouter : BrowserRouter;
+  console.log(process.env.REACT_APP_STAGING);
+  console.log(process.env.REACT_APP_BASENAME);
+  console.log(process.env.PUBLIC_URL);
+  console.log(process.env.GITHUB_TOKEN);
 
   return (
     <>
