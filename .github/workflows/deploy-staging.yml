@@ -74,7 +74,7 @@ jobs:
         run: lerna run --concurrency 1 --stream lint:es --exclude-dependents
 
   lint_style:
-    needs: lint_es
+    needs: lint_types
     runs-on: ubuntu-latest
     environment: staging
     name: Lint Stylelint
@@ -96,7 +96,7 @@ jobs:
         run: lerna run --concurrency 1 --stream lint:style --exclude-dependents
 
   deploy_stage:
-    needs: lint_style
+    needs: [lint_style, lint_es]
     if: github.event.action == 'opened' || github.event.action == 'synchronize'
     runs-on: ubuntu-latest
     environment: staging
