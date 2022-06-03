@@ -262,7 +262,6 @@ const config: ConfigFn = (env, argv) => {
             template: path.join(WEB_PATH, '/index.html'),
             favicon: path.join(WEB_PATH, '/public/favicon.ico'),
             base: process.env.PUBLIC_URL,
-            // filename: 'index.[contenthash].html',
           },
           __PRODUCTION__ && {
             minify: {

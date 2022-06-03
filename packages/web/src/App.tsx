@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { HashRouter, BrowserRouter, Route, Switch } from 'react-router-dom';
+import { BrowserRouter, HashRouter, Route, Switch } from 'react-router-dom';
 
 import dayjs from 'dayjs';
 import localizedFormat from 'dayjs/plugin/localizedFormat';
@@ -27,6 +27,9 @@ dayjs.extend(localizedFormat);
 
 const App: React.FC = () => {
   const Router: React.ElementType = process.env.REACT_APP_STAGING ? HashRouter : BrowserRouter;
+  console.log(process.env.REACT_APP_STAGING);
+  console.log(process.env.REACT_APP_BASENAME);
+  console.log(process.env.PUBLIC_URL);
 
   return (
     <>
