@@ -96,7 +96,6 @@ const config: ConfigFn = (env, argv) => {
           ),
           REACT_APP_TRANSAK_API_KEY: JSON.stringify(process.env.REACT_APP_TRANSAK_API_KEY),
           REACT_APP_STAGING: JSON.stringify(process.env.REACT_APP_STAGING),
-          GITHUB_TOKEN: JSON.stringify(process.env.GITHUB_TOKEN),
         },
       }),
       new CleanWebpackPlugin(),
