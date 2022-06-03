@@ -79,7 +79,7 @@ const config: ConfigFn = (env, argv) => {
       // These ENVs are for passing secrets on CI in opposite to passing them from .env
       new webpack.DefinePlugin({
         'process.env': {
-          PUBLIC_URL: JSON.stringify(process.env.PUBLIC_URL),
+          REACT_APP_BASENAME: JSON.stringify(process.env.REACT_APP_BASENAME),
           REACT_APP_AMPLITUDE_API_KEY: JSON.stringify(process.env.REACT_APP_AMPLITUDE_API_KEY),
           REACT_APP_CRYPTO_COMPARE_API_KEY: JSON.stringify(
             process.env.REACT_APP_CRYPTO_COMPARE_API_KEY,
@@ -262,7 +262,6 @@ const config: ConfigFn = (env, argv) => {
             template: path.join(WEB_PATH, '/index.html'),
             favicon: path.join(WEB_PATH, '/public/favicon.ico'),
             base: process.env.PUBLIC_URL,
-            // filename: 'index.[contenthash].html',
           },
           __PRODUCTION__ && {
             minify: {
