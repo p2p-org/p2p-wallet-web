@@ -6,10 +6,10 @@
     "static/js/1.70cf4c55.chunk.js": "https://p2p-org.github.io/p2p-wallet-web/pr-preview/pr-153/static/js/1.70cf4c55.chunk.js",
     "static/js/1.70cf4c55.chunk.js.map": "https://p2p-org.github.io/p2p-wallet-web/pr-preview/pr-153/static/js/1.70cf4c55.chunk.js.map",
     "main.css": "https://p2p-org.github.io/p2p-wallet-web/pr-preview/pr-153/static/css/main.4c4c530b.chunk.css",
-    "main.js": "https://p2p-org.github.io/p2p-wallet-web/pr-preview/pr-153/static/js/main.d81162bc.chunk.js",
-    "main.js.map": "https://p2p-org.github.io/p2p-wallet-web/pr-preview/pr-153/static/js/main.d81162bc.chunk.js.map",
-    "runtime-main.js": "https://p2p-org.github.io/p2p-wallet-web/pr-preview/pr-153/static/js/runtime-main.88fc09eb.js",
-    "runtime-main.js.map": "https://p2p-org.github.io/p2p-wallet-web/pr-preview/pr-153/static/js/runtime-main.88fc09eb.js.map",
+    "main.js": "https://p2p-org.github.io/p2p-wallet-web/pr-preview/pr-153/static/js/main.6ebac65e.chunk.js",
+    "main.js.map": "https://p2p-org.github.io/p2p-wallet-web/pr-preview/pr-153/static/js/main.6ebac65e.chunk.js.map",
+    "runtime-main.js": "https://p2p-org.github.io/p2p-wallet-web/pr-preview/pr-153/static/js/runtime-main.84f0fda3.js",
+    "runtime-main.js.map": "https://p2p-org.github.io/p2p-wallet-web/pr-preview/pr-153/static/js/runtime-main.84f0fda3.js.map",
     "static/css/4.59b48f64.chunk.css": "https://p2p-org.github.io/p2p-wallet-web/pr-preview/pr-153/static/css/4.59b48f64.chunk.css",
     "static/js/4.7069a3a5.chunk.js": "https://p2p-org.github.io/p2p-wallet-web/pr-preview/pr-153/static/js/4.7069a3a5.chunk.js",
     "static/js/4.7069a3a5.chunk.js.map": "https://p2p-org.github.io/p2p-wallet-web/pr-preview/pr-153/static/js/4.7069a3a5.chunk.js.map",
@@ -23,11 +23,11 @@
     "static/js/7.aaba5e75.chunk.js": "https://p2p-org.github.io/p2p-wallet-web/pr-preview/pr-153/static/js/7.aaba5e75.chunk.js",
     "static/js/7.aaba5e75.chunk.js.map": "https://p2p-org.github.io/p2p-wallet-web/pr-preview/pr-153/static/js/7.aaba5e75.chunk.js.map",
     "static/css/8.6ec7d20c.chunk.css": "https://p2p-org.github.io/p2p-wallet-web/pr-preview/pr-153/static/css/8.6ec7d20c.chunk.css",
-    "static/js/8.1f8ca754.chunk.js": "https://p2p-org.github.io/p2p-wallet-web/pr-preview/pr-153/static/js/8.1f8ca754.chunk.js",
-    "static/js/8.1f8ca754.chunk.js.map": "https://p2p-org.github.io/p2p-wallet-web/pr-preview/pr-153/static/js/8.1f8ca754.chunk.js.map",
+    "static/js/8.db5e6e29.chunk.js": "https://p2p-org.github.io/p2p-wallet-web/pr-preview/pr-153/static/js/8.db5e6e29.chunk.js",
+    "static/js/8.db5e6e29.chunk.js.map": "https://p2p-org.github.io/p2p-wallet-web/pr-preview/pr-153/static/js/8.db5e6e29.chunk.js.map",
     "static/css/9.bf22627d.chunk.css": "https://p2p-org.github.io/p2p-wallet-web/pr-preview/pr-153/static/css/9.bf22627d.chunk.css",
-    "static/js/9.8772d2da.chunk.js": "https://p2p-org.github.io/p2p-wallet-web/pr-preview/pr-153/static/js/9.8772d2da.chunk.js",
-    "static/js/9.8772d2da.chunk.js.map": "https://p2p-org.github.io/p2p-wallet-web/pr-preview/pr-153/static/js/9.8772d2da.chunk.js.map",
+    "static/js/9.88fbd4df.chunk.js": "https://p2p-org.github.io/p2p-wallet-web/pr-preview/pr-153/static/js/9.88fbd4df.chunk.js",
+    "static/js/9.88fbd4df.chunk.js.map": "https://p2p-org.github.io/p2p-wallet-web/pr-preview/pr-153/static/js/9.88fbd4df.chunk.js.map",
     "static/css/10.0fcfabee.chunk.css": "https://p2p-org.github.io/p2p-wallet-web/pr-preview/pr-153/static/css/10.0fcfabee.chunk.css",
     "static/js/10.507a9e44.chunk.js": "https://p2p-org.github.io/p2p-wallet-web/pr-preview/pr-153/static/js/10.507a9e44.chunk.js",
     "static/js/10.507a9e44.chunk.js.map": "https://p2p-org.github.io/p2p-wallet-web/pr-preview/pr-153/static/js/10.507a9e44.chunk.js.map",
@@ -84,10 +84,10 @@
     "static/media/TokenAvatar.tsx": "https://p2p-org.github.io/p2p-wallet-web/pr-preview/pr-153/static/media/wrapped.3372a516.svg"
   },
   "entrypoints": [
-    "static/js/runtime-main.88fc09eb.js",
+    "static/js/runtime-main.84f0fda3.js",
     "static/css/4.59b48f64.chunk.css",
     "static/js/4.7069a3a5.chunk.js",
     "static/css/main.4c4c530b.chunk.css",
-    "static/js/main.d81162bc.chunk.js"
+    "static/js/main.6ebac65e.chunk.js"
   ]
 }
