@@ -9,8 +9,7 @@ import { theme } from '@p2p-wallet-web/ui';
 import type { Token } from '@saberhq/token-utils';
 import { Feature } from 'flagged';
 
-import { useSendState } from 'app/contexts';
-import { useFeeCalculation } from 'app/contexts/solana/send/sendState/hooks/useFeeCalculation';
+import { useFeeCalculation, useSendState } from 'app/contexts';
 import { FeePaySelector } from 'components/common/FeePaySelector';
 import { FEATURE_PAY_BY } from 'config/featureFlags';
 import { trackEvent } from 'utils/analytics';
