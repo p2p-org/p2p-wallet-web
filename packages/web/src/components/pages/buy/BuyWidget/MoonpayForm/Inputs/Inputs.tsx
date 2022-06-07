@@ -1,11 +1,13 @@
 import type { FC } from 'react';
+import { useMemo } from 'react';
 
 import { styled } from '@linaria/react';
-import { useToken } from '@p2p-wallet-web/core';
+import { useToken, useTokensContext } from '@p2p-wallet-web/core';
 import { TokenAmount } from '@p2p-wallet-web/token-utils';
 import { borders, theme } from '@p2p-wallet-web/ui';
+import { PublicKey } from '@solana/web3.js';
 
-import { useBuyState, useConfig } from 'app/contexts';
+import { useBuyState } from 'app/contexts';
 import { TokenAvatar } from 'components/common/TokenAvatar';
 import { InputAmount } from 'components/ui/InputAmount';
 import { formatNumberToUSD } from 'utils/format';
@@ -38,6 +40,9 @@ const Title = styled.div`
   letter-spacing: 0.01em;
 `;
 
+const DOLLAR_DECIMALS = 2;
+const QUOTE_CURRENCY_AMOUNT_DECIMALS = 5;
+
 export const Inputs: FC = () => {
   const {
     currency: { symbol },
@@ -48,8 +53,10 @@ export const Inputs: FC = () => {
     buyQuote,
   } = useBuyState();
 
-  const { tokenConfigs } = useConfig();
-  const token = useToken(tokenConfigs[symbol]?.mint);
+  const { tokenNameMap } = useTokensContext();
+  const tokenInfo = tokenNameMap[symbol.toUpperCase()];
+  const mint = useMemo(() => tokenInfo && new PublicKey(tokenInfo?.address), [tokenInfo?.address]);
+  const token = useToken(mint);
 
   const prefix = isBaseAmountType ? '$' : <TokenAvatar symbol={symbol} size={32} />;
 
@@ -64,7 +71,12 @@ export const Inputs: FC = () => {
     <Wrapper>
       <InputWrapper>
         <Title>{isBaseAmountType ? 'You pay' : 'You get'}</Title>
-        <InputAmount prefix={prefix} value={amount} onChange={setAmount} />
+        <InputAmount
+          prefix={prefix}
+          value={amount}
+          onChange={setAmount}
+          decimals={isBaseAmountType ? DOLLAR_DECIMALS : QUOTE_CURRENCY_AMOUNT_DECIMALS}
+        />
       </InputWrapper>
       <InputWrapper>
         <Title>{isBaseAmountType ? 'You get' : 'You pay'}</Title>

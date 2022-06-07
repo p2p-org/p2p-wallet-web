@@ -164,6 +164,7 @@ export const FromToSelectInput: FC<Props> = ({
               '0'
             }
             value={amount}
+            decimals={tokenAccount?.balance?.token.decimals}
             onChange={handleAmountChange}
             disabled={disabled || disabledInput}
           />
