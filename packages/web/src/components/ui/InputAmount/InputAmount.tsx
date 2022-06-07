@@ -6,6 +6,8 @@ import { styled } from '@linaria/react';
 import { theme } from '@p2p-wallet-web/ui';
 import classNames from 'classnames';
 
+import { formatNumber, trimFormattedNumber } from 'utils/format';
+
 const WrapperLabel = styled.label`
   display: flex;
   flex: 1;
@@ -67,6 +69,7 @@ interface Props
   > {
   prefix?: React.ReactNode;
   onChange?: (val: string) => void;
+  decimals?: number;
 }
 
 export const InputAmount: FC<Props> = ({
@@ -74,6 +77,7 @@ export const InputAmount: FC<Props> = ({
   placeholder = '0',
   value = '',
   onChange,
+  decimals,
   ...props
 }) => {
   const [localValue, setLocalValue] = useState(value);
@@ -92,6 +96,7 @@ export const InputAmount: FC<Props> = ({
     }
 
     if ((!Number.isNaN(nextValue) && DECIMAL_ONLY.test(nextValue)) || nextValue === '') {
+      nextValue = trimFormattedNumber(formatNumber(nextValue, decimals));
       setLocalValue(nextValue);
       onChange?.(nextValue);
     }
