@@ -188,14 +188,14 @@ const useSendStateInternal = (): UseSendState => {
           if (!isSOL) {
             setIsResolvingAddress(true);
 
-            const { address, owner, needCreateATA } = await resolveAddress(
+            const { owner, needCreateATA } = await resolveAddress(
               new PublicKey(destinationAddress),
               fromTokenAccount.balance.token,
             );
 
             setIsResolvingAddress(true);
             setDestinationAccount({
-              address,
+              address: new PublicKey(destinationAddress),
               owner,
               isNeedCreate: needCreateATA,
               symbol: fromTokenAccount.balance.token.symbol,

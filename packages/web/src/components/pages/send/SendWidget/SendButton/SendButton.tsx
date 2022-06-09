@@ -1,6 +1,6 @@
 import type { FC } from 'react';
 
-import { useSendState } from 'app/contexts';
+import { useFeeCalculation, useSendState } from 'app/contexts';
 
 import { SendButtonBitcoin } from './SendButtonBitcoin';
 import { SendButtonSolana } from './SendButtonSolana';
@@ -22,6 +22,7 @@ export const SendButton: FC = () => {
     setIsInitBurnAndRelease,
     isAddressNotMatchNetwork,
   } = useSendState();
+  const { isInsufficientFundsForFee } = useFeeCalculation();
 
   const tokenBalance = fromTokenAccount?.balance?.asNumber || 0;
 
@@ -33,7 +34,8 @@ export const SendButton: FC = () => {
     isValidAmount(fromAmount) ||
     isAddressInvalid ||
     isAddressNotMatchNetwork ||
-    !hasBalance;
+    !hasBalance ||
+    isInsufficientFundsForFee;
 
   if (blockchain === 'bitcoin') {
     return (
