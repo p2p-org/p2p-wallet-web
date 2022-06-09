@@ -6,7 +6,13 @@ import { useTokenAccount } from '@p2p-wallet-web/core';
 import { usePubkey } from '@p2p-wallet-web/sail';
 import { PublicKey } from '@solana/web3.js';
 
-import { ModalType, useModals, useSendState, useTransferAction } from 'app/contexts';
+import {
+  ModalType,
+  useFeeCalculation,
+  useModals,
+  useSendState,
+  useTransferAction,
+} from 'app/contexts';
 import type { TransactionConfirmModalProps } from 'components/modals/TransactionConfirmModal/TransactionConfirmModal';
 import type { TransactionStatusModalProps } from 'components/modals/TransactionInfoModals/TransactionStatusSendModal/TransactionStatusSendModal';
 import { Button, Icon } from 'components/ui';
@@ -41,6 +47,7 @@ export const SendButtonSolana: FC<Props> = ({ primary, disabled }) => {
     details,
     isAddressNotMatchNetwork,
   } = sendState;
+  const { isInsufficientFundsForFee } = useFeeCalculation();
 
   const handleSubmit = async () => {
     if (!fromTokenAccount?.key || !fromTokenAccount?.balance || !parsedAmount) {
@@ -141,6 +148,10 @@ export const SendButtonSolana: FC<Props> = ({ primary, disabled }) => {
       return 'Change the network or the address';
     }
 
+    if (isInsufficientFundsForFee) {
+      return 'Insufficient funds to cover fees';
+    }
+
     return (
       <>
         <SendIcon name="top" />
@@ -154,6 +165,7 @@ export const SendButtonSolana: FC<Props> = ({ primary, disabled }) => {
     hasBalance,
     details.totalAmountToShow,
     isAddressNotMatchNetwork,
+    isInsufficientFundsForFee,
   ]);
 
   return (
