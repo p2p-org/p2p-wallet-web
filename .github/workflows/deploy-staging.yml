@@ -120,7 +120,7 @@ jobs:
         run: echo "::set-output name=sha_short::$(git rev-parse --short ${{ github.event.pull_request.head.sha }})"
 
       - name: Test outputs
-        run: echo "${{ steps.vars.outputs.sha_short }}"
+        run: echo "p2p-wallet-web_pr-preview_${{ github.event.pull_request.number }}_${{ steps.vars.outputs.sha_short }}"
 
       - name: Build site
         env:
