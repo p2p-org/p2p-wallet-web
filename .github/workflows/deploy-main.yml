@@ -36,6 +36,10 @@ jobs:
           REACT_APP_INTERCOM_APP_ID: ${{ secrets.REACT_APP_INTERCOM_APP_ID }}
           REACT_APP_MOONPAY_API_KEY: ${{ secrets.REACT_APP_MOONPAY_API_KEY }}
           REACT_APP_MOONPAY_SIGNER_URL: ${{ secrets.REACT_APP_MOONPAY_SIGNER_URL }}
+          REACT_APP_SENTRY_DSN_ENDPOINT: ${{ secrets.REACT_APP_SENTRY_DSN_ENDPOINT }}
+          REACT_APP_SENTRY_MODE: production
+          REACT_APP_SENTRY_TRACES_SAMPLE_RATE: 1
+          REACT_APP_SENTRY_RELEASE: p2p-wallet-web_production_${{ github.sha }}
         run: yarn build
 
       - name: Publish

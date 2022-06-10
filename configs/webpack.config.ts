@@ -96,6 +96,12 @@ const config: ConfigFn = (env, argv) => {
           ),
           REACT_APP_TRANSAK_API_KEY: JSON.stringify(process.env.REACT_APP_TRANSAK_API_KEY),
           REACT_APP_STAGING: JSON.stringify(process.env.REACT_APP_STAGING),
+          REACT_APP_SENTRY_DSN_ENDPOINT: JSON.stringify(process.env.REACT_APP_SENTRY_DSN_ENDPOINT),
+          REACT_APP_SENTRY_MODE: JSON.stringify(process.env.REACT_APP_SENTRY_MODE),
+          REACT_APP_SENTRY_TRACES_SAMPLE_RATE: JSON.stringify(
+            process.env.REACT_APP_SENTRY_TRACES_SAMPLE_RATE,
+          ),
+          REACT_APP_SENTRY_RELEASE: JSON.stringify(process.env.REACT_APP_SENTRY_RELEASE),
         },
       }),
       new CleanWebpackPlugin(),

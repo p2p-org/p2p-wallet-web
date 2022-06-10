@@ -16,20 +16,21 @@ initAmplitude();
 
 export const global = globalCss;
 
-Sentry.init({
-  dsn: 'https://088e2b0cd1f44164a6ad584ec3fbab31@o1272413.ingest.sentry.io/6479116',
-  integrations: [new BrowserTracing()],
-  environment: 'dev',
+const SENTRY_DSN_ENDPOINT = process.env.REACT_APP_SENTRY_DSN_ENDPOINT;
+const SENTRY_ENVIRONMENT = process.env.SENTRY_ENVIRONMENT;
+const SENTRY_TRACES_SAMPLE_RATE = process.env.REACT_APP_SENTRY_TRACES_SAMPLE_RATE;
+const SENTRY_RELEASE = process.env.REACT_APP_SENTRY_RELEASE;
 
-  // We recommend adjusting this value in production, or using tracesSampler
-  // for finer control
-  tracesSampleRate: 1.0,
-  /*tracesSampler: function () {
-    const args = Array.from(arguments);
-    console.log('args -', args);
-    throw new Error('dont send error to sentry');
-  },*/
-});
+if (__DEVELOPMENT__) {
+  Sentry.init({
+    dsn: SENTRY_DSN_ENDPOINT,
+    integrations: [new BrowserTracing()],
+    environment: SENTRY_ENVIRONMENT,
+    release: SENTRY_RELEASE,
+
+    tracesSampleRate: Number(SENTRY_TRACES_SAMPLE_RATE),
+  });
+}
 
 const render = () => {
   // Load the app dynamically, which allows for hot-reloading in development mode.
