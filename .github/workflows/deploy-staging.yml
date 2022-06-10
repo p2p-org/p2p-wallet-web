@@ -31,7 +31,6 @@ jobs:
           body-uppercase-base-match: false
 
   deploy_stage:
-    needs: [lint_style, lint_es]
     if: github.event.action == 'opened' || github.event.action == 'synchronize'
     runs-on: ubuntu-latest
     environment: staging
