@@ -38,19 +38,8 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Cache node_modules
-        uses: actions/cache@v2
-        with:
-          path: |
-            node_modules
-            */*/node_modules
-          key: ${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
-
-      - name: Install dependecies
-        run: yarn install --frozen-lockfile
-
       - name: Log git hash
         run: |
-          echo {{github.sha}}
-          echo {{git rev-parse --short "$GITHUB_SHA"}}
-          echo {{ steps.vars.outputs.sha_short }}
+          echo "1: ${{github.sha}}"
+          echo "2: ${{git rev-parse --short "$GITHUB_SHA"}}"
+          echo "3: ${{ steps.vars.outputs.sha_short }}"
