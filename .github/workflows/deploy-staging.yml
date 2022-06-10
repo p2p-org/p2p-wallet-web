@@ -41,5 +41,5 @@ jobs:
       - name: Log git hash
         run: |
           echo "1: ${{github.sha}}"
-          echo "2: ${{git rev-parse --short "$GITHUB_SHA"}}"
+#          echo "2: ${{git rev-parse --short "$GITHUB_SHA"}}"
           echo "3: ${{ steps.vars.outputs.sha_short }}"
