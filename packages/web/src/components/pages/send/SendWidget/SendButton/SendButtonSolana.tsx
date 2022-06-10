@@ -8,15 +8,13 @@ import { PublicKey } from '@solana/web3.js';
 
 import {
   ModalType,
-  useFeeCompensation,
-  useFreeFeeLimits,
+  useFeeCalculation,
   useModals,
-  useNetworkFees,
   useSendState,
   useTransferAction,
 } from 'app/contexts';
 import type { TransactionConfirmModalProps } from 'components/modals/TransactionConfirmModal/TransactionConfirmModal';
-import type { TransactionStatusModalProps } from 'components/modals/TransactionInfoModals/TransactionStatusSendModal/TransactionStatusModal';
+import type { TransactionStatusModalProps } from 'components/modals/TransactionInfoModals/TransactionStatusSendModal/TransactionStatusSendModal';
 import { Button, Icon } from 'components/ui';
 import { trackEvent } from 'utils/analytics';
 
@@ -35,10 +33,7 @@ export const SendButtonSolana: FC<Props> = ({ primary, disabled }) => {
   const { openModal } = useModals();
   const sendState = useSendState();
   const transferAction = useTransferAction();
-  const { compensationParams } = useFeeCompensation();
-  const { userFreeFeeLimits } = useFreeFeeLimits();
   const destinationTokenAccount = useTokenAccount(usePubkey(sendState.destinationAddress));
-  const networkFees = useNetworkFees();
   const {
     fromAmount,
     fromTokenAccount,
@@ -52,6 +47,7 @@ export const SendButtonSolana: FC<Props> = ({ primary, disabled }) => {
     details,
     isAddressNotMatchNetwork,
   } = sendState;
+  const { isInsufficientFundsForFee } = useFeeCalculation();
 
   const handleSubmit = async () => {
     if (!fromTokenAccount?.key || !fromTokenAccount?.balance || !parsedAmount) {
@@ -95,8 +91,6 @@ export const SendButtonSolana: FC<Props> = ({ primary, disabled }) => {
           username: resolvedAddress ? toPublicKey : '',
         },
         sendState: { fromTokenAccount, destinationAccount, details },
-        userFreeFeeLimits,
-        networkFees,
       } as TransactionConfirmModalProps,
     );
 
@@ -111,7 +105,6 @@ export const SendButtonSolana: FC<Props> = ({ primary, disabled }) => {
         fromTokenAccount,
         destinationAccount,
         amount: parsedAmount,
-        compensationParams,
       });
 
       trackEvent('send_send_click', {
@@ -131,8 +124,6 @@ export const SendButtonSolana: FC<Props> = ({ primary, disabled }) => {
             username: resolvedAddress ? toPublicKey : '',
           },
           sendState,
-          userFreeFeeLimits,
-          networkFees,
         },
       );
     } finally {
@@ -157,6 +148,10 @@ export const SendButtonSolana: FC<Props> = ({ primary, disabled }) => {
       return 'Change the network or the address';
     }
 
+    if (isInsufficientFundsForFee) {
+      return 'Insufficient funds to cover fees';
+    }
+
     return (
       <>
         <SendIcon name="top" />
@@ -170,6 +165,7 @@ export const SendButtonSolana: FC<Props> = ({ primary, disabled }) => {
     hasBalance,
     details.totalAmountToShow,
     isAddressNotMatchNetwork,
+    isInsufficientFundsForFee,
   ]);
 
   return (

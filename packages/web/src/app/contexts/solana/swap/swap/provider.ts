@@ -5,7 +5,7 @@ import { useSolana, useStorage } from '@p2p-wallet-web/core';
 import { u64 } from '@solana/spl-token';
 import { createContainer } from 'unstated-next';
 
-import { useFeeCompensation, useFeeRelayer, useMarketsData } from 'app/contexts';
+import { useMarketsData } from 'app/contexts';
 import type { UserTokenAccountMap } from 'app/contexts/solana/swap';
 import { useConfig, usePools, useUser } from 'app/contexts/solana/swap';
 import SlippageTolerance from 'app/contexts/solana/swap/models/SlippageTolerance';
@@ -99,14 +99,6 @@ export type UseSwapArgs = {
 const useSwapInternal = (props: UseSwapArgs = {}): UseSwap => {
   const { wallet, connection } = useSolana();
   const { programIds, tokenConfigs, routeConfigs } = useConfig();
-  const { relayTopUpWithSwap, userSetupSwap, userSwap } = useFeeRelayer();
-  const {
-    estimatedFeeAmount,
-    compensationState,
-    compensationSwapData,
-    feeAmountInToken,
-    feeToken,
-  } = useFeeCompensation();
 
   const [inputTokenName, _setInputTokenName] = useState(props.inputTokenName ?? 'SOL');
   const _outputTokenName = props.outputTokenName
@@ -243,18 +235,6 @@ const useSwapInternal = (props: UseSwapArgs = {}): UseSwap => {
     setTrade((currentTrade) => currentTrade.updateSlippageTolerance(slippageTolerance));
   }, [slippageTolerance]);
 
-  const feeAmount: u64 | undefined = useMemo(() => {
-    if (estimatedFeeAmount.totalLamports.eq(ZERO)) {
-      return;
-    }
-
-    if (!estimatedFeeAmount.accountsCreation.feeToken?.token.isRawSOL) {
-      return estimatedFeeAmount.accountsCreation.feeToken?.toU64();
-    } else if (inputTokenName === 'SOL') {
-      return estimatedFeeAmount.accountsCreation.sol?.toU64();
-    }
-  }, [estimatedFeeAmount, inputTokenName]);
-
   useEffect(() => {
     if (
       buttonState === ButtonState.ConfirmWallet ||
@@ -279,17 +259,14 @@ const useSwapInternal = (props: UseSwapArgs = {}): UseSwap => {
           : solRemainingForFees.sub(inputAmount);
       }
 
-      let balanceSubstractFee = inputUserTokenAccount?.getAmount();
-      if (feeAmount) {
-        balanceSubstractFee = balanceSubstractFee?.sub(feeAmount);
-        balanceSubstractFee = balanceSubstractFee?.gt(ZERO) ? balanceSubstractFee : ZERO;
-      }
+      const inputTokenAmount = inputUserTokenAccount?.getAmount();
 
       if (inputAmount.eq(ZERO)) {
         setButtonState(ButtonState.ZeroInputValue);
       } else if (solRemainingForFees.lt(minSolBalanceRequired)) {
         setButtonState(ButtonState.NotEnoughSOL);
-      } else if (!balanceSubstractFee || balanceSubstractFee.lt(inputAmount)) {
+      } else if (!inputTokenAmount || inputTokenAmount.lt(inputAmount)) {
+        //TODO: здесь необходимо приплюсовать сумму коммисий
         setButtonState(ButtonState.InsufficientBalance);
       } else {
         if (trade.isPriceImpactHigh()) {
@@ -311,7 +288,6 @@ const useSwapInternal = (props: UseSwapArgs = {}): UseSwap => {
     outputUserTokenAccount,
     solUserTokenAccount,
     minSolBalanceRequired,
-    feeAmount,
   ]);
 
   useEffect(() => {
@@ -369,45 +345,17 @@ const useSwapInternal = (props: UseSwapArgs = {}): UseSwap => {
       ...notificationParams,
     });
 
-    const isFreeTransactions = true; // TODO get from settings
     let executeSetup, executeSwap, txSignatureSwap;
     try {
-      if (!isFreeTransactions) {
-        ({ executeSetup, executeSwap, txSignatureSwap } = await trade.confirmExchange(
-          connection,
-          tokenConfigs,
-          programIds,
-          wallet,
-          inputUserTokenPublicKey,
-          intermediateTokenPublicKey?.account,
-          outputUserTokenAccount?.account,
-        ));
-      } else {
-        const { userSwapArgs, setupSwapArgs } = await trade.prepareExchangeTransactionsArgs(
-          connection,
-          tokenConfigs,
-          programIds,
-          wallet.publicKey,
-          inputUserTokenPublicKey,
-          intermediateTokenPublicKey?.account,
-          outputUserTokenAccount?.account,
-        );
-
-        if (setupSwapArgs) {
-          executeSetup = async () =>
-            await userSetupSwap(setupSwapArgs, {
-              feeAmount: compensationState?.nextTransactionFee,
-              feeToken,
-            });
-        }
-
-        executeSwap = async () => {
-          txSignatureSwap = await userSwap(userSwapArgs, {
-            feeAmount: compensationState?.nextTransactionFee,
-            feeToken,
-          });
-        };
-      }
+      ({ executeSetup, executeSwap, txSignatureSwap } = await trade.confirmExchange(
+        connection,
+        tokenConfigs,
+        programIds,
+        wallet,
+        inputUserTokenPublicKey,
+        intermediateTokenPublicKey?.account,
+        outputUserTokenAccount?.account,
+      ));
 
       // setSolanaExplorerLink(getExplorerUrl('tx', txSignature, cluster));
     } catch (e) {
@@ -426,28 +374,6 @@ const useSwapInternal = (props: UseSwapArgs = {}): UseSwap => {
     }
 
     setButtonState(() => ButtonState.SendingTransaction);
-
-    if (compensationState.needTopUp && feeToken) {
-      try {
-        await relayTopUpWithSwap({
-          feeAmount: compensationState.topUpCompensationFee,
-          feeToken,
-          feeAmountInToken,
-          needCreateRelayAccount: compensationState.needCreateRelayAccount,
-          topUpParams: compensationSwapData,
-        });
-      } catch (e) {
-        console.error(e);
-        setButtonState(ButtonState.Retry);
-        swapNotification({
-          header: 'Swap didn’t complete!',
-          status: 'error',
-          ...notificationParams,
-          text: e.message,
-        });
-        return;
-      }
-    }
 
     if (executeSetup) {
       try {
@@ -519,11 +445,7 @@ const useSwapInternal = (props: UseSwapArgs = {}): UseSwap => {
   }, [
     asyncPools.value,
     asyncStandardTokenAccounts.value,
-    compensationState,
-    compensationSwapData,
     connection,
-    feeAmountInToken,
-    feeToken,
     fetchPool,
     inputTokenName,
     inputUserTokenAccount,
@@ -532,11 +454,8 @@ const useSwapInternal = (props: UseSwapArgs = {}): UseSwap => {
     outputUserTokenAccount?.account,
     programIds,
     refreshStandardTokenAccounts,
-    relayTopUpWithSwap,
     tokenConfigs,
     trade,
-    userSetupSwap,
-    userSwap,
     wallet,
   ]);
 
@@ -559,7 +478,6 @@ const useSwapInternal = (props: UseSwapArgs = {}): UseSwap => {
     intermediateTokenPrice,
     buttonState,
     onSwap,
-    feeAmount,
   };
 };
 

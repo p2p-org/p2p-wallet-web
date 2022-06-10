@@ -1,15 +1,13 @@
-import './wdyr';
 import 'sanitize.css';
-import '@p2p-wallet-web/ui/css/nprogress.css';
+import './css/nprogress.css';
 import 'react-loading-skeleton/dist/skeleton.css';
 
-import { StrictMode } from 'react';
 import * as React from 'react';
+import { StrictMode } from 'react';
 import ReactDOM from 'react-dom';
 
 import { globalCss } from '@p2p-wallet-web/ui';
 
-import { isDev } from 'config/constants';
 import { initAmplitude } from 'utils/analytics';
 
 initAmplitude();
@@ -31,6 +29,7 @@ const render = () => {
 render();
 
 // Allow the hot-reloading of the App in development mode
-if (isDev && module.hot) {
+// @TODO Fix typing resolution
+if (__DEVELOPMENT__ && module.hot) {
   module.hot.accept('./App', render);
 }

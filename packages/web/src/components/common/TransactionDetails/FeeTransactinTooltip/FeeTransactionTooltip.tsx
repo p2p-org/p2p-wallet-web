@@ -3,15 +3,20 @@ import type { FC } from 'react';
 import { styled } from '@linaria/react';
 import { theme } from '@p2p-wallet-web/ui';
 
-import type { INITIAL_USER_FREE_FEE_LIMITS } from 'app/contexts/api/feeRelayer/utils';
 import { LaagTooltip } from 'components/ui';
+
+type UserFreeFeeLimitsType = {
+  currentTransactionCount: number;
+  maxTransactionCount: number;
+  hasFreeTransactions: boolean;
+};
 
 const TooltipContent = styled.div`
   width: 300px;
 `;
 
 interface Props {
-  userFreeFeeLimits: typeof INITIAL_USER_FREE_FEE_LIMITS;
+  userFreeFeeLimits: UserFreeFeeLimitsType;
 }
 
 export const FeeTransactionTooltip: FC<Props> = ({ userFreeFeeLimits }) => {

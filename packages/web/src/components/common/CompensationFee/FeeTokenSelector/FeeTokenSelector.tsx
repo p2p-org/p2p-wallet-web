@@ -56,7 +56,6 @@ type Props = {
   feeTokenAccounts: TokenAccount[];
   value: TokenAccount | null | undefined;
   feeAmountInSol: TokenAmount | undefined;
-  feeTokenAmount: TokenAmount | undefined;
   accountSymbol?: string | undefined;
   onSelectToken: (token: TokenAccount) => void;
 };
@@ -66,7 +65,6 @@ export const FeeTokenSelector: FC<Props> = ({
   value,
   feeTokenAccounts,
   feeAmountInSol,
-  feeTokenAmount,
   accountSymbol,
   onSelectToken,
 }) => {
@@ -76,7 +74,7 @@ export const FeeTokenSelector: FC<Props> = ({
 
   const isSend = type === 'send';
   const selectedTokenSymbol = value?.balance?.token.symbol || '';
-  const feeAmount = selectedTokenSymbol === 'SOL' ? feeAmountInSol : feeTokenAmount;
+  const feeAmount = feeAmountInSol;
 
   return (
     <Select

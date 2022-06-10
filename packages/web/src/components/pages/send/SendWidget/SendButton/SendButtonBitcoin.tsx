@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from 'react';
 
 import { styled } from '@linaria/react';
 
-import { ModalType, useFreeFeeLimits, useModals, useSendState } from 'app/contexts';
+import { ModalType, useModals, useSendState } from 'app/contexts';
 import { Button, Icon } from 'components/ui';
 import { useFetchFees } from 'utils/providers/LockAndMintProvider';
 
@@ -42,7 +42,6 @@ export const SendButtonBitcoin: FC<Props> = ({ primary, disabled, onInitBurnAndR
   const { fees, pending: isFetchingFee } = useFetchFees(true);
 
   const [renBtcMinimalAmount, setRenBtcMinimalAmount] = useState(0);
-  const { userFreeFeeLimits } = useFreeFeeLimits();
 
   useEffect(() => {
     if (sendState.blockchain === 'bitcoin' && !isFetchingFee) {
@@ -61,8 +60,6 @@ export const SendButtonBitcoin: FC<Props> = ({ primary, disabled, onInitBurnAndR
     const result = await openModal<boolean>(ModalType.SHOW_MODAL_TRANSACTION_CONFIRM, {
       type: 'send',
       params,
-      userFreeFeeLimits,
-      sendState,
       btcAddress: sendState.toPublicKey,
     });
 

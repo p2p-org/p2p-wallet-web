@@ -2,14 +2,12 @@ import type { FC } from 'react';
 import { useMemo } from 'react';
 
 import { styled } from '@linaria/react';
-import { ZERO } from '@orca-so/sdk';
 import type { TokenAccount } from '@p2p-wallet-web/core';
 import { NUMBER_FORMAT, TokenAmount } from '@p2p-wallet-web/token-utils';
 import { theme } from '@p2p-wallet-web/ui';
 import type { Token } from '@saberhq/token-utils';
 import classNames from 'classnames';
 
-import { AccountCreationFeeTooltip } from 'components/common/AccountCreationFeeTooltip';
 import { Icon } from 'components/ui';
 import { InputAmount } from 'components/ui/InputAmount';
 
@@ -78,7 +76,6 @@ type Props = {
   tokenAccounts: readonly TokenAccount[];
   tokenAccount?: TokenAccount | null;
   amount?: string;
-  feeAmount?: TokenAmount | null;
   onTokenAccountChange: (token: Token, tokenAccount: TokenAccount | null) => void;
   onAmountChange: (minorAmount: string, type?: 'available') => void;
   disabled?: boolean;
@@ -91,7 +88,6 @@ export const FromToSelectInput: FC<Props> = ({
   tokenAccounts,
   tokenAccount,
   amount,
-  feeAmount,
   onTokenAccountChange,
   onAmountChange,
   disabled,
@@ -103,19 +99,8 @@ export const FromToSelectInput: FC<Props> = ({
       return null;
     }
 
-    let tokenAccountBal = tokenAccount.balance;
-
-    if (feeAmount) {
-      const balanceSubstractFee = tokenAccount.balance.toU64().sub(feeAmount.toU64());
-
-      tokenAccountBal = balanceSubstractFee.gt(ZERO)
-        ? new TokenAmount(tokenAccount.balance.token, balanceSubstractFee)
-        : new TokenAmount(tokenAccount.balance.token, 0);
-      return tokenAccountBal;
-    }
-
-    return tokenAccountBal;
-  }, [feeAmount, tokenAccount]);
+    return tokenAccount.balance;
+  }, [tokenAccount]);
 
   const handleAllBalanceClick = () => {
     if (!tokenAccountBalance) {
@@ -182,7 +167,7 @@ export const FromToSelectInput: FC<Props> = ({
             onChange={handleAmountChange}
             disabled={disabled || disabledInput}
           />
-          {feeAmount ? <AccountCreationFeeTooltip /> : undefined}
+          {/*feeAmount ? <AccountCreationFeeTooltip /> : undefined*/}
         </InputWrapper>
         {/*<BalanceWrapper>*/}
         {/*  {tokenAccount?.balance?.token ? (*/}
