@@ -10,16 +10,17 @@ import { globalCss } from '@p2p-wallet-web/ui';
 import * as Sentry from '@sentry/react';
 import { BrowserTracing } from '@sentry/tracing';
 
+import {
+  SENTRY_DSN_ENDPOINT,
+  SENTRY_ENVIRONMENT,
+  SENTRY_RELEASE,
+  SENTRY_TRACES_SAMPLE_RATE,
+} from 'config/constants';
 import { initAmplitude } from 'utils/analytics';
 
 initAmplitude();
 
 export const global = globalCss;
-
-const SENTRY_DSN_ENDPOINT = process.env.REACT_APP_SENTRY_DSN_ENDPOINT;
-const SENTRY_ENVIRONMENT = process.env.SENTRY_ENVIRONMENT;
-const SENTRY_TRACES_SAMPLE_RATE = process.env.REACT_APP_SENTRY_TRACES_SAMPLE_RATE;
-const SENTRY_RELEASE = process.env.REACT_APP_SENTRY_RELEASE;
 
 if (!__DEVELOPMENT__) {
   Sentry.init({
