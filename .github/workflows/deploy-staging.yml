@@ -115,6 +115,13 @@ jobs:
       - name: Install dependecies
         run: yarn install --frozen-lockfile
 
+      - name: Set short SHA output
+          id: vars
+          run: echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
+
+      - name: Test outputs
+          run: echo ${{ steps.vars.outputs.sha_short }}
+
       - name: Build site
         env:
           REACT_APP_BASENAME: p2p-wallet-web/pr-preview/pr-${{ github.event.pull_request.number }}/
@@ -130,7 +137,7 @@ jobs:
           REACT_APP_SENTRY_DSN_ENDPOINT: ${{ secrets.REACT_APP_SENTRY_DSN_ENDPOINT }}
           REACT_APP_SENTRY_MODE: staging
           REACT_APP_SENTRY_TRACES_SAMPLE_RATE: 1
-          REACT_APP_SENTRY_RELEASE: p2p-wallet-web_pr-preview_${{ github.event.pull_request.number }}_${{ github.sha }}
+          REACT_APP_SENTRY_RELEASE: p2p-wallet-web_pr-preview_${{ github.event.pull_request.number }}_${{ steps.vars.outputs.sha_short }}
         run: yarn build
 
       - name: Deploy preview
