@@ -120,7 +120,7 @@ jobs:
           run: echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
 
       - name: Test outputs
-          run: echo ${{ steps.vars.outputs.sha_short }}
+          run: echo "${{ steps.vars.outputs.sha_short }}"
 
       - name: Build site
         env:
