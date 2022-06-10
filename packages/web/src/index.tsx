@@ -21,7 +21,7 @@ const SENTRY_ENVIRONMENT = process.env.SENTRY_ENVIRONMENT;
 const SENTRY_TRACES_SAMPLE_RATE = process.env.REACT_APP_SENTRY_TRACES_SAMPLE_RATE;
 const SENTRY_RELEASE = process.env.REACT_APP_SENTRY_RELEASE;
 
-if (__DEVELOPMENT__) {
+if (!__DEVELOPMENT__) {
   Sentry.init({
     dsn: SENTRY_DSN_ENDPOINT,
     integrations: [new BrowserTracing()],
