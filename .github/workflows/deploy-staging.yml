@@ -115,12 +115,9 @@ jobs:
       - name: Install dependecies
         run: yarn install --frozen-lockfile
 
-      - name: Set short SHA output
+      - name: Set short sha output
           id: vars
-          run: echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
-
-      - name: Test outputs
-          run: echo "${{ steps.vars.outputs.sha_short }}"
+          run: echo "::set-output name=sha_short::$(git rev-parse --short ${{ github.event.pull_request.head.sha }})"
 
       - name: Build site
         env:
