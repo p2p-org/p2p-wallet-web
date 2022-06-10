@@ -47,9 +47,9 @@ const SELECT_ITEMS: SelectItemType[] = [
     feeTitle: 'Transfer fees:',
     feeValue: '$0',
   },
-  {
+  /*{
     key: 'notification',
-  },
+  },*/
   {
     key: Blockchain.bitcoin,
     symbol: 'BTC',

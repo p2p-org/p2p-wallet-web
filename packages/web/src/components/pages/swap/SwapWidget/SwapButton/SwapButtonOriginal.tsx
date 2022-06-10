@@ -1,9 +1,7 @@
 import type { FC } from 'react';
 
 import { styled } from '@linaria/react';
-import { useUserTokenAccounts } from '@p2p-wallet-web/core';
 
-import { useFeeCompensation, useFreeFeeLimits, useNetworkFees } from 'app/contexts';
 import { ModalType, useModals } from 'app/contexts/general/modals';
 import { ButtonState, useSwap } from 'app/contexts/solana/swap';
 import type { TransactionConfirmModalProps } from 'components/modals/TransactionConfirmModal/TransactionConfirmModal';
@@ -20,12 +18,8 @@ const SwapIcon = styled(Icon)`
 
 export const SwapButtonOriginal: FC = () => {
   const { openModal } = useModals();
-  const networkFees = useNetworkFees();
   const { buttonState, trade, onSwap } = useSwap();
   const swapInfo = useSwap();
-  const userTokenAccounts = useUserTokenAccounts();
-  const feeCompensationInfo = useFeeCompensation();
-  const feeLimitsInfo = useFreeFeeLimits();
 
   const handleSwapClick = async () => {
     trackEvent('Swap_Verification_Invoked');
@@ -41,10 +35,6 @@ export const SwapButtonOriginal: FC = () => {
           minimumOutputAmount: trade.getMinimumOutputAmount(),
         },
         swapInfo,
-        userTokenAccounts,
-        feeCompensationInfo,
-        feeLimitsInfo,
-        networkFees,
       },
     );
 
@@ -60,10 +50,6 @@ export const SwapButtonOriginal: FC = () => {
         inputAmount: trade.getInputAmount(),
         minimumOutputAmount: trade.getMinimumOutputAmount(),
       },
-      userTokenAccounts,
-      feeCompensationInfo,
-      feeLimitsInfo,
-      networkFees,
       swapInfo,
     });
   };

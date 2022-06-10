@@ -16,7 +16,6 @@ import assert from 'ts-invariant';
 import {
   BlockchainProvider,
   FeatureFlagsProvider,
-  FeeRelayerProvider,
   ModalsProvider,
   NameServiceProvider,
   RatesProvider,
@@ -26,11 +25,15 @@ import { ToastManager } from 'components/common/ToastManager';
 import { Providers as SwapProviders } from 'components/pages/swap/Providers';
 import { LockAndMintProvider } from 'utils/providers/LockAndMintProvider';
 
+const PUBLIC_KEY_LENGTH_FOR_TRIMMING = 20;
+
 const onConnect = (wallet: ConnectedWallet) => {
   const walletPublicKey = wallet.publicKey.toBase58();
   const keyToDisplay =
-    walletPublicKey.length > 20
-      ? `${walletPublicKey.substring(0, 7)}.....${walletPublicKey.substring(
+    walletPublicKey.length > PUBLIC_KEY_LENGTH_FOR_TRIMMING
+      ? // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+        `${walletPublicKey.substring(0, 7)}.....${walletPublicKey.substring(
+          // eslint-disable-next-line @typescript-eslint/no-magic-numbers
           walletPublicKey.length - 7,
           walletPublicKey.length,
         )}`
@@ -90,11 +93,9 @@ export const Providers: FC = ({ children }) => {
               <SettingsProvider>
                 <BlockchainProvider>
                   <LockAndMintProvider>
-                    <FeeRelayerProvider>
-                      <SwapProviders>
-                        <ModalsProvider>{children}</ModalsProvider>
-                      </SwapProviders>
-                    </FeeRelayerProvider>
+                    <SwapProviders>
+                      <ModalsProvider>{children}</ModalsProvider>
+                    </SwapProviders>
                   </LockAndMintProvider>
                 </BlockchainProvider>
               </SettingsProvider>

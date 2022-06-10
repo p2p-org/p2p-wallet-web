@@ -1,16 +1,4 @@
-import type { FC } from 'react';
-import { useEffect } from 'react';
-
-import { ZERO } from '@orca-so/sdk';
-import type { TokenAccount } from '@p2p-wallet-web/core';
-import type { u64 } from '@saberhq/token-utils';
-
-import { useFeeCompensation } from 'app/contexts';
-import { useCompensationSwap } from 'app/contexts/solana/feeCompensation/hooks/useCompensationSwap';
-
-import { FeeTokenSelector } from './FeeTokenSelector';
-
-const CompensationSwap: FC<{
+/*const CompensationSwap: FC<{
   compensationAmount: u64;
   feeToken: TokenAccount;
 }> = ({ compensationAmount, feeToken }) => {
@@ -30,8 +18,9 @@ const CompensationSwap: FC<{
   }, [setFeeAmountInToken, inputAmount]);
 
   return null;
-};
+};*/
 
+/*
 export const CompensationFee: FC<{
   type: 'send' | 'swap';
   isShow?: boolean;
@@ -45,20 +34,22 @@ export const CompensationFee: FC<{
     return null;
   }
 
+  return null;
+
   return (
     <>
       <FeeTokenSelector
         type={type}
         feeTokenAccounts={feeTokenAccounts}
         feeAmountInSol={estimatedFeeAmount.accountsCreation.sol}
-        feeTokenAmount={estimatedFeeAmount.accountsCreation.feeToken}
         onSelectToken={setFeeToken}
         value={feeToken}
         accountSymbol={accountSymbol}
       />
-      {feeToken && compensationState.needTopUp ? (
-        <CompensationSwap compensationAmount={compensationState.totalFee} feeToken={feeToken} />
-      ) : undefined}
+      {feeToken && compensationState.needTopUp
+        ? <CompensationSwap compensationAmount={compensationState.totalFee} feeToken={feeToken} />
+        : null}
     </>
   );
 };
+*/
