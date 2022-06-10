@@ -22,10 +22,6 @@ const WhatCanReceiveLink = styled(NavLink)`
   text-decoration: none;
 `;
 
-const ErrorRenderComponent = () => {
-  return <button onClick={onClick}>Button</button>;
-};
-
 export const ReceiveWidget: FC = () => {
   const { sourceNetwork } = useReceiveState();
 
@@ -49,7 +45,6 @@ export const ReceiveWidget: FC = () => {
       </Content>
 
       {renderSourceNetworkReceivePanel()}
-      <ErrorRenderComponent />
     </WidgetPage>
   );
 };

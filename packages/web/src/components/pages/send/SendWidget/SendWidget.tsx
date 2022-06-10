@@ -11,11 +11,6 @@ import { SendButton } from 'components/pages/send/SendWidget/SendButton';
 
 import { BurnAndRelease } from './BurnAndRelease/BurnAndRelease';
 
-const ErrorComponent = () => {
-  throw new Error('Some error');
-  return null;
-};
-
 export const SendWidget: FunctionComponent = () => {
   useTrackEventOpen('Send_Viewed');
 
@@ -65,7 +60,6 @@ export const SendWidget: FunctionComponent = () => {
       {isInitBurnAndRelease ? (
         <BurnAndRelease destinationAddress={toPublicKey} targetAmount={fromAmount} />
       ) : undefined}
-      <ErrorComponent />
     </WidgetPageWithBottom>
   );
 };
