@@ -8,5 +8,10 @@
     { "path": "packages/core" },
     { "path": "packages/sail" },
     { "path": "packages/ui" }
-  ]
+  ],
+  "ts-node": {
+    "compilerOptions": {
+      "module": "CommonJS"
+    }
+  }
 }

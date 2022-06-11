@@ -1,0 +1,41 @@
+#nprogress {
+  pointer-events: none;
+}
+
+#nprogress .bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1;
+
+  width: 100%;
+  height: 2px;
+
+  background: #5887ff;
+}
+
+/* Fancy blur effect */
+#nprogress .peg {
+  position: absolute;
+  right: 0;
+
+  display: block;
+  width: 100px;
+  height: 100%;
+
+  box-shadow: 0 0 10px #5887ff, 0 0 5px #5887ff;
+  transform: rotate(3deg) translate(0, -4px);
+  opacity: 1;
+}
+
+.nprogress-custom-parent {
+  position: relative;
+}
+
+.nprogress-custom-parent #nprogress {
+  position: fixed;
+}
+
+.nprogress-custom-parent #nprogress .bar {
+  top: 64px;
+}

@@ -10,17 +10,17 @@ export class APIEndpoint {
   constructor({
     address,
     network,
-    sockerUrl,
+    socketUrl,
     additionalQuery,
   }: {
     address: string;
     network: Network;
-    sockerUrl?: string;
+    socketUrl?: string;
     additionalQuery?: string;
   }) {
     this.address = address;
     this.network = network;
-    this.socketUrl = sockerUrl ?? address.replace('http', 'ws');
+    this.socketUrl = socketUrl ?? address.replace('http', 'ws');
     this.additionalQuery = additionalQuery;
   }
 

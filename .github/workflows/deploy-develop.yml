@@ -26,9 +26,6 @@ jobs:
 
       - name: Build site
         env:
-          # @FIXME in https://p2pvalidator.atlassian.net/browse/PWN-3411
-          CI: false
-          PUBLIC_URL: ${{ secrets.PUBLIC_URL }}
           REACT_APP_BASENAME: ${{ secrets.REACT_APP_BASENAME }}
           REACT_APP_CRYPTO_COMPARE_API_KEY: ${{ secrets.REACT_APP_CRYPTO_COMPARE_API_KEY }}
           REACT_APP_FEE_RELAYER_URL: ${{ secrets.REACT_APP_FEE_RELAYER_URL }}
@@ -40,8 +37,9 @@ jobs:
           REACT_APP_MOONPAY_SIGNER_URL: ${{ secrets.REACT_APP_MOONPAY_SIGNER_URL }}
         run: yarn build
 
-      - name: Publish
-        uses: peaceiris/actions-gh-pages@v3
+      - uses: JamesIves/github-pages-deploy-action@v4
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./packages/web/build
+          branch: gh-pages # The branch the action should deploy to.
+          folder: ./packages/web/build
+          clean-exclude: pr-preview/
+          force: false

@@ -3,9 +3,7 @@ import type { FC } from 'react';
 import { styled } from '@linaria/react';
 import { theme } from '@p2p-wallet-web/ui';
 
-import { useFreeFeeLimits, useSendState, useSettings } from 'app/contexts';
-import { CompensationFee } from 'components/common/CompensationFee';
-import { FeeTransactionTooltip } from 'components/common/TransactionDetails/FeeTransactinTooltip';
+import { useSendState } from 'app/contexts';
 import { Accordion } from 'components/ui';
 import { AccordionTitle } from 'components/ui/AccordionDetails/AccordionTitle';
 import { ListWrapper, Row, Text } from 'components/ui/AccordionDetails/common';
@@ -25,12 +23,10 @@ const titleBottomValueEl = (isAddressNotMatchNetwork: boolean, detailsTotalAmoun
   isAddressNotMatchNetwork ? '' : detailsTotalAmount;
 
 export const TransactionDetails: FC = () => {
-  const {
+  /*const {
     settings: { useFreeTransactions },
-  } = useSettings();
-  const { fromTokenAccount, destinationAccount, details, isAddressNotMatchNetwork } =
-    useSendState();
-  const { userFreeFeeLimits } = useFreeFeeLimits();
+  } = useSettings();*/
+  const { details, isAddressNotMatchNetwork } = useSendState();
 
   if (!details.receiveAmount) {
     return null;
@@ -56,7 +52,7 @@ export const TransactionDetails: FC = () => {
             {/* <Text className="gray">(~$150)</Text> */}
           </Text>
         </Row>
-        <Row>
+        {/*<Row>
           <Text className="gray">Transaction fee</Text>
           {useFreeTransactions ? (
             <Text>
@@ -68,23 +64,23 @@ export const TransactionDetails: FC = () => {
           ) : (
             <Text>1</Text>
           )}
-        </Row>
-        {details.accountCreationAmount ? (
+          <Text>5000 lamport</Text>
+        </Row>*/}
+        {/*details.accountCreationAmount ? (
           <Row>
             <Text className="gray">{destinationAccount?.symbol} account creation</Text>
             <Text>
               {details.accountCreationAmount}
-              {/* <Text className="gray">(~$0.5)</Text> */}
             </Text>
           </Row>
-        ) : undefined}
-        {!fromTokenAccount?.balance?.token.isRawSOL ? (
+        ) : undefined*/}
+        {/*!fromTokenAccount?.balance?.token.isRawSOL ? (
           <CompensationFee
             type="send"
             isShow={!fromTokenAccount?.balance?.token.isRawSOL}
             accountSymbol={destinationAccount?.symbol || ''}
           />
-        ) : undefined}
+        ) : undefined*/}
       </ListWrapper>
       <ListWrapper className="total">
         <Row>

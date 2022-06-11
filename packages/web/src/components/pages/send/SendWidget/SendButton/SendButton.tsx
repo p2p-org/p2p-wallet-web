@@ -1,6 +1,6 @@
 import type { FC } from 'react';
 
-import { useFeeCompensation, useSendState } from 'app/contexts';
+import { useFeeCalculation, useSendState } from 'app/contexts';
 
 import { SendButtonBitcoin } from './SendButtonBitcoin';
 import { SendButtonSolana } from './SendButtonSolana';
@@ -22,15 +22,11 @@ export const SendButton: FC = () => {
     setIsInitBurnAndRelease,
     isAddressNotMatchNetwork,
   } = useSendState();
-  const { estimatedFeeAmount } = useFeeCompensation();
+  const { isInsufficientFundsForFee } = useFeeCalculation();
 
-  const feeToken = estimatedFeeAmount.accountsCreation.feeToken;
-  const feeAmount = feeToken?.asNumber;
-  const isSPLPayed = feeToken?.token?.info?.symbol === fromTokenAccount?.balance?.token?.symbol;
-  const tokenBalance = fromTokenAccount?.balance?.asNumber;
-  const maxAllowedAmount = isSPLPayed ? tokenBalance - Number(feeAmount) : tokenBalance;
+  const tokenBalance = fromTokenAccount?.balance?.asNumber || 0;
 
-  const hasBalance = fromTokenAccount?.balance ? maxAllowedAmount >= Number(fromAmount) : false;
+  const hasBalance = fromTokenAccount?.balance ? tokenBalance >= Number(fromAmount) : false;
 
   const isDisabledButton =
     isExecuting ||
@@ -38,7 +34,8 @@ export const SendButton: FC = () => {
     isValidAmount(fromAmount) ||
     isAddressInvalid ||
     isAddressNotMatchNetwork ||
-    !hasBalance;
+    !hasBalance ||
+    isInsufficientFundsForFee;
 
   if (blockchain === 'bitcoin') {
     return (

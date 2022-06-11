@@ -22,7 +22,7 @@ import { Icon } from 'components/ui';
 import { Row, Text } from 'components/ui/AccordionDetails/common';
 import { InputAmount } from 'components/ui/InputAmount';
 import { SearchInput } from 'components/ui/SearchInput';
-import { getNumberFromFormattedNumber } from 'utils/format';
+import { trimFormattedNumber } from 'utils/format';
 import { shortAddress } from 'utils/tokens';
 
 import { AmountUSDStyled } from '../AmountUSD';
@@ -606,7 +606,7 @@ export const SwapTokenForm: FC<Props> = ({
         <InputWrapper>
           <InputAmount
             placeholder={Number(0).toFixed(tokenInfo?.decimals || 0)}
-            value={getNumberFromFormattedNumber(formatBigNumber(amount, tokenInfo?.decimals || 0))}
+            value={trimFormattedNumber(formatBigNumber(amount, tokenInfo?.decimals || 0))}
             onChange={handleAmountChange}
             disabled={disabled || disabledInput}
           />

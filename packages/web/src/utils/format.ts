@@ -56,6 +56,14 @@ export const formatNumber = (str: string | number) => {
   return res + (match[2] || '');
 };
 
+export const trimFormattedNumber = (valueStr: string) => {
+  return valueStr.replace(/\s/g, '');
+};
+
 export const getNumberFromFormattedNumber = (valueStr: string) => {
-  return Number(valueStr.replace(/\s/g, ''));
+  return Number(trimFormattedNumber(valueStr));
+};
+
+export const getNumberFromFormattedUSD = (valueStr: string) => {
+  return getNumberFromFormattedNumber(valueStr.replace('$', ''));
 };

@@ -1,5 +1,6 @@
 import type { BigintIsh, Token } from '@saberhq/token-utils';
 import { TokenAmount as TokenAmountOriginal } from '@saberhq/token-utils';
+import { parseAmountFromString } from '@ubeswap/token-math';
 
 export const NUMBER_FORMAT = {
   decimalSeparator: '.',
@@ -12,8 +13,13 @@ export class TokenAmount extends TokenAmountOriginal {
   }
 
   static override parse(token: Token, uiAmount: string): TokenAmount {
-    const value = super.parse(token, uiAmount);
-    return new TokenAmount(token, value.raw);
+    const prev = parseAmountFromString(
+      token,
+      uiAmount,
+      NUMBER_FORMAT.decimalSeparator,
+      NUMBER_FORMAT.groupSeparator,
+    );
+    return new TokenAmount(token, prev);
   }
 
   override divideByInteger(other: BigintIsh): TokenAmount {

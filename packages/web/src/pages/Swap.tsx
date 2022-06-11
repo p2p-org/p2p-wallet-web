@@ -4,7 +4,6 @@ import { Route, Switch, useLocation, useParams } from 'react-router-dom';
 
 import { useIsMobile } from '@p2p-wallet-web/ui';
 
-import { FeeCompensationProvider } from 'app/contexts';
 import { SwapProvider } from 'app/contexts/solana/swap';
 import { useTrackEventOpen } from 'app/hooks/metrics';
 import { Layout } from 'components/common/Layout';
@@ -32,18 +31,16 @@ export const Swap: FunctionComponent = () => {
 
   return (
     <Layout mobileAction={mobileHeaderButton}>
-      <FeeCompensationProvider>
-        <SwapProvider initialState={{ inputTokenName: symbol }}>
-          <Switch>
-            <Route path={`/swap/settings/:symbol?`}>
-              <SwapSlippageWidget />
-            </Route>
-            <Route path={'/swap/:symbol?'}>
-              <SwapWidget />
-            </Route>
-          </Switch>
-        </SwapProvider>
-      </FeeCompensationProvider>
+      <SwapProvider initialState={{ inputTokenName: symbol }}>
+        <Switch>
+          <Route path={`/swap/settings/:symbol?`}>
+            <SwapSlippageWidget />
+          </Route>
+          <Route path={'/swap/:symbol?'}>
+            <SwapWidget />
+          </Route>
+        </Switch>
+      </SwapProvider>
     </Layout>
   );
 };

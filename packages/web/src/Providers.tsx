@@ -16,7 +16,6 @@ import assert from 'ts-invariant';
 import {
   BlockchainProvider,
   FeatureFlagsProvider,
-  FeeRelayerProvider,
   ModalsProvider,
   NameServiceProvider,
   RatesProvider,
@@ -28,6 +27,8 @@ import * as SolanaSDK from 'new/app/sdk/SolanaSDK';
 import { DI_KEYS } from 'new/core/Constants';
 import DependencyContext, { DependencyService } from 'new/services/injection/DependencyContext';
 import { LockAndMintProvider } from 'utils/providers/LockAndMintProvider';
+
+const PUBLIC_KEY_LENGTH_FOR_TRIMMING = 20;
 
 const solanaNetwork =
   process.env.REACT_APP_SOLANA_NETWORK ?? SolanaSDK.APIEndpoint.defaultEndpoints[2]!.network;
@@ -41,8 +42,10 @@ DependencyService.registerValue(DI_KEYS.SOLANA_RPC_HOST, solanaRpcHost);
 const onConnect = (wallet: ConnectedWallet) => {
   const walletPublicKey = wallet.publicKey.toBase58();
   const keyToDisplay =
-    walletPublicKey.length > 20
-      ? `${walletPublicKey.substring(0, 7)}.....${walletPublicKey.substring(
+    walletPublicKey.length > PUBLIC_KEY_LENGTH_FOR_TRIMMING
+      ? // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+        `${walletPublicKey.substring(0, 7)}.....${walletPublicKey.substring(
+          // eslint-disable-next-line @typescript-eslint/no-magic-numbers
           walletPublicKey.length - 7,
           walletPublicKey.length,
         )}`
@@ -102,15 +105,13 @@ export const Providers: FC = ({ children }) => {
               <SettingsProvider>
                 <BlockchainProvider>
                   <LockAndMintProvider>
-                    <FeeRelayerProvider>
-                      <SwapProviders>
-                        <ModalsProvider>
-                          <DependencyContext.Provider value={DependencyService.container()}>
-                            {children}
-                          </DependencyContext.Provider>
-                        </ModalsProvider>
-                      </SwapProviders>
-                    </FeeRelayerProvider>
+                    <SwapProviders>
+                      <ModalsProvider>
+                        <DependencyContext.Provider value={DependencyService.container()}>
+                          {children}
+                        </DependencyContext.Provider>
+                      </ModalsProvider>
+                    </SwapProviders>
                   </LockAndMintProvider>
                 </BlockchainProvider>
               </SettingsProvider>

@@ -7,7 +7,6 @@ import classNames from 'classnames';
 
 import { useSwap } from 'app/contexts';
 import SlippageTolerance from 'app/contexts/solana/swap/models/SlippageTolerance';
-import { CompensationFee } from 'components/common/CompensationFee';
 import { WidgetPageWithBottom } from 'components/common/WidgetPageWithBottom';
 
 import type { SwapRouteParams } from '../types';
@@ -41,9 +40,9 @@ const ListWrapper = styled.div`
   }
 `;
 
-const CompensationWrapper = styled.div`
+/*const CompensationWrapper = styled.div`
   padding: 0 20px;
-`;
+`;*/
 
 const SlippageWrapper = styled.div`
   display: grid;
@@ -108,7 +107,7 @@ export const SwapSlippageWidget = () => {
   const { symbol } = useParams<SwapRouteParams>();
   const backToPath = useMemo(() => generatePath('/swap/:symbol?', { symbol }), []);
 
-  const { slippageTolerance, setSlippageTolerance, trade } = useSwap();
+  const { slippageTolerance, setSlippageTolerance } = useSwap();
 
   const activeButtonIdx = useMemo(
     () => PREDEFINED_SLIPPAGE_VALUES.findIndex((value) => slippageTolerance.stringEq(value)),
@@ -159,7 +158,7 @@ export const SwapSlippageWidget = () => {
           </ListWrapper>
           {elDescriptionRender()}
         </Content>
-        {trade.inputTokenName !== 'SOL' ? (
+        {/*trade.inputTokenName !== 'SOL' ? (
           <Content>
             <ListWrapper>
               <CompensationWrapper>
@@ -167,7 +166,7 @@ export const SwapSlippageWidget = () => {
               </CompensationWrapper>
             </ListWrapper>
           </Content>
-        ) : undefined}
+        ) : undefined*/}
       </Wrapper>
     </WidgetPageWithBottom>
   );
