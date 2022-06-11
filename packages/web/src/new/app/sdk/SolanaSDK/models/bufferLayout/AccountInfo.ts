@@ -1,3 +1,4 @@
+import { ZERO } from '@orca-so/sdk';
 import { AccountLayout, u64 } from '@solana/spl-token';
 import { PublicKey } from '@solana/web3.js';
 
@@ -6,7 +7,7 @@ export class AccountInfo {
   owner: PublicKey;
   amount: u64;
   delegateOption: number;
-  delegate?: PublicKey;
+  delegate: PublicKey | null;
   state: number;
   isNativeOption: number;
   isNativeRaw: u64;
@@ -33,6 +34,15 @@ export class AccountInfo {
     this.closeAuthority = accountInfo.closeAuthority
       ? new PublicKey(accountInfo.closeAuthority)
       : null;
+
+    if (this.delegateOption === 0) {
+      this.delegate = null;
+      this.delegatedAmount = ZERO;
+    }
+
+    if (this.closeAuthorityOption === 0) {
+      this.closeAuthority = null;
+    }
   }
 
   // non-parsing

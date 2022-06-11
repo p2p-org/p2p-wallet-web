@@ -24,8 +24,8 @@ export class APIEndpoint {
     this.additionalQuery = additionalQuery;
   }
 
-  // TODO: default
-  static defaultEndpoints() {
+  // TODO: defaults
+  static get defaultEndpoints(): APIEndpoint[] {
     const endpoints: APIEndpoint[] = [
       new APIEndpoint({
         address: 'https://p2p.rpcpool.com',

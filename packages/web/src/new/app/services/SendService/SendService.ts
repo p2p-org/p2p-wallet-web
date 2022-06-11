@@ -3,12 +3,11 @@ import { TokenAmount } from '@p2p-wallet-web/token-utils';
 import { u64 } from '@solana/spl-token';
 import { PublicKey } from '@solana/web3.js';
 
-import type { Wallet } from 'new/app/extensions/SolanaSDKWalletExtensions';
 import type { FeeRelayerAPIClientType } from 'new/app/sdk/FeeRelayer';
 import * as FeeRelayer from 'new/app/sdk/FeeRelayer';
 import { FeeRelayerError } from 'new/app/sdk/FeeRelayer/models/FeeRelayerError';
 import type * as OrcaSwap from 'new/app/sdk/OrcaSwap';
-import type { SolanaSDK as SolanaSDKClass } from 'new/app/sdk/SolanaSDK';
+import type { SolanaSDK as SolanaSDKClass, Wallet } from 'new/app/sdk/SolanaSDK';
 import * as SolanaSDK from 'new/app/sdk/SolanaSDK';
 import {
   LogEvent,
@@ -17,10 +16,10 @@ import {
   SolanaSDKPublicKey,
   toLamport,
 } from 'new/app/sdk/SolanaSDK';
+import type { WalletsRepository } from 'new/models/Repositories';
 
 import type { FeeServiceType } from '../FeeService';
 import type { RenVMBurnAndReleaseServiceType } from '../RenVM/BurnAndRelease';
-import type { WalletsRepository } from '../Repositories/WalletsRepository';
 
 export enum RelayMethod {
   relay,

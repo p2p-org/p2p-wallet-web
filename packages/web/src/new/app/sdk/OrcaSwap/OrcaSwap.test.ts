@@ -1,24 +1,26 @@
-import { SignerWallet, SolanaProvider } from '@saberhq/solana-contrib';
+import { Provider } from '@project-serum/anchor';
+import { SignerWallet } from '@saberhq/solana-contrib';
 import { Connection, Keypair } from '@solana/web3.js';
+
+import { APIEndpoint } from 'new/app/sdk/SolanaSDK';
 
 import { OrcaSwap, OrcaSwapAPIClient, OrcaSwapSolanaClient } from './index';
 
+jest.setTimeout(50000);
+
 it('OrcaSwap', async () => {
+  const endpoint = APIEndpoint.defaultEndpoints[1]!;
   const signer = Keypair.generate();
   const wallet = new SignerWallet(signer);
-  const connection = new Connection('https://p2p.rpcpool.com/');
+  const connection = new Connection(endpoint.address);
 
-  const provider = SolanaProvider.load({
-    connection,
-    sendConnection: connection,
-    wallet,
-  });
+  const provider = new Provider(connection, wallet, Provider.defaultOptions());
 
   const apiClient = new OrcaSwapAPIClient('mainnet-beta');
-  const solanaClient = new OrcaSwapSolanaClient({ provider });
+  const solanaClient = new OrcaSwapSolanaClient({ provider, endpoint });
   const orcaSwap = new OrcaSwap(apiClient, solanaClient);
 
-  orcaSwap.load();
+  await orcaSwap.load();
 
   await expect(
     orcaSwap.getTradablePoolsPairs({

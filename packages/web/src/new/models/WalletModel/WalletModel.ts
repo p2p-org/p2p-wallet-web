@@ -11,7 +11,7 @@ import { PublicKey } from '@solana/web3.js';
 import { autorun, computed, makeObservable, observable, runInAction } from 'mobx';
 import { singleton } from 'tsyringe';
 
-import { WalletAdaptorService } from 'new/services/WalletAdaptorService/WalletAdaptorService';
+import { WalletAdaptorService } from 'new/services/WalletAdaptorService';
 
 import { Model } from '../Model';
 
@@ -27,7 +27,7 @@ export class WalletModel extends Model {
   constructor(protected walletAdaptorService: WalletAdaptorService) {
     super();
     this.name = '';
-    this.network = WalletAdapterNetwork.Devnet;
+    this.network = WalletAdapterNetwork.Mainnet;
     this.publicKey = '';
     this.connected = false;
     makeObservable(this, {

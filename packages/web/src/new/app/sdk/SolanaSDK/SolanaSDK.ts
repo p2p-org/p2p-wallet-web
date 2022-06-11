@@ -1,8 +1,9 @@
 import { ZERO } from '@orca-so/sdk';
-import type { SolanaProvider } from '@saberhq/solana-contrib';
-import { Token, u64 } from '@solana/spl-token';
+import type { Provider } from '@project-serum/anchor';
+import { networkToChainId } from '@saberhq/token-utils';
+import { Token as SPLToken, u64 } from '@solana/spl-token';
+import { TokenListProvider } from '@solana/spl-token-registry';
 import type {
-  Account,
   AccountInfo as BufferInfo,
   Commitment,
   RpcResponseAndContext,
@@ -19,21 +20,24 @@ import {
   AccountInstructions,
   EmptyInfo,
   FeeAmount,
+  MintInfo,
   PreparedTransaction,
   SolanaSDKError,
   SolanaSDKPublicKey,
   SPLTokenDestinationAddress,
+  Token,
+  Wallet,
 } from './index';
 
-export interface SolanaSDKAccountStorage {
-  readonly account?: Account;
-  save(account: Account): void;
-}
+// export interface SolanaSDKAccountStorage {
+//   readonly account?: Account;
+//   save(account: Account): void;
+// }
 
 export class SolanaSDK {
   // Properties
-  provider: SolanaProvider;
-  accountStorage: SolanaSDKAccountStorage;
+  provider: Provider;
+  // accountStorage: SolanaSDKAccountStorage;
   endpoint: APIEndpoint;
   supportedTokensCache?: Token[];
 
@@ -42,13 +46,13 @@ export class SolanaSDK {
     endpoint,
     accountStorage,
   }: {
-    provider: SolanaProvider;
+    provider: Provider;
     endpoint: APIEndpoint;
-    accountStorage: SolanaSDKAccountStorage;
+    // accountStorage: SolanaSDKAccountStorage;
   }) {
     this.provider = provider;
     this.endpoint = endpoint;
-    this.accountStorage = accountStorage;
+    // this.accountStorage = accountStorage;
   }
 
   // SolanaSDKMethods
@@ -75,6 +79,30 @@ export class SolanaSDK {
 
   async getMinimumBalanceForRentExemption(span: number): Promise<Lamports> {
     return new u64(await this.provider.connection.getMinimumBalanceForRentExemption(span));
+  }
+
+  async getMultipleAccounts<T>({
+    pubkeys,
+    decodedTo,
+  }: {
+    pubkeys: string[];
+    decodedTo: { decode(data: Buffer): T };
+  }): Promise<(BufferInfo<T> | null)[]> {
+    if (pubkeys.length === 0) {
+      return Promise.resolve([]);
+    }
+
+    const pubkeysNew = pubkeys.map((pubkey) => new PublicKey(pubkey));
+    return (await this.provider.connection.getMultipleAccountsInfo(pubkeysNew)).map((info) => {
+      if (!info) {
+        return null;
+      }
+
+      return {
+        ...info,
+        data: decodedTo.decode(info.data),
+      };
+    });
   }
 
   async getRecentBlockhash(commitment?: Commitment): Promise<string> {
@@ -132,10 +160,34 @@ export class SolanaSDK {
     });
   }
 
+  getMultipleMintDatas({
+    mintAddresses,
+    programId = SolanaSDKPublicKey.tokenProgramId.toString(),
+  }: {
+    mintAddresses: string[];
+    programId?: string;
+  }): Promise<(MintInfo | null)[]> {
+    return this.getMultipleAccounts<MintInfo>({
+      pubkeys: mintAddresses,
+      decodedTo: MintInfo,
+    }).then((accounts) => {
+      if (accounts.some((account) => account?.owner.toString() !== programId)) {
+        throw SolanaSDKError.other('Invalid mint owner');
+      }
+
+      const result = accounts.map((account) => account?.data ?? null);
+      if (result.length !== mintAddresses.length) {
+        throw SolanaSDKError.other('Some of mint data are missing');
+      }
+
+      return result;
+    });
+  }
+
   async checkIfAssociatedTokenAccountExists(owner: PublicKey, mint: string): Promise<boolean> {
     const mintAddress = new PublicKey(mint);
 
-    const associatedTokenAccount = await Token.getAssociatedTokenAddress(
+    const associatedTokenAccount = await SPLToken.getAssociatedTokenAddress(
       SolanaSDKPublicKey.splAssociatedTokenAccountProgramId,
       SolanaSDKPublicKey.tokenProgramId,
       mintAddress,
@@ -296,7 +348,7 @@ export class SolanaSDK {
               space: AccountInfo.span,
               programId: SolanaSDKPublicKey.tokenProgramId,
             }),
-            Token.createInitAccountInstruction(
+            SPLToken.createInitAccountInstruction(
               SolanaSDKPublicKey.tokenProgramId,
               SolanaSDKPublicKey.wrappedSOLMint,
               newAccount.publicKey,
@@ -304,7 +356,7 @@ export class SolanaSDK {
             ),
           ],
           cleanupInstructions: [
-            Token.createCloseAccountInstruction(
+            SPLToken.createCloseAccountInstruction(
               SolanaSDKPublicKey.tokenProgramId,
               newAccount.publicKey,
               payer,
@@ -324,7 +376,7 @@ export class SolanaSDK {
     feePayer: PublicKey,
     closeAfterward: boolean,
   ): Promise<AccountInstructions> {
-    const associatedAddress = await Token.getAssociatedTokenAddress(
+    const associatedAddress = await SPLToken.getAssociatedTokenAddress(
       SolanaSDKPublicKey.splAssociatedTokenAccountProgramId,
       SolanaSDKPublicKey.tokenProgramId,
       mint,
@@ -363,7 +415,7 @@ export class SolanaSDK {
           let cleanupInstructions: TransactionInstruction[] = [];
           if (closeAfterward) {
             cleanupInstructions = [
-              Token.createCloseAccountInstruction(
+              SPLToken.createCloseAccountInstruction(
                 SolanaSDKPublicKey.tokenProgramId,
                 associatedAddress,
                 owner,
@@ -385,7 +437,7 @@ export class SolanaSDK {
           return new AccountInstructions({
             account: associatedAddress,
             instructions: [
-              Token.createAssociatedTokenAccountInstruction(
+              SPLToken.createAssociatedTokenAccountInstruction(
                 SolanaSDKPublicKey.splAssociatedTokenAccountProgramId,
                 SolanaSDKPublicKey.tokenProgramId,
                 mint,
@@ -420,7 +472,7 @@ export class SolanaSDK {
     feePayer?: PublicKey | null;
     recentBlockhash?: string;
   }): Promise<PreparedTransaction> {
-    const account = this.provider.publicKey;
+    const account = this.provider.wallet.publicKey;
 
     const feePayerNew = feePayer ?? account;
     const fromPublicKey = account;
@@ -492,7 +544,7 @@ export class SolanaSDK {
     preparedTransaction: PreparedTransaction;
     realDestination: string;
   }> {
-    const account = this.provider.publicKey;
+    const account = this.provider.wallet.publicKey;
 
     const feePayerNew = feePayer ?? account;
 
@@ -529,7 +581,7 @@ export class SolanaSDK {
         const mint = new PublicKey(mintAddress);
         const ownerNew = new PublicKey(destinationAddress);
 
-        const createATokenInstruction = Token.createAssociatedTokenAccountInstruction(
+        const createATokenInstruction = SPLToken.createAssociatedTokenAccountInstruction(
           SolanaSDKPublicKey.splAssociatedTokenAccountProgramId,
           SolanaSDKPublicKey.tokenProgramId,
           mint,
@@ -547,7 +599,7 @@ export class SolanaSDK {
       // use transfer checked transaction for proxy, otherwise use normal transfer transaction
       if (transferChecked) {
         // transfer checked transaction
-        sendInstruction = Token.createTransferCheckedInstruction(
+        sendInstruction = SPLToken.createTransferCheckedInstruction(
           SolanaSDKPublicKey.tokenProgramId,
           fromPublicKeyNew,
           new PublicKey(mintAddress),
@@ -559,7 +611,7 @@ export class SolanaSDK {
         );
       } else {
         // transfer transaction
-        sendInstruction = Token.createTransferInstruction(
+        sendInstruction = SPLToken.createTransferInstruction(
           SolanaSDKPublicKey.tokenProgramId,
           fromPublicKeyNew,
           toPublicKey,
@@ -619,7 +671,7 @@ export class SolanaSDK {
           const tokenMint = new PublicKey(mintAddress);
 
           // create associated token address
-          const address = await Token.getAssociatedTokenAddress(
+          const address = await SPLToken.getAssociatedTokenAddress(
             SolanaSDKPublicKey.splAssociatedTokenAccountProgramId,
             SolanaSDKPublicKey.tokenProgramId,
             tokenMint,
@@ -638,7 +690,7 @@ export class SolanaSDK {
           const tokenMint = new PublicKey(mintAddress);
 
           // create associated token address
-          const address = await Token.getAssociatedTokenAddress(
+          const address = await SPLToken.getAssociatedTokenAddress(
             SolanaSDKPublicKey.splAssociatedTokenAccountProgramId,
             SolanaSDKPublicKey.tokenProgramId,
             tokenMint,
@@ -689,6 +741,137 @@ export class SolanaSDK {
   }
 
   // SolanaSDKTokens
+
+  // TODo: external parser
+  async getTokensList(): Promise<Token[]> {
+    const cache = this.supportedTokensCache;
+    if (cache) {
+      return Promise.resolve(cache);
+    }
+
+    const tokenList = await new TokenListProvider().resolve();
+
+    // map tags
+    const tokens = tokenList
+      .getList()
+      .filter((token) => token.chainId === networkToChainId(this.endpoint.network))
+      .map((item) => {
+        return new Token(item);
+      });
+
+    // renBTC for devnet
+    if (this.endpoint.network === 'devnet') {
+      tokens.push(
+        new Token({
+          _tags: null,
+          chainId: 101,
+          address: 'FsaLodPu4VmSwXGr3gWfwANe4vKf8XSZcCh1CEeJ3jpD',
+          symbol: 'renBTC',
+          name: 'renBTC',
+          decimals: 8,
+          logoURI:
+            'https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/CDJWUqTcYTVAKXAVXoQZFes5JUFc7owSeq7eMQcDSbo5/logo.png',
+          extensions: {
+            website: 'https://renproject.io/',
+            bridgeContract: null,
+            assetContract: null,
+            address: null,
+            explorer: null,
+            twitter: null,
+            github: null,
+            medium: null,
+            tgann: null,
+            tggroup: null,
+            discord: null,
+            serumV3Usdt: null,
+            serumV3Usdc: '74Ciu5yRzhe8TFTHvQuEVbFZJrbnCMRoohBK33NNiPtv',
+            coingeckoId: 'renbtc',
+            imageUrl: null,
+            description: null,
+          },
+        }),
+      );
+    }
+
+    this.supportedTokensCache = tokens;
+
+    return Promise.resolve(tokens);
+  }
+
+  getTokenWallets(account: string): Promise<Wallet[]> {
+    return Promise.all([
+      this.provider.connection.getTokenAccountsByOwner(new PublicKey(account), {
+        programId: SolanaSDKPublicKey.tokenProgramId,
+      }),
+      this.getTokensList(),
+    ]).then(([list, supportedTokens]): Promise<Wallet[]> => {
+      const knownWallets: Wallet[] = [];
+      const unknownAccounts: [string, AccountInfo][] = [];
+
+      for (const item of list.value) {
+        const pubkey = item.pubkey;
+        const accountInfo = AccountInfo.decode(item.account.data);
+
+        const mintAddress = accountInfo.mint.toString();
+        // known token
+        const token = supportedTokens.find(
+          (supportedToken) => supportedToken.address === mintAddress,
+        );
+        if (token) {
+          knownWallets.push(
+            new Wallet({
+              pubkey: pubkey.toString(),
+              lamports: accountInfo.amount,
+              token,
+            }),
+          );
+        }
+        // unknown token
+        else {
+          unknownAccounts.push([item.pubkey.toString(), accountInfo]);
+        }
+      }
+
+      return this.getMultipleMintDatas({
+        mintAddresses: unknownAccounts.map((account) => account[1].mint.toString()),
+      })
+        .then((mintDatas): Wallet[] => {
+          if (Object.keys(mintDatas).length !== unknownAccounts.length) {
+            throw SolanaSDKError.unknown();
+          }
+
+          const wallets: Wallet[] = [];
+          for (const [index, item] of mintDatas.entries()) {
+            wallets.push(
+              new Wallet({
+                pubkey: unknownAccounts[index]![0],
+                lamports: unknownAccounts[index]![1].amount,
+                token: Token.unsupported({
+                  mint: unknownAccounts[index]![1].mint.toString(),
+                  decimals: item?.decimals,
+                }),
+              }),
+            );
+          }
+
+          return wallets;
+        })
+        .catch(() => {
+          return unknownAccounts.map(
+            (account) =>
+              new Wallet({
+                pubkey: account[0],
+                lamports: account[1].amount,
+                token: Token.unsupported({
+                  mint: account[1].mint.toString(),
+                }),
+              }),
+          );
+        })
+        .then((wallets) => knownWallets.concat(wallets));
+    });
+  }
+
   checkAccountValidation(account: string): Promise<boolean> {
     return this.getAccountInfo({
       account,

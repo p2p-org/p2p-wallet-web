@@ -1,12 +1,11 @@
+import { awaitReaction } from 'new/core/ObservableReactionContainer';
+import { DependencyService } from 'new/services/injection/DependencyContext';
+
 import {
   MockWalletAdaptor,
   MockWalletAdaptorName,
   MockWalletAdaptorService,
-} from '__mocks__/services/MockWalletAdaptor';
-
-import { awaitReaction } from 'new/core/ObservableReactionContainer';
-import { DependencyService } from 'new/services/injection/DependencyContext';
-
+} from '../../../__mocks__/services/MockWalletAdaptor';
 import { WalletModel } from './WalletModel';
 
 describe('WalletModel should work as expected', function () {

@@ -46,19 +46,19 @@ export const NETWORKS: NetworksByNameType = {
   'solana-mainnet': {
     name: 'solana-mainnet',
     network: 'mainnet-beta',
-    endpoint: `${clusterApiUrl('mainnet-beta')}/`,
+    endpoint: `${clusterApiUrl('mainnet-beta')}`,
   },
   'solana-devnet': {
     name: 'solana-devnet',
     network: 'devnet',
     feature: FEATURE_NETWORKS,
-    endpoint: `${clusterApiUrl('devnet')}/`,
+    endpoint: `${clusterApiUrl('devnet')}`,
   },
   'solana-testnet': {
     name: 'solana-testnet',
     network: 'testnet',
     feature: FEATURE_NETWORKS,
-    endpoint: `${clusterApiUrl('testnet')}/`,
+    endpoint: `${clusterApiUrl('testnet')}`,
   },
 };
 

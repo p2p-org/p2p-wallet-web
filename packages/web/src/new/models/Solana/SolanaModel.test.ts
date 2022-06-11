@@ -1,4 +1,4 @@
-import { MockWalletAdaptorService } from '../../__mocks__/services/MockWalletAdaptor';
+import { MockWalletAdaptorService } from '../../../__mocks__/services/MockWalletAdaptor';
 import { DependencyService } from '../../services/injection/DependencyContext';
 import { WalletModel } from '../WalletModel/WalletModel';
 import { SolanaModel } from './SolanaModel';

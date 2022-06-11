@@ -1,5 +1,6 @@
 class InvalidRequestError extends Error {}
 class OtherError extends Error {}
+class UnknownError extends Error {}
 
 export class SolanaSDKError {
   static equals(lhs: Error, rhs: Error) {
@@ -21,6 +22,9 @@ export class SolanaSDKError {
   // Other
   static other(message: string): OtherError {
     return new OtherError(message);
+  }
+  static unknown(): UnknownError {
+    return new UnknownError();
   }
 
   // Predefined error

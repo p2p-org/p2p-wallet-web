@@ -3,20 +3,26 @@ import { ASSOCIATED_TOKEN_PROGRAM_ID, NATIVE_MINT, TOKEN_PROGRAM_ID } from '@sol
 import { PublicKey, SYSVAR_RENT_PUBKEY } from '@solana/web3.js';
 
 export class SolanaSDKPublicKey {
-  static get tokenProgramId() {
+  static get tokenProgramId(): PublicKey {
     return TOKEN_PROGRAM_ID;
   }
-  static get sysvarRent() {
+  static get sysvarRent(): PublicKey {
     return SYSVAR_RENT_PUBKEY;
   }
-  static get programId() {
+  static get programId(): PublicKey {
     return SYSTEM_PROGRAM_ID;
   }
-  static get wrappedSOLMint() {
+  static get wrappedSOLMint(): PublicKey {
     return NATIVE_MINT;
   }
-  static get splAssociatedTokenAccountProgramId() {
+  static get splAssociatedTokenAccountProgramId(): PublicKey {
     return ASSOCIATED_TOKEN_PROGRAM_ID;
+  }
+  static get renBTCMint(): PublicKey {
+    return new PublicKey('CDJWUqTcYTVAKXAVXoQZFes5JUFc7owSeq7eMQcDSbo5');
+  }
+  static get renBTCMintDevnet(): PublicKey {
+    return new PublicKey('FsaLodPu4VmSwXGr3gWfwANe4vKf8XSZcCh1CEeJ3jpD');
   }
 
   static orcaSwapId(version = 2): PublicKey {

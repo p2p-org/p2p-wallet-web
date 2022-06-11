@@ -5,4 +5,5 @@ export * from './FeeAmount';
 export * from './PreparedTransaction';
 export * from './SolanaSDKError';
 export * from './SolanaSDKModels';
+export * from './SolanaToken';
 export * from './Wallet';

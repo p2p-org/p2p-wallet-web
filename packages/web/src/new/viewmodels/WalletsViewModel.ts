@@ -1,5 +1,7 @@
+import { action, computed, makeObservable } from 'mobx';
 import { injectable } from 'tsyringe';
 
+import type { Wallet } from 'new/app/sdk/SolanaSDK';
 import { WalletsRepository } from 'new/models/Repositories';
 
 import { ViewModel } from './ViewModel';
@@ -8,6 +10,13 @@ import { ViewModel } from './ViewModel';
 export class WalletsViewModel extends ViewModel {
   constructor(protected walletsRepository: WalletsRepository) {
     super();
+    makeObservable(this, {
+      isInitialized: computed,
+      wallets: computed,
+      isHiddenWalletsShown: computed,
+      toggleIsHiddenWalletShown: action,
+      toggleWalletVisibility: action,
+    });
   }
 
   protected onInitialize(): void {
@@ -21,7 +30,19 @@ export class WalletsViewModel extends ViewModel {
     return this.walletsRepository.isInitialized;
   }
 
-  get tokens() {
-    return this.walletsRepository.tokens;
+  get wallets() {
+    return this.walletsRepository.data;
   }
+
+  get isHiddenWalletsShown() {
+    return this.walletsRepository.isHiddenWalletsShown;
+  }
+
+  toggleIsHiddenWalletShown = (): void => {
+    this.walletsRepository.toggleIsHiddenWalletShown();
+  };
+
+  toggleWalletVisibility = (wallet: Wallet): void => {
+    this.walletsRepository.toggleWalletVisibility(wallet);
+  };
 }
