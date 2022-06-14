@@ -276,3 +276,12 @@ PERFORMANCE OF THIS SOFTWARE.
  * @author Peter A. Bigot
  * @see {@link https://github.com/pabigot/buffer-layout|buffer-layout on GitHub}
  */
+
+/**
+ * [js-sha3]{@link https://github.com/emn178/js-sha3}
+ *
+ * @version 0.7.0
+ * @author Chen, Yi-Cyuan [emn178@gmail.com]
+ * @copyright Chen, Yi-Cyuan 2015-2017
+ * @license MIT
+ */
