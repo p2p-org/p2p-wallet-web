@@ -7,7 +7,6 @@ import { styled } from '@linaria/react';
 import { useWallet } from '@p2p-wallet-web/core';
 
 import { trackEventUniversal } from 'utils/analytics';
-import { useUpdateEffect } from 'utils/hooks/useUpdateEffect';
 
 import { LoaderWide } from '../../../common/LoaderWide';
 import { Login } from './Login';
@@ -97,13 +96,9 @@ export const AuthSide: FC = () => {
     }
   };
 
-  useUpdateEffect(() => {
-    goToHomePageIfConnected();
-  }, [connected]);
-
   useEffect(() => {
     goToHomePageIfConnected();
-  }, []);
+  }, [connected]);
 
   useEffect(() => {
     trackEventUniversal({ name: 'Splash_Viewed', data: { Splash_Campaign: null } });
