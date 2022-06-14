@@ -89,13 +89,21 @@ export const AuthSide: FC = () => {
     password: '',
   });
 
-  useUpdateEffect(() => {
+  const goToHomePageIfConnected = () => {
     if (connected) {
       history.push(location.state?.fromPage || '/wallets', {
         fromPage: location.state?.fromPage || location.pathname,
       });
     }
+  };
+
+  useUpdateEffect(() => {
+    goToHomePageIfConnected();
   }, [connected]);
+
+  useEffect(() => {
+    goToHomePageIfConnected();
+  }, []);
 
   useEffect(() => {
     trackEventUniversal({ name: 'Splash_Viewed', data: { Splash_Campaign: null } });
