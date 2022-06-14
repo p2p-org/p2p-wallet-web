@@ -115,6 +115,11 @@ jobs:
       - name: Install dependecies
         run: yarn install --frozen-lockfile
 
+      # set 'steps.vars.outputs.sha_short' variable that is used in 'Build site' step
+      - name: Set short sha output
+        id: vars
+        run: echo "::set-output name=sha_short::$(git rev-parse --short ${{ github.event.pull_request.head.sha }})"
+
       - name: Build site
         env:
           REACT_APP_BASENAME: p2p-wallet-web/pr-preview/pr-${{ github.event.pull_request.number }}/
@@ -127,6 +132,10 @@ jobs:
           REACT_APP_MOONPAY_API_KEY: ${{ secrets.REACT_APP_MOONPAY_API_KEY }}
           REACT_APP_MOONPAY_SIGNER_URL: ${{ secrets.REACT_APP_MOONPAY_SIGNER_URL }}
           REACT_APP_STAGING: true
+          REACT_APP_SENTRY_DSN_ENDPOINT: ${{ secrets.REACT_APP_SENTRY_DSN_ENDPOINT }}
+          REACT_APP_SENTRY_MODE: staging
+          REACT_APP_SENTRY_TRACES_SAMPLE_RATE: 1
+          REACT_APP_SENTRY_RELEASE: p2p-wallet-web_pr-preview_${{ github.event.pull_request.number }}_${{ steps.vars.outputs.sha_short }}
         run: yarn build
 
       - name: Deploy preview
