@@ -139,8 +139,7 @@ export const Main: FC = () => {
         {isShowConfirmAddressSwitch ? (
           <ConfirmWrapper>
             This address does not appear to have a {tokenSymbol} account. You have to pay a one-time
-            fee to create a {tokenSymbol} account for this address. You can choose which currency to
-            pay in below.
+            fee to create a {tokenSymbol} account for this address.
           </ConfirmWrapper>
         ) : undefined}
       </ToWrapper>
