@@ -25,7 +25,6 @@ import { formatNumber } from 'utils/format';
 import { shortAddress } from 'utils/tokens';
 
 import {
-  BlockWrapper,
   ButtonExplorer,
   CloseIcon,
   CloseWrapper,
@@ -37,7 +36,6 @@ import {
   FieldWrapper,
   Footer,
   Header,
-  OtherIcon,
   ProgressWrapper,
   SendWrapper,
   ShareIcon,
@@ -359,9 +357,6 @@ export const TransactionDetailsModal: FC<Props> = ({ signature, source: sourceAd
         <CloseWrapper onClick={close}>
           <CloseIcon name="close" />
         </CloseWrapper>
-        <BlockWrapper>
-          {transaction?.details.icon ? <OtherIcon name={transaction.details.icon} /> : undefined}
-        </BlockWrapper>
       </Header>
       <ProgressWrapper />
       <Content>
