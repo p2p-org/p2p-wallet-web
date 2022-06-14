@@ -74,7 +74,6 @@ export const OtherIcon = styled(Icon)`
 
 export const Header = styled.div`
   position: relative;
-  padding: 24px;
 
   color: ${theme.colors.textIcon.primary};
   font-weight: 500;

@@ -142,6 +142,10 @@ const PaidByBadge = styled.div`
   border-radius: 4px;
 `;
 
+const PaddedHeader = styled(Header)`
+  padding: 24px;
+`;
+
 type Props = {
   signature: TransactionSignature;
   source: string;
@@ -351,13 +355,13 @@ export const TransactionDetailsModal: FC<Props> = ({ signature, source: sourceAd
 
   return (
     <WrapperModal close={close}>
-      <Header>
+      <PaddedHeader>
         <Title>{titleCase(transaction?.details.type)}</Title>
         <Desc title={`${transaction?.raw?.slot} SLOT`}>{date}</Desc>
         <CloseWrapper onClick={close}>
           <CloseIcon name="close" />
         </CloseWrapper>
-      </Header>
+      </PaddedHeader>
       <ProgressWrapper />
       <Content>
         {/* {details.typeOriginal === 'transfer' ? ( */}
