@@ -7,7 +7,6 @@ import { styled } from '@linaria/react';
 import { useWallet } from '@p2p-wallet-web/core';
 
 import { trackEventUniversal } from 'utils/analytics';
-import { useUpdateEffect } from 'utils/hooks/useUpdateEffect';
 
 import { LoaderWide } from '../../../common/LoaderWide';
 import { Login } from './Login';
@@ -89,12 +88,16 @@ export const AuthSide: FC = () => {
     password: '',
   });
 
-  useUpdateEffect(() => {
+  const goToHomePageIfConnected = () => {
     if (connected) {
       history.push(location.state?.fromPage || '/wallets', {
         fromPage: location.state?.fromPage || location.pathname,
       });
     }
+  };
+
+  useEffect(() => {
+    goToHomePageIfConnected();
   }, [connected]);
 
   useEffect(() => {
