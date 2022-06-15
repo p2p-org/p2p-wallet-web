@@ -1,5 +1,7 @@
+import { theme } from '../themes';
+
 const card = `
-  box-shadow: 0px 4px 4px #F6F6F9;
+  box-shadow: 0px 4px 4px ${theme.colors.card};
 `;
 
 const notification = `
