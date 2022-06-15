@@ -12,6 +12,7 @@ const theme = {
       buttonSecondary: '#F6F6F8',
       buttonDisabled: '#A3A5BA',
       app: '#FBFBFD',
+      pressed: '#E4EAFF',
       // chart: '',
     },
     stroke: {

@@ -96,22 +96,15 @@ const NavLinkMenu = styled(NavLink)`
     }
   }
 
-  /* TODO: temp, delete after release recieve and settings */
-  &.disabled {
-    pointer-events: none;
-  }
-
   &:hover {
     ${NavButton} {
-      color: ${theme.colors.textIcon.active};
+      background-color: ${theme.colors.bg.activePrimary};
+    }
+  }
 
-      ${IconBlock} {
-        color: ${theme.colors.textIcon.active};
-
-        ${NavIcon} {
-          color: ${theme.colors.textIcon.active};
-        }
-      }
+  &:active {
+    ${NavButton} {
+      background-color: ${theme.colors.bg.pressed};
     }
   }
 `;
