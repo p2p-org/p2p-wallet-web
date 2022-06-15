@@ -107,6 +107,12 @@ const NavLinkMenu = styled(NavLink)`
       background-color: ${theme.colors.bg.pressed};
     }
   }
+
+  &:focus-visible {
+    border-radius: 12px;
+    outline: ${theme.colors.textIcon.active} solid 1px;
+    outline-offset: 2px;
+  }
 `;
 
 const Separator = styled.div`
