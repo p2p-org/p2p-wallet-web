@@ -1,10 +1,10 @@
 import type { FC } from 'react';
 
 import { styled } from '@linaria/react';
-import type { u64 } from '@saberhq/token-utils';
+import type { TokenAmount } from '@p2p-wallet-web/token-utils';
 
 import type { UseSendState } from 'app/contexts';
-import { AmountUSDStyled } from 'components/pages/swap/SwapWidget/AmountUSD';
+import { AmountUSD } from 'components/common/AmountUSD';
 import { Accordion } from 'components/ui';
 import { AccordionTitle } from 'components/ui/AccordionDetails/AccordionTitle';
 import { ListWrapper, Row, Text } from 'components/ui/AccordionDetails/common';
@@ -13,11 +13,17 @@ export interface TransactionDetailsProps {
   sendState?: UseSendState;
   btcAddress?: string;
   isOpen?: boolean;
-  amount?: u64;
+  amount?: TokenAmount;
 }
 
 const TokenAndUsd = styled.div`
   display: flex;
+`;
+
+const AmountUSDStyled = styled(AmountUSD)`
+  margin-left: 8px;
+
+  color: #8e8e93;
 `;
 
 export const TransactionDetails: FC<TransactionDetailsProps> = ({ sendState, amount }) => {
@@ -42,12 +48,7 @@ export const TransactionDetails: FC<TransactionDetailsProps> = ({ sendState, amo
           <Text className="gray">Receive</Text>
           <TokenAndUsd>
             <Text>{sendState?.details.receiveAmount}</Text>
-            <AmountUSDStyled
-              prefix="(~"
-              postfix=")"
-              amount={sendState?.parsedAmount?.toU64() || amount}
-              tokenName={sendState?.fromTokenAccount?.balance?.token.symbol}
-            />
+            <AmountUSDStyled prefix="(~" postfix=")" value={sendState?.parsedAmount || amount} />
           </TokenAndUsd>
         </Row>
         {/*<Row>
@@ -69,7 +70,7 @@ export const TransactionDetails: FC<TransactionDetailsProps> = ({ sendState, amo
             <Text className="gray">{sendState.destinationAccount?.symbol} account creation</Text>
             <TokenAndUsd>
               <Text>{sendState.details.accountCreationAmount}</Text>
-              <AmountUSDStyled
+              <AmountUSD
                 prefix="(~"
                 postfix=")"
                 amount={networkFees?.accountRentExemption}
@@ -84,12 +85,7 @@ export const TransactionDetails: FC<TransactionDetailsProps> = ({ sendState, amo
           <Text>Total</Text>
           <TokenAndUsd>
             <Text>{sendState?.details.totalAmount}</Text>
-            <AmountUSDStyled
-              prefix="(~"
-              postfix=")"
-              amount={sendState?.parsedAmount?.toU64() || amount}
-              tokenName={sendState?.fromTokenAccount?.balance?.token.symbol}
-            />
+            <AmountUSDStyled prefix="(~" postfix=")" value={sendState?.parsedAmount || amount} />
           </TokenAndUsd>
         </Row>
       </ListWrapper>

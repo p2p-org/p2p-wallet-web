@@ -128,7 +128,7 @@ export const Send: FC<Props & TransactionDetailsProps> = ({ params, sendState, b
         </FieldInfo>
       </div>
 
-      <TransactionDetails sendState={sendState} amount={params.amount.toU64()} />
+      <TransactionDetails sendState={sendState} amount={params.amount} />
     </Section>
   );
 };

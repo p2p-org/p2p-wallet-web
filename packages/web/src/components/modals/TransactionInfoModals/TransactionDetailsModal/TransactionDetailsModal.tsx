@@ -333,7 +333,7 @@ export const TransactionDetailsModal: FC<Props> = ({ signature, source: sourceAd
           </ValueCurrency>
           <ValueOriginal>
             <AmountUSD
-              prefix={transaction?.details.isReceiver ? '+' : '-'}
+              prefix={transaction?.details.isReceiver ? '+ ' : '- '}
               value={tokenAmount.balance}
             />
           </ValueOriginal>
