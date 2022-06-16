@@ -18,7 +18,7 @@ export const makeTokenMap = (chainId: ChainId): Record<string, Token> => {
       address: 'FsaLodPu4VmSwXGr3gWfwANe4vKf8XSZcCh1CEeJ3jpD',
       name: 'renBTC',
       decimals: 8,
-      symbol: 'RENBTC',
+      symbol: 'renBTC',
     });
   }
 
