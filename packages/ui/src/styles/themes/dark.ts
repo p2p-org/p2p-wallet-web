@@ -12,6 +12,7 @@ const theme = {
       buttonSecondary: '#F6F6F8',
       buttonDisabled: '#A3A5BA',
       app: '#FBFBFD',
+      pressed: '#E4EAFF',
       // chart: '',
     },
     stroke: {
@@ -40,6 +41,7 @@ const theme = {
       buttonSecondary: '#8E8E93',
       buttonDisabled: '#D0D3E9',
     },
+    card: '#F6F6F9',
   },
 };
 

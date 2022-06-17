@@ -32,10 +32,11 @@ const NavButton = styled.div`
 
   border-radius: 12px;
 
+  ${borders.primary};
+  ${shadows.card}
+
   ${up.tablet} {
     padding: 10px 10px;
-    ${borders.primaryRGBA};
-    ${shadows.card}
   }
 
   ${up.desktop} {
@@ -74,7 +75,7 @@ const Name = styled.span`
 
   ${up.desktop} {
     display: block;
-    margin-left: 9px;
+    margin-left: 8px;
   }
 `;
 
@@ -82,38 +83,35 @@ const NavLinkMenu = styled(NavLink)`
   &.active {
     ${NavButton} {
       color: ${theme.colors.textIcon.active};
-      font-weight: bold;
+      font-weight: 700;
       letter-spacing: 0.03em;
 
       background: ${theme.colors.bg.activePrimary};
 
-      ${IconBlock} {
-        color: ${theme.colors.textIcon.secondary};
+      border-color: ${theme.colors.bg.buttonPrimary};
 
-        ${NavIcon} {
-          color: ${theme.colors.textIcon.active};
-        }
+      ${NavIcon} {
+        color: ${theme.colors.textIcon.active};
       }
     }
-  }
-
-  /* TODO: temp, delete after release recieve and settings */
-  &.disabled {
-    pointer-events: none;
   }
 
   &:hover {
     ${NavButton} {
-      color: ${theme.colors.textIcon.active};
-
-      ${IconBlock} {
-        color: ${theme.colors.textIcon.active};
-
-        ${NavIcon} {
-          color: ${theme.colors.textIcon.active};
-        }
-      }
+      background-color: ${theme.colors.bg.activePrimary};
     }
+  }
+
+  &:active {
+    ${NavButton} {
+      background-color: ${theme.colors.bg.pressed};
+    }
+  }
+
+  &:focus-visible {
+    border-radius: 12px;
+    outline: ${theme.colors.textIcon.active} solid 1px;
+    outline-offset: 2px;
   }
 `;
 
