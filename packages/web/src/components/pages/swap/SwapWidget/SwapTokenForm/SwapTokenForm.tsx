@@ -3,6 +3,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { styled } from '@linaria/react';
 import { ZERO } from '@orca-so/sdk';
+import { useTokensContext } from '@p2p-wallet-web/core';
 import { theme, up } from '@p2p-wallet-web/ui';
 import type { u64 } from '@solana/spl-token';
 import classNames from 'classnames';
@@ -350,10 +351,11 @@ export const SwapTokenForm: FC<Props> = ({
   const [isOpen, setIsOpen] = useState(false);
   const [filter, setFilter] = useState('');
   const [scrollTop, setScrollTop] = useState(0);
+  const { tokenNameMap } = useTokensContext();
 
   const hasAsyncStandardTokenAccounts = !!asyncStandardTokenAccounts;
 
-  const tokenInfo = tokenConfigs[tokenName];
+  const tokenInfo = tokenNameMap[tokenName.toUpperCase()];
 
   const boxShadow = useMemo(() => {
     return `0 5px 10px rgba(56, 60, 71, ${
@@ -414,8 +416,7 @@ export const SwapTokenForm: FC<Props> = ({
   };
 
   const handleAmountChange = (nextAmount: string) => {
-    const tokenConfig = tokenConfigs[tokenName];
-    const maxDecimals = tokenConfig.decimals;
+    const maxDecimals = tokenInfo.decimals;
     setAmount(parseString(nextAmount, maxDecimals));
   };
 
@@ -567,13 +568,13 @@ export const SwapTokenForm: FC<Props> = ({
                 })}
               >
                 <WalletBalanceIcon name="wallet" />
-                {formatBigNumber(maxAmount, tokenConfigs[tokenName].decimals)}
+                {formatBigNumber(maxAmount, tokenInfo.decimals)}
                 <Max>MAX</Max>
               </AllBalance>
             ) : (
               <>
                 <WalletBalanceIcon name="wallet" />
-                {formatBigNumber(maxAmount, tokenConfigs[tokenName].decimals)} {tokenName}
+                {formatBigNumber(maxAmount, tokenInfo.decimals)} {tokenName}
               </>
             )
           ) : undefined}
@@ -583,7 +584,7 @@ export const SwapTokenForm: FC<Props> = ({
         <TokenSelector>
           <TokenAvatarWrapper className={classNames({ isOpen: isOpen && !tokenName })}>
             {tokenName ? (
-              <TokenAvatar address={tokenInfo?.mint.toString()} size={44} />
+              <TokenAvatar address={tokenInfo?.address} size={44} />
             ) : (
               <WalletTokenIcon name="wallet" />
             )}
@@ -593,8 +594,8 @@ export const SwapTokenForm: FC<Props> = ({
             onClick={handleSelectorClick}
             className={classNames({ isOpen })}
           >
-            <TokenName title={tokenInfo?.mint.toString()}>
-              {tokenName || (tokenInfo?.mint && shortAddress(tokenInfo.mint.toString())) || (
+            <TokenName title={tokenInfo?.address}>
+              {tokenName || (tokenInfo?.address && shortAddress(tokenInfo.address)) || (
                 <EmptyName>—</EmptyName>
               )}
             </TokenName>
@@ -607,6 +608,7 @@ export const SwapTokenForm: FC<Props> = ({
           <InputAmount
             placeholder={Number(0).toFixed(tokenInfo?.decimals || 0)}
             value={trimFormattedNumber(formatBigNumber(amount, tokenInfo?.decimals || 0))}
+            decimals={tokenInfo?.decimals}
             onChange={handleAmountChange}
             disabled={disabled || disabledInput}
           />

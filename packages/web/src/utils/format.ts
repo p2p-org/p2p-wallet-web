@@ -17,10 +17,10 @@ export const formatNumberToUSD = (
     .replace(/,/g, ' ');
 };
 
-export const formatNumber = (str: string | number) => {
+export const formatNumber = (str: string | number, decimals?: number) => {
   str = String(str);
   let res = '';
-  const match = str.match(/^(\d+)(\.\d+)?$/);
+  const match = str.match(/^(\d+)(\.\d*)?$/);
   if (!match) {
     return '';
   }
@@ -36,7 +36,13 @@ export const formatNumber = (str: string | number) => {
     const substr = str.substring(start, end);
     res = substr.concat(res ? ' ' : '', res);
   }
-  return res + (match[2] || '');
+
+  let decimalsStr = match[2];
+  if (decimals && decimalsStr) {
+    decimalsStr = decimalsStr.substring(0, decimals + 1);
+  }
+
+  return res + (decimalsStr || '');
 };
 
 export const trimFormattedNumber = (valueStr: string) => {
