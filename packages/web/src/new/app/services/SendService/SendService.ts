@@ -16,7 +16,7 @@ import {
   SolanaSDKPublicKey,
   toLamport,
 } from 'new/app/sdk/SolanaSDK';
-import type { WalletsRepository } from 'new/models/Repositories';
+import type { WalletsRepository } from 'new/services/Repositories';
 
 import type { FeeServiceType } from '../FeeService';
 import type { RenVMBurnAndReleaseServiceType } from '../RenVM/BurnAndRelease';

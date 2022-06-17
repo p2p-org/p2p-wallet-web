@@ -1,6 +1,6 @@
 import { ZERO } from '@orca-so/sdk';
 import { u64 } from '@solana/spl-token';
-import { action, computed, makeObservable, observable, reaction, runInAction } from 'mobx';
+import { action, computed, flow, makeObservable, observable, reaction } from 'mobx';
 import { Lifecycle, scoped } from 'tsyringe';
 
 import { LogEvent, Logger, Wallet } from 'new/app/sdk/SolanaSDK';
@@ -9,14 +9,10 @@ import { PricesService } from 'new/services/PriceAPIs/PricesService';
 import type { AccountsObservableEvent } from 'new/services/Socket';
 import { AccountObservableService } from 'new/services/Socket';
 import { SolanaService } from 'new/services/SolanaService';
-
-import { Model } from '../Model';
+import { SDListViewModel } from 'new/viewmodels/SDListViewModel';
 
 @scoped(Lifecycle.ContainerScoped)
-export class WalletsRepository extends Model {
-  isInitialized = false;
-  data: Wallet[] = [];
-
+export class WalletsRepository extends SDListViewModel<Wallet> {
   // Properties
 
   private _timer?: NodeJS.Timeout;
@@ -44,11 +40,11 @@ export class WalletsRepository extends Model {
   ) {
     super();
     makeObservable(this, {
-      isInitialized: observable,
-      data: observable,
       nativeWallet: computed,
       isHiddenWalletsShown: observable,
-      toggleIsHiddenWalletShown: action,
+      createRequest: flow,
+      toggleIsHiddenWalletShown: action.bound,
+      toggleWalletVisibility: action.bound,
     });
   }
 
@@ -58,20 +54,17 @@ export class WalletsRepository extends Model {
   }
 
   protected override afterReactionsRemoved() {
+    // TODO: check it works
     this._stopObserving();
   }
 
   // Binding
   private _bind(): void {
-    this.isInitialized = false;
-    this._createRequest().then(() => {
-      runInAction(() => (this.isInitialized = true));
-    });
-
     // observe prices
     reaction(
       () => this._pricesService.currentPrices().pending,
       () => {
+        console.log('before _updatePrices()');
         this._updatePrices();
       },
     );
@@ -117,8 +110,8 @@ export class WalletsRepository extends Model {
 
   // Methods
 
-  private _createRequest(): Promise<void> {
-    return Promise.all([
+  override createRequest = flow(function* (this: WalletsRepository) {
+    return yield Promise.all([
       this._solanaService.provider.connection.getBalance(
         this._solanaService.provider.wallet.publicKey,
         'recent',
@@ -155,17 +148,15 @@ export class WalletsRepository extends Model {
         this._pricesService.addToWatchList(newTokens);
         this._pricesService.fetchPrices(newTokens);
 
-        runInAction(() => {
-          this.data = wallets;
-        });
+        return wallets;
       });
-  }
+  });
 
   private _getNewWallet(): Promise<void> {
     return this._solanaService
       .getTokenWallets(this._solanaService.provider.wallet.publicKey.toString())
       .then((newData) => {
-        let data = this.data;
+        let data = [...this.data];
         let newWallets = newData
           .filter((w1) => !data.some((wallet) => wallet.pubkey === w1.pubkey))
           .filter((w1) => !w1.lamports?.eq(ZERO));
@@ -177,10 +168,13 @@ export class WalletsRepository extends Model {
         return data;
       })
       .then((data) => {
-        runInAction(() => {
-          this.data = data;
-        });
+        this.overrideData(data);
       });
+  }
+
+  // getters
+  get hiddenWallets(): Wallet[] {
+    return this.data.filter((wallet) => wallet.isHidden);
   }
 
   // Actions
@@ -190,7 +184,6 @@ export class WalletsRepository extends Model {
   }
 
   toggleWalletVisibility(wallet: Wallet): void {
-    console.log(1111111, wallet.isHidden);
     if (wallet.isHidden) {
       this._unhideWallet(wallet);
     } else {
@@ -231,11 +224,10 @@ export class WalletsRepository extends Model {
     //   return;
     // }
 
-    runInAction(() => {
-      let wallets = this._mapPrices(this.data);
-      wallets = wallets.sort(Wallet.defaultSorter);
-      this.data = wallets;
-    });
+    let wallets = this._mapPrices(this.data);
+    wallets = wallets.sort(Wallet.defaultSorter);
+    console.log('_updatePrices()', wallets);
+    this.overrideData(wallets);
   }
 
   private _updateWalletsVisibility(): void {
@@ -244,10 +236,8 @@ export class WalletsRepository extends Model {
     //   return;
     // }
 
-    runInAction(() => {
-      const wallets = this._mapVisibility(this.data);
-      this.data = wallets;
-    });
+    const wallets = this._mapVisibility(this.data);
+    this.overrideData(wallets);
   }
 
   private _hideWallet(wallet: Wallet): void {
@@ -271,16 +261,14 @@ export class WalletsRepository extends Model {
   }
 
   private _updateVisibility(wallet: Wallet): void {
-    runInAction(() => {
-      this.updateItem(
-        (item) => item.pubkey === wallet.pubkey,
-        (item) => {
-          // TODO: check new reference
-          item.updateVisibility();
-          return item;
-        },
-      );
-    });
+    this.updateItem(
+      (item) => item.pubkey === wallet.pubkey,
+      (item) => {
+        // TODO: check new reference
+        item.updateVisibility();
+        return item;
+      },
+    );
   }
 
   // Account notifications
@@ -322,30 +310,13 @@ export class WalletsRepository extends Model {
     }
 
     // update
-    runInAction(() => {
-      this.updateItem(
-        (item) => item.pubkey === notification.pubkey,
-        (item) => {
-          // TODO: check new reference
-          item.lamports = notification.lamports;
-          return item;
-        },
-      );
-    });
-  }
-
-  updateItem(predicate: (item: Wallet) => boolean, transform: (item: Wallet) => Wallet) {
-    // modify items
-    let itemsChanged = false;
-    const index = this.data.findIndex(predicate);
-    const item = transform(this.data[index]!);
-    if (item !== this.data[index]) {
-      itemsChanged = true;
-      const data = this.data;
-      data[index] = item;
-      this.data = data;
-    }
-
-    return itemsChanged;
+    this.updateItem(
+      (item) => item.pubkey === notification.pubkey,
+      (item) => {
+        // TODO: check new reference
+        item.lamports = notification.lamports;
+        return item;
+      },
+    );
   }
 }

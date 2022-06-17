@@ -1,7 +1,9 @@
 import { autorun, makeObservable, observable, set, toJS } from 'mobx';
 
 import { Fiat } from 'new/app/models/Fiat';
-import { APIEndpoint } from 'new/app/sdk/SolanaSDK';
+import type { CurrentPrice } from 'new/services/PriceAPIs/PricesService';
+
+import { APIEndpoint } from '../app/sdk/SolanaSDK/models/APIEndpoint';
 
 function makeLocalStorage<T>(_this: { fromJSON(json: T): T }, name: string) {
   const storedJson = localStorage.getItem(name);
@@ -27,8 +29,6 @@ interface DefaultsKeys {
   fiat: Fiat;
 }
 
-console.log(1111, APIEndpoint.defaultEndpoints);
-
 class _Defaults implements DefaultsKeys {
   apiEndPoint: APIEndpoint = APIEndpoint.defaultEndpoints[0]!;
 
@@ -39,6 +39,7 @@ class _Defaults implements DefaultsKeys {
   hideZeroBalances = true;
 
   fiat: Fiat = Fiat.rub;
+  prices: { [key in string]: CurrentPrice } = {};
 
   constructor() {
     makeObservable(this, {
@@ -51,6 +52,7 @@ class _Defaults implements DefaultsKeys {
       hideZeroBalances: observable,
 
       fiat: observable,
+      prices: observable,
     });
     makeLocalStorage(this, 'defaults');
   }

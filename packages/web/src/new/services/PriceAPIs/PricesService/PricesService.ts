@@ -45,6 +45,8 @@ export class PricesService {
       return Promise.resolve({});
     }
 
+    console.log('_getCurrentPricesRequest', coins);
+
     return this._fetcher
       .getCurrentPrices({ coins, toFiat: Defaults.fiat.code.toLowerCase() })
       .then((prices): { [key in string]: CurrentPrice | null } => {
@@ -98,6 +100,8 @@ export class PricesService {
     //   this._getCurrentPricesRequest(tokens).then((prices) => sink(prices));
     // }, this._storage.retrivePrices());
 
+    console.log('fetchPrices()', tokens);
+
     this._currentPrices.refresh();
   }
 
@@ -111,6 +115,7 @@ export class PricesService {
 
   startObserving(): void {
     this.fetchAllTokensPriceInWatchList();
+    // TODO: use timeout
     this._timer = setInterval(() => {
       this.fetchAllTokensPriceInWatchList();
     }, this._refreshInterval);

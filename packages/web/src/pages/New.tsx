@@ -1,11 +1,13 @@
 import type { FC } from 'react';
+import { useEffect } from 'react';
 
 import { styled } from '@linaria/react';
 import { observer } from 'mobx-react-lite';
 
+import { HomeViewModel } from 'new/scenes/Main/Home';
 import { Defaults } from 'new/services/Defaults';
+import { SDFetcherState } from 'new/viewmodels/SDViewModel';
 import { useViewModel } from 'new/viewmodels/useViewModel';
-import { WalletsViewModel } from 'new/viewmodels/WalletsViewModel';
 import { formatNumberTo, formatNumberToUSD } from 'utils/format';
 
 const Wrapper = styled.div``;
@@ -13,22 +15,19 @@ const Wrapper = styled.div``;
 interface Props {}
 
 export const New: FC<Props> = observer((props) => {
-  const vm = useViewModel<WalletsViewModel>(WalletsViewModel);
+  const vm = useViewModel<HomeViewModel>(HomeViewModel);
 
-  // console.log(vm.isInitialized);
-  // console.log(vm.wallets);
+  useEffect(() => {
+    vm.walletsRepository.reload();
+  }, []);
 
   return (
     <Wrapper>
-      <div>
-        {Defaults.fiat.symbol}{' '}
-        {vm.wallets.reduce((acc, wallet) => {
-          return acc + wallet.amountInCurrentFiat;
-        }, 0)}
-      </div>
+      <div>{vm.balance}</div>
 
-      {!vm.isInitialized && 'loading'}
-      {vm.isInitialized && (
+      {vm.walletsRepository.state}
+      {vm.walletsRepository.state === SDFetcherState.loading && 'loading'}
+      {vm.walletsRepository.state === SDFetcherState.loaded && (
         <table>
           <thead>
             <tr>
@@ -41,7 +40,8 @@ export const New: FC<Props> = observer((props) => {
             </tr>
           </thead>
           <tbody>
-            {vm.wallets
+            {vm.walletsRepository
+              .getWallets()
               .filter((wallet) => !wallet.isHidden)
               .map((wallet) => (
                 <tr key={wallet.pubkey.toString()}>
@@ -58,20 +58,23 @@ export const New: FC<Props> = observer((props) => {
                   <td>{wallet.token.extensions?.coingeckoId}</td>
                   <td>
                     {!wallet.isNativeSOL ? (
-                      <button onClick={() => vm.toggleWalletVisibility(wallet)}>Hide</button>
+                      <button onClick={() => vm.walletsRepository.toggleWalletVisibility(wallet)}>
+                        Hide
+                      </button>
                     ) : null}
                   </td>
                 </tr>
               ))}
             <tr>
               <td colSpan={6}>
-                <button onClick={vm.toggleIsHiddenWalletShown}>
-                  {!vm.isHiddenWalletsShown ? 'Show' : 'Hide'} hidden
+                <button onClick={vm.walletsRepository.toggleIsHiddenWalletShown}>
+                  {!vm.walletsRepository.isHiddenWalletsShown ? 'Show' : 'Hide'} hidden
                 </button>
               </td>
             </tr>
-            {vm.isHiddenWalletsShown &&
-              vm.wallets
+            {vm.walletsRepository.isHiddenWalletsShown &&
+              vm.walletsRepository
+                .getWallets()
                 .filter((wallet) => wallet.isHidden)
                 .map((wallet) => (
                   <tr key={wallet.pubkey.toString()}>
@@ -89,7 +92,9 @@ export const New: FC<Props> = observer((props) => {
                     </td>
                     <td>{wallet.token.extensions?.coingeckoId}</td>
                     <td>
-                      <button onClick={() => vm.toggleWalletVisibility(wallet)}>Show</button>
+                      <button onClick={() => vm.walletsRepository.toggleWalletVisibility(wallet)}>
+                        Show
+                      </button>
                     </td>
                   </tr>
                 ))}

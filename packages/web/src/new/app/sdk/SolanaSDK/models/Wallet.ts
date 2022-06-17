@@ -2,9 +2,9 @@ import { ZERO } from '@orca-so/sdk';
 import type { u64 } from '@solana/spl-token';
 import { isEmpty } from 'ramda';
 
-import { Defaults } from 'new/services/Defaults';
 import type { CurrentPrice } from 'new/services/PriceAPIs/PricesService';
 
+import { Defaults } from '../../../../../new/services/Defaults';
 import { Token, TokenAmount } from '../models/SolanaToken';
 
 interface SolanaWalletUserInfo {

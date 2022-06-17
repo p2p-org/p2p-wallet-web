@@ -34,7 +34,7 @@ export class FeeRelayerAPIClient implements FeeRelayerAPIClientType {
     }
     url += '/fee_payer/pubkey';
 
-    return request.get(url).then(({ data }) => data);
+    return request(url).then(({ data }) => data);
   }
 
   requestFreeFeeLimits(authority: string): Promise<Relay.FeeLimitForAuthorityResponse> {
