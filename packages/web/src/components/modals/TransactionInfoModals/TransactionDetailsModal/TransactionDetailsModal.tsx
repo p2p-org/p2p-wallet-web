@@ -25,7 +25,6 @@ import { formatNumber } from 'utils/format';
 import { shortAddress } from 'utils/tokens';
 
 import {
-  BlockWrapper,
   ButtonExplorer,
   CloseIcon,
   CloseWrapper,
@@ -37,7 +36,6 @@ import {
   FieldWrapper,
   Footer,
   Header,
-  OtherIcon,
   ProgressWrapper,
   SendWrapper,
   ShareIcon,
@@ -142,6 +140,10 @@ const PaidByBadge = styled.div`
 
   background: #eff3ff;
   border-radius: 4px;
+`;
+
+const PaddedHeader = styled(Header)`
+  padding: 24px;
 `;
 
 type Props = {
@@ -333,7 +335,7 @@ export const TransactionDetailsModal: FC<Props> = ({ signature, source: sourceAd
           </ValueCurrency>
           <ValueOriginal>
             <AmountUSD
-              prefix={transaction?.details.isReceiver ? '+' : '-'}
+              prefix={transaction?.details.isReceiver ? '+ ' : '- '}
               value={tokenAmount.balance}
             />
           </ValueOriginal>
@@ -353,16 +355,13 @@ export const TransactionDetailsModal: FC<Props> = ({ signature, source: sourceAd
 
   return (
     <WrapperModal close={close}>
-      <Header>
+      <PaddedHeader>
         <Title>{titleCase(transaction?.details.type)}</Title>
         <Desc title={`${transaction?.raw?.slot} SLOT`}>{date}</Desc>
         <CloseWrapper onClick={close}>
           <CloseIcon name="close" />
         </CloseWrapper>
-        <BlockWrapper>
-          {transaction?.details.icon ? <OtherIcon name={transaction.details.icon} /> : undefined}
-        </BlockWrapper>
-      </Header>
+      </PaddedHeader>
       <ProgressWrapper />
       <Content>
         {/* {details.typeOriginal === 'transfer' ? ( */}

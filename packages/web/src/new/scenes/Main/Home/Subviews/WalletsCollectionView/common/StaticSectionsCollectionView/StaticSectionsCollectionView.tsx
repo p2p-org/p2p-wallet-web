@@ -14,6 +14,7 @@ const Wrapper = styled.div``;
 interface Props {
   viewModel: ISDListViewModel;
   numberOfLoadingCells?: number;
+  keyExtractor: (item: any, index: number) => string | number;
   Cell: React.ElementType;
   EmptyCell?: React.ElementType;
   customFilter?: (item: any) => boolean;
@@ -21,7 +22,7 @@ interface Props {
 }
 
 export const StaticSectionsCollectionView: FC<Props> = observer(
-  ({ viewModel, numberOfLoadingCells = 2, Cell, EmptyCell = null, customFilter }) => {
+  ({ viewModel, numberOfLoadingCells = 2, keyExtractor, Cell, EmptyCell = null, customFilter }) => {
     const items = useMemo(() => {
       let _items = viewModel.data;
 
@@ -52,9 +53,13 @@ export const StaticSectionsCollectionView: FC<Props> = observer(
 
     return (
       <Wrapper>
-        {items.map((item) => {
+        {items.map((item, index) => {
           if (!item.isEmptyCell) {
-            return <Cell item={item.value} isLoading={item.isPlaceholder} />;
+            if (item.isPlaceholder) {
+              return <Cell key={item.placeholderIndex} isLoading />;
+            }
+
+            return <Cell key={keyExtractor(item.value, index)} item={item.value} />;
           }
 
           if (item.isEmptyCell && EmptyCell) {

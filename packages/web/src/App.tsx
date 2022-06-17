@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { BrowserRouter, HashRouter, Route, Switch } from 'react-router-dom';
 
+import * as Sentry from '@sentry/react';
 import dayjs from 'dayjs';
 import localizedFormat from 'dayjs/plugin/localizedFormat';
 
@@ -33,33 +34,35 @@ const App: React.FC = () => {
 
   return (
     <>
-      <Router basename={process.env.REACT_APP_BASENAME}>
-        <Providers>
-          <Root>
-            <Main>
-              <Switch>
-                <Route path="/" component={Landing} exact />
-                <Route path="/:type(signup|login)" component={Auth} exact />
-                <AuthRequiredRoute path="/new" component={New} />
-                <AuthRequiredRoute path="/wallets" component={Home} />
-                <AuthRequiredRoute path="/wallet/:publicKey/settings" component={WalletSettings} />
-                <AuthRequiredRoute path="/wallet/:publicKey" exact component={Wallet} />
-                <AuthRequiredRoute path="/receive/(tokens)?" component={Receive} />
-                <AuthRequiredRoute path="/send/:publicKey/:status(result)" component={Send} />
-                <AuthRequiredRoute path="/send/:publicKey?" component={Send} />
-                <AuthRequiredRoute path="/swap/(settings)?/:symbol?" component={Swap} />
-                {/*<AuthRequiredRoute path="/swap/:publicKey?" component={SwapNew} />*/}
-                <AuthRequiredRoute path="/settings/network" component={SettingsNetwork} />
-                <AuthRequiredRoute path="/settings" component={Settings} />
-                <AuthRequiredRoute path="/buy/:symbol?" component={Buy} />
-              </Switch>
-              <Intercom />
-              <FeaturesToggle />
-              <ToastManager anchor="left" renderToast={(props) => <NotifyToast {...props} />} />
-            </Main>
-          </Root>
-        </Providers>
-      </Router>
+      <Sentry.ErrorBoundary>
+        <Router basename={process.env.REACT_APP_BASENAME}>
+          <Providers>
+            <Root>
+              <Main>
+                <Switch>
+                  <Route path="/" component={Landing} exact />
+                  <Route path="/:type(signup|login)" component={Auth} exact />
+                  <AuthRequiredRoute path="/new" component={New} />
+                  <AuthRequiredRoute path="/wallets" component={Home} />
+                  <AuthRequiredRoute path="/wallet/:publicKey/settings" component={WalletSettings} />
+                  <AuthRequiredRoute path="/wallet/:publicKey" exact component={Wallet} />
+                  <AuthRequiredRoute path="/receive/(tokens)?" component={Receive} />
+                  <AuthRequiredRoute path="/send/:publicKey/:status(result)" component={Send} />
+                  <AuthRequiredRoute path="/send/:publicKey?" component={Send} />
+                  <AuthRequiredRoute path="/swap/(settings)?/:symbol?" component={Swap} />
+                  {/*<AuthRequiredRoute path="/swap/:publicKey?" component={SwapNew} />*/}
+                  <AuthRequiredRoute path="/settings/network" component={SettingsNetwork} />
+                  <AuthRequiredRoute path="/settings" component={Settings} />
+                  <AuthRequiredRoute path="/buy/:symbol?" component={Buy} />
+                </Switch>
+                <Intercom />
+                <FeaturesToggle />
+                <ToastManager anchor="left" renderToast={(props) => <NotifyToast {...props} />} />
+              </Main>
+            </Root>
+          </Providers>
+        </Router>
+      </Sentry.ErrorBoundary>
     </>
   );
 };

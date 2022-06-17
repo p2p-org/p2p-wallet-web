@@ -67,6 +67,7 @@ export const HiddenWalletsSection: FC<Props> = observer(({ viewModel }) => {
       {viewModel.isHiddenWalletsShown ? (
         <StaticSectionsCollectionView
           viewModel={viewModel}
+          keyExtractor={(wallet: Wallet) => wallet.pubkey}
           Cell={VisibleWalletCell}
           customFilter={customFilter}
         />

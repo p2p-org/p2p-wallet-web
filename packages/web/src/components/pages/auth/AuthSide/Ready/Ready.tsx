@@ -124,7 +124,7 @@ export const Ready: FC<Props> = ({ setIsLoading, data }) => {
       setIsLoading(true);
       try {
         const secretKey = Array.from(deriveSecretKeyFromSeed(data.seed, 0, data.derivationPath));
-        activate(DefaultWalletType.SecretKey, { secretKey });
+        await activate(DefaultWalletType.SecretKey, { secretKey });
         setEncryptedSeedAndMnemonic(
           {
             seed: data.seed,

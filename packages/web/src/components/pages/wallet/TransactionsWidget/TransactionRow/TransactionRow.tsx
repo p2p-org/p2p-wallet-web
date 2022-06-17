@@ -25,6 +25,8 @@ import { shortAddress } from 'utils/tokens';
 
 import { BaseWrapper } from './common/styled';
 
+const ALFA_CHANNEL = 0.05;
+
 const Wrapper = styled.div`
   position: relative;
 
@@ -37,7 +39,7 @@ const Wrapper = styled.div`
       bottom: 0;
       left: 10px;
 
-      border-bottom: 1px solid ${rgba(0, 0, 0, 0.05)};
+      border-bottom: 1px solid ${rgba(0, 0, 0, ALFA_CHANNEL)};
 
       content: '';
     }
@@ -267,7 +269,7 @@ export const TransactionRow: FunctionComponent<Props> = ({ signature, source: so
               ) : tokenAmount?.balance ? (
                 <Amount className={classNames({ isReceiver: transaction?.details.isReceiver })}>
                   <AmountUSD
-                    prefix={transaction?.details.isReceiver ? '+' : '-'}
+                    prefix={transaction?.details.isReceiver ? '+ ' : '- '}
                     value={tokenAmount.balance}
                   />
                 </Amount>

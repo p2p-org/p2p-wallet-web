@@ -2,6 +2,7 @@
   "name": "@p2p-wallet-web/web",
   "version": "1.0.0",
   "private": true,
+  "main": "index.js",
   "license": "MIT",
   "scripts": {
     "predeploy": "npm run build",
@@ -43,6 +44,8 @@
     "@saberhq/solana-contrib": "^1.13.1",
     "@saberhq/token-utils": "^1.13.6",
     "@saberhq/use-solana": "^1.13.1",
+    "@sentry/react": "^7.1.1",
+    "@sentry/tracing": "^7.1.1",
     "@solana/spl-token": "^0.1.8",
     "@solana/spl-token-registry": "^0.2.3996",
     "@solana/spl-token-swap": "^0.1.3",

@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-import { useCallback } from 'react';
 
 import type { Wallet } from 'new/app/sdk/SolanaSDK';
 import type { WalletsRepository } from 'new/services/Repositories';
@@ -14,22 +13,21 @@ interface Props {
 
 export const WalletsSection: FC<Props> = ({ viewModel }) => {
   // const configureCell = useCallback(({ item }: { item: SDCollectionViewItem }) => {});
-  const customFilter = useCallback((wallet: Wallet) => {
-    if (!wallet) {
-      return false;
-    }
-
-    return !wallet.isHidden;
-  }, []);
-
   return (
     <>
       <Title>Tokens</Title>
       <StaticSectionsCollectionView
         viewModel={viewModel}
+        keyExtractor={(wallet: Wallet) => wallet.pubkey}
         Cell={VisibleWalletCell}
         // configureCell={configureCell}
-        customFilter={customFilter}
+        customFilter={(wallet: Wallet) => {
+          if (!wallet) {
+            return false;
+          }
+
+          return !wallet.isHidden;
+        }}
       />
     </>
   );
