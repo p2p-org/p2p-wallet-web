@@ -1,4 +1,4 @@
-import type { FunctionComponent } from 'react';
+import type { FunctionComponent, ReactElement } from 'react';
 import Skeleton from 'react-loading-skeleton';
 
 import type { CSSProperties } from '@linaria/core';
@@ -11,14 +11,15 @@ import { formatNumberToUSD } from 'utils/format';
 const Wrapper = styled.div``;
 
 type Props = {
-  prefix?: string;
-  value: TokenAmount;
+  prefix?: ReactElement | string;
+  postfix?: ReactElement | string;
+  value?: TokenAmount;
   style?: CSSProperties;
   className?: string;
 };
 
-export const AmountUSD: FunctionComponent<Props> = ({ prefix, value, ...props }) => {
-  const rate = useMarketData(value.token.symbol);
+export const AmountUSD: FunctionComponent<Props> = ({ prefix, postfix, value, ...props }) => {
+  const rate = useMarketData(value?.token.symbol);
 
   if (!rate.loading && !rate.data) {
     return null;
@@ -30,10 +31,11 @@ export const AmountUSD: FunctionComponent<Props> = ({ prefix, value, ...props })
         <Skeleton width={50} />
       ) : rate.data ? (
         <>
-          {prefix ? `${prefix} ` : undefined}
-          {formatNumberToUSD(value.asNumber * rate.data)}
+          {prefix}
+          {formatNumberToUSD((value?.asNumber || 0) * rate.data)}
+          {postfix}
         </>
-      ) : undefined}
+      ) : null}
     </Wrapper>
   );
 };

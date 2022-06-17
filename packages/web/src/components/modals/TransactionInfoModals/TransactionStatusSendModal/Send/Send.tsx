@@ -39,7 +39,7 @@ export const Send: FC<Props> = ({ params: { amount }, transaction }) => {
       </ValueCurrency>
       <ValueOriginal>
         <AmountUSD
-          prefix={transaction?.details.isReceiver ? '+' : '-'}
+          prefix={transaction?.details.isReceiver ? '+ ' : '- '}
           value={tokenAmount?.balance || amount}
         />
       </ValueOriginal>
