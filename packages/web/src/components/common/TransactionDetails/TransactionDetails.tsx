@@ -2,6 +2,7 @@ import type { FC } from 'react';
 
 import { styled } from '@linaria/react';
 import type { TokenAmount } from '@p2p-wallet-web/token-utils';
+import { theme } from '@p2p-wallet-web/ui';
 
 import type { UseSendState } from 'app/contexts';
 import { AmountUSD } from 'components/common/AmountUSD';
@@ -23,7 +24,7 @@ const TokenAndUsd = styled.div`
 const AmountUSDStyled = styled(AmountUSD)`
   margin-left: 8px;
 
-  color: #8e8e93;
+  color: ${theme.colors.textIcon.secondary};
 `;
 
 export const TransactionDetails: FC<TransactionDetailsProps> = ({ sendState, amount }) => {
