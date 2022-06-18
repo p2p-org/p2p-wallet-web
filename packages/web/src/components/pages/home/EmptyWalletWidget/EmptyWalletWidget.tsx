@@ -3,11 +3,9 @@ import { useHistory, useLocation } from 'react-router';
 
 import { styled } from '@linaria/react';
 import { theme, up, useIsMobile } from '@p2p-wallet-web/ui';
-import classNames from 'classnames';
 
 import { ModalType, useModals } from 'app/contexts';
 import { Card } from 'components/common/Card';
-import { LoaderWide } from 'components/common/LoaderWide';
 import { NavButton, NavButtonIcon, NavButtons } from 'components/common/NavButtons';
 
 import rocketImg from './rocket.png';
@@ -17,12 +15,6 @@ const WrapperCard = styled(Card)`
 
   display: grid;
   grid-gap: 8px;
-`;
-
-const Main = styled.div`
-  &.isLoading {
-    visibility: hidden;
-  }
 `;
 
 const Content = styled.div`
@@ -72,11 +64,7 @@ const NavButtonStyled = styled(NavButton)`
   font-size: 20px;
 `;
 
-interface Props {
-  isLoading: boolean;
-}
-
-export const EmptyWalletWidget: FC<Props> = ({ isLoading }) => {
+export const EmptyWalletWidget: FC = () => {
   const history = useHistory();
   const location = useLocation();
   const isMobile = useIsMobile();
@@ -96,24 +84,21 @@ export const EmptyWalletWidget: FC<Props> = ({ isLoading }) => {
 
   return (
     <WrapperCard>
-      {isLoading ? <LoaderWide /> : undefined}
-      <Main className={classNames({ isLoading })}>
-        <Content>
-          <RocketImg src={rocketImg} />
-          <Title>Top up your account to get started</Title>
-          <Description>Make your first deposit or buy with your credit card</Description>
-        </Content>
-        <ButtonsWrapper>
-          <NavButtonsStyled>
-            <NavButtonStyled onClick={handleBuyButtonClick}>
-              <NavButtonIcon name="plus" /> Buy
-            </NavButtonStyled>
-            <NavButtonStyled onClick={handleButtonClick('/receive')}>
-              <NavButtonIcon name="bottom" /> Receive
-            </NavButtonStyled>
-          </NavButtonsStyled>
-        </ButtonsWrapper>
-      </Main>
+      <Content>
+        <RocketImg src={rocketImg} />
+        <Title>Top up your account to get started</Title>
+        <Description>Make your first deposit or buy with your credit card</Description>
+      </Content>
+      <ButtonsWrapper>
+        <NavButtonsStyled>
+          <NavButtonStyled onClick={handleBuyButtonClick}>
+            <NavButtonIcon name="plus" /> Buy
+          </NavButtonStyled>
+          <NavButtonStyled onClick={handleButtonClick('/receive')}>
+            <NavButtonIcon name="bottom" /> Receive
+          </NavButtonStyled>
+        </NavButtonsStyled>
+      </ButtonsWrapper>
     </WrapperCard>
   );
 };

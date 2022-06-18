@@ -44,8 +44,8 @@ export class SolanaSDK {
   constructor({
     provider,
     endpoint,
-    accountStorage,
-  }: {
+  }: // accountStorage,
+  {
     provider: Provider;
     endpoint: APIEndpoint;
     // accountStorage: SolanaSDKAccountStorage;
@@ -763,7 +763,6 @@ export class SolanaSDK {
     if (this.endpoint.network === 'devnet') {
       tokens.push(
         new Token({
-          _tags: null,
           chainId: 101,
           address: 'FsaLodPu4VmSwXGr3gWfwANe4vKf8XSZcCh1CEeJ3jpD',
           symbol: 'renBTC',

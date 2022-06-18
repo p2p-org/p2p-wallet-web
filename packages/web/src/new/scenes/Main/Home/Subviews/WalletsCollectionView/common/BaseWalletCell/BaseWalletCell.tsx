@@ -1,20 +1,21 @@
 import type { FC } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 
 import { styled } from '@linaria/react';
-import { borders, theme, up } from '@p2p-wallet-web/ui';
+import { borders, theme, up, useIsMobile, useIsTablet } from '@p2p-wallet-web/ui';
 
-import { TokenAvatarStyled } from 'components/common/TokenAccountRowContent';
-import { MenuStyled } from 'components/pages/home/TokensWidget/TokenAccountList/TokenAccountRow/TokenMenu';
+import { SwipeToRevealActions } from 'components/common/SwipeToRevealActions';
+import { Icon } from 'components/ui';
 import type { Wallet } from 'new/app/sdk/SolanaSDK';
-import { TokenAccountRowContent } from 'new/ui/views/TokenAccountRowContent';
+import { TokenAccountRowContent, TokenAvatarStyled } from 'new/ui/views/TokenAccountRowContent';
 
-const WrapperLink = styled(Link)`
+import { MenuStyled, TokenMenu } from './TokenMenu';
+
+const wrapperCss = `
   display: flex;
   align-items: center;
   padding: 12px 24px;
-
-  text-decoration: none;
 
   background: ${theme.colors.bg.primary};
 
@@ -24,7 +25,24 @@ const WrapperLink = styled(Link)`
     border: 1px solid transparent;
     border-radius: 12px;
     cursor: pointer;
+  }
+`;
 
+const IconStyled = styled(Icon)`
+  width: 24px;
+  height: 24px;
+`;
+
+const Wrapper = styled.div`
+  ${wrapperCss};
+`;
+
+const WrapperLink = styled(Link)`
+  ${wrapperCss};
+
+  text-decoration: none;
+
+  ${up.tablet} {
     &:hover {
       background: ${theme.colors.bg.activePrimary};
       ${borders.linksRGBA}
@@ -40,15 +58,53 @@ const WrapperLink = styled(Link)`
   }
 `;
 
+const TokenMenuStyled = styled(TokenMenu)`
+  margin-left: 8px;
+`;
+
 interface Props {
   wallet?: Wallet;
-  isLoading: boolean;
+  isPlaceholder?: boolean;
+  isHidden?: boolean;
+  onToggleClick?: () => void;
 }
 
-export const BaseWalletCell: FC<Props> = ({ wallet, isLoading }) => {
+export const BaseWalletCell: FC<Props> = ({
+  wallet,
+  isPlaceholder = false,
+  isHidden = false,
+  onToggleClick,
+}) => {
+  const isMobile = useIsMobile();
+  const isTablet = useIsTablet();
+
+  if (isPlaceholder) {
+    return (
+      <Wrapper>
+        <TokenAccountRowContent isPlaceholder={isPlaceholder} />
+      </Wrapper>
+    );
+  }
+
+  const actions = [
+    {
+      icon: <IconStyled name={isHidden ? 'eye' : 'eye-hide'} />,
+      onClick: onToggleClick,
+    },
+  ];
+
+  // Mobile and not SOL
+  const SwipeOrFragment =
+    isMobile && !wallet?.token.isNativeSOL ? SwipeToRevealActions : React.Fragment;
+
   return (
-    <WrapperLink to={wallet ? `/wallet/${wallet.pubkey}` : ''}>
-      <TokenAccountRowContent wallet={wallet} isLoading={isLoading} />
-    </WrapperLink>
+    <SwipeOrFragment {...(isMobile ? actions : undefined)}>
+      <WrapperLink to={wallet ? `/wallet/${wallet.pubkey}` : ''}>
+        <TokenAccountRowContent wallet={wallet} />
+        {isTablet && wallet ? (
+          <TokenMenuStyled wallet={wallet} isHidden={isHidden} onToggleClick={onToggleClick!} />
+        ) : undefined}
+      </WrapperLink>
+    </SwipeOrFragment>
   );
 };

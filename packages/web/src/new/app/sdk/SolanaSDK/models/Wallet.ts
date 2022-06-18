@@ -1,5 +1,6 @@
 import { ZERO } from '@orca-so/sdk';
 import type { u64 } from '@solana/spl-token';
+import { makeAutoObservable } from 'mobx';
 import { isEmpty } from 'ramda';
 
 import type { CurrentPrice } from 'new/services/PriceAPIs/PricesService';
@@ -44,6 +45,8 @@ export class Wallet {
     this.pubkey = pubkey;
     this.lamports = lamports;
     this.token = token;
+
+    makeAutoObservable(this);
   }
 
   // Computed properties

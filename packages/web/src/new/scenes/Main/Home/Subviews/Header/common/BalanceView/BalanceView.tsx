@@ -55,8 +55,6 @@ interface Props {
 export const BalanceView: FC<Props> = observer(({ viewModel }) => {
   const { username, domain } = useUsername();
 
-  console.log('BalanceView', viewModel.balance);
-
   return (
     <Wrapper>
       <BalanceWrapper>

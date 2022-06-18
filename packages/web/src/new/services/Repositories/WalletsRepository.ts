@@ -62,9 +62,8 @@ export class WalletsRepository extends SDListViewModel<Wallet> {
   private _bind(): void {
     // observe prices
     reaction(
-      () => this._pricesService.currentPrices().pending,
+      () => this._pricesService.currentPrices.pending,
       () => {
-        console.log('before _updatePrices()');
         this._updatePrices();
       },
     );
@@ -226,7 +225,6 @@ export class WalletsRepository extends SDListViewModel<Wallet> {
 
     let wallets = this._mapPrices(this.data);
     wallets = wallets.sort(Wallet.defaultSorter);
-    console.log('_updatePrices()', wallets);
     this.overrideData(wallets);
   }
 

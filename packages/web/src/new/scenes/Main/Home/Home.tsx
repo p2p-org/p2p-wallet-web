@@ -7,7 +7,7 @@ import { observer } from 'mobx-react-lite';
 
 import { Layout } from 'components/common/Layout';
 import { WidgetPage } from 'components/common/WidgetPage';
-import { NavButtonsMenu, TokensWidget } from 'components/pages/home';
+import { NavButtonsMenu } from 'components/pages/home';
 import { EmptyWalletWidget } from 'components/pages/home/EmptyWalletWidget';
 import { HomeViewModel } from 'new/scenes/Main/Home/Home.ViewModel';
 import { WalletsCollectionView } from 'new/scenes/Main/Home/Subviews/WalletsCollectionView';
@@ -23,22 +23,13 @@ const Content = styled.div`
   }
 `;
 
-const TokensWidgetStyled = styled(TokensWidget)`
-  margin-right: -16px;
-  margin-left: -16px;
-
-  ${up.tablet} {
-    margin: inherit;
-  }
-`;
-
 export const Home: FunctionComponent = observer(() => {
   const viewModel = useViewModel<HomeViewModel>(HomeViewModel);
   const isMobile = useIsMobile();
 
   useEffect(() => {
     viewModel.walletsRepository.reload();
-  }, []);
+  }, [viewModel.walletsRepository]);
 
   return (
     <Layout>
@@ -48,11 +39,10 @@ export const Home: FunctionComponent = observer(() => {
             <Header viewModel={viewModel} />
             {isMobile ? <NavButtonsMenu /> : undefined}
             <WalletsCollectionView viewModel={viewModel.walletsRepository} />
-            {/*<TokensWidgetStyled />*/}
           </Content>
         </WidgetPage>
       ) : (
-        <EmptyWalletWidget isLoading={false} />
+        <EmptyWalletWidget />
       )}
     </Layout>
   );

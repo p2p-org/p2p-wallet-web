@@ -1,3 +1,4 @@
+import { computed, makeObservable } from 'mobx';
 import { lazyObservable } from 'mobx-utils';
 import type { ILazyObservable } from 'mobx-utils/lib/lazy-observable';
 import { uniq } from 'ramda';
@@ -13,7 +14,7 @@ import { PricesStorage } from './PricesStorage';
 export class PricesService {
   // Constants
 
-  private _refreshInterval = 15 * 60 * 1000; // 15 minutes
+  private _refreshInterval = 10 * 1000; // 15 minutes
   private _timer?: NodeJS.Timeout;
 
   // Properties
@@ -26,6 +27,10 @@ export class PricesService {
     }, this._storage.retrivePrices());
 
     this._currentPrices.refresh();
+
+    makeObservable(this, {
+      currentPrices: computed,
+    });
   }
 
   // Helpers
@@ -33,34 +38,26 @@ export class PricesService {
   private _getCurrentPricesRequest(
     tokens: string[] | null = null,
   ): Promise<{ [key in string]: CurrentPrice }> {
-    let coins = (tokens ?? Array.from(this._watchList)).map((token): string => {
-      if (token === 'renBTC') {
-        return 'BTC';
-      }
-      return token;
-    });
+    let coins = tokens ?? Array.from(this._watchList);
     coins = uniq(coins); // .filter((token) => !token.includes('-') && !token.includes('/'));
 
     if (coins.length === 0) {
       return Promise.resolve({});
     }
 
-    console.log('_getCurrentPricesRequest', coins);
-
     return this._fetcher
       .getCurrentPrices({ coins, toFiat: Defaults.fiat.code.toLowerCase() })
-      .then((prices): { [key in string]: CurrentPrice | null } => {
-        const pricesNew = { ...prices };
-        pricesNew['renBTC'] = pricesNew['BTC']!;
-        return prices;
-      })
       .then((newPrices) => {
+        // TODO: refactor, because it makes second request
         const prices = this._currentPrices.current() ?? {};
+
         for (const [key, value] of Object.entries(newPrices)) {
           if (value) {
             prices[key] = value;
           }
         }
+        prices['solana'] = { value: Math.floor(Math.random() * (1000 - 10)) + 10 };
+
         return prices;
       })
       .then((newPrices) => {
@@ -72,7 +69,7 @@ export class PricesService {
 
   //
 
-  currentPrices(): ILazyObservable<{ [p: string]: CurrentPrice }> {
+  get currentPrices(): ILazyObservable<{ [p: string]: CurrentPrice }> {
     return this._currentPrices;
   }
 
@@ -99,8 +96,6 @@ export class PricesService {
     // this._currentPrices = lazyObservable((sink) => {
     //   this._getCurrentPricesRequest(tokens).then((prices) => sink(prices));
     // }, this._storage.retrivePrices());
-
-    console.log('fetchPrices()', tokens);
 
     this._currentPrices.refresh();
   }

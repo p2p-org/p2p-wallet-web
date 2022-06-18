@@ -20,9 +20,13 @@ export class HomeViewModel extends ViewModel {
     });
   }
 
-  protected override onInitialize() {}
+  protected override onInitialize() {
+    this.walletsRepository.initialize();
+  }
 
-  protected override afterReactionsRemoved() {}
+  protected override afterReactionsRemoved() {
+    this.walletsRepository.end();
+  }
 
   get isWalletReady(): boolean {
     const state = this.walletsRepository.state;
@@ -52,8 +56,6 @@ export class HomeViewModel extends ViewModel {
   get balance(): string {
     const data = this.walletsRepository.dataObservable ?? [];
     const state = this.walletsRepository.state;
-
-    console.log('balance', state, data);
 
     switch (state) {
       case SDFetcherState.initializing:

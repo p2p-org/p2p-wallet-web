@@ -1,7 +1,8 @@
 import type { FC } from 'react';
-import React, { useMemo } from 'react';
+import React from 'react';
 
 import { styled } from '@linaria/react';
+import { computed } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { nanoid } from 'nanoid';
 
@@ -14,16 +15,23 @@ const Wrapper = styled.div``;
 interface Props {
   viewModel: ISDListViewModel;
   numberOfLoadingCells?: number;
-  keyExtractor: (item: any, index: number) => string | number;
-  Cell: React.ElementType;
-  EmptyCell?: React.ElementType;
+  renderPlaceholder: (key: string) => React.ReactNode;
+  renderItem: (item: any, index: number) => React.ReactNode;
+  renderEmpty?: (key: string) => React.ReactNode;
   customFilter?: (item: any) => boolean;
   configureCell?: ({ item }: { item: SDCollectionViewItem }) => void;
 }
 
 export const StaticSectionsCollectionView: FC<Props> = observer(
-  ({ viewModel, numberOfLoadingCells = 2, keyExtractor, Cell, EmptyCell = null, customFilter }) => {
-    const items = useMemo(() => {
+  ({
+    viewModel,
+    numberOfLoadingCells = 2,
+    renderPlaceholder,
+    renderItem,
+    renderEmpty,
+    customFilter,
+  }) => {
+    const items = computed(() => {
       let _items = viewModel.data;
 
       if (customFilter) {
@@ -39,7 +47,7 @@ export const StaticSectionsCollectionView: FC<Props> = observer(
           }
           break;
         case SDFetcherState.loaded:
-          if (collectionViewItems.length === 0 && EmptyCell) {
+          if (collectionViewItems.length === 0 && renderEmpty) {
             collectionViewItems.push(new SDCollectionViewItem({ emptyCellIndex: nanoid() }));
           }
           break;
@@ -47,23 +55,21 @@ export const StaticSectionsCollectionView: FC<Props> = observer(
           break;
       }
       return collectionViewItems;
-    }, [EmptyCell, numberOfLoadingCells, viewModel.data, viewModel.state]);
-
-    console.log(111, items);
+    }).get();
 
     return (
       <Wrapper>
         {items.map((item, index) => {
           if (!item.isEmptyCell) {
             if (item.isPlaceholder) {
-              return <Cell key={item.placeholderIndex} isLoading />;
+              return renderPlaceholder(item.placeholderIndex!);
             }
 
-            return <Cell key={keyExtractor(item.value, index)} item={item.value} />;
+            return renderItem(item.value, index);
           }
 
-          if (item.isEmptyCell && EmptyCell) {
-            return <EmptyCell key={item.emptyCellIndex} />;
+          if (item.isEmptyCell && renderEmpty) {
+            return renderEmpty(item.emptyCellIndex!);
           }
 
           return null;

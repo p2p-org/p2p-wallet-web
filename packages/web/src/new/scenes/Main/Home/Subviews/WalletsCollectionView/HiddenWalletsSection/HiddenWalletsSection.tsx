@@ -10,7 +10,7 @@ import { Icon } from 'components/ui';
 import type { Wallet } from 'new/app/sdk/SolanaSDK';
 import { StaticSectionsCollectionView } from 'new/scenes/Main/Home/Subviews/WalletsCollectionView/common/StaticSectionsCollectionView';
 import { Title } from 'new/scenes/Main/Home/Subviews/WalletsCollectionView/common/styled';
-import { VisibleWalletCell } from 'new/scenes/Main/Home/Subviews/WalletsCollectionView/common/VisibleWalletCell';
+import { HidedWalletCell } from 'new/scenes/Main/Home/Subviews/WalletsCollectionView/HiddenWalletsSection/HidedWalletCell';
 import type { WalletsRepository } from 'new/services/Repositories';
 
 const ChevronIcon = styled(Icon)`
@@ -53,6 +53,10 @@ export const HiddenWalletsSection: FC<Props> = observer(({ viewModel }) => {
     return wallet.isHidden;
   }, []);
 
+  const handleShowClick = (wallet: Wallet) => {
+    viewModel.toggleWalletVisibility(wallet);
+  };
+
   return (
     <>
       <Title
@@ -67,8 +71,14 @@ export const HiddenWalletsSection: FC<Props> = observer(({ viewModel }) => {
       {viewModel.isHiddenWalletsShown ? (
         <StaticSectionsCollectionView
           viewModel={viewModel}
-          keyExtractor={(wallet: Wallet) => wallet.pubkey}
-          Cell={VisibleWalletCell}
+          renderPlaceholder={(key) => <HidedWalletCell key={key} isPlaceholder />}
+          renderItem={(wallet: Wallet) => (
+            <HidedWalletCell
+              key={wallet.pubkey}
+              wallet={wallet}
+              onShowClick={() => handleShowClick(wallet)}
+            />
+          )}
           customFilter={customFilter}
         />
       ) : null}

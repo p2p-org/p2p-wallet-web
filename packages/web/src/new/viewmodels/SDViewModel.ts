@@ -88,7 +88,6 @@ export abstract class SDViewModel<T> extends ObservableReactionContainer {
   }
 
   handleNewData(newData: T): void {
-    console.log('handleNewData', newData);
     this.data = newData;
     this.error = null;
     this.state = SDFetcherState.loaded;
