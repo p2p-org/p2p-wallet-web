@@ -1,5 +1,4 @@
 import '@abraham/reflection';
-// import './wdyr';
 import 'sanitize.css';
 import './css/nprogress.css';
 import 'react-loading-skeleton/dist/skeleton.css';

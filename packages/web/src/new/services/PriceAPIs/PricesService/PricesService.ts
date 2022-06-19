@@ -14,7 +14,7 @@ import { PricesStorage } from './PricesStorage';
 export class PricesService {
   // Constants
 
-  private _refreshInterval = 10 * 1000; // 15 minutes
+  private _refreshInterval = 15 * 60 * 1000; // 15 minutes
   private _timer?: NodeJS.Timeout;
 
   // Properties
@@ -56,7 +56,6 @@ export class PricesService {
             prices[key] = value;
           }
         }
-        prices['solana'] = { value: Math.floor(Math.random() * (1000 - 10)) + 10 };
 
         return prices;
       })
