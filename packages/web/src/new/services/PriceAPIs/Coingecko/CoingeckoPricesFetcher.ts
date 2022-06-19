@@ -6,7 +6,6 @@ import { PricesFetcher } from 'new/services/PriceAPIs/PricesService';
 @singleton()
 export class CoingeckoPricesFetcher extends PricesFetcher {
   endpoint = 'https://api.coingecko.com/api/v3';
-  // apiKey = '';
 
   // TODO: check coingecko api ids limit
   // TODO: check get request size limit

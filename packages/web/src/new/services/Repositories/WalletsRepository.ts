@@ -172,6 +172,7 @@ export class WalletsRepository extends SDListViewModel<Wallet> {
   }
 
   // getters
+
   get hiddenWallets(): Wallet[] {
     return this.data.filter((wallet) => wallet.isHidden);
   }

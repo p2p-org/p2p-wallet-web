@@ -3,9 +3,10 @@ import type { FC } from 'react';
 import { styled } from '@linaria/react';
 import { up } from '@p2p-wallet-web/ui';
 
-import { HiddenWalletsSection } from 'new/scenes/Main/Home/Subviews/WalletsCollectionView/HiddenWalletsSection';
-import { WalletsSection } from 'new/scenes/Main/Home/Subviews/WalletsCollectionView/WalletsSection';
 import type { WalletsRepository } from 'new/services/Repositories';
+
+import { HiddenWalletsSection } from './HiddenWalletsSection';
+import { WalletsSection } from './WalletsSection';
 
 const Wrapper = styled.div`
   display: grid;

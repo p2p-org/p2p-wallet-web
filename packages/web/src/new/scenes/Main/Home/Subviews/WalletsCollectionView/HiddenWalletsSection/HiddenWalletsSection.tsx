@@ -8,10 +8,11 @@ import { observer } from 'mobx-react-lite';
 
 import { Icon } from 'components/ui';
 import type { Wallet } from 'new/app/sdk/SolanaSDK';
-import { StaticSectionsCollectionView } from 'new/scenes/Main/Home/Subviews/WalletsCollectionView/common/StaticSectionsCollectionView';
-import { Title } from 'new/scenes/Main/Home/Subviews/WalletsCollectionView/common/styled';
-import { HidedWalletCell } from 'new/scenes/Main/Home/Subviews/WalletsCollectionView/HiddenWalletsSection/HidedWalletCell';
 import type { WalletsRepository } from 'new/services/Repositories';
+
+import { StaticSectionsCollectionView } from '../common/StaticSectionsCollectionView';
+import { Title } from '../common/styled';
+import { HidedWalletCell } from './HidedWalletCell';
 
 const ChevronIcon = styled(Icon)`
   width: 16px;

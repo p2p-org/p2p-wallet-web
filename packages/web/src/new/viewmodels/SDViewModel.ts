@@ -98,10 +98,6 @@ export abstract class SDViewModel<T> extends ObservableReactionContainer {
     this.state = SDFetcherState.error;
   }
 
-  // Observable
-  // TODO: check how to do
-  dataDidChange() {}
-
   get dataObservable(): T | null {
     switch (this.state) {
       case SDFetcherState.loaded:

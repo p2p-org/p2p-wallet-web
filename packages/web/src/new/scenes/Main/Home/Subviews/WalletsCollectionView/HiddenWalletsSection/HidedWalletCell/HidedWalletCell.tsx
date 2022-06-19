@@ -1,7 +1,8 @@
 import type { FC } from 'react';
 
 import type { Wallet } from 'new/app/sdk/SolanaSDK';
-import { BaseWalletCell } from 'new/scenes/Main/Home/Subviews/WalletsCollectionView/common/BaseWalletCell';
+
+import { BaseWalletCell } from '../../common/BaseWalletCell';
 
 interface Props {
   wallet?: Wallet;
