@@ -1,7 +1,7 @@
 import type { MintData, TokenAccountData } from "@saberhq/token-utils";
 import { deserializeAccount, deserializeMint } from "@saberhq/token-utils";
 
-import type { AccountParser } from "./useParsedAccountsData";
+import type { AccountParser } from "./hooks";
 
 /**
  * Parses token accounts.

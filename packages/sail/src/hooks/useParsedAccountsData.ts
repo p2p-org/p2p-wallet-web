@@ -5,9 +5,13 @@ import type { KeyedAccountInfo, PublicKey } from "@solana/web3.js";
 import mapValues from "lodash.mapvalues";
 import zip from "lodash.zip";
 
-import type { ParsedAccountDatum, ParserHooks } from "..";
-import { getCacheKeyOfPublicKey, SailAccountParseError, useSail } from "..";
-import { useAccountsData } from "../hooks/useAccountsData";
+import {
+  getCacheKeyOfPublicKey,
+  SailAccountParseError,
+  useSail,
+} from "../index";
+import type { ParsedAccountDatum } from "../internal";
+import { useAccountsData } from "./useAccountsData";
 
 export type AccountParser<T> = (info: KeyedAccountInfo) => T;
 
@@ -21,6 +25,14 @@ export const makeParsersFromCoder = <M>(parsers: AccountParsers<M>) => {
     parsers,
     (p) => (info: KeyedAccountInfo) => p(info.accountInfo.data)
   );
+};
+
+export type ParserHooks<T> = {
+  useSingleData: (key: PublicKey | null | undefined) => {
+    loading: boolean;
+    data: ParsedAccountDatum<T>;
+  };
+  useData: (keys: (PublicKey | null | undefined)[]) => ParsedAccountDatum<T>[];
 };
 
 /**
@@ -106,11 +118,11 @@ export const useParsedAccountsData = <T>(
   }, [data, keys, onError, parser]);
 
   return useMemo(() => {
-    return keys.map((k) => {
-      if (!k) {
-        return k;
+    return keys.map((key) => {
+      if (!key) {
+        return key;
       }
-      return parsed[getCacheKeyOfPublicKey(k)];
+      return parsed[getCacheKeyOfPublicKey(key)];
     });
   }, [keys, parsed]);
 };

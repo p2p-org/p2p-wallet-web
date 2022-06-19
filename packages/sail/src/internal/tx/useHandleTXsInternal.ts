@@ -5,8 +5,14 @@ import type {
   PendingTransaction,
   TransactionEnvelope,
 } from "@saberhq/solana-contrib";
+import { generateUncheckedInspectLink } from "@saberhq/solana-contrib";
 import { useSolana } from "@saberhq/use-solana";
-import type { ConfirmOptions, Finality, Transaction } from "@solana/web3.js";
+import type {
+  ConfirmOptions,
+  Finality,
+  PublicKey,
+  Transaction,
+} from "@solana/web3.js";
 import type { OperationOptions } from "retry";
 import invariant from "tiny-invariant";
 
@@ -19,34 +25,24 @@ import {
   SailTransactionSignError,
   SailUnknownTXFailError,
 } from "../../errors";
-import { uniqKeys } from "../../utils";
-import type { UseAccounts } from "..";
+import type { UseAccounts } from "../../index";
 
 const DEBUG_MODE =
   !!process.env.REACT_APP_LOCAL_PUBKEY ||
   !!process.env.LOCAL_PUBKEY ||
   !!process.env.DEBUG_MODE;
 
-/**
- * Response when transactions are handled.
- */
 export interface HandleTXResponse {
   success: boolean;
   pending: PendingTransaction | null;
-  errors?: readonly SailError[];
+  errors?: SailError[];
 }
 
 export interface HandleTXsResponse {
   success: boolean;
-  pending: readonly PendingTransaction[];
-  errors?: readonly SailError[];
+  pending: PendingTransaction[];
+  errors?: SailError[];
 }
-
-/**
- * Generates a random identifier for a handled transaction.
- * @returns string
- */
-const genRandomBundleID = (): string => `bundle-${Math.random()}`;
 
 export interface UseHandleTXsArgs extends Pick<UseAccounts, "refetchMany"> {
   /**
@@ -55,50 +51,11 @@ export interface UseHandleTXsArgs extends Pick<UseAccounts, "refetchMany"> {
   txRefetchDelayMs?: number;
 
   /**
-   * Called right before a {@link TransactionEnvelope} is sent.
-   */
-  onBeforeTxSend?: (args: {
-    /**
-     * Unique identifier for the bundle of transactions.
-     */
-    bundleID: string;
-    /**
-     * The {@link Network} this transaction is taking place on.
-     */
-    network: Network;
-    /**
-     * The {@link TransactionEnvelope}s about to be sent.
-     */
-    txs: readonly TransactionEnvelope[];
-    /**
-     * Message identifying the transaction.
-     */
-    message?: string;
-  }) => void;
-
-  /**
-   * Called whenever a {@link TransactionEnvelope} is sent.
+   * Called whenever a Transaction is sent.
    */
   onTxSend?: (args: {
-    /**
-     * Unique identifier for the bundle of transactions.
-     */
-    bundleID: string;
-    /**
-     * The {@link Network} this transaction is taking place on.
-     */
     network: Network;
-    /**
-     * The {@link TransactionEnvelope}s that were sent.
-     */
-    txs: readonly TransactionEnvelope[];
-    /**
-     * Pending transactions.
-     */
-    pending: readonly PendingTransaction[];
-    /**
-     * Message identifying the transaction.
-     */
+    pending: PendingTransaction[];
     message?: string;
   }) => void;
 
@@ -118,73 +75,49 @@ export interface HandleTXOptions extends ConfirmOptions {
    * Options to pass in after a refetch has occured.
    */
   refetchAfterTX?: OperationOptions & {
-    /**
-     * Commitment of the confirmed transaction to fetch.
-     */
     commitment?: Finality;
     /**
      * Delay for the writable accounts to be refetched into the cache after a transaction.
      */
     refetchDelayMs?: number;
-    /**
-     * Whether or not to use websockets for awaiting confirmation. Defaults to `false`.
-     */
-    useWebsocket?: boolean;
   };
   /**
-   * Whether or not to handle the TX envelope in debug mode.
+   * Fee payer
    */
-  debugMode?: boolean;
+  feePayer?: PublicKey;
 }
 
-/**
- * Function which signs and sends a {@link TransactionEnvelope}.
- */
-export type HandleTX = (
-  txEnv: TransactionEnvelope,
-  msg?: string,
-  options?: HandleTXOptions
-) => Promise<HandleTXResponse>;
-
-/**
- * Function which signs and sends a set of {@link TransactionEnvelope}.
- */
-export type HandleTXs = (
-  txEnv: readonly TransactionEnvelope[],
-  msg?: string,
-  options?: HandleTXOptions
-) => Promise<HandleTXsResponse>;
-export interface UseHandleTXs {
-  /**
-   * Signs and sends a transaction using the provider on the {@link TransactionEnvelope}.
-   */
-  handleTX: HandleTX;
-  /**
-   * Signs and sends multiple transactions using the provider on the first {@link TransactionEnvelope}.
-   * These transactions are only sent if all of them are signed.
-   */
-  handleTXs: HandleTXs;
+export interface UseHandleTXsInternal {
+  handleTX: (
+    txEnv: TransactionEnvelope,
+    msg?: string,
+    options?: HandleTXOptions
+  ) => Promise<HandleTXResponse>;
+  handleTXs: (
+    txEnv: TransactionEnvelope[],
+    msg?: string,
+    options?: HandleTXOptions
+  ) => Promise<HandleTXsResponse>;
 }
 
 export const useHandleTXsInternal = ({
   refetchMany,
-  onBeforeTxSend,
   onTxSend,
   onError,
   txRefetchDelayMs = 1_000,
   waitForConfirmation = false,
-}: UseHandleTXsArgs): UseHandleTXs => {
+}: UseHandleTXsArgs): UseHandleTXsInternal => {
   const { network } = useSolana();
 
   const handleTXs = useCallback(
     async (
-      txs: readonly TransactionEnvelope[],
+      txs: TransactionEnvelope[],
       message?: string,
       options?: HandleTXOptions
     ): Promise<{
       success: boolean;
-      pending: readonly PendingTransaction[];
-      errors?: readonly SailError[];
+      pending: PendingTransaction[];
+      errors?: SailError[];
     }> => {
       if (txs.length === 0) {
         return {
@@ -193,7 +126,7 @@ export const useHandleTXsInternal = ({
         };
       }
 
-      if (options?.debugMode ?? DEBUG_MODE) {
+      if (DEBUG_MODE) {
         const txTable = await Promise.all(
           txs.map(async (tx) => {
             return await tx.simulateTable({ verifySigners: false, ...options });
@@ -202,24 +135,20 @@ export const useHandleTXsInternal = ({
         txs.forEach((tx, i) => {
           const table = txTable[i];
           if (network !== "localnet") {
-            console.debug(tx.generateInspectLink(network));
+            console.debug(generateUncheckedInspectLink(network, tx.build()));
           }
           console.debug(table);
         });
       }
-
-      const bundleID = genRandomBundleID();
-      onBeforeTxSend?.({ bundleID, network, txs, message });
-
       try {
         const firstTX = txs[0];
         invariant(firstTX, "firstTX");
         const provider = firstTX.provider;
 
-        // TODO(igm): when we support other accounts being the payer,
-        // we need to alter this check
         const nativeBalance = (
-          await provider.getAccountInfo(provider.wallet.publicKey)
+          await provider.getAccountInfo(
+            options?.feePayer || provider.wallet.publicKey
+          )
         )?.accountInfo.lamports;
         if (!nativeBalance || nativeBalance === 0) {
           const error = new InsufficientSOLError(nativeBalance);
@@ -234,7 +163,10 @@ export const useHandleTXsInternal = ({
         let signedTXs: Transaction[];
         try {
           signedTXs = await provider.signer.signAll(
-            txs.map((tx) => ({ tx: tx.build(), signers: tx.signers })),
+            txs.map((tx) => ({
+              tx: tx.build(options?.feePayer),
+              signers: tx.signers,
+            })),
             options
           );
         } catch (e) {
@@ -287,7 +219,9 @@ export const useHandleTXsInternal = ({
         }
 
         // get the unique writable keys for every transaction
-        const writable = uniqKeys(txs.flatMap((tx) => tx.writableKeys));
+        const writable = [
+          ...new Set([...txs.flatMap((tx) => tx.writableKeys)]),
+        ];
 
         // refetch everything
         void (async () => {
@@ -315,21 +249,32 @@ export const useHandleTXsInternal = ({
             // then fetch, after a delay
             setTimeout(() => {
               void refetchMany(writable).catch((e) => {
-                onError(new SailRefetchAfterTXError(e, writable, pending));
+                onError(
+                  new SailRefetchAfterTXError(
+                    e,
+                    writable,
+                    pending.map((p) => p.signature)
+                  )
+                );
               });
             }, refetchAfterTX?.refetchDelayMs ?? txRefetchDelayMs);
           } catch (e) {
-            onError(new SailRefetchAfterTXError(e, writable, pending));
+            onError(
+              new SailRefetchAfterTXError(
+                e,
+                writable,
+                pending.map((p) => p.signature)
+              )
+            );
           }
         })();
-
-        onTxSend?.({ bundleID, network, txs, pending, message });
 
         if (waitForConfirmation) {
           // await for the tx to be confirmed
           await Promise.all(pending.map((p) => p.wait()));
         }
 
+        onTxSend?.({ network, pending, message });
         return {
           success: true,
           pending,
@@ -350,14 +295,16 @@ export const useHandleTXsInternal = ({
         });
 
         const sailError: SailError =
-          SailError.tryInto(e) ?? new SailUnknownTXFailError(e, network, txs);
+          e instanceof SailError ||
+          ("_isSailError" in (e as SailError) && (e as SailError)._isSailError)
+            ? (e as SailError)
+            : new SailUnknownTXFailError(e, network, txs);
         onError(sailError);
         return { success: false, pending: [], errors: [sailError] };
       }
     },
     [
       network,
-      onBeforeTxSend,
       onError,
       onTxSend,
       refetchMany,
@@ -374,7 +321,7 @@ export const useHandleTXsInternal = ({
     ): Promise<{
       success: boolean;
       pending: PendingTransaction | null;
-      errors?: readonly SailError[];
+      errors?: SailError[];
     }> => {
       const { success, pending, errors } = await handleTXs(
         [txEnv],

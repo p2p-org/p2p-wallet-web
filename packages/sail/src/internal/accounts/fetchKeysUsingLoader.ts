@@ -8,13 +8,15 @@ import type { AccountLoader } from "./useAccountsInternal";
 
 export const fetchKeysUsingLoader = async (
   loader: AccountLoader,
-  keys: readonly PublicKey[]
+  keys: (PublicKey | null | undefined)[]
 ): Promise<AccountFetchResult[]> => {
-  const keysWithIndex = keys.map((k, i) => [k, i] as const);
-  const result = await loader.loadMany(keysWithIndex.map((k) => k[0]));
-  const nextData: AccountFetchResult[] = keys.map(() => ({ data: null }));
-
-  zip(keysWithIndex, result).forEach(([indexInfo, keyResult]) => {
+  const keysWithIndex = keys.map((k, i) => [k, i]);
+  const keysSpecified = keysWithIndex.filter(
+    (args): args is [PublicKey, number] => !!args[0]
+  );
+  const result = await loader.loadMany(keysSpecified.map((k) => k[0]));
+  const nextData: AccountFetchResult[] = keys.map(() => ({ data: undefined }));
+  zip(keysSpecified, result).forEach(([indexInfo, keyResult]) => {
     invariant(indexInfo, "index info missing");
     invariant(keyResult !== undefined, "key result missing");
 

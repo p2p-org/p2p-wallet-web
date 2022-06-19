@@ -1,12 +1,12 @@
 import { useCallback, useMemo } from "react";
 
-import { TokenAmount } from "@p2p-wallet-web/token-utils";
 import { RAW_SOL } from "@saberhq/token-utils";
 import { useConnectedWallet, useConnectionContext } from "@saberhq/use-solana";
 import type { AccountInfo } from "@solana/web3.js";
 
-import type { AccountParser } from "../parsers";
-import { useParsedAccountData } from "../parsers";
+import type { AccountParser } from "./useParsedAccountsData";
+import { useParsedAccountData } from "./useParsedAccountsData";
+import { TokenAmount } from "@p2p-wallet-web/token-utils";
 
 /**
  * Uses the data of the raw SOL account.

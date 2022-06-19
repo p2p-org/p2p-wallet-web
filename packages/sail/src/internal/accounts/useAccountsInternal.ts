@@ -1,18 +1,17 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { unstable_batchedUpdates } from "react-dom";
 
-import { exists } from "@saberhq/solana-contrib";
 import { useConnectionContext } from "@saberhq/use-solana";
 import type { AccountInfo } from "@solana/web3.js";
 import { PublicKey } from "@solana/web3.js";
 import DataLoader from "dataloader";
 
-import type { SailError } from "../../";
+import type { AccountFetchResult, SailError } from "../../";
 import { SailRefetchSubscriptionsError } from "../../";
-import type { CacheBatchUpdateEvent } from "./emitter";
+import type { CacheUpdateEvent } from "./emitter";
 import { AccountsEmitter } from "./emitter";
 import { fetchKeysUsingLoader } from "./fetchKeysUsingLoader";
-import type { AccountDatum, AccountFetchResult } from "./types";
+import type { AccountDatum } from "./types";
 import { getMultipleAccounts } from "./utils/getMultipleAccounts";
 
 /**
@@ -21,7 +20,7 @@ import { getMultipleAccounts } from "./utils/getMultipleAccounts";
  * @returns
  */
 export const getCacheKeyOfPublicKey = (pubkey: PublicKey): string =>
-  pubkey.toString();
+  pubkey.toBuffer().toString("base64");
 
 export type AccountLoader = DataLoader<
   PublicKey,
@@ -58,41 +57,6 @@ export interface UseAccountsArgs {
   onError: (err: SailError) => void;
 }
 
-/**
- * Function signature for fetching keys.
- */
-export type FetchKeysFn = (
-  keys: readonly PublicKey[]
-) => Promise<AccountFetchResult[]>;
-
-/**
- * Fetches keys, passing through null/undefined values.
- * @param fetchKeys
- * @param keys
- * @returns
- */
-export const fetchKeysMaybe = async (
-  fetchKeys: FetchKeysFn,
-  keys: readonly (PublicKey | null | undefined)[]
-): Promise<(AccountFetchResult | null | undefined)[]> => {
-  const keysWithIndex = keys.map((k, i) => [k, i] as const);
-  const nonEmptyKeysWithIndex = keysWithIndex.filter(
-    (key): key is readonly [PublicKey, number] => exists(key[0])
-  );
-  const nonEmptyKeys = nonEmptyKeysWithIndex.map((n) => n[0]);
-  const accountsData = await fetchKeys(nonEmptyKeys);
-
-  const result: (AccountFetchResult | null | undefined)[] = keys.slice() as (
-    | AccountFetchResult
-    | null
-    | undefined
-  )[];
-  nonEmptyKeysWithIndex.forEach(([_, originalIndex], i) => {
-    result[originalIndex] = accountsData[i];
-  });
-  return result;
-};
-
 export interface UseAccounts extends Omit<UseAccountsArgs, "onError"> {
   /**
    * The loader. Usually should not be used directly.
@@ -115,7 +79,7 @@ export interface UseAccounts extends Omit<UseAccountsArgs, "onError"> {
    * Refetches multiple accounts.
    */
   refetchMany: (
-    keys: readonly PublicKey[]
+    keys: PublicKey[]
   ) => Promise<(AccountInfo<Buffer> | Error | null)[]>;
   /**
    * Refetches all accounts that are being subscribed to.
@@ -123,14 +87,16 @@ export interface UseAccounts extends Omit<UseAccountsArgs, "onError"> {
   refetchAllSubscriptions: () => Promise<void>;
 
   /**
-   * Registers a callback to be called whenever a batch of items is cached.
+   * Registers a callback to be called whenever an item is cached.
    */
-  onBatchCache: (cb: (args: CacheBatchUpdateEvent) => void) => void;
+  onCache: (cb: (args: CacheUpdateEvent) => void) => void;
 
   /**
    * Fetches the data associated with the given keys, via the AccountLoader.
    */
-  fetchKeys: FetchKeysFn;
+  fetchKeys: (
+    keys: (PublicKey | null | undefined)[]
+  ) => Promise<AccountFetchResult[]>;
 
   /**
    * Causes a key to be refetched periodically.
@@ -177,19 +143,16 @@ export const useAccountsInternal = (args: UseAccountsArgs): UseAccounts => {
             connection,
             keys,
             onError,
-            "confirmed"
+            "recent"
           );
           unstable_batchedUpdates(() => {
-            const batch = new Set<string>();
             result.array.forEach((info, i) => {
               const addr = keys[i];
               if (addr && !(info instanceof Error)) {
-                const cacheKey = getCacheKeyOfPublicKey(addr);
-                accountsCache.set(cacheKey, info);
-                batch.add(cacheKey);
+                accountsCache.set(getCacheKeyOfPublicKey(addr), info);
+                emitter.raiseCacheUpdated(addr, true);
               }
             });
-            emitter.raiseBatchCacheUpdated(batch);
           });
           return result.array;
         },
@@ -203,13 +166,13 @@ export const useAccountsInternal = (args: UseAccountsArgs): UseAccounts => {
   );
 
   const fetchKeys = useCallback(
-    async (keys: readonly PublicKey[]) => {
+    async (keys: (PublicKey | null | undefined)[]) => {
       return await fetchKeysUsingLoader(accountLoader, keys);
     },
     [accountLoader]
   );
 
-  const onBatchCache = emitter.onBatchCache;
+  const onCache = useMemo(() => emitter.onCache.bind(emitter), [emitter]);
 
   const refetch = useCallback(
     async (key: PublicKey) => {
@@ -220,7 +183,7 @@ export const useAccountsInternal = (args: UseAccountsArgs): UseAccounts => {
   );
 
   const refetchMany = useCallback(
-    async (keys: readonly PublicKey[]) => {
+    async (keys: PublicKey[]) => {
       keys.forEach((key) => {
         accountLoader.clear(key);
       });
@@ -262,7 +225,7 @@ export const useAccountsInternal = (args: UseAccountsArgs): UseAccounts => {
 
   const refetchAllSubscriptions = useCallback(async () => {
     const keysToFetch = [...subscribedAccounts.keys()].map((keyStr) => {
-      return new PublicKey(keyStr);
+      return new PublicKey(Buffer.from(keyStr, "base64"));
     });
     await refetchMany(keysToFetch);
   }, [refetchMany, subscribedAccounts]);
@@ -303,9 +266,7 @@ export const useAccountsInternal = (args: UseAccountsArgs): UseAccounts => {
     refetch,
     refetchMany,
     refetchAllSubscriptions,
-
-    onBatchCache,
-
+    onCache,
     fetchKeys,
     subscribe,
 
