@@ -4444,7 +4444,7 @@
   resolved "https://registry.yarnpkg.com/@rushstack/eslint-patch/-/eslint-patch-1.1.0.tgz#7f698254aadf921e48dda8c0a6b304026b8a9323"
   integrity sha512-JLo+Y592QzIE+q7Dl2pMUtt4q8SKYI5jDrZxrozEQxnGVOyYE+GWK9eLkwTaeN9DDctlaRAQ3TBmzZ1qdLE30A==
 
-"@saberhq/anchor-contrib@^1.13.6":
+"@saberhq/anchor-contrib@^1.12.58":
   version "1.13.29"
   resolved "https://registry.yarnpkg.com/@saberhq/anchor-contrib/-/anchor-contrib-1.13.29.tgz#41bf4fdabfb6396c207ca17e7788f15a7628f1bc"
   integrity sha512-dis2IUqt+cE3pHgLhkOyRCiEqjo3tSyyuF08LEN1ypSjuOqYEotsZCddJsf4ZVyFqBUjwr70HjvwPTxkVZJagg==
@@ -4462,7 +4462,7 @@
   dependencies:
     tslib "^2.4.0"
 
-"@saberhq/solana-contrib@^1.13.29":
+"@saberhq/solana-contrib@^1.12.60", "@saberhq/solana-contrib@^1.13.29":
   version "1.13.29"
   resolved "https://registry.yarnpkg.com/@saberhq/solana-contrib/-/solana-contrib-1.13.29.tgz#e699d63b597172f64d66fa3a465baf5237aa7995"
   integrity sha512-aZJYwfY5Sq1TIeeQJ1AbDudoGsYXcMHe/gE2JWMx3R2EU1AxGpVdXWUi0Y8jkRzLnYfAt3SIfUH4lRs5zfe5Fw==
