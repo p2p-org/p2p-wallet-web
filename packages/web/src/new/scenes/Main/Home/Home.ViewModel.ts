@@ -2,11 +2,11 @@ import { ZERO } from '@orca-so/sdk';
 import { computed, makeObservable } from 'mobx';
 import { injectable } from 'tsyringe';
 
+import { SDFetcherState } from 'new/core/viewmodels/SDViewModel';
+import { ViewModel } from 'new/core/viewmodels/ViewModel';
 import { Defaults } from 'new/services/Defaults';
 import { PricesService } from 'new/services/PriceAPIs/PricesService';
 import { WalletsRepository } from 'new/services/Repositories';
-import { SDFetcherState } from 'new/viewmodels/SDViewModel';
-import { ViewModel } from 'new/viewmodels/ViewModel';
 
 @injectable()
 export class HomeViewModel extends ViewModel {

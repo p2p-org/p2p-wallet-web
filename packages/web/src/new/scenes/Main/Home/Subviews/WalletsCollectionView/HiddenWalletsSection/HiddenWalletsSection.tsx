@@ -70,7 +70,7 @@ export const HiddenWalletsSection: FC<Props> = observer(({ viewModel }) => {
         </ChevronWrapper>
       </Title>
       {viewModel.isHiddenWalletsShown ? (
-        <StaticSectionsCollectionView
+        <StaticSectionsCollectionView<Wallet>
           viewModel={viewModel}
           renderPlaceholder={(key) => <HidedWalletCell key={key} isPlaceholder />}
           renderItem={(wallet: Wallet) => (

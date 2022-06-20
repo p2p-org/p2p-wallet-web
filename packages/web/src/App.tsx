@@ -15,7 +15,6 @@ import { Root } from 'new/scenes/Root';
 import { Auth } from 'pages/Auth';
 import { Buy } from 'pages/Buy';
 import { Landing } from 'pages/Landing';
-// import { New } from 'pages/New';
 import { Receive } from 'pages/Receive';
 import { Send } from 'pages/Send';
 import { Settings } from 'pages/Settings';
@@ -42,7 +41,6 @@ const App: React.FC = () => {
                 <Switch>
                   <Route path="/" component={Landing} exact />
                   <Route path="/:type(signup|login)" component={Auth} exact />
-                  {/*<AuthRequiredRoute path="/new" component={New} />*/}
                   <AuthRequiredRoute path="/wallets" component={Home} />
                   <AuthRequiredRoute
                     path="/wallet/:publicKey/settings"
@@ -53,7 +51,6 @@ const App: React.FC = () => {
                   <AuthRequiredRoute path="/send/:publicKey/:status(result)" component={Send} />
                   <AuthRequiredRoute path="/send/:publicKey?" component={Send} />
                   <AuthRequiredRoute path="/swap/(settings)?/:symbol?" component={Swap} />
-                  {/*<AuthRequiredRoute path="/swap/:publicKey?" component={SwapNew} />*/}
                   <AuthRequiredRoute path="/settings/network" component={SettingsNetwork} />
                   <AuthRequiredRoute path="/settings" component={Settings} />
                   <AuthRequiredRoute path="/buy/:symbol?" component={Buy} />

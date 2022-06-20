@@ -19,7 +19,7 @@ export const WalletsSection: FC<Props> = ({ viewModel }) => {
   return (
     <>
       <Title>Tokens</Title>
-      <StaticSectionsCollectionView
+      <StaticSectionsCollectionView<Wallet>
         viewModel={viewModel}
         renderPlaceholder={(key) => <VisibleWalletCell key={key} isPlaceholder />}
         renderItem={(wallet: Wallet) => (

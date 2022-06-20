@@ -1,7 +1,7 @@
 import { action, computed, flow, makeObservable, observable } from 'mobx';
 import type { CancellablePromise } from 'mobx/dist/api/flow';
 
-import { ObservableReactionContainer } from '../core/ObservableReactionContainer';
+import { ObservableReactionContainer } from '../ObservableReactionContainer';
 
 export enum SDFetcherState {
   initializing = 'initializing',

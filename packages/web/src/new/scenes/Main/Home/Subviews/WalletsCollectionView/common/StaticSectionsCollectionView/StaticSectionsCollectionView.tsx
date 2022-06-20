@@ -1,4 +1,3 @@
-import type { FC } from 'react';
 import React from 'react';
 
 import { styled } from '@linaria/react';
@@ -7,30 +6,30 @@ import { observer } from 'mobx-react-lite';
 import { nanoid } from 'nanoid';
 
 import { SDCollectionViewItem } from 'new/app/models/SDCollectionViewItem';
-import type { ISDListViewModel } from 'new/viewmodels/SDListViewModel';
-import { SDFetcherState } from 'new/viewmodels/SDViewModel';
+import type { ISDListViewModel } from 'new/core/viewmodels/SDListViewModel';
+import { SDFetcherState } from 'new/core/viewmodels/SDViewModel';
 
 const Wrapper = styled.div``;
 
-interface Props {
-  viewModel: ISDListViewModel;
+interface Props<T> {
+  viewModel: ISDListViewModel<T>;
   numberOfLoadingCells?: number;
   renderPlaceholder: (key: string) => React.ReactNode;
-  renderItem: (item: any, index: number) => React.ReactNode;
+  renderItem: (item: T, index: number) => React.ReactNode;
   renderEmpty?: (key: string) => React.ReactNode;
-  customFilter?: (item: any) => boolean;
+  customFilter?: (item: T) => boolean;
   configureCell?: ({ item }: { item: SDCollectionViewItem }) => void;
 }
 
-export const StaticSectionsCollectionView: FC<Props> = observer(
-  ({
+export const StaticSectionsCollectionView = observer(
+  <T,>({
     viewModel,
     numberOfLoadingCells = 2,
     renderPlaceholder,
     renderItem,
     renderEmpty,
     customFilter,
-  }) => {
+  }: Props<T>) => {
     const items = computed(() => {
       let _items = viewModel.data;
 

@@ -4,12 +4,12 @@ import { action, computed, flow, makeObservable, observable, reaction } from 'mo
 import { Lifecycle, scoped } from 'tsyringe';
 
 import { LogEvent, Logger, Wallet } from 'new/app/sdk/SolanaSDK';
+import { SDListViewModel } from 'new/core/viewmodels/SDListViewModel';
 import { Defaults } from 'new/services/Defaults';
 import { PricesService } from 'new/services/PriceAPIs/PricesService';
 import type { AccountsObservableEvent } from 'new/services/Socket';
 import { AccountObservableService } from 'new/services/Socket';
 import { SolanaService } from 'new/services/SolanaService';
-import { SDListViewModel } from 'new/viewmodels/SDListViewModel';
 
 @scoped(Lifecycle.ContainerScoped)
 export class WalletsRepository extends SDListViewModel<Wallet> {

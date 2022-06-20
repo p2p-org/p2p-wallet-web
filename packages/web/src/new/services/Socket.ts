@@ -39,6 +39,8 @@ export class AccountObservableService {
     account: string,
     cb: (notification: AccountsObservableEvent) => void,
   ) {
+    // TODO: maybe not subscribe if exists
+
     this._connection.onAccountChange(new PublicKey(account), (accountInfo) => {
       const pubkey = account;
 

@@ -14,7 +14,7 @@ const Wrapper = styled.div`
   align-items: center;
 `;
 
-// export for styling on hover in TokenAcountRow
+// export for styling on hover in TokenAccountRow
 export const MenuStyled = styled(Menu)``;
 
 interface Props extends HTMLAttributes<HTMLDivElement> {

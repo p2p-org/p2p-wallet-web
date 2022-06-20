@@ -1,1 +1,0 @@
-export { TokenAccountList } from './TokenAccountList';

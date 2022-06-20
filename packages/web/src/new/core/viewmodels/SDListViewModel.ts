@@ -3,12 +3,12 @@ import { action, makeObservable, observable } from 'mobx';
 import type { SDFetcherState } from './SDViewModel';
 import { SDViewModel } from './SDViewModel';
 
-export interface ISDListViewModel {
+export interface ISDListViewModel<T> {
   state: SDFetcherState;
-  data: any[];
+  data: T[];
 }
 
-export abstract class SDListViewModel<T> extends SDViewModel<T[]> implements ISDListViewModel {
+export abstract class SDListViewModel<T> extends SDViewModel<T[]> implements ISDListViewModel<T> {
   // Properties
 
   isPaginationEnabled: boolean;

@@ -7,13 +7,13 @@ import { observer } from 'mobx-react-lite';
 
 import { Layout } from 'components/common/Layout';
 import { WidgetPage } from 'components/common/WidgetPage';
-import { NavButtonsMenu } from 'components/pages/home';
-import { EmptyWalletWidget } from 'components/pages/home/EmptyWalletWidget';
-import { HomeViewModel } from 'new/scenes/Main/Home/Home.ViewModel';
-import { WalletsCollectionView } from 'new/scenes/Main/Home/Subviews/WalletsCollectionView';
-import { useViewModel } from 'new/viewmodels/useViewModel';
+import { useViewModel } from 'new/core/viewmodels/useViewModel';
 
+import { HomeViewModel } from './Home.ViewModel';
+import { EmptyWalletWidget } from './Subviews/EmptyWalletWidget';
 import { Header } from './Subviews/Header';
+import { NavButtonsMenu } from './Subviews/NavButtonsMenu';
+import { WalletsCollectionView } from './Subviews/WalletsCollectionView';
 
 const Content = styled.div`
   padding: 16px 16px 8px;

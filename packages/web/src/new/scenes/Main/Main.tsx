@@ -3,7 +3,7 @@ import React from 'react';
 
 import { observer } from 'mobx-react-lite';
 
-import { useViewModel } from 'new/viewmodels/useViewModel';
+import { useViewModel } from 'new/core/viewmodels/useViewModel';
 
 import { MainViewModel } from './Main.ViewModel';
 
@@ -12,7 +12,7 @@ interface Props {
 }
 
 export const Main: FC<Props> = observer(({ children }) => {
-  const vm = useViewModel<MainViewModel>(MainViewModel);
+  useViewModel<MainViewModel>(MainViewModel);
 
   return <>{children}</>;
 });

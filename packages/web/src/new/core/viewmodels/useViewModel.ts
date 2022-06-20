@@ -4,7 +4,7 @@ import type { DependencyContainer } from 'tsyringe';
 import { instanceCachingFactory } from 'tsyringe';
 import type constructor from 'tsyringe/dist/typings/types/constructor';
 
-import DependencyContext from '../services/injection/DependencyContext';
+import DependencyContext from '../../services/injection/DependencyContext';
 import type { ViewModel } from './ViewModel';
 
 export const useViewModel = <T extends ViewModel>(token: constructor<T>) => {

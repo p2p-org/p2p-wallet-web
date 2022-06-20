@@ -1,7 +1,7 @@
 import { injectable } from 'tsyringe';
 
+import { ViewModel } from 'new/core/viewmodels/ViewModel';
 import { PricesService } from 'new/services/PriceAPIs/PricesService';
-import { ViewModel } from 'new/viewmodels/ViewModel';
 
 @injectable()
 export class MainViewModel extends ViewModel {

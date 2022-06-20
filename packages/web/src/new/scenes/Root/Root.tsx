@@ -1,7 +1,7 @@
 import type { FC } from 'react';
 import React from 'react';
 
-import { useViewModel } from 'new/viewmodels/useViewModel';
+import { useViewModel } from 'new/core/viewmodels/useViewModel';
 
 import { RootViewModel } from './Root.ViewModel';
 
