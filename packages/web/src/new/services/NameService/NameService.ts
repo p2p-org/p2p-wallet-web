@@ -19,8 +19,8 @@ export type Owner = {
 
 interface NameServiceType {
   getName(owner: string): Promise<string | null>;
-  getOwnerAddress(name: string): Promise<string | null>;
   getOwners(name: string): Promise<Owner[]>;
+  // getOwnerAddress(name: string): Promise<string | null>;
 }
 
 // TODO: application scope
@@ -30,7 +30,6 @@ export class NameService implements NameServiceType {
   private _cache: { [owner in string]: string | null } = {};
 
   constructor() {}
-
   getName(owner: string): Promise<string | null> {
     if (this._cache[owner]) {
       return Promise.resolve(this._cache[owner] ?? null);
@@ -61,19 +60,23 @@ export class NameService implements NameServiceType {
       });
   }
 
-  getOwnerAddress(name: string): Promise<string | null> {
-    return this._getOwner(name)
-      .then((item) => item?.owner ?? null)
-      .catch((err) => {
-        // TODO: catch only 404
-        console.error('TODO: catch only 404 - ', err);
-        return null;
-      });
-  }
+  // getOwnerAddress(name: string): Promise<string | null> {
+  //   return this._getOwner(name)
+  //     .then((item) => item?.owner ?? null)
+  //     .catch((err) => {
+  //       // TODO: catch only 404
+  //       console.error('TODO: catch only 404 - ', err);
+  //       return null;
+  //     });
+  // }
 
-  private _getOwner(name: string): Promise<Owner | null> {
-    return request(`${this._endpoint}/${name}`).then(({ data }) => data);
-  }
+  // isNameAvailable(name: string): Promise<string | null> {
+  //   return this.getOwnerAddress(name).then((address) => address ?? null);
+  // }
+
+  // private _getOwner(name: string): Promise<Owner | null> {
+  //   return request(`${this._endpoint}/${name}`).then(({ data }) => data);
+  // }
 
   private _getNames(owner: string): Promise<Name[]> {
     return request(`${this._endpoint}/lookup/${owner}`).then(({ data }) => data);
