@@ -1,7 +1,7 @@
 import type { Network } from '@saberhq/solana-contrib';
 import { chainIdToNetwork } from '@saberhq/token-utils';
 
-import { SolanaSDKPublicKey } from 'new/app/sdk/SolanaSDK';
+import { SolanaSDKPublicKey } from 'new/sdk/SolanaSDK';
 
 export class TokenList {
   constructor() {}

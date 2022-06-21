@@ -14,7 +14,7 @@ import type {
 import { Keypair, PublicKey, SystemProgram, Transaction } from '@solana/web3.js';
 import promiseRetry from 'promise-retry';
 
-import type { APIEndpoint, Lamports } from './';
+import type { APIEndpoint, Lamports } from './index';
 import {
   AccountInfo,
   AccountInstructions,
@@ -27,7 +27,7 @@ import {
   SPLTokenDestinationAddress,
   Token,
   Wallet,
-} from './';
+} from './index';
 
 // export interface SolanaSDKAccountStorage {
 //   readonly account?: Account;

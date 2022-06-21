@@ -1,4 +1,4 @@
-import { LogEvent, Logger } from 'new/app/sdk/SolanaSDK';
+import { LogEvent, Logger } from 'new/sdk/SolanaSDK';
 
 export abstract class PricesFetcher {
   abstract readonly endpoint: string;

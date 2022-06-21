@@ -6,7 +6,7 @@ import { theme, up, useIsMobile } from '@p2p-wallet-web/ui';
 import classNames from 'classnames';
 import { observer } from 'mobx-react-lite';
 
-import type { Wallet } from 'new/app/sdk/SolanaSDK';
+import type { Wallet } from 'new/sdk/SolanaSDK';
 import { Defaults } from 'new/services/Defaults';
 import { getAvatarSize } from 'utils/common';
 import { shortAddress } from 'utils/tokens';

@@ -5,7 +5,7 @@ import { styled } from '@linaria/react';
 import classNames from 'classnames';
 
 import { Avatar } from 'components/ui';
-import type { Token } from 'new/app/sdk/SolanaSDK';
+import type { Token } from 'new/sdk/SolanaSDK';
 
 import wrappedImage from './images/wrapped.svg';
 import { Jazzicon } from './Jazzicon';

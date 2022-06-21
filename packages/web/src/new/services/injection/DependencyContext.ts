@@ -1,13 +1,10 @@
 import '@abraham/reflection';
 
-import React, { useContext } from 'react';
+import React from 'react';
 
 import type { DependencyContainer, InjectionToken } from 'tsyringe';
 import { container, Lifecycle } from 'tsyringe';
 import type constructor from 'tsyringe/dist/typings/types/constructor';
-
-// TODO: deal with server vs client side context here
-//export const DependencyService = container;
 
 export class DependencyService {
   static registerValue<T>(token: InjectionToken<T>, value: T): DependencyContainer {
@@ -37,13 +34,13 @@ export class DependencyService {
 
 const DependencyContext = React.createContext<DependencyContainer>(container);
 
-export const useDependency = <T>(token: InjectionToken<T>) => {
-  const container = useContext(DependencyContext);
-  return container.resolve(token);
-};
-
-export const useDependencyContainer = (): DependencyContainer => {
-  return DependencyService.container();
-};
+// export const useDependency = <T>(token: InjectionToken<T>) => {
+//   const container = useContext(DependencyContext);
+//   return container.resolve(token);
+// };
+//
+// export const useDependencyContainer = (): DependencyContainer => {
+//   return DependencyService.container();
+// };
 
 export default DependencyContext;

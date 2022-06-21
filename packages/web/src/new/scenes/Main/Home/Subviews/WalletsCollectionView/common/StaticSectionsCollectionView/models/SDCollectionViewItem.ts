@@ -1,5 +1,5 @@
-export class SDCollectionViewItem {
-  value?: any;
+export class SDCollectionViewItem<T> {
+  value?: T;
   placeholderIndex?: string;
   emptyCellIndex?: string;
 
@@ -8,7 +8,7 @@ export class SDCollectionViewItem {
     placeholderIndex,
     emptyCellIndex,
   }: {
-    value?: any;
+    value?: T;
     placeholderIndex?: string;
     emptyCellIndex?: string;
   }) {

@@ -64,7 +64,7 @@ const NavButtonStyled = styled(NavButton)`
   font-size: 20px;
 `;
 
-export const EmptyWalletWidget: FC = () => {
+export const EmptyWalletView: FC = () => {
   const history = useHistory();
   const location = useLocation();
   const isMobile = useIsMobile();

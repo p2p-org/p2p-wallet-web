@@ -3,7 +3,7 @@ import { autorun, makeObservable, observable, set, toJS } from 'mobx';
 import { Fiat } from 'new/app/models/Fiat';
 import type { CurrentPrice } from 'new/services/PriceAPIs/PricesService';
 
-import { APIEndpoint } from '../app/sdk/SolanaSDK/models/APIEndpoint';
+import { APIEndpoint } from '../sdk/SolanaSDK/models/APIEndpoint';
 
 function makeLocalStorage<T>(_this: { fromJSON(json: T): T }, name: string) {
   const storedJson = localStorage.getItem(name);

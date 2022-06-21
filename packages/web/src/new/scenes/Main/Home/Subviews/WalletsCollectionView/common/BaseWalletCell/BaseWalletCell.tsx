@@ -7,8 +7,11 @@ import { borders, theme, up, useIsMobile, useIsTablet } from '@p2p-wallet-web/ui
 
 import { SwipeToRevealActions } from 'components/common/SwipeToRevealActions';
 import { Icon } from 'components/ui';
-import type { Wallet } from 'new/app/sdk/SolanaSDK';
-import { TokenAccountRowContent, TokenAvatarStyled } from 'new/ui/views/TokenAccountRowContent';
+import type { Wallet } from 'new/sdk/SolanaSDK';
+import {
+  TokenAccountRowContent,
+  TokenAvatarStyled,
+} from 'new/ui/components/common/TokenAccountRowContent';
 
 import { MenuStyled, TokenMenu } from './TokenMenu';
 

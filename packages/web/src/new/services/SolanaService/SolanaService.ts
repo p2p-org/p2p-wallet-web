@@ -1,7 +1,7 @@
 import { singleton } from 'tsyringe';
 
-import * as SolanaSDK from 'new/app/sdk/SolanaSDK';
-import { SolanaModel } from 'new/models/Solana/SolanaModel';
+import { SolanaModel } from 'new/models/SolanaModel/SolanaModel';
+import * as SolanaSDK from 'new/sdk/SolanaSDK';
 
 @singleton()
 export class SolanaService extends SolanaSDK.SolanaSDK {

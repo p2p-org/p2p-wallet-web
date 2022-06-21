@@ -7,7 +7,7 @@ import { observer } from 'mobx-react-lite';
 
 import { useConfig } from 'app/contexts';
 import { Menu, MenuItem } from 'components/ui';
-import type { Wallet } from 'new/app/sdk/SolanaSDK';
+import type { Wallet } from 'new/sdk/SolanaSDK';
 
 const Wrapper = styled.div`
   display: flex;

@@ -13,7 +13,7 @@ import { singleton } from 'tsyringe';
 
 import { WalletAdaptorService } from 'new/services/WalletAdaptorService';
 
-import { Model } from '../Model';
+import { Model } from '../../core/models/Model';
 
 @singleton()
 export class WalletModel extends Model {
@@ -127,8 +127,7 @@ export class WalletModel extends Model {
       throw new Error('Not connected to an adaptor');
     }
 
-    const signer = this.signer;
-    return signer.signAllTransactions(transactions);
+    return this.signer.signAllTransactions(transactions);
   }
 
   signTransaction(transaction: Transaction): Promise<Transaction> {

@@ -10,7 +10,7 @@ import { WidgetPage } from 'components/common/WidgetPage';
 import { useViewModel } from 'new/core/viewmodels/useViewModel';
 
 import { HomeViewModel } from './Home.ViewModel';
-import { EmptyWalletWidget } from './Subviews/EmptyWalletWidget';
+import { EmptyWalletView } from './Subviews/EmptyWalletView';
 import { Header } from './Subviews/Header';
 import { NavButtonsMenu } from './Subviews/NavButtonsMenu';
 import { WalletsCollectionView } from './Subviews/WalletsCollectionView';
@@ -42,7 +42,7 @@ export const Home: FunctionComponent = observer(() => {
           </Content>
         </WidgetPage>
       ) : (
-        <EmptyWalletWidget />
+        <EmptyWalletView />
       )}
     </Layout>
   );

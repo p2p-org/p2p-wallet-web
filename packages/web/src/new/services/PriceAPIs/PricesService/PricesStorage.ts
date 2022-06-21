@@ -1,3 +1,4 @@
+import { runInAction } from 'mobx';
 import { isEmpty } from 'ramda';
 import { singleton } from 'tsyringe';
 
@@ -22,6 +23,8 @@ export class PricesStorage implements IPricesStorage {
   }
 
   savePrices(prices: { [key in string]: CurrentPrice }) {
-    Defaults.prices = prices;
+    runInAction(() => {
+      Defaults.prices = prices;
+    });
   }
 }

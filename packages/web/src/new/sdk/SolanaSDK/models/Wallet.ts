@@ -6,7 +6,7 @@ import { isEmpty } from 'ramda';
 import { Defaults } from 'new/services/Defaults';
 import type { CurrentPrice } from 'new/services/PriceAPIs/PricesService';
 
-import { Token, TokenAmount } from '../models/SolanaToken';
+import { Token, TokenAmount } from './SolanaToken';
 
 interface SolanaWalletUserInfo {
   price?: CurrentPrice | null;

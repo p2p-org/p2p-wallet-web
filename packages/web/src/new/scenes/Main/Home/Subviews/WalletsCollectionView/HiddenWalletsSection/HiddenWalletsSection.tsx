@@ -7,7 +7,7 @@ import classNames from 'classnames';
 import { observer } from 'mobx-react-lite';
 
 import { Icon } from 'components/ui';
-import type { Wallet } from 'new/app/sdk/SolanaSDK';
+import type { Wallet } from 'new/sdk/SolanaSDK';
 import type { WalletsRepository } from 'new/services/Repositories';
 
 import { StaticSectionsCollectionView } from '../common/StaticSectionsCollectionView';

@@ -20,7 +20,7 @@ describe('WalletModel should work as expected', function () {
     walletModel.end();
   });
 
-  it('should load the SolanaModel correctly', async () => {
+  it('should load the SolanaModel correctly', () => {
     const solanaModel = DependencyService.resolve<SolanaModel>(SolanaModel);
     expect(solanaModel, 'solana model should resolve correctly').toBeTruthy();
   });

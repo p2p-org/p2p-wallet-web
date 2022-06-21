@@ -3,8 +3,9 @@ import { u64 } from '@solana/spl-token';
 import { action, computed, flow, makeObservable, observable, reaction } from 'mobx';
 import { Lifecycle, scoped } from 'tsyringe';
 
-import { LogEvent, Logger, Wallet } from 'new/app/sdk/SolanaSDK';
 import { SDListViewModel } from 'new/core/viewmodels/SDListViewModel';
+import { SDFetcherState } from 'new/core/viewmodels/SDViewModel';
+import { LogEvent, Logger, Wallet } from 'new/sdk/SolanaSDK';
 import { Defaults } from 'new/services/Defaults';
 import { PricesService } from 'new/services/PriceAPIs/PricesService';
 import type { AccountsObservableEvent } from 'new/services/Socket';
@@ -61,33 +62,39 @@ export class WalletsRepository extends SDListViewModel<Wallet> {
   // Binding
   private _bind(): void {
     // observe prices
-    reaction(
-      () => this._pricesService.currentPrices.pending,
-      () => {
-        this._updatePrices();
-      },
+    this.addReaction(
+      reaction(
+        () => this._pricesService.currentPrices.pending,
+        () => {
+          this._updatePrices();
+        },
+      ),
     );
 
     // observe hideZeroBalances settings
-    reaction(
-      () => Defaults.hideZeroBalances,
-      () => {
-        this._updateWalletsVisibility();
-      },
+    this.addReaction(
+      reaction(
+        () => Defaults.hideZeroBalances,
+        () => {
+          this._updateWalletsVisibility();
+        },
+      ),
     );
 
     // observe tokens' balance
     // observe account notification
-    reaction(
-      () => this.getWallets(),
-      (wallets) => {
-        for (const wallet of wallets) {
-          this._socket.subscribeAccountNotification(
-            wallet.pubkey,
-            this._handleAccountNotification.bind(this),
-          );
-        }
-      },
+    this.addReaction(
+      reaction(
+        () => this.getWallets(),
+        (wallets) => {
+          for (const wallet of wallets) {
+            this._socket.subscribeAccountNotification(
+              wallet.pubkey,
+              this._handleAccountNotification.bind(this),
+            );
+          }
+        },
+      ),
     );
   }
 
@@ -96,7 +103,7 @@ export class WalletsRepository extends SDListViewModel<Wallet> {
   private _startObserving(): void {
     this._timer = setTimeout(async () => {
       try {
-        await this._getNewWallet();
+        await this._getNewWallets();
       } finally {
         this._startObserving();
       }
@@ -118,7 +125,7 @@ export class WalletsRepository extends SDListViewModel<Wallet> {
       this._solanaService.getTokenWallets(this._solanaService.provider.wallet.publicKey.toString()),
     ])
       .then(([balance, wallets]) => {
-        let walletsNew = [...wallets];
+        let walletsNew = wallets;
 
         const solWallet = Wallet.nativeSolana({
           pubkey: this._solanaService.provider.wallet.publicKey.toString(),
@@ -151,7 +158,7 @@ export class WalletsRepository extends SDListViewModel<Wallet> {
       });
   });
 
-  private _getNewWallet(): Promise<void> {
+  private _getNewWallets(): Promise<void> {
     return this._solanaService
       .getTokenWallets(this._solanaService.provider.wallet.publicKey.toString())
       .then((newData) => {
@@ -194,9 +201,8 @@ export class WalletsRepository extends SDListViewModel<Wallet> {
   // Mappers
 
   private _mapPrices(wallets: Wallet[]): Wallet[] {
-    const walletsNew = [...wallets];
-
-    for (const wallet of wallets) {
+    const walletsNew = wallets;
+    for (const wallet of walletsNew) {
       if (!wallet.token.extensions?.coingeckoId) {
         continue;
       }
@@ -208,7 +214,7 @@ export class WalletsRepository extends SDListViewModel<Wallet> {
   }
 
   private _mapVisibility(wallets: Wallet[]): Wallet[] {
-    const walletsNew = [...wallets];
+    const walletsNew = wallets;
     walletsNew.forEach((wallet) => {
       // update visibility
       wallet.updateVisibility();
@@ -219,10 +225,9 @@ export class WalletsRepository extends SDListViewModel<Wallet> {
   // Helpers
 
   private _updatePrices(): void {
-    // TODO: check current state loaded
-    // if (data.pending) {
-    //   return;
-    // }
+    if (this.state !== SDFetcherState.loaded) {
+      return;
+    }
 
     let wallets = this._mapPrices(this.data);
     wallets = wallets.sort(Wallet.defaultSorter);
@@ -231,9 +236,9 @@ export class WalletsRepository extends SDListViewModel<Wallet> {
 
   private _updateWalletsVisibility(): void {
     // TODO: check current state loaded
-    // if (data.pending) {
-    //   return;
-    // }
+    if (this.state !== SDFetcherState.loaded) {
+      return;
+    }
 
     const wallets = this._mapVisibility(this.data);
     this.overrideData(wallets);

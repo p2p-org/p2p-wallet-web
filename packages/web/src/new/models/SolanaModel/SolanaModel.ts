@@ -3,9 +3,9 @@ import { Connection } from '@solana/web3.js';
 import { get } from 'lodash';
 import { singleton } from 'tsyringe';
 
-import { DI_KEYS } from '../../core/Constants';
-import { DependencyService } from '../../services/injection/DependencyContext';
-import { Model } from '../Model';
+import { Defaults } from 'new/services/Defaults';
+
+import { Model } from '../../core/models/Model';
 import { WalletModel } from '../WalletModel/WalletModel';
 
 @singleton()
@@ -32,12 +32,7 @@ export class SolanaModel extends Model {
   }
 
   protected setUpConnection() {
-    const rpcHost: string = DependencyService.resolve(DI_KEYS.SOLANA_RPC_HOST);
-    if (!rpcHost) {
-      throw new Error('~~~ No RPC Host provided by ENV');
-    }
-
-    this._connection = new Connection(rpcHost);
+    this._connection = new Connection(Defaults.apiEndPoint.getURL());
   }
 
   protected setUpProvider() {

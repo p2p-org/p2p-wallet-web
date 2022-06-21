@@ -1,6 +1,6 @@
 import '@abraham/reflection';
 import 'sanitize.css';
-import './css/nprogress.css';
+import './new/ui/css/nprogress.css';
 import 'react-loading-skeleton/dist/skeleton.css';
 
 import * as React from 'react';

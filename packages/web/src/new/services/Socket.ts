@@ -3,10 +3,9 @@ import { Connection, PublicKey } from '@solana/web3.js';
 import { computed, makeObservable } from 'mobx';
 import { Lifecycle, scoped } from 'tsyringe';
 
-import type { Lamports } from 'new/app/sdk/SolanaSDK';
-import { AccountInfo } from 'new/app/sdk/SolanaSDK';
-import { DI_KEYS } from 'new/core/Constants';
-import { DependencyService } from 'new/services/injection/DependencyContext';
+import type { Lamports } from 'new/sdk/SolanaSDK';
+import { AccountInfo } from 'new/sdk/SolanaSDK';
+import { Defaults } from 'new/services/Defaults';
 
 export interface AccountsObservableEvent {
   pubkey: string;
@@ -23,12 +22,9 @@ export class AccountObservableService {
   }
 
   constructor() {
-    const rpcHost: string = DependencyService.resolve(DI_KEYS.SOLANA_RPC_HOST);
-    if (!rpcHost) {
-      throw new Error('~~~ No RPC Host provided by ENV');
-    }
-
-    this._connection = new Connection(rpcHost);
+    this._connection = new Connection(Defaults.apiEndPoint.getURL(), {
+      wsEndpoint: Defaults.apiEndPoint.socketUrl,
+    });
 
     makeObservable(this, {
       isConnected: computed,
