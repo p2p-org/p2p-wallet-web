@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
 
 import type { PublicKey } from '@solana/web3.js';
 
