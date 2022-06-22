@@ -11,8 +11,17 @@ jobs:
     environment: release
     name: Deploy
     steps:
+      - name:
+        uses: rishabhgupta/split-by@v1
+        id: split
+        with:
+          string: ${{ github.ref_name }}
+          split-by: '/'
+
       - name: logging
-        run: echo "${{ github.ref_name }} /n ${{ github.event.release.tag_name }}"
+        run: echo "${{ steps.split.outputs._0}} ${{ steps.split.outputs._1}}"
+
+
 #      - uses: actions/checkout@v2
 
 #      - name: Cache node_modules
