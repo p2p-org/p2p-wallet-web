@@ -6,14 +6,12 @@ on:
       - opened
       - synchronize
       - closed
-    branches:
-      - 'release/**'
 
 concurrency: preview-${{ github.ref }}
 
 jobs:
   deploy_release:
-    if: github.event.action == 'opened' || github.event.action == 'synchronize'
+    if: startsWith(github.head_ref, 'release/') && (github.event.action == 'opened' || github.event.action == 'synchronize')
     runs-on: ubuntu-latest
     environment: release
     name: Deploy Release Preview
@@ -22,10 +20,10 @@ jobs:
         uses: rishabhgupta/split-by@v1
         id: split
         with:
-          string: ${{ github.ref_name }}
+          string: ${{ github.head_ref }}
           split-by: '/'
 
-      - run: echo "${{ github.ref_name }} ${{ steps.split.outputs._1}}"
+      - run: echo "${{ github.head_ref }} ${{ steps.split.outputs._1}}"
 
 #      - uses: actions/checkout@v2
 #
@@ -73,7 +71,7 @@ jobs:
 #          preview-branch: gh-pages
 #
   remove_preview:
-    if: ${{ (github.event.action == 'closed') || github.event.pull_request.merged }}
+    if: startsWith(github.head_ref, 'release/') && ${{ (github.event.action == 'closed') || github.event.pull_request.merged }}
     runs-on: ubuntu-latest
     environment: release
     name: Remove Release Preview
