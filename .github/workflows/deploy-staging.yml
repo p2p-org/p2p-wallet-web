@@ -7,7 +7,7 @@ on:
       - synchronize
       - closed
     branches:
-      - '!release/**'
+      - 'release/**'
 
 concurrency: preview-${{ github.ref }}
 
