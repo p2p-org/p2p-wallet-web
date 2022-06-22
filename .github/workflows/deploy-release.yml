@@ -11,7 +11,7 @@ jobs:
     environment: release
     name: Deploy
     steps:
-      - run: echo "run"
+      - run: echo "run fix some"
 
 #      - uses: actions/checkout@v2
 #
