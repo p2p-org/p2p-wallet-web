@@ -23,7 +23,7 @@ jobs:
           string: ${{ github.head_ref }}
           split-by: '/'
 
-      - run: echo "${{ github.head_ref }} ${{ steps.split.outputs._1}}"
+      - run: echo " ${{ github.head_ref }} ${{ steps.split.outputs._1}}"
 
 #      - uses: actions/checkout@v2
 #
