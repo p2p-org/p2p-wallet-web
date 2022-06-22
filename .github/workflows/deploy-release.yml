@@ -77,7 +77,6 @@ jobs:
           force: false
 
       - name: Leave a comment after deployment
-        if: env.deployment_status == 'success'
         uses: marocchino/sticky-pull-request-comment@v2
         with:
           header: pr-preview
@@ -88,29 +87,29 @@ jobs:
             at ${{ env.datetime }}
             "
 
-  remove_preview:
-    if: startsWith(github.head_ref, 'release/') && ${{ (github.event.action == 'closed') || github.event.pull_request.merged }}
-    runs-on: ubuntu-latest
-    environment: release
-    name: Remove Release preview
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Remove preview directory
-        uses: JamesIves/github-pages-deploy-action@v4
-        with:
-          branch: gh-pages
-          folder: ${{ env.empty_dir }}
-          target-folder: ${{ env.target_dir }}
-          commit-message: Remove preview for Release ${{ env.release_number }} 🛬
-          force: false
-
-      - name: Leave a comment after removal
-        if: env.deployment_status == 'success'
-        uses: marocchino/sticky-pull-request-comment@v2
-        with:
-          header: pr-preview
-          message: "\
-            Preview removed because the pull request was closed.
-            ${{ env.datetime }}
-            "
+#  remove_preview:
+#    if: startsWith(github.head_ref, 'release/') && ${{ (github.event.action == 'closed') || github.event.pull_request.merged }}
+#    runs-on: ubuntu-latest
+#    environment: release
+#    name: Remove Release preview
+#    steps:
+#      - uses: actions/checkout@v2
+#
+#      - name: Remove preview directory
+#        uses: JamesIves/github-pages-deploy-action@v4
+#        with:
+#          branch: gh-pages
+#          folder: ${{ env.empty_dir }}
+#          target-folder: ${{ env.target_dir }}
+#          commit-message: Remove preview for Release ${{ env.release_number }} 🛬
+#          force: false
+#
+#      - name: Leave a comment after removal
+#        if: env.deployment_status == 'success'
+#        uses: marocchino/sticky-pull-request-comment@v2
+#        with:
+#          header: pr-preview
+#          message: "\
+#            Preview removed because the pull request was closed.
+#            ${{ env.datetime }}
+#            "
