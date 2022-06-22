@@ -1,20 +1,34 @@
-name: Deploy Release Preview
+name: Deploy Release
 
 on:
-  push:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - closed
     branches:
       - 'release/**'
 
+concurrency: preview-${{ github.ref }}
+
 jobs:
-  deploy:
+  deploy_release:
+    if: github.event.action == 'opened' || github.event.action == 'synchronize'
     runs-on: ubuntu-latest
     environment: release
-    name: Deploy
+    name: Deploy Release Preview
     steps:
-      - name: logging
-        run: echo "${{ github.event.release.number }}"
-#      - uses: actions/checkout@v2
+      - name: Learn release number
+        uses: rishabhgupta/split-by@v1
+        id: split
+        with:
+          string: ${{ github.ref_name }}
+          split-by: '/'
 
+      - run: echo "${{ github.ref_name }} ${{ steps.split.outputs._1}}"
+
+#      - uses: actions/checkout@v2
+#
 #      - name: Cache node_modules
 #        uses: actions/cache@v2
 #        with:
@@ -22,18 +36,20 @@ jobs:
 #            node_modules
 #            */*/node_modules
 #          key: ${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
-
+#
 #      - name: Install dependecies
 #        run: yarn install --frozen-lockfile
-
-      # set 'steps.vars.outputs.sha_short' variable that is used in 'Build site' step
-#      - name: Set short sha output
-#        id: vars
-#        run: echo "::set-output name=sha_short::$(git rev-parse --short ${{ github.event.pull_request.head.sha }})"
+#
+#      - name: Learn release number
+#        uses: rishabhgupta/split-by@v1
+#        id: split
+#        with:
+#          string: ${{ github.ref_name }}
+#          split-by: '/'
 
 #      - name: Build site
 #        env:
-#          REACT_APP_BASENAME: p2p-wallet-web/release/${{ github.event.release.number }}/
+#          REACT_APP_BASENAME: p2p-wallet-web/release/${{ steps.split.outputs._1}}/
 #          REACT_APP_CRYPTO_COMPARE_API_KEY: ${{ secrets.REACT_APP_CRYPTO_COMPARE_API_KEY }}
 #          REACT_APP_FEE_RELAYER_URL: ${{ secrets.REACT_APP_FEE_RELAYER_URL }}
 #          REACT_APP_SWAP_HOST_FEE_ADDRESS: ${{ secrets.REACT_APP_SWAP_HOST_FEE_ADDRESS }}
@@ -42,15 +58,31 @@ jobs:
 #          REACT_APP_INTERCOM_APP_ID: ${{ secrets.REACT_APP_INTERCOM_APP_ID }}
 #          REACT_APP_MOONPAY_API_KEY: ${{ secrets.REACT_APP_MOONPAY_API_KEY }}
 #          REACT_APP_MOONPAY_SIGNER_URL: ${{ secrets.REACT_APP_MOONPAY_SIGNER_URL }}
+#          REACT_APP_STAGING: true
 #          REACT_APP_SENTRY_DSN_ENDPOINT: ${{ secrets.REACT_APP_SENTRY_DSN_ENDPOINT }}
 #          REACT_APP_SENTRY_MODE: release
 #          REACT_APP_SENTRY_TRACES_SAMPLE_RATE: 1
-#          REACT_APP_SENTRY_RELEASE: p2p-wallet-web_release_${{ github.event.release.number }}_${{ steps.vars.outputs.sha_short }}
+#          REACT_APP_SENTRY_RELEASE: p2p-wallet-web_release_${{ steps.split.outputs._1}}
 #        run: yarn build
 #
-#      - uses: JamesIves/github-pages-deploy-action@v4
+#      - name: Deploy preview
+#        uses: rossjrw/pr-preview-action@v1
 #        with:
-#          branch: gh-pages # The branch the action should deploy to.
-#          folder: ./packages/web/build
-#          clean-exclude: pr-preview/
-#          force: false
+#          source-dir: ./packages/web/build
+#          action: deploy
+#          preview-branch: gh-pages
+#
+  remove_preview:
+    if: ${{ (github.event.action == 'closed') || github.event.pull_request.merged }}
+    runs-on: ubuntu-latest
+    environment: release
+    name: Remove Release Preview
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Clean up preview
+        uses: rossjrw/pr-preview-action@v1
+        with:
+          source-dir: ./packages/web/build
+          action: remove
+          preview-branch: gh-pages
