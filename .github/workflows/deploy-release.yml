@@ -23,9 +23,11 @@ jobs:
           string: ${{ github.head_ref }}
           split-by: '/'
 
+      - run: echo "${{ steps.split.outputs._1 }}"
+
       - name: Store environment variables
         env:
-          release_number: ${{ steps.split.outputs._1}}
+          release_number: ${{ steps.split.outputs._1 }}
         run: |
           echo "target_dir=release/$release_number" >> $GITHUB_ENV
           echo "empty_dir=$(mktemp -d)" >> $GITHUB_ENV
