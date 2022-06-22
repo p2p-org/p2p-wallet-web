@@ -88,7 +88,7 @@ jobs:
             "
 
   remove_preview:
-    if: startsWith(github.head_ref, 'release/') && ${{ (github.event.action == 'closed') || github.event.pull_request.merged }}
+    if: ${{ startsWith(github.head_ref, 'release/') && ((github.event.action == 'closed') || github.event.pull_request.merged) }}
     runs-on: ubuntu-latest
     environment: release
     name: Remove Release preview
