@@ -23,8 +23,6 @@ jobs:
           string: ${{ github.head_ref }}
           split-by: '/'
 
-      - run: echo "${{ steps.split.outputs._1 }}"
-
       - name: Store environment variables
         env:
           release_number: ${{ steps.split.outputs._1 }}
@@ -35,6 +33,10 @@ jobs:
           pagesurl=$(echo $GITHUB_REPOSITORY | sed 's/\//.github.io\//')
           echo "pagesurl=$pagesurl" >> $GITHUB_ENV
         shell: bash
+
+      - run: |
+          echo "${{ steps.split.outputs._1 }}"
+          echo "${{ env.empty_dir }}"
 
       - uses: actions/checkout@v2
 
@@ -83,8 +85,6 @@ jobs:
           message: "\
             :rocket: Deployed preview to
             https://${{ env.pagesurl }}/${{ env.target_dir }}/
-            on branch [`gh-pages`]/
-            at ${{ env.datetime }}
             "
 
 #  remove_preview:
