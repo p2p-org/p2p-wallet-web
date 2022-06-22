@@ -11,19 +11,10 @@ jobs:
     environment: release
     name: Deploy
     steps:
-      - name:
-        uses: rishabhgupta/split-by@v1
-        id: split
-        with:
-          string: ${{ github.ref_name }}
-          split-by: '/'
-
-      - name: logging
-        run: echo "${{ steps.split.outputs._0}} ${{ steps.split.outputs._1}}"
-
+      - echo: "run"
 
 #      - uses: actions/checkout@v2
-
+#
 #      - name: Cache node_modules
 #        uses: actions/cache@v2
 #        with:
@@ -31,18 +22,20 @@ jobs:
 #            node_modules
 #            */*/node_modules
 #          key: ${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
-
+#
 #      - name: Install dependecies
 #        run: yarn install --frozen-lockfile
-
-      # set 'steps.vars.outputs.sha_short' variable that is used in 'Build site' step
-#      - name: Set short sha output
-#        id: vars
-#        run: echo "::set-output name=sha_short::$(git rev-parse --short ${{ github.event.pull_request.head.sha }})"
-
+#
+#      - name: Learn release number
+#        uses: rishabhgupta/split-by@v1
+#        id: split
+#        with:
+#          string: ${{ github.ref_name }}
+#          split-by: '/'
+#
 #      - name: Build site
 #        env:
-#          REACT_APP_BASENAME: p2p-wallet-web/release/${{ github.event.release.number }}/
+#          REACT_APP_BASENAME: p2p-wallet-web/release/${{ steps.split.outputs._1}}/
 #          REACT_APP_CRYPTO_COMPARE_API_KEY: ${{ secrets.REACT_APP_CRYPTO_COMPARE_API_KEY }}
 #          REACT_APP_FEE_RELAYER_URL: ${{ secrets.REACT_APP_FEE_RELAYER_URL }}
 #          REACT_APP_SWAP_HOST_FEE_ADDRESS: ${{ secrets.REACT_APP_SWAP_HOST_FEE_ADDRESS }}
@@ -54,12 +47,13 @@ jobs:
 #          REACT_APP_SENTRY_DSN_ENDPOINT: ${{ secrets.REACT_APP_SENTRY_DSN_ENDPOINT }}
 #          REACT_APP_SENTRY_MODE: release
 #          REACT_APP_SENTRY_TRACES_SAMPLE_RATE: 1
-#          REACT_APP_SENTRY_RELEASE: p2p-wallet-web_release_${{ github.event.release.number }}_${{ steps.vars.outputs.sha_short }}
+#          REACT_APP_SENTRY_RELEASE: p2p-wallet-web_release_${{ steps.split.outputs._1}}
 #        run: yarn build
 #
 #      - uses: JamesIves/github-pages-deploy-action@v4
 #        with:
 #          branch: gh-pages # The branch the action should deploy to.
 #          folder: ./packages/web/build
-#          clean-exclude: pr-preview/
+#          clean-exclude: release/
 #          force: false
+#
