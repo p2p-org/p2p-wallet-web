@@ -6,8 +6,6 @@ on:
       - opened
       - synchronize
       - closed
-    branches:
-      - 'release/**'
 
 concurrency: preview-${{ github.ref }}
 
