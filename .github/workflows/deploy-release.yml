@@ -30,6 +30,8 @@ jobs:
           echo "target_dir=release/$release_number" >> $GITHUB_ENV
           echo "empty_dir=$(mktemp -d)" >> $GITHUB_ENV
           echo "datetime=$(date '+%Y-%m-%d %H:%M %Z')" >> $GITHUB_ENV
+          pagesurl=$(echo $GITHUB_REPOSITORY | sed 's/\//.github.io\//')
+          echo "pagesurl=$pagesurl" >> $GITHUB_ENV
         shell: bash
 
       - uses: actions/checkout@v2
