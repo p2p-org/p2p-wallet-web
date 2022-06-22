@@ -25,7 +25,7 @@ jobs:
           string: ${{ github.ref_name }}
           split-by: '/'
 
-      - run: echo "${{ github.ref_name }} ${{ steps.split.outputs._1}}"
+      - run: echo " ${{ github.ref_name }} ${{ steps.split.outputs._1}}"
 
 #      - uses: actions/checkout@v2
 #
