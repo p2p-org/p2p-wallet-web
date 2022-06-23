@@ -15,7 +15,7 @@ import { trackEvent } from 'utils/analytics';
 const Content = styled.div`
   padding: 16px 16px 8px;
 
-  background-color: red;
+  background-color: blue;
 
   ${up.tablet} {
     padding: 0 16px 16px;
