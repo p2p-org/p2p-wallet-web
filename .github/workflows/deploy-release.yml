@@ -10,6 +10,25 @@ on:
 concurrency: preview-${{ github.ref }}
 
 jobs:
+  set_info:
+    if: ${{ startsWith(github.head_ref, 'release/') && github.event.action == 'opened' }}
+    runs-on: ubuntu-latest
+    environment: staging
+    name: Set Jira Info
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: tzkhan/pr-update-action@v2
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          head-branch-regex: 'release/\d+.\d+.\d+'
+          title-update-action: 'prefix'
+          title-template: '[%headbranch%]'
+          body-template: |
+            🚀 [ JIRA TICKET ](https://p2pvalidator.atlassian.net/browse/%headbranch%)
+          body-update-action: 'prefix'
+          body-uppercase-base-match: false
+
   deploy_release:
     if: startsWith(github.head_ref, 'release/') && (github.event.action == 'opened' || github.event.action == 'synchronize')
     runs-on: ubuntu-latest
