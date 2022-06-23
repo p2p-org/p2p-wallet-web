@@ -43,7 +43,6 @@ export const Home: FunctionComponent = () => {
 
   return (
     <Layout>
-      123123123
       {hasSomeBalance ? (
         <WidgetPage title="Wallets" icon="wallet">
           <Content>
