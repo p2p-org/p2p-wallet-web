@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - develop
+      - release/2.0.0
 
 jobs:
   deploy:
