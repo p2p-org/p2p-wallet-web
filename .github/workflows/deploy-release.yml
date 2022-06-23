@@ -25,7 +25,7 @@ jobs:
 
       - name: Store environment variables
         env:
-          release_number: ${{ steps.split.outputs._1}}
+          release_number: ${{ steps.split.outputs._1 }}
         run: |
           echo "target_dir=release/$release_number" >> $GITHUB_ENV
           echo "empty_dir=$(mktemp -d)" >> $GITHUB_ENV
@@ -33,6 +33,10 @@ jobs:
           pagesurl=$(echo $GITHUB_REPOSITORY | sed 's/\//.github.io\//')
           echo "pagesurl=$pagesurl" >> $GITHUB_ENV
         shell: bash
+
+      - run: |
+          echo "${{ steps.split.outputs._1 }}"
+          echo "${{ env.empty_dir }}"
 
       - uses: actions/checkout@v2
 
@@ -75,23 +79,36 @@ jobs:
           force: false
 
       - name: Leave a comment after deployment
-        if: env.deployment_status == 'success'
         uses: marocchino/sticky-pull-request-comment@v2
         with:
           header: pr-preview
           message: "\
             :rocket: Deployed preview to
             https://${{ env.pagesurl }}/${{ env.target_dir }}/
-            on branch [`gh-pages`]/
-            at ${{ env.datetime }}
             "
 
   remove_preview:
-    if: startsWith(github.head_ref, 'release/') && ${{ (github.event.action == 'closed') || github.event.pull_request.merged }}
+    if: ${{ startsWith(github.head_ref, 'release/') && ((github.event.action == 'closed') || github.event.pull_request.merged) }}
     runs-on: ubuntu-latest
     environment: release
     name: Remove Release preview
     steps:
+      - name: Learn release number
+        uses: rishabhgupta/split-by@v1
+        id: split
+        with:
+          string: ${{ github.head_ref }}
+          split-by: '/'
+
+      - name: Store environment variables
+        env:
+          release_number: ${{ steps.split.outputs._1 }}
+        run: |
+          echo "target_dir=release/$release_number" >> $GITHUB_ENV
+          echo "empty_dir=$(mktemp -d)" >> $GITHUB_ENV
+          echo "datetime=$(date '+%Y-%m-%d %H:%M %Z')" >> $GITHUB_ENV
+        shell: bash
+
       - uses: actions/checkout@v2
 
       - name: Remove preview directory
