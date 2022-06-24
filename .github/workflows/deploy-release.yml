@@ -1,13 +1,13 @@
 name: Deploy Release
 
 on:
-  pull_request:
-    types:
-      - opened
-      - synchronize
-      - closed
+#  pull_request:
+#    types:
+#      - opened
+#      - synchronize
+#      - closed
 
-concurrency: preview-${{ github.ref }}
+concurrency: release-${{ github.ref }}
 
 jobs:
   set_info:
