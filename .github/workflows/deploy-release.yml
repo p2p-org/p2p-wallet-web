@@ -45,8 +45,8 @@ jobs:
       - name: Store environment variables
         env:
           release_number: ${{ steps.split.outputs._1 }}
-          echo "empty_dir1=$(mktemp -d)" >> $GITHUB_ENV
-          echo "datetime1=$(date '+%Y-%m-%d %H:%M %Z')" >> $GITHUB_ENV
+          empty_dir1: $(mktemp -d)
+          datetime1: $(date '+%Y-%m-%d %H:%M %Z')
         run: |
           echo "target_dir=release/$release_number" >> $GITHUB_ENV
           echo "empty_dir=$(mktemp -d)" >> $GITHUB_ENV
