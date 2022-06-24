@@ -46,9 +46,9 @@ jobs:
         env:
           release_number: ${{ steps.split.outputs._1 }}
           target_dir1: release/${{ steps.split.outputs._1 }}
-          empty_dir1: $(mktemp -d)
-          datetime1: $(date '+%Y-%m-%d %H:%M %Z')
-          pagesurl1: $(echo $GITHUB_REPOSITORY | sed 's/\//.github.io\//')
+          empty_dir1: ${{ mktemp -d }}
+          datetime1: ${{ date '+%Y-%m-%d %H:%M %Z' }}
+          pagesurl1: ${{ echo $GITHUB_REPOSITORY | sed 's/\//.github.io\//' }}
         run: |
           echo "target_dir=release/$release_number" >> $GITHUB_ENV
           echo "empty_dir=$(mktemp -d)" >> $GITHUB_ENV
