@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 
 import { styled } from '@linaria/react';
 import type { TokenAccount } from '@p2p-wallet-web/core';
-import { borders, theme, up, useIsMobile, useIsTablet } from '@p2p-wallet-web/ui';
+import { theme, up, useIsMobile, useIsTablet } from '@p2p-wallet-web/ui';
 
 import { useSettings } from 'app/contexts';
 import { SwipeToRevealActions } from 'components/common/SwipeToRevealActions';
@@ -39,7 +39,7 @@ const WrapperLink = styled(Link)`
 
     &:hover {
       background: ${theme.colors.bg.activePrimary};
-      ${borders.linksRGBA}
+      border: 1px solid rgba(${theme.colors.textIcon.linksRGB}, 0.7);
 
       ${TokenAvatarStyled} {
         background: transparent;
