@@ -57,7 +57,7 @@ jobs:
           echo "pagesurl=$pagesurl" >> $GITHUB_ENV
         shell: bash
 
-       - run: echo "${{ env.target_dir1 }}  ${{ env.empty_dir1 }} ${{ env.datetime1 }} ${{ env.pageurl1 }}"
+      - run: echo "${{ env.target_dir1 }}  ${{ env.empty_dir1 }} ${{ env.datetime1 }} ${{ env.pageurl1 }}"
 
 #      - uses: actions/checkout@v2
 #
