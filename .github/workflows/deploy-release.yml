@@ -45,18 +45,19 @@ jobs:
       - name: Store environment variables
         env:
           release_number: ${{ steps.split.outputs._1 }}
+          target_dir1: release/${{ steps.split.outputs._1 }}
           empty_dir1: $(mktemp -d)
           datetime1: $(date '+%Y-%m-%d %H:%M %Z')
+          pagesurl1: $(echo $GITHUB_REPOSITORY | sed 's/\//.github.io\//')
         run: |
           echo "target_dir=release/$release_number" >> $GITHUB_ENV
           echo "empty_dir=$(mktemp -d)" >> $GITHUB_ENV
           echo "datetime=$(date '+%Y-%m-%d %H:%M %Z')" >> $GITHUB_ENV
           pagesurl=$(echo $GITHUB_REPOSITORY | sed 's/\//.github.io\//')
           echo "pagesurl=$pagesurl" >> $GITHUB_ENV
-          echo "pagesurl1=$(echo $GITHUB_REPOSITORY | sed 's/\//.github.io\//')" >> $GITHUB_ENV
         shell: bash
 
-       - run: echo "${{ env.target_dir1 }}  ${{ env.empty_dir1 }} ${{ env.pageurl1 }}"
+       - run: echo "${{ env.target_dir1 }}  ${{ env.empty_dir1 }} ${{ env.datetime1 }} ${{ env.pageurl1 }}"
 
 #      - uses: actions/checkout@v2
 #
