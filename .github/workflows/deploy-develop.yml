@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - develop
-      - feat/PWN-3981/release-preview
+      - release-preview
 
 jobs:
   deploy:
