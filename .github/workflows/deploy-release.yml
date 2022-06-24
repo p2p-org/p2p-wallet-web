@@ -1,11 +1,11 @@
 name: Deploy Release
 
 on:
-#  pull_request:
-#    types:
-#      - opened
+  pull_request:
+    types:
+      - opened
 #      - synchronize
-#      - closed
+      - closed
 
 concurrency: release-${{ github.ref }}
 
