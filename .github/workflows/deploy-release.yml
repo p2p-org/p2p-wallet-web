@@ -56,7 +56,7 @@ jobs:
           echo "pagesurl1=$(echo $GITHUB_REPOSITORY | sed 's/\//.github.io\//')" >> $GITHUB_ENV
         shell: bash
 
-       - run: echo "${{ env.target_dir1 }} ${{ env.empty_dir1 }} ${{ env.pageurl1 }}"
+       - run: echo "${{ env.target_dir1 }}  ${{ env.empty_dir1 }} ${{ env.pageurl1 }}"
 
 #      - uses: actions/checkout@v2
 #
