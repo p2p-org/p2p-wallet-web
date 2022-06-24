@@ -4,7 +4,7 @@ on:
   pull_request:
     types:
       - opened
-#      - synchronize
+      - synchronize
       - closed
 
 concurrency: preview-${{ github.ref }}
