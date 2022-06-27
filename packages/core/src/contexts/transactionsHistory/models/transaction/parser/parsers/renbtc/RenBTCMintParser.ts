@@ -7,7 +7,7 @@ import type {
   ParsedInstruction,
 } from '../../../../../types';
 import type { Parser } from '../types';
-import { REN_BTC_MINT } from './const';
+import { REN_BTC_MINT } from './constants';
 import { RenBTCTransaction } from './RenBTCTransaction';
 
 export class RentBTCMintParser implements Parser {

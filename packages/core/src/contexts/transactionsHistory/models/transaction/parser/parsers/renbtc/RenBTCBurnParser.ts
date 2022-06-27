@@ -2,7 +2,7 @@ import { TOKEN_PROGRAM_ID } from '@solana/spl-token';
 
 import type { ParsedConfirmedTransaction, ParsedInstruction } from '../../../../../types';
 import type { Parser } from '../types';
-import { REN_BTC_MINT } from './const';
+import { REN_BTC_MINT } from './constants';
 import { RenBTCTransaction } from './RenBTCTransaction';
 
 export class RentBTCBurnParser implements Parser {
