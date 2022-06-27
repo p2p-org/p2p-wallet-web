@@ -31,7 +31,7 @@ jobs:
 
       - name: Build site
         env:
-          REACT_APP_BASENAME: ${{ secrets.REACT_APP_BASENAME }}
+          REACT_APP_BASENAME: p2p-wallet-web/
           REACT_APP_CRYPTO_COMPARE_API_KEY: ${{ secrets.REACT_APP_CRYPTO_COMPARE_API_KEY }}
           REACT_APP_FEE_RELAYER_URL: ${{ secrets.REACT_APP_FEE_RELAYER_URL }}
           REACT_APP_SWAP_HOST_FEE_ADDRESS: ${{ secrets.REACT_APP_SWAP_HOST_FEE_ADDRESS }}
@@ -42,7 +42,7 @@ jobs:
           REACT_APP_MOONPAY_SIGNER_URL: ${{ secrets.REACT_APP_MOONPAY_SIGNER_URL }}
           REACT_APP_SENTRY_DSN_ENDPOINT: ${{ secrets.REACT_APP_SENTRY_DSN_ENDPOINT }}
           REACT_APP_SENTRY_MODE: development
-          REACT_APP_SENTRY_TRACES_SAMPLE_RATE: 1
+          REACT_APP_SENTRY_TRACES_SAMPLE_RATE: 0.9
           REACT_APP_SENTRY_RELEASE: p2p-wallet-web_development_${{ steps.vars.outputs.sha_short }}
         run: yarn build
 
@@ -50,5 +50,7 @@ jobs:
         with:
           branch: gh-pages # The branch the action should deploy to.
           folder: ./packages/web/build
-          clean-exclude: pr-preview/
+          clean-exclude: |
+            pr-preview/
+            release*
           force: false
