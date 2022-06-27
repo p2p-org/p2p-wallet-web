@@ -12,13 +12,13 @@ const secondary = `
   border: 1px solid ${theme.colors.stroke.secondary};
 `;
 
-const linksRGBA = `
-  border: 1px solid rgba(${theme.colors.textIcon.linksRGB}, 0.7);
+const links = `
+  border: 0.5px solid ${theme.colors.textIcon.links};
 `;
 
 export const borders = {
   primary,
   primaryRGBA,
   secondary,
-  linksRGBA,
+  links,
 };
