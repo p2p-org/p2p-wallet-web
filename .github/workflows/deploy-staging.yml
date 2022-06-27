@@ -11,7 +11,7 @@ concurrency: preview-${{ github.ref }}
 
 jobs:
   set_info:
-    if: github.event.action == 'opened'
+    if: ${{ !startsWith(github.head_ref, 'release/') && github.event.action == 'opened' }}
     runs-on: ubuntu-latest
     environment: staging
     name: Set Jira Info
@@ -31,6 +31,7 @@ jobs:
           body-uppercase-base-match: false
 
   lint_types:
+    if: ${{ !startsWith(github.head_ref, 'release/') }}
     runs-on: ubuntu-latest
     environment: staging
     name: Typecheck TS
@@ -52,6 +53,7 @@ jobs:
         run: lerna run --concurrency 1 --stream lint:type --exclude-dependents
 
   lint_es:
+    if: ${{ !startsWith(github.head_ref, 'release/') }}
     needs: lint_types
     runs-on: ubuntu-latest
     environment: staging
@@ -74,6 +76,7 @@ jobs:
         run: lerna run --concurrency 1 --stream lint:es --exclude-dependents
 
   lint_style:
+    if: ${{ !startsWith(github.head_ref, 'release/') }}
     needs: lint_types
     runs-on: ubuntu-latest
     environment: staging
@@ -97,7 +100,7 @@ jobs:
 
   deploy_stage:
     needs: [lint_style, lint_es]
-    if: github.event.action == 'opened' || github.event.action == 'synchronize'
+    if: ${{ !startsWith(github.head_ref, 'release/') && (github.event.action == 'opened' || github.event.action == 'synchronize') }}
     runs-on: ubuntu-latest
     environment: staging
     name: Deploy PR preview
@@ -146,7 +149,7 @@ jobs:
           preview-branch: gh-pages
 
   remove_preview:
-    if: ${{ (github.event.action == 'closed') || github.event.pull_request.merged }}
+    if: ${{ !startsWith(github.head_ref, 'release/') && ((github.event.action == 'closed') || github.event.pull_request.merged) }}
     runs-on: ubuntu-latest
     environment: staging
     name: Remove PR preview
