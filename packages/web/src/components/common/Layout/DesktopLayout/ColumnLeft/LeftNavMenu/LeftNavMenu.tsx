@@ -3,7 +3,7 @@ import { useLocation } from 'react-router';
 import { Link, NavLink } from 'react-router-dom';
 
 import { styled } from '@linaria/react';
-import { borders, shadows, theme, up } from '@p2p-wallet-web/ui';
+import { borders, shadows, theme, up, useIsDesktop } from '@p2p-wallet-web/ui';
 import { Feature } from 'flagged';
 
 import { Icon } from 'components/ui';
@@ -18,9 +18,11 @@ const Wrapper = styled.div`
 
 const NavButton = styled.div`
   display: grid;
-  grid-template-rows: 30px;
   grid-template-columns: repeat(2, max-content) 1fr;
   align-items: center;
+
+  width: 52px;
+  height: 52px;
 
   color: ${theme.colors.textIcon.primary};
   font-weight: 500;
@@ -40,6 +42,7 @@ const NavButton = styled.div`
   }
 
   ${up.desktop} {
+    width: auto;
     padding: 10px 16px;
   }
 `;
@@ -120,7 +123,7 @@ const Separator = styled.div`
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  margin: 8px 0;
+  margin: 3px 0;
   padding: 0;
 `;
 
@@ -138,6 +141,7 @@ const Line = styled.hr`
 
 export const LeftNavMenu: FunctionComponent = () => {
   const location = useLocation();
+  const isDesktop = useIsDesktop();
 
   const handleAppLinkClick = (store: 'app_store' | 'google_play') => () => {
     if (store === 'app_store') {
@@ -234,7 +238,7 @@ export const LeftNavMenu: FunctionComponent = () => {
             <NavIcon name="app-store" />
           </IconBlock>
           <Name>App Store</Name>
-          <StoreIcon name="store-icon" />
+          {isDesktop ? <StoreIcon name="store-icon" /> : null}
         </NavButton>
       </NavLinkMenu>
       <NavLinkMenu
@@ -249,7 +253,7 @@ export const LeftNavMenu: FunctionComponent = () => {
             <NavIcon name="google-play" />
           </IconBlock>
           <Name>Google Play</Name>
-          <StoreIcon name="store-icon" />
+          {isDesktop ? <StoreIcon name="store-icon" /> : null}
         </NavButton>
       </NavLinkMenu>
     </Wrapper>
