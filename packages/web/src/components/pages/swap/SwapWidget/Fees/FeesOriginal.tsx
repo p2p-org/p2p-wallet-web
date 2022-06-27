@@ -8,6 +8,7 @@ import classNames from 'classnames';
 import Decimal from 'decimal.js';
 
 import type { UseSwap } from 'app/contexts';
+import { useNetworkFees } from 'app/contexts';
 import { useConfig } from 'app/contexts/solana/swap';
 import { formatBigNumber } from 'app/contexts/solana/swap/utils/format';
 import { Accordion, Icon } from 'components/ui';
@@ -45,8 +46,9 @@ export interface FeesOriginalProps {
 
 export const FeesOriginal: FC<FeesOriginalProps> = ({ swapInfo, forPage, open }) => {
   const { tokenConfigs } = useConfig();
-  const { trade } = swapInfo;
+  const { trade, intermediateTokenName } = swapInfo;
   const isMobile = useIsMobile();
+  const { accountRentExemption } = useNetworkFees();
 
   /*const {
     settings: { useFreeTransactions },
@@ -56,6 +58,11 @@ export const FeesOriginal: FC<FeesOriginalProps> = ({ swapInfo, forPage, open })
 
   const outputDecimals = tokenConfigs[swapInfo.trade.outputTokenName]?.decimals || 0;
   const minReceiveAmount = formatBigNumber(swapInfo.trade.getMinimumOutputAmount(), outputDecimals);
+  const depositFee = formatBigNumber(accountRentExemption, tokenConfigs['SOL']?.decimals || 0);
+  const showDepositFee =
+    trade.inputTokenName === 'SOL' ||
+    trade.outputTokenName === 'SOL' ||
+    intermediateTokenName === 'SOL';
 
   /*const tokenNames = useMemo(() => {
     if (!asyncStandardTokenAccounts) {
@@ -179,6 +186,22 @@ export const FeesOriginal: FC<FeesOriginalProps> = ({ swapInfo, forPage, open })
             </Text>
           </Text>
         </Row>
+        {showDepositFee ? (
+          <Row>
+            <Text className="gray">Deposit (will be returned)</Text>
+            <Text className={classNames({ grid: isMobile })}>
+              {depositFee} SOL
+              <Text className="flex-end">
+                <AmountUSDStyled
+                  prefix="(~"
+                  postfix=")"
+                  amount={accountRentExemption}
+                  tokenName="SOL"
+                />
+              </Text>
+            </Text>
+          </Row>
+        ) : null}
         {/*<Row>
           <Text className="gray">Transaction fee</Text>
           {useFreeTransactions ? (
