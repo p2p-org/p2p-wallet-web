@@ -18,9 +18,11 @@ const Wrapper = styled.div`
 
 const NavButton = styled.div`
   display: grid;
-  grid-template-rows: 30px;
   grid-template-columns: repeat(2, max-content) 1fr;
   align-items: center;
+
+  width: 52px;
+  height: 52px;
 
   color: ${theme.colors.textIcon.primary};
   font-weight: 500;
@@ -40,6 +42,7 @@ const NavButton = styled.div`
   }
 
   ${up.desktop} {
+    width: auto;
     padding: 10px 16px;
   }
 `;
