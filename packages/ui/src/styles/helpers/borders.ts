@@ -1,9 +1,5 @@
 import { theme } from '../themes';
 
-const primaryRGBA = `
-  border: 1px solid rgba(${theme.colors.stroke.primaryRGB}, 0.3);
-`;
-
 const primary = `
   border: 0.5px solid ${theme.colors.stroke.primary};
 `;
@@ -18,7 +14,6 @@ const links = `
 
 export const borders = {
   primary,
-  primaryRGBA,
   secondary,
   links,
 };
