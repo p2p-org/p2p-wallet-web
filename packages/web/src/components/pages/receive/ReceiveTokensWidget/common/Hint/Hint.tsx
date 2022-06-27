@@ -15,7 +15,7 @@ const Wrapper = styled.div`
 
   background: ${theme.colors.bg.app};
   border-radius: 12px;
-  ${borders.primaryRGBA}
+  ${borders.primary}
 `;
 
 interface Props extends React.HTMLAttributes<HTMLDivElement> {

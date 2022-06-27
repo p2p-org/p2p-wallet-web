@@ -27,7 +27,7 @@ const UsernameAddressWrapper = styled.div`
   text-align: center;
 
   border-radius: 12px;
-  ${borders.primaryRGBA}
+  ${borders.primary}
   ${shadows.card};
 
   ${up.tablet} {
@@ -105,6 +105,9 @@ const handleCopyClick = (type: Type, value: string, text: CopyType) => () => {
   return copy(value, text);
 };
 
+const QR_MOBILE_SIZE = 237;
+const QR_DESKTOP_SIZE = 122;
+
 type Props = {
   type: Type;
   address: string;
@@ -144,7 +147,7 @@ export const UsernameAddressWidget: FC<Props> = ({ type, address, username }) =>
       <UsernameAddressWrapper>
         {isMobile && username ? <Username>{username}</Username> : undefined}
         <QRCodeWrapper>
-          <QRCode id="qrcode" value={address} size={isMobile ? 237 : 122} />
+          <QRCode id="qrcode" value={address} size={isMobile ? QR_MOBILE_SIZE : QR_DESKTOP_SIZE} />
         </QRCodeWrapper>
         <AddressWrapper>
           {isTablet && username ? <Username>{username}</Username> : undefined}
