@@ -23,22 +23,10 @@ import {
 } from 'app/contexts';
 import { ToastManager } from 'components/common/ToastManager';
 import { Providers as SwapProviders } from 'components/pages/swap/Providers';
-import { DI_KEYS } from 'new/core/Constants';
-import * as SolanaSDK from 'new/sdk/SolanaSDK';
 import DependencyContext, { DependencyService } from 'new/services/injection/DependencyContext';
 import { LockAndMintProvider } from 'utils/providers/LockAndMintProvider';
 
 const PUBLIC_KEY_LENGTH_FOR_TRIMMING = 20;
-
-const solanaNetwork =
-  process.env.REACT_APP_SOLANA_NETWORK ?? SolanaSDK.APIEndpoint.defaultEndpoints[2]!.network;
-const solanaRpcHost =
-  process.env.REACT_APP_SOLANA_RPC_HOST ?? SolanaSDK.APIEndpoint.defaultEndpoints[2]!.address;
-
-// eslint-disable-next-line no-console
-console.log('~~~ Index Props: ', solanaNetwork, solanaRpcHost);
-DependencyService.registerValue(DI_KEYS.SOLANA_NETWORK, solanaNetwork);
-DependencyService.registerValue(DI_KEYS.SOLANA_RPC_HOST, solanaRpcHost);
 
 const onConnect = (wallet: ConnectedWallet) => {
   const walletPublicKey = wallet.publicKey.toBase58();

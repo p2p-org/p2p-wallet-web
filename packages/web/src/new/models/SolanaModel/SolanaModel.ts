@@ -6,14 +6,13 @@ import { singleton } from 'tsyringe';
 import { Defaults } from 'new/services/Defaults';
 
 import { Model } from '../../core/models/Model';
-import { WalletModel } from '../WalletModel/WalletModel';
 
 @singleton()
 export class SolanaModel extends Model {
   protected _provider: Provider | null = null;
   protected _connection: Connection | null = null;
 
-  constructor(protected walletModel: WalletModel) {
+  constructor() {
     super();
   }
 

@@ -161,17 +161,18 @@ export class WalletsRepository extends SDListViewModel<Wallet> {
   private _getNewWallets(): Promise<void> {
     return this._solanaService
       .getTokenWallets(this._solanaService.provider.wallet.publicKey.toString())
-      .then((newData) => {
-        let data = [...this.data];
-        let newWallets = newData
+      .then((wallets) => {
+        const data = this.data;
+        let newWallets = wallets
           .filter((w1) => !data.some((wallet) => wallet.pubkey === w1.pubkey))
           .filter((w1) => !w1.lamports?.eq(ZERO));
 
         newWallets = this._mapPrices(newWallets);
         newWallets = this._mapVisibility(newWallets);
-        data.push(...newWallets);
-        data = data.sort(Wallet.defaultSorter);
-        return data;
+
+        let newData = data.concat(...newWallets);
+        newData = newData.sort(Wallet.defaultSorter);
+        return newData;
       })
       .then((data) => {
         this.overrideData(data);
