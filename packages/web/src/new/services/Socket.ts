@@ -16,6 +16,8 @@ export interface AccountsObservableEvent {
 export class AccountObservableService {
   private _connection: Connection;
 
+  private _accountSubscriptions: Record<string, number> = {};
+
   get isConnected(): boolean {
     // @ts-ignore
     return this._connection._rpcWebSocketConnected;
@@ -34,23 +36,32 @@ export class AccountObservableService {
   subscribeAccountNotification(
     account: string,
     cb: (notification: AccountsObservableEvent) => void,
-  ) {
-    // TODO: maybe not subscribe if exists
+  ): number {
+    if (this._accountSubscriptions[account]) {
+      return this._accountSubscriptions[account]!;
+    }
 
-    this._connection.onAccountChange(new PublicKey(account), (accountInfo) => {
-      const pubkey = account;
+    const subscriptionId = this._connection.onAccountChange(
+      new PublicKey(account),
+      (accountInfo) => {
+        const pubkey = account;
 
-      // Native Account
-      if (!accountInfo.data.length) {
-        const lamports = new u64(accountInfo.lamports);
-        cb({ pubkey, lamports });
-      }
-      // Token Account
-      else {
-        const info = AccountInfo.decode(accountInfo.data);
-        const lamports = info.amount;
-        cb({ pubkey, lamports });
-      }
-    });
+        // Native Account
+        if (!accountInfo.data.length) {
+          const lamports = new u64(accountInfo.lamports);
+          cb({ pubkey, lamports });
+        }
+        // Token Account
+        else {
+          const info = AccountInfo.decode(accountInfo.data);
+          const lamports = info.amount;
+          cb({ pubkey, lamports });
+        }
+      },
+    );
+
+    this._accountSubscriptions[account] = subscriptionId;
+
+    return subscriptionId;
   }
 }
