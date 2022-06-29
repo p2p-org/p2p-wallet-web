@@ -1,31 +1,61 @@
 import { ZERO } from '@orca-so/sdk';
-import { computed, makeObservable } from 'mobx';
+import { action, computed, makeObservable, observable, reaction } from 'mobx';
 import { injectable } from 'tsyringe';
 
 import { SDFetcherState } from 'new/core/viewmodels/SDViewModel';
 import { ViewModel } from 'new/core/viewmodels/ViewModel';
 import { Defaults } from 'new/services/Defaults';
+import { NameService } from 'new/services/NameService';
 import { PricesService } from 'new/services/PriceAPIs/PricesService';
 import { WalletsRepository } from 'new/services/Repositories';
 
 @injectable()
 export class HomeViewModel extends ViewModel {
-  constructor(public walletsRepository: WalletsRepository, public pricesService: PricesService) {
+  username: string | null | undefined;
+
+  constructor(
+    public walletsRepository: WalletsRepository,
+    public pricesService: PricesService,
+    public nameService: NameService,
+  ) {
     super();
 
     makeObservable(this, {
+      username: observable,
       isWalletReady: computed,
       balance: computed,
       isBalanceLoading: computed,
+      changeUsername: action,
     });
   }
 
   protected override onInitialize() {
     this.walletsRepository.initialize();
+
+    this.addReaction(
+      reaction(
+        () => !!this.walletsRepository.nativeWallet?.pubkey,
+        () => {
+          this._getUsername();
+        },
+      ),
+    );
   }
 
   protected override afterReactionsRemoved() {
     this.walletsRepository.end();
+  }
+
+  private _getUsername() {
+    if (this.walletsRepository.nativeWallet?.pubkey) {
+      void this.nameService.getName(this.walletsRepository.nativeWallet.pubkey).then((username) => {
+        this.changeUsername(username);
+      });
+    }
+  }
+
+  changeUsername(username: string | null) {
+    this.username = username;
   }
 
   get isWalletReady(): boolean {
