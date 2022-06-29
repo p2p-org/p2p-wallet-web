@@ -73,6 +73,9 @@ const ChevronWrapper = styled.div`
 `;
 
 const ChevronIcon = styled(Icon)`
+  width: 24px;
+  height: 24px;
+
   color: ${theme.colors.textIcon.secondary};
 `;
 
@@ -206,17 +209,18 @@ const YourTokens = styled(TitleTokens)`
 `;
 
 const SCROLL_THRESHOLD = 15;
+const SCROLL_THROTTLE_TIMEOUT = 100;
 
 interface Props {
   tokenAccounts: readonly TokenAccount[];
-  tokenAccount?: TokenAccount | null;
+  selectedTokenAccount?: TokenAccount | null;
   direction?: 'from' | 'to';
   onTokenAccountChange: (token: Token, tokenAccount: TokenAccount | null) => void;
 }
 
 export const TokenSelector: FC<Props> = ({
   tokenAccounts,
-  tokenAccount,
+  selectedTokenAccount,
   direction,
   onTokenAccountChange,
 }) => {
@@ -235,6 +239,7 @@ export const TokenSelector: FC<Props> = ({
 
   const boxShadow = useMemo(() => {
     return `0 5px 10px rgba(56, 60, 71, ${
+      // eslint-disable-next-line @typescript-eslint/no-magic-numbers
       scrollTop >= SCROLL_THRESHOLD ? '0.05' : 0.003 * scrollTop
     }`;
   }, [scrollTop]);
@@ -249,7 +254,7 @@ export const TokenSelector: FC<Props> = ({
     } else {
       setScrollTop(SCROLL_THRESHOLD);
     }
-  }, 100);
+  }, SCROLL_THROTTLE_TIMEOUT);
 
   const handleAwayClick = (e: MouseEvent) => {
     if (
@@ -339,11 +344,13 @@ export const TokenSelector: FC<Props> = ({
   return (
     <Wrapper>
       <SelectorWrapper>
-        <TokenAvatarWrapper className={classNames({ isOpen: isOpen && !tokenAccount?.key })}>
-          {tokenAccount?.balance?.token ? (
+        <TokenAvatarWrapper
+          className={classNames({ isOpen: isOpen && !selectedTokenAccount?.key })}
+        >
+          {selectedTokenAccount?.balance?.token ? (
             <TokenAvatar
-              symbol={tokenAccount.balance.token.symbol}
-              address={tokenAccount.balance.token.address}
+              symbol={selectedTokenAccount.balance.token.symbol}
+              address={selectedTokenAccount.balance.token.address}
               size={44}
             />
           ) : (
@@ -355,9 +362,9 @@ export const TokenSelector: FC<Props> = ({
           onClick={handleSelectorClick}
           className={classNames({ isOpen })}
         >
-          <TokenName title={tokenAccount?.balance?.token.address}>
-            {tokenAccount?.balance?.token.symbol ||
-              (tokenAccount?.key && shortAddress(tokenAccount.key.toBase58())) || (
+          <TokenName title={selectedTokenAccount?.balance?.token.address}>
+            {selectedTokenAccount?.balance?.token.symbol ||
+              (selectedTokenAccount?.key && shortAddress(selectedTokenAccount.key.toBase58())) || (
                 <EmptyName>—</EmptyName>
               )}
           </TokenName>
