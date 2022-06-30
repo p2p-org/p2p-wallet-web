@@ -11,7 +11,7 @@ import { WalletsRepository } from 'new/services/Repositories';
 
 @injectable()
 export class HomeViewModel extends ViewModel {
-  username: string | null | undefined;
+  username: string | null = null;
 
   constructor(
     public walletsRepository: WalletsRepository,
