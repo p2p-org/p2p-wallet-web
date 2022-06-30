@@ -54,9 +54,7 @@ export const useResolveAddress = () => {
     async (owner: PublicKey, token: Token): Promise<ResolvedAddress> => {
       if (await isTokenAccountExist(connection, owner)) {
         const { data } = (await getTokenAccountInfo(connection, owner)) || {};
-        const { owner: tokenAccountOwner } = data
-          ? AccountLayout.decode(data)
-          : { owner: undefined };
+        const tokenAccountOwner = data ? AccountLayout.decode(data).owner : undefined;
 
         return {
           address: owner,
