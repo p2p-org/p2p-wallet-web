@@ -52,6 +52,7 @@ export interface UseSendState {
   setIsExecuting: (v: boolean) => void;
 
   isAddressInvalid: boolean;
+  isSelfAddress: boolean;
 
   isRenBTC: boolean;
   isRawSOL: boolean;
@@ -116,6 +117,17 @@ const useSendStateInternal = (): UseSendState => {
 
     return false;
   }, [destinationAddress, renNetwork]);
+
+  const isSelfAddress = useMemo(() => {
+    if (
+      destinationAddress === publicKeySol.toString() ||
+      publicKeySol.toString() === destinationAccount?.owner?.toString()
+    ) {
+      return true;
+    }
+
+    return false;
+  }, [destinationAddress, destinationAccount, publicKeySol]);
 
   useEffect(() => {
     if (isRenBTC) {
@@ -265,6 +277,7 @@ const useSendStateInternal = (): UseSendState => {
     isExecuting,
     setIsExecuting,
     isAddressInvalid,
+    isSelfAddress,
     isRenBTC,
     isRawSOL,
     isShowConfirmAddressSwitch,
