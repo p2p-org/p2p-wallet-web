@@ -44,9 +44,10 @@ export const MoonpayButton: FC = () => {
   }
 
   if (error && amount) {
+    const errorText = error.replace(/_SOL|(.$)/g, '');
     return (
       <Button disabled primary full>
-        {error}
+        {errorText}
       </Button>
     );
   }
