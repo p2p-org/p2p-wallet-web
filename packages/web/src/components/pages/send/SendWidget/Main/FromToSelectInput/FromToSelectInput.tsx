@@ -152,7 +152,7 @@ export const FromToSelectInput: FC<Props> = ({
       <MainWrapper>
         <TokenSelector
           tokenAccounts={tokenAccounts}
-          tokenAccount={tokenAccount}
+          selectedTokenAccount={tokenAccount}
           direction={direction}
           onTokenAccountChange={onTokenAccountChange}
         />
