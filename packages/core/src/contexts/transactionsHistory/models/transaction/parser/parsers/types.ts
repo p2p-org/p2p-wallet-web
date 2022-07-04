@@ -5,6 +5,7 @@ import type {
   ParsedInstruction,
   SwapTransaction,
   TransferTransaction,
+  RenBTCTransaction,
 } from '../../../../index';
 
 export type CustomParsedTransaction =
@@ -12,6 +13,7 @@ export type CustomParsedTransaction =
   | CreateAccountTransaction
   | CloseAccountTransaction
   | TransferTransaction
+  | RenBTCTransaction
   | null;
 
 // additional properties if you want to show spend amount
