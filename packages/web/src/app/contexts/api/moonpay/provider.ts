@@ -15,7 +15,7 @@ import { buildParams } from './utils';
 const ERROR_STATUS_CODE = 400;
 
 const baseParams: MoonpayBaseParams = {
-  apiKey: String(MOONPAY_API_KEY),
+  apiKey: MOONPAY_API_KEY,
 };
 
 export interface UseMoonpay {
