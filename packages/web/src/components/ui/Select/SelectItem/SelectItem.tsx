@@ -40,7 +40,7 @@ const Wrapper = styled.div`
   align-items: center;
   padding: 12px;
 
-  border: 1px solid transparent;
+  border: 0.5px solid transparent;
   border-radius: 12px;
   cursor: pointer;
 

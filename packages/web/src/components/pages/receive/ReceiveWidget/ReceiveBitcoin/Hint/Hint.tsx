@@ -20,7 +20,7 @@ const Wrapper = styled.div`
 
   background: ${theme.colors.bg.app};
   border-radius: 12px;
-  ${borders.primaryRGBA}
+  ${borders.primary}
 `;
 
 const List = styled.ul`
@@ -35,10 +35,10 @@ const Row = styled.li`
 `;
 
 const MinimumTxAmount = styled.div`
-  display: flex;
+  display: inline;
 
   &.inline {
-    display: inline;
+    display: inline-flex;
   }
 `;
 
@@ -60,12 +60,16 @@ export const Hint: FC<Props> = ({ expiryTime }) => {
         </Row>
         <Row>
           <MinimumTxAmount className={classNames({ inline: isFetchingFee })}>
-            Minimum transaction amount of &nbsp;
+            Minimum transaction amount of&nbsp;
             {isFetchingFee ? (
               <Loader />
             ) : (
               <>
-                <strong>{`${(fees.lock / 10 ** 8) * 2} ${Bitcoin.asset}`}</strong>.
+                <strong>
+                  {/* eslint-disable-next-line @typescript-eslint/no-magic-numbers */}
+                  {(fees.lock * 2) / 10 ** 8}&nbsp;{Bitcoin.asset}
+                </strong>
+                .
               </>
             )}
           </MinimumTxAmount>

@@ -24,13 +24,13 @@ const Wrapper = styled.div`
   line-height: 140%;
   letter-spacing: 0.01em;
 
-  border: 1px solid transparent;
+  border: 0.5px solid transparent;
   border-radius: 4px;
   cursor: pointer;
 
   &:hover {
     background: ${theme.colors.bg.activePrimary};
-    ${borders.linksRGBA}
+    ${borders.links}
   }
 `;
 
