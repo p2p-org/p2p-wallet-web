@@ -1,10 +1,9 @@
 import type { FunctionComponent } from 'react';
-import { memo, useEffect, useState } from 'react';
+import { memo, useState } from 'react';
 
 import { styled } from '@linaria/react';
 import { useConnectionContext, useTokenAccount, useWallet } from '@p2p-wallet-web/core';
 import { usePubkey } from '@p2p-wallet-web/sail';
-import classNames from 'classnames';
 import { rgba } from 'polished';
 import QRCode from 'qrcode.react';
 
@@ -12,8 +11,10 @@ import { Card } from 'components/common/Card';
 import { ToastManager } from 'components/common/ToastManager';
 import { Button, Icon } from 'components/ui';
 import { trackEvent } from 'utils/analytics';
-import { askClipboardWritePermission, setToClipboard } from 'utils/clipboard';
+import { setToClipboard1 } from 'utils/clipboard';
 import { getExplorerUrl } from 'utils/connection';
+
+const ALFA_CHANNEL = 0.05;
 
 const WrapperCard = styled(Card)`
   flex: 1;
@@ -83,7 +84,7 @@ const Content = styled.div`
   flex-direction: column;
   align-items: center;
 
-  border-top: 1px solid ${rgba('#000', 0.05)};
+  border-top: 1px solid ${rgba('#000', ALFA_CHANNEL)};
 `;
 
 const Text = styled.div`
@@ -105,12 +106,11 @@ const QRCodeWrapper = styled.div`
   margin: 20px 0;
   padding: 17px;
 
+  background: #f6f6f8;
+
   border-radius: 12px;
 
-  &.isImageCopyAvailable:hover {
-    background: #f6f6f8;
-    cursor: pointer;
-  }
+  cursor: pointer;
 `;
 
 const QRCopiedWrapper = styled.div`
@@ -143,7 +143,7 @@ const QRCopied = styled.div`
 `;
 
 const Details = styled.div`
-  border-top: 1px solid ${rgba('#000', 0.05)};
+  border-top: 1px solid ${rgba('#000', ALFA_CHANNEL)};
 `;
 
 const DetailRow = styled.div`
@@ -154,7 +154,7 @@ const DetailRow = styled.div`
   padding: 20px;
 
   &:not(:last-child) {
-    border-bottom: 1px solid ${rgba('#000', 0.05)};
+    border-bottom: 1px solid ${rgba('#000', ALFA_CHANNEL)};
   }
 `;
 
@@ -219,8 +219,10 @@ const Footer = styled.div`
   line-height: 21px;
   text-align: center;
 
-  border-top: 1px solid ${rgba('#000', 0.05)};
+  border-top: 1px solid ${rgba('#000', ALFA_CHANNEL)};
 `;
+
+const NOTIFICATION_FADE_TIMEOUT = 2000;
 
 type Props = {
   publicKey: string;
@@ -231,18 +233,18 @@ export const QRAddressWidgetOrigin: FunctionComponent<Props> = ({ publicKey, cla
   const [copied, setCopied] = useState(false);
   const [isExpand, setIsExpand] = useState(false);
   const [isShowDetails, setIsShowDetails] = useState(false);
-  const [isImageCopyAvailable, setIsImageCopyAvailable] = useState(false);
+  // const [isImageCopyAvailable, setIsImageCopyAvailable] = useState(false);
   const [isImageCopied, setIsImageCopied] = useState(false);
   const { network } = useConnectionContext();
   const { publicKey: solPublicKey } = useWallet();
 
   const tokenAccount = useTokenAccount(usePubkey(publicKey));
 
-  useEffect(() => {
+  /*useEffect(() => {
     askClipboardWritePermission()
       .then((state) => setIsImageCopyAvailable(state))
       .catch(() => setIsImageCopyAvailable(false));
-  }, []);
+  }, []);*/
 
   if (!tokenAccount) {
     return null;
@@ -273,29 +275,28 @@ export const QRAddressWidgetOrigin: FunctionComponent<Props> = ({ publicKey, cla
       // fade copied after some seconds
       setTimeout(() => {
         setCopied(false);
-      }, 2000);
+      }, NOTIFICATION_FADE_TIMEOUT);
     } catch (error) {
       console.error(error);
     }
   };
 
   const handleImageCopyClick = () => {
-    const qrElement = document.querySelector<HTMLCanvasElement>('#qrcode');
-    if (!qrElement) {
-      return;
-    }
-
-    try {
-      qrElement.toBlob((blob: Blob | null) => setToClipboard(blob));
+    const showHideNotification = () => {
       setIsImageCopied(true);
 
       // fade copied after some seconds
       setTimeout(() => {
         setIsImageCopied(false);
-      }, 2000);
-    } catch (error) {
-      console.error(error);
+      }, NOTIFICATION_FADE_TIMEOUT);
+    };
+
+    const qrElement = document.querySelector<HTMLCanvasElement>('#qrcode');
+    if (!qrElement) {
+      return;
     }
+
+    setToClipboard1(qrElement, showHideNotification);
   };
 
   const handleToggleAddressDetailsClick = () => {
@@ -327,10 +328,7 @@ export const QRAddressWidgetOrigin: FunctionComponent<Props> = ({ publicKey, cla
         <>
           <Content>
             <Text>Scan or copy QR code</Text>
-            <QRCodeWrapper
-              className={classNames({ isImageCopyAvailable })}
-              onClick={isImageCopyAvailable ? handleImageCopyClick : undefined}
-            >
+            <QRCodeWrapper onClick={handleImageCopyClick}>
               {isImageCopied ? (
                 <QRCopiedWrapper>
                   <QRCopied>Copied</QRCopied>
