@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-import { useEffect, useState } from 'react';
 
 import { styled } from '@linaria/react';
 import { borders, shadows, theme, up, useIsMobile, useIsTablet } from '@p2p-wallet-web/ui';
@@ -10,7 +9,7 @@ import { AddressText } from 'components/common/AddressText';
 import { ToastManager } from 'components/common/ToastManager';
 import { Button } from 'components/ui';
 import { trackEvent } from 'utils/analytics';
-import { askClipboardWritePermission, setToClipboard } from 'utils/clipboard';
+import { setToClipboard1 } from 'utils/clipboard';
 
 const Wrapper = styled.div`
   display: grid;
@@ -91,6 +90,9 @@ const copy = (value: string, text: string) => {
 type Type = 'receive';
 type CopyType = 'Username' | 'Address';
 
+const QR_CODE_SIZE_MOBILE = 237;
+const QR_CODE_SIZE = 122;
+
 const handleCopyClick = (type: Type, value: string, text: CopyType) => () => {
   if (type === 'receive') {
     switch (text) {
@@ -115,28 +117,26 @@ export const UsernameAddressWidget: FC<Props> = ({ type, address, username }) =>
   const isMobile = useIsMobile();
   const isTablet = useIsTablet();
 
-  const [isImageCopyAvailable, setIsImageCopyAvailable] = useState(false);
+  /*const [isImageCopyAvailable, setIsImageCopyAvailable] = useState(false);
 
   useEffect(() => {
     askClipboardWritePermission()
       .then((state) => setIsImageCopyAvailable(state))
       .catch(() => setIsImageCopyAvailable(false));
-  }, []);
+  }, []);*/
 
   const handleImageCopyClick = () => {
+    const showNotification = () => {
+      ToastManager.info('QR code Copied!');
+      trackEvent('Receive_QR_Saved');
+    };
+
     const qrElement = document.querySelector<HTMLCanvasElement>('#qrcode');
     if (!qrElement) {
       return;
     }
 
-    try {
-      qrElement.toBlob((blob: Blob | null) => setToClipboard(blob));
-      ToastManager.info('QR code Copied!');
-
-      trackEvent('Receive_QR_Saved');
-    } catch (error) {
-      console.error(error);
-    }
+    setToClipboard1(qrElement, showNotification);
   };
 
   return (
@@ -144,7 +144,11 @@ export const UsernameAddressWidget: FC<Props> = ({ type, address, username }) =>
       <UsernameAddressWrapper>
         {isMobile && username ? <Username>{username}</Username> : undefined}
         <QRCodeWrapper>
-          <QRCode id="qrcode" value={address} size={isMobile ? 237 : 122} />
+          <QRCode
+            id="qrcode"
+            value={address}
+            size={isMobile ? QR_CODE_SIZE_MOBILE : QR_CODE_SIZE}
+          />
         </QRCodeWrapper>
         <AddressWrapper>
           {isTablet && username ? <Username>{username}</Username> : undefined}
@@ -171,12 +175,7 @@ export const UsernameAddressWidget: FC<Props> = ({ type, address, username }) =>
         >
           Copy address
         </Button>
-        <Button
-          small={!isMobile}
-          medium={isMobile}
-          hollow
-          onClick={isImageCopyAvailable ? handleImageCopyClick : undefined}
-        >
+        <Button small={!isMobile} medium={isMobile} hollow onClick={handleImageCopyClick}>
           Copy QR code
         </Button>
       </ButtonsWrapper>

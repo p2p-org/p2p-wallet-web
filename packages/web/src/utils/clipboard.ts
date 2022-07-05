@@ -28,3 +28,28 @@ export const setToClipboard = async (blob: Blob | null) => {
     ToastManager.error((error as Error).message);
   }
 };
+
+export const setToClipboard1 = async (qrElement: HTMLCanvasElement, callback: () => void) => {
+  try {
+    const data = [
+      new ClipboardItem({
+        'image/png': new Promise((resolve) => {
+          qrElement.toBlob((blob: Blob | null) => {
+            if (blob) {
+              resolve(blob);
+            } else {
+              ToastManager.error(`Can't copy to clipboard`);
+            }
+          });
+        }),
+      }),
+    ];
+    await navigator.clipboard.write(data);
+
+    if (typeof callback === 'function') {
+      callback();
+    }
+  } catch (error) {
+    ToastManager.error((error as Error).message);
+  }
+};
