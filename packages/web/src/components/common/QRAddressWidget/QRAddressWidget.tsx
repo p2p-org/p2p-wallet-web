@@ -4,6 +4,7 @@ import { memo, useState } from 'react';
 import { styled } from '@linaria/react';
 import { useConnectionContext, useTokenAccount, useWallet } from '@p2p-wallet-web/core';
 import { usePubkey } from '@p2p-wallet-web/sail';
+import classNames from 'classnames';
 import { rgba } from 'polished';
 import QRCode from 'qrcode.react';
 
@@ -11,8 +12,9 @@ import { Card } from 'components/common/Card';
 import { ToastManager } from 'components/common/ToastManager';
 import { Button, Icon } from 'components/ui';
 import { trackEvent } from 'utils/analytics';
-import { setToClipboard1 } from 'utils/clipboard';
+import { setToClipboard } from 'utils/clipboard';
 import { getExplorerUrl } from 'utils/connection';
+import { browserName, BrowserNames } from 'utils/userAgent';
 
 const ALFA_CHANNEL = 0.05;
 
@@ -106,11 +108,12 @@ const QRCodeWrapper = styled.div`
   margin: 20px 0;
   padding: 17px;
 
-  background: #f6f6f8;
-
   border-radius: 12px;
 
-  cursor: pointer;
+  &.copyEnabled {
+    background: #f6f6f8;
+    cursor: pointer;
+  }
 `;
 
 const QRCopiedWrapper = styled.div`
@@ -296,7 +299,7 @@ export const QRAddressWidgetOrigin: FunctionComponent<Props> = ({ publicKey, cla
       return;
     }
 
-    setToClipboard1(qrElement, showHideNotification);
+    void setToClipboard(qrElement, showHideNotification);
   };
 
   const handleToggleAddressDetailsClick = () => {
@@ -306,6 +309,8 @@ export const QRAddressWidgetOrigin: FunctionComponent<Props> = ({ publicKey, cla
   if (!solPublicKey) {
     return null;
   }
+
+  const qrCopyEnabled = browserName !== BrowserNames.FIREFOX;
 
   return (
     <WrapperCard className={className}>
@@ -328,7 +333,10 @@ export const QRAddressWidgetOrigin: FunctionComponent<Props> = ({ publicKey, cla
         <>
           <Content>
             <Text>Scan or copy QR code</Text>
-            <QRCodeWrapper onClick={handleImageCopyClick}>
+            <QRCodeWrapper
+              onClick={qrCopyEnabled ? handleImageCopyClick : undefined}
+              className={classNames({ copyEnabled: qrCopyEnabled })}
+            >
               {isImageCopied ? (
                 <QRCopiedWrapper>
                   <QRCopied>Copied</QRCopied>

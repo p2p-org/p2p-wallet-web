@@ -9,7 +9,8 @@ import { AddressText } from 'components/common/AddressText';
 import { ToastManager } from 'components/common/ToastManager';
 import { Button } from 'components/ui';
 import { trackEvent } from 'utils/analytics';
-import { setToClipboard1 } from 'utils/clipboard';
+import { setToClipboard } from 'utils/clipboard';
+import { browserName, BrowserNames } from 'utils/userAgent';
 
 const Wrapper = styled.div`
   display: grid;
@@ -116,6 +117,7 @@ type Props = {
 export const UsernameAddressWidget: FC<Props> = ({ type, address, username }) => {
   const isMobile = useIsMobile();
   const isTablet = useIsTablet();
+  const qrCopyEnabled = browserName !== BrowserNames.FIREFOX;
 
   /*const [isImageCopyAvailable, setIsImageCopyAvailable] = useState(false);
 
@@ -136,7 +138,7 @@ export const UsernameAddressWidget: FC<Props> = ({ type, address, username }) =>
       return;
     }
 
-    setToClipboard1(qrElement, showNotification);
+    void setToClipboard(qrElement, showNotification);
   };
 
   return (
@@ -175,9 +177,11 @@ export const UsernameAddressWidget: FC<Props> = ({ type, address, username }) =>
         >
           Copy address
         </Button>
-        <Button small={!isMobile} medium={isMobile} hollow onClick={handleImageCopyClick}>
-          Copy QR code
-        </Button>
+        {qrCopyEnabled ? (
+          <Button small={!isMobile} medium={isMobile} hollow onClick={handleImageCopyClick}>
+            Copy QR code
+          </Button>
+        ) : null}
       </ButtonsWrapper>
     </Wrapper>
   );

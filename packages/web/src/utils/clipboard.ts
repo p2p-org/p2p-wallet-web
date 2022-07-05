@@ -13,23 +13,8 @@ export const askClipboardWritePermission = async () => {
   }
 };
 
-// @params blob - The ClipboardItem takes an object with the MIME type as key, and the actual blob as the value.
-// @return Promise<void>
-export const setToClipboard = async (blob: Blob | null) => {
-  if (!blob) {
-    ToastManager.error(`Can't copy to clipboard`);
-    return;
-  }
-
-  try {
-    const data = [new ClipboardItem({ [blob.type]: blob })];
-    await navigator.clipboard.write(data);
-  } catch (error) {
-    ToastManager.error((error as Error).message);
-  }
-};
-
-export const setToClipboard1 = async (qrElement: HTMLCanvasElement, callback: () => void) => {
+// Promise is needed for Safari. But Chrome also can work with such flow
+export const setToClipboard = async (qrElement: HTMLCanvasElement, callback: () => void) => {
   try {
     const data = [
       new ClipboardItem({
