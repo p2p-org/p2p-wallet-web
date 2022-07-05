@@ -2,6 +2,9 @@ export enum BrowserNames {
   NONE,
   CHROME,
   FIREFOX,
+  SAFARI,
+  OPERA,
+  EDGE,
 }
 
 const userAgent = navigator.userAgent;
@@ -11,13 +14,13 @@ if (userAgent.match(/chrome|chromium|crios/i)) {
   browserName = BrowserNames.CHROME;
 } else if (userAgent.match(/firefox|fxios/i)) {
   browserName = BrowserNames.FIREFOX;
-} /*else if (userAgent.match(/safari/i)) {
-  browserName = 'safari';
+} else if (userAgent.match(/safari/i)) {
+  browserName = BrowserNames.SAFARI;
 } else if (userAgent.match(/opr\//i)) {
-  browserName = 'opera';
+  browserName = BrowserNames.OPERA;
 } else if (userAgent.match(/edg/i)) {
-  browserName = 'edge';
-} */ else {
+  browserName = BrowserNames.EDGE;
+} else {
   browserName = BrowserNames.NONE;
 }
 
