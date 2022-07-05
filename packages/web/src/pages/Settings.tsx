@@ -201,7 +201,7 @@ export const Settings: FunctionComponent = () => {
             </Feature>
             <AccordionItem>
               <Accordion
-                open={(location.state as any)?.isUsernameActive}
+                open={location.state?.isUsernameActive}
                 title={
                   <AccordionTitle>
                     <AccordionTitlePrimary>Username</AccordionTitlePrimary>
@@ -234,7 +234,6 @@ export const Settings: FunctionComponent = () => {
                       <NavLink to={{ pathname: playStorePath }} target="_blank" className="button">
                         <img
                           src={GooglePlayBadge}
-                          width="135"
                           height="40"
                           alt="Download P2P Wallet at the Google Play Store"
                         />
@@ -242,7 +241,6 @@ export const Settings: FunctionComponent = () => {
                       <NavLink to={{ pathname: appStorePath }} target="_blank" className="button">
                         <img
                           src={AppStoreBadge}
-                          width="120"
                           height="40"
                           alt="Download P2P Wallet from the App Store"
                         />
