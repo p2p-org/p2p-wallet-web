@@ -118,16 +118,12 @@ const useSendStateInternal = (): UseSendState => {
     return false;
   }, [destinationAddress, renNetwork]);
 
-  const isSelfAddress = useMemo(() => {
-    if (
+  const isSelfAddress = useMemo(
+    () =>
       destinationAddress === publicKeySol.toString() ||
-      publicKeySol.toString() === destinationAccount?.owner?.toString()
-    ) {
-      return true;
-    }
-
-    return false;
-  }, [destinationAddress, destinationAccount, publicKeySol]);
+      publicKeySol.toString() === destinationAccount?.owner?.toString(),
+    [destinationAddress, destinationAccount, publicKeySol],
+  );
 
   useEffect(() => {
     if (isRenBTC) {
