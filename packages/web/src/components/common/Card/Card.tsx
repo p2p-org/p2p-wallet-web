@@ -12,7 +12,7 @@ const Wrapper = styled.div`
   border-radius: 12px;
 
   ${up.tablet} {
-    ${borders.primaryRGBA}
+    ${borders.primary}
     ${shadows.card}
   }
 `;

@@ -33,13 +33,13 @@ const WrapperLink = styled(Link)`
   ${up.tablet} {
     padding: 12px 8px;
 
-    border: 1px solid transparent;
+    border: 0.5px solid transparent;
     border-radius: 12px;
     cursor: pointer;
 
     &:hover {
       background: ${theme.colors.bg.activePrimary};
-      ${borders.linksRGBA}
+      ${borders.links}
 
       ${TokenAvatarStyled} {
         background: transparent;
