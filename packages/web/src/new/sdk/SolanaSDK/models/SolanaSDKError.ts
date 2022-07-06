@@ -24,7 +24,7 @@ export class SolanaSDKError {
     return new OtherError(message);
   }
   static unknown(): UnknownError {
-    return new UnknownError();
+    return new UnknownError('Unknown error');
   }
 
   // Predefined error

@@ -70,7 +70,7 @@ export class TokenAmount extends UTokenAmount<Token> {
    * String representation of this token amount.
    */
   override toString(): string {
-    return `TokenAmount[Token=(${this.token.toString()}), amount=${this.toExact()}`;
+    return `TokenAmount[Token=(${this.token.toString()}), amount=${this.toExact()}]`;
   }
 
   /**

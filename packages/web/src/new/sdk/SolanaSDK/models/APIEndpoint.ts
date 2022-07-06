@@ -41,6 +41,7 @@ export class APIEndpoint {
       }),
     ];
 
+    // TODO: add feature flag condition
     // if (debug) {
     // endpoints.push(
     //   new APIEndpoint({
