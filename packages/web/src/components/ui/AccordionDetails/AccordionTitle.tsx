@@ -6,6 +6,7 @@ import { theme } from '@p2p-wallet-web/ui';
 const AccordionTitleWrapper = styled.div`
   display: grid;
   grid-gap: 4px;
+  width: 100%;
 
   font-weight: 500;
   letter-spacing: 0.01em;
