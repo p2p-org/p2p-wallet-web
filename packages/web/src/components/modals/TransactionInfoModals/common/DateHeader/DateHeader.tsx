@@ -1,4 +1,5 @@
 import type { FC } from 'react';
+import { useState } from 'react';
 
 import { styled } from '@linaria/react';
 import { theme } from '@p2p-wallet-web/ui';
@@ -23,13 +24,16 @@ export const DateHeaderWrapper = styled.div`
   }
 `;
 export const DateHeader: FC = () => {
-  const today = new Date();
+  const [today] = useState(new Date());
+  const [date] = useState(dayjs().format('MMMM D, YYYY'));
+  const [time] = useState(dayjs().format('hh:mm:ss'));
+
   const utcDiff = today.getHours() - today.getUTCHours();
 
   return (
     <DateHeaderWrapper>
-      <span>{dayjs().format('MMMM D, YYYY')}</span>
-      <Time>{dayjs().format('hh:mm:ss')}</Time>
+      <span>{date}</span>
+      <Time>{time}</Time>
       <span>
         (UTC{utcDiff >= 0 ? '+' : '-'}
         {utcDiff})
