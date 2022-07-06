@@ -5,8 +5,8 @@ import { styled } from '@linaria/react';
 import { theme, up } from '@p2p-wallet-web/ui';
 import { observer } from 'mobx-react-lite';
 
-import { useUsername } from 'app/contexts';
 import type { HomeViewModel } from 'new/scenes/Main/Home';
+import { Defaults } from 'new/services/Defaults';
 
 const Wrapper = styled.div``;
 
@@ -53,15 +53,15 @@ interface Props {
 }
 
 export const BalanceView: FC<Props> = observer(({ viewModel }) => {
-  const { username, domain } = useUsername();
+  const domain = Defaults.apiEndPoint.network === 'mainnet-beta' ? '.p2p.sol' : '.p2p';
 
   return (
     <Wrapper>
       <BalanceWrapper>
         <Title>
-          {username ? (
+          {viewModel.username ? (
             <>
-              <Strong>{username}</Strong>
+              <Strong>{viewModel.username}</Strong>
               {domain}
             </>
           ) : (
