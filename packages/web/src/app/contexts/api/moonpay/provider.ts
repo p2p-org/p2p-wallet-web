@@ -12,8 +12,10 @@ import type {
 } from './types';
 import { buildParams } from './utils';
 
+const ERROR_STATUS_CODE = 400;
+
 const baseParams: MoonpayBaseParams = {
-  apiKey: MOONPAY_API_KEY!,
+  apiKey: MOONPAY_API_KEY,
 };
 
 export interface UseMoonpay {
@@ -38,6 +40,8 @@ const useMoonpayInternal = (): UseMoonpay => {
       const params: MoonpayGetBuyQuoteParams = {
         ...baseParams,
         baseCurrencyCode: 'usd',
+        fixed: true,
+        regionalPricing: true,
       };
 
       if (isBaseAmountType) {
@@ -54,7 +58,7 @@ const useMoonpayInternal = (): UseMoonpay => {
           },
         );
 
-        if (!res.ok && res.status !== 400) {
+        if (!res.ok && res.status !== ERROR_STATUS_CODE) {
           throw new Error('getBuyQuote something wrong');
         }
 

@@ -15,7 +15,7 @@ const Wrapper = styled.div`
 `;
 
 const baseParams: MoonpayIframeParams = {
-  apiKey: MOONPAY_API_KEY!,
+  apiKey: MOONPAY_API_KEY,
   currencyCode: 'sol',
   baseCurrencyAmount: 100,
   baseCurrencyCode: 'usd',
