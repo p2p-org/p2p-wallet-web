@@ -11,6 +11,9 @@ export const makeTokenMap = (chainId: ChainId): Record<string, Token> => {
     tokenMap[item.address] = new Token(item);
   });
 
+  // eslint-disable-next-line no-console
+  console.log(Object.values(tokenMap).filter((token) => token.symbol === 'SOL'));
+
   if (chainId === ChainId.Devnet) {
     tokenMap['FsaLodPu4VmSwXGr3gWfwANe4vKf8XSZcCh1CEeJ3jpD'] = new Token({
       chainId: 101,
