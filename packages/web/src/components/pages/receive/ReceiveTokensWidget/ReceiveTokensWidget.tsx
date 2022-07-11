@@ -5,6 +5,7 @@ import { styled } from '@linaria/react';
 import { useTokensContext } from '@p2p-wallet-web/core';
 import { useIsTablet } from '@p2p-wallet-web/ui';
 import type { Token } from '@saberhq/token-utils';
+import { NATIVE_MINT } from '@solana/spl-token';
 import Fuse from 'fuse.js';
 import { useDebounce } from 'use-debounce';
 
@@ -23,7 +24,6 @@ const Content = styled.div`
 `;
 
 const DEBOUNCE_DELAY = 200;
-const WRAPPED_SOL_MINT = 'So11111111111111111111111111111111111111112';
 
 export const ReceiveTokensWidget: FC = () => {
   const { tokens: tokensNotFiltered } = useTokensContext();
@@ -34,7 +34,7 @@ export const ReceiveTokensWidget: FC = () => {
   const [searchQueryDebounced] = useDebounce(searchQuery, DEBOUNCE_DELAY);
 
   const tokens = useMemo(() => {
-    return tokensNotFiltered.filter((token: Token) => token.address !== WRAPPED_SOL_MINT);
+    return tokensNotFiltered.filter((token: Token) => token.address !== NATIVE_MINT.toString());
   }, [tokensNotFiltered]);
 
   const fuse = useMemo(
