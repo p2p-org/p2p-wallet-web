@@ -6,10 +6,15 @@ import { tryParseTokenAmount, useTokenAccount, useWallet } from '@p2p-wallet-web
 import { usePubkey } from '@p2p-wallet-web/sail';
 import { TokenAmount } from '@p2p-wallet-web/token-utils';
 import type { RenNetwork } from '@renproject/interfaces';
+import { useSolana } from '@saberhq/use-solana';
 import { PublicKey } from '@solana/web3.js';
 import { createContainer } from 'unstated-next';
 
-import { isValidBitcoinAddress, isValidSolanaAddress } from 'app/contexts';
+import {
+  checkUserHasTokenAccount,
+  isValidBitcoinAddress,
+  isValidSolanaAddress,
+} from 'app/contexts';
 import type { DestinationAccount } from 'app/contexts/solana/send/sendState/types';
 import { useRenNetwork } from 'utils/hooks/renBridge/useNetwork';
 
@@ -75,6 +80,7 @@ export interface UseSendState {
 }
 
 const useSendStateInternal = (): UseSendState => {
+  const { provider } = useSolana();
   const { publicKey } = useParams<{ publicKey: string }>();
   const { publicKey: publicKeySol } = useWallet();
   const { resolveAddress } = useResolveAddress();
@@ -91,6 +97,7 @@ const useSendStateInternal = (): UseSendState => {
   const [toPublicKey, setToPublicKey] = useState('');
   const [resolvedAddress, setResolvedAddress] = useState<string | null>(null);
   const [isResolvingAddress, setIsResolvingAddress] = useState(false);
+  const [isAddressResolved, setIsAddressResolved] = useState(false);
 
   const [blockchain, setBlockchain] = useState<Blockchain>(BLOCKCHAINS[0]);
   const [isAutomatchNetwork, setIsAutomatchNetwork] = useState(true);
@@ -103,6 +110,8 @@ const useSendStateInternal = (): UseSendState => {
   const [isInitBurnAndRelease, setIsInitBurnAndRelease] = useState(false);
 
   const [destinationAccount, setDestinationAccount] = useState<DestinationAccount | null>(null);
+
+  const isSolanaNetwork = blockchain === 'solana';
 
   const destinationAddress = resolvedAddress || toPublicKey;
 
@@ -175,13 +184,12 @@ const useSendStateInternal = (): UseSendState => {
   }, [tokenAccount]);
 
   useEffect(() => {
+    setIsAddressResolved(false);
+  }, [destinationAddress]);
+
+  useEffect(() => {
     const resolve = async () => {
-      if (
-        destinationAddress &&
-        fromTokenAccount &&
-        fromTokenAccount.balance &&
-        blockchain === 'solana'
-      ) {
+      if (destinationAddress && fromTokenAccount && fromTokenAccount.balance && isSolanaNetwork) {
         const isSOL = fromTokenAccount.balance.token.isRawSOL;
 
         if (isValidSolanaAddress(destinationAddress)) {
@@ -193,13 +201,16 @@ const useSendStateInternal = (): UseSendState => {
               fromTokenAccount.balance.token,
             );
 
-            setIsResolvingAddress(true);
+            setIsResolvingAddress(false);
+
             setDestinationAccount({
               address: new PublicKey(destinationAddress),
               owner,
               isNeedCreate: needCreateATA,
               symbol: fromTokenAccount.balance.token.symbol,
             });
+
+            setIsAddressResolved(true);
           } else {
             setDestinationAccount({
               address: new PublicKey(destinationAddress),
@@ -214,7 +225,40 @@ const useSendStateInternal = (): UseSendState => {
     if (!isAddressInvalid) {
       void resolve();
     }
-  }, [destinationAddress, fromTokenAccount, isAddressInvalid, resolveAddress]);
+  }, [destinationAddress, fromTokenAccount, isAddressInvalid, resolveAddress, isSolanaNetwork]);
+
+  useEffect(() => {
+    let pubKey: string | null = '';
+
+    if (isValidSolanaAddress(toPublicKey)) {
+      const { address, owner } = destinationAccount || {};
+      if (address?.toString() === toPublicKey && !!owner) {
+        pubKey = owner.toString();
+      } else {
+        pubKey = toPublicKey;
+      }
+    } else if (isValidSolanaAddress(resolvedAddress ?? '')) {
+      pubKey = resolvedAddress;
+    }
+
+    if (pubKey && isSolanaNetwork && isAddressResolved) {
+      checkUserHasTokenAccount(pubKey, fromTokenAccount, provider)
+        .then((userHasToken) => {
+          setIsShowConfirmAddressSwitch(!userHasToken);
+        })
+        .catch(console.error);
+    } else {
+      setIsShowConfirmAddressSwitch(false);
+    }
+  }, [
+    resolvedAddress,
+    isSolanaNetwork,
+    toPublicKey,
+    provider,
+    fromTokenAccount,
+    destinationAccount,
+    isAddressResolved,
+  ]);
 
   const hasBalance = useMemo(() => {
     if (!tokenAccount?.balance) {
