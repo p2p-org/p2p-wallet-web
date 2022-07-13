@@ -3,7 +3,8 @@ import type { FC } from 'react';
 import { styled } from '@linaria/react';
 import { theme } from '@p2p-wallet-web/ui';
 
-import { useSendState } from 'app/contexts';
+import { useConfig, useNetworkFees, useSendState } from 'app/contexts';
+import { formatBigNumber } from 'app/contexts/solana/swap/utils/format';
 import { Accordion } from 'components/ui';
 import { AccordionTitle } from 'components/ui/AccordionDetails/AccordionTitle';
 import { ListWrapper, Row, Text } from 'components/ui/AccordionDetails/common';
@@ -26,7 +27,10 @@ export const TransactionDetails: FC = () => {
   /*const {
     settings: { useFreeTransactions },
   } = useSettings();*/
-  const { details, isAddressNotMatchNetwork } = useSendState();
+  const { details, isAddressNotMatchNetwork, destinationAccount } = useSendState();
+  const { isNeedCreate } = destinationAccount || {};
+  const { accountRentExemption } = useNetworkFees();
+  const { tokenConfigs } = useConfig();
 
   if (!details.receiveAmount) {
     return null;
@@ -66,14 +70,14 @@ export const TransactionDetails: FC = () => {
           )}
           <Text>5000 lamport</Text>
         </Row>*/}
-        {/*details.accountCreationAmount ? (
+        {isNeedCreate ? (
           <Row>
             <Text className="gray">{destinationAccount?.symbol} account creation</Text>
             <Text>
-              {details.accountCreationAmount}
+              {formatBigNumber(accountRentExemption, tokenConfigs['SOL']?.decimals || 0)} SOL
             </Text>
           </Row>
-        ) : undefined*/}
+        ) : null}
         {/*!fromTokenAccount?.balance?.token.isRawSOL ? (
           <CompensationFee
             type="send"
