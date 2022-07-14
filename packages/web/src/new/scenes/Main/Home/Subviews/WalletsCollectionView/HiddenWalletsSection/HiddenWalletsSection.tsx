@@ -9,8 +9,8 @@ import { observer } from 'mobx-react-lite';
 import { Icon } from 'components/ui';
 import type { Wallet } from 'new/sdk/SolanaSDK';
 import type { WalletsRepository } from 'new/services/Repositories';
+import { StaticSectionsCollectionView } from 'new/ui/components/common/StaticSectionsCollectionView';
 
-import { StaticSectionsCollectionView } from '../common/StaticSectionsCollectionView';
 import { Title } from '../common/styled';
 import { HidedWalletCell } from './HidedWalletCell';
 
@@ -57,6 +57,10 @@ export const HiddenWalletsSection: FC<Props> = observer(({ viewModel }) => {
   const handleShowClick = (wallet: Wallet) => {
     viewModel.toggleWalletVisibility(wallet);
   };
+
+  if (!viewModel.hiddenWallets.length) {
+    return null;
+  }
 
   return (
     <>
