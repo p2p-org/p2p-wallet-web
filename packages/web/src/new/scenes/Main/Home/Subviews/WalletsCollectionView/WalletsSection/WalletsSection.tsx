@@ -2,8 +2,8 @@ import type { FC } from 'react';
 
 import type { Wallet } from 'new/sdk/SolanaSDK';
 import type { WalletsRepository } from 'new/services/Repositories';
+import { StaticSectionsCollectionView } from 'new/ui/components/common/StaticSectionsCollectionView';
 
-import { StaticSectionsCollectionView } from '../common/StaticSectionsCollectionView';
 import { Title } from '../common/styled';
 import { VisibleWalletCell } from './VisibleWalletCell';
 
