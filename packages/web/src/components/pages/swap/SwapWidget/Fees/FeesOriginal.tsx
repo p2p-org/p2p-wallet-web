@@ -2,6 +2,7 @@ import type { FC } from 'react';
 import { useMemo } from 'react';
 
 import { styled } from '@linaria/react';
+import { ZERO } from '@orca-so/sdk';
 import { theme, useIsMobile } from '@p2p-wallet-web/ui';
 import { u64 } from '@solana/spl-token';
 import classNames from 'classnames';
@@ -63,6 +64,23 @@ export const FeesOriginal: FC<FeesOriginalProps> = ({ swapInfo, forPage, open })
     trade.inputTokenName === 'SOL' ||
     trade.outputTokenName === 'SOL' ||
     intermediateTokenName === 'SOL';
+
+  /*
+  useEffect(() => {
+    if (trade && trade.pools && !Object.values(trade.pools).length) {
+      return;
+    }
+
+    console.log('trade.pools -', trade.pools);
+    trade.pools &&
+      Object.entries(trade.pools).forEach(([name, pool]) => {
+        console.log(
+          `fees ${name} -`,
+          pool.calculateFees(trade.getInputAmount(), trade.inputTokenName).toString(),
+        );
+      });
+  }, [trade.pools]);
+*/
 
   /*const tokenNames = useMemo(() => {
     if (!asyncStandardTokenAccounts) {
@@ -157,6 +175,39 @@ export const FeesOriginal: FC<FeesOriginalProps> = ({ swapInfo, forPage, open })
     </ListWrapper>
   );
 
+  const liquidityFeeEl = useMemo(() => {
+    let fee1Formated = null;
+
+    const [fee0, fee1] = trade.derivedFields?.fees as u64[];
+
+    const fee0Formated =
+      formatBigNumber(fee0, tokenConfigs[trade.inputTokenName]?.decimals) +
+      ' ' +
+      trade.inputTokenName;
+
+    if (trade.derivedFields?.doubleHopFields) {
+      fee1Formated =
+        formatBigNumber(fee1, tokenConfigs[trade.outputTokenName]?.decimals) +
+        ' ' +
+        trade.outputTokenName;
+    }
+
+    const showFee1 = fee1 && !fee1.eq(ZERO);
+
+    return (
+      <Row>
+        <Text className="gray">Liquidity provider fee</Text>
+        <Text className={classNames({ grid: true })}>
+          <span>
+            {fee0Formated}
+            {showFee1 ? <span style={{ marginLeft: 5 }}>+</span> : null}
+          </span>
+          {showFee1 ? <span>{fee1Formated}</span> : null}
+        </Text>
+      </Row>
+    );
+  }, [trade.derivedFields, trade.inputTokenName, trade.outputTokenName, tokenConfigs]);
+
   return (
     <Accordion
       title={
@@ -202,6 +253,7 @@ export const FeesOriginal: FC<FeesOriginalProps> = ({ swapInfo, forPage, open })
             </Text>
           </Row>
         ) : null}
+        {liquidityFeeEl}
         {/*<Row>
           <Text className="gray">Transaction fee</Text>
           {useFreeTransactions ? (
