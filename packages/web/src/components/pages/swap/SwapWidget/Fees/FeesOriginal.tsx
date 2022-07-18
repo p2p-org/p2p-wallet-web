@@ -46,7 +46,7 @@ export interface FeesOriginalProps {
 
 export const FeesOriginal: FC<FeesOriginalProps> = ({ swapInfo, forPage, open }) => {
   const { tokenConfigs } = useConfig();
-  const { trade, intermediateTokenName } = swapInfo;
+  const { trade, intermediateTokenName, asyncStandardTokenAccounts } = swapInfo;
   const isMobile = useIsMobile();
   const { accountRentExemption } = useNetworkFees();
 
@@ -58,19 +58,22 @@ export const FeesOriginal: FC<FeesOriginalProps> = ({ swapInfo, forPage, open })
 
   const outputDecimals = tokenConfigs[swapInfo.trade.outputTokenName]?.decimals || 0;
   const minReceiveAmount = formatBigNumber(swapInfo.trade.getMinimumOutputAmount(), outputDecimals);
-  const depositFee = formatBigNumber(accountRentExemption, tokenConfigs['SOL']?.decimals || 0);
+  const accountCreationFee = formatBigNumber(
+    accountRentExemption,
+    tokenConfigs['SOL']?.decimals || 0,
+  );
   const showDepositFee =
     trade.inputTokenName === 'SOL' ||
     trade.outputTokenName === 'SOL' ||
     intermediateTokenName === 'SOL';
 
-  /*const tokenNames = useMemo(() => {
+  const tokenNames = useMemo(() => {
     if (!asyncStandardTokenAccounts) {
       return [];
     }
 
     return trade.getTokenNamesToSetup(asyncStandardTokenAccounts);
-  }, [trade, asyncStandardTokenAccounts]);*/
+  }, [trade, asyncStandardTokenAccounts]);
 
   const totalAmount = useMemo(() => {
     return `${formatBigNumber(
@@ -190,7 +193,7 @@ export const FeesOriginal: FC<FeesOriginalProps> = ({ swapInfo, forPage, open })
           <Row>
             <Text className="gray">Deposit (will be returned)</Text>
             <Text className={classNames({ grid: isMobile })}>
-              {depositFee} SOL
+              {accountCreationFee} SOL
               <Text className="flex-end">
                 <AmountUSDStyled
                   prefix="(~"
@@ -216,7 +219,7 @@ export const FeesOriginal: FC<FeesOriginalProps> = ({ swapInfo, forPage, open })
           )}
           <Text>5000 lamport</Text>
         </Row>*/}
-        {/*tokenNames?.map((tokenName) => (
+        {tokenNames?.map((tokenName) => (
           <Row key={tokenName}>
             <Text className="gray">{tokenName} account creation</Text>
             <Text className={classNames({ grid: isMobile })}>
@@ -225,13 +228,13 @@ export const FeesOriginal: FC<FeesOriginalProps> = ({ swapInfo, forPage, open })
                 <AmountUSDStyled
                   prefix="(~"
                   postfix=")"
-                  amount={networkFees.accountRentExemption}
-                  tokenName={'SOL'}
+                  amount={accountRentExemption}
+                  tokenName="SOL"
                 />
               </Text>
             </Text>
           </Row>
-        ))*/}
+        ))}
       </ListWrapper>
       {/*elCompensationFee*/}
       {elTotal}
