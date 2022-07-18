@@ -65,23 +65,6 @@ export const FeesOriginal: FC<FeesOriginalProps> = ({ swapInfo, forPage, open })
     trade.outputTokenName === 'SOL' ||
     intermediateTokenName === 'SOL';
 
-  /*
-  useEffect(() => {
-    if (trade && trade.pools && !Object.values(trade.pools).length) {
-      return;
-    }
-
-    console.log('trade.pools -', trade.pools);
-    trade.pools &&
-      Object.entries(trade.pools).forEach(([name, pool]) => {
-        console.log(
-          `fees ${name} -`,
-          pool.calculateFees(trade.getInputAmount(), trade.inputTokenName).toString(),
-        );
-      });
-  }, [trade.pools]);
-*/
-
   /*const tokenNames = useMemo(() => {
     if (!asyncStandardTokenAccounts) {
       return [];
