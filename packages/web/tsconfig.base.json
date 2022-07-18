@@ -6,14 +6,13 @@
     "emitDecoratorMetadata": true,
     "baseUrl": "./",
     "paths": {
-      "*": ["src/*"],
-      "@solana/web3.js": ["./../../node_modules/@solana/web3.js/lib/types/index.d.ts"]
-    }
+      "*": ["src/*"]
+    },
+    "types": ["webpack-env", "jest-expect-message"]
   },
   "exclude": ["node_modules"],
   "include": [
     "./src/**/*",
-    "./test/[^e2e]/*",
-    "./../../node_modules/@solana/web3.js/lib/types/index.d.ts"
+    "jest.config.ts"
   ]
 }

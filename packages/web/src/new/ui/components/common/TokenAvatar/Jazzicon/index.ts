@@ -1,0 +1,1 @@
+export { Jazzicon } from './Jazzicon';

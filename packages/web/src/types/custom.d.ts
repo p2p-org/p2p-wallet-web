@@ -12,3 +12,8 @@ declare module '*-icon.svg' {
   // eslint-disable-next-line import/no-default-export
   export default content;
 }
+
+declare module '*.svg' {
+  const content: any;
+  export default content;
+}

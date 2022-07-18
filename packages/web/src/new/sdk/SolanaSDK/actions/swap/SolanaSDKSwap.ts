@@ -1,0 +1,52 @@
+import type { PublicKey, Signer, TransactionInstruction } from '@solana/web3.js';
+
+export class SwapResponse {
+  transactionId: string;
+  newWalletPubkey?: string | null;
+
+  constructor({
+    transactionId,
+    newWalletPubkey,
+  }: {
+    transactionId: string;
+    newWalletPubkey?: string | null;
+  }) {
+    this.transactionId = transactionId;
+    this.newWalletPubkey = newWalletPubkey;
+  }
+}
+
+export class AccountInstructions {
+  account: PublicKey;
+  instructions: TransactionInstruction[];
+  cleanupInstructions: TransactionInstruction[];
+  signers: Signer[];
+
+  // additionally return new wallet address
+  protected newWalletPubkey?: string;
+  // additionally return newAccount's secretkey
+  protected secretKey?: Uint8Array;
+
+  constructor({
+    account,
+    instructions = [],
+    cleanupInstructions = [],
+    signers = [],
+    newWalletPubkey,
+    secretKey,
+  }: {
+    account: PublicKey;
+    instructions?: TransactionInstruction[];
+    cleanupInstructions?: TransactionInstruction[];
+    signers?: Signer[];
+    newWalletPubkey?: string;
+    secretKey?: Uint8Array;
+  }) {
+    this.account = account;
+    this.instructions = instructions;
+    this.cleanupInstructions = cleanupInstructions;
+    this.signers = signers;
+    this.newWalletPubkey = newWalletPubkey;
+    this.secretKey = secretKey;
+  }
+}

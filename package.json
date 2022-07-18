@@ -48,6 +48,7 @@
     "lerna": "^4.0.0",
     "lint-staged": "^11.2.2",
     "mini-css-extract-plugin": "^2.6.0",
+    "path-browserify": "^1.0.1",
     "prettier": "^2.4.1",
     "stream-browserify": "^3.0.0",
     "style-loader": "^3.3.1",

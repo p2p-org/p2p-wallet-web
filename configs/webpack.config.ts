@@ -47,6 +47,7 @@ const config: ConfigFn = (env, argv) => {
   const prodPlugins: Array<WebpackPluginInstance> = [];
 
   const webAliases = {
+    new: path.join(WEB_PATH, '/src/new'),
     constants: path.join(WEB_PATH, '/src/constants'),
     config: path.resolve(WEB_PATH, '/src/config'),
     utils: path.resolve(WEB_PATH, '/src/utils'),
@@ -229,6 +230,7 @@ const config: ConfigFn = (env, argv) => {
     resolve: {
       extensions: ['.ts', '.tsx', '.js', '.jsx', '.json', '.css'],
       fallback: {
+        path: require.resolve('path-browserify'),
         http: require.resolve('stream-http'),
         https: require.resolve('https-browserify'),
         crypto: require.resolve('crypto-browserify'),

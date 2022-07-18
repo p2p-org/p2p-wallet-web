@@ -1,1 +1,0 @@
-export { TopWithBalance } from './TopWithBalance';

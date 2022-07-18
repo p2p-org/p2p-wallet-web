@@ -1,6 +1,23 @@
 const USD_MAX_FRACTION_DIGITS = 2;
 const GROUP_SIZE = 3;
 
+export const formatNumberTo = (
+  currency: string,
+  amount: number,
+  options: { alwaysShowCents: boolean } = { alwaysShowCents: true },
+) => {
+  const minFractionDigits = options.alwaysShowCents ? USD_MAX_FRACTION_DIGITS : 0;
+
+  return amount
+    .toLocaleString('en-US', {
+      style: 'currency',
+      currency,
+      minimumFractionDigits: minFractionDigits,
+      maximumFractionDigits: USD_MAX_FRACTION_DIGITS,
+    })
+    .replace(/,/g, ' ');
+};
+
 export const formatNumberToUSD = (
   amount: number,
   options: { alwaysShowCents: boolean } = { alwaysShowCents: true },

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-magic-numbers */
 export type MintConfig = {
   expiryTime: number;
   createdAt: number;
