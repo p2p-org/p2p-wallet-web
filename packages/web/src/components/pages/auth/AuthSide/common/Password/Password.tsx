@@ -109,6 +109,17 @@ const ButtonStyled = styled(Button)`
   margin-top: 32px;
 `;
 
+const RELIABILITY_POOR = 1;
+const RELIABILITY_NORMAL = 2;
+const RELIABILITY_GOOD = 3;
+const RELIABILITY_BEST = 4;
+
+const STEPS_AMOUNT = 4;
+
+const isPasswordNotMatch = (password: string, passwordRepeat: string) => {
+  return password ? password !== passwordRepeat : false;
+};
+
 type Props = {
   type: 'signup' | 'login';
   next: (password: string) => void;
@@ -141,6 +152,14 @@ export const Password: FC<Props> = ({ type, next }) => {
     } else if (type === 'signup') {
       trackEventOnce('signup_password_keydown');
     }
+
+    if (hasPasswordRepeatError) {
+      setHasPasswordRepeatError(isPasswordNotMatch(value, passwordRepeat));
+    }
+  };
+
+  const handlePasswordBlur = () => {
+    handlePasswordRepeatBlur();
   };
 
   const handlePasswordRepeatChange = (value: string) => {
@@ -153,12 +172,12 @@ export const Password: FC<Props> = ({ type, next }) => {
     }
 
     if (hasPasswordRepeatError) {
-      setHasPasswordRepeatError(password !== value);
+      setHasPasswordRepeatError(isPasswordNotMatch(password, value));
     }
   };
 
   const handlePasswordRepeatBlur = () => {
-    setHasPasswordRepeatError(password !== passwordRepeat);
+    setHasPasswordRepeatError(isPasswordNotMatch(password, passwordRepeat));
   };
 
   const handleContinueClick = () => {
@@ -189,15 +208,15 @@ export const Password: FC<Props> = ({ type, next }) => {
               <Step
                 key={index}
                 className={classNames({
-                  red: counter === 1,
-                  orange: counter === 2,
-                  green: counter === 3,
-                  blue: counter === 4,
+                  red: counter === RELIABILITY_POOR,
+                  orange: counter === RELIABILITY_NORMAL,
+                  green: counter === RELIABILITY_GOOD,
+                  blue: counter === RELIABILITY_BEST,
                 })}
               />
             );
           })}
-          {new Array(4 - counter).fill(null).map((_, index) => (
+          {new Array(STEPS_AMOUNT - counter).fill(null).map((_, index) => (
             <Step key={index} />
           ))}
         </StepsWrappers>
@@ -230,6 +249,7 @@ export const Password: FC<Props> = ({ type, next }) => {
         placeholder="Create new password"
         value={password}
         onChange={handlePasswordChange}
+        onBlur={handlePasswordBlur}
       />
       {renderRules()}
       <RepeatPassword>Repeat password</RepeatPassword>
@@ -240,7 +260,7 @@ export const Password: FC<Props> = ({ type, next }) => {
         onBlur={handlePasswordRepeatBlur}
         className={classNames({ error: hasPasswordRepeatError })}
       />
-      {hasPasswordRepeatError ? <ErrorHint error="Passwords doesn’t match" /> : undefined}
+      {hasPasswordRepeatError ? <ErrorHint error="Passwords do not match" /> : undefined}
       <ButtonStyled disabled={disabled} onClick={handleContinueClick}>
         Continue
       </ButtonStyled>
