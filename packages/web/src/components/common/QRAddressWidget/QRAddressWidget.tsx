@@ -1,5 +1,5 @@
 import type { FunctionComponent } from 'react';
-import { memo, useEffect, useState } from 'react';
+import { memo, useState } from 'react';
 
 import { styled } from '@linaria/react';
 import { useConnectionContext, useTokenAccount, useWallet } from '@p2p-wallet-web/core';
@@ -12,8 +12,11 @@ import { Card } from 'components/common/Card';
 import { ToastManager } from 'components/common/ToastManager';
 import { Button, Icon } from 'components/ui';
 import { trackEvent } from 'utils/analytics';
-import { askClipboardWritePermission, setToClipboard } from 'utils/clipboard';
+import { setToClipboard } from 'utils/clipboard';
 import { getExplorerUrl } from 'utils/connection';
+import { browserName, BrowserNames } from 'utils/userAgent';
+
+const ALFA_CHANNEL = 0.05;
 
 const WrapperCard = styled(Card)`
   flex: 1;
@@ -83,7 +86,7 @@ const Content = styled.div`
   flex-direction: column;
   align-items: center;
 
-  border-top: 1px solid ${rgba('#000', 0.05)};
+  border-top: 1px solid ${rgba('#000', ALFA_CHANNEL)};
 `;
 
 const Text = styled.div`
@@ -107,7 +110,7 @@ const QRCodeWrapper = styled.div`
 
   border-radius: 12px;
 
-  &.isImageCopyAvailable:hover {
+  &.copyEnabled {
     background: #f6f6f8;
     cursor: pointer;
   }
@@ -143,7 +146,7 @@ const QRCopied = styled.div`
 `;
 
 const Details = styled.div`
-  border-top: 1px solid ${rgba('#000', 0.05)};
+  border-top: 1px solid ${rgba('#000', ALFA_CHANNEL)};
 `;
 
 const DetailRow = styled.div`
@@ -154,7 +157,7 @@ const DetailRow = styled.div`
   padding: 20px;
 
   &:not(:last-child) {
-    border-bottom: 1px solid ${rgba('#000', 0.05)};
+    border-bottom: 1px solid ${rgba('#000', ALFA_CHANNEL)};
   }
 `;
 
@@ -219,8 +222,10 @@ const Footer = styled.div`
   line-height: 21px;
   text-align: center;
 
-  border-top: 1px solid ${rgba('#000', 0.05)};
+  border-top: 1px solid ${rgba('#000', ALFA_CHANNEL)};
 `;
+
+const NOTIFICATION_FADE_TIMEOUT = 2000;
 
 type Props = {
   publicKey: string;
@@ -231,18 +236,18 @@ export const QRAddressWidgetOrigin: FunctionComponent<Props> = ({ publicKey, cla
   const [copied, setCopied] = useState(false);
   const [isExpand, setIsExpand] = useState(false);
   const [isShowDetails, setIsShowDetails] = useState(false);
-  const [isImageCopyAvailable, setIsImageCopyAvailable] = useState(false);
+  // const [isImageCopyAvailable, setIsImageCopyAvailable] = useState(false);
   const [isImageCopied, setIsImageCopied] = useState(false);
   const { network } = useConnectionContext();
   const { publicKey: solPublicKey } = useWallet();
 
   const tokenAccount = useTokenAccount(usePubkey(publicKey));
 
-  useEffect(() => {
+  /*useEffect(() => {
     askClipboardWritePermission()
       .then((state) => setIsImageCopyAvailable(state))
       .catch(() => setIsImageCopyAvailable(false));
-  }, []);
+  }, []);*/
 
   if (!tokenAccount) {
     return null;
@@ -273,29 +278,28 @@ export const QRAddressWidgetOrigin: FunctionComponent<Props> = ({ publicKey, cla
       // fade copied after some seconds
       setTimeout(() => {
         setCopied(false);
-      }, 2000);
+      }, NOTIFICATION_FADE_TIMEOUT);
     } catch (error) {
       console.error(error);
     }
   };
 
   const handleImageCopyClick = () => {
-    const qrElement = document.querySelector<HTMLCanvasElement>('#qrcode');
-    if (!qrElement) {
-      return;
-    }
-
-    try {
-      qrElement.toBlob((blob: Blob | null) => setToClipboard(blob));
+    const showHideNotification = () => {
       setIsImageCopied(true);
 
       // fade copied after some seconds
       setTimeout(() => {
         setIsImageCopied(false);
-      }, 2000);
-    } catch (error) {
-      console.error(error);
+      }, NOTIFICATION_FADE_TIMEOUT);
+    };
+
+    const qrElement = document.querySelector<HTMLCanvasElement>('#qrcode');
+    if (!qrElement) {
+      return;
     }
+
+    void setToClipboard(qrElement, showHideNotification);
   };
 
   const handleToggleAddressDetailsClick = () => {
@@ -305,6 +309,8 @@ export const QRAddressWidgetOrigin: FunctionComponent<Props> = ({ publicKey, cla
   if (!solPublicKey) {
     return null;
   }
+
+  const qrCopyEnabled = browserName !== BrowserNames.FIREFOX;
 
   return (
     <WrapperCard className={className}>
@@ -328,8 +334,8 @@ export const QRAddressWidgetOrigin: FunctionComponent<Props> = ({ publicKey, cla
           <Content>
             <Text>Scan or copy QR code</Text>
             <QRCodeWrapper
-              className={classNames({ isImageCopyAvailable })}
-              onClick={isImageCopyAvailable ? handleImageCopyClick : undefined}
+              onClick={qrCopyEnabled ? handleImageCopyClick : undefined}
+              className={classNames({ copyEnabled: qrCopyEnabled })}
             >
               {isImageCopied ? (
                 <QRCopiedWrapper>
