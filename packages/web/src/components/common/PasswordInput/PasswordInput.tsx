@@ -102,7 +102,9 @@ export const PasswordInput: FC<
     }
   };
 
-  const handleToggleShowPassword = () => {
+  const handleToggleShowPassword = (e: React.MouseEvent) => {
+    e.preventDefault();
+
     setIsShowPassword((state) => !state);
   };
 
