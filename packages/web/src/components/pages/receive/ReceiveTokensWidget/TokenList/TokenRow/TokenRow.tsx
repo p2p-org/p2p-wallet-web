@@ -40,24 +40,13 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
   forwardedRef?: React.Ref<HTMLDivElement>;
 }
 
-const TokenRowOrigin: FC<Props> = ({ forwardedRef, token, style }) => {
-  const renderName = (token: Token) => {
-    if (token.symbol === 'SOL') {
-      return 'Solana';
-    }
-
-    return token.name;
-  };
-
-  return (
-    <Wrapper ref={forwardedRef} style={style}>
-      <TokenAvatar token={token} size="32" />
-      <Name>{renderName(token)}</Name>
-      <Symbol>{token.symbol}</Symbol>
-    </Wrapper>
-  );
-};
-
+const TokenRowOrigin: FC<Props> = ({ forwardedRef, token, style }) => (
+  <Wrapper ref={forwardedRef} style={style}>
+    <TokenAvatar token={token} size="32" />
+    <Name>{token.name}</Name>
+    <Symbol>{token.symbol}</Symbol>
+  </Wrapper>
+);
 export const TokenRow = forwardRef<HTMLDivElement, Props>(
   (props, ref: React.Ref<HTMLDivElement>) => <TokenRowOrigin {...props} forwardedRef={ref} />,
 );

@@ -4,6 +4,8 @@ import { useMemo, useState } from 'react';
 import { styled } from '@linaria/react';
 import { useTokensContext } from '@p2p-wallet-web/core';
 import { useIsTablet } from '@p2p-wallet-web/ui';
+import type { Token } from '@saberhq/token-utils';
+import { NATIVE_MINT } from '@solana/spl-token';
 import Fuse from 'fuse.js';
 import { useDebounce } from 'use-debounce';
 
@@ -21,15 +23,19 @@ const Content = styled.div`
   padding: 16px 16px 0;
 `;
 
-interface Props {}
+const DEBOUNCE_DELAY = 200;
 
-export const ReceiveTokensWidget: FC<Props> = () => {
-  const { tokens } = useTokensContext();
+export const ReceiveTokensWidget: FC = () => {
+  const { tokens: tokensNotFiltered } = useTokensContext();
   const isTablet = useIsTablet();
 
   const [searchQuery, setSearchQuery] = useState('');
 
-  const [searchQueryDebounced] = useDebounce(searchQuery, 200);
+  const [searchQueryDebounced] = useDebounce(searchQuery, DEBOUNCE_DELAY);
+
+  const tokens = useMemo(() => {
+    return tokensNotFiltered.filter((token: Token) => token.address !== NATIVE_MINT.toString());
+  }, [tokensNotFiltered]);
 
   const fuse = useMemo(
     () =>
