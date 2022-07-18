@@ -21,6 +21,7 @@ export const SendButton: FC = () => {
     isAddressInvalid,
     setIsInitBurnAndRelease,
     isAddressNotMatchNetwork,
+    isSelfAddress,
   } = useSendState();
   const { isInsufficientFundsForFee } = useFeeCalculation();
 
@@ -33,6 +34,7 @@ export const SendButton: FC = () => {
     !destinationAddress ||
     isValidAmount(fromAmount) ||
     isAddressInvalid ||
+    isSelfAddress ||
     isAddressNotMatchNetwork ||
     !hasBalance ||
     isInsufficientFundsForFee;

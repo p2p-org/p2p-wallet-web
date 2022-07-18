@@ -24,6 +24,7 @@ export const SendWidget: FunctionComponent = () => {
     isInitBurnAndRelease,
     resolvedAddress,
     setIsShowConfirmAddressSwitch,
+    destinationAccount,
   } = useSendState();
 
   useEffect(() => {
@@ -31,7 +32,12 @@ export const SendWidget: FunctionComponent = () => {
     const isSolanaNetwork = blockchain === 'solana';
 
     if (isValidSolanaAddress(toPublicKey)) {
-      pubKey = toPublicKey;
+      const { address, owner } = destinationAccount || {};
+      if (address?.toString() === toPublicKey && !!owner) {
+        pubKey = owner.toString();
+      } else {
+        pubKey = toPublicKey;
+      }
     } else if (isValidSolanaAddress(resolvedAddress ?? '')) {
       pubKey = resolvedAddress;
     }
@@ -51,6 +57,7 @@ export const SendWidget: FunctionComponent = () => {
     provider,
     setIsShowConfirmAddressSwitch,
     fromTokenAccount?.balance?.token?.mintAccount,
+    destinationAccount,
   ]);
 
   return (
