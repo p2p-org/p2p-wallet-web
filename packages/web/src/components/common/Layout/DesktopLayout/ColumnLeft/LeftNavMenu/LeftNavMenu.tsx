@@ -82,25 +82,25 @@ const Name = styled.span`
   }
 `;
 
-const navLinkMenuMixins = {
-  '&:hover': {
-    '& > div': {
-      backgroundColor: theme.colors.bg.activePrimary,
-    },
-  },
+const navLinkMenuMixins = `
+  &:hover {
+    & > div {
+      background-color: ${theme.colors.bg.activePrimary};
+    }
+  }
 
-  '&:active': {
-    '& > div': {
-      backgroundColor: theme.colors.bg.pressed,
-    },
-  },
+  &:active {
+    & > div {
+      background-color: ${theme.colors.bg.pressed};
+    }
+  }
 
-  '&:focus-visible': {
-    borderRadius: 12,
-    outline: `${theme.colors.textIcon.active} solid 1px`,
-    outlineOffset: 2,
-  },
-};
+  &:focus-visible {
+    border-radius: 12px;
+    outline: ${theme.colors.textIcon.active} solid 1px;
+    outline-offset: 2px;
+  }
+`;
 
 const NavLinkMenu = styled(NavLink)`
   &.active {
