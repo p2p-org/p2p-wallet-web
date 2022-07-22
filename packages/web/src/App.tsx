@@ -38,10 +38,10 @@ const App: React.FC = () => {
         <Router basename={process.env.REACT_APP_BASENAME}>
           <Providers>
             <Root>
-              <Main>
-                <Switch>
-                  <Route path="/" component={Landing} exact />
-                  <Route path="/:type(signup|login)" component={Auth} exact />
+              <Switch>
+                <Route path="/" component={Landing} exact />
+                <Route path="/:type(signup|login)" component={Auth} exact />
+                <Main>
                   <AuthRequiredRoute path="/wallets" component={Home} />
                   <AuthRequiredRoute
                     path="/wallet/:publicKey/settings"
@@ -56,11 +56,11 @@ const App: React.FC = () => {
                   <AuthRequiredRoute path="/settings/network" component={SettingsNetwork} />
                   <AuthRequiredRoute path="/settings" component={Settings} />
                   <AuthRequiredRoute path="/buy/:symbol?" component={Buy} />
-                </Switch>
-                <Intercom />
-                <FeaturesToggle />
-                <ToastManager anchor="left" renderToast={(props) => <NotifyToast {...props} />} />
-              </Main>
+                </Main>
+              </Switch>
+              <Intercom />
+              <FeaturesToggle />
+              <ToastManager anchor="left" renderToast={(props) => <NotifyToast {...props} />} />
             </Root>
           </Providers>
         </Router>
