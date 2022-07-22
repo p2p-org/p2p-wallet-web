@@ -4677,13 +4677,13 @@
     json-to-pretty-yaml "^1.2.2"
     mkdirp "1.0.4"
 
-"@solana/spl-token-swap@^0.1.3":
-  version "0.1.3"
-  resolved "https://registry.yarnpkg.com/@solana/spl-token-swap/-/spl-token-swap-0.1.3.tgz#b5480bb36d70a6b299debf0fb84b522f1ba686f0"
-  integrity sha512-sqFD8qfgmLhddAfilRdxRz/UFLrTlae/We0MEi5Qw976sR3YzCTaL3CTbQVKOjBADbmM8jObaW93JeN0ogcOwQ==
+"@solana/spl-token-swap@^0.2.0":
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/@solana/spl-token-swap/-/spl-token-swap-0.2.0.tgz#931610368c6ad2900daed3c825aab09027b27dba"
+  integrity sha512-Bb9J0Kw/2KrnYaTKnnaY2VvToHe1PzsbgZIPrGwEi1CRKR8L+de4GRXm0dDmT9Zpyn+AhYUoQIPC6ExhC8xErA==
   dependencies:
-    "@solana/buffer-layout" "^3.0.0"
-    "@solana/web3.js" "^1.10.0"
+    "@solana/buffer-layout" "^4.0.0"
+    "@solana/web3.js" "^1.42.0"
     bn.js "^5.1.3"
 
 "@solana/spl-token@^0.0.13":

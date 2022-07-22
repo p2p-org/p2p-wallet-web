@@ -12,8 +12,8 @@ export abstract class SDListViewModel<T> extends SDViewModel<T[]> implements ISD
   // Properties
 
   isPaginationEnabled: boolean;
-  customFilter?: (item: T) => boolean;
-  customSorter?: (a: T, b: T) => number;
+  customFilter?(item: T): boolean;
+  customSorter?(a: T, b: T): number;
 
   // For pagination
 

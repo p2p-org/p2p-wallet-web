@@ -11,6 +11,7 @@ import { WalletsSection } from './WalletsSection';
 const Wrapper = styled.div`
   display: grid;
   grid-gap: 8px;
+  margin: 0 -18px;
 
   ${up.tablet} {
     grid-gap: 16px;
@@ -19,7 +20,7 @@ const Wrapper = styled.div`
 `;
 
 interface Props {
-  viewModel: WalletsRepository;
+  viewModel: Readonly<WalletsRepository>;
 }
 
 export const WalletsCollectionView: FC<Props> = ({ viewModel }) => {

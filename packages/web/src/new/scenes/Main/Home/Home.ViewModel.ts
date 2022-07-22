@@ -6,18 +6,13 @@ import { SDFetcherState } from 'new/core/viewmodels/SDViewModel';
 import { ViewModel } from 'new/core/viewmodels/ViewModel';
 import { Defaults } from 'new/services/Defaults';
 import { NameService } from 'new/services/NameService';
-import { PricesService } from 'new/services/PriceAPIs/PricesService';
 import { WalletsRepository } from 'new/services/Repositories';
 
 @injectable()
 export class HomeViewModel extends ViewModel {
   username: string | null = null;
 
-  constructor(
-    public walletsRepository: WalletsRepository,
-    public pricesService: PricesService,
-    public nameService: NameService,
-  ) {
+  constructor(public walletsRepository: WalletsRepository, public nameService: NameService) {
     super();
 
     makeObservable(this, {
@@ -30,7 +25,7 @@ export class HomeViewModel extends ViewModel {
   }
 
   protected override onInitialize() {
-    this.walletsRepository.initialize();
+    // this.walletsRepository.initialize();
 
     this.addReaction(
       reaction(
@@ -43,7 +38,7 @@ export class HomeViewModel extends ViewModel {
   }
 
   protected override afterReactionsRemoved() {
-    this.walletsRepository.end();
+    // this.walletsRepository.end();
   }
 
   private _getUsername() {

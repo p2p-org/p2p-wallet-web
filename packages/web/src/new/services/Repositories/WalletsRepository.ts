@@ -1,7 +1,7 @@
 import { ZERO } from '@orca-so/sdk';
 import { u64 } from '@solana/spl-token';
 import { action, computed, flow, makeObservable, observable, reaction } from 'mobx';
-import { Lifecycle, scoped } from 'tsyringe';
+import { singleton } from 'tsyringe';
 
 import { SDListViewModel } from 'new/core/viewmodels/SDListViewModel';
 import { SDFetcherState } from 'new/core/viewmodels/SDViewModel';
@@ -12,7 +12,7 @@ import type { AccountsObservableEvent } from 'new/services/Socket';
 import { AccountObservableService } from 'new/services/Socket';
 import { SolanaService } from 'new/services/SolanaService';
 
-@scoped(Lifecycle.ContainerScoped)
+@singleton()
 export class WalletsRepository extends SDListViewModel<Wallet> {
   // Properties
 
@@ -88,10 +88,12 @@ export class WalletsRepository extends SDListViewModel<Wallet> {
         () => this.getWallets(),
         (wallets) => {
           for (const wallet of wallets) {
-            this._socket.subscribeAccountNotification(
-              wallet.pubkey,
-              this._handleAccountNotification.bind(this),
-            );
+            if (wallet.pubkey) {
+              this._socket.subscribeAccountNotification(
+                wallet.pubkey,
+                this._handleAccountNotification.bind(this),
+              );
+            }
           }
         },
       ),
@@ -116,12 +118,14 @@ export class WalletsRepository extends SDListViewModel<Wallet> {
 
   // Methods
 
-  override createRequest = flow(function* (this: WalletsRepository) {
+  override createRequest = flow(function* (this: WalletsRepository): Generator<Promise<Wallet[]>> {
     return yield Promise.all([
+      // TODO: encapsulate address to service
       this._solanaService.provider.connection.getBalance(
         this._solanaService.provider.wallet.publicKey,
         'recent',
       ),
+      // TODO: encapsulate address to service
       this._solanaService.getTokenWallets(this._solanaService.provider.wallet.publicKey.toString()),
     ])
       .then(([balance, wallets]) => {
@@ -249,14 +253,14 @@ export class WalletsRepository extends SDListViewModel<Wallet> {
     Defaults.unhiddenWalletPubkey = Defaults.unhiddenWalletPubkey.filter(
       (item) => item !== wallet.pubkey,
     );
-    if (Defaults.hiddenWalletPubkey.indexOf(wallet.pubkey) === -1) {
+    if (wallet.pubkey && Defaults.hiddenWalletPubkey.indexOf(wallet.pubkey) === -1) {
       Defaults.hiddenWalletPubkey.push(wallet.pubkey);
     }
     this._updateVisibility(wallet);
   }
 
   private _unhideWallet(wallet: Wallet): void {
-    if (Defaults.unhiddenWalletPubkey.indexOf(wallet.pubkey) === -1) {
+    if (wallet.pubkey && Defaults.unhiddenWalletPubkey.indexOf(wallet.pubkey) === -1) {
       Defaults.unhiddenWalletPubkey.push(wallet.pubkey);
     }
     Defaults.hiddenWalletPubkey = Defaults.hiddenWalletPubkey.filter(

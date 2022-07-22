@@ -31,7 +31,7 @@ export class SolanaModel extends Model {
   }
 
   protected setUpConnection() {
-    this._connection = new Connection(Defaults.apiEndPoint.getURL());
+    this._connection = new Connection(Defaults.apiEndpoint.getURL());
   }
 
   protected setUpProvider() {

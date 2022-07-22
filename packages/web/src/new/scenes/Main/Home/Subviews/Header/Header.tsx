@@ -8,7 +8,7 @@ import { Desktop } from './Desktop';
 import { Mobile } from './Mobile';
 
 type Props = {
-  viewModel: HomeViewModel;
+  viewModel: Readonly<HomeViewModel>;
 };
 
 export const Header: FunctionComponent<Props> = ({ viewModel }) => {

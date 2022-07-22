@@ -5,6 +5,7 @@ import * as React from 'react';
 import { styled } from '@linaria/react';
 import { theme } from '@p2p-wallet-web/ui';
 import classNames from 'classnames';
+import { useDebouncedCallback } from 'use-debounce';
 
 import { Icon } from 'components/ui';
 
@@ -99,20 +100,21 @@ const SearchClearIcon = styled(Icon)`
 
 type CustomProps = {
   forwardedRef?: React.Ref<HTMLInputElement>;
-  value?: string;
+  initialValue?: string;
   onChange?: (value: string) => void;
 };
 
 type Props = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange'> & CustomProps;
 
-const InputOriginal: FunctionComponent<Props> = ({
+const SearchInputOriginal: FunctionComponent<Props> = ({
   forwardedRef,
-  value,
+  initialValue = '',
   onChange,
   className,
   ...props
 }) => {
   const [isFocused, setIsFocused] = useState(false);
+  const [localValue, setLocalValue] = useState(initialValue);
 
   const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
     setIsFocused(true);
@@ -130,13 +132,19 @@ const InputOriginal: FunctionComponent<Props> = ({
     }
   };
 
-  const handleChange = (e: React.FocusEvent<HTMLInputElement>) => {
+  const debouncedOnChange = useDebouncedCallback((value: string) => {
     if (onChange) {
-      onChange(e.target.value);
+      onChange(value);
     }
+  }, 300);
+
+  const handleChange = (e: React.FocusEvent<HTMLInputElement>) => {
+    setLocalValue(e.target.value);
+    debouncedOnChange(e.target.value);
   };
 
   const handleClear = () => {
+    setLocalValue('');
     if (onChange) {
       onChange('');
     }
@@ -150,7 +158,7 @@ const InputOriginal: FunctionComponent<Props> = ({
       <Content>
         <InputElement
           ref={forwardedRef}
-          value={value}
+          value={localValue}
           onFocus={handleFocus}
           onBlur={handleBlur}
           onChange={handleChange}
@@ -165,5 +173,7 @@ const InputOriginal: FunctionComponent<Props> = ({
 };
 
 export const SearchInput = forwardRef<HTMLInputElement, Props>(
-  (props, ref: React.Ref<HTMLInputElement>) => <InputOriginal {...props} forwardedRef={ref} />,
+  (props, ref: React.Ref<HTMLInputElement>) => (
+    <SearchInputOriginal {...props} forwardedRef={ref} />
+  ),
 );

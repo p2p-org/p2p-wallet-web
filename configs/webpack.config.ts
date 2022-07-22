@@ -131,6 +131,7 @@ const config: ConfigFn = (env, argv) => {
     entry: path.resolve(__dirname, WEB_PATH, '/src/index.tsx'),
 
     output: {
+      publicPath: __DEVELOPMENT__ ? '/' : undefined,
       path: path.resolve(__dirname, WEB_PATH, 'build'),
       filename: __DEVELOPMENT__ ? '[name].[contenthash].js' : '[contenthash].js',
       chunkFilename: __DEVELOPMENT__ ? '[id]-[contenthash].chunk.js' : '[contenthash].chunk.js',

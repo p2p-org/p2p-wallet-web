@@ -39,7 +39,7 @@ export const Row = styled.div`
 `;
 
 export const Text = styled.div`
-  display: inline-flex;
+  display: inline-block;
 
   color: ${theme.colors.textIcon.primary};
   font-weight: 500;

@@ -8,6 +8,10 @@ const primary = `
   border: 0.5px solid ${theme.colors.stroke.primary};
 `;
 
+const primary1 = `
+  border: 1px solid ${theme.colors.stroke.primary};
+`;
+
 const secondary = `
   border: 1px solid ${theme.colors.stroke.secondary};
 `;
@@ -18,6 +22,7 @@ const linksRGBA = `
 
 export const borders = {
   primary,
+  primary1,
   primaryRGBA,
   secondary,
   linksRGBA,

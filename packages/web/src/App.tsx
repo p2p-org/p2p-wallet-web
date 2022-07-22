@@ -11,6 +11,7 @@ import { NotifyToast } from 'components/common/NotifyToast';
 import { ToastManager } from 'components/common/ToastManager';
 import { Main } from 'new/scenes/Main';
 import { Home } from 'new/scenes/Main/Home';
+import { Send as SendNew } from 'new/scenes/Main/Send';
 import { Root } from 'new/scenes/Root';
 import { Auth } from 'pages/Auth';
 import { Buy } from 'pages/Buy';
@@ -48,6 +49,7 @@ const App: React.FC = () => {
                   />
                   <AuthRequiredRoute path="/wallet/:publicKey" exact component={Wallet} />
                   <AuthRequiredRoute path="/receive/(tokens)?" component={Receive} />
+                  <AuthRequiredRoute path="/sendnew/:publicKey?" component={SendNew} />
                   <AuthRequiredRoute path="/send/:publicKey/:status(result)" component={Send} />
                   <AuthRequiredRoute path="/send/:publicKey?" component={Send} />
                   <AuthRequiredRoute path="/swap/(settings)?/:symbol?" component={Swap} />

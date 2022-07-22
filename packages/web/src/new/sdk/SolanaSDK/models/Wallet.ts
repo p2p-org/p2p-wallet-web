@@ -24,8 +24,8 @@ const defaultSolanaWalletUserInfo: SolanaWalletUserInfo = {
 export class Wallet {
   // Properties
 
-  pubkey: string;
-  lamports: u64 | null;
+  pubkey?: string | null;
+  lamports?: u64 | null;
   token: Token;
   userInfo: object | null = null;
 
@@ -34,11 +34,11 @@ export class Wallet {
   }
 
   constructor({
-    pubkey,
+    pubkey = null,
     lamports = null,
     token,
   }: {
-    pubkey: string;
+    pubkey?: string | null;
     lamports?: u64 | null;
     token: Token;
   }) {
@@ -55,7 +55,13 @@ export class Wallet {
   }
 
   // Fabric methods
-  static nativeSolana({ pubkey, lamports }: { pubkey: string; lamports?: u64 }): Wallet {
+  static nativeSolana({
+    pubkey = null,
+    lamports = null,
+  }: {
+    pubkey?: string | null;
+    lamports?: u64 | null;
+  }): Wallet {
     return new Wallet({ pubkey, lamports, token: Token.nativeSolana });
   }
 

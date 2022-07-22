@@ -51,7 +51,7 @@ export abstract class ObservableReactionContainer extends LifeCycleObject {
   protected abstract afterReactionsRemoved(): void;
 
   // this returns an index that can be used to clear a reaction later
-  // via the clearReaction function.
+  // via the removeReaction function.
   addReaction(reaction: IReactionDisposer): number {
     return this.reactions.push(reaction) - 1;
   }

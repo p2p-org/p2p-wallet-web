@@ -1,4 +1,4 @@
-import type { FunctionComponent, HTMLAttributes } from 'react';
+import type { FC, HTMLAttributes } from 'react';
 import { useEffect, useMemo, useState } from 'react';
 
 import { styled } from '@linaria/react';
@@ -46,7 +46,7 @@ type Props = {
   token?: Token;
 };
 
-export const TokenAvatar: FunctionComponent<Props & HTMLAttributes<HTMLDivElement>> = ({
+export const TokenAvatar: FC<Props & HTMLAttributes<HTMLDivElement>> = ({
   token,
   className,
   ...props

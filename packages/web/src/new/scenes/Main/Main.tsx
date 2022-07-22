@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import React from 'react';
+import React, { useEffect } from 'react';
 
 import { observer } from 'mobx-react-lite';
 
@@ -12,7 +12,11 @@ interface Props {
 }
 
 export const Main: FC<Props> = observer(({ children }) => {
-  useViewModel<MainViewModel>(MainViewModel);
+  const viewModel = useViewModel<MainViewModel>(MainViewModel);
+
+  useEffect(() => {
+    viewModel.walletsRepository.reload();
+  }, [viewModel.walletsRepository]);
 
   return <>{children}</>;
 });

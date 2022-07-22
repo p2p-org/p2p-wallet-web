@@ -43,7 +43,7 @@ const Content = styled.div`
 
 type Action = {
   icon: React.ReactNode;
-  onClick: () => void;
+  onClick?: () => void;
 };
 
 interface Props {

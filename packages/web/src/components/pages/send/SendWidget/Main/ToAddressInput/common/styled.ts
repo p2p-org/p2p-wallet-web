@@ -19,6 +19,10 @@ export const IconWrapper = styled.div`
     border: 1px solid ${theme.colors.textIcon.active};
   }
 
+  &.isWarning {
+    background: ${theme.colors.system.warningBg};
+  }
+
   &.isError {
     background: ${theme.colors.system.errorBg};
   }
@@ -29,4 +33,8 @@ export const WalletIcon = styled(Icon)`
   height: 24px;
 
   color: ${theme.colors.textIcon.secondary};
+
+  &.isWarning {
+    color: ${theme.colors.system.warningMain};
+  }
 `;

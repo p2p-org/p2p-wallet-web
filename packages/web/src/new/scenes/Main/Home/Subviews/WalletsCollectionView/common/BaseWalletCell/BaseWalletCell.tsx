@@ -9,9 +9,9 @@ import { SwipeToRevealActions } from 'components/common/SwipeToRevealActions';
 import { Icon } from 'components/ui';
 import type { Wallet } from 'new/sdk/SolanaSDK';
 import {
-  TokenAccountRowContent,
+  BaseWalletCellContent,
   TokenAvatarStyled,
-} from 'new/ui/components/common/TokenAccountRowContent';
+} from 'new/ui/components/common/BaseWalletCellContent';
 
 import { MenuStyled, TokenMenu } from './TokenMenu';
 
@@ -84,7 +84,7 @@ export const BaseWalletCell: FC<Props> = ({
   if (isPlaceholder) {
     return (
       <Wrapper>
-        <TokenAccountRowContent isPlaceholder={isPlaceholder} />
+        <BaseWalletCellContent isPlaceholder={isPlaceholder} />
       </Wrapper>
     );
   }
@@ -97,13 +97,13 @@ export const BaseWalletCell: FC<Props> = ({
   ];
 
   // Mobile and not SOL
-  const SwipeOrFragment =
-    isMobile && !wallet?.token.isNativeSOL ? SwipeToRevealActions : React.Fragment;
+  const shouldHasSwipe = isMobile && !wallet?.token.isNativeSOL;
+  const SwipeOrFragment = shouldHasSwipe ? SwipeToRevealActions : React.Fragment;
 
   return (
-    <SwipeOrFragment {...(isMobile ? actions : undefined)}>
+    <SwipeOrFragment {...(shouldHasSwipe ? { actions } : {})}>
       <WrapperLink to={wallet ? `/wallet/${wallet.pubkey}` : ''}>
-        <TokenAccountRowContent wallet={wallet} />
+        <BaseWalletCellContent wallet={wallet} />
         {isTablet && wallet ? (
           <TokenMenuStyled wallet={wallet} isHidden={isHidden} onToggleClick={onToggleClick!} />
         ) : undefined}

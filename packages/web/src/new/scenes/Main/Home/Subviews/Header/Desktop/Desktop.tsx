@@ -28,7 +28,7 @@ const WalletImg = styled.img`
 `;
 
 interface Props {
-  viewModel: HomeViewModel;
+  viewModel: Readonly<HomeViewModel>;
 }
 
 export const Desktop: FC<Props> = ({ viewModel }) => {

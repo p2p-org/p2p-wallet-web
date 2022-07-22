@@ -8,7 +8,7 @@ import Fuse from 'fuse.js';
 import { useDebounce } from 'use-debounce';
 
 import { WidgetPage } from 'components/common/WidgetPage';
-import { SearchInput } from 'components/ui';
+import { SearchInput } from 'new/ui/components/ui/SearchInput';
 
 import { EmptyError } from './common/EmptyError';
 import { Hint } from './common/Hint';
