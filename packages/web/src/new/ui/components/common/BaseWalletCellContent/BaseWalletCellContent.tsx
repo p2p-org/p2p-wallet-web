@@ -7,6 +7,7 @@ import { observer } from 'mobx-react-lite';
 
 import type { Wallet } from 'new/sdk/SolanaSDK';
 import { Defaults } from 'new/services/Defaults';
+import { numberToString } from 'new/utils/NumberExtensions';
 import { getAvatarSize } from 'utils/common';
 import { shortAddress } from 'utils/tokens';
 
@@ -18,7 +19,7 @@ const TokenInfo = styled.div`
   display: grid;
   grid-auto-flow: column;
   grid-template-rows: 22px 22px;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: auto;
 `;
 
 const TokenName = styled.div`
@@ -151,7 +152,8 @@ export const BaseWalletCellContent: FC<Props> = observer(({ wallet, isPlaceholde
     if (wallet.amountInCurrentFiat) {
       return (
         <TokenUSD>
-          {Defaults.fiat.symbol} {wallet.amountInCurrentFiat.toFixed(2)}
+          {Defaults.fiat.symbol}{' '}
+          {numberToString(wallet.amountInCurrentFiat, { maximumFractionDigits: 2 })}
         </TokenUSD>
       );
     }

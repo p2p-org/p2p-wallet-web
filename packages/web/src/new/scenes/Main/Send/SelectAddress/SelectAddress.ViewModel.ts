@@ -72,4 +72,8 @@ export class SelectAddressViewModel extends ViewModel implements SelectAddressVi
     this.inputState = InputState.searching;
     this.sendViewModel.selectRecipient(null);
   }
+
+  clearSearching() {
+    this.search('');
+  }
 }

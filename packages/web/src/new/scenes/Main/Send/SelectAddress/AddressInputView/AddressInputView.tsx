@@ -1,6 +1,6 @@
 import type { FC } from 'react';
+import { useRef, useState } from 'react';
 import * as React from 'react';
-import { useState } from 'react';
 
 import { styled } from '@linaria/react';
 import { theme } from '@p2p-wallet-web/ui';
@@ -102,6 +102,7 @@ interface Props {
 }
 
 export const AddressInputView: FC<Props> = observer(({ viewModel }) => {
+  const inputRef = useRef<HTMLInputElement>(null);
   const [isFocused, setIsFocused] = useState(false);
 
   const handleChange = useDebouncedCallback((e: React.ChangeEvent<HTMLInputElement>) => {
@@ -110,7 +111,10 @@ export const AddressInputView: FC<Props> = observer(({ viewModel }) => {
   }, 300);
 
   const handleClear = () => {
-    viewModel.clearRecipient();
+    viewModel.clearSearching();
+    if (inputRef.current) {
+      inputRef.current.value = '';
+    }
   };
 
   return (
@@ -119,9 +123,8 @@ export const AddressInputView: FC<Props> = observer(({ viewModel }) => {
         <SearchIcon name="search" />
       </IconWrapper>
       <ToInput
-        // ref={inputRef}
+        ref={inputRef}
         placeholder="Username / SOL address"
-        // value={viewModel.searchText ?? ''}
         onChange={handleChange}
         onFocus={() => setIsFocused(true)}
         onBlur={() => setIsFocused(false)}

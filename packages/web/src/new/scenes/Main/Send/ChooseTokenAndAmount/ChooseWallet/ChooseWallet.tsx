@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useEvent } from 'react-use';
 
 import { styled } from '@linaria/react';
@@ -129,15 +129,19 @@ const TitleTokens = styled.div`
 
 interface Props {
   viewModel: Readonly<ChooseWalletViewModel>;
+  selectedWallet: Wallet | null;
+  onWalletChange: (wallet: Wallet) => void;
 }
 
-export const ChooseWallet: FC<Props> = observer(({ viewModel }) => {
-  // const viewModel = useViewModel(ChooseWalletViewModel);
-
+export const ChooseWallet: FC<Props> = observer(({ viewModel, selectedWallet, onWalletChange }) => {
   const selectorRef = useRef<HTMLDivElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const [isOpen, setIsOpen] = useState(false);
+
+  useEffect(() => {
+    viewModel.selectWallet(selectedWallet);
+  }, [selectedWallet]);
 
   const handleAwayClick = useCallback((e: MouseEvent) => {
     if (
@@ -159,7 +163,7 @@ export const ChooseWallet: FC<Props> = observer(({ viewModel }) => {
   };
 
   const handleWalletClick = (wallet: Wallet) => {
-    viewModel.selectWallet(wallet);
+    onWalletChange(wallet);
     setIsOpen(false);
   };
 
@@ -191,7 +195,11 @@ export const ChooseWallet: FC<Props> = observer(({ viewModel }) => {
       {isOpen ? (
         <DropDownListContainer ref={dropdownRef}>
           <DropDownHeader>
-            <SearchInput placeholder="Search for token" onChange={handleFilterChange} />
+            <SearchInput
+              placeholder="Search for token"
+              initialValue={viewModel.keyword}
+              onChange={handleFilterChange}
+            />
           </DropDownHeader>
           <DropDownList>
             <CollectionView viewModel={viewModel} onWalletClick={handleWalletClick} />

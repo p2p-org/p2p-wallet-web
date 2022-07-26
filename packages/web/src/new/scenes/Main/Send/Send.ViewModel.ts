@@ -1,4 +1,4 @@
-import { action, computed, makeObservable, observable, runInAction, when } from 'mobx';
+import { action, makeObservable, observable, runInAction, when } from 'mobx';
 import type { ILazyObservable } from 'mobx-utils';
 import { lazyObservable } from 'mobx-utils';
 import { delay, inject, Lifecycle, scoped } from 'tsyringe';
@@ -17,7 +17,7 @@ import { WalletsRepository } from 'new/services/Repositories';
 import { SendService } from 'new/services/SendService';
 import { bitcoinAddress, matches } from 'new/utils/RegularExpression';
 
-import { ChooseTokenAndAmountViewModel, CurrencyMode } from './ChooseTokenAndAmount';
+import { ChooseTokenAndAmountViewModel } from './ChooseTokenAndAmount';
 
 export type Recipient = {
   address: string;
@@ -61,7 +61,7 @@ export class SendViewModel extends ViewModel implements SendViewModelType {
   // Subject
 
   wallet: Wallet | null = null;
-  amount: number | null = null;
+  amount = 0;
   recipient: Recipient | null = null;
   network: Network = Network.solana;
   loadingState = LoadableState.notRequested;
@@ -73,7 +73,7 @@ export class SendViewModel extends ViewModel implements SendViewModelType {
   });
 
   // ChooseTokenAndAmount
-  currencyMode: CurrencyMode = CurrencyMode.token;
+  // currencyMode: CurrencyMode = CurrencyMode.token;
 
   private _walletsLoadPromise: (Promise<void> & { cancel(): void }) | null = null;
 
@@ -95,9 +95,7 @@ export class SendViewModel extends ViewModel implements SendViewModelType {
       loadingState: observable,
       payingWallet: observable,
 
-      currencyMode: observable,
-
-      balanceText: computed,
+      // currencyMode: observable,
 
       selectRecipient: action,
     });
@@ -236,29 +234,6 @@ export class SendViewModel extends ViewModel implements SendViewModelType {
     /// TODO:
   }
 
-  /////////////////
-
-  // available amount
-  get balanceText(): string | null {
-    const wallet = this.wallet;
-    const mode = this.currencyMode;
-
-    if (!wallet) {
-      return null;
-    }
-
-    const amount = this.calculateAvailableAmount();
-    if (!amount) {
-      return null;
-    }
-
-    if (mode === CurrencyMode.fiat) {
-      return `${amount.toFixed(2)} ${Defaults.fiat.code}`;
-    }
-
-    return amount.formatUnits();
-  }
-
   // SendTokenChooseRecipientAndNetworkViewModelType
 
   getSelectedWallet(): Wallet | null {
@@ -291,12 +266,14 @@ export class SendViewModel extends ViewModel implements SendViewModelType {
     }
   }
 
+  enterAmount(amount: number) {
+    this.amount = amount;
+  }
+
   // SendTokenRecipientAndNetworkHandler
 
   selectRecipient(recipient: Recipient | null = null): void {
     this.recipient = recipient;
-
-    console.log(333, this.id, recipient);
 
     if (recipient !== null) {
       if (this._isRecipientBTCAddress()) {
@@ -323,6 +300,11 @@ export class SendViewModel extends ViewModel implements SendViewModelType {
         }
       }
     }
+  }
+
+  selectPayingWallet(payingWallet: Wallet): void {
+    Defaults.payingTokenMint = payingWallet.mintAddress;
+    this.payingWallet = payingWallet;
   }
 
   // Helpers

@@ -2,13 +2,18 @@ import type { FC } from 'react';
 
 import { styled } from '@linaria/react';
 import { theme } from '@p2p-wallet-web/ui';
+import classNames from 'classnames';
 import { computed } from 'mobx';
 import { observer } from 'mobx-react-lite';
 
 import { Icon } from 'components/ui';
+import { InputAmount } from 'components/ui/InputAmount';
 import type { SendViewModel } from 'new/scenes/Main/Send';
 import { ChooseWallet } from 'new/scenes/Main/Send/ChooseTokenAndAmount/ChooseWallet';
+import type { Wallet } from 'new/sdk/SolanaSDK';
 import { Defaults } from 'new/services/Defaults';
+import { AmountTypeButton } from 'new/ui/components/common/AmountTypeButton';
+import { numberToString } from 'new/utils/NumberExtensions';
 
 import { CurrencyMode } from './ChooseTokenAndAmount.ViewModel';
 
@@ -92,6 +97,12 @@ const InputWrapper = styled.div`
   display: flex;
 `;
 
+const BottomWrapper = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 4px;
+`;
+
 interface Props {
   viewModel: Readonly<SendViewModel>;
 }
@@ -103,47 +114,168 @@ export const ChooseTokenAndAmount: FC<Props> = observer(({ viewModel }) => {
   const balanceText = computed(() => {
     const wallet = vm.wallet;
     const mode = vm.currencyMode;
-    const amount = vm.calculateAvailableAmount();
-    if (!wallet || !amount) {
+    if (!wallet) {
       return null;
     }
 
-    let string = amount.toString() + ' ';
-    string += mode === CurrencyMode.fiat ? Defaults.fiat.code : wallet.token.symbol;
-    return string;
+    const amount = vm.calculateAvailableAmount;
+    if (!amount) {
+      return null;
+    }
+
+    if (mode === CurrencyMode.fiat) {
+      return `${numberToString(amount, { maximumFractionDigits: 2 })} ${Defaults.fiat.code}`;
+    }
+
+    return `${numberToString(amount, { maximumFractionDigits: 9 })} ${wallet.token.symbol}`;
   }).get();
 
-  const useAllBalance = () => {
-    const availableAmount = vm.calculateAvailableAmount();
-    const string = availableAmount?.toExact();
+  const equityValueLabel = computed(() => {
+    const amount = viewModel.amount;
+    const wallet = vm.wallet;
+    const currencyMode = vm.currencyMode;
+    if (!wallet) {
+      return '';
+    }
+
+    let equityValue = amount * wallet.priceInCurrentFiat;
+    let equityValueSymbol = Defaults.fiat.code;
+    let maximumFractionDigits = 2;
+    if (currencyMode === CurrencyMode.fiat) {
+      if (wallet.priceInCurrentFiat > 0) {
+        equityValue = amount / wallet.priceInCurrentFiat;
+      } else {
+        equityValue = 0;
+      }
+      equityValueSymbol = wallet.token.symbol;
+      maximumFractionDigits = wallet.token.decimals;
+    }
+
+    return `${equityValueSymbol} ${numberToString(equityValue, { maximumFractionDigits })}`;
+  }).get();
+
+  const handleUseAllBalanceClick = () => {
+    const availableAmount = vm.calculateAvailableAmount;
+    const string = numberToString(availableAmount ?? 0, {
+      maximumFractionDigits: 9,
+      groupingSeparator: '',
+    });
+    viewModel.enterAmount(Number(string));
   };
+
+  const handleWalletChange = (wallet: Wallet) => {
+    viewModel.chooseWallet(wallet);
+  };
+
+  const handleToggleCurrencyModeClick = () => {
+    vm.toggleCurrencyMode();
+  };
+
+  const handleAmountChange = (value: string) => {
+    viewModel.enterAmount(Number(value));
+
+    // const wallet = vm.wallet;
+    // const totalLamports = wallet?.lamports;
+    // let amount = Number(value);
+    // if (!wallet || !totalLamports || !amount) {
+    //   return;
+    // }
+    //
+    // // convert value
+    // if (vm.currencyMode === CurrencyMode.fiat && wallet.priceInCurrentFiat > 0) {
+    //   amount = amount / wallet.priceInCurrentFiat;
+    // }
+    //
+    // // calculate lamports
+    // let lamports = toLamport(amount, wallet.token.decimals);
+    // if (lamports.gt(totalLamports)) {
+    //   lamports = totalLamports;
+    // }
+    // viewModel.enterAmount(convertToBalance(lamports, wallet.token.decimals));
+  };
+
+  // useEffect(() => {
+  //   autorun(() => {
+  //     const wallet = vm.wallet;
+  //     const totalLamports = wallet?.lamports;
+  //     let amount = vm.amount;
+  //     if (!wallet || !totalLamports || !amount) {
+  //       return;
+  //     }
+  //
+  //     // convert value
+  //     if (vm.currencyMode === CurrencyMode.fiat && wallet.priceInCurrentFiat > 0) {
+  //       amount = amount / wallet.priceInCurrentFiat;
+  //     }
+  //
+  //     // calculate lamports
+  //     let lamports = toLamport(amount, wallet.token.decimals);
+  //     if (lamports.gt(totalLamports)) {
+  //       lamports = totalLamports;
+  //     }
+  //
+  //     console.log(4444, {
+  //       amount: amount,
+  //       currencyMode: vm.currencyMode,
+  //       lamports: toLamport(amount, wallet.token.decimals).toString(),
+  //       totalLamports: totalLamports.toString(),
+  //       convertToBalance: convertToBalance(lamports, wallet.token.decimals),
+  //     });
+  //   });
+  // }, []);
+
+  // error
+  const balanceClassName = computed(() => {
+    const error = vm.error;
+    const amount = vm.amount;
+
+    let className = '';
+    if (vm.error && amount !== 0) {
+      className = 'error';
+    } else if (!error && amount === vm.calculateAvailableAmount) {
+      className = 'success';
+    }
+    return className;
+  }).get();
+
+  const isAmountEqualMaxBalance = computed(() => {
+    return vm.amount === vm.calculateAvailableAmount;
+  }).get();
 
   return (
     <Wrapper>
       <TopWrapper>
         <Title>From</Title>
         <BalanceText>
-          {/*{tokenAccount ? (*/}
-          {/*  <AllBalance*/}
-          {/*    className={classNames({*/}
-          {/*      disabled,*/}
-          {/*      error: !hasBalance,*/}
-          {/*      success: Number(amount) && hasBalance,*/}
-          {/*    })}*/}
-          {/*  >*/}
-          {/*    <WalletBalanceIcon name="wallet" />*/}
-          {/*    {balanceText}*/}
-          {/*    {!isAmountEqualMaxBalance ? (*/}
-          {/*      <Max onClick={handleAllBalanceClick}>MAX</Max>*/}
-          {/*    ) : undefined}*/}
-          {/*  </AllBalance>*/}
-          {/*) : undefined}*/}
+          <AllBalance
+            className={classNames({ [balanceClassName]: true })}
+            onClick={handleUseAllBalanceClick}
+          >
+            <WalletBalanceIcon name="wallet" />
+            {balanceText}
+            {!isAmountEqualMaxBalance ? <Max>MAX</Max> : null}
+          </AllBalance>
         </BalanceText>
       </TopWrapper>
       <MainWrapper>
-        <ChooseWallet viewModel={vm.chooseWalletViewModel} />
-        <InputWrapper> {balanceText}</InputWrapper>
+        <ChooseWallet
+          viewModel={vm.chooseWalletViewModel}
+          selectedWallet={viewModel.wallet}
+          onWalletChange={handleWalletChange}
+        />
+        <InputWrapper>
+          <InputAmount
+            placeholder={vm.wallet ? Number(0).toFixed(vm.wallet.token.decimals) : '0'}
+            value={viewModel.amount === 0 ? undefined : viewModel.amount}
+            onChange={handleAmountChange}
+          />
+        </InputWrapper>
       </MainWrapper>
+      {vm.wallet?.priceInCurrentFiat ? (
+        <BottomWrapper>
+          <AmountTypeButton title={equityValueLabel} onClick={handleToggleCurrencyModeClick} />
+        </BottomWrapper>
+      ) : null}
     </Wrapper>
   );
 });

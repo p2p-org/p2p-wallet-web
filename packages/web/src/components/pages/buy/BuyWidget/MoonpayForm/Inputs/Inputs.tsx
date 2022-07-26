@@ -8,9 +8,8 @@ import { borders, theme } from '@p2p-wallet-web/ui';
 import { useBuyState, useConfig } from 'app/contexts';
 import { TokenAvatar } from 'components/common/TokenAvatar';
 import { InputAmount } from 'components/ui/InputAmount';
+import { AmountTypeButton } from 'new/ui/components/common/AmountTypeButton';
 import { formatNumberToUSD } from 'utils/format';
-
-import { AmountTypeButton } from '../AmountTypeButton';
 
 const Wrapper = styled.div`
   border-radius: 12px;

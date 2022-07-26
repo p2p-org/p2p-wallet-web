@@ -1,8 +1,14 @@
-import BN from 'bn.js';
-
-export function convertToBalance(value: BN, decimals: number) {
-  const divisor = new BN(10).pow(new BN(decimals));
-  const quotient = value.div(divisor);
-  const remainder = value.mod(divisor);
-  return quotient.toNumber() + remainder.toNumber() / divisor.toNumber();
+export function numberToString(
+  value: number,
+  {
+    maximumFractionDigits = 3,
+    groupingSeparator = ' ',
+  }: {
+    maximumFractionDigits?: number;
+    groupingSeparator?: string;
+  },
+): string {
+  return value
+    .toLocaleString(undefined, { maximumFractionDigits })
+    .replace(/,/g, groupingSeparator);
 }

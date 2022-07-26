@@ -9,8 +9,8 @@ import { ListWrapper, Row, Text } from 'components/ui/AccordionDetails/common';
 import type { SendViewModelType } from 'new/scenes/Main/Send';
 import { Network } from 'new/scenes/Main/Send';
 import type * as SolanaSDK from 'new/sdk/SolanaSDK';
+import { convertToBalance } from 'new/sdk/SolanaSDK';
 import { Defaults } from 'new/services/Defaults';
-import { convertToBalance } from 'new/utils/NumberExtensions';
 
 import { FeeTransactionTooltip } from './FeeTransactionTooltip';
 

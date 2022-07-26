@@ -1,7 +1,8 @@
 import { action, flow, makeObservable, observable, reaction } from 'mobx';
-import { injectable } from 'tsyringe';
+import { delay, inject, injectable } from 'tsyringe';
 
 import { SDListViewModel } from 'new/core/viewmodels/SDListViewModel';
+import { SendViewModel } from 'new/scenes/Main/Send';
 import { excludingSpecialTokens, Wallet } from 'new/sdk/SolanaSDK';
 import { PricesService } from 'new/services/PriceAPIs/PricesService';
 import { WalletsRepository } from 'new/services/Repositories';
@@ -19,6 +20,7 @@ export class ChooseWalletViewModel extends SDListViewModel<Wallet> {
     // private _tokensRepository: TokensRepository,
     private _solanaSDK: SolanaService,
     private _pricesService: PricesService,
+    @inject(delay(() => SendViewModel)) public sendViewModel: Readonly<SendViewModel>,
   ) {
     super();
 
@@ -108,11 +110,12 @@ export class ChooseWalletViewModel extends SDListViewModel<Wallet> {
     this.reload();
   }
 
-  selectWallet(wallet: Wallet) {
-    // TODO: handler
+  selectWallet(wallet: Wallet | null) {
     this.selectedWallet = wallet;
-    this._pricesService.addToWatchList([wallet.token.symbol]);
-    this._pricesService.fetchPrices([wallet.token.symbol]);
+    if (wallet) {
+      this._pricesService.addToWatchList([wallet.token.symbol]);
+      this._pricesService.fetchPrices([wallet.token.symbol]);
+    }
   }
 }
 

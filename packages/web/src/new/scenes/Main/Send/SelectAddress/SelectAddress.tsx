@@ -79,6 +79,7 @@ export const SelectAddress: FC<Props> = observer(({ viewModel }) => {
 
   const handleClearClick = () => {
     vm.clearRecipient();
+    vm.clearSearching();
   };
 
   return (
