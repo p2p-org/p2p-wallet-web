@@ -1,6 +1,6 @@
 import type { FunctionComponent } from 'react';
 import { useLocation } from 'react-router';
-import { Link, NavLink } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 
 import { styled } from '@linaria/react';
 import { borders, shadows, theme, up, useIsDesktop } from '@p2p-wallet-web/ui';
@@ -82,6 +82,26 @@ const Name = styled.span`
   }
 `;
 
+const navLinkMenuMixins = `
+  &:hover {
+    & > div {
+      background-color: ${theme.colors.bg.activePrimary};
+    }
+  }
+
+  &:active {
+    & > div {
+      background-color: ${theme.colors.bg.pressed};
+    }
+  }
+
+  &:focus-visible {
+    border-radius: 12px;
+    outline: ${theme.colors.textIcon.active} solid 1px;
+    outline-offset: 2px;
+  }
+`;
+
 const NavLinkMenu = styled(NavLink)`
   &.active {
     ${NavButton} {
@@ -99,23 +119,11 @@ const NavLinkMenu = styled(NavLink)`
     }
   }
 
-  &:hover {
-    ${NavButton} {
-      background-color: ${theme.colors.bg.activePrimary};
-    }
-  }
+  ${navLinkMenuMixins};
+`;
 
-  &:active {
-    ${NavButton} {
-      background-color: ${theme.colors.bg.pressed};
-    }
-  }
-
-  &:focus-visible {
-    border-radius: 12px;
-    outline: ${theme.colors.textIcon.active} solid 1px;
-    outline-offset: 2px;
-  }
+const NavLinkMenuOrdinary = styled.a`
+  ${navLinkMenuMixins};
 `;
 
 const Separator = styled.div`
@@ -226,9 +234,8 @@ export const LeftNavMenu: FunctionComponent = () => {
       <Separator>
         <Line />
       </Separator>
-      <NavLinkMenu
-        to={{ pathname: appStorePath }}
-        as={Link}
+      <NavLinkMenuOrdinary
+        href={appStorePath}
         target="_blank"
         className="button"
         onClick={handleAppLinkClick('app_store')}
@@ -240,10 +247,9 @@ export const LeftNavMenu: FunctionComponent = () => {
           <Name>App Store</Name>
           {isDesktop ? <StoreIcon name="store-icon" /> : null}
         </NavButton>
-      </NavLinkMenu>
-      <NavLinkMenu
-        to={{ pathname: playStorePath }}
-        as={Link}
+      </NavLinkMenuOrdinary>
+      <NavLinkMenuOrdinary
+        href={playStorePath}
         target="_blank"
         className="button"
         onClick={handleAppLinkClick('google_play')}
@@ -255,7 +261,7 @@ export const LeftNavMenu: FunctionComponent = () => {
           <Name>Google Play</Name>
           {isDesktop ? <StoreIcon name="store-icon" /> : null}
         </NavButton>
-      </NavLinkMenu>
+      </NavLinkMenuOrdinary>
     </Wrapper>
   );
 };
