@@ -56,7 +56,7 @@ const WalletIcon = styled.div`
   }
 
   &.phantom {
-    background: url('./phantom.png') no-repeat 50%;
+    background: url('./phantom.svg') no-repeat 50%;
   }
 `;
 
