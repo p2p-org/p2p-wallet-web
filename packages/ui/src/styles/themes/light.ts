@@ -1,4 +1,4 @@
-import { generate, toRGB } from './utils';
+import { generate } from './utils';
 
 const theme = {
   colors: {
@@ -16,7 +16,6 @@ const theme = {
     },
     stroke: {
       primary: '#D3D4DE',
-      primaryRGB: toRGB('#D3D4DE'),
       secondary: '#F2F2F7',
       tertiary: '#F6F6F8',
     },
@@ -33,7 +32,6 @@ const theme = {
       secondary: '#8E8E93',
       tertiary: '#D2D4E5',
       links: '#82A5FF',
-      linksRGB: toRGB('#82A5FF'),
       active: '#5887FF',
       buttonPrimary: '#FFFFFF',
       buttonSecondary: '#8E8E93',

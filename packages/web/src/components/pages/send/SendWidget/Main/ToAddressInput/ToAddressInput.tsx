@@ -161,6 +161,8 @@ const ResolvedNamesList = styled.div`
   grid-gap: 20px;
 `;
 
+const DEBOUNCE_TIMEOUT = 300;
+
 // TODO: needs to refactor, logic is weird
 export const ToAddressInput: FunctionComponent = () => {
   const inputRef = useRef<HTMLInputElement>(null);
@@ -175,6 +177,7 @@ export const ToAddressInput: FunctionComponent = () => {
     toPublicKey,
     blockchain,
     isAddressInvalid,
+    isSelfAddress,
   } = useSendState();
 
   const [isFocused, setIsFocused] = useState(false);
@@ -207,13 +210,14 @@ export const ToAddressInput: FunctionComponent = () => {
         }
       };
 
+      // eslint-disable-next-line @typescript-eslint/no-magic-numbers
       if (blockchain === 'solana' && toPublicKey.length > 0 && toPublicKey.length <= 40) {
         void resolveName();
       } else {
         setResolvedAddress(null);
       }
     },
-    300,
+    DEBOUNCE_TIMEOUT,
     [blockchain, toPublicKey, resolveUsername],
   );
   useEffect(() => () => cancel());
@@ -292,6 +296,17 @@ export const ToAddressInput: FunctionComponent = () => {
       );
     }
 
+    if (!isResolvingNames && !isResolvedNamesListOpen && !isAddressInvalid && isSelfAddress) {
+      return (
+        <ErrorWrapper>
+          <IconWrapper className={classNames({ isError: true })}>
+            <RoundStopIcon name="round-stop" />
+          </IconWrapper>
+          <Text className={classNames({ isError: true })}>You can not send tokens to yourself</Text>
+        </ErrorWrapper>
+      );
+    }
+
     if (isResolvedNamesListOpen) {
       return (
         <ResolvedNamesList ref={listRef}>
@@ -303,12 +318,20 @@ export const ToAddressInput: FunctionComponent = () => {
     }
 
     return null;
-  }, [handleItemClick, isAddressInvalid, isResolvedNamesListOpen, isResolvingNames, resolvedNames]);
+  }, [
+    handleItemClick,
+    isAddressInvalid,
+    isResolvedNamesListOpen,
+    isResolvingNames,
+    resolvedNames,
+    isSelfAddress,
+  ]);
 
   return (
     <>
       <WrapperLabel>
         <IconWrapper className={classNames({ isFocused })}>
+          {/* eslint-disable-next-line @typescript-eslint/no-magic-numbers */}
           {!isFocused || (!isAddressInvalid && toPublicKey.length > 40) ? (
             <WalletIcon name="wallet" />
           ) : (

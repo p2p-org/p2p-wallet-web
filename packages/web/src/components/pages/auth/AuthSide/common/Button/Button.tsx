@@ -1,6 +1,8 @@
 import { styled } from '@linaria/react';
 import { rgba } from 'polished';
 
+const ALFA_CHANNEL = 0.15;
+
 export const Button = styled.button`
   display: flex;
   align-items: center;
@@ -19,7 +21,6 @@ export const Button = styled.button`
   border: 1px solid transparent;
   border-radius: 12px;
   outline: none;
-  cursor: pointer;
 
   appearance: none;
 
@@ -27,7 +28,7 @@ export const Button = styled.button`
     color: #161616;
 
     background: #fff;
-    border: 1px solid ${rgba('#161616', 0.15)};
+    border: 1px solid ${rgba('#161616', ALFA_CHANNEL)};
   }
 
   &:disabled {

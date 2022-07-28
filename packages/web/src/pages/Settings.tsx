@@ -1,6 +1,6 @@
 import type { FunctionComponent } from 'react';
 import { useHistory } from 'react-router';
-import { NavLink, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 
 import { styled } from '@linaria/react';
 import { useWallet } from '@p2p-wallet-web/core';
@@ -201,7 +201,7 @@ export const Settings: FunctionComponent = () => {
             </Feature>
             <AccordionItem>
               <Accordion
-                open={(location.state as any)?.isUsernameActive}
+                open={location.state?.isUsernameActive}
                 title={
                   <AccordionTitle>
                     <AccordionTitlePrimary>Username</AccordionTitlePrimary>
@@ -231,22 +231,20 @@ export const Settings: FunctionComponent = () => {
                     </Text>
                     <div>You can access the feature in the app</div>
                     <MobileButtons>
-                      <NavLink to={{ pathname: playStorePath }} target="_blank" className="button">
+                      <a href={playStorePath} target="_blank" className="button" rel="noreferrer">
                         <img
                           src={GooglePlayBadge}
-                          width="135"
                           height="40"
                           alt="Download P2P Wallet at the Google Play Store"
                         />
-                      </NavLink>
-                      <NavLink to={{ pathname: appStorePath }} target="_blank" className="button">
+                      </a>
+                      <a href={appStorePath} target="_blank" className="button" rel="noreferrer">
                         <img
                           src={AppStoreBadge}
-                          width="120"
                           height="40"
                           alt="Download P2P Wallet from the App Store"
                         />
-                      </NavLink>
+                      </a>
                     </MobileButtons>
                   </>
                 )}

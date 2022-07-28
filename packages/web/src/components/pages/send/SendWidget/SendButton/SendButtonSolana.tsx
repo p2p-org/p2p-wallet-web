@@ -46,6 +46,7 @@ export const SendButtonSolana: FC<Props> = ({ primary, disabled }) => {
     hasBalance,
     details,
     isAddressNotMatchNetwork,
+    isSelfAddress,
   } = sendState;
   const { isInsufficientFundsForFee } = useFeeCalculation();
 
@@ -140,7 +141,7 @@ export const SendButtonSolana: FC<Props> = ({ primary, disabled }) => {
       return <>There is not enough {fromTokenAccount?.balance?.token.symbol} balance</>;
     }
 
-    if (!destinationAddress) {
+    if (!destinationAddress || isSelfAddress) {
       return 'Choose the recipient';
     }
 
@@ -166,6 +167,7 @@ export const SendButtonSolana: FC<Props> = ({ primary, disabled }) => {
     details.totalAmountToShow,
     isAddressNotMatchNetwork,
     isInsufficientFundsForFee,
+    isSelfAddress,
   ]);
 
   return (

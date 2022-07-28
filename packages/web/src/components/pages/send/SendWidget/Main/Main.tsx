@@ -2,11 +2,14 @@ import type { FC } from 'react';
 import { useHistory } from 'react-router';
 
 import { styled } from '@linaria/react';
+import { ZERO } from '@orca-so/sdk';
 import type { TokenAccount } from '@p2p-wallet-web/core';
 import { useUserTokenAccounts } from '@p2p-wallet-web/core';
 import { TokenAmount } from '@p2p-wallet-web/token-utils';
 import { theme } from '@p2p-wallet-web/ui';
 import type { Token } from '@saberhq/token-utils';
+import { u64 } from '@solana/spl-token';
+import { LAMPORTS_PER_SOL } from '@solana/web3.js';
 import { Feature } from 'flagged';
 
 import { useFeeCalculation, useSendState } from 'app/contexts';
@@ -91,19 +94,23 @@ export const Main: FC = () => {
   };
 
   const handleFromAmountChange = (minorAmount: string, type?: string) => {
-    let newAmount = minorAmount;
+    let newAmountStr = minorAmount;
 
     if (type === 'available') {
       if (isRawSOL) {
-        const totalFeeSol = new TokenAmount(fromTokenAccount.balance.token, fees.totalFee);
-        newAmount = (Number(newAmount) - Number(totalFeeSol.toExact())).toString();
+        const newAmount = new u64(Number(newAmountStr) * LAMPORTS_PER_SOL);
+        const newAmountMinusFee = newAmount.sub(fees.totalFee);
+
+        newAmountStr = newAmountMinusFee.lt(ZERO)
+          ? '0'
+          : new TokenAmount(fromTokenAccount.balance.token, newAmountMinusFee).toExact();
       }
-      trackEvent('send_available_click', { sum: Number(newAmount) });
+      trackEvent('send_available_click', { sum: Number(newAmountStr) });
     } else {
-      trackEvent('send_amount_keydown', { sum: Number(newAmount) });
+      trackEvent('send_amount_keydown', { sum: Number(newAmountStr) });
     }
 
-    setFromAmount(newAmount);
+    setFromAmount(newAmountStr);
   };
 
   const handleFeeTokenAccountChange = (

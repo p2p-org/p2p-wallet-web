@@ -33,6 +33,8 @@ export interface MoonpayGetBuyQuoteParams extends MoonpayBaseParams {
   baseCurrencyCode: 'usd';
   paymentMethod?: 'credit_debit_card';
   extraFeePercentage?: number;
+  fixed: true;
+  regionalPricing: true;
 }
 
 export type MoonpayGetBuyQuoteResponse = {

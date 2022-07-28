@@ -2,12 +2,14 @@ import type { FC } from 'react';
 import { useMemo } from 'react';
 
 import { styled } from '@linaria/react';
+import { ZERO } from '@orca-so/sdk';
 import { theme, useIsMobile } from '@p2p-wallet-web/ui';
 import { u64 } from '@solana/spl-token';
 import classNames from 'classnames';
 import Decimal from 'decimal.js';
 
 import type { UseSwap } from 'app/contexts';
+import { useNetworkFees } from 'app/contexts';
 import { useConfig } from 'app/contexts/solana/swap';
 import { formatBigNumber } from 'app/contexts/solana/swap/utils/format';
 import { Accordion, Icon } from 'components/ui';
@@ -45,8 +47,9 @@ export interface FeesOriginalProps {
 
 export const FeesOriginal: FC<FeesOriginalProps> = ({ swapInfo, forPage, open }) => {
   const { tokenConfigs } = useConfig();
-  const { trade } = swapInfo;
+  const { trade, intermediateTokenName, asyncStandardTokenAccounts } = swapInfo;
   const isMobile = useIsMobile();
+  const { accountRentExemption } = useNetworkFees();
 
   /*const {
     settings: { useFreeTransactions },
@@ -56,14 +59,22 @@ export const FeesOriginal: FC<FeesOriginalProps> = ({ swapInfo, forPage, open })
 
   const outputDecimals = tokenConfigs[swapInfo.trade.outputTokenName]?.decimals || 0;
   const minReceiveAmount = formatBigNumber(swapInfo.trade.getMinimumOutputAmount(), outputDecimals);
+  const accountCreationFee = formatBigNumber(
+    accountRentExemption,
+    tokenConfigs['SOL']?.decimals || 0,
+  );
+  const showDepositFee =
+    trade.inputTokenName === 'SOL' ||
+    trade.outputTokenName === 'SOL' ||
+    intermediateTokenName === 'SOL';
 
-  /*const tokenNames = useMemo(() => {
+  const tokenNames = useMemo(() => {
     if (!asyncStandardTokenAccounts) {
       return [];
     }
 
     return trade.getTokenNamesToSetup(asyncStandardTokenAccounts);
-  }, [trade, asyncStandardTokenAccounts]);*/
+  }, [trade, asyncStandardTokenAccounts]);
 
   const totalAmount = useMemo(() => {
     return `${formatBigNumber(
@@ -150,6 +161,39 @@ export const FeesOriginal: FC<FeesOriginalProps> = ({ swapInfo, forPage, open })
     </ListWrapper>
   );
 
+  const liquidityFeeEl = useMemo(() => {
+    let fee1Formated = null;
+
+    const [fee0, fee1] = trade.derivedFields?.fees as u64[];
+
+    const fee0Formated =
+      formatBigNumber(fee0, tokenConfigs[trade.inputTokenName]?.decimals) +
+      ' ' +
+      trade.inputTokenName;
+
+    if (trade.derivedFields?.doubleHopFields) {
+      fee1Formated =
+        formatBigNumber(fee1, tokenConfigs[trade.outputTokenName]?.decimals) +
+        ' ' +
+        trade.outputTokenName;
+    }
+
+    const showFee1 = fee1 && !fee1.eq(ZERO);
+
+    return (
+      <Row>
+        <Text className="gray">Liquidity provider fee</Text>
+        <Text className={classNames({ grid: true })}>
+          <span>
+            {fee0Formated}
+            {showFee1 ? <span style={{ marginLeft: 5 }}>+</span> : null}
+          </span>
+          {showFee1 ? <span>{fee1Formated}</span> : null}
+        </Text>
+      </Row>
+    );
+  }, [trade.derivedFields, trade.inputTokenName, trade.outputTokenName, tokenConfigs]);
+
   return (
     <Accordion
       title={
@@ -179,6 +223,23 @@ export const FeesOriginal: FC<FeesOriginalProps> = ({ swapInfo, forPage, open })
             </Text>
           </Text>
         </Row>
+        {showDepositFee ? (
+          <Row>
+            <Text className="gray">Deposit (will be returned)</Text>
+            <Text className={classNames({ grid: isMobile })}>
+              {accountCreationFee} SOL
+              <Text className="flex-end">
+                <AmountUSDStyled
+                  prefix="(~"
+                  postfix=")"
+                  amount={accountRentExemption}
+                  tokenName="SOL"
+                />
+              </Text>
+            </Text>
+          </Row>
+        ) : null}
+        {liquidityFeeEl}
         {/*<Row>
           <Text className="gray">Transaction fee</Text>
           {useFreeTransactions ? (
@@ -193,7 +254,7 @@ export const FeesOriginal: FC<FeesOriginalProps> = ({ swapInfo, forPage, open })
           )}
           <Text>5000 lamport</Text>
         </Row>*/}
-        {/*tokenNames?.map((tokenName) => (
+        {tokenNames?.map((tokenName) => (
           <Row key={tokenName}>
             <Text className="gray">{tokenName} account creation</Text>
             <Text className={classNames({ grid: isMobile })}>
@@ -202,13 +263,13 @@ export const FeesOriginal: FC<FeesOriginalProps> = ({ swapInfo, forPage, open })
                 <AmountUSDStyled
                   prefix="(~"
                   postfix=")"
-                  amount={networkFees.accountRentExemption}
-                  tokenName={'SOL'}
+                  amount={accountRentExemption}
+                  tokenName="SOL"
                 />
               </Text>
             </Text>
           </Row>
-        ))*/}
+        ))}
       </ListWrapper>
       {/*elCompensationFee*/}
       {elTotal}

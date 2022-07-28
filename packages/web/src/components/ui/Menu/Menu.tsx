@@ -26,7 +26,7 @@ const MoreIconWrapper = styled.div`
   width: 32px;
   height: 32px;
 
-  border: 1px solid transparent;
+  border: 0.5px solid transparent;
   border-radius: 4px;
   cursor: pointer;
 
@@ -36,7 +36,7 @@ const MoreIconWrapper = styled.div`
       color: ${theme.colors.textIcon.active};
     }
 
-    ${borders.linksRGBA}
+    ${borders.links}
   }
 
   &.vertical {
