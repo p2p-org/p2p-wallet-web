@@ -3,7 +3,6 @@ import { injectable } from 'tsyringe';
 
 import { LoadableState } from 'new/app/models/LoadableReleay';
 import { ViewModel } from 'new/core/viewmodels/ViewModel';
-import type { CryptoCurrenciesForSelectType } from 'new/scenes/Main/Buy/types';
 import { BuyService } from 'new/services/BuyService';
 import type { ExchangeRate } from 'new/services/BuyService/structures';
 import {
@@ -16,11 +15,13 @@ import { SolanaService } from 'new/services/SolanaService';
 
 const UPDATE_INTERVAL = 10000;
 
+type CryptoCurrenciesForSelectType = { [key: string]: CryptoCurrency };
+
 @injectable()
 export class BuyViewModel extends ViewModel {
   isShowIframe = false;
-  input: ExchangeInput = new ExchangeInput(0, FiatCurrency.usd);
-  output: ExchangeOutput = new ExchangeOutput(0, CryptoCurrency.sol, 0, 0, 0, 0, 0);
+  input: ExchangeInput = ExchangeInput.zeroInstance(FiatCurrency.usd);
+  output: ExchangeOutput = ExchangeOutput.zeroInstance(CryptoCurrency.sol);
   minFiatAmount = 0;
   minCryptoAmount = 0;
   exchangeRate: ExchangeRate | null = null;
@@ -76,7 +77,7 @@ export class BuyViewModel extends ViewModel {
         }),
         ({ input }) => {
           if (input.amount === 0) {
-            this.changeOutput(new ExchangeOutput(0, this.output.currency, 0, 0, 0, 0, 0));
+            this.changeOutput(ExchangeOutput.zeroInstance(this.output.currency));
             this.setLoadingState(LoadableState.loaded);
             return;
           }
@@ -86,7 +87,7 @@ export class BuyViewModel extends ViewModel {
           this._buyService
             .convert(
               input,
-              input.currency instanceof FiatCurrency ? this.crypto : this.output.currency,
+              FiatCurrency.isFiat(input.currency) ? this.crypto : this.output.currency,
             )
             .then((output) => {
               this.setLoadingState(LoadableState.loaded);
@@ -94,7 +95,7 @@ export class BuyViewModel extends ViewModel {
               if (output) {
                 this.changeOutput(output);
               } else {
-                this.changeOutput(new ExchangeOutput(0, this.output.currency, 0, 0, 0, 0, 0));
+                this.changeOutput(ExchangeOutput.zeroInstance(this.output.currency));
               }
             });
         },
@@ -156,7 +157,7 @@ export class BuyViewModel extends ViewModel {
   setCryptoCurrency(cryptoCurrency: CryptoCurrency) {
     this.crypto = cryptoCurrency;
 
-    if (this.input.currency instanceof FiatCurrency) {
+    if (FiatCurrency.isFiat(this.input.currency)) {
       const { amount, price, networkFee, processingFee, purchaseCost, total } = this.output;
       this.output = new ExchangeOutput(
         amount,

@@ -28,15 +28,15 @@ export class BuyService implements BuyServiceType {
   constructor(private _provider: MoonpayProvider) {}
 
   convert(input: ExchangeInput, currency: BuyCurrencyType): Promise<ExchangeOutput | void> {
-    const baseCurrencyAmount = input.currency instanceof FiatCurrency ? input.amount : 0;
-    const quoteCurrencyAmount = input.currency instanceof CryptoCurrency ? input.amount : 0;
+    const baseCurrencyAmount = FiatCurrency.isFiat(input.currency) ? input.amount : 0;
+    const quoteCurrencyAmount = CryptoCurrency.isCrypto(input.currency) ? input.amount : 0;
 
-    const baseCurrencyCode = [input.currency, currency].find(
-      (currency) => currency instanceof FiatCurrency,
+    const baseCurrencyCode = [input.currency, currency].find((currency) =>
+      FiatCurrency.isFiat(currency),
     )!.moonpayCode;
 
-    const quoteCurrencyCode = [input.currency, currency].find(
-      (currency) => currency instanceof CryptoCurrency,
+    const quoteCurrencyCode = [input.currency, currency].find((currency) =>
+      CryptoCurrency.isCrypto(currency),
     )!.moonpayCode;
 
     return this._provider
@@ -57,7 +57,7 @@ export class BuyService implements BuyServiceType {
         } = data as MoonpayGetBuyQuoteResponse;
 
         return new ExchangeOutput(
-          currency instanceof CryptoCurrency ? quoteCurrencyAmount : baseCurrencyAmount,
+          CryptoCurrency.isCrypto(currency) ? quoteCurrencyAmount : baseCurrencyAmount,
           currency,
           quoteCurrencyPrice,
           feeAmount,

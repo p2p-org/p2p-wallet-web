@@ -6,18 +6,15 @@ import { useIsMobile } from '@p2p-wallet-web/ui';
 import { observer } from 'mobx-react-lite';
 
 import { WidgetPageBuy } from 'components/pages/buy/BuyWidget/WidgetPageBuy';
-import type { BuyViewModel } from 'new/scenes/Main/Buy/Buy.ViewModel';
 import { MoonpayButton } from 'new/scenes/Main/Buy/Subviews/Moonpay/Button';
 import { CurrencySelect } from 'new/scenes/Main/Buy/Subviews/Moonpay/CurrencySelector';
 import { Details } from 'new/scenes/Main/Buy/Subviews/Moonpay/Details/Details';
 import { Inputs } from 'new/scenes/Main/Buy/Subviews/Moonpay/Inputs';
-import type { CryptoCurrenciesForSelectSymbols } from 'new/scenes/Main/Buy/types';
+import type { BuyViewModelProps } from 'new/scenes/Main/Buy/Subviews/Moonpay/types';
 
-interface Props {
-  viewModel: BuyViewModel;
-}
+type CryptoCurrenciesForSelectSymbols = 'SOL' | 'USDC';
 
-export const MoonpayWidget: FC<Props> = observer(({ viewModel }) => {
+export const MoonpayWidget: FC<BuyViewModelProps> = observer(({ viewModel }) => {
   const isMobile = useIsMobile();
   const { symbol } = useParams<{ symbol: string }>();
 

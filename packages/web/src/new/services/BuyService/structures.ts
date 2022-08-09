@@ -8,6 +8,10 @@ export type BuyCurrencyType = FiatCurrency | CryptoCurrency;
 export class FiatCurrency {
   private _symbol: FiatCurrencySymbol = BASE_CURRENCY_SYMBOL;
 
+  static isFiat(currency: BuyCurrencyType) {
+    return currency instanceof FiatCurrency;
+  }
+
   static get usd() {
     return new FiatCurrency();
   }
@@ -29,6 +33,10 @@ export class FiatCurrency {
 
 export class CryptoCurrency {
   private _symbol: CryptoCurrencySymbol;
+
+  static isCrypto(currency: BuyCurrencyType) {
+    return currency instanceof CryptoCurrency;
+  }
 
   static get sol() {
     return new CryptoCurrency('SOL');
@@ -110,6 +118,10 @@ export class ExchangeInput {
   amount: number;
   currency: BuyCurrencyType;
 
+  static zeroInstance(currency: BuyCurrencyType) {
+    return new ExchangeInput(0, currency);
+  }
+
   constructor(amount: number, currency: BuyCurrencyType) {
     this.amount = amount;
     this.currency = currency;
@@ -141,6 +153,10 @@ export class ExchangeOutput {
   purchaseCost: number;
 
   total: number;
+
+  static zeroInstance(currency: BuyCurrencyType) {
+    return new ExchangeOutput(0, currency, 0, 0, 0, 0, 0);
+  }
 
   constructor(
     amount: number,

@@ -4,7 +4,7 @@ import { styled } from '@linaria/react';
 import { observer } from 'mobx-react-lite';
 
 import { Button, Icon } from 'components/ui';
-import type { BuyViewModel } from 'new/scenes/Main/Buy/Buy.ViewModel';
+import type { BuyViewModelProps } from 'new/scenes/Main/Buy/Subviews/Moonpay/types';
 import { CryptoCurrency, FiatCurrency } from 'new/services/BuyService/structures';
 import { formatNumberToUSD } from 'utils/format';
 
@@ -14,11 +14,7 @@ const IconWrapper = styled(Icon)`
   margin-right: 8px;
 `;
 
-interface Props {
-  viewModel: BuyViewModel;
-}
-
-export const MoonpayButton: FC<Props> = observer(({ viewModel }) => {
+export const MoonpayButton: FC<BuyViewModelProps> = observer(({ viewModel }) => {
   if (viewModel.loadingState.isLoading) {
     return (
       <Button disabled primary full>
@@ -36,7 +32,7 @@ export const MoonpayButton: FC<Props> = observer(({ viewModel }) => {
   }
 
   if (
-    viewModel.input.currency instanceof FiatCurrency &&
+    FiatCurrency.isFiat(viewModel.input.currency) &&
     viewModel.input.amount &&
     viewModel.minFiatAmount > viewModel.input.amount
   ) {
@@ -48,7 +44,7 @@ export const MoonpayButton: FC<Props> = observer(({ viewModel }) => {
   }
 
   if (
-    viewModel.input.currency instanceof CryptoCurrency &&
+    CryptoCurrency.isCrypto(viewModel.input.currency) &&
     viewModel.input.amount &&
     viewModel.minCryptoAmount > viewModel.input.amount
   ) {

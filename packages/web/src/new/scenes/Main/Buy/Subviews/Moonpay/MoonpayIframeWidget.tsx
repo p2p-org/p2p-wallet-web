@@ -6,7 +6,7 @@ import { observer } from 'mobx-react-lite';
 
 import { useTrackEventOpen } from 'app/hooks/metrics';
 import { WidgetPageBuy } from 'components/pages/buy/BuyWidget/WidgetPageBuy';
-import type { BuyViewModel } from 'new/scenes/Main/Buy/Buy.ViewModel';
+import type { BuyViewModelProps } from 'new/scenes/Main/Buy/Subviews/Moonpay/types';
 import { MOONPAY_API_KEY, MOONPAY_SIGNER_URL } from 'new/services/BuyService/constants';
 import type { MoonpayIframeParams } from 'new/services/BuyService/MoonpayProvider/types';
 import { buildParams } from 'new/services/BuyService/MoonpayProvider/utils';
@@ -23,11 +23,7 @@ const baseParams: MoonpayIframeParams = {
   lockAmount: false,
 };
 
-interface Props {
-  viewModel: BuyViewModel;
-}
-
-export const MoonpayIframeWidget: FC<Props> = observer(({ viewModel }) => {
+export const MoonpayIframeWidget: FC<BuyViewModelProps> = observer(({ viewModel }) => {
   useTrackEventOpen('Buy_Provider_Step_Viewed');
 
   const urlWithParams = computed(

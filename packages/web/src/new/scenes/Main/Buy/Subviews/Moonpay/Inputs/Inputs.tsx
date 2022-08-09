@@ -10,7 +10,7 @@ import { useConfig } from 'app/contexts';
 import { TokenAvatar } from 'components/common/TokenAvatar';
 import { AmountTypeButton } from 'components/pages/buy/BuyWidget/MoonpayForm/AmountTypeButton';
 import { InputAmount } from 'components/ui/InputAmount';
-import type { BuyViewModel } from 'new/scenes/Main/Buy/Buy.ViewModel';
+import type { BuyViewModelProps } from 'new/scenes/Main/Buy/Subviews/Moonpay/types';
 import { FiatCurrency } from 'new/services/BuyService/structures';
 import { formatNumberToUSD } from 'utils/format';
 
@@ -40,14 +40,10 @@ const Title = styled.div`
   letter-spacing: 0.01em;
 `;
 
-interface Props {
-  viewModel: BuyViewModel;
-}
-
-export const Inputs: FC<Props> = observer(({ viewModel }) => {
+export const Inputs: FC<BuyViewModelProps> = observer(({ viewModel }) => {
   const { tokenConfigs } = useConfig();
   const token = useToken(tokenConfigs[viewModel.crypto.symbol]?.mint);
-  const isFiatCurrency = viewModel.input.currency instanceof FiatCurrency;
+  const isFiatCurrency = FiatCurrency.isFiat(viewModel.input.currency);
 
   const prefix = isFiatCurrency ? '$' : <TokenAvatar symbol={viewModel.crypto.symbol} size={32} />;
 

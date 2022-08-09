@@ -8,7 +8,7 @@ import { observer } from 'mobx-react-lite';
 
 import { TokenAvatar } from 'components/common/TokenAvatar';
 import { Select, SelectItem } from 'components/ui';
-import type { BuyViewModel } from 'new/scenes/Main/Buy/Buy.ViewModel';
+import type { BuyViewModelProps } from 'new/scenes/Main/Buy/Subviews/Moonpay/types';
 import type { CryptoCurrency } from 'new/services/BuyService/structures';
 
 const InfoWrapper = styled.div`
@@ -50,11 +50,7 @@ const Normal = styled.span`
   font-weight: normal;
 `;
 
-interface Props {
-  viewModel: BuyViewModel;
-}
-
-export const CurrencySelect: FC<Props> = observer(({ viewModel }) => {
+export const CurrencySelect: FC<BuyViewModelProps> = observer(({ viewModel }) => {
   const history = useHistory();
 
   const handleItemClick = useCallback(

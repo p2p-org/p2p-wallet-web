@@ -5,14 +5,10 @@ import { observer } from 'mobx-react-lite';
 
 import type { Accordion } from 'components/ui/AccordionDetails';
 import { AccordionDetails } from 'components/ui/AccordionDetails';
-import type { BuyViewModel } from 'new/scenes/Main/Buy/Buy.ViewModel';
+import type { BuyViewModelProps } from 'new/scenes/Main/Buy/Subviews/Moonpay/types';
 import { formatNumberToUSD } from 'utils/format';
 
-interface Props {
-  viewModel: BuyViewModel;
-}
-
-export const Details: FC<Props> = observer(({ viewModel }) => {
+export const Details: FC<BuyViewModelProps> = observer(({ viewModel }) => {
   const accordion = computed(() => {
     const lists: Accordion = [
       {
