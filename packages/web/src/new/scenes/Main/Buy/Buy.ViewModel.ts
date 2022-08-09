@@ -1,7 +1,9 @@
-import { action, makeObservable, observable, reaction } from 'mobx';
+import { action, computed, makeObservable, observable, reaction } from 'mobx';
 import { injectable } from 'tsyringe';
 
+import { LoadableState } from 'new/app/models/LoadableReleay';
 import { ViewModel } from 'new/core/viewmodels/ViewModel';
+import type { CryptoCurrenciesForSelectType } from 'new/scenes/Main/Buy/types';
 import { BuyService } from 'new/services/BuyService';
 import type { ExchangeRate } from 'new/services/BuyService/structures';
 import {
@@ -11,66 +13,108 @@ import {
   FiatCurrency,
 } from 'new/services/BuyService/structures';
 
+const UPDATE_INTERVAL = 10000;
+
 @injectable()
 export class BuyViewModel extends ViewModel {
+  isShowIframe = false;
   input: ExchangeInput = new ExchangeInput(0, FiatCurrency.usd);
-  output: ExchangeOutput = new ExchangeOutput(0, CryptoCurrency.sol, 0, 0, 0, 0);
+  output: ExchangeOutput = new ExchangeOutput(0, CryptoCurrency.sol, 0, 0, 0, 0, 0);
   minFiatAmount = 0;
   minCryptoAmount = 0;
-  exchageRate: ExchangeRate | null = null;
+  exchangeRate: ExchangeRate | null = null;
   crypto: CryptoCurrency = CryptoCurrency.sol;
+  loadingState = LoadableState.notRequested;
 
   private _timer: NodeJS.Timer;
 
   constructor(private _buyService: BuyService) {
     super();
 
-    makeObservable({
+    makeObservable(this, {
+      isShowIframe: observable,
+      hasMoonpayAPIKey: computed,
+      cryptoCurrenciesForSelect: computed,
+
       input: observable,
       output: observable,
       crypto: observable,
+      loadingState: observable,
 
-      update: action,
+      _update: action,
       changeOutput: action,
-      setAmount: action,
-      swap: action,
+      setAmount: action.bound,
+      setCryptoCurrency: action,
+      setIsShowIframe: action,
+      setLoadingState: action,
+      swap: action.bound,
     });
   }
 
-  protected override onInitialize() {
-    this._timer = setInterval(() => this._update());
+  private _startUpdating() {
+    this._update();
+    this._timer = setInterval(() => {
+      this._update();
+    }, UPDATE_INTERVAL);
+  }
 
+  private _stopUpdating() {
+    clearInterval(this._timer);
+  }
+
+  protected override onInitialize() {
     this.addReaction(
       reaction(
         () => ({
           input: this.input,
-          exchageRate: this.exchageRate,
+          crypto: this.crypto,
+          exchangeRate: this.exchangeRate,
           minFiatAmount: this.minFiatAmount,
           minCryptoAmount: this.minCryptoAmount,
         }),
         ({ input }) => {
           if (input.amount === 0) {
-            this.changeOutput(new ExchangeOutput(0, this.output.currency, 0, 0, 0, 0));
+            this.changeOutput(new ExchangeOutput(0, this.output.currency, 0, 0, 0, 0, 0));
+            this.setLoadingState(LoadableState.loaded);
             return;
           }
 
+          this.setLoadingState(LoadableState.loading);
+
           this._buyService
-            .convert(input, input.currency instanceof FiatCurrency ? this.crypto : input.currency)
-            .then((output) => this.changeOutput(output!))
-            .catch(() =>
-              this.changeOutput(new ExchangeOutput(0, this.output.currency, 0, 0, 0, 0)),
-            );
+            .convert(
+              input,
+              input.currency instanceof FiatCurrency ? this.crypto : this.output.currency,
+            )
+            .then((output) => {
+              this.setLoadingState(LoadableState.loaded);
+
+              if (output) {
+                this.changeOutput(output);
+              } else {
+                this.changeOutput(new ExchangeOutput(0, this.output.currency, 0, 0, 0, 0, 0));
+              }
+            });
         },
       ),
     );
+
+    this._startUpdating();
   }
 
-  protected override afterReactionsRemoved() {}
+  protected override afterReactionsRemoved() {
+    this._stopUpdating();
+  }
 
-  protected override onEnd() {
-    super.onEnd();
+  get hasMoonpayAPIKey(): boolean {
+    return this._buyService.getMoonpayAPIKeyIsSet();
+  }
 
-    clearInterval(this._timer);
+  get cryptoCurrenciesForSelect(): CryptoCurrenciesForSelectType {
+    return {
+      SOL: CryptoCurrency.sol,
+      USDC: CryptoCurrency.usdc,
+    };
   }
 
   private _update() {
@@ -79,7 +123,7 @@ export class BuyViewModel extends ViewModel {
       this._buyService.getMinAmount(this.crypto),
       this._buyService.getMinAmount(FiatCurrency.usd),
     ]).then(([exchangeRate, minCryptoAmount, minFiatAmount]) => {
-      this.exchageRate = exchangeRate;
+      this.exchangeRate = exchangeRate;
       this.minCryptoAmount = minCryptoAmount;
 
       const newMinFiatAmount = Number(
@@ -94,12 +138,40 @@ export class BuyViewModel extends ViewModel {
     this.output = output;
   }
 
-  setAmount(amount: number) {
-    if (amount === this.input.amount) {
+  setAmount(amount: string) {
+    const newAmount = Number(amount);
+    if (newAmount === this.input.amount) {
       return;
     }
 
-    this.input = new ExchangeInput(amount, this.input.currency);
+    this.input = new ExchangeInput(newAmount, this.input.currency);
+  }
+
+  setCryptoCurrency(cryptoCurrency: CryptoCurrency) {
+    this.crypto = cryptoCurrency;
+
+    if (this.input.currency instanceof FiatCurrency) {
+      const { amount, price, networkFee, processingFee, purchaseCost, total } = this.output;
+      this.output = new ExchangeOutput(
+        amount,
+        cryptoCurrency,
+        price,
+        processingFee,
+        networkFee,
+        purchaseCost,
+        total,
+      );
+    } else {
+      this.input = new ExchangeInput(this.input.amount, cryptoCurrency);
+    }
+  }
+
+  setIsShowIframe(value: boolean) {
+    this.isShowIframe = value;
+  }
+
+  setLoadingState(value: LoadableState) {
+    this.loadingState = value;
   }
 
   swap() {

@@ -1,63 +1,79 @@
-import { BASE_CURRENCY_CODE } from 'new/services/BuyService/constants';
+import { BASE_CURRENCY_SYMBOL } from 'new/services/BuyService/constants';
 
-type FiatCurrencyName = 'usd';
-type CryptoCurrencyCode = 'sol' | 'usdc';
+type FiatCurrencySymbol = 'USD';
+type CryptoCurrencySymbol = 'SOL' | 'USDC';
 
 export type BuyCurrencyType = FiatCurrency | CryptoCurrency;
 
 export class FiatCurrency {
-  private _name: FiatCurrencyName = BASE_CURRENCY_CODE;
+  private _symbol: FiatCurrencySymbol = BASE_CURRENCY_SYMBOL;
 
   static get usd() {
     return new FiatCurrency();
   }
 
-  get name() {
-    return this._name.toUpperCase();
+  get symbol() {
+    switch (this._symbol) {
+      case 'USD':
+        return 'USD';
+    }
   }
 
   get moonpayCode() {
-    return 'usd';
+    switch (this._symbol) {
+      case 'USD':
+        return 'usd';
+    }
   }
 }
 
 export class CryptoCurrency {
-  private _code: CryptoCurrencyCode;
+  private _symbol: CryptoCurrencySymbol;
 
   static get sol() {
-    return new CryptoCurrency('sol');
+    return new CryptoCurrency('SOL');
   }
 
   static get usdc() {
-    return new CryptoCurrency('usdc');
+    return new CryptoCurrency('USDC');
   }
 
-  constructor(code: CryptoCurrencyCode) {
-    this._code = code;
+  constructor(symbol: CryptoCurrencySymbol) {
+    this._symbol = symbol;
   }
 
-  get name() {
-    return this._code.toUpperCase();
+  get symbol() {
+    switch (this._symbol) {
+      case 'SOL':
+        return 'SOL';
+      case 'USDC':
+        return 'USDC';
+    }
   }
 
   get fullName() {
-    switch (this._code) {
-      case 'sol':
+    switch (this._symbol) {
+      case 'SOL':
         return 'Solana';
-      case 'usdc':
+      case 'USDC':
         return 'USD Coin';
     }
   }
 
   get solanaCode() {
-    return this._code;
+    switch (this._symbol) {
+      case 'SOL':
+        return 'SOL';
+      case 'USDC':
+        return 'USDC';
+    }
   }
 
   get moonpayCode() {
-    switch (this._code) {
-      case 'sol':
+    switch (this._symbol) {
+      case 'SOL':
         return 'sol';
-      case 'usdc':
+      case 'USDC':
         return 'usdc_sol';
     }
   }
@@ -105,6 +121,7 @@ export class ExchangeInput {
       output: new ExchangeOutput(
         this.amount,
         this.currency,
+        output.price,
         output.processingFee,
         output.networkFee,
         output.purchaseCost,
@@ -118,6 +135,7 @@ export class ExchangeOutput {
   amount: number;
   currency: BuyCurrencyType;
 
+  price: number;
   processingFee: number;
   networkFee: number;
   purchaseCost: number;
@@ -127,6 +145,7 @@ export class ExchangeOutput {
   constructor(
     amount: number,
     currency: BuyCurrencyType,
+    price: number,
     processingFee: number,
     networkFee: number,
     purchaseCost: number,
@@ -134,6 +153,7 @@ export class ExchangeOutput {
   ) {
     this.amount = amount;
     this.currency = currency;
+    this.price = price;
     this.processingFee = processingFee;
     this.networkFee = networkFee;
     this.purchaseCost = purchaseCost;

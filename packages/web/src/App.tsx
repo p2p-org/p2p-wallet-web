@@ -10,6 +10,7 @@ import { Intercom } from 'components/common/Intercom';
 import { NotifyToast } from 'components/common/NotifyToast';
 import { ToastManager } from 'components/common/ToastManager';
 import { Main } from 'new/scenes/Main';
+import { Buy as BuyNew } from 'new/scenes/Main/Buy/Buy';
 import { Home } from 'new/scenes/Main/Home';
 import { Root } from 'new/scenes/Root';
 import { Auth } from 'pages/Auth';
@@ -54,6 +55,7 @@ const App: React.FC = () => {
                   <AuthRequiredRoute path="/settings/network" component={SettingsNetwork} />
                   <AuthRequiredRoute path="/settings" component={Settings} />
                   <AuthRequiredRoute path="/buy/:symbol?" component={Buy} />
+                  <AuthRequiredRoute path="/buyNew/:symbol?" component={BuyNew} />
                 </Switch>
                 <Intercom />
                 <FeaturesToggle />

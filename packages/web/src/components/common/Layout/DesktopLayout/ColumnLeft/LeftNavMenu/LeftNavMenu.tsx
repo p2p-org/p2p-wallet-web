@@ -175,6 +175,20 @@ export const LeftNavMenu: FunctionComponent = () => {
         </NavLinkMenu>
       </Feature>
 
+      <Feature name={FEATURE_NAV_MENU_BUY_BUTTON}>
+        <NavLinkMenu
+          to={{ pathname: '/buyNew', state: { fromPage: location.pathname } }}
+          className="button"
+        >
+          <NavButton>
+            <IconBlock>
+              <NavIcon name="plus" />
+            </IconBlock>
+            <Name>Buy</Name>
+          </NavButton>
+        </NavLinkMenu>
+      </Feature>
+
       <NavLinkMenu
         to={{ pathname: '/receive', state: { fromPage: location.pathname } }}
         className="button"

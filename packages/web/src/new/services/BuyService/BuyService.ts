@@ -14,19 +14,20 @@ import {
 } from 'new/services/BuyService/structures';
 
 interface BuyServiceType {
-  convert(input: ExchangeInput, currency: BuyCurrencyType): Promise<ExchangeOutput | undefined>;
+  convert(input: ExchangeInput, currency: BuyCurrencyType): Promise<ExchangeOutput | void>;
   getExchangeRate(
     fiatCurrency: FiatCurrency,
     cryptoCurrency: CryptoCurrency,
   ): Promise<ExchangeRate>;
   getMinAmount(currency: BuyCurrencyType): Promise<number>;
+  getMoonpayAPIKeyIsSet(): boolean;
 }
 
 @injectable()
 export class BuyService implements BuyServiceType {
   constructor(private _provider: MoonpayProvider) {}
 
-  convert(input: ExchangeInput, currency: BuyCurrencyType): Promise<ExchangeOutput | undefined> {
+  convert(input: ExchangeInput, currency: BuyCurrencyType): Promise<ExchangeOutput | void> {
     const baseCurrencyAmount = input.currency instanceof FiatCurrency ? input.amount : 0;
     const quoteCurrencyAmount = input.currency instanceof CryptoCurrency ? input.amount : 0;
 
@@ -41,21 +42,32 @@ export class BuyService implements BuyServiceType {
     return this._provider
       .getByQuote(baseCurrencyAmount, quoteCurrencyAmount, baseCurrencyCode, quoteCurrencyCode)
       .then((data) => {
-        if ((data as MoonpayErrorResponse).type) {
-          // processError
-        } else {
-          const { quoteCurrencyAmount, feeAmount, networkFeeAmount, totalAmount } =
-            data as MoonpayGetBuyQuoteResponse;
-
-          return new ExchangeOutput(
-            currency instanceof CryptoCurrency ? quoteCurrencyAmount : totalAmount,
-            currency,
-            feeAmount,
-            networkFeeAmount,
-            baseCurrencyAmount,
-            totalAmount,
-          );
+        const { message, errors } = data as MoonpayErrorResponse;
+        if (errors || message) {
+          console.error(`${message}\n${errors}`);
+          return;
         }
+
+        const {
+          quoteCurrencyPrice,
+          quoteCurrencyAmount,
+          feeAmount,
+          networkFeeAmount,
+          totalAmount,
+        } = data as MoonpayGetBuyQuoteResponse;
+
+        return new ExchangeOutput(
+          currency instanceof CryptoCurrency ? quoteCurrencyAmount : baseCurrencyAmount,
+          currency,
+          quoteCurrencyPrice,
+          feeAmount,
+          networkFeeAmount,
+          baseCurrencyAmount,
+          totalAmount,
+        );
+      })
+      .catch((error) => {
+        console.error(error);
       });
   }
 
@@ -76,5 +88,9 @@ export class BuyService implements BuyServiceType {
           currencies?.find((currencyItem) => currencyItem.code === currency.moonpayCode)
             ?.minBuyAmount ?? 0,
       );
+  }
+
+  getMoonpayAPIKeyIsSet(): boolean {
+    return this._provider.getMoonpayAPIKeyIsSet();
   }
 }

@@ -29,7 +29,7 @@ export class MoonpayProvider {
     quoteCurrencyAmount: number | string,
     baseCurrencyCode: string,
     quoteCurrencyCode: string,
-  ) {
+  ): Promise<MoonpayGetBuyQuoteResponse | MoonpayErrorResponse> {
     try {
       this._abortController?.abort();
     } finally {
@@ -57,13 +57,13 @@ export class MoonpayProvider {
         throw new Error('getBuyQuote something wrong');
       }
 
-      return (await res.json()) as MoonpayGetBuyQuoteResponse | MoonpayErrorResponse;
+      return await res.json();
     } catch (error) {
       throw new Error(`Can't get getBuyQuote: ${error}`);
     }
   }
 
-  async getPrice(fiatCurrency: string, cryptoCurrency: string) {
+  async getPrice(fiatCurrency: string, cryptoCurrency: string): Promise<number | undefined> {
     const params: MoonpayBaseParams = {
       ...baseParams,
     };
@@ -83,7 +83,7 @@ export class MoonpayProvider {
     }
   }
 
-  async getAllCurrencies() {
+  async getAllCurrencies(): Promise<MoonpayGetAllCurrenciesResponse> {
     const params: MoonpayBaseParams = {
       ...baseParams,
     };
@@ -95,9 +95,13 @@ export class MoonpayProvider {
         throw new Error('getAllCurrencies something wrong');
       }
 
-      return (await res.json()) as MoonpayGetAllCurrenciesResponse;
+      return await res.json();
     } catch (error) {
       throw new Error(`Can't get getAllCurrencies: ${error}`);
     }
+  }
+
+  getMoonpayAPIKeyIsSet(): boolean {
+    return !!MOONPAY_API_KEY;
   }
 }

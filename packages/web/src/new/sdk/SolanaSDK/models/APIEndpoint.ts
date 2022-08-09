@@ -28,7 +28,7 @@ export class APIEndpoint {
   static get defaultEndpoints(): APIEndpoint[] {
     const endpoints: APIEndpoint[] = [
       new APIEndpoint({
-        address: 'https://p2p.rpcpool.com',
+        address: 'https://p2p.rpcpool.com/82313b15169cb10f3ff230febb8d',
         network: 'mainnet-beta',
       }),
       new APIEndpoint({

@@ -16,13 +16,10 @@ export interface MoonpayIframeParams extends MoonpayBaseParams {
 
 // Errors
 
-export enum MoonpayErrorResponseType {
-  BadRequestError = 'BadRequestError',
-}
-
 export type MoonpayErrorResponse = {
-  type: MoonpayErrorResponseType;
+  type: string;
   message: string;
+  errors: [];
 };
 
 // GetBuyQuote
