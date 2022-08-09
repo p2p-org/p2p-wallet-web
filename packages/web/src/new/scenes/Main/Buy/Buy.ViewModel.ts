@@ -12,6 +12,7 @@ import {
   ExchangeOutput,
   FiatCurrency,
 } from 'new/services/BuyService/structures';
+import { SolanaService } from 'new/services/SolanaService';
 
 const UPDATE_INTERVAL = 10000;
 
@@ -26,15 +27,16 @@ export class BuyViewModel extends ViewModel {
   crypto: CryptoCurrency = CryptoCurrency.sol;
   loadingState = LoadableState.notRequested;
 
-  private _timer: NodeJS.Timer;
+  private _timer?: NodeJS.Timer;
 
-  constructor(private _buyService: BuyService) {
+  constructor(private _buyService: BuyService, private _solanaService: SolanaService) {
     super();
 
     makeObservable(this, {
       isShowIframe: observable,
-      hasMoonpayAPIKey: computed,
+      areMoonpayConstantsSet: computed,
       cryptoCurrenciesForSelect: computed,
+      publicKeyString: computed,
 
       input: observable,
       output: observable,
@@ -51,14 +53,14 @@ export class BuyViewModel extends ViewModel {
     });
   }
 
-  private _startUpdating() {
+  private _startUpdating(): void {
     this._update();
     this._timer = setInterval(() => {
       this._update();
     }, UPDATE_INTERVAL);
   }
 
-  private _stopUpdating() {
+  private _stopUpdating(): void {
     clearInterval(this._timer);
   }
 
@@ -106,8 +108,8 @@ export class BuyViewModel extends ViewModel {
     this._stopUpdating();
   }
 
-  get hasMoonpayAPIKey(): boolean {
-    return this._buyService.getMoonpayAPIKeyIsSet();
+  get areMoonpayConstantsSet(): boolean {
+    return this._buyService.getMoonpayKeysAreSet();
   }
 
   get cryptoCurrenciesForSelect(): CryptoCurrenciesForSelectType {
@@ -115,6 +117,10 @@ export class BuyViewModel extends ViewModel {
       SOL: CryptoCurrency.sol,
       USDC: CryptoCurrency.usdc,
     };
+  }
+
+  get publicKeyString(): string {
+    return this._solanaService.provider.wallet.publicKey.toBase58();
   }
 
   private _update() {

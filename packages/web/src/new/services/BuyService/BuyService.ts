@@ -20,7 +20,7 @@ interface BuyServiceType {
     cryptoCurrency: CryptoCurrency,
   ): Promise<ExchangeRate>;
   getMinAmount(currency: BuyCurrencyType): Promise<number>;
-  getMoonpayAPIKeyIsSet(): boolean;
+  getMoonpayKeysAreSet(): boolean;
 }
 
 @injectable()
@@ -90,7 +90,7 @@ export class BuyService implements BuyServiceType {
       );
   }
 
-  getMoonpayAPIKeyIsSet(): boolean {
-    return this._provider.getMoonpayAPIKeyIsSet();
+  getMoonpayKeysAreSet(): boolean {
+    return this._provider.getMoonpayKeysAreSet();
   }
 }

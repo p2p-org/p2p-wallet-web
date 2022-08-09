@@ -1,7 +1,11 @@
 import assert from 'ts-invariant';
 import { injectable } from 'tsyringe';
 
-import { MOONPAY_API_KEY, MOONPAY_API_URL } from 'new/services/BuyService/constants';
+import {
+  MOONPAY_API_KEY,
+  MOONPAY_API_URL,
+  MOONPAY_SIGNER_URL,
+} from 'new/services/BuyService/constants';
 import type {
   MoonpayBaseParams,
   MoonpayErrorResponse,
@@ -101,7 +105,7 @@ export class MoonpayProvider {
     }
   }
 
-  getMoonpayAPIKeyIsSet(): boolean {
-    return !!MOONPAY_API_KEY;
+  getMoonpayKeysAreSet(): boolean {
+    return !!MOONPAY_API_KEY && !!MOONPAY_SIGNER_URL;
   }
 }

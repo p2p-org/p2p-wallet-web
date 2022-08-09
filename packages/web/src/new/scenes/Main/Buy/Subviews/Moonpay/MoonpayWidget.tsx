@@ -5,7 +5,6 @@ import { useParams } from 'react-router-dom';
 import { useIsMobile } from '@p2p-wallet-web/ui';
 import { observer } from 'mobx-react-lite';
 
-import { Layout } from 'components/common/Layout';
 import { WidgetPageBuy } from 'components/pages/buy/BuyWidget/WidgetPageBuy';
 import type { BuyViewModel } from 'new/scenes/Main/Buy/Buy.ViewModel';
 import { MoonpayButton } from 'new/scenes/Main/Buy/Subviews/Moonpay/Button';
@@ -18,7 +17,7 @@ interface Props {
   viewModel: BuyViewModel;
 }
 
-export const Moonpay: FC<Props> = observer(({ viewModel }) => {
+export const MoonpayWidget: FC<Props> = observer(({ viewModel }) => {
   const isMobile = useIsMobile();
   const { symbol } = useParams<{ symbol: string }>();
 
@@ -34,12 +33,10 @@ export const Moonpay: FC<Props> = observer(({ viewModel }) => {
   }, [symbol]);
 
   return (
-    <Layout>
-      <WidgetPageBuy bottom={<MoonpayButton viewModel={viewModel} />}>
-        {!isMobile ? <CurrencySelect viewModel={viewModel} /> : null}
-        <Inputs viewModel={viewModel} />
-        <Details viewModel={viewModel} />
-      </WidgetPageBuy>
-    </Layout>
+    <WidgetPageBuy bottom={<MoonpayButton viewModel={viewModel} />}>
+      {!isMobile ? <CurrencySelect viewModel={viewModel} /> : null}
+      <Inputs viewModel={viewModel} />
+      <Details viewModel={viewModel} />
+    </WidgetPageBuy>
   );
 });
