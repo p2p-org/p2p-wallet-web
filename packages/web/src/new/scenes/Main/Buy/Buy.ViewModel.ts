@@ -43,7 +43,7 @@ export class BuyViewModel extends ViewModel {
       crypto: observable,
       loadingState: observable,
 
-      _update: action,
+      update: action,
       changeOutput: action,
       setAmount: action.bound,
       setCryptoCurrency: action,
@@ -54,9 +54,9 @@ export class BuyViewModel extends ViewModel {
   }
 
   private _startUpdating(): void {
-    this._update();
+    this.update();
     this._timer = setInterval(() => {
-      this._update();
+      this.update();
     }, UPDATE_INTERVAL);
   }
 
@@ -123,7 +123,7 @@ export class BuyViewModel extends ViewModel {
     return this._solanaService.provider.wallet.publicKey.toBase58();
   }
 
-  private _update() {
+  update() {
     Promise.all([
       this._buyService.getExchangeRate(FiatCurrency.usd, this.crypto),
       this._buyService.getMinAmount(this.crypto),

@@ -54,7 +54,7 @@ export const MoonpayButton: FC<Props> = observer(({ viewModel }) => {
   ) {
     return (
       <Button disabled primary full>
-        Minimum purchase of {viewModel.minCryptoAmount} SOL required
+        Minimum purchase of {viewModel.minCryptoAmount} {viewModel.crypto.symbol} required
       </Button>
     );
   }
