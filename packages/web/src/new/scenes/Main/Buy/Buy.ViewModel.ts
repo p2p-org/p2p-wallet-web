@@ -39,12 +39,14 @@ export class BuyViewModel extends ViewModel {
       cryptoCurrenciesForSelect: computed,
       publicKeyString: computed,
 
+      loadingState: observable,
       input: observable,
       output: observable,
       crypto: observable,
-      loadingState: observable,
+      minFiatAmount: observable,
+      minCryptoAmount: observable,
+      exchangeRate: observable,
 
-      update: action,
       changeOutput: action,
       setAmount: action.bound,
       setCryptoCurrency: action,
@@ -55,9 +57,9 @@ export class BuyViewModel extends ViewModel {
   }
 
   private _startUpdating(): void {
-    this.update();
+    this._update();
     this._timer = setInterval(() => {
-      this.update();
+      this._update();
     }, UPDATE_INTERVAL);
   }
 
@@ -124,21 +126,24 @@ export class BuyViewModel extends ViewModel {
     return this._solanaService.provider.wallet.publicKey.toBase58();
   }
 
-  update() {
+  private _update() {
     Promise.all([
       this._buyService.getExchangeRate(FiatCurrency.usd, this.crypto),
       this._buyService.getMinAmount(this.crypto),
       this._buyService.getMinAmount(FiatCurrency.usd),
-    ]).then(([exchangeRate, minCryptoAmount, minFiatAmount]) => {
-      this.exchangeRate = exchangeRate;
-      this.minCryptoAmount = minCryptoAmount;
+    ]).then(
+      action(([exchangeRate, minCryptoAmount, minFiatAmount]) => {
+        this.exchangeRate = exchangeRate;
 
-      const newMinFiatAmount = Number(
-        Math.max(Math.ceil(minCryptoAmount * exchangeRate.amount), minFiatAmount).toFixed(2),
-      );
+        this.minCryptoAmount = minCryptoAmount;
 
-      this.minFiatAmount = newMinFiatAmount;
-    });
+        const newMinFiatAmount = Number(
+          Math.max(Math.ceil(minCryptoAmount * exchangeRate.amount), minFiatAmount).toFixed(2),
+        );
+
+        this.minFiatAmount = newMinFiatAmount;
+      }),
+    );
   }
 
   changeOutput(output: ExchangeOutput) {
