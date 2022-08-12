@@ -1,7 +1,9 @@
 import type { FC } from 'react';
 
 import { styled } from '@linaria/react';
+import { observer } from 'mobx-react-lite';
 
+import { Button } from 'components/ui';
 import type { HomeViewModel } from 'new/scenes/Main/Home';
 
 import { BalanceView } from '../common/BalanceView';
@@ -27,15 +29,24 @@ const WalletImg = styled.img`
   height: 147px;
 `;
 
+const TestFeatureButton = () => {
+  return (
+    <Button title="Test Feature Button" small primary>
+      Test Feature Button
+    </Button>
+  );
+};
+
 interface Props {
   viewModel: HomeViewModel;
 }
 
-export const Desktop: FC<Props> = ({ viewModel }) => {
+export const Desktop: FC<Props> = observer(({ viewModel }) => {
   return (
     <Wrapper>
       <BalanceView viewModel={viewModel} />
+      {viewModel.featureFlags.testFeatureEnabled ? <TestFeatureButton /> : null}
       <WalletImg src={walletImg} />
     </Wrapper>
   );
-};
+});

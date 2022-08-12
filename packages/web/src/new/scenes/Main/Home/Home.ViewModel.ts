@@ -5,6 +5,7 @@ import { injectable } from 'tsyringe';
 import { SDFetcherState } from 'new/core/viewmodels/SDViewModel';
 import { ViewModel } from 'new/core/viewmodels/ViewModel';
 import { Defaults } from 'new/services/Defaults';
+import { FeatureFlags } from 'new/services/FetureFlags';
 import { NameService } from 'new/services/NameService';
 import { PricesService } from 'new/services/PriceAPIs/PricesService';
 import { WalletsRepository } from 'new/services/Repositories';
@@ -17,6 +18,7 @@ export class HomeViewModel extends ViewModel {
     public walletsRepository: WalletsRepository,
     public pricesService: PricesService,
     public nameService: NameService,
+    public featureFlags: FeatureFlags,
   ) {
     super();
 
