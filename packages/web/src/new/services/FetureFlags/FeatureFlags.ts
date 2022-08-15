@@ -16,9 +16,7 @@ export class FeatureFlags implements FeatureFlagsType {
       testFeatureEnabled: observable,
     });
 
-    this._updateFlags = this._updateFlags.bind(this);
-
-    this._provider.whenActivated(this._updateFlags);
+    this._provider.whenActivated(() => this._updateFlags());
   }
 
   private _updateFlags() {
