@@ -81,15 +81,19 @@ export class BuyViewModel extends ViewModel {
   protected override onInitialize() {
     this.addReaction(
       reaction(
+        () => this.crypto,
+        () => this._update(),
+      ),
+    );
+
+    this.addReaction(
+      reaction(
         () => ({
-          input: this.input,
+          amount: this.input.amount,
           crypto: this.crypto,
-          exchangeRate: this.exchangeRate,
-          minFiatAmount: this.minFiatAmount,
-          minCryptoAmount: this.minCryptoAmount,
         }),
-        ({ input }) => {
-          if (input.amount === 0) {
+        ({ amount }) => {
+          if (amount === 0) {
             this.changeOutput(ExchangeOutput.zeroInstance(this.output.currency));
             this.setLoadingState(LoadableState.loaded);
             return;
@@ -98,10 +102,9 @@ export class BuyViewModel extends ViewModel {
           this.setLoadingState(LoadableState.loading);
 
           this._buyService
-            .convert(input, this.output)
+            .convert(this.input, this.output)
             .then((output) => {
               this.setLoadingState(LoadableState.loaded);
-
               this.changeOutput(output);
             })
             .catch((error) => {
