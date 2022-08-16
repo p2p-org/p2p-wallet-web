@@ -8,7 +8,6 @@ import {
   MOONPAY_API_URL,
   MOONPAY_SIGNER_URL,
 } from 'new/services/BuyService/constants';
-import { buildParams } from 'new/services/BuyService/MoonpayProvider/utils';
 import type {
   MoonpayBaseParams,
   MoonpayGetAllCurrenciesResponse,
@@ -70,41 +69,16 @@ export class MoonpayProvider {
   }
 
   async getPrice(fiatCurrency: string, cryptoCurrency: string): Promise<number | undefined> {
-    const params: MoonpayBaseParams = {
-      ...baseParams,
-    };
-
-    try {
-      const res = await fetch(
-        `${MOONPAY_API_URL}${cryptoCurrency}/ask_price?${buildParams(params)}`,
-      );
-
-      if (!res.ok && res.status !== 400) {
-        throw new Error('getPrice something wrong');
-      }
-
-      return ((await res.json()) as MoonpayGetPriceResponse)[fiatCurrency.toUpperCase()];
-    } catch (error) {
-      throw new Error(`Can't get getPrice: ${error}`);
-    }
+    return request(`${cryptoCurrency}/ask_price`, { params: baseParams }).then(
+      (response: AxiosResponse<MoonpayGetPriceResponse>) =>
+        response.data[fiatCurrency.toUpperCase()],
+    );
   }
 
   async getAllCurrencies(): Promise<MoonpayGetAllCurrenciesResponse> {
-    const params: MoonpayBaseParams = {
-      ...baseParams,
-    };
-
-    try {
-      const res = await fetch(`${MOONPAY_API_URL}?${buildParams(params)}`);
-
-      if (!res.ok && res.status !== 400) {
-        throw new Error('getAllCurrencies something wrong');
-      }
-
-      return await res.json();
-    } catch (error) {
-      throw new Error(`Can't get getAllCurrencies: ${error}`);
-    }
+    return request({ params: baseParams }).then(
+      (response: AxiosResponse<MoonpayGetAllCurrenciesResponse>) => response.data,
+    );
   }
 
   getMoonpayKeysAreSet(): boolean {
