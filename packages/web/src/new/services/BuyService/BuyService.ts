@@ -23,8 +23,10 @@ export class BuyService implements BuyServiceType {
   constructor(private _provider: MoonpayProvider) {}
 
   convert(input: ExchangeInput, currency: BuyCurrencyType): Promise<ExchangeOutput | void> {
-    const baseCurrencyAmount = FiatCurrency.isFiat(input.currency) ? input.amount : 0;
-    const quoteCurrencyAmount = CryptoCurrency.isCrypto(input.currency) ? input.amount : 0;
+    const baseCurrencyAmountForRequest = FiatCurrency.isFiat(input.currency) ? input.amount : 0;
+    const quoteCurrencyAmountForRequest = CryptoCurrency.isCrypto(input.currency)
+      ? input.amount
+      : 0;
 
     const baseCurrencyCode = [input.currency, currency].find((currency) =>
       FiatCurrency.isFiat(currency),
@@ -35,7 +37,12 @@ export class BuyService implements BuyServiceType {
     )!.moonpayCode;
 
     return this._provider
-      .getByQuote(baseCurrencyAmount, quoteCurrencyAmount, baseCurrencyCode, quoteCurrencyCode)
+      .getByQuote(
+        baseCurrencyAmountForRequest,
+        quoteCurrencyAmountForRequest,
+        baseCurrencyCode,
+        quoteCurrencyCode,
+      )
       .then((data) => {
         const { message, errors } = data as MoonpayErrorResponse;
         if (errors || message) {
@@ -46,6 +53,7 @@ export class BuyService implements BuyServiceType {
         const {
           quoteCurrencyPrice,
           quoteCurrencyAmount,
+          baseCurrencyAmount,
           feeAmount,
           networkFeeAmount,
           totalAmount,
