@@ -1,11 +1,12 @@
 import { injectable } from 'tsyringe';
 
 import { MoonpayProvider } from 'new/services/BuyService/MoonpayProvider';
-import type { BuyCurrencyType, ExchangeInput } from 'new/services/BuyService/structures';
+import type { ExchangeInput } from 'new/services/BuyService/structures';
 import { CryptoCurrency, ExchangeOutput, FiatCurrency } from 'new/services/BuyService/structures';
+import type { MoonpayGetBuyQuoteResponse } from 'new/services/BuyService/types';
 
 interface BuyServiceType {
-  convert(input: ExchangeInput, currency: BuyCurrencyType): Promise<ExchangeOutput | void>;
+  convert(input: ExchangeInput, output: ExchangeOutput): Promise<ExchangeOutput | void>;
   getExchangeRate(fiatCurrency: FiatCurrency, cryptoCurrency: CryptoCurrency): Promise<number>;
   getMinAmount(
     cryptoCurrency: CryptoCurrency,
@@ -18,17 +19,17 @@ interface BuyServiceType {
 export class BuyService implements BuyServiceType {
   constructor(private _provider: MoonpayProvider) {}
 
-  convert(input: ExchangeInput, currency: BuyCurrencyType): Promise<ExchangeOutput> {
+  convert(input: ExchangeInput, output: ExchangeOutput): Promise<ExchangeOutput> {
     const baseCurrencyAmountForRequest = FiatCurrency.isFiat(input.currency) ? input.amount : 0;
     const quoteCurrencyAmountForRequest = CryptoCurrency.isCrypto(input.currency)
       ? input.amount
       : 0;
 
-    const baseCurrencyCode = [input.currency, currency].find((currency) =>
+    const baseCurrencyCode = [input.currency, output.currency].find((currency) =>
       FiatCurrency.isFiat(currency),
     )!.moonpayCode;
 
-    const quoteCurrencyCode = [input.currency, currency].find((currency) =>
+    const quoteCurrencyCode = [input.currency, output.currency].find((currency) =>
       CryptoCurrency.isCrypto(currency),
     )!.moonpayCode;
 
@@ -47,11 +48,11 @@ export class BuyService implements BuyServiceType {
           feeAmount,
           networkFeeAmount,
           totalAmount,
-        } = data;
+        } = data as MoonpayGetBuyQuoteResponse;
 
         return new ExchangeOutput(
-          CryptoCurrency.isCrypto(currency) ? quoteCurrencyAmount : baseCurrencyAmount,
-          currency,
+          CryptoCurrency.isCrypto(output.currency) ? quoteCurrencyAmount : baseCurrencyAmount,
+          output.currency,
           quoteCurrencyPrice,
           feeAmount,
           networkFeeAmount,

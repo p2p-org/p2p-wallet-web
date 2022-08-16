@@ -98,18 +98,15 @@ export class BuyViewModel extends ViewModel {
           this.setLoadingState(LoadableState.loading);
 
           this._buyService
-            .convert(
-              input,
-              FiatCurrency.isFiat(input.currency) ? this.crypto : this.output.currency,
-            )
+            .convert(input, this.output)
             .then((output) => {
               this.setLoadingState(LoadableState.loaded);
 
               this.changeOutput(output);
             })
             .catch((error) => {
-              this.setLoadingState(LoadableState.error(error.response?.data?.message));
-              console.error(error.response?.data?.message);
+              this.setLoadingState(LoadableState.error(error.message));
+              this.changeOutput(ExchangeOutput.zeroInstance(this.output.currency));
             });
         },
       ),

@@ -37,7 +37,7 @@ export class MoonpayProvider {
     quoteCurrencyAmount: number | string,
     baseCurrencyCode: string,
     quoteCurrencyCode: string,
-  ): Promise<MoonpayGetBuyQuoteResponse> {
+  ): Promise<MoonpayGetBuyQuoteResponse | void> {
     try {
       this._abortController?.abort();
     } finally {
@@ -56,7 +56,17 @@ export class MoonpayProvider {
     return request(`${quoteCurrencyCode}/buy_quote`, {
       signal: this._abortController.signal,
       params,
-    }).then((response: AxiosResponse<MoonpayGetBuyQuoteResponse>) => response.data);
+    })
+      .then((response: AxiosResponse<MoonpayGetBuyQuoteResponse>) => response.data)
+      .catch((error) => {
+        let mes;
+        if (error.response) {
+          mes = error.response.data.message;
+        } else {
+          mes = error.message;
+        }
+        new Error(mes);
+      });
   }
 
   async getPrice(fiatCurrency: string, cryptoCurrency: string): Promise<number | undefined> {
