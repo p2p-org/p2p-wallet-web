@@ -8,8 +8,8 @@ import { useTrackEventOpen } from 'app/hooks/metrics';
 import { WidgetPageBuy } from 'components/pages/buy/BuyWidget/WidgetPageBuy';
 import type { BuyViewModelProps } from 'new/scenes/Main/Buy/Subviews/Moonpay/types';
 import { MOONPAY_API_KEY, MOONPAY_SIGNER_URL } from 'new/services/BuyService/constants';
-import type { MoonpayIframeParams } from 'new/services/BuyService/MoonpayProvider/types';
 import { buildParams } from 'new/services/BuyService/MoonpayProvider/utils';
+import type { MoonpayIframeParams } from 'new/services/BuyService/types';
 
 const Wrapper = styled.div`
   height: 640px;

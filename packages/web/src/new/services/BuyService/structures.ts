@@ -85,33 +85,6 @@ export class CryptoCurrency {
         return 'usdc_sol';
     }
   }
-
-  /*get mintAddress() {
-    const mintAddress = CryptoCurrency.Addresses[Defaults.apiEndpoint.network][this._code];
-    if (!mintAddress) {
-      assert(true, `Unhandeled mint address for ${Defaults.apiEndpoint.network} : ${this._code}`);
-    }
-    return mintAddress;
-  }
-
-  static Addresses = {
-    'mainnet-beta': {
-      sol: NATIVE_MINT.toBase58(),
-      usdc: USDC_MINT.toBase58(),
-    },
-    testnet: {
-      sol: NATIVE_MINT.toBase58(),
-      usdc: 'CpMah17kQEL2wqyMKt3mZBdTnZbkbfx4nqmQMFDP5vwp',
-    },
-    devnet: {
-      sol: NATIVE_MINT.toBase58(),
-      usdc: '4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU',
-    },
-    localnet: {
-      sol: '',
-      usdc: '',
-    },
-  };*/
 }
 
 export class ExchangeInput {
@@ -174,17 +147,5 @@ export class ExchangeOutput {
     this.networkFee = networkFee;
     this.purchaseCost = purchaseCost;
     this.total = total;
-  }
-}
-
-export class ExchangeRate {
-  amount: number;
-  cryptoCurrency: CryptoCurrency;
-  fiatCurrency: FiatCurrency;
-
-  constructor(amount: number, cryptoCurrency: CryptoCurrency, fiatCurrency: FiatCurrency) {
-    this.amount = amount;
-    this.cryptoCurrency = cryptoCurrency;
-    this.fiatCurrency = fiatCurrency;
   }
 }

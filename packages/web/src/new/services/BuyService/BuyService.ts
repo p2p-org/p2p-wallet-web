@@ -1,25 +1,20 @@
 import { injectable } from 'tsyringe';
 
 import { MoonpayProvider } from 'new/services/BuyService/MoonpayProvider';
+import type { BuyCurrencyType, ExchangeInput } from 'new/services/BuyService/structures';
+import { CryptoCurrency, ExchangeOutput, FiatCurrency } from 'new/services/BuyService/structures';
 import type {
   MoonpayErrorResponse,
   MoonpayGetBuyQuoteResponse,
-} from 'new/services/BuyService/MoonpayProvider/types';
-import type { BuyCurrencyType, ExchangeInput } from 'new/services/BuyService/structures';
-import {
-  CryptoCurrency,
-  ExchangeOutput,
-  ExchangeRate,
-  FiatCurrency,
-} from 'new/services/BuyService/structures';
+} from 'new/services/BuyService/types';
 
 interface BuyServiceType {
   convert(input: ExchangeInput, currency: BuyCurrencyType): Promise<ExchangeOutput | void>;
-  getExchangeRate(
-    fiatCurrency: FiatCurrency,
+  getExchangeRate(fiatCurrency: FiatCurrency, cryptoCurrency: CryptoCurrency): Promise<number>;
+  getMinAmount(
     cryptoCurrency: CryptoCurrency,
-  ): Promise<ExchangeRate>;
-  getMinAmount(currency: BuyCurrencyType): Promise<number>;
+    fiatCurrency: FiatCurrency,
+  ): Promise<{ minCryptoAmount: number; minFiatAmount: number }>;
   getMoonpayKeysAreSet(): boolean;
 }
 
@@ -71,23 +66,24 @@ export class BuyService implements BuyServiceType {
       });
   }
 
-  getExchangeRate(
-    fiatCurrency: FiatCurrency,
-    cryptoCurrency: CryptoCurrency,
-  ): Promise<ExchangeRate> {
+  getExchangeRate(fiatCurrency: FiatCurrency, cryptoCurrency: CryptoCurrency): Promise<number> {
     return this._provider
       .getPrice(fiatCurrency.moonpayCode, cryptoCurrency.moonpayCode)
-      .then((exchangeRate) => new ExchangeRate(exchangeRate || 0, cryptoCurrency, fiatCurrency));
+      .then((exchangeRate) => exchangeRate || 0);
   }
 
-  getMinAmount(currency: BuyCurrencyType): Promise<number> {
-    return this._provider
-      .getAllCurrencies()
-      .then(
-        (currencies) =>
-          currencies?.find((currencyItem) => currencyItem.code === currency.moonpayCode)
-            ?.minBuyAmount ?? 0,
-      );
+  getMinAmount(
+    cryptoCurrency: CryptoCurrency,
+    fiatCurrency: FiatCurrency,
+  ): Promise<{ minCryptoAmount: number; minFiatAmount: number }> {
+    return this._provider.getAllCurrencies().then((currencies) => ({
+      minCryptoAmount:
+        currencies?.find((currencyItem) => currencyItem.code === cryptoCurrency.moonpayCode)
+          ?.minBuyAmount || 0,
+      minFiatAmount:
+        currencies?.find((currencyItem) => currencyItem.code === fiatCurrency.moonpayCode)
+          ?.minBuyAmount || 0,
+    }));
   }
 
   getMoonpayKeysAreSet(): boolean {

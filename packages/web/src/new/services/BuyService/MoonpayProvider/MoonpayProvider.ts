@@ -6,6 +6,7 @@ import {
   MOONPAY_API_URL,
   MOONPAY_SIGNER_URL,
 } from 'new/services/BuyService/constants';
+import { buildParams } from 'new/services/BuyService/MoonpayProvider/utils';
 import type {
   MoonpayBaseParams,
   MoonpayErrorResponse,
@@ -13,8 +14,7 @@ import type {
   MoonpayGetBuyQuoteParams,
   MoonpayGetBuyQuoteResponse,
   MoonpayGetPriceResponse,
-} from 'new/services/BuyService/MoonpayProvider/types';
-import { buildParams } from 'new/services/BuyService/MoonpayProvider/utils';
+} from 'new/services/BuyService/types';
 
 const baseParams: MoonpayBaseParams = {
   apiKey: MOONPAY_API_KEY,
@@ -26,6 +26,7 @@ export class MoonpayProvider {
 
   constructor() {
     assert(MOONPAY_API_KEY, 'Define moonpay api key in .env');
+    assert(MOONPAY_SIGNER_URL, 'Define moonpay signer url in .env');
   }
 
   async getByQuote(
@@ -81,7 +82,7 @@ export class MoonpayProvider {
         throw new Error('getPrice something wrong');
       }
 
-      return ((await res.json()) as MoonpayGetPriceResponse)[fiatCurrency];
+      return ((await res.json()) as MoonpayGetPriceResponse)[fiatCurrency.toUpperCase()];
     } catch (error) {
       throw new Error(`Can't get getPrice: ${error}`);
     }
