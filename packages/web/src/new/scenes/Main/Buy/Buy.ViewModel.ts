@@ -12,7 +12,7 @@ import {
 } from 'new/services/BuyService/structures';
 import { SolanaService } from 'new/services/SolanaService';
 
-const UPDATE_INTERVAL = 10000;
+const UPDATE_INTERVAL = 30 * 1000; // 30 secs
 
 let _startUpdatingFirstAttemptCall = true;
 
