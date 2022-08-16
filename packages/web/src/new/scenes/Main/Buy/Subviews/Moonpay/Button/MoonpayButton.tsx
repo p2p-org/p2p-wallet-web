@@ -55,13 +55,13 @@ export const MoonpayButton: FC<BuyViewModelProps> = observer(({ viewModel }) => 
     );
   }
 
-  if (viewModel.loadingState.isError && viewModel.input.amount) {
+  /*if (viewModel.loadingState.isError && viewModel.input.amount) {
     return (
       <Button disabled primary full>
         {viewModel.loadingState.message}
       </Button>
     );
-  }
+  }*/
 
   return (
     <Button primary full onClick={() => viewModel.setIsShowIframe(true)}>

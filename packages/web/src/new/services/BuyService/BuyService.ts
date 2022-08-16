@@ -3,10 +3,6 @@ import { injectable } from 'tsyringe';
 import { MoonpayProvider } from 'new/services/BuyService/MoonpayProvider';
 import type { BuyCurrencyType, ExchangeInput } from 'new/services/BuyService/structures';
 import { CryptoCurrency, ExchangeOutput, FiatCurrency } from 'new/services/BuyService/structures';
-import type {
-  MoonpayErrorResponse,
-  MoonpayGetBuyQuoteResponse,
-} from 'new/services/BuyService/types';
 
 interface BuyServiceType {
   convert(input: ExchangeInput, currency: BuyCurrencyType): Promise<ExchangeOutput | void>;
@@ -22,7 +18,7 @@ interface BuyServiceType {
 export class BuyService implements BuyServiceType {
   constructor(private _provider: MoonpayProvider) {}
 
-  convert(input: ExchangeInput, currency: BuyCurrencyType): Promise<ExchangeOutput | void> {
+  convert(input: ExchangeInput, currency: BuyCurrencyType): Promise<ExchangeOutput> {
     const baseCurrencyAmountForRequest = FiatCurrency.isFiat(input.currency) ? input.amount : 0;
     const quoteCurrencyAmountForRequest = CryptoCurrency.isCrypto(input.currency)
       ? input.amount
@@ -44,12 +40,6 @@ export class BuyService implements BuyServiceType {
         quoteCurrencyCode,
       )
       .then((data) => {
-        const { message, errors } = data as MoonpayErrorResponse;
-        if (errors || message) {
-          console.error(`${message}\n${errors}`);
-          return;
-        }
-
         const {
           quoteCurrencyPrice,
           quoteCurrencyAmount,
@@ -57,7 +47,7 @@ export class BuyService implements BuyServiceType {
           feeAmount,
           networkFeeAmount,
           totalAmount,
-        } = data as MoonpayGetBuyQuoteResponse;
+        } = data;
 
         return new ExchangeOutput(
           CryptoCurrency.isCrypto(currency) ? quoteCurrencyAmount : baseCurrencyAmount,
@@ -68,9 +58,6 @@ export class BuyService implements BuyServiceType {
           baseCurrencyAmount,
           totalAmount,
         );
-      })
-      .catch((error) => {
-        console.error(error);
       });
   }
 

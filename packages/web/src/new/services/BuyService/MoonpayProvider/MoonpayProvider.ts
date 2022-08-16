@@ -1,3 +1,5 @@
+import type { AxiosResponse } from 'axios';
+import axios from 'axios';
 import assert from 'ts-invariant';
 import { injectable } from 'tsyringe';
 
@@ -9,12 +11,13 @@ import {
 import { buildParams } from 'new/services/BuyService/MoonpayProvider/utils';
 import type {
   MoonpayBaseParams,
-  MoonpayErrorResponse,
   MoonpayGetAllCurrenciesResponse,
   MoonpayGetBuyQuoteParams,
   MoonpayGetBuyQuoteResponse,
   MoonpayGetPriceResponse,
 } from 'new/services/BuyService/types';
+
+const request = axios.create({ baseURL: MOONPAY_API_URL });
 
 const baseParams: MoonpayBaseParams = {
   apiKey: MOONPAY_API_KEY,
@@ -34,7 +37,7 @@ export class MoonpayProvider {
     quoteCurrencyAmount: number | string,
     baseCurrencyCode: string,
     quoteCurrencyCode: string,
-  ): Promise<MoonpayGetBuyQuoteResponse | MoonpayErrorResponse> {
+  ): Promise<MoonpayGetBuyQuoteResponse> {
     try {
       this._abortController?.abort();
     } finally {
@@ -50,22 +53,10 @@ export class MoonpayProvider {
       regionalPricing: true,
     };
 
-    try {
-      const res = await fetch(
-        `${MOONPAY_API_URL}${quoteCurrencyCode}/buy_quote?${buildParams(params)}`,
-        {
-          signal: this._abortController.signal,
-        },
-      );
-
-      if (!res.ok && res.status !== 400) {
-        throw new Error('getBuyQuote something wrong');
-      }
-
-      return await res.json();
-    } catch (error) {
-      throw new Error(`Can't get getBuyQuote: ${error}`);
-    }
+    return request(`${quoteCurrencyCode}/buy_quote`, {
+      signal: this._abortController.signal,
+      params,
+    }).then((response: AxiosResponse<MoonpayGetBuyQuoteResponse>) => response.data);
   }
 
   async getPrice(fiatCurrency: string, cryptoCurrency: string): Promise<number | undefined> {

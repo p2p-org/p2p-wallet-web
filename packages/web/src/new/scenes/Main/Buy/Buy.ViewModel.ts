@@ -105,11 +105,11 @@ export class BuyViewModel extends ViewModel {
             .then((output) => {
               this.setLoadingState(LoadableState.loaded);
 
-              if (output) {
-                this.changeOutput(output);
-              } else {
-                this.changeOutput(ExchangeOutput.zeroInstance(this.output.currency));
-              }
+              this.changeOutput(output);
+            })
+            .catch((error) => {
+              this.setLoadingState(LoadableState.error(error.response?.data?.message));
+              console.error(error.response?.data?.message);
             });
         },
       ),
