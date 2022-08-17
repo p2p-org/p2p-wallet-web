@@ -10,7 +10,7 @@ import { Intercom } from 'components/common/Intercom';
 import { NotifyToast } from 'components/common/NotifyToast';
 import { ToastManager } from 'components/common/ToastManager';
 import { Main } from 'new/scenes/Main';
-import { Buy as BuyNew } from 'new/scenes/Main/Buy/Buy';
+import { Buy as BuyNew } from 'new/scenes/Main/Buy';
 import { Home } from 'new/scenes/Main/Home';
 import { Root } from 'new/scenes/Root';
 import { Auth } from 'pages/Auth';
