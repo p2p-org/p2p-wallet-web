@@ -5,6 +5,7 @@ import { observer } from 'mobx-react-lite';
 
 import { Button } from 'components/ui';
 import type { HomeViewModel } from 'new/scenes/Main/Home';
+import { Features, isEnabled } from 'new/services/FetureFlags';
 
 import { BalanceView } from '../common/BalanceView';
 import walletImg from './wallet.png';
@@ -45,7 +46,7 @@ export const Desktop: FC<Props> = observer(({ viewModel }) => {
   return (
     <Wrapper>
       <BalanceView viewModel={viewModel} />
-      {viewModel.featureFlags.testFeatureEnabled ? <TestFeatureButton /> : null}
+      {isEnabled(Features.TestFeature) ? <TestFeatureButton /> : null}
       <WalletImg src={walletImg} />
     </Wrapper>
   );
