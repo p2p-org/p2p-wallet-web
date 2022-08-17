@@ -1,7 +1,7 @@
 import { initializeApp } from 'firebase/app';
 import type { RemoteConfig } from 'firebase/remote-config';
 import { fetchAndActivate, getAll, getRemoteConfig, setLogLevel } from 'firebase/remote-config';
-import { computed, makeObservable, observable, runInAction } from 'mobx';
+import { makeObservable, observable, runInAction } from 'mobx';
 
 import type { FeatureFlagsType } from 'new/services/FetureFlags/defaultFlags';
 import { defaultFlags } from 'new/services/FetureFlags/defaultFlags';
@@ -11,10 +11,12 @@ import { firebaseConfig } from 'new/services/FetureFlags/firebaseConfig';
 class FeatureFlags {
   private readonly _remoteConfig: RemoteConfig;
 
+  isInitialized = false;
   featureFlags = defaultFlags;
 
   constructor() {
     makeObservable(this, {
+      isInitialized: observable,
       featureFlags: observable,
     });
 
@@ -30,7 +32,7 @@ class FeatureFlags {
       setLogLevel(this._remoteConfig, 'debug');
     }
 
-    fetchAndActivate(this._remoteConfig).then(() => {
+    void fetchAndActivate(this._remoteConfig).then(() => {
       const values = getAll(this._remoteConfig);
 
       runInAction(() => {
@@ -41,19 +43,15 @@ class FeatureFlags {
           },
           { ...defaultFlags },
         );
+
+        this.isInitialized = true;
       });
     });
   }
 
   isEnabled(feature: Features): boolean {
-    return computed(() => {
-      return this.featureFlags[feature];
-    }).get();
+    return this.featureFlags[feature];
   }
 }
 
-const featureFlagsService = new FeatureFlags();
-
-export const isEnabled = (feature: Features): boolean => {
-  return featureFlagsService.isEnabled(feature);
-};
+export const featureFlags = new FeatureFlags();
