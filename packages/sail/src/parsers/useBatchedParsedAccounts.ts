@@ -1,0 +1,127 @@
+import { useEffect } from "react";
+import type { UseQueryOptions, UseQueryResult } from "react-query";
+import { useQuery } from "react-query";
+
+import type { Network } from "@saberhq/solana-contrib";
+import type { ProgramAccount } from "@saberhq/token-utils";
+import { useSolana } from "@saberhq/use-solana";
+import type { PublicKey } from "@solana/web3.js";
+
+import type { FetchKeysFn } from "..";
+import {
+  fetchKeysMaybe,
+  SailProgramAccountParseError,
+  serializeKeys,
+  useAccountsSubscribe,
+} from "..";
+import { useSail } from "../provider";
+import type { ProgramAccountParser } from "./programAccounts";
+
+/**
+ * Result of a parsed account query.
+ */
+export type BatchParsedAccountQueryResult<T> = UseQueryResult<
+  BatchedParsedAccountQueryData<T>
+>;
+
+/**
+ * Data resulting from a batch query.
+ */
+export type BatchedParsedAccountQueryKeys =
+  | readonly (PublicKey | null | undefined)[]
+  | null
+  | undefined;
+
+/**
+ * Data resulting from a batch query.
+ */
+export type BatchedParsedAccountQueryData<T> =
+  | readonly (ProgramAccount<T> | null | undefined)[]
+  | null
+  | undefined;
+
+export const makeBatchedParsedAccountQuery = <T>(
+  keys: BatchedParsedAccountQueryKeys,
+  network: Network,
+  fetchKeys: FetchKeysFn,
+  parser: ProgramAccountParser<T>,
+  options: Omit<
+    UseQueryOptions<BatchedParsedAccountQueryData<T>>,
+    "queryFn" | "queryKey"
+  > = {}
+): UseQueryOptions<BatchedParsedAccountQueryData<T>> => ({
+  queryKey: [
+    "sail/batchedParsedAccounts",
+    network,
+    ...(keys ? serializeKeys(keys) : keys === null ? ["null"] : ["undefined"]),
+  ],
+  queryFn: async (): Promise<BatchedParsedAccountQueryData<T>> => {
+    if (!keys) {
+      return keys;
+    }
+    const accountsData = await fetchKeysMaybe(fetchKeys, keys);
+    return accountsData.map((result): ProgramAccount<T> | null | undefined => {
+      if (!result) {
+        return result;
+      }
+      const data = result.data;
+      if (!data) {
+        return null;
+      }
+
+      try {
+        const parsed = parser.parse(data.accountInfo.data);
+        return {
+          publicKey: data.accountId,
+          account: parsed,
+        };
+      } catch (e) {
+        throw new SailProgramAccountParseError(e, data, parser);
+      }
+    });
+  },
+  staleTime: Infinity,
+  ...options,
+});
+
+/**
+ * Parses accounts with the given parser, fetching them in batch.
+ *
+ * @param keys
+ * @param parser
+ * @returns
+ */
+export const useBatchedParsedAccounts = <T>(
+  keys: BatchedParsedAccountQueryKeys,
+  parser: ProgramAccountParser<T>,
+  options: Omit<
+    UseQueryOptions<BatchedParsedAccountQueryData<T>>,
+    "queryFn" | "queryKey"
+  > = {}
+): BatchParsedAccountQueryResult<T> => {
+  const {
+    accounts: { fetchKeys, onBatchCache },
+  } = useSail();
+  const { network } = useSolana();
+
+  const query = useQuery(
+    makeBatchedParsedAccountQuery(keys, network, fetchKeys, parser, options)
+  );
+
+  useAccountsSubscribe(keys);
+
+  // refresh from the cache whenever the cache is updated
+  const { refetch } = query;
+  useEffect(() => {
+    if (!keys) {
+      return;
+    }
+    return onBatchCache((e) => {
+      if (keys.find((key) => key && e.hasKey(key))) {
+        void refetch();
+      }
+    });
+  }, [keys, fetchKeys, onBatchCache, refetch]);
+
+  return query;
+};
