@@ -10,8 +10,23 @@ import type { CurrentPrice } from 'new/services/PriceAPIs/PricesService/PricesFe
 import { CoingeckoPricesFetcher } from '../Coingecko';
 import { PricesStorage } from './PricesStorage';
 
+export interface PricesServiceType {
+  // Getters
+  getWatchList(): Set<string>;
+  currentPrice(coinName: string): CurrentPrice | null;
+
+  // Actions
+  clearCurrentPrices(): void;
+  addToWatchList(tokens: string[]): void;
+  fetchPrices(tokens: string[]): void;
+  fetchAllTokensPriceInWatchList(): void;
+
+  startObserving(): void;
+  stopObserving(): void;
+}
+
 @scoped(Lifecycle.ContainerScoped)
-export class PricesService {
+export class PricesService implements PricesServiceType {
   // Constants
 
   private _refreshInterval = 15 * 60 * 1000; // 15 minutes
@@ -19,7 +34,7 @@ export class PricesService {
 
   // Properties
   private _watchList: Set<string> = new Set();
-  private _currentPrices: ILazyObservable<{ [key in string]: CurrentPrice }>;
+  private readonly _currentPrices: ILazyObservable<{ [key in string]: CurrentPrice }>;
 
   constructor(private _storage: PricesStorage, private _fetcher: CoingeckoPricesFetcher) {
     this._currentPrices = lazyObservable((sink) => {
@@ -78,6 +93,11 @@ export class PricesService {
 
   currentPrice(coinName: string): CurrentPrice | null {
     return this._currentPrices.current()[coinName] ?? null;
+  }
+
+  clearCurrentPrices(): void {
+    this._currentPrices.reset();
+    this._storage.savePrices({});
   }
 
   addToWatchList(tokens: string[]): void {

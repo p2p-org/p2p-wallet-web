@@ -8,7 +8,5 @@ export function numberToString(
     groupingSeparator?: string;
   },
 ): string {
-  return value
-    .toLocaleString(undefined, { maximumFractionDigits })
-    .replace(/,/g, groupingSeparator);
+  return value.toLocaleString('en-US', { maximumFractionDigits }).replace(/,/g, groupingSeparator);
 }

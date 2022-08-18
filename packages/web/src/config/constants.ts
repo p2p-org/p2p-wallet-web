@@ -36,7 +36,7 @@ export const NETWORKS: NetworksByNameType = {
   'p2p-rpcpool': {
     name: 'p2p-rpcpool',
     network: 'mainnet-beta',
-    endpoint: 'https://p2p.rpcpool.com/',
+    endpoint: 'https://p2p.rpcpool.com/78306120-3a44-4ede-89f4-6133642ccab2',
   },
   'serum-mainnet': {
     name: 'serum-mainnet',

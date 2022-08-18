@@ -3,6 +3,7 @@ import type { ILazyObservable } from 'mobx-utils';
 import { lazyObservable } from 'mobx-utils';
 import { delay, inject, Lifecycle, scoped } from 'tsyringe';
 
+import { ModalType } from 'app/contexts';
 import { LoadableState } from 'new/app/models/LoadableRelay';
 import { SDFetcherState } from 'new/core/viewmodels/SDViewModel';
 import { ViewModel } from 'new/core/viewmodels/ViewModel';
@@ -10,8 +11,9 @@ import { SelectAddressViewModel } from 'new/scenes/Main/Send/SelectAddress/Selec
 import type * as FeeRelayer from 'new/sdk/FeeRelayer';
 import type * as SolanaSDK from 'new/sdk/SolanaSDK';
 import type { Wallet } from 'new/sdk/SolanaSDK';
-import { FeeAmount } from 'new/sdk/SolanaSDK';
+import { convertToBalance, FeeAmount } from 'new/sdk/SolanaSDK';
 import { Defaults } from 'new/services/Defaults';
+import { ModalService } from 'new/services/ModalService';
 import { PricesService } from 'new/services/PriceAPIs/PricesService';
 import { WalletsRepository } from 'new/services/Repositories';
 import { SendService } from 'new/services/SendService';
@@ -84,6 +86,7 @@ export class SendViewModel extends ViewModel implements SendViewModelType {
     public chooseTokenAndAmountViewModel: ChooseTokenAndAmountViewModel,
     @inject(delay(() => SelectAddressViewModel))
     public selectAddressViewModel: Readonly<SelectAddressViewModel>,
+    private _modalService: ModalService,
   ) {
     super();
 
@@ -98,6 +101,8 @@ export class SendViewModel extends ViewModel implements SendViewModelType {
       // currencyMode: observable,
 
       selectRecipient: action,
+
+      openConfirmModal: action,
     });
   }
 
@@ -229,9 +234,17 @@ export class SendViewModel extends ViewModel implements SendViewModelType {
     }
 
     // modify amount if using source wallet as paying wallet
-    const totalFee = this.feeInfo;
+    const totalFee = this.feeInfo.current().feeAmount;
+    if (totalFee && totalFee.total.gtn(0) && this.payingWallet?.pubkey === wallet.pubkey) {
+      const feeAmount = convertToBalance(totalFee.total, this.payingWallet?.token.decimals);
+      if (amount + feeAmount > wallet.amount.asNumber) {
+        amount -= feeAmount;
+      }
+    }
 
-    /// TODO:
+    const network = this.network;
+
+    /// TODO: processTransaction
   }
 
   // SendTokenChooseRecipientAndNetworkViewModelType
@@ -256,8 +269,6 @@ export class SendViewModel extends ViewModel implements SendViewModelType {
     return this._sendService.getFreeTransactionFeeLimit();
   }
 
-  //////
-
   chooseWallet(wallet: Wallet): void {
     this.wallet = wallet;
 
@@ -265,6 +276,13 @@ export class SendViewModel extends ViewModel implements SendViewModelType {
       this.selectNetwork(Network.solana);
     }
   }
+
+  authenticateAndSend(): void {
+    // TODO: authenticationHandler
+    this._send();
+  }
+
+  ///
 
   enterAmount(amount: number) {
     this.amount = amount;
@@ -320,5 +338,11 @@ export class SendViewModel extends ViewModel implements SendViewModelType {
       recipient.name === null &&
       matches(recipient.address, [bitcoinAddress(this._sendService.isTestNet())])
     );
+  }
+
+  /// our code
+
+  openConfirmModal(): Promise<void> {
+    return this._modalService.openModal(ModalType.SHOW_MODAL_ACTIONS_MOBILE);
   }
 }

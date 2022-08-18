@@ -238,9 +238,7 @@ export const ChooseTokenAndAmount: FC<Props> = observer(({ viewModel }) => {
     return className;
   }).get();
 
-  const isAmountEqualMaxBalance = computed(() => {
-    return vm.amount === vm.calculateAvailableAmount;
-  }).get();
+  const isAmountEqualMaxBalance = computed(() => vm.amount === vm.calculateAvailableAmount).get();
 
   return (
     <Wrapper>

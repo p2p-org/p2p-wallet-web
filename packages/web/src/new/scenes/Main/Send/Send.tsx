@@ -22,7 +22,7 @@ export const Send: FC = observer(() => {
 
   return (
     <Layout>
-      <WidgetPageWithBottom title="Send" icon="top" bottom={<ActionButton />}>
+      <WidgetPageWithBottom title="Send" icon="top" bottom={<ActionButton viewModel={viewModel} />}>
         <Wrapper>
           <ChooseTokenAndAmount viewModel={viewModel} />
           <SelectAddress viewModel={viewModel} />

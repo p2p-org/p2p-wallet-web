@@ -14,12 +14,14 @@ import type {
 import { Keypair, PublicKey, SystemProgram, Transaction } from '@solana/web3.js';
 import promiseRetry from 'promise-retry';
 
-import type { APIEndpoint, Lamports } from './index';
+import type { APIEndpoint, Lamports, TransactionID } from './index';
 import {
   AccountInfo,
   AccountInstructions,
   EmptyInfo,
   FeeAmount,
+  LogEvent,
+  Logger,
   MintInfo,
   PreparedTransaction,
   SolanaSDKError,
@@ -240,9 +242,7 @@ export class SolanaSDK {
     if (recentBlockhash) {
       getRecentBlockhashRequest = Promise.resolve(recentBlockhash);
     } else {
-      getRecentBlockhashRequest = Promise.resolve(
-        (await this.provider.connection.getRecentBlockhash()).blockhash,
-      );
+      getRecentBlockhashRequest = this.getRecentBlockhash();
     }
 
     // get lamports per signature
@@ -255,10 +255,10 @@ export class SolanaSDK {
     //   );
     // }
 
-    return getRecentBlockhashRequest.then(async (recentBlockhashNew) => {
+    return getRecentBlockhashRequest.then(async (_recentBlockhash) => {
       const transaction = new Transaction();
       transaction.instructions = instructions;
-      transaction.recentBlockhash = recentBlockhashNew;
+      transaction.recentBlockhash = _recentBlockhash;
       transaction.feePayer = feePayer;
 
       // calculate fee first
@@ -322,6 +322,112 @@ export class SolanaSDK {
         }
       }
       throw error;
+    });
+  }
+
+  /// Traditional sending without FeeRelayer
+  /// - Parameters:
+  ///   - instructions: transaction's instructions
+  ///   - recentBlockhash: recentBlockhash
+  ///   - signers: signers
+  ///   - isSimulation: define if this is a simulation or real transaction
+  /// - Returns: transaction id
+  serializeAndSendTraditional({
+    instructions,
+    recentBlockhash = null,
+    signers,
+    isSimulation,
+  }: {
+    instructions: TransactionInstruction[];
+    recentBlockhash?: string | null;
+    signers?: Signer[];
+    isSimulation: boolean;
+  }): Promise<TransactionID> {
+    const maxAttemps = 3;
+    let numberOfTries = 0;
+    return this.serializeTransaction({
+      instructions,
+      recentBlockhash,
+      signers,
+    })
+      .then((transaction) => {
+        if (isSimulation) {
+          // transfrom serialized tx to Transaction class
+          const restoredTransaction = Transaction.from(Buffer.from(transaction, 'base64'));
+          // simulate
+          return this.provider.connection
+            .simulateTransaction(restoredTransaction)
+            .then((result) => {
+              if (result.value.err) {
+                throw Error('Simulation error');
+              }
+
+              return 'simulated transaction id';
+            });
+        } else {
+          return this.provider.connection.sendEncodedTransaction(transaction);
+        }
+      })
+      .catch((error: Error) => {
+        if (numberOfTries <= maxAttemps) {
+          let shouldRetry = false;
+          if (error.message.includes('Blockhash not found')) {
+            shouldRetry = true;
+          }
+
+          if (shouldRetry) {
+            numberOfTries += 1;
+            return this.serializeAndSendTraditional({ instructions, signers, isSimulation });
+          }
+        }
+        throw error;
+      });
+  }
+
+  serializeTransaction({
+    instructions,
+    recentBlockhash = null,
+    signers = [],
+    feePayer = null,
+  }: {
+    instructions: TransactionInstruction[];
+    recentBlockhash?: string | null;
+    signers?: Signer[];
+    feePayer?: PublicKey | null;
+  }): Promise<string> {
+    // get recentBlockhash
+    let getRecentBlockhashRequest: Promise<string>;
+    if (recentBlockhash) {
+      getRecentBlockhashRequest = Promise.resolve(recentBlockhash);
+    } else {
+      getRecentBlockhashRequest = this.getRecentBlockhash();
+    }
+
+    const _feePayer = feePayer ?? this.provider.wallet.publicKey;
+    if (!feePayer) {
+      // TODO: custom error wrapper
+      throw SolanaSDKError.invalidRequest('Fee-payer not found');
+    }
+
+    // serialize transaction
+    return getRecentBlockhashRequest.then(async (_recentBlockhash) => {
+      const transaction = new Transaction();
+      transaction.instructions = instructions;
+      transaction.feePayer = _feePayer;
+      transaction.recentBlockhash = _recentBlockhash;
+
+      if (signers.length > 0) {
+        transaction.partialSign(...signers);
+      }
+
+      const signedTransaction = await this.provider.wallet.signTransaction(transaction);
+      const serializedTransaction = signedTransaction.serialize().toString('base64');
+
+      const decodedTransaction = JSON.stringify(transaction);
+      Logger.log(decodedTransaction, LogEvent.info);
+      Logger.log(serializedTransaction, LogEvent.info);
+
+      return serializedTransaction;
     });
   }
 
@@ -738,6 +844,38 @@ export class SolanaSDK {
 
   getCreatingTokenAccountFee(): Promise<u64> {
     return this.getMinimumBalanceForRentExemption(AccountInfo.span);
+  }
+
+  // SolanaSDKClose
+  closeTokenAccount({
+    // account = null,
+    tokenPubkey,
+    isSimulation = false,
+  }: {
+    // account: string;
+    tokenPubkey: string;
+    isSimulation?: boolean;
+  }): Promise<TransactionID> {
+    const account = this.provider.wallet.publicKey;
+    if (!account) {
+      throw SolanaSDKError.unauthorized();
+    }
+
+    const _tokenPubkey = new PublicKey(tokenPubkey);
+
+    const instruction = SPLToken.createCloseAccountInstruction(
+      SolanaSDKPublicKey.tokenProgramId,
+      _tokenPubkey,
+      account,
+      account,
+      [],
+    );
+
+    // TOOD: custom error wrapper
+    return this.serializeAndSendTraditional({
+      instructions: [instruction],
+      isSimulation,
+    });
   }
 
   // SolanaSDKTokens

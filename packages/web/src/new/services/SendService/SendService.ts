@@ -35,7 +35,7 @@ export enum Network {
   bitcoin,
 }
 
-export type SendServiceType = {
+export interface SendServiceType {
   load(): Promise<void>;
   checkAccountValidation(account: string): Promise<boolean>;
   isTestNet(): boolean;
@@ -74,9 +74,9 @@ export type SendServiceType = {
     receiver: string;
     amount: number;
     network: Network;
-    payingFeeWallet?: Wallet;
+    payingFeeWallet?: Wallet | null;
   }): Promise<string>;
-};
+}
 
 @injectable()
 export class SendService implements SendServiceType {
@@ -310,7 +310,7 @@ export class SendService implements SendServiceType {
     receiver: string;
     amount: number;
     network: Network;
-    payingFeeWallet?: Wallet; // null for relayMethod === RelayMethod.reward
+    payingFeeWallet?: Wallet | null; // null for relayMethod === RelayMethod.reward
   }): Promise<string> {
     const amountNew = toLamport(amount, wallet.token.decimals);
     const sender = wallet.pubkey;
@@ -362,7 +362,7 @@ export class SendService implements SendServiceType {
     wallet: Wallet;
     receiver: string;
     amount: SolanaSDK.Lamports;
-    payingFeeWallet?: Wallet;
+    payingFeeWallet?: Wallet | null;
   }): Promise<string> {
     // get paying fee token
     const payingFeeTokenNew = this._getPayingFeeToken({
@@ -502,7 +502,7 @@ export class SendService implements SendServiceType {
   private _getPayingFeeToken({
     payingFeeWallet,
   }: {
-    payingFeeWallet?: Wallet;
+    payingFeeWallet?: Wallet | null;
   }): FeeRelayer.Relay.TokenInfo | null {
     if (!payingFeeWallet) {
       return null;

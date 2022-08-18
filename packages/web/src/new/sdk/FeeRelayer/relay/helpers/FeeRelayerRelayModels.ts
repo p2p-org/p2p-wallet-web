@@ -582,12 +582,12 @@ export enum RelayAccountStatusType {
 }
 
 export class RelayAccountStatus {
-  private _balance?: u64;
   type: RelayAccountStatusType;
+  private _balance?: u64;
 
-  private constructor({ balance, type }: { balance?: u64; type: RelayAccountStatusType }) {
-    this._balance = balance;
+  private constructor({ type, balance }: { type: RelayAccountStatusType; balance?: u64 }) {
     this.type = type;
+    this._balance = balance;
   }
 
   static notYetCreated() {

@@ -183,7 +183,12 @@ export class WalletsRepository extends SDListViewModel<Wallet> {
       });
   }
 
-  // getters
+  batchUpdate(cb: (wallets: Wallet[]) => Wallet[]): void {
+    const wallets = cb(this.getWallets());
+    this.overrideData(wallets);
+  }
+
+  // Getters
 
   get hiddenWallets(): Wallet[] {
     return this.data.filter((wallet) => wallet.isHidden);
