@@ -1,4 +1,4 @@
-import { Features } from 'new/services/FetureFlags/features';
+import { Features } from 'new/services/FeatureFlags/features';
 
 export type FeatureFlagsType = { [key in Features]: boolean };
 

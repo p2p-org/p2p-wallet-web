@@ -3,12 +3,12 @@ import type { RemoteConfig } from 'firebase/remote-config';
 import { fetchAndActivate, getAll, getRemoteConfig, setLogLevel } from 'firebase/remote-config';
 import { makeObservable, observable, runInAction } from 'mobx';
 
-import type { FeatureFlagsType } from 'new/services/FetureFlags/defaultFlags';
-import { defaultFlags } from 'new/services/FetureFlags/defaultFlags';
-import { Features } from 'new/services/FetureFlags/features';
-import { firebaseConfig } from 'new/services/FetureFlags/firebaseConfig';
+import type { FeatureFlagsType } from 'new/services/FeatureFlags/defaultFlags';
+import { defaultFlags } from 'new/services/FeatureFlags/defaultFlags';
+import { Features } from 'new/services/FeatureFlags/features';
+import { firebaseConfig } from 'new/services/FeatureFlags/firebaseConfig';
 
-class FeatureFlags {
+class _FeatureFlags {
   private readonly _remoteConfig: RemoteConfig;
 
   isInitialized = false;
@@ -54,4 +54,8 @@ class FeatureFlags {
   }
 }
 
-export const featureFlags = new FeatureFlags();
+export const isEnabled = (feature: Features): boolean => {
+  return FeatureFlags.isEnabled(feature);
+};
+
+export const FeatureFlags = new _FeatureFlags();
