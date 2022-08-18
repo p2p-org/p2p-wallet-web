@@ -13,6 +13,7 @@ import { Main } from 'new/scenes/Main';
 import { Home } from 'new/scenes/Main/Home';
 import { Send as SendNew } from 'new/scenes/Main/Send';
 import { Root } from 'new/scenes/Root';
+import { ModalManager } from 'new/ui/modals/ModalManager';
 import { Auth } from 'pages/Auth';
 import { Buy } from 'pages/Buy';
 import { Landing } from 'pages/Landing';
@@ -39,8 +40,8 @@ const App: React.FC = () => {
           <Providers>
             <Root>
               <Switch>
-                <Route path="/" component={Landing} exact />
-                <Route path="/:type(signup|login)" component={Auth} exact />
+                <Route path="/" exact component={Landing} />
+                <Route path="/:type(signup|login)" exact component={Auth} />
                 <Main>
                   <AuthRequiredRoute path="/wallets" component={Home} />
                   <AuthRequiredRoute
@@ -61,6 +62,7 @@ const App: React.FC = () => {
               <Intercom />
               <FeaturesToggle />
               <ToastManager anchor="left" renderToast={(props) => <NotifyToast {...props} />} />
+              <ModalManager />
             </Root>
           </Providers>
         </Router>
