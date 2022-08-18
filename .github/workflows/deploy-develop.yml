@@ -44,6 +44,8 @@ jobs:
           REACT_APP_SENTRY_MODE: development
           REACT_APP_SENTRY_TRACES_SAMPLE_RATE: 1
           REACT_APP_SENTRY_RELEASE: p2p-wallet-web_development_${{ steps.vars.outputs.sha_short }}
+          REACT_APP_FIREBASE_API_KEY: ${{ secrets.REACT_APP_FIREBASE_API_KEY }}
+          REACT_APP_FIREBASE_APP_ID: ${{ secrets.REACT_APP_FIREBASE_APP_ID }}
         run: yarn build
 
       - uses: JamesIves/github-pages-deploy-action@v4
