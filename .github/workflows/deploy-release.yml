@@ -82,6 +82,8 @@ jobs:
           REACT_APP_SENTRY_MODE: release
           REACT_APP_SENTRY_TRACES_SAMPLE_RATE: 1
           REACT_APP_SENTRY_RELEASE: p2p-wallet-web_release_${{ steps.split.outputs._1}}
+          REACT_APP_FIREBASE_API_KEY: ${{ secrets.REACT_APP_FIREBASE_API_KEY }}
+          REACT_APP_FIREBASE_APP_ID: ${{ secrets.REACT_APP_FIREBASE_APP_ID }}
         run: yarn build
 
       - name: Deploy Release preview
