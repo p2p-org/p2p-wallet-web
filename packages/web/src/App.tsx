@@ -13,6 +13,7 @@ import { Main } from 'new/scenes/Main';
 import { Buy as BuyNew } from 'new/scenes/Main/Buy';
 import { Home } from 'new/scenes/Main/Home';
 import { Root } from 'new/scenes/Root';
+import { ModalManager } from 'new/ui/modals/ModalManager';
 import { Auth } from 'pages/Auth';
 import { Buy } from 'pages/Buy';
 import { Landing } from 'pages/Landing';
@@ -38,10 +39,10 @@ const App: React.FC = () => {
         <Router basename={process.env.REACT_APP_BASENAME}>
           <Providers>
             <Root>
-              <Main>
-                <Switch>
-                  <Route path="/" component={Landing} exact />
-                  <Route path="/:type(signup|login)" component={Auth} exact />
+              <Switch>
+                <Route path="/" exact component={Landing} />
+                <Route path="/:type(signup|login)" exact component={Auth} />
+                <Main>
                   <AuthRequiredRoute path="/wallets" component={Home} />
                   <AuthRequiredRoute
                     path="/wallet/:publicKey/settings"
@@ -56,11 +57,12 @@ const App: React.FC = () => {
                   <AuthRequiredRoute path="/settings" component={Settings} />
                   <AuthRequiredRoute path="/buy/:symbol?" component={Buy} />
                   <AuthRequiredRoute path="/buyNew/:symbol?" component={BuyNew} />
-                </Switch>
-                <Intercom />
-                <FeaturesToggle />
-                <ToastManager anchor="left" renderToast={(props) => <NotifyToast {...props} />} />
-              </Main>
+                </Main>
+              </Switch>
+              <Intercom />
+              <FeaturesToggle />
+              <ToastManager anchor="left" renderToast={(props) => <NotifyToast {...props} />} />
+              <ModalManager />
             </Root>
           </Providers>
         </Router>
