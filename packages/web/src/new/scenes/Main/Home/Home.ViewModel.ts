@@ -110,7 +110,7 @@ export class HomeViewModel extends ViewModel {
     return this.walletsRepository.state === SDFetcherState.loading;
   }
 
-  openChooseBuyTokenMobileModal(): void {
+  openChooseBuyTokenMobileModal() {
     void this._modalService.openModal(ModalType.SHOW_MODAL_CHOOSE_BUY_TOKEN_MOBILE);
   }
 }

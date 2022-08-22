@@ -1,6 +1,8 @@
 import type { FC } from 'react';
 import { useHistory, useLocation } from 'react-router';
 
+import { observer } from 'mobx-react-lite';
+
 import type { ModalPropsType } from 'app/contexts';
 import { Modal } from 'components/ui/Modal';
 import { useViewModel } from 'new/core/viewmodels/useViewModel';
@@ -9,12 +11,11 @@ import { ChooseBuyTokenMobileModalViewModel } from 'new/ui/modals/ChooseBuyToken
 
 import { ActionRow } from './ActionRow';
 
-export const ChooseBuyTokenMobileModal: FC<ModalPropsType> = ({ close }) => {
+export const ChooseBuyTokenMobileModal: FC<ModalPropsType> = observer(({ close }) => {
   const history = useHistory();
   const location = useLocation();
-  const viewModel = useViewModel<ChooseBuyTokenMobileModalViewModel>(
-    ChooseBuyTokenMobileModalViewModel,
-  );
+  const { solWallet, solToken, usdcWallet, usdcToken } =
+    useViewModel<ChooseBuyTokenMobileModalViewModel>(ChooseBuyTokenMobileModalViewModel);
 
   const handleCloseClick = () => {
     close(false);
@@ -33,13 +34,15 @@ export const ChooseBuyTokenMobileModal: FC<ModalPropsType> = ({ close }) => {
   return (
     <Modal noDelimiter={false} close={handleCloseClick} title="Choose a crypto for buying">
       <ActionRow
-        wallet={viewModel.getBuySelectionWallet(CryptoCurrency.sol)}
+        wallet={solWallet}
+        token={solToken}
         onClick={() => handleRowClick(CryptoCurrency.sol)}
       />
       <ActionRow
-        wallet={viewModel.getBuySelectionWallet(CryptoCurrency.usdc)}
+        wallet={usdcWallet}
+        token={usdcToken}
         onClick={() => handleRowClick(CryptoCurrency.usdc)}
       />
     </Modal>
   );
-};
+});

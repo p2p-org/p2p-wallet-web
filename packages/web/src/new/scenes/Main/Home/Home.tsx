@@ -42,7 +42,7 @@ export const Home: FunctionComponent = observer(() => {
           </Content>
         </WidgetPage>
       ) : (
-        <EmptyWalletView />
+        <EmptyWalletView viewModel={viewModel} />
       )}
     </Layout>
   );

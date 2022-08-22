@@ -2,12 +2,12 @@ import { computed, makeObservable } from 'mobx';
 import { injectable } from 'tsyringe';
 
 import { ViewModel } from 'new/core/viewmodels/ViewModel';
-import { SolanaModel } from 'new/models/SolanaModel';
 import { ModalService, ModalType } from 'new/services/ModalService';
+import { SolanaService } from 'new/services/SolanaService';
 
 @injectable()
 export class LayoutViewModel extends ViewModel {
-  constructor(private _modalService: ModalService, private _solanaModel: SolanaModel) {
+  constructor(private _modalService: ModalService, private _solanaService: SolanaService) {
     super();
 
     makeObservable(this, {
@@ -20,7 +20,7 @@ export class LayoutViewModel extends ViewModel {
   protected override afterReactionsRemoved() {}
 
   get walletConnected() {
-    return !!this._solanaModel.provider;
+    return !!this._solanaService.provider;
   }
 
   openActionsMobileModal() {

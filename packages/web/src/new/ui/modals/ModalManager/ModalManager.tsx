@@ -9,9 +9,9 @@ import { observer } from 'mobx-react-lite';
 import { expr } from 'mobx-utils';
 
 import type { ModalPropsType } from 'app/contexts';
-import { ModalType } from 'app/contexts';
 import { ScrollFix } from 'components/common/ScollFix';
 import { useViewModel } from 'new/core/viewmodels/useViewModel';
+import { ModalType } from 'new/services/ModalService';
 
 import { ModalManagerViewModel } from './ModalManager.ViewModel';
 

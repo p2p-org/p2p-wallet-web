@@ -2,8 +2,8 @@ import type { FC } from 'react';
 
 import { styled } from '@linaria/react';
 
-import type { Wallet } from 'new/sdk/SolanaSDK';
-import { TokenAccountRowContent } from 'new/ui/components/common/TokenAccountRowContent';
+import type { Token, Wallet } from 'new/sdk/SolanaSDK';
+import { TokenRowContent, WalletRowContent } from 'new/ui/components/common/WalletRowContent';
 
 const Wrapper = styled.div`
   display: flex;
@@ -13,13 +13,18 @@ const Wrapper = styled.div`
 
 interface Props {
   wallet?: Wallet;
+  token?: Token;
   onClick: () => void;
 }
 
-export const ActionRow: FC<Props> = ({ wallet, onClick }) => {
+export const ActionRow: FC<Props> = ({ wallet, token, onClick }) => {
   return (
     <Wrapper onClick={onClick}>
-      <TokenAccountRowContent wallet={wallet} isMobilePopupChild />
+      {token ? (
+        <TokenRowContent token={token} isMobilePopupChild />
+      ) : (
+        <WalletRowContent wallet={wallet} isMobilePopupChild />
+      )}
     </Wrapper>
   );
 };
