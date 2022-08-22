@@ -1,7 +1,8 @@
 import type { FC } from 'react';
 
-import { computed } from 'mobx';
+import { ZERO } from '@orca-so/sdk';
 import { observer } from 'mobx-react-lite';
+import { expr } from 'mobx-utils';
 
 import { Accordion } from 'components/ui';
 import { AccordionTitle } from 'components/ui/AccordionDetails/AccordionTitle';
@@ -19,8 +20,8 @@ interface Props {
 }
 
 export const FeesView: FC<Props> = observer(({ viewModel }) => {
-  const transferFee = computed(() => {
-    const feeAmount = viewModel.feeInfo.current().feeAmount;
+  const transferFee = expr(() => {
+    const feeAmount = viewModel.feeInfo.value?.feeAmount;
     const payingWallet = viewModel.payingWallet;
 
     if (!feeAmount) {
@@ -34,30 +35,42 @@ export const FeesView: FC<Props> = observer(({ viewModel }) => {
       symbol: payingWallet?.token.symbol ?? '',
       decimals: payingWallet?.token.decimals,
     });
-  }).get();
+  });
 
   const feeHint =
     viewModel.network !== Network.solana ? null : <FeeTransactionTooltip viewModel={viewModel} />;
 
-  const accountCreationFeeIsHidden = computed(() => {
+  const accountCreationFeeIsHidden = expr(() => {
     const network = viewModel.network;
-    const feeAmount = viewModel.feeInfo.current().feeAmount;
-
-    if (network !== Network.solana) {
-      return false;
+    const feeAmount = viewModel.feeInfo.value?.feeAmount;
+    if (!feeAmount) {
+      return true;
     }
 
-    return feeAmount.accountBalances.eqn(0);
-  }).get();
+    if (network !== Network.solana) {
+      return true;
+    }
 
-  const accountCreationFee = computed(() => {
+    return feeAmount.accountBalances.eq(ZERO);
+  });
+
+  const accountCreationFee = expr(() => {
     const network = viewModel.network;
     const payingWallet = viewModel.payingWallet;
-    const feeAmount = viewModel.feeInfo.current().feeAmount;
+    const feeAmount = viewModel.feeInfo.value?.feeAmount;
+    if (!feeAmount) {
+      return null;
+    }
 
     if (network !== Network.solana) {
       return null;
     }
+
+    console.log(
+      77777777,
+      payingWallet?.token.symbol ?? '',
+      viewModel.getPrice(payingWallet?.token.symbol ?? ''),
+    );
 
     return _stringForAccountCreationFee({
       feeAmount,
@@ -65,11 +78,11 @@ export const FeesView: FC<Props> = observer(({ viewModel }) => {
       symbol: payingWallet?.token.symbol ?? '',
       decimals: payingWallet?.token.decimals,
     });
-  }).get();
+  });
 
-  const otherFeesIsHidden = computed(() => {
+  const otherFeesIsHidden = expr(() => {
     const network = viewModel.network;
-    const feeAmount = viewModel.feeInfo.current().feeAmount;
+    const feeAmount = viewModel.feeInfo.value?.feeAmount;
 
     if (network !== Network.bitcoin) {
       return true;
@@ -81,19 +94,27 @@ export const FeesView: FC<Props> = observer(({ viewModel }) => {
     }
 
     return _otherFees.length === 0;
-  }).get();
+  });
 
-  const otherFees = computed(() => {
-    const feeAmountInSOL = viewModel.feeInfo.current().feeAmountInSOL;
+  const otherFees = expr(() => {
+    const feeAmount = viewModel.feeInfo.value?.feeAmountInSOL;
+    if (!feeAmount) {
+      return null;
+    }
+
     const prices = viewModel.getPrices(['SOL', 'renBTC']) ?? {};
     return _stringForOtherFees({
-      feeAmount: feeAmountInSOL,
+      feeAmount,
       prices,
     });
-  }).get();
+  });
 
-  const totalFee = computed(() => {
-    const feeAmount = viewModel.feeInfo.current().feeAmount;
+  const totalFee = expr(() => {
+    const feeAmount = viewModel.feeInfo.value?.feeAmount;
+    if (!feeAmount) {
+      return null;
+    }
+
     const payingWallet = viewModel.payingWallet;
 
     return _stringForTotalFee({
@@ -102,7 +123,7 @@ export const FeesView: FC<Props> = observer(({ viewModel }) => {
       symbol: payingWallet?.token.symbol ?? '',
       decimals: payingWallet?.token.decimals,
     });
-  }).get();
+  });
 
   return (
     <Accordion
@@ -271,7 +292,7 @@ function _stringForTotalFee({
 function _feeString({ fee, unit, price = 0 }: { fee: number; unit: string; price?: number }) {
   const feeInFiat = fee * price;
   return (
-    <>
+    <Text>
       <Text>
         {fee.toFixed(9)} {unit}
       </Text>{' '}
@@ -279,6 +300,6 @@ function _feeString({ fee, unit, price = 0 }: { fee: number; unit: string; price
         (~{Defaults.fiat.symbol}
         {feeInFiat.toFixed(2)})
       </Text>
-    </>
+    </Text>
   );
 }

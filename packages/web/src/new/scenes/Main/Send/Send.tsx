@@ -9,6 +9,7 @@ import { useViewModel } from 'new/core/viewmodels/useViewModel';
 import { ActionButton } from 'new/scenes/Main/Send/ActionButton';
 import { ChooseTokenAndAmount } from 'new/scenes/Main/Send/ChooseTokenAndAmount';
 import { FeesView } from 'new/scenes/Main/Send/FeesView';
+import { FeeView } from 'new/scenes/Main/Send/FeeView';
 import { SelectAddress } from 'new/scenes/Main/Send/SelectAddress';
 import { SendViewModel } from 'new/scenes/Main/Send/Send.ViewModel';
 
@@ -26,6 +27,7 @@ export const Send: FC = observer(() => {
         <Wrapper>
           <ChooseTokenAndAmount viewModel={viewModel} />
           <SelectAddress viewModel={viewModel} />
+          <FeeView viewModel={viewModel} />
           <FeesView viewModel={viewModel} />
         </Wrapper>
       </WidgetPageWithBottom>

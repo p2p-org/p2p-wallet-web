@@ -1,24 +1,24 @@
-import { action, makeObservable, observable, runInAction, when } from 'mobx';
-import type { ILazyObservable } from 'mobx-utils';
-import { lazyObservable } from 'mobx-utils';
+import { ZERO } from '@orca-so/sdk';
+import { action, computed, makeObservable, observable, reaction, runInAction, when } from 'mobx';
 import { delay, inject, Lifecycle, scoped } from 'tsyringe';
 
-import { ModalType } from 'app/contexts';
-import { LoadableState } from 'new/app/models/LoadableRelay';
+import { LoadableRelay, LoadableState } from 'new/app/models/LoadableRelay';
 import { SDFetcherState } from 'new/core/viewmodels/SDViewModel';
 import { ViewModel } from 'new/core/viewmodels/ViewModel';
+import type { SelectAddressError } from 'new/scenes/Main/Send/SelectAddress/SelectAddress.ViewModel';
 import { SelectAddressViewModel } from 'new/scenes/Main/Send/SelectAddress/SelectAddress.ViewModel';
 import type * as FeeRelayer from 'new/sdk/FeeRelayer';
 import type * as SolanaSDK from 'new/sdk/SolanaSDK';
 import type { Wallet } from 'new/sdk/SolanaSDK';
 import { convertToBalance, FeeAmount } from 'new/sdk/SolanaSDK';
 import { Defaults } from 'new/services/Defaults';
-import { ModalService } from 'new/services/ModalService';
+import { ModalService, ModalType } from 'new/services/ModalService';
 import { PricesService } from 'new/services/PriceAPIs/PricesService';
 import { WalletsRepository } from 'new/services/Repositories';
-import { SendService } from 'new/services/SendService';
+import { RelayMethod, SendService } from 'new/services/SendService';
 import { bitcoinAddress, matches } from 'new/utils/RegularExpression';
 
+import type { ChooseTokenAndAmountError } from './ChooseTokenAndAmount';
 import { ChooseTokenAndAmountViewModel } from './ChooseTokenAndAmount';
 
 export type Recipient = {
@@ -33,7 +33,7 @@ export enum Network {
   bitcoin,
 }
 
-type FeeInfo = {
+export type FeeInfo = {
   feeAmount: SolanaSDK.FeeAmount;
   feeAmountInSOL: SolanaSDK.FeeAmount;
   hasAvailableWalletToPayFee: boolean;
@@ -41,17 +41,18 @@ type FeeInfo = {
 
 export interface SendViewModelType {
   // SendTokenChooseRecipientAndNetworkViewModelType
-  getSelectedWallet(): Wallet | null;
+  get getSelectedWallet(): Wallet | null;
   getPrice(symbol: string): number;
   getPrices(symbols: string[]): Record<string, number>;
   getFreeTransactionFeeLimit(): Promise<FeeRelayer.Relay.FreeTransactionFeeLimit>;
 
   chooseWallet(wallet: Wallet): void;
 
+  readonly wallet: Wallet | null;
   // SendTokenRecipientAndNetworkHandler
   readonly network: Network;
   readonly payingWallet: Wallet | null;
-  readonly feeInfo: ILazyObservable<FeeInfo>;
+  readonly feeInfo: LoadableRelay<FeeInfo>;
   selectRecipient(recipient: Recipient | null): void;
   selectNetwork(network: Network): void;
 
@@ -68,11 +69,14 @@ export class SendViewModel extends ViewModel implements SendViewModelType {
   network: Network = Network.solana;
   loadingState = LoadableState.notRequested;
   payingWallet: Wallet | null = null;
-  feeInfo: ILazyObservable<FeeInfo> = lazyObservable(() => {}, <FeeInfo>{
-    feeAmount: FeeAmount.zero(),
-    feeAmountInSOL: FeeAmount.zero(),
-    hasAvailableWalletToPayFee: false,
-  });
+  feeInfo: LoadableRelay<FeeInfo> = new LoadableRelay<FeeInfo>(
+    Promise.resolve({
+      feeAmount: FeeAmount.zero(),
+      feeAmountInSOL: FeeAmount.zero(),
+      hasAvailableWalletToPayFee: false,
+    }),
+  );
+  relayMethod: RelayMethod;
 
   // ChooseTokenAndAmount
   // currencyMode: CurrencyMode = CurrencyMode.token;
@@ -82,13 +86,16 @@ export class SendViewModel extends ViewModel implements SendViewModelType {
   constructor(
     private _pricesService: PricesService,
     private _walletsRepository: WalletsRepository,
-    private _sendService: SendService, // TODO: relayMethod in constructor
+    private _sendService: SendService,
     public chooseTokenAndAmountViewModel: ChooseTokenAndAmountViewModel,
     @inject(delay(() => SelectAddressViewModel))
     public selectAddressViewModel: Readonly<SelectAddressViewModel>,
     private _modalService: ModalService,
   ) {
     super();
+
+    // TODO: relayMethod in constructor
+    this.relayMethod = RelayMethod.default;
 
     makeObservable(this, {
       wallet: observable,
@@ -97,8 +104,12 @@ export class SendViewModel extends ViewModel implements SendViewModelType {
       network: observable,
       loadingState: observable,
       payingWallet: observable,
+      feeInfo: observable,
+      relayMethod: observable,
 
       // currencyMode: observable,
+
+      getSelectedWallet: computed,
 
       selectRecipient: action,
 
@@ -128,74 +139,70 @@ export class SendViewModel extends ViewModel implements SendViewModelType {
   }
 
   private _bindFees(): void {
-    const payingWallet = this.payingWallet;
-    const recipient = this.recipient;
-    const network = this.network;
+    this.addReaction(
+      reaction(
+        () => ({
+          payingWallet: this.payingWallet,
+          recipient: this.recipient,
+          network: this.network,
+          wallet: this.getSelectedWallet,
+        }),
+        ({ payingWallet, recipient, network, wallet }) => {
+          if (wallet) {
+            this.feeInfo.request = this._sendService
+              .getFees({
+                wallet,
+                receiver: recipient?.address,
+                network,
+                payingTokenMint: payingWallet?.mintAddress,
+              })
+              .then((_feeAmountInSol) => {
+                // if fee is nil, no need to check for available wallets to pay fee
+                const feeAmountInSOL = _feeAmountInSol ?? FeeAmount.zero();
 
-    const wallet = this.getSelectedWallet();
-    if (wallet) {
-      this.feeInfo = lazyObservable(
-        (sink) => {
-          this._sendService
-            .getFees({
-              wallet,
-              receiver: recipient?.address,
-              network,
-              payingTokenMint: payingWallet?.mintAddress,
-            })
-            .then((_feeAmountInSol) => {
-              // if fee is nil, no need to check for available wallets to pay fee
-              const feeAmountInSOL = _feeAmountInSol ?? FeeAmount.zero();
+                if (feeAmountInSOL.total.eq(ZERO)) {
+                  return {
+                    feeAmount: FeeAmount.zero(),
+                    feeAmountInSOL: FeeAmount.zero(),
+                    hasAvailableWalletToPayFee: true,
+                  };
+                }
 
-              if (feeAmountInSOL.total.eqn(0)) {
-                sink(<FeeInfo>{
-                  feeAmount: FeeAmount.zero(),
-                  feeAmountInSOL: FeeAmount.zero(),
-                  hasAvailableWalletToPayFee: true,
-                });
-                return;
-              }
+                // else, check available wallets to pay fee
+                const payingFeeWallet = payingWallet;
+                if (!payingFeeWallet) {
+                  return {
+                    feeAmount: FeeAmount.zero(),
+                    feeAmountInSOL: FeeAmount.zero(),
+                    hasAvailableWalletToPayFee: false,
+                  };
+                }
 
-              // else, check available wallets to pay fee
-              const payingFeeWallet = payingWallet;
-              if (!payingFeeWallet) {
-                sink(<FeeInfo>{
-                  feeAmount: FeeAmount.zero(),
-                  feeAmountInSOL: FeeAmount.zero(),
-                  hasAvailableWalletToPayFee: false,
-                });
-                return;
-              }
-
-              Promise.all([
-                this._sendService.getAvailableWalletsToPayFee({ feeInSOL: feeAmountInSOL }),
-                this._sendService.getFeesInPayingToken({
-                  feeInSOL: feeAmountInSOL,
-                  payingFeeWallet,
-                }),
-              ]).then(([wallet, feeAmount]) => {
-                sink(<FeeInfo>{
-                  feeAmount: feeAmount ?? FeeAmount.zero(),
-                  feeAmountInSOL,
-                  hasAvailableWalletToPayFee: wallet.length !== 0,
+                return Promise.all([
+                  this._sendService.getAvailableWalletsToPayFee({ feeInSOL: feeAmountInSOL }),
+                  this._sendService.getFeesInPayingToken({
+                    feeInSOL: feeAmountInSOL,
+                    payingFeeWallet,
+                  }),
+                ]).then(([wallets, feeAmount]) => {
+                  return {
+                    feeAmount: feeAmount ?? FeeAmount.zero(),
+                    feeAmountInSOL,
+                    hasAvailableWalletToPayFee: wallets.length !== 0,
+                  };
                 });
               });
+          } else {
+            this.feeInfo.request = Promise.resolve({
+              feeAmount: FeeAmount.zero(),
+              feeAmountInSOL: FeeAmount.zero(),
+              hasAvailableWalletToPayFee: false,
             });
+          }
+          this.feeInfo.reload();
         },
-        <FeeInfo>{
-          feeAmount: FeeAmount.zero(),
-          feeAmountInSOL: FeeAmount.zero(),
-          hasAvailableWalletToPayFee: false,
-        },
-      );
-    } else {
-      this.feeInfo = lazyObservable(() => {}, <FeeInfo>{
-        feeAmount: FeeAmount.zero(),
-        feeAmountInSOL: FeeAmount.zero(),
-        hasAvailableWalletToPayFee: false,
-      });
-    }
-    this.feeInfo.refresh();
+      ),
+    );
   }
 
   reload(): void {
@@ -227,14 +234,14 @@ export class SendViewModel extends ViewModel implements SendViewModelType {
 
   private _send() {
     const wallet = this.wallet;
-    const amount = this.amount;
+    let amount = this.amount;
     const recipient = this.recipient;
     if (!wallet || !amount || !recipient) {
       return;
     }
 
     // modify amount if using source wallet as paying wallet
-    const totalFee = this.feeInfo.current().feeAmount;
+    const totalFee = this.feeInfo.value?.feeAmount;
     if (totalFee && totalFee.total.gtn(0) && this.payingWallet?.pubkey === wallet.pubkey) {
       const feeAmount = convertToBalance(totalFee.total, this.payingWallet?.token.decimals);
       if (amount + feeAmount > wallet.amount.asNumber) {
@@ -249,7 +256,7 @@ export class SendViewModel extends ViewModel implements SendViewModelType {
 
   // SendTokenChooseRecipientAndNetworkViewModelType
 
-  getSelectedWallet(): Wallet | null {
+  get getSelectedWallet(): Wallet | null {
     return this.wallet;
   }
 
@@ -340,9 +347,13 @@ export class SendViewModel extends ViewModel implements SendViewModelType {
     );
   }
 
-  /// our code
+  // our code
 
-  openConfirmModal(): Promise<void> {
-    return this._modalService.openModal(ModalType.SHOW_MODAL_ACTIONS_MOBILE);
+  openConfirmModal(viewModel: Readonly<SendViewModel>): Promise<void> {
+    return this._modalService.openModal(ModalType.SHOW_MODAL_CONFIRM_SEND, { viewModel });
+  }
+
+  get error(): ChooseTokenAndAmountError | SelectAddressError | null {
+    return this.chooseTokenAndAmountViewModel.error || this.selectAddressViewModel.error;
   }
 }

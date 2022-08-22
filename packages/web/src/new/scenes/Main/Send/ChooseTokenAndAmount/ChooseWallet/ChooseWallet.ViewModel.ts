@@ -56,7 +56,7 @@ export class ChooseWalletViewModel extends SDListViewModel<Wallet> {
 
   // Request
 
-  override createRequest = flow(function* (
+  override createRequest = flow<Wallet[], []>(function* (
     this: ChooseWalletViewModel,
   ): Generator<Promise<Wallet[]>> {
     if (this.showOtherWallets) {
@@ -113,8 +113,8 @@ export class ChooseWalletViewModel extends SDListViewModel<Wallet> {
   selectWallet(wallet: Wallet | null) {
     this.selectedWallet = wallet;
     if (wallet) {
-      this._pricesService.addToWatchList([wallet.token.symbol]);
-      this._pricesService.fetchPrices([wallet.token.symbol]);
+      this._pricesService.addToWatchList([wallet.token]);
+      this._pricesService.fetchPrices([wallet.token]);
     }
   }
 }

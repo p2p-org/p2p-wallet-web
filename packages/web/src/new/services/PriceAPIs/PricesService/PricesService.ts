@@ -1,31 +1,51 @@
-import { computed, makeObservable } from 'mobx';
-import { lazyObservable } from 'mobx-utils';
-import type { ILazyObservable } from 'mobx-utils/lib/lazy-observable';
+import { action, computed, makeObservable } from 'mobx';
 import { uniq } from 'ramda';
-import { Lifecycle, scoped } from 'tsyringe';
+import { singleton } from 'tsyringe';
 
+import { LoadableRelay, LoadableState } from 'new/app/models/LoadableRelay';
+import { Token } from 'new/sdk/SolanaSDK';
 import { Defaults } from 'new/services/Defaults';
 import type { CurrentPrice } from 'new/services/PriceAPIs/PricesService/PricesFetcher';
 
 import { CoingeckoPricesFetcher } from '../Coingecko';
 import { PricesStorage } from './PricesStorage';
 
+class PricesLoadableRelay extends LoadableRelay<{ [key in string]: CurrentPrice }> {
+  override map(
+    oldData: { [key in string]: CurrentPrice } | null,
+    newData: { [key in string]: CurrentPrice },
+  ): { [key in string]: CurrentPrice } {
+    const data = oldData;
+    if (!data) {
+      return newData;
+    }
+
+    for (const key of Object.keys(newData)) {
+      data[key] = newData[key]!;
+    }
+    return data;
+  }
+}
+
 export interface PricesServiceType {
+  // Observables
+  currentPrices: LoadableRelay<{ [key in string]: CurrentPrice }>;
+
   // Getters
-  getWatchList(): Set<string>;
+  getWatchList(): Set<Token>;
   currentPrice(coinName: string): CurrentPrice | null;
 
   // Actions
   clearCurrentPrices(): void;
-  addToWatchList(tokens: string[]): void;
-  fetchPrices(tokens: string[]): void;
+  addToWatchList(tokens: Token[]): void;
+  fetchPrices(tokens: Token[]): void;
   fetchAllTokensPriceInWatchList(): void;
 
   startObserving(): void;
   stopObserving(): void;
 }
 
-@scoped(Lifecycle.ContainerScoped)
+@singleton()
 export class PricesService implements PricesServiceType {
   // Constants
 
@@ -33,25 +53,35 @@ export class PricesService implements PricesServiceType {
   private _timer?: NodeJS.Timeout;
 
   // Properties
-  private _watchList: Set<string> = new Set();
-  private readonly _currentPrices: ILazyObservable<{ [key in string]: CurrentPrice }>;
+  private _watchList: Set<Token> = new Set([Token.renBTC, Token.nativeSolana, Token.usdc]);
+  private readonly _currentPrices = new PricesLoadableRelay(Promise.resolve({}));
 
   constructor(private _storage: PricesStorage, private _fetcher: CoingeckoPricesFetcher) {
-    this._currentPrices = lazyObservable((sink) => {
-      this._getCurrentPricesRequest().then((prices) => sink(prices));
-    }, this._storage.retrivePrices());
+    // reload to get cached prices
+    this._currentPrices.reload();
 
-    this._currentPrices.refresh();
+    // get current price
+    const initialValue = this._storage.retrivePrices();
+    this._currentPrices.accept(initialValue, LoadableState.loaded);
+
+    // change request
+    this._currentPrices.request = this._getCurrentPricesRequest();
 
     makeObservable(this, {
       currentPrices: computed,
+
+      currentPrice: action,
+      clearCurrentPrices: action,
+      addToWatchList: action,
+      fetchPrices: action,
+      fetchAllTokensPriceInWatchList: action,
     });
   }
 
   // Helpers
 
-  private _getCurrentPricesRequest(
-    tokens: string[] | null = null,
+  private async _getCurrentPricesRequest(
+    tokens: Token[] | null = null,
   ): Promise<{ [key in string]: CurrentPrice }> {
     let coins = tokens ?? Array.from(this._watchList);
     coins = uniq(coins); // .filter((token) => !token.includes('-') && !token.includes('/'));
@@ -60,62 +90,52 @@ export class PricesService implements PricesServiceType {
       return Promise.resolve({});
     }
 
-    return this._fetcher
-      .getCurrentPrices({ coins, toFiat: Defaults.fiat.code.toLowerCase() })
-      .then((newPrices) => {
-        // TODO: refactor, because it makes second request
-        const prices = this._currentPrices.current() ?? {};
-
-        for (const [key, value] of Object.entries(newPrices)) {
-          if (value) {
-            prices[key] = value;
-          }
-        }
-
-        return prices;
-      })
-      .then((newPrices) => {
-        this._storage.savePrices(newPrices);
-
-        return newPrices;
-      });
+    const newPrices = await this._fetcher.getCurrentPrices({
+      coins,
+      fiat: Defaults.fiat.code,
+    });
+    // newPrices['renBTC'] = newPrices['BTC'] ?? null;
+    const prices = this._currentPrices.value ?? {};
+    for (const [key, value] of Object.entries(newPrices)) {
+      if (value) {
+        prices[key] = value;
+      }
+    }
+    this._storage.savePrices(prices);
+    return prices;
   }
 
   //
 
-  get currentPrices(): ILazyObservable<{ [p: string]: CurrentPrice }> {
+  get currentPrices(): LoadableRelay<{ [key in string]: CurrentPrice }> {
     return this._currentPrices;
   }
 
-  getWatchList(): Set<string> {
+  getWatchList(): Set<Token> {
     return this._watchList;
   }
 
   currentPrice(coinName: string): CurrentPrice | null {
-    return this._currentPrices.current()[coinName] ?? null;
+    return this._currentPrices.value?.[coinName] ?? null;
   }
 
   clearCurrentPrices(): void {
-    this._currentPrices.reset();
+    this._currentPrices.flush();
     this._storage.savePrices({});
   }
 
-  addToWatchList(tokens: string[]): void {
+  addToWatchList(tokens: Token[]): void {
     for (const token of tokens) {
       this._watchList.add(token);
     }
   }
 
-  fetchPrices(tokens: string[]): void {
+  fetchPrices(tokens: Token[]): void {
     if (!tokens.length) {
       return;
     }
 
-    // TODO: check that is needed
-    // this._currentPrices = lazyObservable((sink) => {
-    //   this._getCurrentPricesRequest(tokens).then((prices) => sink(prices));
-    // }, this._storage.retrivePrices());
-
+    this._currentPrices.request = this._getCurrentPricesRequest(tokens);
     this._currentPrices.refresh();
   }
 

@@ -1,7 +1,20 @@
+import { uniq } from 'ramda';
 import { singleton } from 'tsyringe';
 
+import type { Token } from 'new/sdk/SolanaSDK';
 import type { CurrentPrice } from 'new/services/PriceAPIs/PricesService';
 import { PricesFetcher } from 'new/services/PriceAPIs/PricesService';
+
+type CoinMarketData = {
+  id: string;
+  symbol: string;
+  name: string;
+  current_price: number;
+  price_change_24h: number;
+  price_change_percentage_24h: number;
+};
+
+// TODO: look to make it cooler https://github.com/p2p-org/key-app-kit-swift/tree/fb77faab1da1a21b52ad61c9e388535d15a39e98/Sources/SolanaPricesAPIs
 
 @singleton()
 export class CoingeckoPricesFetcher extends PricesFetcher {
@@ -9,30 +22,32 @@ export class CoingeckoPricesFetcher extends PricesFetcher {
 
   // TODO: check coingecko api ids limit
   // TODO: check get request size limit
-  override getCurrentPrices({
+  override async getCurrentPrices({
     coins,
-    toFiat,
+    fiat,
   }: {
-    coins: string[];
-    toFiat: string;
+    coins: Token[];
+    fiat: string;
   }): Promise<{ [key in string]: CurrentPrice | null }> {
-    const path = '/simple/price?';
+    const param = uniq(
+      coins
+        .map((coin) => coin.extensions?.coingeckoId)
+        .filter((coingeckoId): coingeckoId is string => !!coingeckoId),
+    ).join(',');
 
-    const coinListQuery = coins.join(',');
-
-    return this.send<{ [coingeckoId in string]: { [fiat in string]: number } }>({
-      path: `${path}ids=${coinListQuery}&vs_currencies=${toFiat}`,
-    }).then((dict) => {
-      const result: { [key in string]: CurrentPrice | null } = {};
-      for (const key of Object.keys(dict)) {
-        let price: CurrentPrice | null = null;
-        const value = dict[key]?.[toFiat];
-        if (value) {
-          price = { value };
-        }
-        result[key] = price;
-      }
-      return result;
+    const pricesResult = await this.send<CoinMarketData[]>({
+      path: `/coins/markets/?vs_currency=${fiat}&ids=${param}`,
     });
+
+    return pricesResult.reduce((partialResult, data) => {
+      partialResult[data.symbol.toUpperCase()] = {
+        value: data.current_price,
+        change24h: {
+          value: data.price_change_24h,
+          percentage: data.price_change_percentage_24h,
+        },
+      };
+      return partialResult;
+    }, {} as { [key in string]: CurrentPrice | null });
   }
 }

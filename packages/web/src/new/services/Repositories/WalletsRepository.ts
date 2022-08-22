@@ -64,7 +64,7 @@ export class WalletsRepository extends SDListViewModel<Wallet> {
     // observe prices
     this.addReaction(
       reaction(
-        () => this._pricesService.currentPrices.pending,
+        () => this._pricesService.currentPrices.state.type, // TODO: check
         () => {
           this._updatePrices();
         },
@@ -118,7 +118,9 @@ export class WalletsRepository extends SDListViewModel<Wallet> {
 
   // Methods
 
-  override createRequest = flow(function* (this: WalletsRepository): Generator<Promise<Wallet[]>> {
+  override createRequest = flow<Wallet[], []>(function* (
+    this: WalletsRepository,
+  ): Generator<Promise<Wallet[]>> {
     return yield Promise.all([
       // TODO: encapsulate address to service
       this._solanaService.provider.connection.getBalance(
@@ -150,10 +152,8 @@ export class WalletsRepository extends SDListViewModel<Wallet> {
       })
       .then((wallets) => {
         const newTokens = wallets
-          .map((wallet) => wallet.token.extensions?.coingeckoId)
-          .filter(
-            (coingeckoId) => coingeckoId && !this._pricesService.getWatchList().has(coingeckoId),
-          ) as string[];
+          .map((wallet) => wallet.token)
+          .filter((token) => !this._pricesService.getWatchList().has(token));
 
         this._pricesService.addToWatchList(newTokens);
         this._pricesService.fetchPrices(newTokens);
@@ -213,11 +213,7 @@ export class WalletsRepository extends SDListViewModel<Wallet> {
   private _mapPrices(wallets: Wallet[]): Wallet[] {
     const walletsNew = wallets;
     for (const wallet of walletsNew) {
-      if (!wallet.token.extensions?.coingeckoId) {
-        continue;
-      }
-
-      wallet.price = this._pricesService.currentPrice(wallet.token.extensions.coingeckoId);
+      wallet.price = this._pricesService.currentPrice(wallet.token.symbol);
     }
 
     return walletsNew;

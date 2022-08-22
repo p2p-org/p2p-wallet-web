@@ -46,6 +46,7 @@ type Props = {
   token?: Token;
 };
 
+// TODO: sync ios
 export const TokenAvatar: FC<Props & HTMLAttributes<HTMLDivElement>> = ({
   token,
   className,
@@ -59,7 +60,7 @@ export const TokenAvatar: FC<Props & HTMLAttributes<HTMLDivElement>> = ({
 
   const isWrapped = useMemo(() => {
     if (token) {
-      return token.tags.includes('wrapped');
+      return !!token.wrappedBy;
     }
 
     return false;

@@ -3,10 +3,11 @@ import { useMount } from 'react-use';
 
 import { styled } from '@linaria/react';
 import { theme } from '@p2p-wallet-web/ui';
-import { computed } from 'mobx';
 import { observer } from 'mobx-react-lite';
+import { expr } from 'mobx-utils';
 
 import type { Recipient, SendViewModel } from 'new/scenes/Main/Send';
+import { AttentionView } from 'new/scenes/Main/Send/SelectAddress/AttentionView';
 import { ErrorView } from 'new/scenes/Main/Send/SelectAddress/ErrorView';
 import { InputState } from 'new/scenes/Main/Send/SelectAddress/SelectAddress.ViewModel';
 
@@ -61,17 +62,17 @@ export const SelectAddress: FC<Props> = observer(({ viewModel }) => {
   useMount(() => vm.recipientsListViewModel.reload());
 
   // input state
-  const isSearching = computed(() => vm.inputState === InputState.searching).get();
+  const isSearching = expr(() => vm.inputState === InputState.searching);
 
   // searching empty state
-  const shouldHideNetwork = computed(() => {
+  const shouldHideNetwork = expr(() => {
     if (vm.preSelectedNetwork === null) {
       return isSearching;
     } else {
       // show preselected network when search is empty
       return !(!isSearching || !vm.searchText);
     }
-  }).get();
+  });
 
   const handleRecipientClick = (recipient: Recipient) => {
     vm.selectRecipient(recipient);
@@ -99,13 +100,13 @@ export const SelectAddress: FC<Props> = observer(({ viewModel }) => {
       </CommonWrapper>
       {/* NetworkView */}
       <ErrorView viewModel={vm.recipientsListViewModel} />
+      <AttentionView viewModel={viewModel} />
       {!shouldHideNetwork ? null : (
         <RecipientsCollectionViewStyled
           viewModel={vm.recipientsListViewModel}
           onRecipientClick={handleRecipientClick}
         />
       )}
-      {/* FeeView */}
       {/* WarningView */}
     </Wrapper>
   );

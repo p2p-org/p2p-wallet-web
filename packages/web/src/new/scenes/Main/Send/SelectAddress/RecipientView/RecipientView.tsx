@@ -4,8 +4,8 @@ import Skeleton from 'react-loading-skeleton';
 import { styled } from '@linaria/react';
 import { theme } from '@p2p-wallet-web/ui';
 import classNames from 'classnames';
-import { computed } from 'mobx';
 import { observer } from 'mobx-react-lite';
+import { expr } from 'mobx-utils';
 
 import { AddressText } from 'components/common/AddressText';
 import { Icon } from 'components/ui';
@@ -124,7 +124,7 @@ export const RecipientView: FC<Props> = observer(
 
     const shouldShowDescriptionLabel = recipient.hasNoFunds || recipient.hasNoInfo;
 
-    const elIcon = computed(() => {
+    const elIcon = expr(() => {
       if (!recipient.name && shouldShowDescriptionLabel) {
         return (
           <IconWrapper className={classNames({ isWarning: true })}>
@@ -138,15 +138,15 @@ export const RecipientView: FC<Props> = observer(
           <RecipientIcon name="wallet" />
         </IconWrapper>
       );
-    }).get();
+    });
 
-    const elTitle = computed(() => {
+    const elTitle = expr(() => {
       return (
         <Title>{recipient.name || <AddressText address={recipient.address} small gray />}</Title>
       );
-    }).get();
+    });
 
-    const elDescription = computed(() => {
+    const elDescription = expr(() => {
       if (!recipient.name) {
         if (shouldShowDescriptionLabel) {
           return (
@@ -166,7 +166,7 @@ export const RecipientView: FC<Props> = observer(
           <AddressText address={recipient.address} small gray />
         </Description>
       );
-    }).get();
+    });
 
     return (
       <Wrapper onClick={onRecipientClick}>

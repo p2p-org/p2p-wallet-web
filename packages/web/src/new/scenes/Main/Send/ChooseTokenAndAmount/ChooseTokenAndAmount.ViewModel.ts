@@ -12,12 +12,45 @@ export enum CurrencyMode {
   fiat = 'fiat',
 }
 
-// TODO: customize
-export enum Error {
+export enum ChooseTokenAndAmountErrorType {
   loadingIsNotCompleted = 'loadingIsNotCompleted',
   destinationWalletIsMissing = 'destinationWalletIsMissing',
   invalidAmount = 'invalidAmount',
   insufficientFunds = 'insufficientFunds',
+}
+
+export class ChooseTokenAndAmountError {
+  readonly type: ChooseTokenAndAmountErrorType;
+
+  static get loadingIsNotCompleted(): ChooseTokenAndAmountError {
+    return new ChooseTokenAndAmountError(ChooseTokenAndAmountErrorType.loadingIsNotCompleted);
+  }
+  static get destinationWalletIsMissing(): ChooseTokenAndAmountError {
+    return new ChooseTokenAndAmountError(ChooseTokenAndAmountErrorType.destinationWalletIsMissing);
+  }
+  static get invalidAmount(): ChooseTokenAndAmountError {
+    return new ChooseTokenAndAmountError(ChooseTokenAndAmountErrorType.invalidAmount);
+  }
+  static get insufficientFunds(): ChooseTokenAndAmountError {
+    return new ChooseTokenAndAmountError(ChooseTokenAndAmountErrorType.insufficientFunds);
+  }
+
+  constructor(type: ChooseTokenAndAmountErrorType) {
+    this.type = type;
+  }
+
+  get buttonSuggestion(): string {
+    switch (this.type) {
+      case ChooseTokenAndAmountErrorType.loadingIsNotCompleted:
+        return 'Loading';
+      case ChooseTokenAndAmountErrorType.destinationWalletIsMissing:
+        return 'Choose destination wallet';
+      case ChooseTokenAndAmountErrorType.invalidAmount:
+        return 'Enter the amount to proceed';
+      case ChooseTokenAndAmountErrorType.insufficientFunds:
+        return 'Insufficient funds';
+    }
+  }
 }
 
 interface SendTokenChooseTokenAndAmountViewModelType {
@@ -26,7 +59,7 @@ interface SendTokenChooseTokenAndAmountViewModelType {
   wallet: Wallet | null;
   amount: number | null;
   currencyMode: CurrencyMode;
-  readonly error: Error | null;
+  readonly error: ChooseTokenAndAmountError | null;
 }
 
 @injectable()
@@ -90,39 +123,18 @@ export class ChooseTokenAndAmountViewModel
     );
   }
 
-  // available amount
-  // get balanceText(): string | null {
-  //   const wallet = this.wallet;
-  //   const mode = this.currencyMode;
-  //
-  //   if (!wallet) {
-  //     return null;
-  //   }
-  //
-  //   const amount = this.calculateAvailableAmount();
-  //   if (!amount) {
-  //     return null;
-  //   }
-  //
-  //   if (mode === CurrencyMode.fiat) {
-  //     return `${amount.toFixed(2)} ${Defaults.fiat.code}`;
-  //   }
-  //
-  //   return amount.formatUnits();
-  // }
-
-  get error(): Error | null {
+  get error(): ChooseTokenAndAmountError | null {
     const wallet = this.wallet;
     const amount = this.amount;
 
     if (!wallet) {
-      return Error.destinationWalletIsMissing;
+      return ChooseTokenAndAmountError.destinationWalletIsMissing;
     }
     if (!amount || (amount ?? 0) <= 0) {
-      return Error.invalidAmount;
+      return ChooseTokenAndAmountError.invalidAmount;
     }
     if ((amount ?? 0) > (this.calculateAvailableAmount ?? 0)) {
-      return Error.insufficientFunds;
+      return ChooseTokenAndAmountError.insufficientFunds;
     }
     return null;
   }
@@ -152,6 +164,7 @@ export class ChooseTokenAndAmountViewModel
     if (!isValid) {
       // TODO:
     }
+    return isValid;
   }
 
   // Actions

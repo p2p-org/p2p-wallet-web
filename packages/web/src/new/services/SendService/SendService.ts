@@ -25,9 +25,25 @@ import { SolanaService } from 'new/services/SolanaService';
 
 import { FeeService } from '../FeeService';
 
-export enum RelayMethod {
+export enum RelayMethodType {
   relay,
   // reward,
+}
+
+export class RelayMethod {
+  type: RelayMethodType;
+
+  static get relay(): RelayMethod {
+    return new RelayMethod(RelayMethodType.relay);
+  }
+
+  constructor(type: RelayMethodType) {
+    this.type = type;
+  }
+
+  static get default(): RelayMethod {
+    return RelayMethod.relay;
+  }
 }
 
 export enum Network {
@@ -97,7 +113,7 @@ export class SendService implements SendServiceType {
     private _feeService: FeeService,
     private _walletsRepository: WalletsRepository,
   ) {
-    this.relayMethod = RelayMethod.relay;
+    this.relayMethod = RelayMethod.default;
 
     this._feeRelayerAPIClient = new FeeRelayerAPIClient();
     this._relayService = new FeeRelayerRelay({
@@ -112,9 +128,11 @@ export class SendService implements SendServiceType {
   // Methods
 
   async load(): Promise<void> {
+    console.log(11111);
     await this._feeService.load();
 
-    if (this.relayMethod === RelayMethod.relay) {
+    if (this.relayMethod.type === RelayMethod.relay.type) {
+      console.log(12222);
       await this._orcaSwap.load();
       await this._relayService.load();
       // load all pools
@@ -178,8 +196,8 @@ export class SendService implements SendServiceType {
           return Promise.resolve(null);
         }
 
-        switch (this.relayMethod) {
-          case RelayMethod.relay: {
+        switch (this.relayMethod.type) {
+          case RelayMethodType.relay: {
             // get fee calculator
             const lamportsPerSignature = this._relayService.cache.lamportsPerSignature;
             const minRentExemption = this._relayService.cache.minimumTokenAccountBalance;
@@ -279,7 +297,7 @@ export class SendService implements SendServiceType {
     feeInSOL: SolanaSDK.FeeAmount;
     payingFeeWallet: Wallet;
   }): Promise<SolanaSDK.FeeAmount | null> {
-    if (this.relayMethod !== RelayMethod.relay) {
+    if (this.relayMethod.type !== RelayMethod.relay.type) {
       return Promise.resolve(null);
     }
 
@@ -326,8 +344,8 @@ export class SendService implements SendServiceType {
     let request: Promise<string>;
     switch (network) {
       case Network.solana: {
-        switch (this.relayMethod) {
-          case RelayMethod.relay: {
+        switch (this.relayMethod.type) {
+          case RelayMethodType.relay: {
             request = this._sendToSolanaBCViaRelayMethod({
               wallet,
               receiver,
@@ -336,7 +354,7 @@ export class SendService implements SendServiceType {
             });
             break;
           }
-          // case RelayMethod.reward: {
+          // case RelayMethodType.reward: {
           //   request = this._sendToSolanaBCViaRewardMethod();
           // }
         }

@@ -34,7 +34,7 @@ export class RecipientsListViewModel extends SDListViewModel<Recipient> {
 
   // Methods
 
-  override createRequest = flow(function* (
+  override createRequest = flow<Recipient[], []>(function* (
     this: RecipientsListViewModel,
   ): Generator<Promise<Recipient[]>> {
     if (!this.searchString) {

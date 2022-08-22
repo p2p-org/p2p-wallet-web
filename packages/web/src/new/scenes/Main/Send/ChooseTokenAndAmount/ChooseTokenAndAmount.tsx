@@ -3,8 +3,8 @@ import type { FC } from 'react';
 import { styled } from '@linaria/react';
 import { theme } from '@p2p-wallet-web/ui';
 import classNames from 'classnames';
-import { computed } from 'mobx';
 import { observer } from 'mobx-react-lite';
+import { expr } from 'mobx-utils';
 
 import { Icon } from 'components/ui';
 import { InputAmount } from 'components/ui/InputAmount';
@@ -111,7 +111,7 @@ export const ChooseTokenAndAmount: FC<Props> = observer(({ viewModel }) => {
   const vm = viewModel.chooseTokenAndAmountViewModel;
 
   // available amount
-  const balanceText = computed(() => {
+  const balanceText = expr(() => {
     const wallet = vm.wallet;
     const mode = vm.currencyMode;
     if (!wallet) {
@@ -128,9 +128,9 @@ export const ChooseTokenAndAmount: FC<Props> = observer(({ viewModel }) => {
     }
 
     return `${numberToString(amount, { maximumFractionDigits: 9 })} ${wallet.token.symbol}`;
-  }).get();
+  });
 
-  const equityValueLabel = computed(() => {
+  const equityValueLabel = expr(() => {
     const amount = viewModel.amount;
     const wallet = vm.wallet;
     const currencyMode = vm.currencyMode;
@@ -152,7 +152,7 @@ export const ChooseTokenAndAmount: FC<Props> = observer(({ viewModel }) => {
     }
 
     return `${equityValueSymbol} ${numberToString(equityValue, { maximumFractionDigits })}`;
-  }).get();
+  });
 
   const handleUseAllBalanceClick = () => {
     const availableAmount = vm.calculateAvailableAmount;
@@ -225,7 +225,7 @@ export const ChooseTokenAndAmount: FC<Props> = observer(({ viewModel }) => {
   // }, []);
 
   // error
-  const balanceClassName = computed(() => {
+  const balanceClassName = expr(() => {
     const error = vm.error;
     const amount = vm.amount;
 
@@ -236,9 +236,9 @@ export const ChooseTokenAndAmount: FC<Props> = observer(({ viewModel }) => {
       className = 'success';
     }
     return className;
-  }).get();
+  });
 
-  const isAmountEqualMaxBalance = computed(() => vm.amount === vm.calculateAvailableAmount).get();
+  const isAmountEqualMaxBalance = expr(() => vm.amount === vm.calculateAvailableAmount);
 
   return (
     <Wrapper>

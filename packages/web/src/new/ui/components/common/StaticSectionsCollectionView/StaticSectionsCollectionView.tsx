@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 
-import { computed } from 'mobx';
 import { observer } from 'mobx-react-lite';
+import { expr } from 'mobx-utils';
 import { nanoid } from 'nanoid';
 
 import type { ISDListViewModel } from 'new/core/viewmodels/SDListViewModel';
@@ -31,7 +31,7 @@ export const StaticSectionsCollectionView = observer(
   }: Props<T>) => {
     const items = useMemo(
       () =>
-        computed(() => {
+        expr(() => {
           let _items = viewModel.data;
 
           if (customFilter) {
@@ -59,7 +59,7 @@ export const StaticSectionsCollectionView = observer(
           return collectionViewItems;
         }),
       [customFilter, numberOfLoadingCells, renderEmpty, viewModel.data, viewModel.state],
-    ).get();
+    );
 
     if (items.length === 0) {
       return null;
