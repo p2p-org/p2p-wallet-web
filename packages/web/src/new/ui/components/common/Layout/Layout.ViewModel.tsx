@@ -3,8 +3,7 @@ import { injectable } from 'tsyringe';
 
 import { ViewModel } from 'new/core/viewmodels/ViewModel';
 import { SolanaModel } from 'new/models/SolanaModel';
-import type { ModalType } from 'new/services/ModalService';
-import { ModalService } from 'new/services/ModalService';
+import { ModalService, ModalType } from 'new/services/ModalService';
 
 @injectable()
 export class LayoutViewModel extends ViewModel {
@@ -24,7 +23,13 @@ export class LayoutViewModel extends ViewModel {
     return !!this._solanaModel.provider;
   }
 
-  openModal<T, S>(modalType: ModalType, props?: S): Promise<T | void> {
-    return this._modalService.openModal<T, S>(modalType, props);
+  openActionsMobileModal() {
+    void this._modalService.openModal(ModalType.SHOW_MODAL_ACTIONS_MOBILE, {
+      layoutViewModel: this,
+    });
+  }
+
+  openChooseBuyTokenMobileModal() {
+    void this._modalService.openModal(ModalType.SHOW_MODAL_CHOOSE_BUY_TOKEN_MOBILE);
   }
 }

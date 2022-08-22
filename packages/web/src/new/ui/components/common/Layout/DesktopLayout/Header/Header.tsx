@@ -3,6 +3,7 @@ import { Link, NavLink } from 'react-router-dom';
 
 import { styled } from '@linaria/react';
 import { zIndexes } from '@p2p-wallet-web/ui';
+import { observer } from 'mobx-react-lite';
 
 import logo from 'assets/images/logo.png';
 import { COLUMN_LEFT_WIDTH, COLUMNS_GRID_GUTTER } from 'components/common/Layout';
@@ -114,7 +115,7 @@ type Props = {
   breadcrumb?: BreadcrumbType;
 };
 
-export const Header: FunctionComponent<Props> = ({ viewModel, breadcrumb }) => {
+export const Header: FunctionComponent<Props> = observer(({ viewModel, breadcrumb }) => {
   return (
     <Wrapper>
       <ScrollFixContainer>
@@ -138,4 +139,4 @@ export const Header: FunctionComponent<Props> = ({ viewModel, breadcrumb }) => {
       </ScrollFixContainer>
     </Wrapper>
   );
-};
+});

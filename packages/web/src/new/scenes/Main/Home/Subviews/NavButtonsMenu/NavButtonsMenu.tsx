@@ -6,7 +6,6 @@ import { styled } from '@linaria/react';
 import classNames from 'classnames';
 import throttle from 'lodash.throttle';
 
-import { ModalType } from 'app/contexts/general/modals';
 import { NavButton, NavButtonIcon, NavButtons } from 'components/common/NavButtons';
 import type { HomeViewModel } from 'new/scenes/Main/Home';
 
@@ -40,7 +39,7 @@ export const NavButtonsMenu: FC<Props> = ({ viewModel }) => {
   const [stuck, setStuck] = useState(false);
 
   const handleBuyButtonClick = () => {
-    void viewModel.openModal(ModalType.SHOW_MODAL_CHOOSE_BUY_TOKEN_MOBILE);
+    viewModel.openChooseBuyTokenMobileModal();
   };
 
   useEffect(() => {

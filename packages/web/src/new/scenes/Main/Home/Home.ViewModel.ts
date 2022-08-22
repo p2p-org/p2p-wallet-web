@@ -5,8 +5,7 @@ import { injectable } from 'tsyringe';
 import { SDFetcherState } from 'new/core/viewmodels/SDViewModel';
 import { ViewModel } from 'new/core/viewmodels/ViewModel';
 import { Defaults } from 'new/services/Defaults';
-import type { ModalType } from 'new/services/ModalService';
-import { ModalService } from 'new/services/ModalService';
+import { ModalService, ModalType } from 'new/services/ModalService';
 import { NameService } from 'new/services/NameService';
 import { PricesService } from 'new/services/PriceAPIs/PricesService';
 import { WalletsRepository } from 'new/services/Repositories';
@@ -111,7 +110,7 @@ export class HomeViewModel extends ViewModel {
     return this.walletsRepository.state === SDFetcherState.loading;
   }
 
-  openModal<T, S>(modalType: ModalType): Promise<T | void> {
-    return this._modalService.openModal<T, S>(modalType);
+  openChooseBuyTokenMobileModal(): void {
+    void this._modalService.openModal(ModalType.SHOW_MODAL_CHOOSE_BUY_TOKEN_MOBILE);
   }
 }

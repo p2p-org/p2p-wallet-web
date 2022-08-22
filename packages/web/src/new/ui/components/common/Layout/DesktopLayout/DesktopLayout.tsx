@@ -4,6 +4,7 @@ import * as React from 'react';
 import { styled } from '@linaria/react';
 import { up, useIsDesktop, useIsTablet } from '@p2p-wallet-web/ui';
 import classNames from 'classnames';
+import { observer } from 'mobx-react-lite';
 
 import { ColumnLeft } from 'components/common/Layout/DesktopLayout/ColumnLeft';
 import { ScrollFix } from 'components/common/ScollFix';
@@ -69,7 +70,7 @@ type Props = {
   children: React.ReactNode;
 };
 
-export const DesktopLayoutOrigin: FC<Props> = ({ viewModel, breadcrumb, children }) => {
+export const DesktopLayoutOrigin: FC<Props> = observer(({ viewModel, breadcrumb, children }) => {
   const isTablet = useIsTablet();
   const isDesktop = useIsDesktop();
 
@@ -92,6 +93,6 @@ export const DesktopLayoutOrigin: FC<Props> = ({ viewModel, breadcrumb, children
       </MainScrollFix>
     </Wrapper>
   );
-};
+});
 
 export const DesktopLayout = React.memo(DesktopLayoutOrigin);

@@ -5,7 +5,6 @@ import { useIntercom } from 'react-use-intercom';
 import { styled } from '@linaria/react';
 import { theme, zIndexes } from '@p2p-wallet-web/ui';
 
-import { ModalType } from 'app/contexts';
 import { Icon } from 'components/ui';
 import type { LayoutViewModel } from 'new/ui/components/common/Layout/Layout.ViewModel';
 
@@ -81,10 +80,7 @@ export const MobileFooterTabs: FC<Props> = ({ viewModel }) => {
 
   const handleActionsClick = (e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
-    void viewModel.openModal<boolean, { layoutViewModel: LayoutViewModel }>(
-      ModalType.SHOW_MODAL_ACTIONS_MOBILE,
-      { layoutViewModel: viewModel },
-    );
+    viewModel.openActionsMobileModal();
   };
 
   const handleFeedbackClick = (e: React.MouseEvent<HTMLDivElement>) => {

@@ -4,7 +4,6 @@ import { useHistory, useLocation } from 'react-router';
 import { styled } from '@linaria/react';
 
 import type { ModalPropsType } from 'app/contexts';
-import { ModalType } from 'app/contexts';
 import { ActionButton } from 'components/modals/ActionsMobileModal/ActionButton';
 import { Modal } from 'components/ui/Modal';
 import type { LayoutViewModel } from 'new/ui/components/common/Layout/Layout.ViewModel';
@@ -30,7 +29,7 @@ export const ActionsMobileModal: FC<Props & ModalPropsType> = ({ close, layoutVi
   };
 
   const handleBuyButtonClick = () => {
-    void layoutViewModel.openModal(ModalType.SHOW_MODAL_CHOOSE_BUY_TOKEN_MOBILE);
+    layoutViewModel.openChooseBuyTokenMobileModal();
   };
 
   const handleCloseClick = () => {
