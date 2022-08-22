@@ -69,6 +69,7 @@
     "dataloader": "^2.0.0",
     "dayjs": "^1.9.5",
     "decimal.js": "^10.2.1",
+    "firebase": "^9.9.2",
     "flagged": "^2.0.1",
     "fuse.js": "^6.5.3",
     "highcharts": "^9.0.0",

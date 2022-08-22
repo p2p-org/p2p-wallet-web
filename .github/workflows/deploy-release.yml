@@ -1,0 +1,105 @@
+name: Deploy Release
+
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - closed
+
+concurrency: release-${{ github.ref }}
+
+jobs:
+  set_info:
+    if: ${{ startsWith(github.head_ref, 'release/') && github.event.action == 'opened' }}
+    runs-on: ubuntu-latest
+    environment: staging
+    name: Set Jira Info
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: tzkhan/pr-update-action@v2
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          head-branch-regex: 'release/\d+.\d+.\d+'
+          title-update-action: 'prefix'
+          title-template: '[%headbranch%]'
+          body-template: |
+            🚀 [ JIRA TICKET ](https://p2pvalidator.atlassian.net/browse/%headbranch%)
+          body-update-action: 'prefix'
+          body-uppercase-base-match: false
+
+  deploy_release:
+    if: startsWith(github.head_ref, 'release/') && (github.event.action == 'opened' || github.event.action == 'synchronize')
+    runs-on: ubuntu-latest
+    environment: release
+    name: Deploy Release Preview
+    steps:
+      - name: Learn release number
+        uses: rishabhgupta/split-by@v1
+        id: split
+        with:
+          string: ${{ github.head_ref }}
+          split-by: '/'
+
+      - name: Store environment variables
+        env:
+          release_number: ${{ steps.split.outputs._1 }}
+        run: |
+          echo "target_dir=release/$release_number" >> $GITHUB_ENV
+          echo "empty_dir=$(mktemp -d)" >> $GITHUB_ENV
+          echo "datetime=$(date '+%Y-%m-%d %H:%M %Z')" >> $GITHUB_ENV
+          pagesurl=$(echo $GITHUB_REPOSITORY | sed 's/\//.github.io\//')
+          echo "pagesurl=$pagesurl" >> $GITHUB_ENV
+        shell: bash
+
+      - uses: actions/checkout@v2
+
+      - name: Cache node_modules
+        uses: actions/cache@v2
+        with:
+          path: |
+            node_modules
+            */*/node_modules
+          key: ${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
+
+      - name: Install dependecies
+        run: yarn install --frozen-lockfile
+
+      - name: Build site
+        env:
+          REACT_APP_BASENAME: p2p-wallet-web/release/${{ env.release_number }}/
+          REACT_APP_CRYPTO_COMPARE_API_KEY: ${{ secrets.REACT_APP_CRYPTO_COMPARE_API_KEY }}
+          REACT_APP_FEE_RELAYER_URL: ${{ secrets.REACT_APP_FEE_RELAYER_URL }}
+          REACT_APP_SWAP_HOST_FEE_ADDRESS: ${{ secrets.REACT_APP_SWAP_HOST_FEE_ADDRESS }}
+          REACT_APP_AMPLITUDE_API_KEY: ${{ secrets.REACT_APP_AMPLITUDE_API_KEY }}
+          REACT_APP_TRANSAK_API_KEY: ${{ secrets.REACT_APP_TRANSAK_API_KEY }}
+          REACT_APP_INTERCOM_APP_ID: ${{ secrets.REACT_APP_INTERCOM_APP_ID }}
+          REACT_APP_MOONPAY_API_KEY: ${{ secrets.REACT_APP_MOONPAY_API_KEY }}
+          REACT_APP_MOONPAY_SIGNER_URL: ${{ secrets.REACT_APP_MOONPAY_SIGNER_URL }}
+          REACT_APP_STAGING: true
+          REACT_APP_SENTRY_DSN_ENDPOINT: ${{ secrets.REACT_APP_SENTRY_DSN_ENDPOINT }}
+          REACT_APP_SENTRY_MODE: release
+          REACT_APP_SENTRY_TRACES_SAMPLE_RATE: 1
+          REACT_APP_SENTRY_RELEASE: p2p-wallet-web_release_${{ steps.split.outputs._1}}
+          REACT_APP_FIREBASE_API_KEY: ${{ secrets.REACT_APP_FIREBASE_API_KEY }}
+          REACT_APP_FIREBASE_APP_ID: ${{ secrets.REACT_APP_FIREBASE_APP_ID }}
+        run: yarn build
+
+      - name: Deploy Release preview
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          branch: gh-pages
+          folder: ./packages/web/build
+          target-folder: ${{ env.target_dir }}
+          commit-message: Deploy preview for Release ${{ env.release_number }} 🛫
+          force: false
+
+      - name: Leave a comment after deployment
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          header: pr-preview
+          message: "\
+            :rocket: Deployed preview to
+            https://${{ env.pagesurl }}/${{ env.target_dir }}/
+            "
