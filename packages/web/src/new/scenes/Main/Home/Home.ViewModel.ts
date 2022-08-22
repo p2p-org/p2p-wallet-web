@@ -5,6 +5,8 @@ import { injectable } from 'tsyringe';
 import { SDFetcherState } from 'new/core/viewmodels/SDViewModel';
 import { ViewModel } from 'new/core/viewmodels/ViewModel';
 import { Defaults } from 'new/services/Defaults';
+import type { ModalType } from 'new/services/ModalService';
+import { ModalService } from 'new/services/ModalService';
 import { NameService } from 'new/services/NameService';
 import { PricesService } from 'new/services/PriceAPIs/PricesService';
 import { WalletsRepository } from 'new/services/Repositories';
@@ -17,6 +19,7 @@ export class HomeViewModel extends ViewModel {
     public walletsRepository: WalletsRepository,
     public pricesService: PricesService,
     public nameService: NameService,
+    private _modalService: ModalService,
   ) {
     super();
 
@@ -106,5 +109,9 @@ export class HomeViewModel extends ViewModel {
 
   get isBalanceLoading() {
     return this.walletsRepository.state === SDFetcherState.loading;
+  }
+
+  openModal<T, S>(modalType: ModalType): Promise<T | void> {
+    return this._modalService.openModal<T, S>(modalType);
   }
 }

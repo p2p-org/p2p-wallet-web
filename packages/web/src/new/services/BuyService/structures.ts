@@ -1,4 +1,10 @@
+import { USDC_MINT } from '@p2p-wallet-web/core';
+import { NATIVE_MINT } from '@solana/spl-token';
+import type { Cluster } from '@solana/web3.js';
+import assert from 'assert';
+
 import { BASE_CURRENCY_SYMBOL } from 'new/services/BuyService/constants';
+import { Defaults } from 'new/services/Defaults';
 
 type FiatCurrencySymbol = 'USD';
 type CryptoCurrencySymbol = 'SOL' | 'USDC';
@@ -85,6 +91,30 @@ export class CryptoCurrency {
         return 'usdc_sol';
     }
   }
+
+  get mintAddress() {
+    const mintAddress =
+      CryptoCurrency.Addresses[Defaults.apiEndPoint.network as Cluster][this._symbol];
+    if (!mintAddress) {
+      assert(true, `Unhandeled mint address for ${Defaults.apiEndPoint.network} : ${this._symbol}`);
+    }
+    return mintAddress;
+  }
+
+  static Addresses = {
+    'mainnet-beta': {
+      SOL: NATIVE_MINT.toBase58(),
+      USDC: USDC_MINT.toBase58(),
+    },
+    testnet: {
+      SOL: NATIVE_MINT.toBase58(),
+      USDC: 'CpMah17kQEL2wqyMKt3mZBdTnZbkbfx4nqmQMFDP5vwp',
+    },
+    devnet: {
+      SOL: NATIVE_MINT.toBase58(),
+      USDC: '4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU',
+    },
+  };
 }
 
 export class ExchangeInput {

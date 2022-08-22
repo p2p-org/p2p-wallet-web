@@ -5,9 +5,9 @@ import { styled } from '@linaria/react';
 import { up, useIsMobile } from '@p2p-wallet-web/ui';
 import { observer } from 'mobx-react-lite';
 
-import { Layout } from 'components/common/Layout';
 import { WidgetPage } from 'components/common/WidgetPage';
 import { useViewModel } from 'new/core/viewmodels/useViewModel';
+import { Layout } from 'new/ui/components/common/Layout';
 
 import { HomeViewModel } from './Home.ViewModel';
 import { EmptyWalletView } from './Subviews/EmptyWalletView';
@@ -37,7 +37,7 @@ export const Home: FunctionComponent = observer(() => {
         <WidgetPage title="Wallets" icon="wallet">
           <Content>
             <Header viewModel={viewModel} />
-            {isMobile ? <NavButtonsMenu /> : undefined}
+            {isMobile ? <NavButtonsMenu viewModel={viewModel} /> : undefined}
             <WalletsCollectionView viewModel={viewModel.walletsRepository} />
           </Content>
         </WidgetPage>

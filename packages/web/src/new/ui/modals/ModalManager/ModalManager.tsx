@@ -69,7 +69,7 @@ const getPreset: GetPresetFn = (modal) => {
 };
 
 const modalsMap = new Map<ModalType, LazyExoticComponent<ModalPropsType & any>>([
-  [ModalType.SHOW_MODAL_ACTIONS_MOBILE, lazy(() => import('components/modals/ActionsMobileModal'))],
+  [ModalType.SHOW_MODAL_ACTIONS_MOBILE, lazy(() => import('new/ui/modals/ActionsMobileModal'))],
   [
     ModalType.SHOW_MODAL_RECEIVE_BITCOIN,
     lazy(() => import('components/modals/ReceiveBitcoinModal')),
@@ -100,7 +100,7 @@ const modalsMap = new Map<ModalType, LazyExoticComponent<ModalPropsType & any>>(
   ],
   [
     ModalType.SHOW_MODAL_CHOOSE_BUY_TOKEN_MOBILE,
-    lazy(() => import('components/modals/ChooseBuyTokenMobileModal')),
+    lazy(() => import('new/ui/modals/ChooseBuyTokenMobileModal')),
   ],
   [
     ModalType.SHOW_MODAL_SELECT_LIST_MOBILE,
@@ -109,9 +109,7 @@ const modalsMap = new Map<ModalType, LazyExoticComponent<ModalPropsType & any>>(
   [ModalType.SHOW_MODAL_ERROR, lazy(() => import('components/modals/ErrorModal'))],
 ]);
 
-interface Props {}
-
-export const ModalManager: FC<Props> = observer(() => {
+export const ModalManager: FC = observer(() => {
   const vm = useViewModel(ModalManagerViewModel);
 
   const handleWrapperClick = useCallback(

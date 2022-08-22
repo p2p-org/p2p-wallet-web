@@ -3,10 +3,10 @@ import type { FC } from 'react';
 import { styled } from '@linaria/react';
 import { observer } from 'mobx-react-lite';
 
-import { Layout } from 'components/common/Layout';
 import { useViewModel } from 'new/core/viewmodels/useViewModel';
 import { BuyViewModel } from 'new/scenes/Main/Buy/Buy.ViewModel';
 import { MoonpayIframeWidget, MoonpayWidget } from 'new/scenes/Main/Buy/Subviews';
+import { Layout } from 'new/ui/components/common/Layout';
 
 const Error = styled.div`
   align-self: center;
