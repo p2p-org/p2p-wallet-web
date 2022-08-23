@@ -160,7 +160,7 @@ export const LeftNavMenu: FunctionComponent = () => {
       </NavLinkMenu>
 
       <NavLinkMenu
-        to={{ pathname: '/buyNew', state: { fromPage: location.pathname } }}
+        to={{ pathname: '/buy', state: { fromPage: location.pathname } }}
         className="button"
       >
         <NavButton>

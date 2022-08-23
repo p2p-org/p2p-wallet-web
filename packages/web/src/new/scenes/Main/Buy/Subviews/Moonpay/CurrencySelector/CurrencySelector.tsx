@@ -55,7 +55,7 @@ export const CurrencySelect: FC<BuyViewModelProps> = observer(({ viewModel }) =>
 
   const handleItemClick = useCallback(
     (nextCurrency: CryptoCurrency) => () => {
-      history.push(`/buyNew/${nextCurrency.symbol}`);
+      history.push(`/buy/${nextCurrency.symbol}`);
     },
     [],
   );

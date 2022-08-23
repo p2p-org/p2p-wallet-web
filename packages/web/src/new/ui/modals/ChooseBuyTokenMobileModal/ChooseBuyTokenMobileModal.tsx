@@ -24,7 +24,7 @@ export const ChooseBuyTokenMobileModal: FC<ModalPropsType> = observer(({ close }
   const handleRowClick = (cryptoCurrency: CryptoCurrency) => {
     handleCloseClick();
 
-    const newPath = `/buyNew/${cryptoCurrency.symbol}`;
+    const newPath = `/buy/${cryptoCurrency.symbol}`;
 
     if (location.pathname !== newPath) {
       history.push(newPath);
