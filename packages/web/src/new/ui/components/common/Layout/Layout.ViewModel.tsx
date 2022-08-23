@@ -30,6 +30,7 @@ export class LayoutViewModel extends ViewModel {
   }
 
   openChooseBuyTokenMobileModal() {
+    this._modalService.closeTopModal();
     void this._modalService.openModal(ModalType.SHOW_MODAL_CHOOSE_BUY_TOKEN_MOBILE);
   }
 }
