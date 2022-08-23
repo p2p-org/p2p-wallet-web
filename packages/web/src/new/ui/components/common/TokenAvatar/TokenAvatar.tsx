@@ -59,7 +59,7 @@ export const TokenAvatar: FunctionComponent<Props & HTMLAttributes<HTMLDivElemen
 
   const isWrapped = useMemo(() => {
     if (token) {
-      return token.tags.includes('wrapped');
+      return token.tags.includes('wrapped') || token.name.toLowerCase().includes('wrapped');
     }
 
     return false;
