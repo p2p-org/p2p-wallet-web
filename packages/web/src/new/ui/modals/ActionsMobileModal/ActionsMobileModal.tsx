@@ -29,6 +29,7 @@ export const ActionsMobileModal: FC<Props & ModalPropsType> = ({ close, layoutVi
   };
 
   const handleBuyButtonClick = () => {
+    layoutViewModel.closeTopModal();
     layoutViewModel.openChooseBuyTokenMobileModal();
   };
 
