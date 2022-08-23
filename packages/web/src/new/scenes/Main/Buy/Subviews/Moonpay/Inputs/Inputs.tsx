@@ -8,10 +8,10 @@ import { observer } from 'mobx-react-lite';
 
 import { useConfig } from 'app/contexts';
 import { TokenAvatar } from 'components/common/TokenAvatar';
-import { AmountTypeButton } from 'components/pages/buy/BuyWidget/MoonpayForm/AmountTypeButton';
 import { InputAmount } from 'components/ui/InputAmount';
 import type { BuyViewModelProps } from 'new/scenes/Main/Buy/Subviews/Moonpay/types';
 import { FiatCurrency } from 'new/services/BuyService/structures';
+import { AmountTypeButton } from 'new/ui/components/pages/buy/AmountTypeButton';
 import { formatNumberToUSD } from 'utils/format';
 
 const Wrapper = styled.div`

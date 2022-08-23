@@ -15,7 +15,6 @@ import { Home } from 'new/scenes/Main/Home';
 import { Root } from 'new/scenes/Root';
 import { ModalManager } from 'new/ui/modals/ModalManager';
 import { Auth } from 'pages/Auth';
-import { Buy } from 'pages/Buy';
 import { Landing } from 'pages/Landing';
 import { Receive } from 'pages/Receive';
 import { Send } from 'pages/Send';
@@ -55,7 +54,6 @@ const App: React.FC = () => {
                   <AuthRequiredRoute path="/swap/(settings)?/:symbol?" component={Swap} />
                   <AuthRequiredRoute path="/settings/network" component={SettingsNetwork} />
                   <AuthRequiredRoute path="/settings" component={Settings} />
-                  <AuthRequiredRoute path="/buy/:symbol?" component={Buy} />
                   <AuthRequiredRoute path="/buyNew/:symbol?" component={BuyNew} />
                 </Main>
               </Switch>
