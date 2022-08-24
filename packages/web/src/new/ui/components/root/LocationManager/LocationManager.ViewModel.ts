@@ -15,6 +15,6 @@ export class LocationManagerViewModel extends ViewModel {
   protected override afterReactionsRemoved() {}
 
   setHistory(history: History) {
-    this._locationService.listenHistory(history);
+    this._locationService.setHistory(history);
   }
 }
