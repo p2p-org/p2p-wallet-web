@@ -13,6 +13,7 @@ import { Main } from 'new/scenes/Main';
 import { Buy } from 'new/scenes/Main/Buy';
 import { Home } from 'new/scenes/Main/Home';
 import { Root } from 'new/scenes/Root';
+import { LocationManager } from 'new/ui/components/root/LocationManager';
 import { ModalManager } from 'new/ui/modals/ModalManager';
 import { Auth } from 'pages/Auth';
 import { Landing } from 'pages/Landing';
@@ -61,6 +62,7 @@ const App: React.FC = () => {
               <FeaturesToggle />
               <ToastManager anchor="left" renderToast={(props) => <NotifyToast {...props} />} />
               <ModalManager />
+              <LocationManager />
             </Root>
           </Providers>
         </Router>

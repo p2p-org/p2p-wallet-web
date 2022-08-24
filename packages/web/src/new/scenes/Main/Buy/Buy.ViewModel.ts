@@ -1,22 +1,24 @@
-import { action, computed, makeObservable, observable, reaction } from 'mobx';
+import { action, autorun, computed, makeObservable, observable, reaction } from 'mobx';
 import { injectable } from 'tsyringe';
 
 import { LoadableState } from 'new/app/models/LoadableReleay';
 import { ViewModel } from 'new/core/viewmodels/ViewModel';
 import { BuyService } from 'new/services/BuyService';
+import type { CryptoCurrencySymbol } from 'new/services/BuyService/structures';
 import {
   CryptoCurrency,
   ExchangeInput,
   ExchangeOutput,
   FiatCurrency,
 } from 'new/services/BuyService/structures';
+import { LocationService } from 'new/services/LocationService';
 import { SolanaService } from 'new/services/SolanaService';
 
 const UPDATE_INTERVAL = 30 * 1000; // 30 secs
 
 let _startUpdatingFirstAttemptCall = true;
 
-type CryptoCurrenciesForSelectType = { [key: string]: CryptoCurrency };
+type CryptoCurrenciesForSelectType = Record<CryptoCurrencySymbol, CryptoCurrency>;
 
 @injectable()
 export class BuyViewModel extends ViewModel {
@@ -31,7 +33,11 @@ export class BuyViewModel extends ViewModel {
 
   private _timer?: NodeJS.Timer;
 
-  constructor(private _buyService: BuyService, private _solanaService: SolanaService) {
+  constructor(
+    private _buyService: BuyService,
+    private _solanaService: SolanaService,
+    private _locationService: LocationService,
+  ) {
     super();
 
     makeObservable(this, {
@@ -80,9 +86,24 @@ export class BuyViewModel extends ViewModel {
 
   protected override onInitialize() {
     this.addReaction(
+      autorun(() => {
+        const { symbol } =
+          this._locationService.getParams<{ symbol: CryptoCurrencySymbol }>('/buy/:symbol?');
+
+        if (symbol) {
+          // console.log('change symbol -', symbol);
+          this.setCryptoCurrency(this.cryptoCurrenciesForSelect[symbol]);
+        }
+      }),
+    );
+
+    this.addReaction(
       reaction(
         () => this.crypto,
-        () => this._update(),
+        () => {
+          // console.log('crypto changed -', this.crypto.symbol);
+          this._update();
+        },
       ),
     );
 
@@ -115,7 +136,7 @@ export class BuyViewModel extends ViewModel {
       ),
     );
 
-    this._startUpdating();
+    //this._startUpdating();
   }
 
   protected override afterReactionsRemoved() {
