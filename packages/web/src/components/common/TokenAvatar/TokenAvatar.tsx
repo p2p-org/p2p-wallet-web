@@ -50,7 +50,7 @@ type Props = {
 };
 
 export const TokenAvatar: FunctionComponent<Props & HTMLAttributes<HTMLDivElement>> = ({
-  token,
+  token: inputToken,
   symbol,
   address,
   className,
@@ -61,50 +61,48 @@ export const TokenAvatar: FunctionComponent<Props & HTMLAttributes<HTMLDivElemen
 
   useEffect(() => {
     setIsDead(false);
-  }, [token?.icon]);
+  }, [inputToken?.icon]);
 
   // TODO: remove
-  const tokenInfo = useMemo(() => {
-    if (token) {
+  const foundToken = useMemo(() => {
+    if (inputToken) {
       return null;
     }
 
     return (
       (address && tokenMap[address]) ||
-      tokens.find((token) => token.symbol === symbol || token.address === address)
+      tokens.find((token: Token) => token.symbol === symbol || token.address === address)
     );
-  }, [address, symbol, token, tokenMap, tokens]); // TODO: remove
+  }, [address, symbol, inputToken, tokenMap, tokens]); // TODO: remove
 
   const isWrapped = useMemo(() => {
-    if (token) {
-      return token.hasTag('wrapped');
-    }
+    const _token = inputToken || foundToken;
 
-    return tokenInfo?.hasTag('wrapped');
-  }, [token, tokenInfo]);
+    return _token.hasTag('wrapped') || _token.name.toLowerCase().includes('wrapped');
+  }, [inputToken, foundToken]);
 
   const elAvatar = () => {
     const commonAttr = {
       onError: () => setIsDead(true),
     };
 
-    if (token && !isDead) {
-      return <Avatar src={token.icon} {...props} {...commonAttr} />;
+    if (inputToken && !isDead) {
+      return <Avatar src={inputToken.icon} {...props} {...commonAttr} />;
     }
 
-    if (token && isDead) {
-      return <Jazzicon address={token.address} size={props.size} />;
+    if (inputToken && isDead) {
+      return <Jazzicon address={inputToken.address} size={props.size} />;
     }
 
-    if ((!tokenInfo || !tokenInfo.icon) && address) {
+    if ((!foundToken || !foundToken.icon) && address) {
       return <Jazzicon address={address} size={props.size} />;
     }
 
-    return <Avatar src={tokenInfo?.icon || undefined} {...props} {...commonAttr} />;
+    return <Avatar src={foundToken?.icon || undefined} {...props} {...commonAttr} />;
   };
 
   return (
-    <Wrapper className={classNames(className, { isNotExists: !tokenInfo || !token })}>
+    <Wrapper className={classNames(className, { isNotExists: !foundToken || !inputToken })}>
       {elAvatar()}
       {isWrapped ? (
         <WrappedBy
