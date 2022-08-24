@@ -2,11 +2,19 @@
 
 import { ZERO } from '@orca-so/sdk';
 import type { Network } from '@saberhq/solana-contrib';
-import { ASSOCIATED_TOKEN_PROGRAM_ID, Token, TOKEN_PROGRAM_ID, u64 } from '@solana/spl-token';
+import {
+  AccountLayout,
+  ASSOCIATED_TOKEN_PROGRAM_ID,
+  Token,
+  TOKEN_PROGRAM_ID,
+  u64,
+} from '@solana/spl-token';
 import type { TransactionInstruction } from '@solana/web3.js';
 import { Account, PublicKey, SystemProgram, Transaction } from '@solana/web3.js';
 import promiseRetry from 'promise-retry';
 
+import type { StatsInfoDeviceType } from 'new/sdk/FeeRelayer';
+import { StatsInfo, StatsInfoOperationType } from 'new/sdk/FeeRelayer';
 import type { FeeRelayerAPIClientType } from 'new/sdk/FeeRelayer/apiClient/FeeRelayerAPIClient';
 import { FeeRelayerError } from 'new/sdk/FeeRelayer/models/FeeRelayerError';
 import { FeeRelayerRequestType } from 'new/sdk/FeeRelayer/models/FeeRelayerRequestType';
@@ -84,10 +92,14 @@ export interface FeeRelayerRelayType {
     preparedTransaction,
     payingFeeToken,
     additionalPaybackFee,
+    operationType,
+    currency,
   }: {
     preparedTransaction: SolanaSDK.PreparedTransaction;
     payingFeeToken?: TokenInfo | null;
     additionalPaybackFee: u64;
+    operationType: StatsInfoOperationType;
+    currency: string | null;
   }): Promise<string[]>;
 
   /// Top up relay account (if needed) and relay mutiple transactions
@@ -95,10 +107,14 @@ export interface FeeRelayerRelayType {
     preparedTransactions,
     payingFeeToken,
     additionalPaybackFee,
+    operationType,
+    currency,
   }: {
     preparedTransactions: SolanaSDK.PreparedTransaction[];
     payingFeeToken?: TokenInfo;
     additionalPaybackFee: u64;
+    operationType: StatsInfoOperationType;
+    currency: string | null;
   }): Promise<string[]>;
 
   /// SPECIAL METHODS FOR SWAP NATIVELY
@@ -170,18 +186,24 @@ export class FeeRelayerRelay implements FeeRelayerRelayType {
   cache: Cache;
   owner: Account;
   userRelayAddress: PublicKey;
+  deviceType: StatsInfoDeviceType;
+  buildNumber: string | null;
 
   constructor({
     owner,
     apiClient,
     solanaClient,
     orcaSwapClient,
+    deviceType,
+    buildNumber,
   }: {
     owner: Account;
     apiClient: FeeRelayerAPIClientType;
     solanaClient: FeeRelayerRelaySolanaClient;
     // accountStorage: SolanaSDKAccountStorage,
     orcaSwapClient: OrcaSwap.OrcaSwapType;
+    deviceType: StatsInfoDeviceType;
+    buildNumber: string | null;
   }) {
     // const owner = accountStorage.account;
     // if (!owner) {
@@ -198,6 +220,8 @@ export class FeeRelayerRelay implements FeeRelayerRelayType {
       network: this.solanaClient.endpoint.network,
     });
     this.cache = new Cache();
+    this.deviceType = deviceType;
+    this.buildNumber = buildNumber;
   }
 
   // Methods
@@ -206,7 +230,7 @@ export class FeeRelayerRelay implements FeeRelayerRelayType {
   load(): Promise<void> {
     return Promise.all([
       // get minimum token account balance
-      this.solanaClient.getMinimumBalanceForRentExemption(165),
+      this.solanaClient.getMinimumBalanceForRentExemption(AccountLayout.span), // 165
       // get minimum relay account balance
       this.solanaClient.getMinimumBalanceForRentExemption(0),
       // get fee payer address
@@ -422,15 +446,21 @@ export class FeeRelayerRelay implements FeeRelayerRelayType {
     preparedTransaction,
     payingFeeToken,
     additionalPaybackFee,
+    operationType,
+    currency,
   }: {
     preparedTransaction: SolanaSDK.PreparedTransaction;
     payingFeeToken?: TokenInfo | null;
     additionalPaybackFee: u64;
+    operationType: StatsInfoOperationType;
+    currency: string | null;
   }): Promise<string[]> {
     return this.topUpAndRelayTransactions({
       preparedTransactions: [preparedTransaction],
       payingFeeToken,
       additionalPaybackFee,
+      operationType,
+      currency,
     });
   }
 
@@ -438,10 +468,14 @@ export class FeeRelayerRelay implements FeeRelayerRelayType {
     preparedTransactions,
     payingFeeToken,
     additionalPaybackFee,
+    operationType,
+    currency,
   }: {
     preparedTransactions: SolanaSDK.PreparedTransaction[];
     payingFeeToken?: TokenInfo | null;
     additionalPaybackFee: u64;
+    operationType: StatsInfoOperationType;
+    currency: string | null;
   }): Promise<string[]> {
     return Promise.all([this.updateRelayAccountStatus(), this.updateFreeTransactionFeeLimit()])
       .then(() => {
@@ -469,6 +503,8 @@ export class FeeRelayerRelay implements FeeRelayerRelayType {
           payingFeeToken,
           relayAccountStatus: this.cache.relayAccountStatus ?? RelayAccountStatus.notYetCreated(),
           additionalPaybackFee: preparedTransactions.length === 1 ? additionalPaybackFee : ZERO,
+          operationType,
+          currency,
         });
 
         if (preparedTransactions.length === 2) {
@@ -479,6 +515,8 @@ export class FeeRelayerRelay implements FeeRelayerRelayType {
               relayAccountStatus:
                 this.cache.relayAccountStatus ?? RelayAccountStatus.notYetCreated(),
               additionalPaybackFee,
+              operationType,
+              currency,
             });
           });
         }
@@ -1469,6 +1507,8 @@ export class FeeRelayerRelay implements FeeRelayerRelayType {
           payingFeeToken,
           relayAccountStatus: this.cache.relayAccountStatus ?? RelayAccountStatus.notYetCreated(),
           additionalPaybackFee: ZERO,
+          operationType: StatsInfoOperationType.swap,
+          currency: null, // TODO: - Which?
         });
       });
   }
@@ -1992,11 +2032,15 @@ export class FeeRelayerRelay implements FeeRelayerRelayType {
     payingFeeToken,
     relayAccountStatus,
     additionalPaybackFee,
+    operationType,
+    currency,
   }: {
     preparedTransaction: SolanaSDK.PreparedTransaction;
     payingFeeToken?: TokenInfo | null;
     relayAccountStatus: RelayAccountStatus;
     additionalPaybackFee: u64;
+    operationType: StatsInfoOperationType;
+    currency: string | null;
   }): Promise<string[]> {
     const feePayer = this.cache.feePayerAddress;
     const freeTransactionFeeLimit = this.cache.freeTransactionFeeLimit;
@@ -2055,12 +2099,25 @@ export class FeeRelayerRelay implements FeeRelayerRelayType {
     // }
 
     // resign transaction
-    preparedTransactionNew.transaction.sign(...preparedTransactionNew.signers);
+    console.log(111, preparedTransactionNew.signers);
+    if (preparedTransactionNew.signers.length > 0) {
+      preparedTransactionNew.transaction.sign(...preparedTransactionNew.signers);
+    }
 
     // TODO: retry
     return this.apiClient
       .sendTransaction(
-        FeeRelayerRequestType.relayTransaction(new RelayTransactionParam(preparedTransactionNew)),
+        FeeRelayerRequestType.relayTransaction(
+          new RelayTransactionParam(
+            preparedTransactionNew,
+            new StatsInfo({
+              operationType,
+              deviceType: this.deviceType,
+              currency,
+              build: this.buildNumber,
+            }),
+          ),
+        ),
       )
       .then((txId) => {
         return [txId];

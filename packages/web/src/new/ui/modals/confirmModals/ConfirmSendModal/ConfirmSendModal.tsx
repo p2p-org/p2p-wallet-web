@@ -151,6 +151,7 @@ export const ConfirmSendModal: FC<ModalPropsType & ConfirmSendModalProps> = ({
 
   const handleConfirmClick = () => {
     close(true);
+    viewModel.authenticateAndSend();
   };
 
   const isSecretKeyWallet =

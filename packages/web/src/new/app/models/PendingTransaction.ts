@@ -2,8 +2,6 @@ import { ZERO } from '@orca-so/sdk';
 import { PublicKey } from '@solana/web3.js';
 
 import { networkFeesAll } from 'new/app/models/PayingFee';
-import type { RawTransactionType } from 'new/scenes/Main/ProcessTransaction';
-import { SendTransaction, SwapTransaction } from 'new/scenes/Main/ProcessTransaction';
 import * as SolanaSDK from 'new/sdk/SolanaSDK';
 import {
   convertToBalance,
@@ -11,8 +9,10 @@ import {
   SolanaSDKPublicKey,
 } from 'new/sdk/SolanaSDK';
 import type { PricesServiceType } from 'new/services/PriceAPIs/PricesService';
+import type { RawTransactionType } from 'new/ui/modals/ProcessTransactionModal';
+import * as ProcessTransaction from 'new/ui/modals/ProcessTransactionModal/ProcessTransaction.Models';
 
-enum TransactionStatusType {
+export enum TransactionStatusType {
   sending,
   confirmed,
   finalized,
@@ -194,32 +194,34 @@ export class PendingTransaction {
 
     const transaction = this.rawTransaction;
     switch (transaction.constructor) {
-      case SendTransaction: {
+      case ProcessTransaction.SendTransaction: {
         const amount = convertToBalance(
-          (transaction as SendTransaction).amount,
-          (transaction as SendTransaction).sender.token.decimals,
+          (transaction as ProcessTransaction.SendTransaction).amount,
+          (transaction as ProcessTransaction.SendTransaction).sender.token.decimals,
         );
         value = new SolanaSDK.TransferTransaction({
-          source: (transaction as SendTransaction).sender,
+          source: (transaction as ProcessTransaction.SendTransaction).sender,
           destination: new SolanaSDK.Wallet({
-            pubkey: (transaction as SendTransaction).receiver.address,
+            pubkey: (transaction as ProcessTransaction.SendTransaction).receiver.address,
             lamports: ZERO,
-            token: (transaction as SendTransaction).sender.token,
+            token: (transaction as ProcessTransaction.SendTransaction).sender.token,
           }),
           authority,
           destinationAuthority: null,
           amount,
-          myAccount: (transaction as SendTransaction).sender.pubkey,
+          myAccount: (transaction as ProcessTransaction.SendTransaction).sender.pubkey,
         });
         amountInFiat =
           amount *
-          (pricesService.currentPrice((transaction as SendTransaction).sender.token.symbol)
-            ?.value ?? 0);
-        fee = (transaction as SendTransaction).feeInToken;
+          (pricesService.currentPrice(
+            (transaction as ProcessTransaction.SendTransaction).sender.token.symbol,
+          )?.value ?? 0);
+        fee = (transaction as ProcessTransaction.SendTransaction).feeInToken;
         break;
       }
-      case SwapTransaction: {
-        const destinationWallet = (transaction as SwapTransaction).destinationWallet;
+      case ProcessTransaction.SwapTransaction: {
+        const destinationWallet = (transaction as ProcessTransaction.SwapTransaction)
+          .destinationWallet;
         const mintAddress = new PublicKey(destinationWallet.mintAddress);
         if (authority && mintAddress) {
           const _authority = new PublicKey(authority);
@@ -234,17 +236,18 @@ export class PendingTransaction {
         }
 
         value = new SolanaSDK.SwapTransaction({
-          source: (transaction as SwapTransaction).sourceWallet,
-          sourceAmount: (transaction as SwapTransaction).amount,
+          source: (transaction as ProcessTransaction.SwapTransaction).sourceWallet,
+          sourceAmount: (transaction as ProcessTransaction.SwapTransaction).amount,
           destination: destinationWallet,
-          destinationAmount: (transaction as SwapTransaction).estimatedAmount,
+          destinationAmount: (transaction as ProcessTransaction.SwapTransaction).estimatedAmount,
           myAccountSymbol: null,
         });
         amountInFiat =
-          (transaction as SwapTransaction).amount *
-          (pricesService.currentPrice((transaction as SwapTransaction).sourceWallet.token.symbol)
-            ?.value ?? 0);
-        fee = networkFeesAll((transaction as SwapTransaction).fees);
+          (transaction as ProcessTransaction.SwapTransaction).amount *
+          (pricesService.currentPrice(
+            (transaction as ProcessTransaction.SwapTransaction).sourceWallet.token.symbol,
+          )?.value ?? 0);
+        fee = networkFeesAll((transaction as ProcessTransaction.SwapTransaction).fees);
         break;
       }
       default:

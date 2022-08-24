@@ -79,6 +79,7 @@ const modalsMap = new Map<ModalType, LazyExoticComponent<ModalPropsType & any>>(
     lazy(() => import('components/modals/TransactionConfirmModal')),
   ],
   [ModalType.SHOW_MODAL_CONFIRM_SEND, lazy(() => import('../confirmModals/ConfirmSendModal'))],
+  [ModalType.SHOW_MODAL_PROCESS_TRANSACTION, lazy(() => import('../ProcessTransactionModal'))],
   [
     ModalType.SHOW_MODAL_TRANSACTION_DETAILS,
     lazy(() => import('components/modals/TransactionInfoModals/TransactionDetailsModal')),
@@ -110,9 +111,7 @@ const modalsMap = new Map<ModalType, LazyExoticComponent<ModalPropsType & any>>(
   [ModalType.SHOW_MODAL_ERROR, lazy(() => import('components/modals/ErrorModal'))],
 ]);
 
-interface Props {}
-
-export const ModalManager: FC<Props> = observer(() => {
+export const ModalManager: FC = observer(() => {
   const vm = useViewModel(ModalManagerViewModel);
 
   const handleWrapperClick = useCallback(

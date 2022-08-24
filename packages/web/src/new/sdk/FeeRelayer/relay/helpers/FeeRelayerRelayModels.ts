@@ -1,6 +1,8 @@
 import { u64 } from '@solana/spl-token';
 import type { PublicKey } from '@solana/web3.js';
+import bs58 from 'bs58';
 
+import type { StatsInfo } from 'new/sdk/FeeRelayer';
 import { FeeRelayerError } from 'new/sdk/FeeRelayer/models/FeeRelayerError';
 import type { PoolsPair } from 'new/sdk/OrcaSwap/models/OrcaSwapPools';
 import type * as SolanaSDK from 'new/sdk/SolanaSDK';
@@ -338,8 +340,9 @@ export class RelayTransactionParam {
   signatures: { [key in string]: string };
   pubkeys: string[];
   blockhash: string;
+  statsInfo: StatsInfo;
 
-  constructor(preparedTransaction: SolanaSDK.PreparedTransaction) {
+  constructor(preparedTransaction: SolanaSDK.PreparedTransaction, statsInfo: StatsInfo) {
     const recentBlockhash = preparedTransaction.transaction.recentBlockhash;
     if (!recentBlockhash) {
       throw FeeRelayerError.unknown();
@@ -367,7 +370,7 @@ export class RelayTransactionParam {
       return new RequestInstruction({
         programIndex: compiledInstruction.programIdIndex,
         accounts,
-        data: compiledInstruction.data,
+        data: Buffer.from(bs58.decode(compiledInstruction.data)),
       });
     });
 
@@ -383,13 +386,24 @@ export class RelayTransactionParam {
       }
     }
     this.signatures = signatures;
+    this.statsInfo = statsInfo;
+  }
+
+  toJSON() {
+    return {
+      instructions: this.instructions.map((instruction) => instruction.toJSON()),
+      signatures: this.signatures,
+      pubkeys: this.pubkeys,
+      blockhash: this.blockhash,
+      info: this.statsInfo,
+    };
   }
 }
 
 export class RequestInstruction {
   programIndex: number;
   accounts: RequestAccountMeta[];
-  data: string;
+  data: Buffer;
 
   constructor({
     programIndex,
@@ -398,11 +412,19 @@ export class RequestInstruction {
   }: {
     programIndex: number;
     accounts: RequestAccountMeta[];
-    data: string;
+    data: Buffer;
   }) {
     this.programIndex = programIndex;
     this.accounts = accounts;
     this.data = data;
+  }
+
+  toJSON() {
+    return {
+      program_id: this.programIndex,
+      accounts: this.accounts.map((account) => account.toJSON()),
+      data: [...this.data],
+    };
   }
 }
 
@@ -423,6 +445,14 @@ export class RequestAccountMeta {
     this.pubkeyIndex = pubkeyIndex;
     this.isSigner = isSigner;
     this.isWritable = isWritable;
+  }
+
+  toJSON() {
+    return {
+      pubkey: this.pubkeyIndex,
+      is_signer: this.isSigner,
+      is_writable: this.isWritable,
+    };
   }
 }
 

@@ -10,12 +10,15 @@ import { SelectAddressViewModel } from 'new/scenes/Main/Send/SelectAddress/Selec
 import type * as FeeRelayer from 'new/sdk/FeeRelayer';
 import type * as SolanaSDK from 'new/sdk/SolanaSDK';
 import type { Wallet } from 'new/sdk/SolanaSDK';
-import { convertToBalance, FeeAmount } from 'new/sdk/SolanaSDK';
+import { convertToBalance, FeeAmount, toLamport } from 'new/sdk/SolanaSDK';
 import { Defaults } from 'new/services/Defaults';
 import { ModalService, ModalType } from 'new/services/ModalService';
 import { PricesService } from 'new/services/PriceAPIs/PricesService';
 import { WalletsRepository } from 'new/services/Repositories';
 import { RelayMethod, SendService } from 'new/services/SendService';
+import type { ConfirmSendModalProps } from 'new/ui/modals/confirmModals/ConfirmSendModal/ConfirmSendModal';
+import * as ProcessTransaction from 'new/ui/modals/ProcessTransactionModal/ProcessTransaction.Models';
+import type { ProcessTransactionModalProps } from 'new/ui/modals/ProcessTransactionModal/ProcessTransactionModal';
 import { bitcoinAddress, matches } from 'new/utils/RegularExpression';
 
 import type { ChooseTokenAndAmountError } from './ChooseTokenAndAmount';
@@ -110,6 +113,8 @@ export class SendViewModel extends ViewModel implements SendViewModelType {
       // currencyMode: observable,
 
       getSelectedWallet: computed,
+
+      enterAmount: action,
 
       selectRecipient: action,
 
@@ -235,8 +240,8 @@ export class SendViewModel extends ViewModel implements SendViewModelType {
   private _send() {
     const wallet = this.wallet;
     let amount = this.amount;
-    const recipient = this.recipient;
-    if (!wallet || !amount || !recipient) {
+    const receiver = this.recipient;
+    if (!wallet || !amount || !receiver) {
       return;
     }
 
@@ -251,7 +256,23 @@ export class SendViewModel extends ViewModel implements SendViewModelType {
 
     const network = this.network;
 
-    /// TODO: processTransaction
+    void this._modalService.openModal<void, ProcessTransactionModalProps>(
+      ModalType.SHOW_MODAL_PROCESS_TRANSACTION,
+      {
+        transaction: new ProcessTransaction.SendTransaction({
+          sendService: this._sendService,
+          network: network,
+          sender: wallet,
+          receiver: receiver,
+          authority: this._walletsRepository.nativeWallet?.pubkey ?? null,
+          amount: toLamport(amount, wallet.token.decimals),
+          payingFeeWallet: this.payingWallet,
+          feeInSOL: this.feeInfo.value?.feeAmountInSOL.total ?? ZERO,
+          feeInToken: this.feeInfo.value?.feeAmount ?? null,
+          isSimulation: false,
+        }),
+      },
+    );
   }
 
   // SendTokenChooseRecipientAndNetworkViewModelType
@@ -349,8 +370,13 @@ export class SendViewModel extends ViewModel implements SendViewModelType {
 
   // our code
 
-  openConfirmModal(viewModel: Readonly<SendViewModel>): Promise<void> {
-    return this._modalService.openModal(ModalType.SHOW_MODAL_CONFIRM_SEND, { viewModel });
+  openConfirmModal(): Promise<void> {
+    return this._modalService.openModal<void, ConfirmSendModalProps>(
+      ModalType.SHOW_MODAL_CONFIRM_SEND,
+      {
+        viewModel: this,
+      },
+    );
   }
 
   get error(): ChooseTokenAndAmountError | SelectAddressError | null {

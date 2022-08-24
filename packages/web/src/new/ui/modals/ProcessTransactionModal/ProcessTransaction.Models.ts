@@ -201,7 +201,7 @@ export class SendTransaction extends RawTransactionBase implements RawTransactio
   amount: SolanaSDK.Lamports;
   payingFeeWallet: Wallet | null;
   feeInSOL: u64;
-  feeInToken: SolanaSDK.FeeAmount;
+  feeInToken: SolanaSDK.FeeAmount | null;
   isSimulation: boolean;
 
   constructor({
@@ -224,7 +224,7 @@ export class SendTransaction extends RawTransactionBase implements RawTransactio
     amount: SolanaSDK.Lamports;
     payingFeeWallet: Wallet | null;
     feeInSOL: u64;
-    feeInToken: SolanaSDK.FeeAmount;
+    feeInToken: SolanaSDK.FeeAmount | null;
     isSimulation: boolean;
   }) {
     super();

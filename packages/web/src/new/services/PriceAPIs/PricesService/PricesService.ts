@@ -87,7 +87,7 @@ export class PricesService implements PricesServiceType {
     coins = uniq(coins); // .filter((token) => !token.includes('-') && !token.includes('/'));
 
     if (coins.length === 0) {
-      return Promise.resolve({});
+      return {};
     }
 
     const newPrices = await this._fetcher.getCurrentPrices({
@@ -95,7 +95,7 @@ export class PricesService implements PricesServiceType {
       fiat: Defaults.fiat.code,
     });
     // newPrices['renBTC'] = newPrices['BTC'] ?? null;
-    const prices = this._currentPrices.value ?? {};
+    const prices = this._currentPrices.value ? { ...this._currentPrices.value } : {};
     for (const [key, value] of Object.entries(newPrices)) {
       if (value) {
         prices[key] = value;

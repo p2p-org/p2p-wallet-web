@@ -8,15 +8,15 @@ import { TransactionHandler } from 'new/services/TransactionHandler';
 
 import type { RawTransactionType } from './ProcessTransaction.Models';
 
-interface ProcessTransactionViewModelType {
+interface ProcessTransactionModalViewModelType {
   pendingTransaction: PendingTransaction;
   observingTransactionIndex: number | null;
 }
 
 @injectable()
-export class ProcessTransactionViewModel
+export class ProcessTransactionModalViewModel
   extends ViewModel
-  implements ProcessTransactionViewModelType
+  implements ProcessTransactionModalViewModelType
 {
   pendingTransaction: PendingTransaction;
   observingTransactionIndex: number | null = null;
@@ -25,17 +25,6 @@ export class ProcessTransactionViewModel
 
   constructor(private _transactionHandler: TransactionHandler) {
     super();
-
-    const processingTransaction = '';
-
-    this.rawTransaction = processingTransaction;
-
-    this.pendingTransaction = new PendingTransaction({
-      transactionId: null,
-      sentAt: new Date(),
-      rawTransaction: processingTransaction,
-      status: TransactionStatus.sending(),
-    });
 
     makeObservable(this, {
       pendingTransaction: observable,
@@ -48,6 +37,17 @@ export class ProcessTransactionViewModel
   protected override onInitialize() {}
 
   protected override afterReactionsRemoved() {}
+
+  setTransaction(processingTransaction: RawTransactionType) {
+    this.rawTransaction = processingTransaction;
+
+    this.pendingTransaction = new PendingTransaction({
+      transactionId: null,
+      sentAt: new Date(),
+      rawTransaction: processingTransaction,
+      status: TransactionStatus.sending(),
+    });
+  }
 
   get isSwapping(): boolean {
     return this.rawTransaction.isSwap;

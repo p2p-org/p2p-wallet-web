@@ -4,8 +4,12 @@ import { Account, PublicKey } from '@solana/web3.js';
 import { injectable } from 'tsyringe';
 
 import type { FeeRelayerAPIClientType } from 'new/sdk/FeeRelayer';
-import { FeeRelayerAPIClient } from 'new/sdk/FeeRelayer';
 import * as FeeRelayer from 'new/sdk/FeeRelayer';
+import {
+  FeeRelayerAPIClient,
+  StatsInfoDeviceType,
+  StatsInfoOperationType,
+} from 'new/sdk/FeeRelayer';
 import { FeeRelayerError } from 'new/sdk/FeeRelayer/models/FeeRelayerError';
 import { FeeRelayerRelay, FeeRelayerRelaySolanaClient } from 'new/sdk/FeeRelayer/relay';
 import type * as OrcaSwap from 'new/sdk/OrcaSwap';
@@ -117,10 +121,12 @@ export class SendService implements SendServiceType {
 
     this._feeRelayerAPIClient = new FeeRelayerAPIClient();
     this._relayService = new FeeRelayerRelay({
-      owner: new Account(),
+      owner: new Account(), // TODO: owner!
       apiClient: this._feeRelayerAPIClient,
       solanaClient: this._feeRelayerRelaySolanaClient,
       orcaSwapClient: this._orcaSwap,
+      deviceType: StatsInfoDeviceType.web,
+      buildNumber: '1', // TODO: pass build number from environment
     });
     // this._renVMBurnAndReleaseService = renVMBurnAndReleaseService;
   }
@@ -128,11 +134,9 @@ export class SendService implements SendServiceType {
   // Methods
 
   async load(): Promise<void> {
-    console.log(11111);
     await this._feeService.load();
 
     if (this.relayMethod.type === RelayMethod.relay.type) {
-      console.log(12222);
       await this._orcaSwap.load();
       await this._relayService.load();
       // load all pools
@@ -387,6 +391,8 @@ export class SendService implements SendServiceType {
       payingFeeWallet,
     });
 
+    const currency = wallet.mintAddress;
+
     return this._prepareForSendingToSolanaNetworkViaRelayMethod({
       wallet,
       receiver,
@@ -401,6 +407,8 @@ export class SendService implements SendServiceType {
               preparedTransaction,
               payingFeeToken: payingFeeTokenNew,
               additionalPaybackFee: ZERO, // TODO: move inside relayService
+              operationType: StatsInfoOperationType.transfer,
+              currency,
             })
             .then((txIds) => txIds[0] ?? '');
         } else {
@@ -417,6 +425,7 @@ export class SendService implements SendServiceType {
         return txId;
       })
       .catch((error: Error) => {
+        console.error(error);
         Logger.log(error.message, LogEvent.error);
 
         throw error;

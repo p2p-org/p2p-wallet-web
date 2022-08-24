@@ -21,7 +21,7 @@ export const ActionButton: FC<Props> = observer(({ viewModel }) => {
   const isDisabled = Boolean(viewModel.error);
 
   const handleSendClick = () => {
-    void viewModel.openConfirmModal(viewModel);
+    void viewModel.openConfirmModal();
   };
 
   return (

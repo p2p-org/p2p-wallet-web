@@ -5,8 +5,6 @@ import { injectable } from 'tsyringe';
 
 import { FeeTypeEnum } from 'new/app/models/PayingFee';
 import { PendingTransaction, TransactionStatus } from 'new/app/models/PendingTransaction';
-import type { RawTransactionType } from 'new/scenes/Main/ProcessTransaction';
-import * as ProcessTransaction from 'new/scenes/Main/ProcessTransaction';
 import type * as SolanaSDK from 'new/sdk/SolanaSDK';
 import {
   getAssociatedTokenAddressSync,
@@ -18,6 +16,8 @@ import { PricesService } from 'new/services/PriceAPIs/PricesService';
 import { WalletsRepository } from 'new/services/Repositories';
 import { AccountObservableService } from 'new/services/Socket';
 import { SolanaService } from 'new/services/SolanaService';
+import type { RawTransactionType } from 'new/ui/modals/ProcessTransactionModal';
+import * as ProcessTransaction from 'new/ui/modals/ProcessTransactionModal/ProcessTransaction.Models';
 import type { Emitter } from 'new/utils/libs/nanoEvent';
 import { createNanoEvent } from 'new/utils/libs/nanoEvent';
 
@@ -139,43 +139,42 @@ export class TransactionHandler implements TransactionHandlerType {
   }
 
   // Send and observe transaction
-  sendAndObserve({
+  async sendAndObserve({
     index,
     processingTransaction,
   }: {
     index: TransactionIndex;
     processingTransaction: RawTransactionType;
-  }): void {
-    processingTransaction
-      .createRequest()
-      .then((transactionId) => {
-        // show notification
-        // this._notificationsService.showInAppNotification(done(transactionHasBeenSent))
+  }): Promise<void> {
+    try {
+      const transactionId = await processingTransaction.createRequest();
 
-        // update status
-        this._updateTransactionAtIndex(index, () => {
-          return new PendingTransaction({
-            transactionId,
-            sentAt: new Date(),
-            rawTransaction: processingTransaction,
-            status: TransactionStatus.confirmed(0),
-          });
-        });
+      // show notification
+      // this._notificationsService.showInAppNotification(done(transactionHasBeenSent))
 
-        // observe confirmations
-        this.observe({ index, transactionId });
-      })
-      .catch((error) => {
-        // update status
-        // TODO: notification this._notificationsService.showInAppNotification(error(error));
-
-        // mark transaction as failured
-        this._updateTransactionAtIndex(index, (currentValue) => {
-          const info = currentValue;
-          info.status = TransactionStatus.error(error);
-          return info;
+      // update status
+      this._updateTransactionAtIndex(index, () => {
+        return new PendingTransaction({
+          transactionId,
+          sentAt: new Date(),
+          rawTransaction: processingTransaction,
+          status: TransactionStatus.confirmed(0),
         });
       });
+
+      // observe confirmations
+      this.observe({ index, transactionId });
+    } catch (error) {
+      // update status
+      // TODO: notification this._notificationsService.showInAppNotification(error(error));
+
+      // mark transaction as failured
+      this._updateTransactionAtIndex(index, (currentValue) => {
+        const info = currentValue;
+        info.status = TransactionStatus.error(error as Error);
+        return info;
+      });
+    }
   }
 
   // Observe confirmation statuses of given transaction
@@ -291,7 +290,9 @@ export class TransactionHandler implements TransactionHandlerType {
           );
           if (index) {
             const feeInToken = (rawTransaction as ProcessTransaction.SendTransaction).feeInToken;
-            wallets[index]!.decreaseBalance(feeInToken.total);
+            if (feeInToken) {
+              wallets[index]!.decreaseBalance(feeInToken.total);
+            }
           }
 
           return wallets;
