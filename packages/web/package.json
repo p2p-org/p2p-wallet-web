@@ -72,7 +72,7 @@
     "flagged": "^2.0.1",
     "fuse.js": "^6.5.3",
     "highcharts": "^9.0.0",
-    "history": "^5.0.0",
+    "history": "4.9.0",
     "jsbi": "^4.1.0",
     "lodash.throttle": "^4.1.1",
     "mobx": "^6.5.0",

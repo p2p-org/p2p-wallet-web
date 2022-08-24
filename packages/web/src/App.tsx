@@ -12,6 +12,7 @@ import { ToastManager } from 'components/common/ToastManager';
 import { Main } from 'new/scenes/Main';
 import { Home } from 'new/scenes/Main/Home';
 import { Root } from 'new/scenes/Root';
+import { LocationManager } from 'new/ui/components/root/LocationManager';
 import { ModalManager } from 'new/ui/modals/ModalManager';
 import { Auth } from 'pages/Auth';
 import { Buy } from 'pages/Buy';
@@ -38,6 +39,7 @@ const App: React.FC = () => {
         <Router basename={process.env.REACT_APP_BASENAME}>
           <Providers>
             <Root>
+              <LocationManager />
               <Switch>
                 <Route path="/" exact component={Landing} />
                 <Route path="/:type(signup|login)" exact component={Auth} />
