@@ -17,7 +17,7 @@ export class LocationService {
     });
   }
 
-  _listenHistory(): void {
+  private _listenHistory(): void {
     this._removeListener && this._removeListener();
 
     this._removeListener = this._history?.listen((location) => {
