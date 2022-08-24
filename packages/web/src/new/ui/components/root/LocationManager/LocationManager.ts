@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useLayoutEffect } from 'react';
 import { useHistory } from 'react-router';
 
 import { useViewModel } from 'new/core/viewmodels/useViewModel';
@@ -10,7 +10,7 @@ export const LocationManager = () => {
 
   const history = useHistory();
 
-  useEffect(() => viewModel.setHistory(history), [history]);
+  useLayoutEffect(() => viewModel.setHistory(history), [history]);
 
   return null;
 };

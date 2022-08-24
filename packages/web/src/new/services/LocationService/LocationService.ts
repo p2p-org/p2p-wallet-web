@@ -17,17 +17,21 @@ export class LocationService {
     });
   }
 
-  setHistory(history: History) {
+  _listenHistory(): void {
     this._removeListener && this._removeListener();
 
-    this._history = history;
-
-    this._removeListener = this._history.listen((location) => {
+    this._removeListener = this._history?.listen((location) => {
       runInAction(() => (this._location = location));
     });
   }
 
-  getParams<Params>(pathTemplate: string) {
+  setHistory(history: History): void {
+    this._history = history;
+
+    this._listenHistory();
+  }
+
+  getParams<Params>(pathTemplate: string): Params {
     const match = matchPath<Params>(this._location?.pathname || '', { path: pathTemplate });
 
     if (!match) {
@@ -37,7 +41,7 @@ export class LocationService {
     return match.params;
   }
 
-  pushLocation(pathname: Path, props: LocationState) {
+  push(pathname: Path, props: LocationState): void {
     this._history?.push(pathname, props);
   }
 }
