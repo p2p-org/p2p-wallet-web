@@ -1,15 +1,15 @@
 import type { FC } from 'react';
+import { useEffect, useState } from 'react';
 
 import { styled } from '@linaria/react';
-import { useToken } from '@p2p-wallet-web/core';
 import { TokenAmount } from '@p2p-wallet-web/token-utils';
 import { borders, theme } from '@p2p-wallet-web/ui';
 import { observer } from 'mobx-react-lite';
 
-import { useConfig } from 'app/contexts';
 import { TokenAvatar } from 'components/common/TokenAvatar';
 import { InputAmount } from 'components/ui/InputAmount';
 import type { BuyViewModelProps } from 'new/scenes/Main/Buy/Subviews/Moonpay/types';
+import type { Token } from 'new/sdk/SolanaSDK';
 import { FiatCurrency } from 'new/services/BuyService/structures';
 import { AmountTypeButton } from 'new/ui/components/pages/buy/AmountTypeButton';
 import { formatNumberToUSD } from 'utils/format';
@@ -41,20 +41,30 @@ const Title = styled.div`
 `;
 
 export const Inputs: FC<BuyViewModelProps> = observer(({ viewModel }) => {
-  const { tokenConfigs } = useConfig();
-  const token = useToken(tokenConfigs[viewModel.crypto.symbol]?.mint);
-  const isFiatCurrency = FiatCurrency.isFiat(viewModel.input.currency);
+  const [token, setToken] = useState<Token | undefined>();
 
-  const prefix = isFiatCurrency ? '$' : <TokenAvatar symbol={viewModel.crypto.symbol} size={32} />;
+  useEffect(() => {
+    viewModel.getToken(viewModel.crypto.mintAddress).then(setToken);
+  }, [viewModel.crypto.mintAddress]);
 
-  const buttonAmountFormatted = isFiatCurrency
-    ? TokenAmount.parse(token, viewModel.output.amount.toString()).formatUnits()
+  const isFiatInputCurrency = FiatCurrency.isFiat(viewModel.input.currency);
+
+  const prefix = isFiatInputCurrency ? (
+    '$'
+  ) : (
+    <TokenAvatar symbol={viewModel.crypto.symbol} size={32} />
+  );
+
+  const buttonAmountFormatted = isFiatInputCurrency
+    ? token
+      ? TokenAmount.parse(token, viewModel.output.amount.toString()).formatUnits()
+      : ''
     : formatNumberToUSD(viewModel.output.amount, { alwaysShowCents: false });
 
   return (
     <Wrapper>
       <InputWrapper>
-        <Title>{isFiatCurrency ? 'You pay' : 'You get'}</Title>
+        <Title>{isFiatInputCurrency ? 'You pay' : 'You get'}</Title>
         <InputAmount
           prefix={prefix}
           value={viewModel.input.amount}
@@ -62,7 +72,7 @@ export const Inputs: FC<BuyViewModelProps> = observer(({ viewModel }) => {
         />
       </InputWrapper>
       <InputWrapper>
-        <Title>{isFiatCurrency ? 'You get' : 'You pay'}</Title>
+        <Title>{isFiatInputCurrency ? 'You get' : 'You pay'}</Title>
         <AmountTypeButton title={buttonAmountFormatted} onClick={viewModel.swap} />
       </InputWrapper>
     </Wrapper>

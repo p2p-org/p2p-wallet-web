@@ -3,6 +3,7 @@ import { injectable } from 'tsyringe';
 
 import { LoadableState } from 'new/app/models/LoadableReleay';
 import { ViewModel } from 'new/core/viewmodels/ViewModel';
+import type { Token } from 'new/sdk/SolanaSDK';
 import { BuyService } from 'new/services/BuyService';
 import {
   CryptoCurrency,
@@ -137,7 +138,7 @@ export class BuyViewModel extends ViewModel {
     return this._solanaService.provider.wallet.publicKey.toBase58();
   }
 
-  private _update() {
+  private _update(): void {
     Promise.all([
       this._buyService.getExchangeRate(FiatCurrency.usd, this.crypto),
       this._buyService.getMinAmount(this.crypto, FiatCurrency.usd),
@@ -156,11 +157,15 @@ export class BuyViewModel extends ViewModel {
     );
   }
 
-  changeOutput(output: ExchangeOutput) {
+  getToken(mint: string): Promise<Token | undefined> {
+    return this._solanaService.getToken(mint);
+  }
+
+  changeOutput(output: ExchangeOutput): void {
     this.output = output;
   }
 
-  setAmount(amount: string) {
+  setAmount(amount: string): void {
     const newAmount = Number(amount);
     if (newAmount === this.input.amount) {
       return;
@@ -169,7 +174,7 @@ export class BuyViewModel extends ViewModel {
     this.input = new ExchangeInput(newAmount, this.input.currency);
   }
 
-  setCryptoCurrency(cryptoCurrency: CryptoCurrency) {
+  setCryptoCurrency(cryptoCurrency: CryptoCurrency): void {
     this.crypto = cryptoCurrency;
 
     if (FiatCurrency.isFiat(this.input.currency)) {
@@ -188,15 +193,15 @@ export class BuyViewModel extends ViewModel {
     }
   }
 
-  setIsShowIframe(value: boolean) {
+  setIsShowIframe(value: boolean): void {
     this.isShowIframe = value;
   }
 
-  setLoadingState(value: LoadableState) {
+  setLoadingState(value: LoadableState): void {
     this.loadingState = value;
   }
 
-  swap() {
+  swap(): void {
     const { input, output } = this.input.swap(this.output);
     this.input = input;
     this.output = output;

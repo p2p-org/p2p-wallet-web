@@ -57,14 +57,7 @@ export class ChooseBuyTokenMobileModalViewModel extends ViewModel {
   }
 
   private _getToken(cryptoCurrency: CryptoCurrency): Promise<Token | undefined> {
-    return this._solanaService
-      .getTokensList()
-      .then((tokenList) =>
-        tokenList.find(
-          (token) =>
-            token.symbol === cryptoCurrency.symbol && token.address === cryptoCurrency.mintAddress,
-        ),
-      );
+    return this._solanaService.getToken(cryptoCurrency.mintAddress);
   }
 
   private _setWallets(newSOLWallet?: Wallet, newUSDCWallet?: Wallet): void {
@@ -72,7 +65,7 @@ export class ChooseBuyTokenMobileModalViewModel extends ViewModel {
       runInAction(() => (this.solWallet = newSOLWallet));
     } else {
       this._getToken(CryptoCurrency.sol).then(
-        action((newSOLToken) => newSOLToken && (this.solToken = newSOLToken)),
+        action((newSOLToken) => (this.solToken = newSOLToken)),
       );
     }
 
@@ -80,7 +73,7 @@ export class ChooseBuyTokenMobileModalViewModel extends ViewModel {
       runInAction(() => (this.usdcWallet = newUSDCWallet));
     } else {
       this._getToken(CryptoCurrency.usdc).then(
-        action((newUSDCToken) => newUSDCToken && (this.usdcToken = newUSDCToken)),
+        action((newUSDCToken) => (this.usdcToken = newUSDCToken)),
       );
     }
   }

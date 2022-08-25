@@ -797,6 +797,12 @@ export class SolanaSDK {
     return Promise.resolve(tokens);
   }
 
+  getToken(mint: string): Promise<Token | undefined> {
+    return this.getTokensList().then((tokensList) =>
+      tokensList.find((token) => token.address === mint),
+    );
+  }
+
   getTokenWallets(account: string): Promise<Wallet[]> {
     return Promise.all([
       this.provider.connection.getTokenAccountsByOwner(new PublicKey(account), {
