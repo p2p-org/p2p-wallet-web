@@ -13,7 +13,8 @@ import {
 } from 'new/services/BuyService/structures';
 import { SolanaService } from 'new/services/SolanaService';
 
-const UPDATE_INTERVAL = 30 * 1000; // 30 secs
+// const UPDATE_INTERVAL = 30 * 1000; // 30 secs
+const UPDATE_INTERVAL = 10 * 1000; // 30 secs
 
 let _startUpdatingFirstAttemptCall = true;
 
@@ -60,12 +61,13 @@ export class BuyViewModel extends ViewModel {
 
   private _startUpdating(): void {
     // guards against this function from being called twice by React's <StrictMode /> tag in developer mode
-    if (__DEVELOPMENT__ && _startUpdatingFirstAttemptCall) {
+    /*if (__DEVELOPMENT__ && _startUpdatingFirstAttemptCall) {
       _startUpdatingFirstAttemptCall = false;
       return;
-    }
+    }*/
 
-    this._update();
+    setTimeout(() => this._update(), 0);
+
     this._timer = setInterval(() => {
       this._update();
     }, UPDATE_INTERVAL);
