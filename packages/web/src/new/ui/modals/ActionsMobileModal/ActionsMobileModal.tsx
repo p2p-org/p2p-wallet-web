@@ -25,11 +25,14 @@ export const ActionsMobileModal: FC<Props & ModalPropsType> = ({ close, layoutVi
 
   const handleButtonClick = (route: string) => () => {
     close(false);
-    history.push(route, { fromPage: location.pathname });
+
+    if (location.pathname !== route) {
+      history.push(route, { fromPage: location.pathname });
+    }
   };
 
   const handleBuyButtonClick = () => {
-    layoutViewModel.closeTopModal();
+    close(false);
     layoutViewModel.openChooseBuyTokenMobileModal();
   };
 

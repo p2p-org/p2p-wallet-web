@@ -22,7 +22,7 @@ export const ChooseBuyTokenMobileModal: FC<ModalPropsType> = observer(({ close }
   };
 
   const handleRowClick = (cryptoCurrency: CryptoCurrency) => {
-    handleCloseClick();
+    close(false);
 
     const newPath = `/buy/${cryptoCurrency.symbol}`;
 
