@@ -1,4 +1,4 @@
-import { autorun, makeObservable, observable } from 'mobx';
+import { action, makeObservable, observable, reaction, runInAction } from 'mobx';
 import { injectable } from 'tsyringe';
 
 import { ViewModel } from 'new/core/viewmodels/ViewModel';
@@ -25,60 +25,38 @@ export class ChooseBuyTokenMobileModalViewModel extends ViewModel {
       solToken: observable,
       usdcToken: observable,
     });
+
+    this._setWallets(
+      this._getBuySelectionWallet(CryptoCurrency.sol),
+      this._getBuySelectionWallet(CryptoCurrency.usdc),
+    );
   }
 
   protected override onInitialize() {
     this.addReaction(
-      autorun(() => {
-        const _solWallet = this._getBuySelectionWallet(CryptoCurrency.sol);
-        const _usdcWallet = this._getBuySelectionWallet(CryptoCurrency.usdc);
-
-        if (_solWallet) {
-          this._setSOLWallet(_solWallet);
-        } else {
-          this._getToken(CryptoCurrency.sol).then((token) => token && this._setSOLToken(token));
-        }
-
-        if (_usdcWallet) {
-          this._setUSDCWallet(_usdcWallet);
-        } else {
-          this._getToken(CryptoCurrency.usdc).then((token) => token && this._setUSDCToken(token));
-        }
-      }),
+      reaction(
+        () => [
+          this._getBuySelectionWallet(CryptoCurrency.sol),
+          this._getBuySelectionWallet(CryptoCurrency.usdc),
+        ],
+        ([newSOLWallet, newUSDCWallet]) => this._setWallets(newSOLWallet, newUSDCWallet),
+      ),
     );
   }
 
   protected override afterReactionsRemoved() {}
 
-  _setSOLWallet(_solWallet: Wallet) {
-    this.solWallet = _solWallet;
-  }
-
-  _setUSDCWallet(_usdcWallet: Wallet) {
-    this.usdcWallet = _usdcWallet;
-  }
-
-  _setSOLToken(_solToken: Token) {
-    this.solToken = _solToken;
-  }
-
-  _setUSDCToken(_isdcToken: Token) {
-    this.usdcToken = _isdcToken;
-  }
-
-  _getBuySelectionWallet(cryptoCurrency: CryptoCurrency) {
-    const wallet = this._wallets
+  private _getBuySelectionWallet(cryptoCurrency: CryptoCurrency): Wallet | undefined {
+    return this._wallets
       .getWallets()
       .find(
         (wallet) =>
           wallet.token.symbol === cryptoCurrency.symbol &&
           wallet.token.address === cryptoCurrency.mintAddress,
       );
-
-    return wallet;
   }
 
-  _getToken(cryptoCurrency: CryptoCurrency): Promise<Token | undefined> {
+  private _getToken(cryptoCurrency: CryptoCurrency): Promise<Token | undefined> {
     return this._solanaService
       .getTokensList()
       .then((tokenList) =>
@@ -87,5 +65,23 @@ export class ChooseBuyTokenMobileModalViewModel extends ViewModel {
             token.symbol === cryptoCurrency.symbol && token.address === cryptoCurrency.mintAddress,
         ),
       );
+  }
+
+  private _setWallets(newSOLWallet?: Wallet, newUSDCWallet?: Wallet): void {
+    if (newSOLWallet) {
+      runInAction(() => (this.solWallet = newSOLWallet));
+    } else {
+      this._getToken(CryptoCurrency.sol).then(
+        action((newSOLToken) => newSOLToken && (this.solToken = newSOLToken)),
+      );
+    }
+
+    if (newUSDCWallet) {
+      runInAction(() => (this.usdcWallet = newUSDCWallet));
+    } else {
+      this._getToken(CryptoCurrency.usdc).then(
+        action((newUSDCToken) => newUSDCToken && (this.usdcToken = newUSDCToken)),
+      );
+    }
   }
 }
