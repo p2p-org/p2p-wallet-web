@@ -6,8 +6,8 @@ import assert from 'assert';
 import { BASE_CURRENCY_SYMBOL } from 'new/services/BuyService/constants';
 import { Defaults } from 'new/services/Defaults';
 
-type FiatCurrencySymbol = 'USD';
-type CryptoCurrencySymbol = 'SOL' | 'USDC';
+export type FiatCurrencySymbol = 'USD';
+export type CryptoCurrencySymbol = 'SOL' | 'USDC';
 
 export type BuyCurrencyType = FiatCurrency | CryptoCurrency;
 

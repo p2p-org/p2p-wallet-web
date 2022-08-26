@@ -1,40 +1,46 @@
-import { action, computed, makeObservable, observable, reaction } from 'mobx';
-import { injectable } from 'tsyringe';
+import { action, computed, makeObservable, observable, reaction, runInAction } from 'mobx';
+import { singleton } from 'tsyringe';
 
 import { LoadableState } from 'new/app/models/LoadableReleay';
 import { ViewModel } from 'new/core/viewmodels/ViewModel';
 import type { Token } from 'new/sdk/SolanaSDK';
 import { BuyService } from 'new/services/BuyService';
+import type { CryptoCurrencySymbol } from 'new/services/BuyService/structures';
 import {
   CryptoCurrency,
   ExchangeInput,
   ExchangeOutput,
   FiatCurrency,
 } from 'new/services/BuyService/structures';
+import { LocationService } from 'new/services/LocationService';
 import { SolanaService } from 'new/services/SolanaService';
 
 // const UPDATE_INTERVAL = 30 * 1000; // 30 secs
 const UPDATE_INTERVAL = 10 * 1000; // 30 secs
 
-let _startUpdatingFirstAttemptCall = true;
+type CryptoCurrenciesForSelectType = Record<CryptoCurrencySymbol, CryptoCurrency>;
 
-type CryptoCurrenciesForSelectType = { [key: string]: CryptoCurrency };
-
-@injectable()
+@singleton()
 export class BuyViewModel extends ViewModel {
-  isShowIframe = false;
-  input: ExchangeInput = ExchangeInput.zeroInstance(FiatCurrency.usd);
-  output: ExchangeOutput = ExchangeOutput.zeroInstance(CryptoCurrency.sol);
-  minFiatAmount = 0;
-  minCryptoAmount = 0;
-  exchangeRate = 0;
-  crypto: CryptoCurrency = CryptoCurrency.sol;
-  loadingState = LoadableState.notRequested;
+  isShowIframe!: boolean;
+  input!: ExchangeInput;
+  output!: ExchangeOutput;
+  minFiatAmount!: number;
+  minCryptoAmount!: number;
+  exchangeRate!: number;
+  crypto!: CryptoCurrency;
+  loadingState!: LoadableState;
 
   private _timer?: NodeJS.Timer;
 
-  constructor(private _buyService: BuyService, private _solanaService: SolanaService) {
+  constructor(
+    private _buyService: BuyService,
+    private _solanaService: SolanaService,
+    private _locationService: LocationService,
+  ) {
     super();
+
+    this._setInitValues();
 
     makeObservable(this, {
       isShowIframe: observable,
@@ -59,29 +65,43 @@ export class BuyViewModel extends ViewModel {
     });
   }
 
-  private _startUpdating(): void {
-    // guards against this function from being called twice by React's <StrictMode /> tag in developer mode
-    /*if (__DEVELOPMENT__ && _startUpdatingFirstAttemptCall) {
-      _startUpdatingFirstAttemptCall = false;
-      return;
-    }*/
-
-    setTimeout(() => this._update(), 0);
-
-    this._timer = setInterval(() => {
-      this._update();
-    }, UPDATE_INTERVAL);
-  }
-
-  private _stopUpdating(): void {
-    clearInterval(this._timer);
-
-    if (__DEVELOPMENT__) {
-      _startUpdatingFirstAttemptCall = true;
-    }
-  }
-
   protected override onInitialize() {
+    this._setInitValues();
+
+    this._addReactions();
+
+    this._startUpdating();
+  }
+
+  protected override afterReactionsRemoved() {
+    this._stopUpdating();
+  }
+
+  private _setInitValues(): void {
+    runInAction(() => {
+      this.isShowIframe = false;
+      this.input = ExchangeInput.zeroInstance(FiatCurrency.usd);
+      this.output = ExchangeOutput.zeroInstance(CryptoCurrency.sol);
+      this.minFiatAmount = 0;
+      this.minCryptoAmount = 0;
+      this.exchangeRate = 0;
+      this.crypto = CryptoCurrency.sol;
+      this.loadingState = LoadableState.notRequested;
+    });
+  }
+
+  private _addReactions(): void {
+    this.addReaction(
+      reaction(
+        () => this._locationService.getParams<{ symbol?: CryptoCurrencySymbol }>('/buy/:symbol?'),
+        ({ symbol }) => {
+          if (symbol) {
+            this.setCryptoCurrency(this.cryptoCurrenciesForSelect[symbol]);
+          }
+        },
+      ),
+    );
+
     this.addReaction(
       reaction(
         () => this.crypto,
@@ -117,12 +137,18 @@ export class BuyViewModel extends ViewModel {
         },
       ),
     );
-
-    this._startUpdating();
   }
 
-  protected override afterReactionsRemoved() {
-    this._stopUpdating();
+  private _startUpdating(): void {
+    this._update();
+
+    this._timer = setInterval(() => {
+      this._update();
+    }, UPDATE_INTERVAL);
+  }
+
+  private _stopUpdating(): void {
+    clearInterval(this._timer);
   }
 
   get areMoonpayConstantsSet(): boolean {

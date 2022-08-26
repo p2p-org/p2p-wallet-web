@@ -9,10 +9,6 @@ export abstract class LifeCycleObject {
   initialize() {
     ++this.initGuard;
 
-    if (this.changeOutput) {
-      console.log('initGuard while initializing -', this.initGuard);
-    }
-
     if (this.initGuard > 1) {
       return;
     }
@@ -22,10 +18,6 @@ export abstract class LifeCycleObject {
 
   end() {
     --this.initGuard;
-
-    if (this.changeOutput) {
-      console.log('initGuard on end -', this.initGuard);
-    }
 
     if (this.initGuard > 0) {
       return;

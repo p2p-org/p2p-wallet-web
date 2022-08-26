@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
+import { useIsomorphicLayoutEffect } from 'react-use';
 
-import { get, hasIn, set } from 'lodash';
+import { clone, get, hasIn, isEmpty, set } from 'lodash';
 import { nanoid } from 'nanoid';
 import type { DependencyContainer } from 'tsyringe';
 import { instanceCachingFactory } from 'tsyringe';
@@ -14,7 +15,12 @@ const mountCountKey = '__RK_mountCount';
 const reactInitKey = '__RK_initKey';
 
 export const hasReactInitKey = (vm: ViewModel): boolean => {
-  return hasIn(vm, reactInitKey);
+  return hasIn(vm, reactInitKey) && !isEmpty(get(vm, reactInitKey));
+};
+
+export const getReactInitKey = (vm: ViewModel) => {
+  const val = get(vm, reactInitKey);
+  return val ? clone(val) : null;
 };
 
 export const setReactInitKey = (vm: ViewModel) => {
@@ -75,10 +81,19 @@ export const useViewModel = <T extends ViewModel>(token: constructor<T>) => {
     viewModel.initialize();
   }
 
+  useIsomorphicLayoutEffect(() => {
+    // viewModel.onLayoutEffect();
+    return () => {
+      // viewModel.onLayoutEffectUnmount();
+    };
+  }, []);
+
   useEffect(() => {
     incrementMountCount(viewModel);
+    // viewModel.onEffect();
     return () => {
       decrementMountCount(viewModel);
+      // viewModel.onEffectUnmount();
       if (getMountCount(viewModel) === 0) {
         viewModel.end();
         removeReactInitKey(viewModel);
