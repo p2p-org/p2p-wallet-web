@@ -1,5 +1,5 @@
 import { action, makeObservable, observable, reaction, runInAction } from 'mobx';
-import { injectable } from 'tsyringe';
+import { singleton } from 'tsyringe';
 
 import { ViewModel } from 'new/core/viewmodels/ViewModel';
 import type { Token, Wallet } from 'new/sdk/SolanaSDK';
@@ -7,7 +7,7 @@ import { CryptoCurrency } from 'new/services/BuyService/structures';
 import { WalletsRepository } from 'new/services/Repositories';
 import { SolanaService } from 'new/services/SolanaService';
 
-@injectable()
+@singleton()
 export class ChooseBuyTokenMobileModalViewModel extends ViewModel {
   solWallet?: Wallet;
   usdcWallet?: Wallet;
@@ -31,6 +31,8 @@ export class ChooseBuyTokenMobileModalViewModel extends ViewModel {
       this._getBuySelectionWallet(CryptoCurrency.usdc),
     );
   }
+
+  protected override _setDefaults() {}
 
   protected override onInitialize() {
     this.addReaction(
