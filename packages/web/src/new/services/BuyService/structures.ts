@@ -1,7 +1,6 @@
 import { USDC_MINT } from '@p2p-wallet-web/core';
 import { NATIVE_MINT } from '@solana/spl-token';
 import type { Cluster } from '@solana/web3.js';
-import assert from 'assert';
 
 import { BASE_CURRENCY_SYMBOL } from 'new/services/BuyService/constants';
 import { Defaults } from 'new/services/Defaults';
@@ -96,7 +95,9 @@ export class CryptoCurrency {
     const mintAddress =
       CryptoCurrency.Addresses[Defaults.apiEndPoint.network as Cluster][this._symbol];
     if (!mintAddress) {
-      assert(true, `Unhandeled mint address for ${Defaults.apiEndPoint.network} : ${this._symbol}`);
+      throw new Error(
+        `Unhandeled mint address for ${Defaults.apiEndPoint.network} : ${this._symbol}`,
+      );
     }
     return mintAddress;
   }

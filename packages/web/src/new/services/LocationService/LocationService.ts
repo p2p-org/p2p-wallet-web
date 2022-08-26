@@ -1,5 +1,6 @@
 import { matchPath } from 'react-router';
 
+import assert from 'assert';
 import type { History, Location, LocationState, Path, UnregisterCallback } from 'history';
 import { makeObservable, observable, runInAction } from 'mobx';
 import { singleton } from 'tsyringe';
@@ -17,9 +18,18 @@ export class LocationService {
     });
   }
 
+  private _assertHistory(): void {
+    assert(!!this._history, 'History is not set in LocationService');
+  }
+
+  private _assertLocation(): void {
+    assert(!!this._location, 'Location is not set in LocationService');
+  }
+
   private _listenHistory(): void {
     this._removeListener && this._removeListener();
 
+    this._assertHistory();
     this._removeListener = this._history?.listen((location) => {
       runInAction(() => (this._location = location));
     });
@@ -32,6 +42,7 @@ export class LocationService {
   }
 
   getParams<Params>(pathTemplate: string): Params {
+    this._assertLocation();
     const match = matchPath<Params>(this._location?.pathname || '', { path: pathTemplate });
 
     if (!match) {
@@ -42,6 +53,7 @@ export class LocationService {
   }
 
   push(pathname: Path, props: LocationState): void {
+    this._assertHistory();
     this._history?.push(pathname, props);
   }
 }
