@@ -1,8 +1,8 @@
 import { matchPath } from 'react-router';
 
-import assert from 'assert';
 import type { History, Location, LocationState, Path, UnregisterCallback } from 'history';
 import { makeObservable, observable, runInAction } from 'mobx';
+import assert from 'ts-invariant';
 import { singleton } from 'tsyringe';
 
 @singleton()
@@ -19,11 +19,11 @@ export class LocationService {
   }
 
   private _assertHistory(): void {
-    assert(!!this._history, 'History is not set in LocationService');
+    assert(this._history, 'History is not set in LocationService');
   }
 
   private _assertLocation(): void {
-    assert(!!this._location, 'Location is not set in LocationService');
+    assert(this._location, 'Location is not set in LocationService');
   }
 
   private _listenHistory(): void {
