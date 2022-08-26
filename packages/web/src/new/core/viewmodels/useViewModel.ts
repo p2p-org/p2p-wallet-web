@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { useIsomorphicLayoutEffect } from 'react-use';
 
 import { clone, get, hasIn, isEmpty, set } from 'lodash';
 import { nanoid } from 'nanoid';
@@ -81,19 +80,10 @@ export const useViewModel = <T extends ViewModel>(token: constructor<T>) => {
     viewModel.initialize();
   }
 
-  useIsomorphicLayoutEffect(() => {
-    // viewModel.onLayoutEffect();
-    return () => {
-      // viewModel.onLayoutEffectUnmount();
-    };
-  }, []);
-
   useEffect(() => {
     incrementMountCount(viewModel);
-    // viewModel.onEffect();
     return () => {
       decrementMountCount(viewModel);
-      // viewModel.onEffectUnmount();
       if (getMountCount(viewModel) === 0) {
         viewModel.end();
         removeReactInitKey(viewModel);

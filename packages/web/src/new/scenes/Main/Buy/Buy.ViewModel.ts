@@ -1,4 +1,4 @@
-import { action, computed, makeObservable, observable, reaction, runInAction } from 'mobx';
+import { action, computed, makeObservable, observable, reaction } from 'mobx';
 import { singleton } from 'tsyringe';
 
 import { LoadableState } from 'new/app/models/LoadableReleay';
@@ -15,21 +15,20 @@ import {
 import { LocationService } from 'new/services/LocationService';
 import { SolanaService } from 'new/services/SolanaService';
 
-// const UPDATE_INTERVAL = 30 * 1000; // 30 secs
-const UPDATE_INTERVAL = 10 * 1000; // 30 secs
+const UPDATE_INTERVAL = 30 * 1000; // 30 secs
 
 type CryptoCurrenciesForSelectType = Record<CryptoCurrencySymbol, CryptoCurrency>;
 
 @singleton()
 export class BuyViewModel extends ViewModel {
-  isShowIframe!: boolean;
-  input!: ExchangeInput;
-  output!: ExchangeOutput;
-  minFiatAmount!: number;
-  minCryptoAmount!: number;
-  exchangeRate!: number;
-  crypto!: CryptoCurrency;
-  loadingState!: LoadableState;
+  isShowIframe: boolean;
+  input: ExchangeInput;
+  output: ExchangeOutput;
+  minFiatAmount: number;
+  minCryptoAmount: number;
+  exchangeRate: number;
+  crypto: CryptoCurrency;
+  loadingState: LoadableState;
 
   private _timer?: NodeJS.Timer;
 
@@ -40,7 +39,14 @@ export class BuyViewModel extends ViewModel {
   ) {
     super();
 
-    this._setInitValues();
+    this.isShowIframe = false;
+    this.input = ExchangeInput.zeroInstance(FiatCurrency.usd);
+    this.output = ExchangeOutput.zeroInstance(CryptoCurrency.sol);
+    this.minFiatAmount = 0;
+    this.minCryptoAmount = 0;
+    this.exchangeRate = 0;
+    this.crypto = CryptoCurrency.sol;
+    this.loadingState = LoadableState.notRequested;
 
     makeObservable(this, {
       isShowIframe: observable,
@@ -65,9 +71,18 @@ export class BuyViewModel extends ViewModel {
     });
   }
 
-  protected override onInitialize() {
-    this._setInitValues();
+  protected override _setDefaults() {
+    this.isShowIframe = false;
+    this.input = ExchangeInput.zeroInstance(FiatCurrency.usd);
+    this.output = ExchangeOutput.zeroInstance(CryptoCurrency.sol);
+    this.minFiatAmount = 0;
+    this.minCryptoAmount = 0;
+    this.exchangeRate = 0;
+    this.crypto = CryptoCurrency.sol;
+    this.loadingState = LoadableState.notRequested;
+  }
 
+  protected override onInitialize() {
     this._addReactions();
 
     this._startUpdating();
@@ -75,19 +90,6 @@ export class BuyViewModel extends ViewModel {
 
   protected override afterReactionsRemoved() {
     this._stopUpdating();
-  }
-
-  private _setInitValues(): void {
-    runInAction(() => {
-      this.isShowIframe = false;
-      this.input = ExchangeInput.zeroInstance(FiatCurrency.usd);
-      this.output = ExchangeOutput.zeroInstance(CryptoCurrency.sol);
-      this.minFiatAmount = 0;
-      this.minCryptoAmount = 0;
-      this.exchangeRate = 0;
-      this.crypto = CryptoCurrency.sol;
-      this.loadingState = LoadableState.notRequested;
-    });
   }
 
   private _addReactions(): void {
