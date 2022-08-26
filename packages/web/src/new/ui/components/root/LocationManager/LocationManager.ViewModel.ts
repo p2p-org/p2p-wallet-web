@@ -1,14 +1,16 @@
 import type { History } from 'history';
-import { injectable } from 'tsyringe';
+import { singleton } from 'tsyringe';
 
 import { ViewModel } from 'new/core/viewmodels/ViewModel';
 import { LocationService } from 'new/services/LocationService';
 
-@injectable()
+@singleton()
 export class LocationManagerViewModel extends ViewModel {
   constructor(private _locationService: LocationService) {
     super();
   }
+
+  protected override setDefaults() {}
 
   protected override onInitialize() {}
 

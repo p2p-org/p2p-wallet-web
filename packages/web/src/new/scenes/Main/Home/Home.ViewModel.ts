@@ -1,6 +1,6 @@
 import { ZERO } from '@orca-so/sdk';
 import { action, computed, makeObservable, observable, reaction } from 'mobx';
-import { injectable } from 'tsyringe';
+import { singleton } from 'tsyringe';
 
 import { SDFetcherState } from 'new/core/viewmodels/SDViewModel';
 import { ViewModel } from 'new/core/viewmodels/ViewModel';
@@ -10,9 +10,9 @@ import { NameService } from 'new/services/NameService';
 import { PricesService } from 'new/services/PriceAPIs/PricesService';
 import { WalletsRepository } from 'new/services/Repositories';
 
-@injectable()
+@singleton()
 export class HomeViewModel extends ViewModel {
-  username: string | null = null;
+  username: string | null;
 
   constructor(
     public walletsRepository: WalletsRepository,
@@ -22,6 +22,8 @@ export class HomeViewModel extends ViewModel {
   ) {
     super();
 
+    this.username = null;
+
     makeObservable(this, {
       username: observable,
       isWalletReady: computed,
@@ -29,6 +31,10 @@ export class HomeViewModel extends ViewModel {
       isBalanceLoading: computed,
       changeUsername: action,
     });
+  }
+
+  protected override setDefaults() {
+    this.username = null;
   }
 
   protected override onInitialize() {

@@ -32,7 +32,7 @@ export class ChooseBuyTokenMobileModalViewModel extends ViewModel {
     );
   }
 
-  protected override _setDefaults() {}
+  protected override setDefaults() {}
 
   protected override onInitialize() {
     this.addReaction(

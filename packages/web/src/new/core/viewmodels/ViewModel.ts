@@ -4,8 +4,8 @@ export abstract class ViewModel extends ObservableReactionContainer {
   protected override onEnd() {
     super.onEnd();
 
-    this._setDefaults();
+    this.setDefaults();
   }
 
-  protected abstract _setDefaults(): void;
+  protected abstract setDefaults(): void;
 }

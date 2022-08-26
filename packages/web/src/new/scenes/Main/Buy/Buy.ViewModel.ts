@@ -71,7 +71,7 @@ export class BuyViewModel extends ViewModel {
     });
   }
 
-  protected override _setDefaults() {
+  protected override setDefaults() {
     this.isShowIframe = false;
     this.input = ExchangeInput.zeroInstance(FiatCurrency.usd);
     this.output = ExchangeOutput.zeroInstance(CryptoCurrency.sol);
