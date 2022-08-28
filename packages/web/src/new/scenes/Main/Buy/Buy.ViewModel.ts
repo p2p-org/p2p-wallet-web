@@ -1,7 +1,7 @@
-import { action, computed, makeObservable, observable, reaction } from 'mobx';
+import { action, computed, makeObservable, observable, reaction, runInAction } from 'mobx';
 import { singleton } from 'tsyringe';
 
-import { LoadableState } from 'new/app/models/LoadableReleay';
+import { LoadableState } from 'new/app/models/LoadableRelay';
 import { ViewModel } from 'new/core/viewmodels/ViewModel';
 import type { Token } from 'new/sdk/SolanaSDK';
 import { BuyService } from 'new/services/BuyService';
@@ -15,7 +15,7 @@ import {
 import { LocationService } from 'new/services/LocationService';
 import { SolanaService } from 'new/services/SolanaService';
 
-const UPDATE_INTERVAL = 30 * 1000; // 30 secs
+const UPDATE_INTERVAL = 10 * 1000; // 10 secs
 
 type CryptoCurrenciesForSelectType = Record<CryptoCurrencySymbol, CryptoCurrency>;
 
@@ -62,11 +62,8 @@ export class BuyViewModel extends ViewModel {
       minCryptoAmount: observable,
       exchangeRate: observable,
 
-      changeOutput: action,
       setAmount: action.bound,
-      setCryptoCurrency: action,
       setIsShowIframe: action,
-      setLoadingState: action,
       swap: action.bound,
     });
   }
@@ -86,6 +83,9 @@ export class BuyViewModel extends ViewModel {
     this._addReactions();
 
     this._startUpdating();
+
+    // should be here in initialization (not in setDefaults) to get proper symbol from current url
+    runInAction(() => (this.crypto = new CryptoCurrency(this._getSymbolFromParams())));
   }
 
   protected override afterReactionsRemoved() {
@@ -95,10 +95,10 @@ export class BuyViewModel extends ViewModel {
   private _addReactions(): void {
     this.addReaction(
       reaction(
-        () => this._locationService.getParams<{ symbol?: CryptoCurrencySymbol }>('/buy/:symbol?'),
-        ({ symbol }) => {
+        () => this._getSymbolFromParams(),
+        (symbol) => {
           if (symbol) {
-            this.setCryptoCurrency(this.cryptoCurrenciesForSelect[symbol]);
+            this._setCryptoCurrency(this.cryptoCurrenciesForSelect[symbol]);
           }
         },
       ),
@@ -119,25 +119,32 @@ export class BuyViewModel extends ViewModel {
         }),
         ({ amount }) => {
           if (amount === 0) {
-            this.changeOutput(ExchangeOutput.zeroInstance(this.output.currency));
-            this.setLoadingState(LoadableState.loaded);
+            this._changeOutput(ExchangeOutput.zeroInstance(this.output.currency));
+            this._setLoadingState(LoadableState.loaded);
             return;
           }
 
-          this.setLoadingState(LoadableState.loading);
+          this._setLoadingState(LoadableState.loading);
 
           this._buyService
             .convert(this.input, this.output)
             .then((output) => {
-              this.setLoadingState(LoadableState.loaded);
-              this.changeOutput(output);
+              this._setLoadingState(LoadableState.loaded);
+              this._changeOutput(output);
             })
             .catch((error) => {
-              this.setLoadingState(LoadableState.error(error.message));
-              this.changeOutput(ExchangeOutput.zeroInstance(this.output.currency));
+              this._setLoadingState(LoadableState.error(error.message));
+              this._changeOutput(ExchangeOutput.zeroInstance(this.output.currency));
             });
         },
       ),
+    );
+  }
+
+  private _getSymbolFromParams(): CryptoCurrencySymbol {
+    return (
+      this._locationService.getParams<{ symbol?: CryptoCurrencySymbol }>('/buy/:symbol?').symbol ||
+      'SOL'
     );
   }
 
@@ -151,21 +158,6 @@ export class BuyViewModel extends ViewModel {
 
   private _stopUpdating(): void {
     clearInterval(this._timer);
-  }
-
-  get areMoonpayConstantsSet(): boolean {
-    return this._buyService.getMoonpayKeysAreSet();
-  }
-
-  get cryptoCurrenciesForSelect(): CryptoCurrenciesForSelectType {
-    return {
-      SOL: CryptoCurrency.sol,
-      USDC: CryptoCurrency.usdc,
-    };
-  }
-
-  get publicKeyString(): string {
-    return this._solanaService.provider.wallet.publicKey.toBase58();
   }
 
   private _update(): void {
@@ -187,12 +179,52 @@ export class BuyViewModel extends ViewModel {
     );
   }
 
-  getToken(mint: string): Promise<Token | undefined> {
-    return this._solanaService.getToken(mint);
+  private _changeOutput(output: ExchangeOutput): void {
+    runInAction(() => (this.output = output));
   }
 
-  changeOutput(output: ExchangeOutput): void {
-    this.output = output;
+  private _setCryptoCurrency(cryptoCurrency: CryptoCurrency): void {
+    runInAction(() => {
+      this.crypto = cryptoCurrency;
+
+      if (FiatCurrency.isFiat(this.input.currency)) {
+        const { amount, price, networkFee, processingFee, purchaseCost, total } = this.output;
+        this.output = new ExchangeOutput(
+          amount,
+          cryptoCurrency,
+          price,
+          processingFee,
+          networkFee,
+          purchaseCost,
+          total,
+        );
+      } else {
+        this.input = new ExchangeInput(this.input.amount, cryptoCurrency);
+      }
+    });
+  }
+
+  private _setLoadingState(value: LoadableState): void {
+    runInAction(() => (this.loadingState = value));
+  }
+
+  get areMoonpayConstantsSet(): boolean {
+    return this._buyService.getMoonpayKeysAreSet();
+  }
+
+  get cryptoCurrenciesForSelect(): CryptoCurrenciesForSelectType {
+    return {
+      SOL: CryptoCurrency.sol,
+      USDC: CryptoCurrency.usdc,
+    };
+  }
+
+  get publicKeyString(): string {
+    return this._solanaService.provider.wallet.publicKey.toBase58();
+  }
+
+  getToken(mint: string): Promise<Token | undefined> {
+    return this._solanaService.getToken(mint);
   }
 
   setAmount(amount: string): void {
@@ -204,31 +236,8 @@ export class BuyViewModel extends ViewModel {
     this.input = new ExchangeInput(newAmount, this.input.currency);
   }
 
-  setCryptoCurrency(cryptoCurrency: CryptoCurrency): void {
-    this.crypto = cryptoCurrency;
-
-    if (FiatCurrency.isFiat(this.input.currency)) {
-      const { amount, price, networkFee, processingFee, purchaseCost, total } = this.output;
-      this.output = new ExchangeOutput(
-        amount,
-        cryptoCurrency,
-        price,
-        processingFee,
-        networkFee,
-        purchaseCost,
-        total,
-      );
-    } else {
-      this.input = new ExchangeInput(this.input.amount, cryptoCurrency);
-    }
-  }
-
   setIsShowIframe(value: boolean): void {
     this.isShowIframe = value;
-  }
-
-  setLoadingState(value: LoadableState): void {
-    this.loadingState = value;
   }
 
   swap(): void {
