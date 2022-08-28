@@ -6,9 +6,8 @@ import { theme } from '@p2p-wallet-web/ui';
 import { observer } from 'mobx-react-lite';
 
 import type { LayoutViewModel } from 'new/ui/components/common/Layout/Layout.ViewModel';
-
-import { MOBILE_HEADER_HEIGHT } from './constants';
-import logo from './logo.png';
+import { MOBILE_HEADER_HEIGHT } from 'new/ui/components/common/Layout/MobileLayout/MobileHeader/constants';
+import logo from 'new/ui/components/common/Layout/MobileLayout/MobileHeader/logo.png';
 
 const Wrapper = styled.div`
   display: flex;

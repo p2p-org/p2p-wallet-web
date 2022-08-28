@@ -1,3 +1,4 @@
+// <FeatureName> = '<remote control feature key>'
 export enum Features {
-  TestFeature = 'web_testFeature',
+  LeftNavMenuProfile = 'web_LeftNavMenuProfile',
 }

@@ -3,13 +3,12 @@ import { useHistory, useLocation } from 'react-router';
 
 import { observer } from 'mobx-react-lite';
 
-import type { ModalPropsType } from 'app/contexts';
-import { Modal } from 'components/ui/Modal';
 import { useViewModel } from 'new/core/viewmodels/useViewModel';
 import { CryptoCurrency } from 'new/services/BuyService/structures';
+import type { ModalPropsType } from 'new/services/ModalService';
+import { ActionRow } from 'new/ui/modals/ChooseBuyTokenMobileModal/ActionRow';
 import { ChooseBuyTokenMobileModalViewModel } from 'new/ui/modals/ChooseBuyTokenMobileModal/ChooseBuyTokenMobileModal.ViewModel';
-
-import { ActionRow } from './ActionRow';
+import { Modal } from 'new/ui/modals/Modal';
 
 export const ChooseBuyTokenMobileModal: FC<ModalPropsType> = observer(({ close }) => {
   const history = useHistory();

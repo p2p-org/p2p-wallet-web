@@ -6,9 +6,8 @@ import { styled } from '@linaria/react';
 import { theme, zIndexes } from '@p2p-wallet-web/ui';
 
 import { Icon } from 'components/ui';
+import { MOBILE_FOOTER_TABS_HEIGHT } from 'new/ui/components/common/Layout';
 import type { LayoutViewModel } from 'new/ui/components/common/Layout/Layout.ViewModel';
-
-import { MOBILE_FOOTER_TABS_HEIGHT } from './constants';
 
 const Wrapper = styled.div`
   position: sticky;

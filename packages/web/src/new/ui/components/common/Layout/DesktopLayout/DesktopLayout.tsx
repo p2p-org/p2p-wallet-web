@@ -6,9 +6,9 @@ import { up, useIsDesktop, useIsTablet } from '@p2p-wallet-web/ui';
 import classNames from 'classnames';
 import { observer } from 'mobx-react-lite';
 
-import { ColumnLeft } from 'components/common/Layout/DesktopLayout/ColumnLeft';
 import { ScrollFix } from 'components/common/ScollFix';
 import { Header, HEADER_HEIGHT } from 'new/ui/components/common/Layout';
+import { ColumnLeft } from 'new/ui/components/common/Layout/DesktopLayout/ColumnLeft';
 import type { LayoutViewModel } from 'new/ui/components/common/Layout/Layout.ViewModel';
 
 import {

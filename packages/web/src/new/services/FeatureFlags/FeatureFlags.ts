@@ -25,7 +25,6 @@ class _FeatureFlags {
 
     this._remoteConfig.defaultConfig = defaultFlags;
 
-    // TODO: REMOVE: only for period of developing of task https://p2pvalidator.atlassian.net/browse/PWN-4423
     // @ts-ignore
     if (__DEVELOPMENT__ || process.env.REACT_APP_STAGING) {
       this._remoteConfig.settings.minimumFetchIntervalMillis = 0; // default value is 12 hours

@@ -6,13 +6,13 @@ import { TokenAmount } from '@p2p-wallet-web/token-utils';
 import { borders, theme } from '@p2p-wallet-web/ui';
 import { observer } from 'mobx-react-lite';
 
-import { TokenAvatar } from 'components/common/TokenAvatar';
-import { InputAmount } from 'components/ui/InputAmount';
 import type { BuyViewModelProps } from 'new/scenes/Main/Buy/Subviews/Moonpay/types';
 import type { Token } from 'new/sdk/SolanaSDK';
 import { FiatCurrency } from 'new/services/BuyService/structures';
+import { InputAmount } from 'new/ui/components/common/InputAmount';
+import { TokenAvatar } from 'new/ui/components/common/TokenAvatar';
 import { AmountTypeButton } from 'new/ui/components/pages/buy/AmountTypeButton';
-import { formatNumberToUSD } from 'utils/format';
+import { numberToUSDString } from 'new/utils/NumberExtensions';
 
 const Wrapper = styled.div`
   border-radius: 12px;
@@ -49,17 +49,13 @@ export const Inputs: FC<BuyViewModelProps> = observer(({ viewModel }) => {
 
   const isFiatInputCurrency = FiatCurrency.isFiat(viewModel.input.currency);
 
-  const prefix = isFiatInputCurrency ? (
-    '$'
-  ) : (
-    <TokenAvatar symbol={viewModel.crypto.symbol} size={32} />
-  );
+  const prefix = isFiatInputCurrency ? '$' : <TokenAvatar token={token} size={32} />;
 
   const buttonAmountFormatted = isFiatInputCurrency
     ? token
       ? TokenAmount.parse(token, viewModel.output.amount.toString()).formatUnits()
       : ''
-    : formatNumberToUSD(viewModel.output.amount, { alwaysShowCents: false });
+    : numberToUSDString(viewModel.output.amount);
 
   return (
     <Wrapper>

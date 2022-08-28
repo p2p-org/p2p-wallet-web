@@ -5,14 +5,16 @@ import { styled } from '@linaria/react';
 import { zIndexes } from '@p2p-wallet-web/ui';
 import { observer } from 'mobx-react-lite';
 
-import logo from 'assets/images/logo.png';
-import { COLUMN_LEFT_WIDTH, COLUMNS_GRID_GUTTER } from 'components/common/Layout';
 import { ScrollFix } from 'components/common/ScollFix';
 import { Icon } from 'components/ui';
+import logo from 'new/ui/assets/images/logo.png';
+import type { BreadcrumbType } from 'new/ui/components/common/Layout';
+import {
+  COLUMN_LEFT_WIDTH,
+  COLUMNS_GRID_GUTTER,
+  HEADER_HEIGHT,
+} from 'new/ui/components/common/Layout';
 import type { LayoutViewModel } from 'new/ui/components/common/Layout/Layout.ViewModel';
-
-import type { BreadcrumbType } from '../../types';
-import { HEADER_HEIGHT } from './constants';
 
 const Wrapper = styled.header`
   position: sticky;
