@@ -9,7 +9,8 @@ import { expr } from 'mobx-utils';
 import { Icon } from 'components/ui';
 import { InputAmount } from 'components/ui/InputAmount';
 import type { SendViewModel } from 'new/scenes/Main/Send';
-import { ChooseWallet } from 'new/scenes/Main/Send/ChooseTokenAndAmount/ChooseWallet';
+import { WalletSelectorContent } from 'new/scenes/Main/Send/ChooseTokenAndAmount/WalletSelectorContent';
+import { ChooseWallet } from 'new/scenes/Main/Send/ChooseWallet';
 import type { Wallet } from 'new/sdk/SolanaSDK';
 import { Defaults } from 'new/services/Defaults';
 import { AmountTypeButton } from 'new/ui/components/common/AmountTypeButton';
@@ -194,36 +195,6 @@ export const ChooseTokenAndAmount: FC<Props> = observer(({ viewModel }) => {
     // viewModel.enterAmount(convertToBalance(lamports, wallet.token.decimals));
   };
 
-  // useEffect(() => {
-  //   autorun(() => {
-  //     const wallet = vm.wallet;
-  //     const totalLamports = wallet?.lamports;
-  //     let amount = vm.amount;
-  //     if (!wallet || !totalLamports || !amount) {
-  //       return;
-  //     }
-  //
-  //     // convert value
-  //     if (vm.currencyMode === CurrencyMode.fiat && wallet.priceInCurrentFiat > 0) {
-  //       amount = amount / wallet.priceInCurrentFiat;
-  //     }
-  //
-  //     // calculate lamports
-  //     let lamports = toLamport(amount, wallet.token.decimals);
-  //     if (lamports.gt(totalLamports)) {
-  //       lamports = totalLamports;
-  //     }
-  //
-  //     console.log(4444, {
-  //       amount: amount,
-  //       currencyMode: vm.currencyMode,
-  //       lamports: toLamport(amount, wallet.token.decimals).toString(),
-  //       totalLamports: totalLamports.toString(),
-  //       convertToBalance: convertToBalance(lamports, wallet.token.decimals),
-  //     });
-  //   });
-  // }, []);
-
   // error
   const balanceClassName = expr(() => {
     const error = vm.error;
@@ -258,7 +229,9 @@ export const ChooseTokenAndAmount: FC<Props> = observer(({ viewModel }) => {
       <MainWrapper>
         <ChooseWallet
           viewModel={vm.chooseWalletViewModel}
+          selector={<WalletSelectorContent viewModel={vm.chooseWalletViewModel} />}
           selectedWallet={viewModel.wallet}
+          showOtherWallets={false}
           onWalletChange={handleWalletChange}
         />
         <InputWrapper>

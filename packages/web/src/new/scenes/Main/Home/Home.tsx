@@ -26,7 +26,7 @@ export const Home: FC = observer(() => {
   const viewModel = useViewModel<HomeViewModel>(HomeViewModel);
   const isMobile = useIsMobile();
 
-  // useEffect(() => {
+  // useLayoutEffect(() => {
   //   viewModel.walletsRepository.reload();
   // }, [viewModel.walletsRepository]);
 

@@ -1,6 +1,6 @@
 import { ZERO } from '@orca-so/sdk';
 import { action, computed, makeObservable, observable, reaction } from 'mobx';
-import { injectable } from 'tsyringe';
+import { singleton } from 'tsyringe';
 
 import { SDFetcherState } from 'new/core/viewmodels/SDViewModel';
 import { ViewModel } from 'new/core/viewmodels/ViewModel';
@@ -8,7 +8,7 @@ import { Defaults } from 'new/services/Defaults';
 import { NameService } from 'new/services/NameService';
 import { WalletsRepository } from 'new/services/Repositories';
 
-@injectable()
+@singleton()
 export class HomeViewModel extends ViewModel {
   username: string | null = null;
 

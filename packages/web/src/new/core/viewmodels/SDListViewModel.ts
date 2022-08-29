@@ -21,7 +21,7 @@ export abstract class SDListViewModel<T> extends SDViewModel<T[]> implements ISD
   offset: number;
   private _isLastPageLoaded = false;
 
-  constructor({
+  protected constructor({
     initialData = [],
     isPaginationEnabled = false,
     limit = 10,

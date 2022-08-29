@@ -55,6 +55,10 @@ export const Text = styled.div`
     justify-content: flex-end;
   }
 
+  &.right {
+    text-align: right;
+  }
+
   &.grid {
     display: grid;
     flex-shrink: 0;

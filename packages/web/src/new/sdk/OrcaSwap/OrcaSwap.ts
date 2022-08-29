@@ -616,6 +616,7 @@ export class OrcaSwap implements OrcaSwapType {
   }): Promise<string> {
     return this._solanaClient
       .prepareTransaction({
+        owner: this._solanaClient.provider.wallet.publicKey,
         instructions: swapTransaction.instructions,
         signers: swapTransaction.signers,
         feePayer,

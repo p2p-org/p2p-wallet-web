@@ -57,7 +57,7 @@ export class FeeRelayerAPIClient implements FeeRelayerAPIClientType {
   sendTransaction(requestType: FeeRelayerRequestType): Promise<string> {
     // TODO: add error parsing
     return request(this._urlRequest(requestType)).then(({ data }) => {
-      return data.replace('[', '').replace(']', '');
+      return data[0];
     });
   }
 

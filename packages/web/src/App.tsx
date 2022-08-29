@@ -11,14 +11,13 @@ import { NotifyToast } from 'components/common/NotifyToast';
 import { ToastManager } from 'components/common/ToastManager';
 import { Main } from 'new/scenes/Main';
 import { Home } from 'new/scenes/Main/Home';
-import { Send as SendNew } from 'new/scenes/Main/Send';
+import { Send } from 'new/scenes/Main/Send';
 import { Root } from 'new/scenes/Root';
 import { ModalManager } from 'new/ui/modals/ModalManager';
 import { Auth } from 'pages/Auth';
 import { Buy } from 'pages/Buy';
 import { Landing } from 'pages/Landing';
 import { Receive } from 'pages/Receive';
-import { Send } from 'pages/Send';
 import { Settings } from 'pages/Settings';
 import { SettingsNetwork } from 'pages/SettingsNetwork';
 import { Swap } from 'pages/Swap';
@@ -50,7 +49,6 @@ const App: React.FC = () => {
                   />
                   <AuthRequiredRoute path="/wallet/:publicKey" exact component={Wallet} />
                   <AuthRequiredRoute path="/receive/(tokens)?" component={Receive} />
-                  <AuthRequiredRoute path="/sendnew/:publicKey?" component={SendNew} />
                   <AuthRequiredRoute path="/send/:publicKey/:status(result)" component={Send} />
                   <AuthRequiredRoute path="/send/:publicKey?" component={Send} />
                   <AuthRequiredRoute path="/swap/(settings)?/:symbol?" component={Swap} />

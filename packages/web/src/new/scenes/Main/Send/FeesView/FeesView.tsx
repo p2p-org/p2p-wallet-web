@@ -7,19 +7,34 @@ import { expr } from 'mobx-utils';
 import { Accordion } from 'components/ui';
 import { AccordionTitle } from 'components/ui/AccordionDetails/AccordionTitle';
 import { ListWrapper, Row, Text } from 'components/ui/AccordionDetails/common';
-import type { SendViewModelType } from 'new/scenes/Main/Send';
+import type { SendViewModel } from 'new/scenes/Main/Send';
 import { Network } from 'new/scenes/Main/Send';
 import type * as SolanaSDK from 'new/sdk/SolanaSDK';
 import { convertToBalance } from 'new/sdk/SolanaSDK';
 import { Defaults } from 'new/services/Defaults';
+import { RelayMethodType } from 'new/services/SendService';
+import { numberToString } from 'new/utils/NumberExtensions';
 
 import { FeeTransactionTooltip } from './FeeTransactionTooltip';
+import { FeeView } from './FeeView';
 
 interface Props {
-  viewModel: Readonly<SendViewModelType>;
+  viewModel: Readonly<SendViewModel>;
 }
 
 export const FeesView: FC<Props> = observer(({ viewModel }) => {
+  const receive = expr(() => {
+    const amount = viewModel.amount;
+    const wallet = viewModel.wallet;
+
+    // use _feeString to render receive line
+    return _feeString({
+      fee: amount,
+      unit: wallet?.token.symbol ?? '',
+      price: viewModel.getPrice(wallet?.token.symbol ?? ''),
+    });
+  });
+
   const transferFee = expr(() => {
     const feeAmount = viewModel.feeInfo.value?.feeAmount;
     const payingWallet = viewModel.payingWallet;
@@ -66,12 +81,6 @@ export const FeesView: FC<Props> = observer(({ viewModel }) => {
       return null;
     }
 
-    console.log(
-      77777777,
-      payingWallet?.token.symbol ?? '',
-      viewModel.getPrice(payingWallet?.token.symbol ?? ''),
-    );
-
     return _stringForAccountCreationFee({
       feeAmount,
       price: viewModel.getPrice(payingWallet?.token.symbol ?? ''),
@@ -109,6 +118,24 @@ export const FeesView: FC<Props> = observer(({ viewModel }) => {
     });
   });
 
+  const payingFeeTokenIsHidden = expr(() => {
+    if (viewModel.relayMethod.type !== RelayMethodType.relay) {
+      return true;
+    }
+
+    const network = viewModel.network;
+    if (network !== Network.solana) {
+      return true;
+    }
+
+    const fee = viewModel.feeInfo.value?.feeAmount;
+    if (fee) {
+      return fee.total.eqn(0); // only this condition to show
+    }
+
+    return true;
+  });
+
   const totalFee = expr(() => {
     const feeAmount = viewModel.feeInfo.value?.feeAmount;
     if (!feeAmount) {
@@ -141,6 +168,10 @@ export const FeesView: FC<Props> = observer(({ viewModel }) => {
     >
       <ListWrapper>
         <Row>
+          <Text className="gray">Receive</Text>
+          {receive}
+        </Row>
+        <Row>
           <Text className="gray">Transfer fee</Text>
           <Text className="inline-flex">
             {transferFee} {feeHint}
@@ -153,44 +184,12 @@ export const FeesView: FC<Props> = observer(({ viewModel }) => {
           </Row>
         ) : null}
         {!otherFeesIsHidden ? otherFees : null}
-
-        {/*<Row>*/}
-        {/*  <Text className="gray">Receive</Text>*/}
-        {/*  <Text>*/}
-        {/*    receiveAmount*/}
-        {/*    /!* <Text className="gray">(~$150)</Text> *!/*/}
-        {/*  </Text>*/}
-        {/*</Row>*/}
-        {/*<Row>
-          <Text className="gray">Transaction fee</Text>
-          {useFreeTransactions ? (
-            <Text>
-              Free{' '}
-              <Text className="green inline-flex">
-                (Paid by P2P.org) <FeeTransactionTooltip userFreeFeeLimits={userFreeFeeLimits} />
-              </Text>
-            </Text>
-          ) : (
-            <Text>1</Text>
-          )}
-          <Text>5000 lamport</Text>
-        </Row>*/}
-        {/*details.accountCreationAmount ? (
-          <Row>
-            <Text className="gray">{destinationAccount?.symbol} account creation</Text>
-            <Text>
-              {details.accountCreationAmount}
-            </Text>
-          </Row>
-        ) : undefined*/}
-        {/*!fromTokenAccount?.balance?.token.isRawSOL ? (
-          <CompensationFee
-            type="send"
-            isShow={!fromTokenAccount?.balance?.token.isRawSOL}
-            accountSymbol={destinationAccount?.symbol || ''}
-          />
-        ) : undefined*/}
       </ListWrapper>
+      {!payingFeeTokenIsHidden ? (
+        <ListWrapper>
+          <FeeView viewModel={viewModel} />
+        </ListWrapper>
+      ) : null}
       <ListWrapper className="total">
         <Row>
           <Text>Total</Text>
@@ -292,13 +291,13 @@ function _stringForTotalFee({
 function _feeString({ fee, unit, price = 0 }: { fee: number; unit: string; price?: number }) {
   const feeInFiat = fee * price;
   return (
-    <Text>
+    <Text className="right">
       <Text>
-        {fee.toFixed(9)} {unit}
+        {numberToString(fee, { maximumFractionDigits: 9 })} {unit}
       </Text>{' '}
       <Text className="gray">
         (~{Defaults.fiat.symbol}
-        {feeInFiat.toFixed(2)})
+        {numberToString(feeInFiat, { maximumFractionDigits: 2 })})
       </Text>
     </Text>
   );

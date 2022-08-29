@@ -1,4 +1,5 @@
 import { action, flow, makeObservable, observable, reaction } from 'mobx';
+import assert from 'ts-invariant';
 import { delay, inject, injectable } from 'tsyringe';
 
 import { SDListViewModel } from 'new/core/viewmodels/SDListViewModel';
@@ -10,10 +11,12 @@ import { SolanaService } from 'new/services/SolanaService';
 
 @injectable()
 export class ChooseWalletViewModel extends SDListViewModel<Wallet> {
-  selectedWallet: Wallet | null;
+  selectedWallet: Wallet | null = null;
   myWallets: Wallet[];
-  showOtherWallets: boolean;
+  showOtherWallets: boolean | null = null;
   keyword = '';
+
+  isOpen = false;
 
   constructor(
     private _walletsRepository: WalletsRepository,
@@ -24,8 +27,6 @@ export class ChooseWalletViewModel extends SDListViewModel<Wallet> {
   ) {
     super();
 
-    this.selectedWallet = null;
-    this.showOtherWallets = false;
     this.myWallets = this._walletsRepository.getWallets();
 
     makeObservable(this, {
@@ -33,9 +34,15 @@ export class ChooseWalletViewModel extends SDListViewModel<Wallet> {
       myWallets: observable,
       keyword: observable,
 
+      showOtherWallets: observable,
+      isOpen: observable,
+
       createRequest: flow,
       search: action,
       selectWallet: action,
+
+      setShowOtherWallets: action,
+      setIsOpen: action,
     });
   }
 
@@ -44,8 +51,8 @@ export class ChooseWalletViewModel extends SDListViewModel<Wallet> {
     this.addReaction(
       reaction(
         () => this._walletsRepository.getWallets(),
-        () => {
-          this.myWallets = this._walletsRepository.getWallets();
+        (wallets) => {
+          this.myWallets = wallets;
           this.reload();
         },
       ),
@@ -59,6 +66,8 @@ export class ChooseWalletViewModel extends SDListViewModel<Wallet> {
   override createRequest = flow<Wallet[], []>(function* (
     this: ChooseWalletViewModel,
   ): Generator<Promise<Wallet[]>> {
+    assert(this.showOtherWallets !== null, 'Set showOtherWallets');
+
     if (this.showOtherWallets) {
       return yield this._solanaSDK
         .getTokensList()
@@ -116,6 +125,16 @@ export class ChooseWalletViewModel extends SDListViewModel<Wallet> {
       this._pricesService.addToWatchList([wallet.token]);
       this._pricesService.fetchPrices([wallet.token]);
     }
+  }
+
+  //
+
+  setShowOtherWallets(state: boolean): void {
+    this.showOtherWallets = state;
+  }
+
+  setIsOpen(state: boolean): void {
+    this.isOpen = state;
   }
 }
 

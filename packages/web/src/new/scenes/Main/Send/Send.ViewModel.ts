@@ -5,6 +5,7 @@ import { delay, inject, Lifecycle, scoped } from 'tsyringe';
 import { LoadableRelay, LoadableState } from 'new/app/models/LoadableRelay';
 import { SDFetcherState } from 'new/core/viewmodels/SDViewModel';
 import { ViewModel } from 'new/core/viewmodels/ViewModel';
+import { ChooseWalletViewModel } from 'new/scenes/Main/Send/ChooseWallet/ChooseWallet.ViewModel';
 import type { SelectAddressError } from 'new/scenes/Main/Send/SelectAddress/SelectAddress.ViewModel';
 import { SelectAddressViewModel } from 'new/scenes/Main/Send/SelectAddress/SelectAddress.ViewModel';
 import type * as FeeRelayer from 'new/sdk/FeeRelayer';
@@ -19,6 +20,7 @@ import { RelayMethod, SendService } from 'new/services/SendService';
 import type { ConfirmSendModalProps } from 'new/ui/modals/confirmModals/ConfirmSendModal/ConfirmSendModal';
 import * as ProcessTransaction from 'new/ui/modals/ProcessTransactionModal/ProcessTransaction.Models';
 import type { ProcessTransactionModalProps } from 'new/ui/modals/ProcessTransactionModal/ProcessTransactionModal';
+import { numberToString } from 'new/utils/NumberExtensions';
 import { bitcoinAddress, matches } from 'new/utils/RegularExpression';
 
 import type { ChooseTokenAndAmountError } from './ChooseTokenAndAmount';
@@ -43,54 +45,55 @@ export type FeeInfo = {
 };
 
 export interface SendViewModelType {
+  relayMethod: RelayMethod;
+
   // SendTokenChooseRecipientAndNetworkViewModelType
   get getSelectedWallet(): Wallet | null;
   getPrice(symbol: string): number;
   getPrices(symbols: string[]): Record<string, number>;
+  get getFeeInCurrentFiat(): string;
   getFreeTransactionFeeLimit(): Promise<FeeRelayer.Relay.FreeTransactionFeeLimit>;
 
   chooseWallet(wallet: Wallet): void;
 
   readonly wallet: Wallet | null;
+  readonly amount: number;
+  readonly recipient: Recipient | null;
   // SendTokenRecipientAndNetworkHandler
   readonly network: Network;
+  readonly loadingState: LoadableState;
   readonly payingWallet: Wallet | null;
   readonly feeInfo: LoadableRelay<FeeInfo>;
   selectRecipient(recipient: Recipient | null): void;
   selectNetwork(network: Network): void;
 
-  // SendTokenSelectNetworkViewModelType
+  chooseTokenAndAmountViewModel: ChooseTokenAndAmountViewModel;
 }
 
 @scoped(Lifecycle.ResolutionScoped)
 export class SendViewModel extends ViewModel implements SendViewModelType {
   // Subject
 
-  wallet: Wallet | null = null;
-  amount = 0;
-  recipient: Recipient | null = null;
-  network: Network = Network.solana;
-  loadingState = LoadableState.notRequested;
-  payingWallet: Wallet | null = null;
-  feeInfo: LoadableRelay<FeeInfo> = new LoadableRelay<FeeInfo>(
-    Promise.resolve({
-      feeAmount: FeeAmount.zero(),
-      feeAmountInSOL: FeeAmount.zero(),
-      hasAvailableWalletToPayFee: false,
-    }),
-  );
+  wallet: Wallet | null;
+  amount: number;
+  recipient: Recipient | null;
+  network: Network;
+  loadingState: LoadableState;
+  payingWallet: Wallet | null;
+  feeInfo: LoadableRelay<FeeInfo>;
   relayMethod: RelayMethod;
 
   // ChooseTokenAndAmount
   // currencyMode: CurrencyMode = CurrencyMode.token;
 
-  private _walletsLoadPromise: (Promise<void> & { cancel(): void }) | null = null;
+  private _walletsLoadPromise: (Promise<void> & { cancel(): void }) | null;
 
   constructor(
     private _pricesService: PricesService,
     private _walletsRepository: WalletsRepository,
     private _sendService: SendService,
     public chooseTokenAndAmountViewModel: ChooseTokenAndAmountViewModel,
+    public choosePayingWalletViewModel: ChooseWalletViewModel,
     @inject(delay(() => SelectAddressViewModel))
     public selectAddressViewModel: Readonly<SelectAddressViewModel>,
     private _modalService: ModalService,
@@ -99,6 +102,21 @@ export class SendViewModel extends ViewModel implements SendViewModelType {
 
     // TODO: relayMethod in constructor
     this.relayMethod = RelayMethod.default;
+
+    this.wallet = null;
+    this.amount = 0;
+    this.recipient = null;
+    this.network = Network.solana;
+    this.loadingState = LoadableState.notRequested;
+    this.payingWallet = null;
+    this.feeInfo = new LoadableRelay<FeeInfo>(
+      Promise.resolve({
+        feeAmount: FeeAmount.zero(),
+        feeAmountInSOL: FeeAmount.zero(),
+        hasAvailableWalletToPayFee: false,
+      }),
+    );
+    this._walletsLoadPromise = null;
 
     makeObservable(this, {
       wallet: observable,
@@ -114,6 +132,10 @@ export class SendViewModel extends ViewModel implements SendViewModelType {
 
       getSelectedWallet: computed,
 
+      getFeeInCurrentFiat: computed,
+
+      chooseWallet: action,
+
       enterAmount: action,
 
       selectRecipient: action,
@@ -125,6 +147,7 @@ export class SendViewModel extends ViewModel implements SendViewModelType {
   protected override onInitialize() {
     this.chooseTokenAndAmountViewModel.initialize();
     this.selectAddressViewModel.initialize();
+    this.choosePayingWalletViewModel.initialize();
 
     this._bind();
     this.reload();
@@ -133,6 +156,7 @@ export class SendViewModel extends ViewModel implements SendViewModelType {
   protected override afterReactionsRemoved() {
     this.chooseTokenAndAmountViewModel.end();
     this.selectAddressViewModel.end();
+    this.choosePayingWalletViewModel.end();
 
     if (this._walletsLoadPromise) {
       this._walletsLoadPromise.cancel();
@@ -161,7 +185,7 @@ export class SendViewModel extends ViewModel implements SendViewModelType {
                 network,
                 payingTokenMint: payingWallet?.mintAddress,
               })
-              .then((_feeAmountInSol) => {
+              .then(async (_feeAmountInSol) => {
                 // if fee is nil, no need to check for available wallets to pay fee
                 const feeAmountInSOL = _feeAmountInSol ?? FeeAmount.zero();
 
@@ -183,19 +207,19 @@ export class SendViewModel extends ViewModel implements SendViewModelType {
                   };
                 }
 
-                return Promise.all([
+                const [availableWallets, feeInSPL] = await Promise.all([
                   this._sendService.getAvailableWalletsToPayFee({ feeInSOL: feeAmountInSOL }),
                   this._sendService.getFeesInPayingToken({
                     feeInSOL: feeAmountInSOL,
                     payingFeeWallet,
                   }),
-                ]).then(([wallets, feeAmount]) => {
-                  return {
-                    feeAmount: feeAmount ?? FeeAmount.zero(),
-                    feeAmountInSOL,
-                    hasAvailableWalletToPayFee: wallets.length !== 0,
-                  };
-                });
+                ]);
+
+                return {
+                  feeAmount: feeInSPL ?? FeeAmount.zero(),
+                  feeAmountInSOL,
+                  hasAvailableWalletToPayFee: availableWallets.length !== 0,
+                };
               });
           } else {
             this.feeInfo.request = Promise.resolve({
@@ -291,6 +315,16 @@ export class SendViewModel extends ViewModel implements SendViewModelType {
       dict[symbol] = this.getPrice(symbol);
     }
     return dict;
+  }
+
+  get getFeeInCurrentFiat(): string {
+    let fee = 0;
+    const feeInfo = this.feeInfo.value;
+    if (feeInfo) {
+      const feeInSol = convertToBalance(feeInfo.feeAmountInSOL.total, 9);
+      fee = feeInSol * this.getPrice('SOL');
+    }
+    return `~${Defaults.fiat.symbol}${numberToString(fee, { maximumFractionDigits: 2 })}`;
   }
 
   getFreeTransactionFeeLimit(): Promise<FeeRelayer.Relay.FreeTransactionFeeLimit> {

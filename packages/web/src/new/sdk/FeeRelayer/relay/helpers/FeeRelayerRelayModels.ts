@@ -2,7 +2,8 @@ import { u64 } from '@solana/spl-token';
 import type { PublicKey } from '@solana/web3.js';
 import bs58 from 'bs58';
 
-import type { StatsInfo } from 'new/sdk/FeeRelayer';
+import type { StatsInfoDeviceType } from 'new/sdk/FeeRelayer';
+import { StatsInfo, StatsInfoOperationType } from 'new/sdk/FeeRelayer';
 import { FeeRelayerError } from 'new/sdk/FeeRelayer/models/FeeRelayerError';
 import type { PoolsPair } from 'new/sdk/OrcaSwap/models/OrcaSwapPools';
 import type * as SolanaSDK from 'new/sdk/SolanaSDK';
@@ -171,6 +172,7 @@ export class TopUpWithSwapParams {
   feeAmount: u64;
   signatures: SwapTransactionSignatures;
   blockhash: string;
+  statsInfo: StatsInfo;
 
   constructor({
     userSourceTokenAccountPubkey,
@@ -180,6 +182,8 @@ export class TopUpWithSwapParams {
     feeAmount,
     signatures,
     blockhash,
+    deviceType,
+    buildNumber,
   }: {
     userSourceTokenAccountPubkey: string;
     sourceTokenMintPubkey: string;
@@ -188,6 +192,8 @@ export class TopUpWithSwapParams {
     feeAmount: u64;
     signatures: SwapTransactionSignatures;
     blockhash: string;
+    deviceType: StatsInfoDeviceType;
+    buildNumber: string | null;
   }) {
     this.userSourceTokenAccountPubkey = userSourceTokenAccountPubkey;
     this.sourceTokenMintPubkey = sourceTokenMintPubkey;
@@ -196,6 +202,12 @@ export class TopUpWithSwapParams {
     this.feeAmount = feeAmount;
     this.signatures = signatures;
     this.blockhash = blockhash;
+    this.statsInfo = new StatsInfo({
+      operationType: StatsInfoOperationType.topUp,
+      deviceType,
+      currency: sourceTokenMintPubkey,
+      build: buildNumber,
+    });
   }
 
   toJSON() {
@@ -207,6 +219,7 @@ export class TopUpWithSwapParams {
       fee_amount: this.feeAmount.toNumber,
       signatures: this.signatures.toJSON(),
       blockhash: this.blockhash,
+      info: this.statsInfo,
     };
   }
 }
@@ -223,6 +236,7 @@ export class SwapParams {
   feeAmount: u64;
   signatures: SwapTransactionSignatures;
   blockhash: string;
+  statsInfo: StatsInfo;
 
   constructor({
     userSourceTokenAccountPubkey,
@@ -235,6 +249,8 @@ export class SwapParams {
     feeAmount,
     signatures,
     blockhash,
+    deviceType,
+    buildNumber,
   }: {
     userSourceTokenAccountPubkey: string;
     userDestinationPubkey: string;
@@ -246,6 +262,8 @@ export class SwapParams {
     feeAmount: u64;
     signatures: SwapTransactionSignatures;
     blockhash: string;
+    deviceType: StatsInfoDeviceType;
+    buildNumber: string;
   }) {
     this.userSourceTokenAccountPubkey = userSourceTokenAccountPubkey;
     this.userDestinationPubkey = userDestinationPubkey;
@@ -257,6 +275,12 @@ export class SwapParams {
     this.feeAmount = feeAmount;
     this.signatures = signatures;
     this.blockhash = blockhash;
+    this.statsInfo = new StatsInfo({
+      operationType: StatsInfoOperationType.transfer,
+      deviceType,
+      currency: sourceTokenMintPubkey,
+      build: buildNumber,
+    });
   }
 
   toJSON() {
@@ -271,6 +295,7 @@ export class SwapParams {
       fee_amount: this.feeAmount.toNumber(),
       signatures: this.signatures.toJSON(),
       blockhash: this.blockhash,
+      info: this.statsInfo,
     };
   }
 }
@@ -286,6 +311,7 @@ export class TransferParam {
   decimals: number;
   authoritySignature: string;
   blockhash: string;
+  statsInfo: StatsInfo;
 
   constructor({
     senderTokenAccountPubkey,
@@ -297,6 +323,8 @@ export class TransferParam {
     decimals,
     authoritySignature,
     blockhash,
+    deviceType,
+    buildNumber,
   }: {
     senderTokenAccountPubkey: string;
     recipientPubkey: string;
@@ -307,6 +335,8 @@ export class TransferParam {
     decimals: number;
     authoritySignature: string;
     blockhash: string;
+    deviceType: StatsInfoDeviceType;
+    buildNumber: string;
   }) {
     this.senderTokenAccountPubkey = senderTokenAccountPubkey;
     this.recipientPubkey = recipientPubkey;
@@ -317,6 +347,12 @@ export class TransferParam {
     this.decimals = decimals;
     this.authoritySignature = authoritySignature;
     this.blockhash = blockhash;
+    this.statsInfo = new StatsInfo({
+      operationType: StatsInfoOperationType.transfer,
+      deviceType,
+      currency: tokenMintPubkey,
+      build: buildNumber,
+    });
   }
 
   toJSON() {
@@ -330,6 +366,7 @@ export class TransferParam {
       fee_amount: this.feeAmount.toNumber(),
       authority_signature: this.authoritySignature,
       blockhash: this.blockhash,
+      info: this.statsInfo,
     };
   }
 }
@@ -340,9 +377,8 @@ export class RelayTransactionParam {
   signatures: { [key in string]: string };
   pubkeys: string[];
   blockhash: string;
-  statsInfo: StatsInfo;
 
-  constructor(preparedTransaction: SolanaSDK.PreparedTransaction, statsInfo: StatsInfo) {
+  constructor(preparedTransaction: SolanaSDK.PreparedTransaction) {
     const recentBlockhash = preparedTransaction.transaction.recentBlockhash;
     if (!recentBlockhash) {
       throw FeeRelayerError.unknown();
@@ -375,18 +411,24 @@ export class RelayTransactionParam {
     });
 
     const signatures: { [key in string]: string } = {};
+
+    // extract publicKeys from signers and add owner
+    const publicKeys: PublicKey[] = [preparedTransaction.owner];
     for (const signer of preparedTransaction.signers) {
-      const idx = this.pubkeys.findIndex((pubkey) => pubkey === signer.publicKey.toString());
+      publicKeys.push(signer.publicKey);
+    }
+
+    for (const publicKey of publicKeys) {
+      const idx = this.pubkeys.findIndex((pubkey) => pubkey === publicKey.toString());
       if (idx) {
         const idxString = `${idx}`;
-        const signature = preparedTransaction.findSignature(signer.publicKey);
+        const signature = preparedTransaction.findSignature(publicKey);
         signatures[idxString] = signature;
       } else {
         throw FeeRelayerError.invalidSignature();
       }
     }
     this.signatures = signatures;
-    this.statsInfo = statsInfo;
   }
 
   toJSON() {
@@ -395,7 +437,6 @@ export class RelayTransactionParam {
       signatures: this.signatures,
       pubkeys: this.pubkeys,
       blockhash: this.blockhash,
-      info: this.statsInfo,
     };
   }
 }

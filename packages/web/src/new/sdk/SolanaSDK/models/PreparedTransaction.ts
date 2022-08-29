@@ -5,22 +5,30 @@ import { LogEvent, Logger } from '../index';
 import type { FeeAmount } from './FeeAmount';
 
 export class PreparedTransaction {
+  owner: PublicKey;
   transaction: Transaction;
   signers: Signer[];
   expectedFee: FeeAmount;
 
   constructor({
+    owner,
     transaction,
     signers,
     expectedFee,
   }: {
+    owner: PublicKey;
     transaction: Transaction;
     signers: Signer[];
     expectedFee: FeeAmount;
   }) {
+    this.owner = owner;
     this.transaction = transaction;
     this.signers = signers;
     this.expectedFee = expectedFee;
+  }
+
+  sign() {
+    this.transaction.sign(...this.signers);
   }
 
   serialize(): string {

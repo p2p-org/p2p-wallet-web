@@ -99,6 +99,7 @@ export class LoadableRelay<T> {
         });
       })
       .catch((error) => {
+        console.error(error);
         runInAction(() => {
           this.state = LoadableState.error(error);
         });

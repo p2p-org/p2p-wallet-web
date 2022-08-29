@@ -1,1 +1,0 @@
-export { ResultWidget } from './ResultWidget';

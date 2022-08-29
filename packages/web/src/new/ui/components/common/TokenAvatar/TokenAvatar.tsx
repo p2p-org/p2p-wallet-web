@@ -1,5 +1,5 @@
 import type { FC, HTMLAttributes } from 'react';
-import { useEffect, useMemo, useState } from 'react';
+import { useLayoutEffect, useMemo, useState } from 'react';
 
 import { styled } from '@linaria/react';
 import classNames from 'classnames';
@@ -54,7 +54,7 @@ export const TokenAvatar: FC<Props & HTMLAttributes<HTMLDivElement>> = ({
 }) => {
   const [isDead, setIsDead] = useState<boolean>(false);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     setIsDead(false);
   }, [token?.logoURI]);
 

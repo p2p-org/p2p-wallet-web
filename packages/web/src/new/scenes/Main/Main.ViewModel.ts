@@ -1,11 +1,11 @@
-import { injectable } from 'tsyringe';
+import { singleton } from 'tsyringe';
 
 import { ViewModel } from 'new/core/viewmodels/ViewModel';
 import { SolanaModel } from 'new/models/SolanaModel';
 import { PricesService } from 'new/services/PriceAPIs/PricesService';
 import { WalletsRepository } from 'new/services/Repositories';
 
-@injectable()
+@singleton()
 export class MainViewModel extends ViewModel {
   constructor(
     private _pricesService: PricesService,
