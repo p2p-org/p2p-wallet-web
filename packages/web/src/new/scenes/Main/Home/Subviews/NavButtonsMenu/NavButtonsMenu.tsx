@@ -6,8 +6,8 @@ import { styled } from '@linaria/react';
 import classNames from 'classnames';
 import throttle from 'lodash.throttle';
 
-import { ModalType, useModals } from 'app/contexts/general/modals';
 import { NavButton, NavButtonIcon, NavButtons } from 'components/common/NavButtons';
+import type { HomeViewModel } from 'new/scenes/Main/Home';
 
 const Wrapper = styled.div`
   position: sticky;
@@ -27,17 +27,19 @@ const NavButtonsMenuStyled = styled(NavButtons)`
 
 const MENU_TRIGGER_OFFSET = 100;
 
-export const NavButtonsMenu: FC = () => {
+interface Props {
+  viewModel: HomeViewModel;
+}
+
+export const NavButtonsMenu: FC<Props> = ({ viewModel }) => {
   const history = useHistory();
   const location = useLocation();
 
   const menuRef = useRef<HTMLDivElement>(null);
   const [stuck, setStuck] = useState(false);
 
-  const { openModal } = useModals();
-
   const handleBuyButtonClick = () => {
-    openModal(ModalType.SHOW_MODAL_CHOOSE_BUY_TOKEN_MOBILE);
+    viewModel.openChooseBuyTokenMobileModal();
   };
 
   useEffect(() => {

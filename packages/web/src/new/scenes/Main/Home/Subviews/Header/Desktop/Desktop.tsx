@@ -1,6 +1,7 @@
 import type { FC } from 'react';
 
 import { styled } from '@linaria/react';
+import { observer } from 'mobx-react-lite';
 
 import type { HomeViewModel } from 'new/scenes/Main/Home';
 
@@ -31,11 +32,11 @@ interface Props {
   viewModel: Readonly<HomeViewModel>;
 }
 
-export const Desktop: FC<Props> = ({ viewModel }) => {
+export const Desktop: FC<Props> = observer(({ viewModel }) => {
   return (
     <Wrapper>
       <BalanceView viewModel={viewModel} />
       <WalletImg src={walletImg} />
     </Wrapper>
   );
-};
+});

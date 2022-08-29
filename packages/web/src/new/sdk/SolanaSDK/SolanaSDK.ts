@@ -927,6 +927,12 @@ export class SolanaSDK {
     return Promise.resolve(tokens);
   }
 
+  getToken(mint: string): Promise<Token | undefined> {
+    return this.getTokensList().then((tokensList) =>
+      tokensList.find((token) => token.address === mint),
+    );
+  }
+
   async getTokenWallets(account: string): Promise<Wallet[]> {
     const knownWallets: Wallet[] = [];
     const unknownAccounts: [string, AccountInfo][] = [];

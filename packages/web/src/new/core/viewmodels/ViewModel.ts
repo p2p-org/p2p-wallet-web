@@ -1,7 +1,11 @@
-import { nanoid } from 'nanoid';
-
 import { ObservableReactionContainer } from '../ObservableReactionContainer';
 
 export abstract class ViewModel extends ObservableReactionContainer {
-  readonly id = nanoid(10);
+  protected override onEnd() {
+    super.onEnd();
+
+    this.setDefaults();
+  }
+
+  protected abstract setDefaults(): void;
 }

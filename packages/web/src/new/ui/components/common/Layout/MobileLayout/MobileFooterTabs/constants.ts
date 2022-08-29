@@ -1,0 +1,1 @@
+export const MOBILE_FOOTER_TABS_HEIGHT = 56;

@@ -15,6 +15,8 @@ export class MainViewModel extends ViewModel {
     super();
   }
 
+  protected override setDefaults() {}
+
   protected override onInitialize() {
     this._pricesService.startObserving();
     this._solanaModel.initialize();

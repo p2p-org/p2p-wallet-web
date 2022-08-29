@@ -4,11 +4,9 @@ import { Link, NavLink } from 'react-router-dom';
 
 import { styled } from '@linaria/react';
 import { borders, shadows, theme, up } from '@p2p-wallet-web/ui';
-import { Feature } from 'flagged';
 
 import { Icon } from 'components/ui';
 import { appStorePath, playStorePath } from 'config/constants';
-import { FEATURE_NAV_MENU_BUY_BUTTON } from 'config/featureFlags';
 import { trackEvent } from 'utils/analytics';
 
 const Wrapper = styled.div`
@@ -161,19 +159,17 @@ export const LeftNavMenu: FunctionComponent = () => {
         </NavButton>
       </NavLinkMenu>
 
-      <Feature name={FEATURE_NAV_MENU_BUY_BUTTON}>
-        <NavLinkMenu
-          to={{ pathname: '/buy', state: { fromPage: location.pathname } }}
-          className="button"
-        >
-          <NavButton>
-            <IconBlock>
-              <NavIcon name="plus" />
-            </IconBlock>
-            <Name>Buy</Name>
-          </NavButton>
-        </NavLinkMenu>
-      </Feature>
+      <NavLinkMenu
+        to={{ pathname: '/buy', state: { fromPage: location.pathname } }}
+        className="button"
+      >
+        <NavButton>
+          <IconBlock>
+            <NavIcon name="plus" />
+          </IconBlock>
+          <Name>Buy</Name>
+        </NavButton>
+      </NavLinkMenu>
 
       <NavLinkMenu
         to={{ pathname: '/receive', state: { fromPage: location.pathname } }}

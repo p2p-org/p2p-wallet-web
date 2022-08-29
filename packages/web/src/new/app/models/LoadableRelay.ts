@@ -30,6 +30,10 @@ export class LoadableState {
     this.message = message;
   }
 
+  get isLoading(): boolean {
+    return this.type === LoadableStateType.loading;
+  }
+
   get isError(): boolean {
     if (this.type === LoadableStateType.error) {
       return true;

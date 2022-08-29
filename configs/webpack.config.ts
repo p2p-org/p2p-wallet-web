@@ -95,6 +95,8 @@ const config: ConfigFn = (env, argv) => {
             process.env.REACT_APP_SENTRY_TRACES_SAMPLE_RATE,
           ),
           REACT_APP_SENTRY_RELEASE: JSON.stringify(process.env.REACT_APP_SENTRY_RELEASE),
+          REACT_APP_FIREBASE_API_KEY: JSON.stringify(process.env.REACT_APP_FIREBASE_API_KEY),
+          REACT_APP_FIREBASE_APP_ID: JSON.stringify(process.env.REACT_APP_FIREBASE_APP_ID),
         },
       }),
       new CleanWebpackPlugin(),

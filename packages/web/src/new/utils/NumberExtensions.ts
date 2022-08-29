@@ -25,3 +25,7 @@ export function numberToString(
     .toLocaleString('en-US', { maximumFractionDigits: _maximumFractionDigits })
     .replace(/,/g, groupingSeparator);
 }
+
+export const numberToUSDString = (value: number) => {
+  return numberToString(value, { maximumFractionDigits: 2 });
+};
