@@ -60,7 +60,7 @@ export const TokenAvatar: FC<Props & HTMLAttributes<HTMLDivElement>> = ({
 
   const isWrapped = useMemo(() => {
     if (token) {
-      return !!token.wrappedBy;
+      return Boolean(token.wrappedBy);
     }
 
     return false;
