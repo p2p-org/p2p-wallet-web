@@ -93,10 +93,10 @@ export class CryptoCurrency {
 
   get mintAddress() {
     const mintAddress =
-      CryptoCurrency.Addresses[Defaults.apiEndPoint.network as Cluster][this._symbol];
+      CryptoCurrency.Addresses[Defaults.apiEndpoint.network as Cluster][this._symbol];
     if (!mintAddress) {
       throw new Error(
-        `Unhandeled mint address for ${Defaults.apiEndPoint.network} : ${this._symbol}`,
+        `Unhandeled mint address for ${Defaults.apiEndpoint.network} : ${this._symbol}`,
       );
     }
     return mintAddress;

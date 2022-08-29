@@ -1,21 +1,21 @@
 import type { FC } from 'react';
 
-import { TokenAmount } from '@p2p-wallet-web/token-utils';
 import { useIsMobile } from '@p2p-wallet-web/ui';
 import classNames from 'classnames';
 import { observer } from 'mobx-react-lite';
 
 import type { Token } from 'new/sdk/SolanaSDK';
+import { numberToString } from 'new/utils/NumberExtensions';
 import { getAvatarSize } from 'utils/common';
 
 import { Content, TokenAvatarStyled, TokenBalance, TokenInfo, TokenName } from './styled';
 
 interface Props {
   token: Token;
-  isMobilePopupChild: boolean;
+  isMobilePopupChild?: boolean;
 }
 
-export const TokenRowContent: FC<Props> = observer(({ token, isMobilePopupChild }) => {
+export const BaseTokenCellContent: FC<Props> = observer(({ token, isMobilePopupChild }) => {
   const isMobile = useIsMobile();
 
   const avatarSize = getAvatarSize(isMobile);
@@ -24,7 +24,11 @@ export const TokenRowContent: FC<Props> = observer(({ token, isMobilePopupChild 
     return <TokenName title={token.symbol}>{token.name}</TokenName>;
   };
 
-  const elTokenBalance = <TokenBalance>{TokenAmount.parse(token, '0').formatUnits()}</TokenBalance>;
+  const elTokenBalance = (
+    <TokenBalance>
+      {numberToString(0, { maximumFractionDigits: 9 })} {token.symbol}
+    </TokenBalance>
+  );
 
   return (
     <>

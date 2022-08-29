@@ -9,7 +9,7 @@ export const TokenInfo = styled.div`
   display: grid;
   grid-auto-flow: column;
   grid-template-rows: 22px 22px;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: auto;
 `;
 
 export const TokenName = styled.div`

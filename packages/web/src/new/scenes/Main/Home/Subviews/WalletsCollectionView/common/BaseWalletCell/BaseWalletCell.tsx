@@ -8,10 +8,8 @@ import { borders, theme, up, useIsMobile, useIsTablet } from '@p2p-wallet-web/ui
 import { SwipeToRevealActions } from 'components/common/SwipeToRevealActions';
 import { Icon } from 'components/ui';
 import type { Wallet } from 'new/sdk/SolanaSDK';
-import {
-  BaseWalletCellContent,
-  TokenAvatarStyled,
-} from 'new/ui/components/common/BaseWalletCellContent';
+import { BaseWalletCellContent } from 'new/ui/components/common/BaseWalletCellContent';
+import { TokenAvatarStyled } from 'new/ui/components/common/BaseWalletCellContent/styled';
 
 import { MenuStyled, TokenMenu } from './TokenMenu';
 

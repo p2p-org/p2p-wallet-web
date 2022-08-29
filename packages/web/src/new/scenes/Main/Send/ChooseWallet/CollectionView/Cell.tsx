@@ -6,10 +6,8 @@ import classNames from 'classnames';
 
 import { Icon } from 'components/ui';
 import type { Wallet } from 'new/sdk/SolanaSDK';
-import {
-  BaseWalletCellContent,
-  TokenAvatarStyled,
-} from 'new/ui/components/common/BaseWalletCellContent';
+import { BaseWalletCellContent } from 'new/ui/components/common/BaseWalletCellContent';
+import { TokenAvatarStyled } from 'new/ui/components/common/BaseWalletCellContent/styled';
 
 const wrapperCss = `
   display: flex;
