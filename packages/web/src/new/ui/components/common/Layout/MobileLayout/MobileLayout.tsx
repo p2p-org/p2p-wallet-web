@@ -4,11 +4,11 @@ import * as React from 'react';
 import { styled } from '@linaria/react';
 import { observer } from 'mobx-react-lite';
 
-import { ScrollFix } from 'components/common/ScollFix';
 import type { BreadcrumbType } from 'new/ui/components/common/Layout';
 import { MOBILE_FOOTER_TABS_HEIGHT, MobileFooterTabs } from 'new/ui/components/common/Layout';
 import type { LayoutViewModel } from 'new/ui/components/common/Layout/Layout.ViewModel';
 import { MobileHeader } from 'new/ui/components/common/Layout/MobileLayout/MobileHeader';
+import { ScrollFix } from 'new/ui/components/common/ScollFix';
 
 const fullHeight = `
   display: flex;

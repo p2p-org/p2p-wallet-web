@@ -5,7 +5,6 @@ import { styled } from '@linaria/react';
 import { zIndexes } from '@p2p-wallet-web/ui';
 import { observer } from 'mobx-react-lite';
 
-import { ScrollFix } from 'components/common/ScollFix';
 import { Icon } from 'components/ui';
 import logo from 'new/ui/assets/images/logo.png';
 import type { BreadcrumbType } from 'new/ui/components/common/Layout';
@@ -15,6 +14,7 @@ import {
   HEADER_HEIGHT,
 } from 'new/ui/components/common/Layout';
 import type { LayoutViewModel } from 'new/ui/components/common/Layout/Layout.ViewModel';
+import { ScrollFix } from 'new/ui/components/common/ScollFix';
 
 const Wrapper = styled.header`
   position: sticky;
