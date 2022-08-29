@@ -10,12 +10,12 @@ import { Intercom } from 'components/common/Intercom';
 import { NotifyToast } from 'components/common/NotifyToast';
 import { ToastManager } from 'components/common/ToastManager';
 import { Main } from 'new/scenes/Main';
+import { Buy } from 'new/scenes/Main/Buy';
 import { Home } from 'new/scenes/Main/Home';
 import { Root } from 'new/scenes/Root';
 import { LocationManager } from 'new/ui/components/root/LocationManager';
 import { ModalManager } from 'new/ui/modals/ModalManager';
 import { Auth } from 'pages/Auth';
-import { Buy } from 'pages/Buy';
 import { Landing } from 'pages/Landing';
 import { Receive } from 'pages/Receive';
 import { Send } from 'pages/Send';
@@ -50,13 +50,13 @@ const App: React.FC = () => {
                     component={WalletSettings}
                   />
                   <AuthRequiredRoute path="/wallet/:publicKey" exact component={Wallet} />
+                  <AuthRequiredRoute path="/buy/:symbol?" component={Buy} />
                   <AuthRequiredRoute path="/receive/(tokens)?" component={Receive} />
                   <AuthRequiredRoute path="/send/:publicKey/:status(result)" component={Send} />
                   <AuthRequiredRoute path="/send/:publicKey?" component={Send} />
                   <AuthRequiredRoute path="/swap/(settings)?/:symbol?" component={Swap} />
                   <AuthRequiredRoute path="/settings/network" component={SettingsNetwork} />
                   <AuthRequiredRoute path="/settings" component={Settings} />
-                  <AuthRequiredRoute path="/buy/:symbol?" component={Buy} />
                 </Main>
               </Switch>
               <Intercom />

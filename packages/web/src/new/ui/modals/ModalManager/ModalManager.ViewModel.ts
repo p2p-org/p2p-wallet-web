@@ -17,6 +17,8 @@ export class ModalManagerViewModel extends ViewModel implements ModalManagerView
     });
   }
 
+  protected override setDefaults() {}
+
   protected override onInitialize() {}
 
   protected override afterReactionsRemoved() {}

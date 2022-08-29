@@ -8,10 +8,7 @@ import { borders, theme, up, useIsMobile, useIsTablet } from '@p2p-wallet-web/ui
 import { SwipeToRevealActions } from 'components/common/SwipeToRevealActions';
 import { Icon } from 'components/ui';
 import type { Wallet } from 'new/sdk/SolanaSDK';
-import {
-  TokenAccountRowContent,
-  TokenAvatarStyled,
-} from 'new/ui/components/common/TokenAccountRowContent';
+import { TokenAvatarStyled, WalletRowContent } from 'new/ui/components/common/WalletRowContent';
 
 import { MenuStyled, TokenMenu } from './TokenMenu';
 
@@ -84,7 +81,7 @@ export const BaseWalletCell: FC<Props> = ({
   if (isPlaceholder) {
     return (
       <Wrapper>
-        <TokenAccountRowContent isPlaceholder={isPlaceholder} />
+        <WalletRowContent isPlaceholder={isPlaceholder} />
       </Wrapper>
     );
   }
@@ -103,7 +100,7 @@ export const BaseWalletCell: FC<Props> = ({
   return (
     <SwipeOrFragment {...(isMobile ? actions : undefined)}>
       <WrapperLink to={wallet ? `/wallet/${wallet.pubkey}` : ''}>
-        <TokenAccountRowContent wallet={wallet} />
+        <WalletRowContent wallet={wallet} />
         {isTablet && wallet ? (
           <TokenMenuStyled wallet={wallet} isHidden={isHidden} onToggleClick={onToggleClick!} />
         ) : undefined}

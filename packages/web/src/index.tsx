@@ -16,7 +16,7 @@ import {
   SENTRY_ENVIRONMENT,
   SENTRY_RELEASE,
   SENTRY_TRACES_SAMPLE_RATE,
-} from 'config/constants';
+} from 'new/constants';
 import { initAmplitude } from 'utils/analytics';
 
 initAmplitude();

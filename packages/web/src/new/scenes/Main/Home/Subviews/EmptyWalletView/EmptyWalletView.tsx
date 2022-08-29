@@ -4,9 +4,9 @@ import { useHistory, useLocation } from 'react-router';
 import { styled } from '@linaria/react';
 import { theme, up, useIsMobile } from '@p2p-wallet-web/ui';
 
-import { ModalType, useModals } from 'app/contexts';
 import { Card } from 'components/common/Card';
 import { NavButton, NavButtonIcon, NavButtons } from 'components/common/NavButtons';
+import type { HomeViewModel } from 'new/scenes/Main/Home';
 
 import rocketImg from './rocket.png';
 
@@ -64,15 +64,18 @@ const NavButtonStyled = styled(NavButton)`
   font-size: 20px;
 `;
 
-export const EmptyWalletView: FC = () => {
+type Props = {
+  viewModel: HomeViewModel;
+};
+
+export const EmptyWalletView: FC<Props> = ({ viewModel }) => {
   const history = useHistory();
   const location = useLocation();
   const isMobile = useIsMobile();
-  const { openModal } = useModals();
 
   const handleBuyButtonClick = () => {
     if (isMobile) {
-      openModal(ModalType.SHOW_MODAL_CHOOSE_BUY_TOKEN_MOBILE);
+      viewModel.openChooseBuyTokenMobileModal();
     } else {
       handleButtonClick('/buy')();
     }

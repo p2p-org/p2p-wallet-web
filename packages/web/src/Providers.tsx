@@ -23,7 +23,6 @@ import {
 } from 'app/contexts';
 import { ToastManager } from 'components/common/ToastManager';
 import { Providers as SwapProviders } from 'components/pages/swap/Providers';
-import DependencyContext, { DependencyService } from 'new/services/injection/DependencyContext';
 import { LockAndMintProvider } from 'utils/providers/LockAndMintProvider';
 
 const PUBLIC_KEY_LENGTH_FOR_TRIMMING = 20;
@@ -95,11 +94,7 @@ export const Providers: FC = ({ children }) => {
                 <BlockchainProvider>
                   <LockAndMintProvider>
                     <SwapProviders>
-                      <ModalsProvider>
-                        <DependencyContext.Provider value={DependencyService.container()}>
-                          {children}
-                        </DependencyContext.Provider>
-                      </ModalsProvider>
+                      <ModalsProvider>{children}</ModalsProvider>
                     </SwapProviders>
                   </LockAndMintProvider>
                 </BlockchainProvider>

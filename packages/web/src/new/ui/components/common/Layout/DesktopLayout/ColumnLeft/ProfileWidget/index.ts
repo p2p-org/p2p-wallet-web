@@ -1,0 +1,1 @@
+export { ProfileWidget } from './ProfileWidget';

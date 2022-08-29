@@ -1,13 +1,15 @@
-import { injectable } from 'tsyringe';
+import { singleton } from 'tsyringe';
 
 import { ViewModel } from 'new/core/viewmodels/ViewModel';
 import { PricesService } from 'new/services/PriceAPIs/PricesService';
 
-@injectable()
+@singleton()
 export class MainViewModel extends ViewModel {
   constructor(private _pricesService: PricesService) {
     super();
   }
+
+  protected override setDefaults() {}
 
   protected override onInitialize() {
     this._pricesService.startObserving();
