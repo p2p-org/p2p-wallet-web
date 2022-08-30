@@ -76,9 +76,13 @@ export const TokenAvatar: FunctionComponent<Props & HTMLAttributes<HTMLDivElemen
   }, [address, symbol, inputToken, tokenMap, tokens]); // TODO: remove
 
   const isWrapped = useMemo(() => {
-    const _token = inputToken || foundToken;
+    const token = inputToken || foundToken;
 
-    return _token.hasTag('wrapped') || _token.name.toLowerCase().includes('wrapped');
+    if (!token) {
+      return false;
+    }
+
+    return token.hasTag('wrapped') || token.name.toLowerCase().includes('wrapped');
   }, [inputToken, foundToken]);
 
   const elAvatar = () => {
