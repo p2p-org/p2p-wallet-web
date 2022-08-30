@@ -1,3 +1,6 @@
+import type { Token } from 'new/sdk/SolanaSDK';
+import { Defaults } from 'new/services/Defaults';
+
 export function numberToString(
   value: number,
   {
@@ -11,6 +14,10 @@ export function numberToString(
   return value.toLocaleString('en-US', { maximumFractionDigits }).replace(/,/g, groupingSeparator);
 }
 
-export const numberToUSDString = (value: number) => {
-  return numberToString(value, { maximumFractionDigits: 2 });
+export const numberToFiatString = (value: number) => {
+  return Defaults.fiat.symbol + numberToString(value, { maximumFractionDigits: 2 });
+};
+
+export const numberToTokenString = (value: number, token: Token) => {
+  return numberToString(value, { maximumFractionDigits: token.decimals || 9 }) + ' ' + token.symbol;
 };
