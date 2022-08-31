@@ -14,31 +14,6 @@ import { SolanaSDKPublicKey } from 'new/sdk/SolanaSDK/extensions/PublicKey/Publi
 import type { OrcaSwapSolanaClient } from '../apiClient/OrcaSwapSolanaClient';
 import { OrcaSwapError } from './OrcaSwapError';
 
-export type OrcaSwapPoolResponse = {
-  account: string;
-  authority: string;
-  nonce: number;
-  poolTokenMint: string;
-  tokenAccountA: string;
-  tokenAccountB: string;
-  feeAccount: string;
-  hostFeeAccount?: string;
-  feeNumerator: number;
-  feeDenominator: number;
-  ownerTradeFeeNumerator: number;
-  ownerTradeFeeDenominator: number;
-  ownerWithdrawFeeNumerator: number;
-  ownerWithdrawFeeDenominator: number;
-  hostFeeNumerator: number;
-  hostFeeDenominator: number;
-  tokenAName: string;
-  tokenBName: string;
-  curveType: string;
-  programVersion?: number;
-  amp?: number;
-  deprecated?: boolean;
-};
-
 const STABLE = 'Stable';
 const CONSTANT_PRODUCT = 'ConstantProduct';
 
@@ -207,9 +182,9 @@ export class Pool {
   //   this.deprecated = deprecated;
   // }
 
-  // TODO: @web references?
   get reversed() {
-    const reversedPool = this;
+    // https://stackoverflow.com/a/44782052/1024097
+    const reversedPool = Object.assign(Object.create(Object.getPrototypeOf(this)), this);
 
     const [tokenAccountB, tokenAccountA] = [reversedPool.tokenAccountA, reversedPool.tokenAccountB];
     reversedPool.tokenAccountA = tokenAccountA;
