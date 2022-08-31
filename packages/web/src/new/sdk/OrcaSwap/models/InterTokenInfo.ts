@@ -1,6 +1,6 @@
 import type { u64 } from '@solana/spl-token';
 
-export class OrcaSwapInterTokenInfo {
+export class InterTokenInfo {
   tokenName: string;
   outputAmount?: u64;
   minAmountOut?: u64;

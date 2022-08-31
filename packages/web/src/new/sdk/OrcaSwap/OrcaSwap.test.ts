@@ -4,7 +4,7 @@ import { Connection, Keypair } from '@solana/web3.js';
 
 import { APIEndpoint } from 'new/sdk/SolanaSDK';
 
-import { OrcaSwap, OrcaSwapAPIClient, OrcaSwapSolanaClient } from './index';
+import { APIClient, OrcaSwap, OrcaSwapSolanaClient } from './index';
 
 jest.setTimeout(50000);
 
@@ -16,7 +16,7 @@ it('OrcaSwap', async () => {
 
   const provider = new Provider(connection, wallet, Provider.defaultOptions());
 
-  const apiClient = new OrcaSwapAPIClient('mainnet-beta');
+  const apiClient = new APIClient('mainnet-beta');
   const solanaClient = new OrcaSwapSolanaClient({ provider, endpoint });
   const orcaSwap = new OrcaSwap(apiClient, solanaClient);
 

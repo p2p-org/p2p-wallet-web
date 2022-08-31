@@ -107,15 +107,19 @@ export interface SelectAddressViewModelType {
 @injectable()
 export class SelectAddressViewModel extends ViewModel implements SelectAddressViewModelType {
   // SendTokenChooseRecipientAndNetworkSelectAddressViewModelType
-  preSelectedNetwork: Network | null = null;
-  inputState: InputState = InputState.searching;
-  searchText: string | null = null;
+  preSelectedNetwork: Network | null;
+  inputState: InputState;
+  searchText: string | null;
 
   constructor(
     public recipientsListViewModel: RecipientsListViewModel,
     @inject(delay(() => SendViewModel)) public sendViewModel: Readonly<SendViewModel>,
   ) {
     super();
+
+    this.preSelectedNetwork = null;
+    this.inputState = InputState.searching;
+    this.searchText = null;
 
     makeObservable(this, {
       inputState: observable,
@@ -125,6 +129,12 @@ export class SelectAddressViewModel extends ViewModel implements SelectAddressVi
       selectRecipient: action,
       clearRecipient: action,
     });
+  }
+
+  protected override setDefaults() {
+    this.preSelectedNetwork = null;
+    this.inputState = InputState.searching;
+    this.searchText = null;
   }
 
   protected override onInitialize() {

@@ -1,5 +1,5 @@
-export type OrcaSwapRoute = string[];
-export type OrcaSwapRoutes = Record<string, OrcaSwapRoute[]>;
+export type Route = string[];
+export type Routes = Record<string, Route[]>;
 
 //    "FTT/RAY": [
 //            [

@@ -1,21 +1,20 @@
 import type { u64 } from '@solana/spl-token';
-import type {
-  Commitment,
-  PublicKey,
-  RpcResponseAndContext,
-  Signer,
-  TokenAmount,
-  TransactionInstruction,
-} from '@solana/web3.js';
+import type { Commitment, PublicKey, Signer, TransactionInstruction } from '@solana/web3.js';
 
-import type { AccountInstructions, Lamports, PreparedTransaction } from 'new/sdk/SolanaSDK';
+import type {
+  AccountInstructions,
+  FeeCalculator,
+  Lamports,
+  PreparedTransaction,
+  TokenAccountBalance,
+} from 'new/sdk/SolanaSDK';
 import { SolanaSDK } from 'new/sdk/SolanaSDK';
 
 interface OrcaSwapSolanaClientType {
   getTokenAccountBalance(
-    tokenAddress: PublicKey,
+    tokenAddress: string,
     commitment?: Commitment,
-  ): Promise<RpcResponseAndContext<TokenAmount>>;
+  ): Promise<TokenAccountBalance>;
 
   getMinimumBalanceForRentExemption(span: number): Promise<u64>;
 
@@ -43,17 +42,17 @@ interface OrcaSwapSolanaClientType {
   }): Promise<string>;
 
   prepareTransaction({
+    owner,
     instructions,
     signers,
     feePayer,
-    accountsCreationFee,
-    recentBlockhash,
+    feeCalculator,
   }: {
+    owner: PublicKey;
     instructions: TransactionInstruction[];
-    signers: Signer[];
+    signers?: Signer[];
     feePayer: PublicKey;
-    accountsCreationFee: Lamports;
-    recentBlockhash?: string | null;
+    feeCalculator?: FeeCalculator;
   }): Promise<PreparedTransaction>;
 }
 

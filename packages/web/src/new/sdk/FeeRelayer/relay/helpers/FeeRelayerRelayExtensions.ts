@@ -10,7 +10,7 @@ export function getSwapData({
   amountIn,
   minAmountOut,
 }: {
-  pool: OrcaSwap.OrcaSwapPool;
+  pool: OrcaSwap.Pool;
   transferAuthorityPubkey: PublicKey;
   amountIn: u64;
   minAmountOut: u64;

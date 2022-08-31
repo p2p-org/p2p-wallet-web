@@ -8,6 +8,7 @@ import { Defaults } from 'new/services/Defaults';
 import { ModalService, ModalType } from 'new/services/ModalService';
 import { NameService } from 'new/services/NameService';
 import { WalletsRepository } from 'new/services/Repositories';
+import { numberToString } from 'new/utils/NumberExtensions';
 
 @singleton()
 export class HomeViewModel extends ViewModel {
@@ -103,7 +104,9 @@ export class HomeViewModel extends ViewModel {
           (partialResult, wallet) => partialResult + wallet.amountInCurrentFiat,
           0,
         );
-        return `${Defaults.fiat.symbol} ${equityValue.toFixed(2)}`;
+        return `${Defaults.fiat.symbol} ${numberToString(equityValue, {
+          maximumFractionDigits: 2,
+        })}`;
       }
       case SDFetcherState.error:
         return 'Error';

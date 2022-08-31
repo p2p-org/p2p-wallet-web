@@ -135,13 +135,33 @@ export class SendViewModel extends ViewModel implements SendViewModelType {
       getFeeInCurrentFiat: computed,
 
       chooseWallet: action,
-
       enterAmount: action,
 
       selectRecipient: action,
+      selectNetwork: action,
+      selectPayingWallet: action,
 
       openConfirmModal: action,
     });
+  }
+
+  protected override setDefaults() {
+    this.relayMethod = RelayMethod.default;
+
+    this.wallet = null;
+    this.amount = 0;
+    this.recipient = null;
+    this.network = Network.solana;
+    this.loadingState = LoadableState.notRequested;
+    this.payingWallet = null;
+    this.feeInfo = new LoadableRelay<FeeInfo>(
+      Promise.resolve({
+        feeAmount: FeeAmount.zero(),
+        feeAmountInSOL: FeeAmount.zero(),
+        hasAvailableWalletToPayFee: false,
+      }),
+    );
+    this._walletsLoadPromise = null;
   }
 
   protected override onInitialize() {
@@ -164,6 +184,61 @@ export class SendViewModel extends ViewModel implements SendViewModelType {
   }
 
   private _bind(): void {
+    // Smart select fee token
+    this.addReaction(
+      reaction(
+        () => this.recipient,
+        (receiver) => {
+          (async () => {
+            const wallet = this.wallet;
+            if (!wallet || !receiver) {
+              return FeeAmount.zero();
+            }
+
+            return this._sendService
+              .getFees({
+                wallet,
+                receiver: receiver.address,
+                network: this.network,
+                payingTokenMint: wallet.mintAddress,
+              })
+              .then((fee) => {
+                if (!fee) {
+                  return FeeAmount.zero();
+                }
+
+                return this._sendService.getFeesInPayingToken({
+                  feeInSOL: fee,
+                  payingFeeWallet: wallet,
+                });
+              });
+          })()
+            .then((fee) => {
+              const amount = this.amount;
+              const wallet = this.wallet;
+              if (!amount || !wallet || !fee) {
+                return;
+              }
+
+              if (
+                toLamport(amount, wallet.token.decimals)
+                  .add(fee.total)
+                  .gt(wallet.lamports ?? ZERO)
+              ) {
+                runInAction(() => {
+                  this.payingWallet = this._walletsRepository.nativeWallet;
+                });
+              } else {
+                runInAction(() => {
+                  this.payingWallet = wallet;
+                });
+              }
+            })
+            .catch((error) => console.error(error));
+        },
+      ),
+    );
+
     this._bindFees();
   }
 
@@ -196,7 +271,6 @@ export class SendViewModel extends ViewModel implements SendViewModelType {
                     hasAvailableWalletToPayFee: true,
                   };
                 }
-
                 // else, check available wallets to pay fee
                 const payingFeeWallet = payingWallet;
                 if (!payingFeeWallet) {
@@ -207,19 +281,30 @@ export class SendViewModel extends ViewModel implements SendViewModelType {
                   };
                 }
 
-                const [availableWallets, feeInSPL] = await Promise.all([
-                  this._sendService.getAvailableWalletsToPayFee({ feeInSOL: feeAmountInSOL }),
-                  this._sendService.getFeesInPayingToken({
-                    feeInSOL: feeAmountInSOL,
-                    payingFeeWallet,
-                  }),
-                ]);
+                let availableWallets: SolanaSDK.Wallet[] = [];
+                let feeInSPL: SolanaSDK.FeeAmount | null = null;
+                try {
+                  [availableWallets, feeInSPL] = await Promise.all([
+                    this._sendService.getAvailableWalletsToPayFee({ feeInSOL: feeAmountInSOL }),
+                    this._sendService.getFeesInPayingToken({
+                      feeInSOL: feeAmountInSOL,
+                      payingFeeWallet,
+                    }),
+                  ]);
 
-                return {
-                  feeAmount: feeInSPL ?? FeeAmount.zero(),
-                  feeAmountInSOL,
-                  hasAvailableWalletToPayFee: availableWallets.length !== 0,
-                };
+                  return {
+                    feeAmount: feeInSPL ?? FeeAmount.zero(),
+                    feeAmountInSOL,
+                    hasAvailableWalletToPayFee: availableWallets.length !== 0,
+                  };
+                } catch (error) {
+                  console.error(error);
+                  return {
+                    feeAmount: FeeAmount.zero(),
+                    feeAmountInSOL,
+                    hasAvailableWalletToPayFee: availableWallets.length !== 0,
+                  };
+                }
               });
           } else {
             this.feeInfo.request = Promise.resolve({
@@ -255,6 +340,7 @@ export class SendViewModel extends ViewModel implements SendViewModelType {
         });
       })
       .catch((error) => {
+        console.error(error);
         runInAction(() => {
           this.loadingState = LoadableState.error(error);
         });

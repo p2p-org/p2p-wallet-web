@@ -129,7 +129,6 @@ export class SendService implements SendServiceType {
 
   async load(): Promise<void> {
     await this._feeService.load();
-
     if (this.relayMethod.type === RelayMethod.relay.type) {
       await this._orcaSwap.load();
       await this._relayService.load();
@@ -176,18 +175,16 @@ export class SendService implements SendServiceType {
   }): Promise<SolanaSDK.FeeAmount | null> {
     switch (network) {
       case Network.bitcoin: {
-        return Promise.resolve(
-          new SolanaSDK.FeeAmount({
-            transaction: new u64(20000),
-            accountBalances: ZERO,
-            others: [
-              new SolanaSDK.OtherFee({
-                amount: 0.0002,
-                unit: 'renBTC',
-              }),
-            ],
-          }),
-        );
+        return new SolanaSDK.FeeAmount({
+          transaction: new u64(20000),
+          accountBalances: ZERO,
+          others: [
+            new SolanaSDK.OtherFee({
+              amount: 0.0002,
+              unit: 'renBTC',
+            }),
+          ],
+        });
       }
       case Network.solana: {
         if (!receiver) {
@@ -205,7 +202,7 @@ export class SendService implements SendServiceType {
         }
       }
       // case RelayMethod.reward: {
-      //   return Promise.resolve(SolanaSDK.FeeAmount.zero());
+      //   return SolanaSDK.FeeAmount.zero();
       // }
     }
   }
@@ -215,9 +212,9 @@ export class SendService implements SendServiceType {
       this._walletsRepository
         .getWallets()
         .filter((wallet) => (wallet.lamports ?? ZERO).gt(ZERO))
-        .map((wallet): Promise<Wallet | null> => {
+        .map(async (wallet): Promise<Wallet | null> => {
           if (wallet.mintAddress === SolanaSDKPublicKey.wrappedSOLMint.toString()) {
-            return Promise.resolve((wallet.lamports ?? ZERO).gte(feeInSOL.total) ? wallet : null);
+            return (wallet.lamports ?? ZERO).gte(feeInSOL.total) ? wallet : null;
           }
 
           return this._relayService
@@ -233,19 +230,19 @@ export class SendService implements SendServiceType {
     );
   }
 
-  getFeesInPayingToken({
+  async getFeesInPayingToken({
     feeInSOL,
     payingFeeWallet,
   }: {
     feeInSOL: SolanaSDK.FeeAmount;
     payingFeeWallet: Wallet;
   }): Promise<SolanaSDK.FeeAmount | null> {
-    if (this.relayMethod.type !== RelayMethod.relay.type) {
-      return Promise.resolve(null);
+    if (this.relayMethod.type !== RelayMethodType.relay) {
+      return null;
     }
 
     if (payingFeeWallet.mintAddress === SolanaSDKPublicKey.wrappedSOLMint.toString()) {
-      return Promise.resolve(feeInSOL);
+      return feeInSOL;
     }
 
     return this._relayService.calculateFeeInPayingToken({

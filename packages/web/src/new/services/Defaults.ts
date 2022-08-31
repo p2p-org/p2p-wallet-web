@@ -41,7 +41,7 @@ class _Defaults implements DefaultsKeys {
   unhiddenWalletPubkey: string[] = [];
   hideZeroBalances = true;
 
-  fiat: Fiat = Fiat.rub;
+  fiat: Fiat = Fiat.usd;
   prices: { [key in string]: CurrentPrice } = {};
   payingTokenMint: string = SolanaSDKPublicKey.wrappedSOLMint.toString();
 

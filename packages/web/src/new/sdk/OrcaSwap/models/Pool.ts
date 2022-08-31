@@ -1,17 +1,18 @@
 import { ONE, ZERO } from '@orca-so/sdk';
 import { computeInputAmount, computeOutputAmount } from '@orca-so/stablecurve';
 import { Token, u64 } from '@solana/spl-token';
-// import { TokenSwap } from '@solana/spl-token-swap';
+import { TokenSwap } from '@solana/spl-token-swap';
 import type { Signer, TransactionInstruction } from '@solana/web3.js';
 import { PublicKey } from '@solana/web3.js';
+import { Transform, Type } from 'class-transformer';
 
+import type { TokenValue } from 'new/sdk/OrcaSwap';
 import type { Lamports, TokenAccountBalance } from 'new/sdk/SolanaSDK';
 import { AccountInstructions } from 'new/sdk/SolanaSDK';
 import { SolanaSDKPublicKey } from 'new/sdk/SolanaSDK/extensions/PublicKey/PublicKeyExtensions';
 
 import type { OrcaSwapSolanaClient } from '../apiClient/OrcaSwapSolanaClient';
 import { OrcaSwapError } from './OrcaSwapError';
-import type { OrcaSwapTokens } from './OrcaSwapToken';
 
 export type OrcaSwapPoolResponse = {
   account: string;
@@ -46,64 +47,165 @@ const VERSION_2 = 2;
 
 type CurveType = 'ConstantProduct' | 'ConstantPrice' | 'Stable' | 'Offset';
 
-export class OrcaSwapPool {
-  isStable?: boolean;
+export class OrcaSwapTokenName {
+  private _tokenName: string;
+
+  constructor(tokenName: string) {
+    this._tokenName = tokenName;
+  }
+
+  get fixedTokenName(): string {
+    return this._tokenName.split('[').shift()!;
+  }
+
+  toString(): string {
+    return this._tokenName;
+  }
+}
+
+export class Pool {
+  // @ts-ignore
+  account: string;
+  // @ts-ignore
+  authority: string;
+  @Type(() => u64)
+  @Transform(({ value }) => new u64(value))
+  // @ts-ignore
+  nonce: u64;
+  // @ts-ignore
+  poolTokenMint: string;
+  // @ts-ignore
+  tokenAccountA: string;
+  // @ts-ignore
+  tokenAccountB: string;
+  // @ts-ignore
+  feeAccount: string;
+  // @ts-ignore
+  hostFeeAccount: string | null = null;
+  @Type(() => u64)
+  @Transform(({ value }) => new u64(value))
+  // @ts-ignore
+  feeNumerator: u64;
+  @Type(() => u64)
+  @Transform(({ value }) => new u64(value))
+  // @ts-ignore
+  feeDenominator: u64;
+  @Type(() => u64)
+  @Transform(({ value }) => new u64(value))
+  // @ts-ignore
+  ownerTradeFeeNumerator: u64;
+  @Type(() => u64)
+  @Transform(({ value }) => new u64(value))
+  // @ts-ignore
+  ownerTradeFeeDenominator: u64;
+  @Type(() => u64)
+  @Transform(({ value }) => new u64(value))
+  // @ts-ignore
+  ownerWithdrawFeeNumerator: u64;
+  @Type(() => u64)
+  @Transform(({ value }) => new u64(value))
+  // @ts-ignore
+  ownerWithdrawFeeDenominator: u64;
+  @Type(() => u64)
+  @Transform(({ value }) => new u64(value))
+  // @ts-ignore
+  hostFeeNumerator: u64;
+  @Type(() => u64)
+  @Transform(({ value }) => new u64(value))
+  // @ts-ignore
+  hostFeeDenominator: u64;
+  @Type(() => OrcaSwapTokenName)
+  @Transform(({ value }) => new OrcaSwapTokenName(value))
+  // @ts-ignore
+  tokenAName: OrcaSwapTokenName;
+  @Type(() => OrcaSwapTokenName)
+  @Transform(({ value }) => new OrcaSwapTokenName(value))
+  // @ts-ignore
+  tokenBName: OrcaSwapTokenName;
+  // @ts-ignore
+  curveType: CurveType;
+  @Type(() => u64)
+  @Transform(({ value }) => new u64(value))
+  amp: u64 | undefined;
+  programVersion: number | undefined = 1;
+  deprecated: boolean | undefined = false;
 
   // balance (lazy load)
   tokenABalance?: TokenAccountBalance;
   tokenBBalance?: TokenAccountBalance;
 
-  constructor(
-    public account: PublicKey,
-    public authority: PublicKey,
-    public nonce: number,
-    public poolTokenMint: PublicKey,
-    public tokenAccountA: PublicKey,
-    public tokenAccountB: PublicKey,
-    public feeAccount: PublicKey,
-    public hostFeeAccount: PublicKey | null = null,
-    public feeNumerator: u64,
-    public feeDenominator: u64,
-    public ownerTradeFeeNumerator: u64,
-    public ownerTradeFeeDenominator: u64,
-    public ownerWithdrawFeeNumerator: u64,
-    public ownerWithdrawFeeDenominator: u64,
-    public hostFeeNumerator: u64,
-    public hostFeeDenominator: u64,
-    public tokenAName: OrcaSwapTokenName,
-    public tokenBName: OrcaSwapTokenName,
-    public curveType: CurveType,
-    public deprecated: boolean = false,
-    public programVersion: number = 1,
-    public amp: u64 | undefined,
-  ) {}
+  isStable?: boolean;
 
-  static fromNetwork(response: OrcaSwapPoolResponse): OrcaSwapPool {
-    return new OrcaSwapPool(
-      new PublicKey(response.account),
-      new PublicKey(response.authority),
-      response.nonce,
-      new PublicKey(response.poolTokenMint),
-      new PublicKey(response.tokenAccountA),
-      new PublicKey(response.tokenAccountB),
-      new PublicKey(response.feeAccount),
-      response.hostFeeAccount ? new PublicKey(response.hostFeeAccount) : undefined,
-      new u64(response.feeNumerator),
-      new u64(response.feeDenominator),
-      new u64(response.ownerTradeFeeNumerator),
-      new u64(response.ownerTradeFeeDenominator),
-      new u64(response.ownerWithdrawFeeNumerator),
-      new u64(response.ownerWithdrawFeeDenominator),
-      new u64(response.hostFeeNumerator),
-      new u64(response.hostFeeDenominator),
-      new OrcaSwapTokenName(response.tokenAName),
-      new OrcaSwapTokenName(response.tokenBName),
-      response.curveType as CurveType,
-      response.deprecated,
-      response.programVersion,
-      response.amp ? new u64(response.amp) : undefined,
-    );
-  }
+  // constructor({
+  //   account,
+  //   authority,
+  //   nonce,
+  //   poolTokenMint,
+  //   tokenAccountA,
+  //   tokenAccountB,
+  //   feeAccount,
+  //   hostFeeAccount = null,
+  //   feeNumerator,
+  //   feeDenominator,
+  //   ownerTradeFeeNumerator,
+  //   ownerTradeFeeDenominator,
+  //   ownerWithdrawFeeNumerator,
+  //   ownerWithdrawFeeDenominator,
+  //   hostFeeNumerator,
+  //   hostFeeDenominator,
+  //   tokenAName,
+  //   tokenBName,
+  //   curveType,
+  //   amp,
+  //   programVersion = 1,
+  //   deprecated,
+  // }: {
+  //   account: string;
+  //   authority: string;
+  //   nonce: u64;
+  //   poolTokenMint: string;
+  //   tokenAccountA: string;
+  //   tokenAccountB: string;
+  //   feeAccount: string;
+  //   hostFeeAccount: string | null;
+  //   feeNumerator: u64;
+  //   feeDenominator: u64;
+  //   ownerTradeFeeNumerator: u64;
+  //   ownerTradeFeeDenominator: u64;
+  //   ownerWithdrawFeeNumerator: u64;
+  //   ownerWithdrawFeeDenominator: u64;
+  //   hostFeeNumerator: u64;
+  //   hostFeeDenominator: u64;
+  //   tokenAName: OrcaSwapTokenName;
+  //   tokenBName: OrcaSwapTokenName;
+  //   curveType: CurveType;
+  //   amp: u64 | undefined;
+  //   programVersion: number | undefined;
+  //   deprecated: boolean | undefined;
+  // }) {
+  //   this.account = account;
+  //   this.authority = authority;
+  //   this.nonce = nonce;
+  //   this.poolTokenMint = poolTokenMint;
+  //   this.tokenAccountA = tokenAccountA;
+  //   this.tokenAccountB = tokenAccountB;
+  //   this.feeAccount = feeAccount;
+  //   this.hostFeeAccount = hostFeeAccount;
+  //   this.feeNumerator = feeNumerator;
+  //   this.feeDenominator = feeDenominator;
+  //   this.ownerTradeFeeNumerator = ownerTradeFeeNumerator;
+  //   this.ownerTradeFeeDenominator = ownerTradeFeeDenominator;
+  //   this.ownerWithdrawFeeNumerator = ownerWithdrawFeeNumerator;
+  //   this.ownerWithdrawFeeDenominator = ownerWithdrawFeeDenominator;
+  //   this.hostFeeNumerator = hostFeeNumerator;
+  //   this.hostFeeDenominator = hostFeeDenominator;
+  //   this.tokenAName = tokenAName;
+  //   this.tokenBName = tokenBName;
+  //   this.curveType = curveType;
+  //   this.amp = amp;
+  //   this.programVersion = programVersion;
+  //   this.deprecated = deprecated;
+  // }
 
   // TODO: @web references?
   get reversed() {
@@ -150,17 +252,17 @@ export class OrcaSwapPool {
     minAmountOut: u64,
   ): TransactionInstruction {
     return TokenSwap.swapInstruction(
-      this.account,
-      this.authority,
-      userTransferAuthorityPubkey,
-      sourceTokenAddress,
-      this.tokenAccountA,
-      this.tokenAccountB,
-      destinationTokenAddress,
-      this.poolTokenMint,
-      this.feeAccount,
-      this.hostFeeAccount,
-      this.swapProgramId,
+      new PublicKey(this.account),
+      new PublicKey(this.authority),
+      new PublicKey(userTransferAuthorityPubkey),
+      new PublicKey(sourceTokenAddress),
+      new PublicKey(this.tokenAccountA),
+      new PublicKey(this.tokenAccountB),
+      new PublicKey(destinationTokenAddress),
+      new PublicKey(this.poolTokenMint),
+      new PublicKey(this.feeAccount),
+      this.hostFeeAccount ? new PublicKey(this.hostFeeAccount) : null,
+      new PublicKey(this.swapProgramId),
       SolanaSDKPublicKey.tokenProgramId,
       amountIn,
       minAmountOut,
@@ -192,23 +294,23 @@ export class OrcaSwapPool {
           poolOutputAmount,
           amp,
         );
-
         const inputAmount = inputAmountLessFee
           .mul(this.feeDenominator)
           .div(this.feeDenominator.sub(this.feeNumerator));
 
-        return inputAmount;
+        return new u64(inputAmount.toString());
       }
       case CONSTANT_PRODUCT: {
         const invariant = poolInputAmount.mul(poolOutputAmount);
 
-        const [newPoolInputAmount] = ceilingDivision(
+        const newPoolInputAmount = ceilingDivision(
           invariant,
           poolOutputAmount.sub(estimatedAmount),
-        );
+        ).quotient;
         const inputAmountLessFees = newPoolInputAmount.sub(poolInputAmount);
 
-        let feeRatioNumerator: u64, feeRatioDenominator: u64;
+        let feeRatioNumerator: u64;
+        let feeRatioDenominator: u64;
 
         if (this.ownerTradeFeeDenominator.eq(ZERO)) {
           feeRatioNumerator = this.feeDenominator;
@@ -222,8 +324,7 @@ export class OrcaSwapPool {
         }
 
         const inputAmount = inputAmountLessFees.mul(feeRatioNumerator).div(feeRatioDenominator);
-
-        return inputAmount;
+        return new u64(inputAmount.toString());
       }
       default: {
         return null;
@@ -256,7 +357,7 @@ export class OrcaSwapPool {
     feePayer,
     minRentExemption,
   }: {
-    tokens: OrcaSwapTokens;
+    tokens: Map<string, TokenValue>;
     solanaClient: OrcaSwapSolanaClient;
     owner: Signer;
     fromTokenPubkey: string;
@@ -267,9 +368,9 @@ export class OrcaSwapPool {
     feePayer?: PublicKey | null;
     minRentExemption: u64;
   }): Promise<[AccountInstructions, Lamports /*account creation fee*/]> {
-    const fromMintStr = tokens[this.tokenAName.toString()]?.mint;
+    const fromMintStr = tokens.get(this.tokenAName.toString())?.mint;
     const fromMint = fromMintStr ? new PublicKey(fromMintStr) : null;
-    const toMintStr = tokens[this.tokenBName.toString()]?.mint;
+    const toMintStr = tokens.get(this.tokenBName.toString())?.mint;
     const toMint = toMintStr ? new PublicKey(toMintStr) : null;
     const fromTokenPubkeyNew = new PublicKey(fromTokenPubkey);
 
@@ -441,7 +542,10 @@ export class OrcaSwapPool {
       }
       case CONSTANT_PRODUCT: {
         const invariant = poolInputAmount.mul(poolOutputAmount);
-        const [newPoolOutputAmount] = ceilingDivision(invariant, poolInputAmount.add(inputAmount));
+        const newPoolOutputAmount = ceilingDivision(
+          invariant,
+          poolInputAmount.add(inputAmount),
+        ).quotient;
         return poolOutputAmount.sub(newPoolOutputAmount);
       }
       default: {
@@ -467,33 +571,21 @@ export class OrcaSwapPool {
   }
 }
 
-export class OrcaSwapTokenName {
-  constructor(private _tokenName: string) {}
-
-  get fixedTokenName(): string {
-    return this._tokenName.split('[').shift()!;
-  }
-
-  toString(): string {
-    return this._tokenName;
-  }
-}
-
-function ceilingDivision(dividend: u64, divisor: u64): [u64, u64] {
+function ceilingDivision(dividend: u64, divisor: u64): { quotient: u64; divisor: u64 } {
   let quotient = dividend.div(divisor);
   if (quotient.eq(ZERO)) {
-    return [ZERO, divisor];
+    return { quotient: ZERO, divisor };
   }
 
   let remainder = dividend.mod(divisor);
   if (remainder.gt(ZERO)) {
     quotient = quotient.add(ONE);
     divisor = dividend.div(quotient);
-    remainder = dividend.mod(quotient);
+    remainder = dividend.mod(quotient); // TODO: check div - ios div, orca mod
     if (remainder.gt(ZERO)) {
       divisor = divisor.add(ONE);
     }
   }
 
-  return [quotient, divisor];
+  return { quotient, divisor };
 }

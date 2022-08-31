@@ -69,15 +69,19 @@ export class ChooseTokenAndAmountViewModel
 {
   selectedNetwork: Network | null;
 
-  wallet: Wallet | null = null;
-  amount = 0;
-  currencyMode: CurrencyMode = CurrencyMode.token;
+  wallet: Wallet | null;
+  amount: number;
+  currencyMode: CurrencyMode;
 
   constructor(
     public chooseWalletViewModel: ChooseWalletViewModel,
     @inject(delay(() => SendViewModel)) public sendViewModel: Readonly<SendViewModel>,
   ) {
     super();
+
+    this.wallet = null;
+    this.amount = 0;
+    this.currencyMode = CurrencyMode.token;
 
     makeObservable(this, {
       selectedNetwork: observable,
@@ -91,6 +95,12 @@ export class ChooseTokenAndAmountViewModel
 
       toggleCurrencyMode: action,
     });
+  }
+
+  protected override setDefaults() {
+    this.wallet = null;
+    this.amount = 0;
+    this.currencyMode = CurrencyMode.token;
   }
 
   protected override onInitialize() {

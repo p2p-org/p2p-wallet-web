@@ -5,29 +5,30 @@ import { PublicKey } from '@solana/web3.js';
 import promiseRetry from 'promise-retry';
 import { pickBy } from 'ramda';
 
+import type { TokenValue } from 'new/sdk/OrcaSwap/models';
+import { BalancesCache } from 'new/sdk/OrcaSwap/models/BalancesCache';
 import { toLamport } from 'new/sdk/SolanaSDK/extensions/NumberExtensions';
 import { SolanaSDKPublicKey } from 'new/sdk/SolanaSDK/extensions/PublicKey/PublicKeyExtensions';
 
-import type { AccountInstructions, Lamports } from '../SolanaSDK';
-import { LogEvent, Logger, SwapResponse } from '../SolanaSDK';
+import type { AccountInstructions, Lamports, TokenAccountBalance } from '../SolanaSDK';
+import { SwapResponse } from '../SolanaSDK';
 import * as SolanaSDK from '../SolanaSDK';
-import type { OrcaSwapAPIClient } from './apiClient/OrcaSwapAPIClient';
+import type { APIClient } from './apiClient/APIClient';
 import type { OrcaSwapSolanaClient } from './apiClient/OrcaSwapSolanaClient';
 import { OrcaSwapError } from './models/OrcaSwapError';
-import { OrcaSwapInfo } from './models/OrcaSwapInfo';
-import type { OrcaSwapPool } from './models/OrcaSwapPool';
-import type { Pools, PoolsPair } from './models/OrcaSwapPools';
+import type { Pool } from './models/Pool';
+import { OrcaSwapTokenName } from './models/Pool';
+import type { Pools, PoolsPair } from './models/Pools';
 import {
   calculateLiquidityProviderFees,
   constructExchange,
   getInputAmount,
   getIntermediaryToken,
   getOutputAmount,
-  getPools,
-} from './models/OrcaSwapPools';
-import { PreparedSwapTransaction } from './models/OrcaSwapPreparedSwapTransaction';
-import type { OrcaSwapRoute, OrcaSwapRoutes } from './models/OrcaSwapRoute';
-import type { OrcaSwapToken, OrcaSwapTokens } from './models/OrcaSwapToken';
+} from './models/Pools';
+import { PreparedSwapTransaction } from './models/PreparedSwapTransaction';
+import type { Route, Routes } from './models/Route';
+import { SwapInfo } from './models/SwapInfo';
 
 export type OrcaSwapType = {
   load(): Promise<void>;
@@ -122,17 +123,18 @@ export type OrcaSwapType = {
 
 export class OrcaSwap implements OrcaSwapType {
   // Properties
-  protected _apiClient: OrcaSwapAPIClient;
+  protected _apiClient: APIClient;
   protected _solanaClient: OrcaSwapSolanaClient;
 
-  private _info: OrcaSwapInfo | null = null;
+  private _info: SwapInfo | null = null;
+  private _balancesCache: BalancesCache = new BalancesCache();
 
   // Constructor
   constructor({
     apiClient,
     solanaClient,
   }: {
-    apiClient: OrcaSwapAPIClient;
+    apiClient: APIClient;
     solanaClient: OrcaSwapSolanaClient;
   }) {
     this._apiClient = apiClient;
@@ -141,24 +143,30 @@ export class OrcaSwap implements OrcaSwapType {
 
   // Methods
   /// Prepare all needed infos for swapping
-  load(): Promise<void> {
+  async load(): Promise<void> {
+    // already been loaded
     if (this._info) {
       return Promise.resolve();
     }
 
-    const tokens = this._apiClient.getTokens();
-    const pools = this._apiClient.getPools();
-    const programIds = this._apiClient.getProgramID();
+    const [tokens, pools, programIds] = await Promise.all([
+      this._apiClient.getTokens(),
+      this._apiClient.getPools(),
+      this._apiClient.getProgramID(),
+    ]);
 
+    // find all available routes
     const routes = _findAllAvailableRoutes(tokens, pools);
-    const tokenNames: Record<string, string> = {};
-    Object.entries(tokens).forEach(([key, value]) => {
-      tokenNames[value.mint] = key;
-    });
+    const tokenNames = [...tokens].reduce((result, token) => {
+      result.set(token[1].mint, token[0]);
+      return result;
+    }, new Map<string, string>());
 
-    Logger.log('Orca swap info loaded', LogEvent.debug);
+    // create swap info
+    const swapInfo = new SwapInfo({ routes, tokens, pools, programIds, tokenNames });
 
-    this._info = new OrcaSwapInfo({ routes, tokens, pools, programIds, tokenNames });
+    // save cache
+    this._info = swapInfo;
 
     return Promise.resolve();
   }
@@ -170,27 +178,22 @@ export class OrcaSwap implements OrcaSwapType {
       return;
     }
 
-    return Object.entries(info?.tokenNames).find((obj) => obj[1] === tokenName)?.[0];
+    return [...info.tokenNames].find((obj) => obj[1] === tokenName)?.[0];
   }
 
   /// Map mint to token info
-  private _getTokenFromMint(mint?: string): { name: string; info: OrcaSwapToken } | null {
+  private _getTokenFromMint(mint?: string): { name: string; info: TokenValue } | null {
     const info = this._info;
     if (!info) {
       return null;
     }
 
-    const key = Object.entries(info.tokens).filter(([, token]) => token.mint === mint)?.[0]?.[0];
-    if (!key) {
+    const tokenInfo = [...info.tokens].find(([, token]) => token.mint === mint);
+    if (!tokenInfo || !tokenInfo[0] || !tokenInfo[1]) {
       return null;
     }
 
-    const tokenInfo = info.tokens[key];
-    if (!tokenInfo) {
-      return null;
-    }
-
-    return { name: key, info: tokenInfo };
+    return { name: tokenInfo[0], info: tokenInfo[1] };
   }
 
   /// Find posible destination tokens by mint
@@ -208,8 +211,8 @@ export class OrcaSwap implements OrcaSwapType {
     const mints = Array.from(
       Object.keys(routes).reduce((acc, key) => {
         const name = key.split('/').find((tokenName) => tokenName !== fromTokenName);
-        if (name && info?.tokens[name]?.mint) {
-          acc.add(info.tokens[name]!.mint);
+        if (name && info?.tokens.get(name)?.mint) {
+          acc.add(info.tokens.get(name)!.mint);
         }
 
         return acc;
@@ -231,33 +234,34 @@ export class OrcaSwap implements OrcaSwapType {
     const fromTokenName = this._getTokenFromMint(fromMint)?.name;
     const toTokenName = this._getTokenFromMint(toMint)?.name;
     const currentRoutes = Object.values(this._findRoutes(fromTokenName, toTokenName))[0];
-
     if (!fromTokenName || !toTokenName || !currentRoutes) {
       return [];
     }
 
-    const requests = Promise.all(
+    const poolsPairs: PoolsPair[] = [];
+    const group = await Promise.all(
       currentRoutes.map((route) => {
         // FIXME: Support more than 2 paths later
         if (route.length > 2) {
           return null;
         }
 
-        if (!this._info?.pools) {
-          return null;
-        }
-
-        return getPools({
-          pools: this._info.pools,
+        return this.getPools({
           route,
           fromTokenName,
           toTokenName,
-          solanaClient: this._solanaClient,
         });
       }),
     );
 
-    return requests.then((resRequests) => resRequests.filter(Boolean) as PoolsPair[]);
+    for (const pools of group) {
+      if (!pools) {
+        continue;
+      }
+      poolsPairs.push(pools);
+    }
+
+    return poolsPairs;
   }
 
   /// Find best pool to swap from input amount
@@ -272,7 +276,7 @@ export class OrcaSwap implements OrcaSwapType {
       return null;
     }
 
-    let bestPools: OrcaSwapPool[] | null = null;
+    let bestPools: Pool[] | null = null;
     let bestEstimatedAmount: u64 = ZERO;
 
     for (const pair of poolsPairs) {
@@ -302,7 +306,7 @@ export class OrcaSwap implements OrcaSwapType {
       return null;
     }
 
-    let bestPools: OrcaSwapPool[] | null = null;
+    let bestPools: Pool[] | null = null;
     let bestInputAmount: u64 = new u64(Number.MAX_SAFE_INTEGER);
 
     for (const pair of poolsPairs) {
@@ -620,8 +624,8 @@ export class OrcaSwap implements OrcaSwapType {
         instructions: swapTransaction.instructions,
         signers: swapTransaction.signers,
         feePayer,
-        accountsCreationFee: swapTransaction.accountCreationFee,
-        recentBlockhash: null,
+        // accountsCreationFee: swapTransaction.accountCreationFee,
+        // recentBlockhash: null,
       })
       .then((preparedTransaction) => {
         return this._solanaClient.serializeAndSend({
@@ -632,7 +636,7 @@ export class OrcaSwap implements OrcaSwapType {
   }
 
   // Find routes for from and to token name, aka symbol
-  private _findRoutes(fromTokenName?: string, toTokenName?: string | null): OrcaSwapRoutes {
+  private _findRoutes(fromTokenName?: string, toTokenName?: string | null): Routes {
     const info = this._info;
     if (!info) {
       throw OrcaSwapError.swapInfoMissing();
@@ -666,7 +670,7 @@ export class OrcaSwap implements OrcaSwapType {
     minRentExemption,
   }: {
     owner: Signer;
-    pool: OrcaSwapPool;
+    pool: Pool;
     fromTokenPubkey: string;
     toTokenPubkey?: string;
     amount: u64;
@@ -719,8 +723,8 @@ export class OrcaSwap implements OrcaSwapType {
     minRentExemption,
   }: {
     owner: Signer;
-    pool0: OrcaSwapPool;
-    pool1: OrcaSwapPool;
+    pool0: Pool;
+    pool1: Pool;
     fromTokenPubkey: string;
     intermediaryTokenAddress: string;
     destinationTokenAddress: string;
@@ -780,19 +784,19 @@ export class OrcaSwap implements OrcaSwapType {
     minRentExemption,
   }: {
     owner: Signer;
-    pool0: OrcaSwapPool;
-    pool1: OrcaSwapPool;
+    pool0: Pool;
+    pool1: Pool;
     // toWalletPubkey?: string;
     feePayer?: PublicKey | null;
     minRentExemption: Lamports;
   }): Promise<
     [PublicKey, PublicKey, AccountInstructions | null, PreparedSwapTransaction | null]
   > /*intermediaryTokenAddress, destination token address, WSOL account and instructions, account creation fee*/ {
-    const intermediaryTokenMintStr = this._info?.tokens[pool0.tokenBName.toString()]?.mint;
+    const intermediaryTokenMintStr = this._info?.tokens.get(pool0.tokenBName.toString())?.mint;
     const intermediaryTokenMint = intermediaryTokenMintStr
       ? new PublicKey(intermediaryTokenMintStr)
       : null;
-    const destinationMintStr = this._info?.tokens[pool1.tokenBName.toString()]?.mint;
+    const destinationMintStr = this._info?.tokens.get(pool1.tokenBName.toString())?.mint;
     const destinationMint = destinationMintStr ? new PublicKey(destinationMintStr) : null;
     if (!intermediaryTokenMint || !destinationMint) {
       throw OrcaSwapError.unauthorized();
@@ -874,10 +878,123 @@ export class OrcaSwap implements OrcaSwapType {
       }
     });
   }
+
+  async getPools({
+    route,
+    fromTokenName,
+    toTokenName,
+  }: {
+    route: Route;
+    fromTokenName: string;
+    toTokenName: string;
+  }): Promise<Pool[]> {
+    if (route.length === 0) {
+      return [];
+    }
+
+    const pools: Pool[] = [];
+    const group = await Promise.all(route.map((path) => this.fixedPool({ path })));
+
+    for (const pool of group) {
+      if (!pool) {
+        continue;
+      }
+      pools.push(pool);
+    }
+
+    // modify orders
+    if (pools.length === 2) {
+      // reverse order of the 2 pools
+      // Ex: Swap from SOCN -> BTC, but paths are
+      // [
+      //     "BTC/SOL[aquafarm]",
+      //     "SOCN/SOL[stable][aquafarm]"
+      // ]
+      // Need to change to
+      // [
+      //     "SOCN/SOL[stable][aquafarm]",
+      //     "BTC/SOL[aquafarm]"
+      // ]
+
+      if (
+        pools[0]!.tokenAName.toString() !== fromTokenName &&
+        pools[0]!.tokenBName.toString() !== fromTokenName
+      ) {
+        const temp = pools[0]!;
+        pools[0] = pools[1]!;
+        pools[1] = temp;
+      }
+    }
+
+    // reverse token A and token B in pool if needed
+    for (let i = 0; i < pools.length; i++) {
+      if (i === 0) {
+        let pool = pools[0]!;
+        if (
+          pool.tokenAName.fixedTokenName !== new OrcaSwapTokenName(fromTokenName).fixedTokenName
+        ) {
+          pool = pool.reversed;
+        }
+        pools[0] = pool;
+      }
+
+      if (i === 1) {
+        let pool = pools[1]!;
+        if (pool.tokenBName.fixedTokenName !== new OrcaSwapTokenName(toTokenName).fixedTokenName) {
+          pool = pool.reversed;
+        }
+        pools[1] = pool;
+      }
+    }
+
+    return pools;
+  }
+
+  async fixedPool({
+    path,
+  }: {
+    path: string; // Ex. BTC/SOL[aquafarm][stable]
+  }): Promise<Pool | null> {
+    const allPools = this._info?.pools;
+    if (!allPools) {
+      return null;
+    }
+    const pool = allPools.get(path);
+    if (!pool) {
+      return null;
+    }
+
+    if (path.includes('[stable]')) {
+      pool.isStable = true;
+    }
+
+    // get balances
+    let tokenABalance: TokenAccountBalance;
+    let tokenBBalance: TokenAccountBalance;
+
+    const tab = this._balancesCache.getTokenABalance(pool);
+    const tbb = this._balancesCache.getTokenBBalance(pool);
+    if (tab && tbb) {
+      [tokenABalance, tokenBBalance] = [tab, tbb];
+    } else {
+      [tokenABalance, tokenBBalance] = await Promise.all([
+        this._solanaClient.getTokenAccountBalance(pool.tokenAccountA),
+        this._solanaClient.getTokenAccountBalance(pool.tokenAccountB),
+      ]);
+    }
+
+    this._balancesCache.save(pool.tokenAccountA.toString(), tokenABalance);
+    this._balancesCache.save(pool.tokenAccountB.toString(), tokenBBalance);
+
+    pool.tokenABalance = tokenABalance;
+    pool.tokenBBalance = tokenBBalance;
+
+    return pool;
+  }
 }
 
-function _findAllAvailableRoutes(tokens: OrcaSwapTokens, pools: Pools): OrcaSwapRoutes {
-  const filteredTokens = Object.entries(tokens)
+function _findAllAvailableRoutes(tokens: Map<string, TokenValue>, pools: Pools): Routes {
+  const filteredTokens = [...tokens]
     .filter(([, token]) => token.poolToken !== true)
     .map(([tokenName]) => tokenName);
 
@@ -921,8 +1038,8 @@ function _orderTokenPair(tokenX: string, tokenY: string): string[] {
   }
 }
 
-function _getAllRoutes(pairs: string[][], pools: Pools): OrcaSwapRoutes {
-  const routes: OrcaSwapRoutes = {};
+function _getAllRoutes(pairs: string[][], pools: Pools): Routes {
+  const routes: Routes = {};
   pairs.forEach((pair) => {
     const tokenA = pair[0] ?? null;
     const tokenB = pair[1] ?? null;
@@ -941,12 +1058,12 @@ function _getTradeId(tokenX: string, tokenY: string): string {
   return _orderTokenPair(tokenX, tokenY).join('/');
 }
 
-function _getRoutes(tokenA: string, tokenB: string, pools: Pools): OrcaSwapRoute[] {
-  const routes: OrcaSwapRoute[] = [];
+function _getRoutes(tokenA: string, tokenB: string, pools: Pools): Route[] {
+  const routes: Route[] = [];
 
   // Find all pools that contain the same tokens.
   // Checking tokenAName and tokenBName will find Stable pools.
-  Object.entries(pools).forEach(([poolId, poolConfig]) => {
+  [...pools].forEach(([poolId, poolConfig]) => {
     if (
       (poolConfig.tokenAName.toString() === tokenA &&
         poolConfig.tokenBName.toString() === tokenB) ||
@@ -957,7 +1074,7 @@ function _getRoutes(tokenA: string, tokenB: string, pools: Pools): OrcaSwapRoute
   });
 
   // Find all pools that contain the first token but not the second
-  const firstLegPools = Object.entries(pools)
+  const firstLegPools = [...pools]
     .filter(
       ([, poolConfig]) =>
         (poolConfig.tokenAName.toString() === tokenA &&
@@ -974,7 +1091,7 @@ function _getRoutes(tokenA: string, tokenB: string, pools: Pools): OrcaSwapRoute
 
   // Find all routes that can include firstLegPool and a second pool.
   firstLegPools.forEach(([firstLegPoolId, intermediateTokenName]) => {
-    Object.entries(pools).forEach(([secondLegPoolId, poolConfig]) => {
+    [...pools].forEach(([secondLegPoolId, poolConfig]) => {
       if (
         (poolConfig.tokenAName.toString() === intermediateTokenName &&
           poolConfig.tokenBName.toString() === tokenB) ||

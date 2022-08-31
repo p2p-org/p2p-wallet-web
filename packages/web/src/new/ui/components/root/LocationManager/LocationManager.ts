@@ -6,7 +6,7 @@ import { useViewModel } from 'new/core/viewmodels/useViewModel';
 import { LocationManagerViewModel } from './LocationManager.ViewModel';
 
 export const LocationManager = () => {
-  const viewModel = useViewModel<LocationManagerViewModel>(LocationManagerViewModel);
+  const viewModel = useViewModel(LocationManagerViewModel);
 
   const history = useHistory();
 

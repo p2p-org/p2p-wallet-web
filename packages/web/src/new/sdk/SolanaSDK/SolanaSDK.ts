@@ -6,9 +6,7 @@ import { TokenListProvider } from '@solana/spl-token-registry';
 import type {
   AccountInfo as BufferInfo,
   Commitment,
-  RpcResponseAndContext,
   Signer,
-  TokenAmount,
   TransactionInstruction,
 } from '@solana/web3.js';
 import { Keypair, PublicKey, SystemProgram, Transaction } from '@solana/web3.js';
@@ -29,6 +27,7 @@ import {
   SolanaSDKPublicKey,
   SPLTokenDestinationAddress,
   Token,
+  TokenAccountBalance,
   Wallet,
 } from './';
 
@@ -112,11 +111,18 @@ export class SolanaSDK {
     return (await this.provider.connection.getRecentBlockhash(commitment)).blockhash;
   }
 
-  getTokenAccountBalance(
-    tokenAddress: PublicKey,
+  async getTokenAccountBalance(
+    tokenAddress: string,
     commitment?: Commitment,
-  ): Promise<RpcResponseAndContext<TokenAmount>> {
-    return this.provider.connection.getTokenAccountBalance(tokenAddress, commitment);
+  ): Promise<TokenAccountBalance> {
+    const result = await this.provider.connection.getTokenAccountBalance(
+      new PublicKey(tokenAddress),
+      commitment,
+    );
+    if (!result.value.amount) {
+      throw SolanaSDKError.couldNotRetrieveAccountInfo();
+    }
+    return new TokenAccountBalance(result.value);
   }
 
   // TODO: test it

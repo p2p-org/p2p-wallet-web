@@ -41,4 +41,14 @@ export class FeeAmount {
   static zero(): FeeAmount {
     return new FeeAmount({ transaction: new u64(0), accountBalances: new u64(0) });
   }
+
+  toJSON() {
+    return {
+      transaction: this.transaction.toNumber(),
+      accountBalances: this.accountBalances.toNumber(),
+      deposit: this.deposit.toNumber(),
+      others: this.others,
+      total: this.total.toNumber(),
+    };
+  }
 }

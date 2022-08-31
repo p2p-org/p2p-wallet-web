@@ -236,7 +236,11 @@ export const ChooseTokenAndAmount: FC<Props> = observer(({ viewModel }) => {
         />
         <InputWrapper>
           <InputAmount
-            placeholder={vm.wallet ? Number(0).toFixed(vm.wallet.token.decimals) : '0'}
+            placeholder={
+              vm.wallet
+                ? numberToString(0, { maximumFractionDigits: vm.wallet.token.decimals })
+                : '0'
+            }
             value={viewModel.amount === 0 ? undefined : viewModel.amount}
             onChange={handleAmountChange}
           />

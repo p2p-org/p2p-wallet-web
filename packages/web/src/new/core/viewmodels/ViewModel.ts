@@ -1,10 +1,14 @@
+import { runInAction } from 'mobx';
+
 import { ObservableReactionContainer } from '../ObservableReactionContainer';
 
 export abstract class ViewModel extends ObservableReactionContainer {
   protected override onEnd() {
     super.onEnd();
 
-    this.setDefaults();
+    runInAction(() => {
+      this.setDefaults();
+    });
   }
 
   protected abstract setDefaults(): void;

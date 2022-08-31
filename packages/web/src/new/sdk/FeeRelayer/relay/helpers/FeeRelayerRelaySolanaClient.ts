@@ -10,6 +10,7 @@ import { injectable } from 'tsyringe';
 
 import { SolanaModel } from 'new/models/SolanaModel';
 import type * as SolanaSDK from 'new/sdk/SolanaSDK';
+import type { FeeCalculator } from 'new/sdk/SolanaSDK';
 import { AccountInfo, SolanaSDK as SolanaSDKClass, SolanaSDKError } from 'new/sdk/SolanaSDK';
 import { Defaults } from 'new/services/Defaults';
 
@@ -25,17 +26,17 @@ interface FeeRelayerRelaySolanaClientType {
   getLamportsPerSignature(): Promise<SolanaSDK.Lamports>;
 
   prepareTransaction({
+    owner,
     instructions,
     signers,
     feePayer,
-    accountsCreationFee,
-    recentBlockhash,
+    feeCalculator,
   }: {
+    owner: PublicKey;
     instructions: TransactionInstruction[];
-    signers: Signer[];
+    signers?: Signer[];
     feePayer: PublicKey;
-    accountsCreationFee: SolanaSDK.Lamports;
-    recentBlockhash?: string | null;
+    feeCalculator?: FeeCalculator;
   }): Promise<SolanaSDK.PreparedTransaction>;
 
   findSPLTokenDestinationAddress({
@@ -75,7 +76,7 @@ export class FeeRelayerRelaySolanaClient
   }
 
   getRelayAccountStatus(relayAccountAddress: string): Promise<Relay.RelayAccountStatus> {
-    return this.getAccountInfo<AccountInfo>({
+    return this.getAccountInfo<AccountInfo | null>({
       account: relayAccountAddress,
       decodedTo: AccountInfo,
     })

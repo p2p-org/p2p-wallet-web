@@ -5,7 +5,7 @@ import bs58 from 'bs58';
 import type { StatsInfoDeviceType } from 'new/sdk/FeeRelayer';
 import { StatsInfo, StatsInfoOperationType } from 'new/sdk/FeeRelayer';
 import { FeeRelayerError } from 'new/sdk/FeeRelayer/models/FeeRelayerError';
-import type { PoolsPair } from 'new/sdk/OrcaSwap/models/OrcaSwapPools';
+import type { PoolsPair } from 'new/sdk/OrcaSwap/models/Pools';
 import type * as SolanaSDK from 'new/sdk/SolanaSDK';
 
 export type FeeRelayerRelaySwapType = {};

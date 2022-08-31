@@ -14,19 +14,19 @@ export class Fiat {
     return new Fiat(FiatType.usd);
   }
   static get eur(): Fiat {
-    return new Fiat(FiatType.usd);
+    return new Fiat(FiatType.eur);
   }
   static get cny(): Fiat {
-    return new Fiat(FiatType.usd);
+    return new Fiat(FiatType.cny);
   }
   static get vnd(): Fiat {
-    return new Fiat(FiatType.usd);
+    return new Fiat(FiatType.vnd);
   }
   static get rub(): Fiat {
-    return new Fiat(FiatType.usd);
+    return new Fiat(FiatType.rub);
   }
   static get gbp(): Fiat {
-    return new Fiat(FiatType.usd);
+    return new Fiat(FiatType.gbp);
   }
 
   constructor(type: FiatType) {

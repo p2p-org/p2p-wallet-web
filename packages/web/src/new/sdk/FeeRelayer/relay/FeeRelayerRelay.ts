@@ -432,14 +432,12 @@ export class FeeRelayerRelay implements FeeRelayerRelayType {
     payingFeeTokenMint: string;
   }): Promise<SolanaSDK.FeeAmount> {
     if (payingFeeTokenMint === SolanaSDKPublicKey.wrappedSOLMint.toString()) {
-      return Promise.resolve(feeInSOL);
+      return feeInSOL;
     }
-
     const tradableTopUpPoolsPair = await this.orcaSwapClient.getTradablePoolsPairs({
       fromMint: payingFeeTokenMint,
       toMint: SolanaSDKPublicKey.wrappedSOLMint.toString(),
     });
-
     const topUpPools = this.orcaSwapClient.findBestPoolsPairForEstimatedAmount({
       estimatedAmount: feeInSOL.total,
       poolsPairs: tradableTopUpPoolsPair,
@@ -448,8 +446,8 @@ export class FeeRelayerRelay implements FeeRelayerRelayType {
       throw FeeRelayerError.swapPoolsNotFound();
     }
 
-    const transactionFee = getInputAmountSlippage(topUpPools, feeInSOL.transaction, 0.01);
-    const accountCreationFee = getInputAmountSlippage(topUpPools, feeInSOL.accountBalances, 0.01);
+    const transactionFee = getInputAmountSlippage(topUpPools, feeInSOL.transaction, 0.03);
+    const accountCreationFee = getInputAmountSlippage(topUpPools, feeInSOL.accountBalances, 0.03);
 
     return new SolanaSDK.FeeAmount({
       transaction: transactionFee ?? ZERO,
@@ -1490,8 +1488,8 @@ export class FeeRelayerRelay implements FeeRelayerRelayType {
         instructions: swapTransaction.instructions,
         signers: swapTransaction.signers,
         feePayer,
-        accountsCreationFee: swapTransaction.accountCreationFee,
-        recentBlockhash: null,
+        // accountsCreationFee: swapTransaction.accountCreationFee,
+        // recentBlockhash: null,
       })
       .then((preparedTransaction) => {
         return this.relayTransaction({
