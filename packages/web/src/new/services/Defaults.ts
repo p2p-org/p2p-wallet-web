@@ -5,6 +5,12 @@ import type { CurrentPrice } from 'new/services/PriceAPIs/PricesService';
 
 import { APIEndpoint } from '../sdk/SolanaSDK/models/APIEndpoint';
 
+export enum Appearance {
+  system = 'system',
+  light = 'light',
+  dark = 'dark',
+}
+
 function makeLocalStorage<T>(_this: { fromJSON(json: T): T }, name: string) {
   const storedJson = localStorage.getItem(name);
   if (storedJson) {
@@ -38,8 +44,11 @@ class _Defaults implements DefaultsKeys {
   unhiddenWalletPubkey: string[] = [];
   hideZeroBalances = true;
 
-  fiat: Fiat = Fiat.rub;
+  fiat: Fiat = Fiat.usd;
   prices: { [key in string]: CurrentPrice } = {};
+
+  appearance: Appearance = Appearance.system;
+  useFreeTransactions = false;
 
   constructor() {
     makeObservable(this, {
@@ -53,6 +62,9 @@ class _Defaults implements DefaultsKeys {
 
       fiat: observable,
       prices: observable,
+
+      appearance: observable,
+      useFreeTransactions: observable,
     });
     makeLocalStorage(this, 'defaults');
   }

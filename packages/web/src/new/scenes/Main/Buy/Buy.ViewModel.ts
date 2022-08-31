@@ -52,7 +52,6 @@ export class BuyViewModel extends ViewModel {
       isShowIframe: observable,
       areMoonpayConstantsSet: computed,
       cryptoCurrenciesForSelect: computed,
-      publicKeyString: computed,
 
       loadingState: observable,
       input: observable,
@@ -219,7 +218,7 @@ export class BuyViewModel extends ViewModel {
     };
   }
 
-  get publicKeyString(): string {
+  get pubkeyBase58(): string {
     return this._solanaService.provider.wallet.publicKey.toBase58();
   }
 

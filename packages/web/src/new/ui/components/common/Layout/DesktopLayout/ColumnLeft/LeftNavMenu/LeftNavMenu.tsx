@@ -215,6 +215,17 @@ export const LeftNavMenu: FunctionComponent = () => {
           <Name>Settings</Name>
         </NavButton>
       </NavLinkMenu>
+      <NavLinkMenu
+        to={{ pathname: '/settingsNew', state: { fromPage: location.pathname } }}
+        className="button"
+      >
+        <NavButton>
+          <IconBlock>
+            <NavIcon name="gear" />
+          </IconBlock>
+          <Name>Settings</Name>
+        </NavButton>
+      </NavLinkMenu>
       <Separator>
         <Line />
       </Separator>

@@ -35,6 +35,11 @@ export class LocationService {
     });
   }
 
+  get location(): Location {
+    this._assertLocation();
+    return this._location!;
+  }
+
   setHistory(history: History): void {
     this._history = history;
 
@@ -55,5 +60,10 @@ export class LocationService {
   push(pathname: Path, props: LocationState): void {
     this._assertHistory();
     this._history?.push(pathname, props);
+  }
+
+  reload(): void {
+    this._assertHistory();
+    this._history?.go(0);
   }
 }
