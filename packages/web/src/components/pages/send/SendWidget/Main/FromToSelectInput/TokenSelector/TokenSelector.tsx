@@ -13,8 +13,7 @@ import { Empty } from 'components/common/Empty';
 import { SlideContainer } from 'components/common/SlideContainer';
 import { TokenAccountRow } from 'components/common/TokenAccountRow';
 import { TokenAvatar } from 'components/common/TokenAvatar';
-import { Icon } from 'components/ui';
-import { SearchInput } from 'new/ui/components/ui/SearchInput';
+import { Icon, SearchInput } from 'components/ui';
 import { matchesFilter, shortAddress, sortByRules } from 'utils/tokens';
 
 const Wrapper = styled.div``;

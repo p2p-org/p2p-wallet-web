@@ -10,12 +10,12 @@ import {
 } from '@p2p-wallet-web/core';
 import { theme } from '@p2p-wallet-web/ui';
 
-import { ButtonCancel } from 'components/common/ButtonCancel';
-import { ErrorHint } from 'components/common/ErrorHint';
-import { PasswordInput } from 'components/common/PasswordInput';
 import { Button, Icon } from 'components/ui';
 import { Modal } from 'components/ui/Modal';
 import type { SendViewModel } from 'new/scenes/Main/Send';
+import { ButtonCancel } from 'new/ui/components/common/ButtonCancel';
+import { ErrorHint } from 'new/ui/components/common/ErrorHint';
+import { PasswordInput } from 'new/ui/components/common/PasswordInput';
 import { numberToString } from 'new/utils/NumberExtensions';
 
 import type { ModalPropsType } from '../../ModalManager';

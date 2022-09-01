@@ -8,6 +8,7 @@ export * from './Switch';
 export * from './RadioButton';
 export * from './Menu';
 export * from './Tooltip';
+export * from './SearchInput';
 export * from './Accordion';
 export * from './TextField';
 export * from './LaagTooltip';
