@@ -17,6 +17,7 @@ import { Layout } from 'new/ui/components/common/Layout';
 import { UsernameAddressWidget } from 'new/ui/components/common/UsernameAddressWidget';
 import { WidgetPage } from 'new/ui/components/common/WidgetPage';
 import { Accordion } from 'new/ui/components/ui/Accordion';
+import { withNameServiceDomain } from 'new/utils/StringExtensions';
 
 const Wrapper = styled.div`
   display: grid;
@@ -194,7 +195,9 @@ export const Settings: FC = observer(() => {
                     <AccordionTitleSecondary
                       className={classNames({ warning: !viewModel.username })}
                     >
-                      {viewModel.username ? `${viewModel.username}${domain}` : 'Not yet reserved'}
+                      {viewModel.username
+                        ? withNameServiceDomain(viewModel.username)
+                        : 'Not yet reserved'}
                     </AccordionTitleSecondary>
                   </AccordionTitle>
                 }
