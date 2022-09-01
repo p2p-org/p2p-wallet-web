@@ -2,9 +2,7 @@ import ReactRefreshWebpackPlugin from '@pmmmwh/react-refresh-webpack-plugin';
 import { CleanWebpackPlugin } from 'clean-webpack-plugin';
 import CopyPlugin from 'copy-webpack-plugin';
 import CssMinimizerPlugin from 'css-minimizer-webpack-plugin';
-import dotenv from 'dotenv';
 import DotEnv from 'dotenv-webpack';
-import * as fs from 'fs';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 import ImageMinimizerPlugin from 'image-minimizer-webpack-plugin';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
@@ -44,11 +42,6 @@ const config: ConfigFn = (env, argv) => {
   // @ts-ignore
   process.env.NODE_ENV = argv.mode;
   process.env.BABEL_ENV = argv.mode;
-
-  let PUBLIC_URL;
-  if (__DEVELOPMENT__) {
-    PUBLIC_URL = dotenv.parse(fs.readFileSync(ENV_FILE_PATH)).PUBLIC_URL;
-  }
 
   const devPlugins: Array<WebpackPluginInstance> = [];
   const utilityPlugins: Array<WebpackPluginInstance> = [];
@@ -273,7 +266,7 @@ const config: ConfigFn = (env, argv) => {
             title: APP_TITLE,
             template: path.join(WEB_PATH, '/index.html'),
             favicon: path.join(WEB_PATH, '/public/favicon.ico'),
-            base: __DEVELOPMENT__ ? PUBLIC_URL : process.env.PUBLIC_URL,
+            base: process.env.PUBLIC_URL,
           },
           __PRODUCTION__ && {
             minify: {
