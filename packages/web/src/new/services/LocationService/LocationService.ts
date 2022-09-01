@@ -35,11 +35,6 @@ export class LocationService {
     });
   }
 
-  get location(): Location {
-    this._assertLocation();
-    return this._location!;
-  }
-
   setHistory(history: History): void {
     this._history = history;
 

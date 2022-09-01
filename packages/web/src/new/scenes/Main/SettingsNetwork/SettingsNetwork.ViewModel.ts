@@ -20,9 +20,6 @@ export class SettingsNetworkViewModel extends ViewModel {
 
   setAPIEndpoint(apiEndpoint: APIEndpoint) {
     runInAction(() => (Defaults.apiEndPoint = apiEndpoint));
-    this._locationService.push('/settingsNew', {
-      state: { fromPage: this._locationService.location.pathname },
-    });
     this._locationService.reload();
   }
 }
