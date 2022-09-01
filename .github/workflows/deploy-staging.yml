@@ -125,7 +125,7 @@ jobs:
 
       - name: Build site
         env:
-          PUBLIC_URL: /p2p-wallet-web/pr-preview/pr-${{ github.event.pull_request.number }}
+          PUBLIC_URL: /p2p-wallet-web/pr-preview/pr-${{ github.event.pull_request.number }}/
           REACT_APP_CRYPTO_COMPARE_API_KEY: ${{ secrets.REACT_APP_CRYPTO_COMPARE_API_KEY }}
           REACT_APP_FEE_RELAYER_URL: ${{ secrets.REACT_APP_FEE_RELAYER_URL }}
           REACT_APP_AMPLITUDE_API_KEY: ${{ secrets.REACT_APP_AMPLITUDE_API_KEY }}
