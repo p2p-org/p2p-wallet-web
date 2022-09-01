@@ -5,10 +5,10 @@ import { useTransactionSignatures } from '@p2p-wallet-web/core';
 
 import { Empty } from 'components/common/Empty';
 import { InfinityScrollHelper } from 'components/common/InfinityScrollHelper';
+import { LoaderBlock } from 'components/common/LoaderBlock';
 import { ToastManager } from 'components/common/ToastManager';
 import { Widget } from 'components/common/Widget';
 import { TransactionList } from 'components/pages/wallet/TransactionsWidget/TransactionList';
-import { LoaderBlock } from 'new/ui/components/common/LoaderBlock';
 import { trackEvent } from 'utils/analytics';
 
 const TRANSACTIONS_LIMIT = 10;

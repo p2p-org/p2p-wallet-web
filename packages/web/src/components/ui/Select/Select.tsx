@@ -5,8 +5,8 @@ import { styled } from '@linaria/react';
 import { shadows, theme, useIsMobile } from '@p2p-wallet-web/ui';
 import classNames from 'classnames';
 
+import { Loader } from 'components/common/Loader';
 import { Icon } from 'components/ui';
-import { Loader } from 'new/ui/components/common/Loader';
 
 import { ListMobile } from './ListMobile';
 

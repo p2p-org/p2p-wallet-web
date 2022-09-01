@@ -2,7 +2,7 @@ import type { FC } from 'react';
 
 import { styled } from '@linaria/react';
 
-import { Loader } from 'new/ui/components/common/Loader';
+import { Loader } from 'components/common/Loader';
 
 const Wrapper = styled.div`
   position: absolute;

@@ -9,8 +9,8 @@ import RenJS from '@renproject/ren';
 import type { BurnSession, BurnTransaction } from '@renproject/ren-tx';
 import { BurnStates, isBurnErroring } from '@renproject/ren-tx';
 
+import { LoaderBlock } from 'components/common/LoaderBlock';
 import { Accordion, Button } from 'components/ui';
-import { LoaderBlock } from 'new/ui/components/common/LoaderBlock';
 import { useBurnAndRelease } from 'utils/hooks/renBridge/useBurnAndRelease';
 import { useRenNetwork } from 'utils/hooks/renBridge/useNetwork';
 

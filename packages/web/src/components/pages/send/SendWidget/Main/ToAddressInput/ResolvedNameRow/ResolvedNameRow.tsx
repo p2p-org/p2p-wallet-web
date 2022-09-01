@@ -3,7 +3,7 @@ import type { FC } from 'react';
 import { styled } from '@linaria/react';
 
 import type { ResolveUsernameResponse } from 'app/contexts';
-import { AddressText } from 'new/ui/components/common/AddressText';
+import { AddressText } from 'components/common/AddressText';
 
 import { IconWrapper, WalletIcon } from '../common/styled';
 

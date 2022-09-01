@@ -3,8 +3,8 @@ import { useMemo } from 'react';
 
 import { getRenNetworkDetails } from '@renproject/interfaces';
 
+import { LoaderBlock } from 'components/common/LoaderBlock';
 import { UsernameAddressWidget } from 'components/common/UsernameAddressWidget';
-import { LoaderBlock } from 'new/ui/components/common/LoaderBlock';
 import { trackEvent } from 'utils/analytics';
 import { useRenNetwork } from 'utils/hooks/renBridge/useNetwork';
 import { useLockAndMintProvider } from 'utils/providers/LockAndMintProvider';

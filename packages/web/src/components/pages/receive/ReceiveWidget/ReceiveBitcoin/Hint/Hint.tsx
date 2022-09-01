@@ -6,7 +6,7 @@ import { Bitcoin } from '@renproject/chains-bitcoin';
 import classNames from 'classnames';
 
 import { HMSCountdown } from 'components/common/HMSCountdown';
-import { Loader } from 'new/ui/components/common/Loader';
+import { Loader } from 'components/common/Loader';
 import { getRemainingGatewayTime } from 'utils/hooks/renBridge/useLockAndMint';
 import { useFetchFees } from 'utils/providers/LockAndMintProvider';
 

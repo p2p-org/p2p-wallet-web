@@ -9,9 +9,9 @@ import classNames from 'classnames';
 
 import type { ResolveUsernameResponse } from 'app/contexts';
 import { useNameService, useSendState } from 'app/contexts';
+import { AddressText } from 'components/common/AddressText';
+import { Loader } from 'components/common/Loader';
 import { Icon } from 'components/ui';
-import { AddressText } from 'new/ui/components/common/AddressText';
-import { Loader } from 'new/ui/components/common/Loader';
 import { useTrackEventOnce } from 'utils/hooks/useTrackEventOnce';
 
 import { IconWrapper, WalletIcon } from './common/styled';
