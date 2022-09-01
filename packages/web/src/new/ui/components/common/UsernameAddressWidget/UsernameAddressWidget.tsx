@@ -6,7 +6,7 @@ import QRCode from 'qrcode.react';
 
 import { ToastManager } from 'components/common/ToastManager';
 import Logo from 'new/ui/assets/images/logo.png';
-import { AddressText } from 'new/ui/components/ui/AddressText';
+import { AddressText } from 'new/ui/components/common/AddressText';
 import { Button } from 'new/ui/components/ui/Button';
 import { setToClipboard } from 'new/utils/Clipboard';
 import { browserName, BrowserNames } from 'new/utils/UserAgent';

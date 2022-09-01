@@ -9,9 +9,9 @@ import type { BuyViewModelProps } from 'new/scenes/Main/Buy/Subviews/Moonpay/typ
 import type { Token } from 'new/sdk/SolanaSDK';
 import { FiatCurrency } from 'new/services/BuyService/structures';
 import { Defaults } from 'new/services/Defaults';
-import { InputAmount } from 'new/ui/components/common/InputAmount';
 import { TokenAvatar } from 'new/ui/components/common/TokenAvatar';
 import { AmountTypeButton } from 'new/ui/components/pages/buy/AmountTypeButton';
+import { InputAmount } from 'new/ui/components/ui/InputAmount';
 import { numberToFiatString, numberToTokenString } from 'new/utils/NumberExtensions';
 
 const Wrapper = styled.div`
