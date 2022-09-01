@@ -7,8 +7,8 @@ import { ViewModel } from 'new/core/viewmodels/ViewModel';
 import { Defaults } from 'new/services/Defaults';
 import { ModalService, ModalType } from 'new/services/ModalService';
 import { NameService } from 'new/services/NameService';
-import { PricesService } from 'new/services/PriceAPIs/PricesService';
 import { WalletsRepository } from 'new/services/Repositories';
+import { numberToString } from 'new/utils/NumberExtensions';
 
 @singleton()
 export class HomeViewModel extends ViewModel {
@@ -16,7 +16,6 @@ export class HomeViewModel extends ViewModel {
 
   constructor(
     public walletsRepository: WalletsRepository,
-    public pricesService: PricesService,
     public nameService: NameService,
     private _modalService: ModalService,
   ) {
@@ -38,7 +37,7 @@ export class HomeViewModel extends ViewModel {
   }
 
   protected override onInitialize() {
-    this.walletsRepository.initialize();
+    // this.walletsRepository.initialize();
 
     this.addReaction(
       reaction(
@@ -51,7 +50,7 @@ export class HomeViewModel extends ViewModel {
   }
 
   protected override afterReactionsRemoved() {
-    this.walletsRepository.end();
+    // this.walletsRepository.end();
   }
 
   private _getUsername() {
@@ -105,7 +104,9 @@ export class HomeViewModel extends ViewModel {
           (partialResult, wallet) => partialResult + wallet.amountInCurrentFiat,
           0,
         );
-        return `${Defaults.fiat.symbol} ${equityValue.toFixed(2)}`;
+        return `${Defaults.fiat.symbol} ${numberToString(equityValue, {
+          maximumFractionDigits: 2,
+        })}`;
       }
       case SDFetcherState.error:
         return 'Error';

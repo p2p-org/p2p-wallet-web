@@ -6,28 +6,30 @@ import { TokenListProvider } from '@solana/spl-token-registry';
 import type {
   AccountInfo as BufferInfo,
   Commitment,
-  RpcResponseAndContext,
   Signer,
-  TokenAmount,
   TransactionInstruction,
 } from '@solana/web3.js';
 import { Keypair, PublicKey, SystemProgram, Transaction } from '@solana/web3.js';
 import promiseRetry from 'promise-retry';
 
-import type { APIEndpoint, Lamports } from './index';
+import type { APIEndpoint, FeeCalculator, Lamports, TransactionID } from './';
 import {
   AccountInfo,
   AccountInstructions,
+  DefaultFeeCalculator,
   EmptyInfo,
-  FeeAmount,
+  getAssociatedTokenAddressSync,
+  LogEvent,
+  Logger,
   MintInfo,
   PreparedTransaction,
   SolanaSDKError,
   SolanaSDKPublicKey,
   SPLTokenDestinationAddress,
   Token,
+  TokenAccountBalance,
   Wallet,
-} from './index';
+} from './';
 
 // export interface SolanaSDKAccountStorage {
 //   readonly account?: Account;
@@ -63,11 +65,12 @@ export class SolanaSDK {
   }: {
     account: string;
     decodedTo: { decode(data: Buffer): T };
-  }): Promise<BufferInfo<T>> {
+  }): Promise<BufferInfo<T> | null> {
     const pubkey = new PublicKey(account);
     return this.provider.connection.getAccountInfo(pubkey).then((info) => {
       if (!info) {
-        throw SolanaSDKError.couldNotRetrieveAccountInfo();
+        return null;
+        // throw SolanaSDKError.couldNotRetrieveAccountInfo();
       }
 
       return {
@@ -109,11 +112,18 @@ export class SolanaSDK {
     return (await this.provider.connection.getRecentBlockhash(commitment)).blockhash;
   }
 
-  getTokenAccountBalance(
-    tokenAddress: PublicKey,
+  async getTokenAccountBalance(
+    tokenAddress: string,
     commitment?: Commitment,
-  ): Promise<RpcResponseAndContext<TokenAmount>> {
-    return this.provider.connection.getTokenAccountBalance(tokenAddress, commitment);
+  ): Promise<TokenAccountBalance> {
+    const result = await this.provider.connection.getTokenAccountBalance(
+      new PublicKey(tokenAddress),
+      commitment,
+    );
+    if (!result.value.amount) {
+      throw SolanaSDKError.couldNotRetrieveAccountInfo();
+    }
+    return new TokenAccountBalance(result.value);
   }
 
   // TODO: test it
@@ -197,7 +207,7 @@ export class SolanaSDK {
     return this.provider.connection
       .getAccountInfo(associatedTokenAccount)
       .then((info) => {
-        if (info === null) {
+        if (!info) {
           throw SolanaSDKError.couldNotRetrieveAccountInfo();
         }
 
@@ -221,66 +231,105 @@ export class SolanaSDK {
   // SolanaSDKActions
 
   async prepareTransaction({
+    owner,
     instructions,
-    signers,
+    signers = [],
     feePayer,
-    accountsCreationFee,
-    recentBlockhash,
-  }: // lamportsPerSignature,
-  {
+    feeCalculator,
+  }: {
+    owner: PublicKey;
     instructions: TransactionInstruction[];
-    signers: Signer[];
+    signers?: Signer[];
     feePayer: PublicKey;
-    accountsCreationFee: Lamports;
-    recentBlockhash?: string | null;
-    // lamportsPerSignature?: Lamports | null;
+    feeCalculator?: FeeCalculator;
   }): Promise<PreparedTransaction> {
-    // get recentBlockhash
-    let getRecentBlockhashRequest: Promise<string>;
-    if (recentBlockhash) {
-      getRecentBlockhashRequest = Promise.resolve(recentBlockhash);
+    // form transaction
+    const transaction = new Transaction();
+    transaction.instructions = instructions;
+    transaction.feePayer = feePayer;
+
+    let feeCalculatorNew: FeeCalculator;
+    if (feeCalculator) {
+      feeCalculatorNew = feeCalculator;
     } else {
-      getRecentBlockhashRequest = Promise.resolve(
-        (await this.provider.connection.getRecentBlockhash()).blockhash,
+      const lps = new u64(
+        (await this.provider.connection.getRecentBlockhash()).feeCalculator.lamportsPerSignature,
       );
+      const minRentExemption = new u64(await this.getMinimumBalanceForRentExemption(165));
+      const lamportsPerSignature = lps ?? new u64(5000);
+      feeCalculatorNew = new DefaultFeeCalculator({
+        lamportsPerSignature,
+        minRentExemption,
+      });
+    }
+    const expectedFee = await feeCalculatorNew.calculateNetworkFee(
+      transaction,
+      this.provider.connection,
+    );
+
+    const blockhash = await this.getRecentBlockhash();
+    transaction.recentBlockhash = blockhash;
+
+    // resign transaction
+    if (signers.length !== 0) {
+      transaction.sign(...signers);
     }
 
-    // get lamports per signature
-    // let getLamportsPerSignature: Promise<Lamports>;
-    // if (lamportsPerSignature) {
-    //   getLamportsPerSignature = Promise.resolve(lamportsPerSignature);
-    // } else {
-    //   getLamportsPerSignature = new u64(
-    //     (await this.provider.connection.getRecentBlockhash()).feeCalculator.lamportsPerSignature,
-    //   );
-    // }
+    const signedTransaction = await this.provider.wallet.signTransaction(transaction);
 
-    return getRecentBlockhashRequest.then(async (recentBlockhashNew) => {
-      const transaction = new Transaction();
-      transaction.instructions = instructions;
-      transaction.recentBlockhash = recentBlockhashNew;
-      transaction.feePayer = feePayer;
-
-      // calculate fee first
-      const estimatedFee = await transaction.getEstimatedFee(this.provider.connection);
-      const expectedFee = new FeeAmount({
-        transaction: new u64(estimatedFee),
-        accountBalances: accountsCreationFee,
-      });
-
-      // resign transaction
-      if (signers.length > 0) {
-        transaction.partialSign(...signers);
-      }
-
-      const signedTransaction = await this.provider.wallet.signTransaction(transaction);
-
-      return new PreparedTransaction({
-        transaction: signedTransaction,
-        signers,
-        expectedFee,
-      });
+    return new PreparedTransaction({
+      owner,
+      transaction: signedTransaction,
+      signers,
+      expectedFee,
     });
+  }
+
+  /// Send preparedTransaction
+  /// - Parameter preparedTransaction: preparedTransaction to be sent
+  /// - Returns: Transaction signature
+  async sendTransaction({
+    preparedTransaction,
+  }: {
+    preparedTransaction: PreparedTransaction;
+  }): Promise<string> {
+    const maxAttemps = 3;
+    let numberOfTries = 0;
+
+    try {
+      const recentBlockhash = await this.getRecentBlockhash();
+      const serializedTransaction = this.signAndSerialize({
+        preparedTransaction,
+        recentBlockhash,
+      });
+      return this.provider.connection.sendEncodedTransaction(serializedTransaction);
+    } catch (error) {
+      if (numberOfTries <= maxAttemps) {
+        let shouldRetry = false;
+        if ((error as Error).message.includes('Blockhash not found')) {
+          shouldRetry = true;
+        }
+
+        if (shouldRetry) {
+          numberOfTries += 1;
+          return this.sendTransaction({ preparedTransaction });
+        }
+      }
+      throw error;
+    }
+  }
+
+  signAndSerialize({
+    preparedTransaction,
+    recentBlockhash,
+  }: {
+    preparedTransaction: PreparedTransaction;
+    recentBlockhash: string;
+  }): string {
+    const preparedTransactionNew = preparedTransaction;
+    preparedTransactionNew.transaction.recentBlockhash = recentBlockhash;
+    preparedTransactionNew.sign();
+    return preparedTransactionNew.serialize();
   }
 
   serializeAndSend({
@@ -325,6 +374,108 @@ export class SolanaSDK {
     });
   }
 
+  /// Traditional sending without FeeRelayer
+  /// - Parameters:
+  ///   - instructions: transaction's instructions
+  ///   - recentBlockhash: recentBlockhash
+  ///   - signers: signers
+  ///   - isSimulation: define if this is a simulation or real transaction
+  /// - Returns: transaction id
+  serializeAndSendTraditional({
+    instructions,
+    recentBlockhash = null,
+    signers,
+    isSimulation,
+  }: {
+    instructions: TransactionInstruction[];
+    recentBlockhash?: string | null;
+    signers?: Signer[];
+    isSimulation: boolean;
+  }): Promise<TransactionID> {
+    const maxAttemps = 3;
+    let numberOfTries = 0;
+    return this.serializeTransaction({
+      instructions,
+      recentBlockhash,
+      signers,
+    })
+      .then((transaction) => {
+        if (isSimulation) {
+          // transfrom serialized tx to Transaction class
+          const restoredTransaction = Transaction.from(Buffer.from(transaction, 'base64'));
+          // simulate
+          return this.provider.connection
+            .simulateTransaction(restoredTransaction)
+            .then((result) => {
+              if (result.value.err) {
+                throw Error('Simulation error');
+              }
+
+              return 'simulated transaction id';
+            });
+        } else {
+          return this.provider.connection.sendEncodedTransaction(transaction);
+        }
+      })
+      .catch((error: Error) => {
+        if (numberOfTries <= maxAttemps) {
+          let shouldRetry = false;
+          if (error.message.includes('Blockhash not found')) {
+            shouldRetry = true;
+          }
+
+          if (shouldRetry) {
+            numberOfTries += 1;
+            return this.serializeAndSendTraditional({ instructions, signers, isSimulation });
+          }
+        }
+        throw error;
+      });
+  }
+
+  serializeTransaction({
+    instructions,
+    recentBlockhash = null,
+    signers = [],
+    feePayer = null,
+  }: {
+    instructions: TransactionInstruction[];
+    recentBlockhash?: string | null;
+    signers?: Signer[];
+    feePayer?: PublicKey | null;
+  }): Promise<string> {
+    // get recentBlockhash
+    let getRecentBlockhashRequest: Promise<string>;
+    if (recentBlockhash) {
+      getRecentBlockhashRequest = Promise.resolve(recentBlockhash);
+    } else {
+      getRecentBlockhashRequest = this.getRecentBlockhash();
+    }
+
+    const _feePayer = feePayer ?? this.provider.wallet.publicKey;
+    if (!feePayer) {
+      // TODO: custom error wrapper
+      throw SolanaSDKError.invalidRequest('Fee-payer not found');
+    }
+
+    // serialize transaction
+    return getRecentBlockhashRequest.then(async (_recentBlockhash) => {
+      const transaction = new Transaction();
+      transaction.instructions = instructions;
+      transaction.feePayer = _feePayer;
+      transaction.recentBlockhash = _recentBlockhash;
+      transaction.sign(...signers);
+      const signedTransaction = await this.provider.wallet.signTransaction(transaction);
+      const serializedTransaction = signedTransaction.serialize().toString('base64');
+
+      const decodedTransaction = JSON.stringify(transaction);
+      Logger.log(decodedTransaction, LogEvent.info);
+      Logger.log(serializedTransaction, LogEvent.info);
+
+      return serializedTransaction;
+    });
+  }
+
   // SolanaSDKSwap
 
   prepareCreatingWSOLAccountAndCloseWhenDone(
@@ -334,7 +485,7 @@ export class SolanaSDK {
   ): Promise<AccountInstructions> {
     return this.provider.connection
       .getMinimumBalanceForRentExemption(AccountInfo.span)
-      .then((minimumBalanceForRentExemption) => {
+      .then((minRentExemption) => {
         // create new account
         const newAccount = new Keypair();
 
@@ -344,7 +495,7 @@ export class SolanaSDK {
             SystemProgram.createAccount({
               fromPubkey: owner,
               newAccountPubkey: newAccount.publicKey,
-              lamports: amount.addn(minimumBalanceForRentExemption).toNumber(),
+              lamports: amount.addn(minRentExemption).toNumber(),
               space: AccountInfo.span,
               programId: SolanaSDKPublicKey.tokenProgramId,
             }),
@@ -383,97 +534,92 @@ export class SolanaSDK {
       owner,
     );
 
-    return (
-      this.provider.connection
-        .getAccountInfo(associatedAddress)
-        // check if associated address is registered
-        .then((info) => {
-          if (info === null) {
-            throw SolanaSDKError.couldNotRetrieveAccountInfo();
-          }
+    let isAssociatedTokenAddressRegistered: boolean;
+    try {
+      const info: BufferInfo<AccountInfo | null> | null = await this.getAccountInfo({
+        account: associatedAddress.toString(),
+        decodedTo: AccountInfo,
+      });
 
-          const accountInfo = info as unknown as BufferInfo<{ owner: string }>;
-          if (
-            accountInfo.owner.equals(SolanaSDKPublicKey.tokenProgramId) &&
-            accountInfo.data.owner === owner.toString()
-          ) {
-            return true;
-          }
+      if (
+        info?.owner.toString() === SolanaSDKPublicKey.tokenProgramId.toString() &&
+        info?.data?.owner.toString() === owner.toString()
+      ) {
+        isAssociatedTokenAddressRegistered = true;
+      } else {
+        throw Error('Associated token account is belong to another user');
+      }
+    } catch (error) {
+      console.error(error);
+      // TODO: check error
+      // associated address is not available
+      if (error === SolanaSDKError.couldNotRetrieveAccountInfo()) {
+        isAssociatedTokenAddressRegistered = false;
+      } else {
+        throw error;
+      }
+    }
 
-          throw Error('Associated token account is belong to another user');
-        })
-        .catch((err) => {
-          // associated address is not available
-          if (err === SolanaSDKError.couldNotRetrieveAccountInfo()) {
-            return false;
-          }
+    // cleanup intructions
+    let cleanupInstructions: TransactionInstruction[] = [];
+    if (closeAfterward) {
+      cleanupInstructions = [
+        SPLToken.createCloseAccountInstruction(
+          SolanaSDKPublicKey.tokenProgramId,
+          associatedAddress,
+          owner,
+          owner,
+          [],
+        ),
+      ];
+    }
 
-          throw err;
-        })
-        .then((isRegistered) => {
-          // cleanup intructions
-          let cleanupInstructions: TransactionInstruction[] = [];
-          if (closeAfterward) {
-            cleanupInstructions = [
-              SPLToken.createCloseAccountInstruction(
-                SolanaSDKPublicKey.tokenProgramId,
-                associatedAddress,
-                owner,
-                owner,
-                [],
-              ),
-            ];
-          }
+    // if associated address is registered, there is no need to creating it again
+    if (isAssociatedTokenAddressRegistered) {
+      return new AccountInstructions({
+        account: associatedAddress,
+        cleanupInstructions: [],
+      });
+    }
 
-          // if associated address is registered, there is no need to creating it again
-          if (isRegistered) {
-            return new AccountInstructions({
-              account: associatedAddress,
-              cleanupInstructions: [],
-            });
-          }
-
-          // create associated address
-          return new AccountInstructions({
-            account: associatedAddress,
-            instructions: [
-              SPLToken.createAssociatedTokenAccountInstruction(
-                SolanaSDKPublicKey.splAssociatedTokenAccountProgramId,
-                SolanaSDKPublicKey.tokenProgramId,
-                mint,
-                associatedAddress,
-                owner,
-                feePayer,
-              ),
-            ],
-            cleanupInstructions,
-            newWalletPubkey: associatedAddress.toString(),
-          });
-        })
-    );
+    // / else create associated address
+    return new AccountInstructions({
+      account: associatedAddress,
+      instructions: [
+        SPLToken.createAssociatedTokenAccountInstruction(
+          SolanaSDKPublicKey.splAssociatedTokenAccountProgramId,
+          SolanaSDKPublicKey.tokenProgramId,
+          mint,
+          associatedAddress,
+          owner,
+          feePayer,
+        ),
+      ],
+      cleanupInstructions,
+      newWalletPubkey: associatedAddress.toString(),
+    });
   }
 
   // SolanaSDKSend
 
   /// Create prepared transaction for sending SOL
   /// - Parameters:
+  ///   - account
   ///   - destination: destination wallet address
   ///   - amount: amount in lamports
-  ///   - feePayer: customm fee payer, can be omited if the authorized user is the payer
+  ///   - feePayer: custom fee payer, can be omited if the authorized user is the payer
   /// - Returns: PreparedTransaction, can be send either directly or via custom fee relayer
-  prepareSendingNativeSOL({
+  async prepareSendingNativeSOL({
+    account,
     destination,
     amount,
     feePayer,
-    recentBlockhash,
   }: {
+    account: PublicKey;
     destination: string;
     amount: u64;
     feePayer?: PublicKey | null;
-    recentBlockhash?: string;
   }): Promise<PreparedTransaction> {
-    const account = this.provider.wallet.publicKey;
-
     const feePayerNew = feePayer ?? account;
     const fromPublicKey = account;
 
@@ -481,46 +627,42 @@ export class SolanaSDK {
       throw SolanaSDKError.other('You can not send tokens to yourself');
     }
 
-    // check
-    return this.getAccountInfo({
-      account: destination,
-      decodedTo: EmptyInfo,
-    })
-      .then((info) => {
-        if (!info.owner.equals(SolanaSDKPublicKey.programId)) {
-          throw SolanaSDKError.other('Invalid account info');
-        }
-        return;
-      })
-      .catch((error) => {
-        if (error === SolanaSDKError.couldNotRetrieveAccountInfo()) {
-          // let request through
-          return;
-        }
-        throw error;
-      })
-      .then(() => {
-        // form instruction
-        const instruction = SystemProgram.transfer({
-          fromPubkey: fromPublicKey,
-          toPubkey: new PublicKey(destination),
-          lamports: amount.toNumber(),
-        });
-
-        return this.prepareTransaction({
-          instructions: [instruction],
-          signers: [
-            /* account */
-          ],
-          feePayer: feePayerNew,
-          accountsCreationFee: ZERO,
-          recentBlockhash,
-        });
+    let accountInfo: BufferInfo<EmptyInfo> | null = null;
+    try {
+      accountInfo = await this.getAccountInfo({
+        account: destination,
+        decodedTo: EmptyInfo,
       });
+      if (accountInfo?.owner.toString() !== SolanaSDKPublicKey.programId.toString()) {
+        throw SolanaSDKError.other('Invalid account info');
+      }
+    } catch (error) {
+      console.error(error);
+      if (error === SolanaSDKError.couldNotRetrieveAccountInfo()) {
+        // ignoring error
+        accountInfo = null;
+      } else {
+        throw error;
+      }
+    }
+
+    // form instruction
+    const instruction = SystemProgram.transfer({
+      fromPubkey: fromPublicKey,
+      toPubkey: new PublicKey(destination),
+      lamports: amount.toNumber(),
+    });
+
+    return this.prepareTransaction({
+      owner: account, // instead of signers with owner
+      instructions: [instruction],
+      feePayer: feePayerNew,
+    });
   }
 
   /// Create prepared transaction for sending SPL token
-  prepareSendingSPLTokens({
+  async prepareSendingSPLTokens({
+    account,
     mintAddress,
     decimals,
     fromPublicKey,
@@ -531,6 +673,7 @@ export class SolanaSDK {
     recentBlockhash,
     minRentExemption,
   }: {
+    account: PublicKey;
     mintAddress: string;
     decimals: number;
     fromPublicKey: string;
@@ -544,200 +687,207 @@ export class SolanaSDK {
     preparedTransaction: PreparedTransaction;
     realDestination: string;
   }> {
-    const account = this.provider.wallet.publicKey;
-
     const feePayerNew = feePayer ?? account;
 
-    let minRentExemptionRequest: Promise<Lamports>;
+    let minRentExemptionNew: Lamports;
     if (minRentExemption) {
-      minRentExemptionRequest = Promise.resolve(minRentExemption);
+      minRentExemptionNew = minRentExemption;
     } else {
-      minRentExemptionRequest = this.getMinimumBalanceForRentExemption(AccountInfo.span);
+      minRentExemptionNew = await this.getMinimumBalanceForRentExemption(AccountInfo.span);
+    }
+    const splDestination = await this.findSPLTokenDestinationAddress({
+      mintAddress,
+      destinationAddress,
+    });
+
+    // get address
+    const toPublicKey = splDestination.destination;
+
+    // catch error
+    if (fromPublicKey === toPublicKey.toString()) {
+      throw SolanaSDKError.other('You can not send tokens to yourself');
     }
 
-    // Request
-    return Promise.all([
-      this.findSPLTokenDestinationAddress({
-        mintAddress,
-        destinationAddress,
-      }),
-      minRentExemptionRequest,
-    ]).then(([splDestinationAddress, minRentExempt]) => {
-      // get address
-      const toPublicKey = splDestinationAddress.destination;
+    const fromPublicKeyNew = new PublicKey(fromPublicKey);
 
-      // catch error
-      if (fromPublicKey === toPublicKey.toString()) {
-        throw SolanaSDKError.other('You can not send tokens to yourself');
-      }
+    const instructions: TransactionInstruction[] = [];
 
-      const fromPublicKeyNew = new PublicKey(fromPublicKey);
+    // create associated token address
+    let accountsCreationFee: u64 = ZERO;
+    if (splDestination.isUnregisteredAsocciatedToken) {
+      const mint = new PublicKey(mintAddress);
+      const ownerNew = new PublicKey(destinationAddress);
 
-      const instructions: TransactionInstruction[] = [];
+      const associatedAccount = getAssociatedTokenAddressSync(mint, ownerNew);
+      const createATokenInstruction = SPLToken.createAssociatedTokenAccountInstruction(
+        SolanaSDKPublicKey.splAssociatedTokenAccountProgramId,
+        SolanaSDKPublicKey.tokenProgramId,
+        mint,
+        associatedAccount,
+        ownerNew,
+        feePayerNew,
+      );
+      instructions.push(createATokenInstruction);
+      accountsCreationFee = accountsCreationFee.sub(minRentExemptionNew);
+    }
 
-      // create associated token address
-      let accountsCreationFee: u64 = ZERO;
-      if (splDestinationAddress.isUnregisteredAsocciatedToken) {
-        const mint = new PublicKey(mintAddress);
-        const ownerNew = new PublicKey(destinationAddress);
+    // send instruction
+    let sendInstruction: TransactionInstruction;
 
-        const createATokenInstruction = SPLToken.createAssociatedTokenAccountInstruction(
-          SolanaSDKPublicKey.splAssociatedTokenAccountProgramId,
-          SolanaSDKPublicKey.tokenProgramId,
-          mint,
-          toPublicKey,
-          ownerNew,
-          feePayerNew,
-        );
-        instructions.push(createATokenInstruction);
-        accountsCreationFee = accountsCreationFee.sub(minRentExempt);
-      }
+    // use transfer checked transaction for proxy, otherwise use normal transfer transaction
+    if (transferChecked) {
+      // transfer checked transaction
+      sendInstruction = SPLToken.createTransferCheckedInstruction(
+        SolanaSDKPublicKey.tokenProgramId,
+        fromPublicKeyNew,
+        new PublicKey(mintAddress),
+        splDestination.destination,
+        account,
+        [],
+        amount,
+        decimals,
+      );
+    } else {
+      // transfer transaction
+      sendInstruction = SPLToken.createTransferInstruction(
+        SolanaSDKPublicKey.tokenProgramId,
+        fromPublicKeyNew,
+        toPublicKey,
+        account,
+        [],
+        amount,
+      );
+    }
 
-      // send instruction
-      let sendInstruction: TransactionInstruction;
+    instructions.push(sendInstruction);
 
-      // use transfer checked transaction for proxy, otherwise use normal transfer transaction
-      if (transferChecked) {
-        // transfer checked transaction
-        sendInstruction = SPLToken.createTransferCheckedInstruction(
-          SolanaSDKPublicKey.tokenProgramId,
-          fromPublicKeyNew,
-          new PublicKey(mintAddress),
-          splDestinationAddress.destination,
-          account,
-          [],
-          amount,
-          decimals,
-        );
-      } else {
-        // transfer transaction
-        sendInstruction = SPLToken.createTransferInstruction(
-          SolanaSDKPublicKey.tokenProgramId,
-          fromPublicKeyNew,
-          toPublicKey,
-          account,
-          [],
-          amount,
-        );
-      }
+    let realDestination = destinationAddress;
+    if (!splDestination.isUnregisteredAsocciatedToken) {
+      realDestination = splDestination.destination.toString();
+    }
 
-      instructions.push(sendInstruction);
-
-      let realDestination = destinationAddress;
-      if (!splDestinationAddress.isUnregisteredAsocciatedToken) {
-        realDestination = splDestinationAddress.destination.toString();
-      }
-
-      // if not, serialize and send instructions normally
-      return this.prepareTransaction({
-        instructions,
-        signers: [
-          /* account */
-        ],
-        feePayer: feePayerNew,
-        accountsCreationFee,
-        recentBlockhash,
-      }).then((preparedTransaction) => ({
-        preparedTransaction,
-        realDestination,
-      }));
+    // if not, serialize and send instructions normally
+    const preparedTransaction = await this.prepareTransaction({
+      owner: this.provider.wallet.publicKey, // instead of signers with owner
+      instructions,
+      feePayer: feePayerNew,
     });
+
+    return {
+      preparedTransaction,
+      realDestination,
+    };
   }
 
   // Helpers
 
-  findSPLTokenDestinationAddress({
+  async findSPLTokenDestinationAddress({
     mintAddress,
     destinationAddress,
   }: {
     mintAddress: string;
     destinationAddress: string;
   }): Promise<SPLTokenDestinationAddress> {
-    return this.getAccountInfo({
-      account: destinationAddress,
-      decodedTo: AccountInfo,
-    })
-      .then(async (info) => {
-        const toTokenMint = info.data.mint.toString();
-
-        // detect if destination address is already a SPLToken address
-        if (mintAddress === toTokenMint) {
-          return destinationAddress;
-        }
-
-        // detect if destination address is a SOL address
-        if (info.owner.equals(SolanaSDKPublicKey.programId)) {
-          const owner = new PublicKey(destinationAddress);
-          const tokenMint = new PublicKey(mintAddress);
-
-          // create associated token address
-          const address = await SPLToken.getAssociatedTokenAddress(
-            SolanaSDKPublicKey.splAssociatedTokenAccountProgramId,
-            SolanaSDKPublicKey.tokenProgramId,
-            tokenMint,
-            owner,
-          );
-          return address.toString();
-        }
-
-        // token is of another type
-        throw SolanaSDKError.invalidRequest('Wallet address is not valid');
-      })
-      .catch(async (error: Error) => {
-        // let request through if result of getAccountInfo is null (it may be a new SOL address)
-        if (SolanaSDKError.equals(error, SolanaSDKError.couldNotRetrieveAccountInfo())) {
-          const owner = new PublicKey(destinationAddress);
-          const tokenMint = new PublicKey(mintAddress);
-
-          // create associated token address
-          const address = await SPLToken.getAssociatedTokenAddress(
-            SolanaSDKPublicKey.splAssociatedTokenAccountProgramId,
-            SolanaSDKPublicKey.tokenProgramId,
-            tokenMint,
-            owner,
-          );
-          return address.toString();
-        }
-
-        // throw another error
-        throw error;
-      })
-      .then((toAddress) => {
-        const toPublicKey = new PublicKey(toAddress);
-        // if destination address is an SOL account address
-        if (destinationAddress !== toPublicKey.toString()) {
-          // check if associated address is already registered
-          return this.getAccountInfo({
-            account: toPublicKey.toString(),
-            decodedTo: AccountInfo,
-          })
-            .catch(() => null)
-            .then((info) => {
-              let isUnregisteredAsocciatedToken = true;
-
-              // if associated token account has been registered
-              if (info?.owner) {
-                isUnregisteredAsocciatedToken = false;
-              }
-
-              // if not, create one in next step
-              return new SPLTokenDestinationAddress({
-                destination: toPublicKey,
-                isUnregisteredAsocciatedToken,
-              });
-            });
-        }
-        return new SPLTokenDestinationAddress({
-          destination: toPublicKey,
-          isUnregisteredAsocciatedToken: false,
-        });
+    let address: string;
+    let accountInfo: BufferInfo<AccountInfo | null> | null = null;
+    try {
+      accountInfo = await this.getAccountInfoThrowable({
+        account: destinationAddress,
+        decodedTo: AccountInfo,
       });
+      const toTokenMint = accountInfo?.data?.mint.toString();
+      // detect if destination address is already a SPLToken address
+      if (mintAddress === toTokenMint) {
+        address = destinationAddress;
+      }
+      // detect if destination address is a SOL address
+      else if (accountInfo?.owner.toString() === SolanaSDKPublicKey.programId.toString()) {
+        const owner = new PublicKey(destinationAddress);
+        const tokenMint = new PublicKey(mintAddress);
+        // create associated token address
+        address = getAssociatedTokenAddressSync(tokenMint, owner).toString();
+      } else {
+        throw SolanaSDKError.invalidRequest('Wallet address is not valid');
+      }
+    } catch (error) {
+      console.error(error, accountInfo, destinationAddress);
+      // TODO: check its work
+      if (SolanaSDKError.equals(error as Error, SolanaSDKError.couldNotRetrieveAccountInfo())) {
+        const owner = new PublicKey(destinationAddress);
+        const tokenMint = new PublicKey(mintAddress);
+
+        // create associated token address
+        address = getAssociatedTokenAddressSync(tokenMint, owner).toString();
+      } else {
+        throw error;
+      }
+    }
+
+    // address needs here
+    const toPublicKey = new PublicKey(address);
+    // if destination address is an SOL account address
+    let isUnregisteredAsocciatedToken = false;
+    if (destinationAddress !== toPublicKey.toString()) {
+      // check if associated address is already registered
+      let info: BufferInfo<AccountInfo | null> | null = null;
+      try {
+        info = await this.getAccountInfoThrowable({
+          account: toPublicKey.toString(),
+          decodedTo: AccountInfo,
+        });
+      } catch {
+        info = null;
+      }
+      isUnregisteredAsocciatedToken = true;
+
+      // if associated token account has been registered
+      if (info?.owner.toString() === SolanaSDKPublicKey.tokenProgramId.toString()) {
+        isUnregisteredAsocciatedToken = false;
+      }
+    }
+
+    return new SPLTokenDestinationAddress({
+      destination: toPublicKey,
+      isUnregisteredAsocciatedToken,
+    });
   }
 
   // SolanaSDKCreateTokenAccount
 
   getCreatingTokenAccountFee(): Promise<u64> {
     return this.getMinimumBalanceForRentExemption(AccountInfo.span);
+  }
+
+  // SolanaSDKClose
+  closeTokenAccount({
+    // account = null,
+    tokenPubkey,
+    isSimulation = false,
+  }: {
+    // account: string;
+    tokenPubkey: string;
+    isSimulation?: boolean;
+  }): Promise<TransactionID> {
+    const account = this.provider.wallet.publicKey;
+    if (!account) {
+      throw SolanaSDKError.unauthorized();
+    }
+
+    const _tokenPubkey = new PublicKey(tokenPubkey);
+
+    const instruction = SPLToken.createCloseAccountInstruction(
+      SolanaSDKPublicKey.tokenProgramId,
+      _tokenPubkey,
+      account,
+      account,
+      [],
+    );
+
+    // TOOD: custom error wrapper
+    return this.serializeAndSendTraditional({
+      instructions: [instruction],
+      isSimulation,
+    });
   }
 
   // SolanaSDKTokens
@@ -772,21 +922,8 @@ export class SolanaSDK {
             'https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/CDJWUqTcYTVAKXAVXoQZFes5JUFc7owSeq7eMQcDSbo5/logo.png',
           extensions: {
             website: 'https://renproject.io/',
-            bridgeContract: null,
-            assetContract: null,
-            address: null,
-            explorer: null,
-            twitter: null,
-            github: null,
-            medium: null,
-            tgann: null,
-            tggroup: null,
-            discord: null,
-            serumV3Usdt: null,
             serumV3Usdc: '74Ciu5yRzhe8TFTHvQuEVbFZJrbnCMRoohBK33NNiPtv',
             coingeckoId: 'renbtc',
-            imageUrl: null,
-            description: null,
           },
         }),
       );
@@ -803,78 +940,78 @@ export class SolanaSDK {
     );
   }
 
-  getTokenWallets(account: string): Promise<Wallet[]> {
-    return Promise.all([
+  async getTokenWallets(account: string): Promise<Wallet[]> {
+    const knownWallets: Wallet[] = [];
+    const unknownAccounts: [string, AccountInfo][] = [];
+
+    const [list, supportedTokens] = await Promise.all([
       this.provider.connection.getTokenAccountsByOwner(new PublicKey(account), {
         programId: SolanaSDKPublicKey.tokenProgramId,
       }),
       this.getTokensList(),
-    ]).then(([list, supportedTokens]): Promise<Wallet[]> => {
-      const knownWallets: Wallet[] = [];
-      const unknownAccounts: [string, AccountInfo][] = [];
+    ]);
 
-      for (const item of list.value) {
-        const pubkey = item.pubkey;
-        const accountInfo = AccountInfo.decode(item.account.data);
+    for (const item of list.value) {
+      const pubkey = item.pubkey;
+      const accountInfo = AccountInfo.decode(item.account.data)!;
 
-        const mintAddress = accountInfo.mint.toString();
-        // known token
-        const token = supportedTokens.find(
-          (supportedToken) => supportedToken.address === mintAddress,
+      const mintAddress = accountInfo.mint.toString();
+      // known token
+      const token = supportedTokens.find(
+        (supportedToken) => supportedToken.address === mintAddress,
+      );
+      if (token) {
+        knownWallets.push(
+          new Wallet({
+            pubkey: pubkey.toString(),
+            lamports: accountInfo.amount,
+            token,
+          }),
         );
-        if (token) {
-          knownWallets.push(
+      }
+      // unknown token
+      else {
+        unknownAccounts.push([item.pubkey.toString(), accountInfo]);
+      }
+    }
+
+    return this.getMultipleMintDatas({
+      mintAddresses: unknownAccounts.map((account) => account[1].mint.toString()),
+    })
+      .then((mintDatas): Wallet[] => {
+        if (Object.keys(mintDatas).length !== unknownAccounts.length) {
+          throw SolanaSDKError.unknown();
+        }
+
+        const wallets: Wallet[] = [];
+        for (const [index, item] of mintDatas.entries()) {
+          wallets.push(
             new Wallet({
-              pubkey: pubkey.toString(),
-              lamports: accountInfo.amount,
-              token,
+              pubkey: unknownAccounts[index]![0],
+              lamports: unknownAccounts[index]![1].amount,
+              token: Token.unsupported({
+                mint: unknownAccounts[index]![1].mint.toString(),
+                decimals: item?.decimals,
+              }),
             }),
           );
         }
-        // unknown token
-        else {
-          unknownAccounts.push([item.pubkey.toString(), accountInfo]);
-        }
-      }
 
-      return this.getMultipleMintDatas({
-        mintAddresses: unknownAccounts.map((account) => account[1].mint.toString()),
+        return wallets;
       })
-        .then((mintDatas): Wallet[] => {
-          if (Object.keys(mintDatas).length !== unknownAccounts.length) {
-            throw SolanaSDKError.unknown();
-          }
-
-          const wallets: Wallet[] = [];
-          for (const [index, item] of mintDatas.entries()) {
-            wallets.push(
-              new Wallet({
-                pubkey: unknownAccounts[index]![0],
-                lamports: unknownAccounts[index]![1].amount,
-                token: Token.unsupported({
-                  mint: unknownAccounts[index]![1].mint.toString(),
-                  decimals: item?.decimals,
-                }),
+      .catch(() => {
+        return unknownAccounts.map(
+          (account) =>
+            new Wallet({
+              pubkey: account[0],
+              lamports: account[1].amount,
+              token: Token.unsupported({
+                mint: account[1].mint.toString(),
               }),
-            );
-          }
-
-          return wallets;
-        })
-        .catch(() => {
-          return unknownAccounts.map(
-            (account) =>
-              new Wallet({
-                pubkey: account[0],
-                lamports: account[1].amount,
-                token: Token.unsupported({
-                  mint: account[1].mint.toString(),
-                }),
-              }),
-          );
-        })
-        .then((wallets) => knownWallets.concat(wallets));
-    });
+            }),
+        );
+      })
+      .then((wallets) => knownWallets.concat(wallets));
   }
 
   checkAccountValidation(account: string): Promise<boolean> {
@@ -890,5 +1027,34 @@ export class SolanaSDK {
 
         throw error;
       });
+  }
+
+  // TODO: check
+  /// Returns all information associated with the account of provided Pubkey
+  /// - Parameters:
+  ///  - account: Pubkey of account to query, as base-58 encoded string
+  /// - Throws: APIClientError and SolanaError.couldNotRetrieveAccountInfo
+  /// - Returns The result will be an BufferInfo
+  /// - SeeAlso https://docs.solana.com/developing/clients/jsonrpc-api#getaccountinfo
+  async getAccountInfoThrowable<T>({
+    account,
+    decodedTo,
+  }: {
+    account: string;
+    decodedTo: { decode(data: Buffer): T };
+  }): Promise<BufferInfo<T>> {
+    let info: BufferInfo<T> | null = null;
+    try {
+      info = await this.getAccountInfo({
+        account,
+        decodedTo,
+      });
+    } catch {
+      //
+    }
+    if (!info) {
+      throw SolanaSDKError.couldNotRetrieveAccountInfo();
+    }
+    return info;
   }
 }

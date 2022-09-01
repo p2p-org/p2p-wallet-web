@@ -1,14 +1,16 @@
 import type { PublicKey, Signer, TransactionInstruction } from '@solana/web3.js';
 
+import type { TransactionID } from 'new/sdk/SolanaSDK';
+
 export class SwapResponse {
-  transactionId: string;
+  transactionId: TransactionID;
   newWalletPubkey?: string | null;
 
   constructor({
     transactionId,
     newWalletPubkey,
   }: {
-    transactionId: string;
+    transactionId: TransactionID;
     newWalletPubkey?: string | null;
   }) {
     this.transactionId = transactionId;

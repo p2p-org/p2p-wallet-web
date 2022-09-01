@@ -5,7 +5,7 @@ import * as React from 'react';
 import { styled } from '@linaria/react';
 import { shadows, theme, up } from '@p2p-wallet-web/ui';
 
-import { Card } from 'new/ui/components/common/Card';
+import { Card } from 'new/ui/components/ui/Card';
 
 const Wrapper = styled(Card)`
   display: flex;

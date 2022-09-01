@@ -1,13 +1,14 @@
+import type { Token } from 'new/sdk/SolanaSDK';
 import { LogEvent, Logger } from 'new/sdk/SolanaSDK';
 
 export abstract class PricesFetcher {
   abstract readonly endpoint: string;
   abstract getCurrentPrices({
     coins,
-    toFiat,
+    fiat,
   }: {
-    coins: string[];
-    toFiat: string;
+    coins: Token[];
+    fiat: string;
   }): Promise<{ [key in string]: CurrentPrice | null }>;
 
   send<T>({ path }: { path: string }): Promise<T> {

@@ -2,13 +2,12 @@ import type { FC } from 'react';
 
 import type { Wallet } from 'new/sdk/SolanaSDK';
 import type { WalletsRepository } from 'new/services/Repositories';
-import { StaticSectionsCollectionView } from 'new/ui/components/common/StaticSectionsCollectionView';
 
-import { Title } from '../common/styled';
+import { StaticSectionsCollectionViewStyled, Title } from '../common/styled';
 import { VisibleWalletCell } from './VisibleWalletCell';
 
 interface Props {
-  viewModel: WalletsRepository;
+  viewModel: Readonly<WalletsRepository>;
 }
 
 export const WalletsSection: FC<Props> = ({ viewModel }) => {
@@ -19,7 +18,7 @@ export const WalletsSection: FC<Props> = ({ viewModel }) => {
   return (
     <>
       <Title>Tokens</Title>
-      <StaticSectionsCollectionView<Wallet>
+      <StaticSectionsCollectionViewStyled<Wallet>
         viewModel={viewModel}
         renderPlaceholder={(key) => <VisibleWalletCell key={key} isPlaceholder />}
         renderItem={(wallet: Wallet) => (

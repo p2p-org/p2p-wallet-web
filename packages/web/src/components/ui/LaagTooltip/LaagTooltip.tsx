@@ -1,4 +1,5 @@
 import type { FunctionComponent, ReactElement } from 'react';
+import { useEffect } from 'react';
 import type { Placement, UseHoverOptions, UseLayerOptions } from 'react-laag';
 import { Arrow, useHover, useLayer } from 'react-laag';
 
@@ -7,21 +8,6 @@ import { styled } from '@linaria/react';
 import { theme } from '@p2p-wallet-web/ui';
 
 import { Icon } from 'components/ui';
-
-interface TooltipProps {
-  elContent: string | ReactElement;
-  elAnchor?: string | ReactElement;
-  withClose?: boolean;
-}
-
-type LaagProps = Pick<UseLayerOptions, 'auto' | 'snap' | 'possiblePlacements' | 'placement'> &
-  Pick<UseHoverOptions, 'hideOnScroll'>;
-
-type AnchorProps = {
-  iconColor?: string;
-};
-
-type OuterProps = LaagProps & AnchorProps & TooltipProps;
 
 const TooltipContent = styled.div`
   display: grid;
@@ -88,6 +74,22 @@ const CLOSE_BUTTON_SIZE = 12;
 const TOOLTIP_ARROW_SIZE = 10;
 const TOOLTIP_ARROW_ANGLE = 35;
 
+interface TooltipProps {
+  elContent: string | ReactElement;
+  elAnchor?: string | ReactElement;
+  withClose?: boolean;
+}
+
+type LaagProps = Pick<UseLayerOptions, 'auto' | 'snap' | 'possiblePlacements' | 'placement'> &
+  Pick<UseHoverOptions, 'hideOnScroll'>;
+
+type AnchorProps = {
+  iconColor?: string;
+  onChange?: (isOver: boolean) => void;
+};
+
+type OuterProps = LaagProps & AnchorProps & TooltipProps;
+
 export const LaagTooltip: FunctionComponent<OuterProps> = ({
   placement,
   withClose,
@@ -98,10 +100,17 @@ export const LaagTooltip: FunctionComponent<OuterProps> = ({
   iconColor,
   elContent,
   elAnchor,
+  onChange,
 }) => {
   const [isOver, hoverProps, close] = useHover({ hideOnScroll: hideOnScroll });
   const { onMouseEnter, onTouchEnd, onTouchStart } = hoverProps;
   const anchorProps = withClose ? { onMouseEnter, onTouchEnd, onTouchStart } : hoverProps;
+
+  useEffect(() => {
+    if (onChange) {
+      onChange(isOver);
+    }
+  }, [isOver]);
 
   const { triggerProps, layerProps, arrowProps, renderLayer } = useLayer({
     isOpen: isOver,

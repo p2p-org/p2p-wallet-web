@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import { useEffect, useState } from 'react';
+import { useLayoutEffect, useState } from 'react';
 
 import { styled } from '@linaria/react';
 import { TokenAmount } from '@p2p-wallet-web/token-utils';
@@ -9,9 +9,9 @@ import { observer } from 'mobx-react-lite';
 import type { BuyViewModelProps } from 'new/scenes/Main/Buy/Subviews/Moonpay/types';
 import type { Token } from 'new/sdk/SolanaSDK';
 import { FiatCurrency } from 'new/services/BuyService/structures';
-import { InputAmount } from 'new/ui/components/common/InputAmount';
+import { AmountTypeButton } from 'new/ui/components/common/AmountTypeButton';
 import { TokenAvatar } from 'new/ui/components/common/TokenAvatar';
-import { AmountTypeButton } from 'new/ui/components/pages/buy/AmountTypeButton';
+import { InputAmount } from 'new/ui/components/ui/InputAmount';
 import { numberToUSDString } from 'new/utils/NumberExtensions';
 
 const Wrapper = styled.div`
@@ -43,7 +43,7 @@ const Title = styled.div`
 export const Inputs: FC<BuyViewModelProps> = observer(({ viewModel }) => {
   const [token, setToken] = useState<Token | undefined>();
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     viewModel.getToken(viewModel.crypto.mintAddress).then(setToken);
   }, [viewModel.crypto.mintAddress]);
 

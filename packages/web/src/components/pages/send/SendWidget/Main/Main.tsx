@@ -28,14 +28,14 @@ const FromWrapper = styled.div`
 
   padding: 16px 20px;
 
-  border: 1px solid #f6f6f8;
+  border: 1px solid ${theme.colors.stroke.secondary};
   border-radius: 12px;
 `;
 
 const ToWrapper = styled.div`
   min-width: 0;
 
-  border: 1px solid #f6f6f8;
+  border: 1px solid ${theme.colors.stroke.secondary};
   border-radius: 12px;
 `;
 

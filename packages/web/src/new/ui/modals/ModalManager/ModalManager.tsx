@@ -8,12 +8,12 @@ import classNames from 'classnames';
 import { observer } from 'mobx-react-lite';
 import { expr } from 'mobx-utils';
 
-import type { ModalPropsType } from 'app/contexts';
 import { useViewModel } from 'new/core/viewmodels/useViewModel';
 import { ModalType } from 'new/services/ModalService';
 import { ScrollFix } from 'new/ui/components/common/ScollFix';
 
 import { ModalManagerViewModel } from './ModalManager.ViewModel';
+import type { ModalPropsType } from './types';
 
 const Wrapper = styled.div`
   position: fixed;
@@ -69,7 +69,7 @@ const getPreset: GetPresetFn = (modal) => {
 };
 
 const modalsMap = new Map<ModalType, LazyExoticComponent<ModalPropsType & any>>([
-  [ModalType.SHOW_MODAL_ACTIONS_MOBILE, lazy(() => import('new/ui/modals/ActionsMobileModal'))],
+  [ModalType.SHOW_MODAL_ACTIONS_MOBILE, lazy(() => import('../ActionsMobileModal'))],
   [
     ModalType.SHOW_MODAL_RECEIVE_BITCOIN,
     lazy(() => import('components/modals/ReceiveBitcoinModal')),
@@ -78,6 +78,8 @@ const modalsMap = new Map<ModalType, LazyExoticComponent<ModalPropsType & any>>(
     ModalType.SHOW_MODAL_TRANSACTION_CONFIRM,
     lazy(() => import('components/modals/TransactionConfirmModal')),
   ],
+  [ModalType.SHOW_MODAL_CONFIRM_SEND, lazy(() => import('../confirmModals/ConfirmSendModal'))],
+  [ModalType.SHOW_MODAL_PROCESS_TRANSACTION, lazy(() => import('../ProcessTransactionModal'))],
   [
     ModalType.SHOW_MODAL_TRANSACTION_DETAILS,
     lazy(() => import('components/modals/TransactionInfoModals/TransactionDetailsModal')),
@@ -100,7 +102,7 @@ const modalsMap = new Map<ModalType, LazyExoticComponent<ModalPropsType & any>>(
   ],
   [
     ModalType.SHOW_MODAL_CHOOSE_BUY_TOKEN_MOBILE,
-    lazy(() => import('new/ui/modals/ChooseBuyTokenMobileModal')),
+    lazy(() => import('../ChooseBuyTokenMobileModal')),
   ],
   [
     ModalType.SHOW_MODAL_SELECT_LIST_MOBILE,

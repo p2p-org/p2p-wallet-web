@@ -5,33 +5,39 @@ import { LogEvent, Logger } from '../index';
 import type { FeeAmount } from './FeeAmount';
 
 export class PreparedTransaction {
+  owner: PublicKey;
   transaction: Transaction;
   signers: Signer[];
   expectedFee: FeeAmount;
 
   constructor({
+    owner,
     transaction,
     signers,
     expectedFee,
   }: {
+    owner: PublicKey;
     transaction: Transaction;
     signers: Signer[];
     expectedFee: FeeAmount;
   }) {
+    this.owner = owner;
     this.transaction = transaction;
     this.signers = signers;
     this.expectedFee = expectedFee;
+  }
+
+  sign() {
+    this.transaction.sign(...this.signers);
   }
 
   serialize(): string {
     const transaction = this.transaction;
     const serializedTransaction = transaction.serialize().toString('base64');
 
-    // if (debug)
     Logger.log(serializedTransaction, LogEvent.info);
     const decodedTransaction = JSON.stringify(transaction);
     Logger.log(decodedTransaction, LogEvent.info);
-    //
 
     return serializedTransaction;
   }

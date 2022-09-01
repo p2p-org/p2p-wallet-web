@@ -1,6 +1,5 @@
-import { SYSTEM_PROGRAM_ID } from '@p2p-wallet-web/core';
 import { ASSOCIATED_TOKEN_PROGRAM_ID, NATIVE_MINT, TOKEN_PROGRAM_ID } from '@solana/spl-token';
-import { PublicKey, SYSVAR_RENT_PUBKEY } from '@solana/web3.js';
+import { PublicKey, SystemProgram, SYSVAR_RENT_PUBKEY } from '@solana/web3.js';
 
 export class SolanaSDKPublicKey {
   static get tokenProgramId(): PublicKey {
@@ -10,7 +9,7 @@ export class SolanaSDKPublicKey {
     return SYSVAR_RENT_PUBKEY;
   }
   static get programId(): PublicKey {
-    return SYSTEM_PROGRAM_ID;
+    return SystemProgram.programId;
   }
   static get wrappedSOLMint(): PublicKey {
     return NATIVE_MINT;

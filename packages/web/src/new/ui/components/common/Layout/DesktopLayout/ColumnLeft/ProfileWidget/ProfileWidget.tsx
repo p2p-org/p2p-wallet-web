@@ -6,8 +6,8 @@ import { rgba } from 'polished';
 
 import { ToastManager } from 'components/common/ToastManager';
 import { Icon } from 'components/ui';
-import { Avatar } from 'new/ui/components/common/Avatar';
 import { Widget } from 'new/ui/components/common/Widget';
+import { Avatar } from 'new/ui/components/ui/Avatar';
 
 const Top = styled.div`
   display: flex;

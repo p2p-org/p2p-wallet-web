@@ -6,7 +6,7 @@
 export abstract class LifeCycleObject {
   protected initGuard = 0;
 
-  initialize() {
+  initialize(): void {
     ++this.initGuard;
 
     if (this.initGuard > 1) {
@@ -16,7 +16,7 @@ export abstract class LifeCycleObject {
     this.onInitialize();
   }
 
-  end() {
+  end(): void {
     --this.initGuard;
 
     if (this.initGuard > 0) {

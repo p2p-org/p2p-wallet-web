@@ -57,7 +57,7 @@ export const useViewModel = <T extends ViewModel>(token: constructor<T>) => {
   let vm = DependencyService.resolveSafe(token) as T;
   if (!vm) {
     DependencyService.container().register(token, {
-      useFactory: instanceCachingFactory((dependencyContainer: DependencyContainer) => {
+      useFactory: instanceCachingFactory((_dependencyContainer: DependencyContainer) => {
         return new token();
       }),
     });
