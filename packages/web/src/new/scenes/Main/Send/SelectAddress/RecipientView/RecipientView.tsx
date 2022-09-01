@@ -7,9 +7,9 @@ import classNames from 'classnames';
 import { observer } from 'mobx-react-lite';
 import { expr } from 'mobx-utils';
 
-import { AddressText } from 'components/common/AddressText';
 import { Icon } from 'components/ui';
 import type { Recipient } from 'new/scenes/Main/Send';
+import { AddressText } from 'new/ui/components/common/AddressText';
 
 const Wrapper = styled.div`
   display: flex;

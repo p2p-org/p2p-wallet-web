@@ -1491,8 +1491,6 @@ export class FeeRelayerRelay implements FeeRelayerRelayType {
 
     // STEP 4: send transaction
     const signatures = topUpTransaction.preparedTransaction.transaction.signatures;
-    console.log(555);
-    signatures.map((a) => console.log(a.publicKey.toString(), a.signature));
     if (signatures.length < 2) {
       throw FeeRelayerError.invalidSignature();
     }
@@ -1822,11 +1820,6 @@ export class FeeRelayerRelay implements FeeRelayerRelayType {
     if (signers.length !== 0) {
       transaction.sign(...signers);
     }
-
-    console.log(
-      444,
-      signers.map((signer) => signer.publicKey.toString()),
-    );
 
     const signedTransaction = await this.solanaClient.provider.wallet.signTransaction(transaction);
 

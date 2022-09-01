@@ -2,8 +2,8 @@ import type { FC } from 'react';
 
 import { observer } from 'mobx-react-lite';
 
-import { AddressText } from 'components/common/AddressText';
 import type { SendViewModel } from 'new/scenes/Main/Send';
+import { AddressText } from 'new/ui/components/common/AddressText';
 
 import {
   FieldInfo,

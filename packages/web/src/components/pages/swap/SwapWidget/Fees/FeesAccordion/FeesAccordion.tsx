@@ -1,8 +1,8 @@
 import type { FC } from 'react';
 import type { UseAsyncReturn } from 'react-async-hook';
 
-import { LoaderBlock } from 'components/common/LoaderBlock';
 import { Accordion } from 'components/ui';
+import { LoaderBlock } from 'new/ui/components/common/LoaderBlock';
 
 interface Props {
   totalFee: UseAsyncReturn<string, any>;

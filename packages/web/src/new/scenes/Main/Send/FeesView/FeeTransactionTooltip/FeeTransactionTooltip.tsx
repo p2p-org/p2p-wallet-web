@@ -4,9 +4,9 @@ import { useCallback, useMemo, useState } from 'react';
 import { styled } from '@linaria/react';
 import { theme } from '@p2p-wallet-web/ui';
 
-import { LoaderBlock } from 'components/common/LoaderBlock';
 import { LaagTooltip } from 'components/ui';
 import type * as FeeRelayer from 'new/sdk/FeeRelayer';
+import { LoaderBlock } from 'new/ui/components/common/LoaderBlock';
 
 const TooltipContent = styled.div`
   width: 300px;

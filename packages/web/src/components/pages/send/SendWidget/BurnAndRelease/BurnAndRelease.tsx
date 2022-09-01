@@ -9,8 +9,8 @@ import RenJS from '@renproject/ren';
 import type { BurnSession, BurnTransaction } from '@renproject/ren-tx';
 import { BurnStates, isBurnErroring } from '@renproject/ren-tx';
 
-import { LoaderBlock } from 'components/common/LoaderBlock';
 import { Accordion, Button } from 'components/ui';
+import { LoaderBlock } from 'new/ui/components/common/LoaderBlock';
 import { useBurnAndRelease } from 'utils/hooks/renBridge/useBurnAndRelease';
 import { useRenNetwork } from 'utils/hooks/renBridge/useNetwork';
 
@@ -77,7 +77,9 @@ const BurnStatusItem: FC<{
         </StatusItem>
       );
     case BurnStates.CONFIRMING_BURN:
-      if (!tx) return <LoaderBlock />;
+      if (!tx) {
+        return <LoaderBlock />;
+      }
       return (
         <StatusItem>
           <Status>
@@ -118,7 +120,9 @@ const BurnStatusItem: FC<{
       );
     case BurnStates.ERROR_BURNING:
     case BurnStates.ERROR_RELEASING:
-      if (!isBurnErroring(session)) return <LoaderBlock />;
+      if (!isBurnErroring(session)) {
+        return <LoaderBlock />;
+      }
       return (
         <StatusItem>
           <Status>

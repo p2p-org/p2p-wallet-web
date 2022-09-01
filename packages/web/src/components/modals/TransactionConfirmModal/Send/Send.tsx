@@ -6,12 +6,12 @@ import type { TokenAmount } from '@p2p-wallet-web/token-utils';
 import { theme } from '@p2p-wallet-web/ui';
 import type { PublicKey } from '@solana/web3.js';
 
-import { AddressText } from 'components/common/AddressText';
 import { AmountUSD } from 'components/common/AmountUSD';
 import { TokenAvatar } from 'components/common/TokenAvatar';
 import type { TransactionDetailsProps } from 'components/common/TransactionDetails';
 import { TransactionDetails } from 'components/common/TransactionDetails';
 import { Icon } from 'components/ui';
+import { AddressText } from 'new/ui/components/common/AddressText';
 
 import {
   FieldInfo,

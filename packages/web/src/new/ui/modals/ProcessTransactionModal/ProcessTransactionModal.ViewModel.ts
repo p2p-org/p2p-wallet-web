@@ -1,4 +1,5 @@
-import { makeObservable, observable } from 'mobx';
+import { action, makeObservable, observable } from 'mobx';
+import assert from 'ts-invariant';
 import { injectable } from 'tsyringe';
 
 import { PendingTransaction, TransactionStatus } from 'new/app/models/PendingTransaction';
@@ -9,7 +10,7 @@ import { TransactionHandler } from 'new/services/TransactionHandler';
 import type { RawTransactionType } from './ProcessTransaction.Models';
 
 interface ProcessTransactionModalViewModelType {
-  pendingTransaction: PendingTransaction;
+  pendingTransaction: PendingTransaction | null;
   observingTransactionIndex: number | null;
 }
 
@@ -18,20 +19,31 @@ export class ProcessTransactionModalViewModel
   extends ViewModel
   implements ProcessTransactionModalViewModelType
 {
-  pendingTransaction: PendingTransaction;
-  observingTransactionIndex: number | null = null;
-
-  rawTransaction: RawTransactionType;
+  rawTransaction: RawTransactionType | null;
+  pendingTransaction: PendingTransaction | null;
+  observingTransactionIndex: number | null;
 
   constructor(private _transactionHandler: TransactionHandler) {
     super();
 
+    this.rawTransaction = null;
+    this.pendingTransaction = null;
+    this.observingTransactionIndex = null;
+
     makeObservable(this, {
+      rawTransaction: observable,
       pendingTransaction: observable,
       observingTransactionIndex: observable,
 
-      rawTransaction: observable,
+      setTransaction: action,
+      sendAndObserveTransaction: action,
     });
+  }
+
+  protected override setDefaults() {
+    this.rawTransaction = null;
+    this.pendingTransaction = null;
+    this.observingTransactionIndex = null;
   }
 
   protected override onInitialize() {}
@@ -40,7 +52,6 @@ export class ProcessTransactionModalViewModel
 
   setTransaction(processingTransaction: RawTransactionType) {
     this.rawTransaction = processingTransaction;
-
     this.pendingTransaction = new PendingTransaction({
       transactionId: null,
       sentAt: new Date(),
@@ -50,20 +61,24 @@ export class ProcessTransactionModalViewModel
   }
 
   get isSwapping(): boolean {
+    assert(this.rawTransaction, 'rawTransaction is not set');
     return this.rawTransaction.isSwap;
   }
 
   get transactionID(): string | null {
+    assert(this.pendingTransaction, 'pendingTransaction is not set');
     return this.pendingTransaction.transactionId;
   }
 
   getMainDescription(): string {
+    assert(this.rawTransaction, 'rawTransaction is not set');
     return this.rawTransaction.mainDescription;
   }
 
   // Actions
 
   sendAndObserveTransaction(): void {
+    assert(this.rawTransaction, 'rawTransaction is not set');
     // send transaction and get observation index
     const index = this._transactionHandler.sendTransaction(this.rawTransaction);
     this.observingTransactionIndex = index;

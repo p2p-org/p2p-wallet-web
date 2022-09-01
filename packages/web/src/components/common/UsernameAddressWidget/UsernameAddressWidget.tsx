@@ -6,9 +6,9 @@ import { borders, shadows, theme, up, useIsMobile, useIsTablet } from '@p2p-wall
 import QRCode from 'qrcode.react';
 
 import Logo from 'assets/images/logo.png';
-import { AddressText } from 'components/common/AddressText';
 import { ToastManager } from 'components/common/ToastManager';
 import { Button } from 'components/ui';
+import { AddressText } from 'new/ui/components/common/AddressText';
 import { trackEvent } from 'utils/analytics';
 import { askClipboardWritePermission, setToClipboard } from 'utils/clipboard';
 
