@@ -38,7 +38,7 @@ const App: React.FC = () => {
   return (
     <>
       <Sentry.ErrorBoundary>
-        <Router basename={process.env.REACT_APP_BASENAME}>
+        <Router basename={process.env.PUBLIC_URL}>
           <Providers>
             <Root>
               <LocationManager />

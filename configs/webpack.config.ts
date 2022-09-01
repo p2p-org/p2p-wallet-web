@@ -2,6 +2,7 @@ import ReactRefreshWebpackPlugin from '@pmmmwh/react-refresh-webpack-plugin';
 import { CleanWebpackPlugin } from 'clean-webpack-plugin';
 import CopyPlugin from 'copy-webpack-plugin';
 import CssMinimizerPlugin from 'css-minimizer-webpack-plugin';
+import dotenv from 'dotenv';
 import DotEnv from 'dotenv-webpack';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 import ImageMinimizerPlugin from 'image-minimizer-webpack-plugin';
@@ -32,6 +33,10 @@ const DEV_PORT = 3000;
 const APP_TITLE = 'Solana Wallet';
 const WEB_PATH = path.resolve(__dirname, '../packages/web');
 const PACKAGE_PATH = path.resolve(__dirname, '../packages');
+const ENV_FILE_PATH = path.join(WEB_PATH, '/.env.development');
+
+// it sets process.env vars but it does not overwrite them
+dotenv.config({ path: ENV_FILE_PATH });
 
 const config: ConfigFn = (env, argv) => {
   const __DEVELOPMENT__ = argv.mode === 'development';
@@ -80,7 +85,7 @@ const config: ConfigFn = (env, argv) => {
       // These ENVs are for passing secrets on CI in opposite to passing them from .env
       new webpack.DefinePlugin({
         'process.env': {
-          REACT_APP_BASENAME: JSON.stringify(process.env.REACT_APP_BASENAME),
+          PUBLIC_URL: JSON.stringify(process.env.PUBLIC_URL),
           REACT_APP_AMPLITUDE_API_KEY: JSON.stringify(process.env.REACT_APP_AMPLITUDE_API_KEY),
           REACT_APP_CRYPTO_COMPARE_API_KEY: JSON.stringify(
             process.env.REACT_APP_CRYPTO_COMPARE_API_KEY,
@@ -292,7 +297,7 @@ const config: ConfigFn = (env, argv) => {
       ),
       // These ENVs are passed from local .env file (in opposite to those from CI secrets)
       new DotEnv({
-        path: path.join(WEB_PATH, '/.env.development'),
+        path: ENV_FILE_PATH,
         ignoreStub: true,
       }),
       new webpack.DefinePlugin({
