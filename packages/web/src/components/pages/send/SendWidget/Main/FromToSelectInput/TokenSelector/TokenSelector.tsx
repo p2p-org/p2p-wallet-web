@@ -1,6 +1,5 @@
 import type { FC } from 'react';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import * as React from 'react';
 
 import { styled } from '@linaria/react';
 import type { TokenAccount } from '@p2p-wallet-web/core';
@@ -14,8 +13,7 @@ import { Empty } from 'components/common/Empty';
 import { SlideContainer } from 'components/common/SlideContainer';
 import { TokenAccountRow } from 'components/common/TokenAccountRow';
 import { TokenAvatar } from 'components/common/TokenAvatar';
-import { Icon } from 'components/ui';
-import { SearchInput } from 'components/ui/SearchInput';
+import { Icon, SearchInput } from 'components/ui';
 import { matchesFilter, shortAddress, sortByRules } from 'utils/tokens';
 
 const Wrapper = styled.div``;

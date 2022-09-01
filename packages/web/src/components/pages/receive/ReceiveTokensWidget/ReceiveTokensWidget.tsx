@@ -8,7 +8,7 @@ import Fuse from 'fuse.js';
 import { useDebounce } from 'use-debounce';
 
 import { WidgetPage } from 'components/common/WidgetPage';
-import { SearchInput } from 'components/ui';
+import { SearchInput } from 'components/ui/SearchInput';
 
 import { EmptyError } from './common/EmptyError';
 import { Hint } from './common/Hint';
@@ -21,9 +21,7 @@ const Content = styled.div`
   padding: 16px 16px 0;
 `;
 
-interface Props {}
-
-export const ReceiveTokensWidget: FC<Props> = () => {
+export const ReceiveTokensWidget: FC = () => {
   const { tokens } = useTokensContext();
   const isTablet = useIsTablet();
 

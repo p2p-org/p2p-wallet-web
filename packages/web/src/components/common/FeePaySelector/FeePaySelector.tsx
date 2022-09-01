@@ -11,7 +11,7 @@ import { useMarketsData } from 'app/contexts';
 import { Empty } from 'components/common/Empty';
 import { TokenAvatar } from 'components/common/TokenAvatar';
 import { Icon } from 'components/ui';
-import { SearchInput } from 'components/ui/SearchInput';
+import { SearchInput } from 'new/ui/components/ui/SearchInput';
 import { matchesFilter, sortByRules } from 'utils/tokens';
 
 import { TokenAccountRow } from './TokenAccountRow';

@@ -1,5 +1,5 @@
-import type { FunctionComponent, HTMLAttributes } from 'react';
-import { useEffect, useMemo, useState } from 'react';
+import type { FC, HTMLAttributes } from 'react';
+import { useLayoutEffect, useMemo, useState } from 'react';
 
 import { styled } from '@linaria/react';
 import classNames from 'classnames';
@@ -46,14 +46,15 @@ type Props = {
   token?: Token;
 };
 
-export const TokenAvatar: FunctionComponent<Props & HTMLAttributes<HTMLDivElement>> = ({
+// TODO: sync ios
+export const TokenAvatar: FC<Props & HTMLAttributes<HTMLDivElement>> = ({
   token,
   className,
   ...props
 }) => {
   const [isDead, setIsDead] = useState<boolean>(false);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     setIsDead(false);
   }, [token?.logoURI]);
 

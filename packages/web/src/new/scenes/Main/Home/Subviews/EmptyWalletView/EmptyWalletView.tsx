@@ -4,9 +4,9 @@ import { useHistory, useLocation } from 'react-router';
 import { styled } from '@linaria/react';
 import { theme, up, useIsMobile } from '@p2p-wallet-web/ui';
 
-import { Card } from 'components/common/Card';
 import { NavButton, NavButtonIcon, NavButtons } from 'components/common/NavButtons';
 import type { HomeViewModel } from 'new/scenes/Main/Home';
+import { Card } from 'new/ui/components/ui/Card';
 
 import rocketImg from './rocket.png';
 

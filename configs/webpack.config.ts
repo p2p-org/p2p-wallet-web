@@ -91,17 +91,9 @@ const config: ConfigFn = (env, argv) => {
             process.env.REACT_APP_CRYPTO_COMPARE_API_KEY,
           ),
           REACT_APP_FEE_RELAYER_URL: JSON.stringify(process.env.REACT_APP_FEE_RELAYER_URL),
-          REACT_APP_FIGMENT_DATAHUB_API_KEY: JSON.stringify(
-            process.env.REACT_APP_FIGMENT_DATAHUB_API_KEY,
-          ),
           REACT_APP_INTERCOM_APP_ID: JSON.stringify(process.env.REACT_APP_INTERCOM_APP_ID),
           REACT_APP_MOONPAY_API_KEY: JSON.stringify(process.env.REACT_APP_MOONPAY_API_KEY),
           REACT_APP_MOONPAY_SIGNER_URL: JSON.stringify(process.env.REACT_APP_MOONPAY_SIGNER_URL),
-          REACT_APP_SWAP_HOST_FEE_ADDRESS: JSON.stringify(
-            process.env.REACT_APP_SWAP_HOST_FEE_ADDRESS,
-          ),
-          REACT_APP_TRANSAK_API_KEY: JSON.stringify(process.env.REACT_APP_TRANSAK_API_KEY),
-          REACT_APP_STAGING: JSON.stringify(process.env.REACT_APP_STAGING),
           REACT_APP_SENTRY_DSN_ENDPOINT: JSON.stringify(process.env.REACT_APP_SENTRY_DSN_ENDPOINT),
           REACT_APP_SENTRY_MODE: JSON.stringify(process.env.REACT_APP_SENTRY_MODE),
           REACT_APP_SENTRY_TRACES_SAMPLE_RATE: JSON.stringify(
@@ -139,6 +131,7 @@ const config: ConfigFn = (env, argv) => {
     entry: path.resolve(__dirname, WEB_PATH, '/src/index.tsx'),
 
     output: {
+      publicPath: __DEVELOPMENT__ ? '/' : undefined,
       path: path.resolve(__dirname, WEB_PATH, 'build'),
       filename: __DEVELOPMENT__ ? '[name].[contenthash].js' : '[contenthash].js',
       chunkFilename: __DEVELOPMENT__ ? '[id]-[contenthash].chunk.js' : '[contenthash].chunk.js',

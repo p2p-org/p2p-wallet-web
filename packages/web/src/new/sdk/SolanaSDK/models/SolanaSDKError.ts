@@ -1,3 +1,4 @@
+class UnauthorizedError extends Error {}
 class InvalidRequestError extends Error {}
 class OtherError extends Error {}
 class UnknownError extends Error {}
@@ -12,6 +13,10 @@ export class SolanaSDKError {
     }
 
     return false;
+  }
+
+  static unauthorized(): UnauthorizedError {
+    return new UnauthorizedError('unauthorized');
   }
 
   // Invalid Requests

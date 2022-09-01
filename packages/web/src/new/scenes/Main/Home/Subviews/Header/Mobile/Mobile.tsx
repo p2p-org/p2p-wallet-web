@@ -11,7 +11,7 @@ const Wrapper = styled.div`
 `;
 
 interface Props {
-  viewModel: HomeViewModel;
+  viewModel: Readonly<HomeViewModel>;
 }
 
 export const Mobile: FC<Props> = ({ viewModel }) => {

@@ -29,7 +29,7 @@ const StatusItem = styled.li`
 
   border-bottom: 1px solid #f6f6f8;
 
-  &:nth-last-child() {
+  &:last-child {
     border-bottom: none;
   }
 `;
@@ -77,7 +77,9 @@ const BurnStatusItem: FC<{
         </StatusItem>
       );
     case BurnStates.CONFIRMING_BURN:
-      if (!tx) return <LoaderBlock />;
+      if (!tx) {
+        return <LoaderBlock />;
+      }
       return (
         <StatusItem>
           <Status>
@@ -118,7 +120,9 @@ const BurnStatusItem: FC<{
       );
     case BurnStates.ERROR_BURNING:
     case BurnStates.ERROR_RELEASING:
-      if (!isBurnErroring(session)) return <LoaderBlock />;
+      if (!isBurnErroring(session)) {
+        return <LoaderBlock />;
+      }
       return (
         <StatusItem>
           <Status>

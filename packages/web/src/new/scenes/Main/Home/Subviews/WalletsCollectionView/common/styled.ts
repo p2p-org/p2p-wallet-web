@@ -1,6 +1,8 @@
 import { styled } from '@linaria/react';
 import { theme, up } from '@p2p-wallet-web/ui';
 
+import { StaticSectionsCollectionView } from 'new/ui/components/common/StaticSectionsCollectionView';
+
 export const Title = styled.div`
   position: relative;
 
@@ -20,5 +22,14 @@ export const Title = styled.div`
   ${up.tablet} {
     margin-left: initial;
     padding-left: 8px;
+  }
+`;
+
+export const StaticSectionsCollectionViewStyled = styled(StaticSectionsCollectionView)`
+  display: grid;
+  grid-gap: 8px;
+
+  ${up.tablet} {
+    grid-gap: 16px;
   }
 `;

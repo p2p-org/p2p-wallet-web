@@ -8,7 +8,6 @@ const Address = styled.div`
   flex-grow: 1;
 
   color: ${theme.colors.textIcon.primary};
-  font-weight: 600;
 
   &.small {
     font-weight: normal;
@@ -25,6 +24,7 @@ const Address = styled.div`
   }
 
   &.big {
+    font-weight: 600;
     font-size: 18px;
   }
 `;

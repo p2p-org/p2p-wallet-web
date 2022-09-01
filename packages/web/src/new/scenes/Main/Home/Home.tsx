@@ -1,5 +1,4 @@
-import type { FunctionComponent } from 'react';
-import { useEffect } from 'react';
+import type { FC } from 'react';
 
 import { styled } from '@linaria/react';
 import { up, useIsMobile } from '@p2p-wallet-web/ui';
@@ -23,13 +22,13 @@ const Content = styled.div`
   }
 `;
 
-export const Home: FunctionComponent = observer(() => {
+export const Home: FC = observer(() => {
   const viewModel = useViewModel<HomeViewModel>(HomeViewModel);
   const isMobile = useIsMobile();
 
-  useEffect(() => {
-    viewModel.walletsRepository.reload();
-  }, [viewModel.walletsRepository]);
+  // useLayoutEffect(() => {
+  //   viewModel.walletsRepository.reload();
+  // }, [viewModel.walletsRepository]);
 
   return (
     <Layout>

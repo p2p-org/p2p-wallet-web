@@ -49,11 +49,11 @@ const Balance = styled.div`
 `;
 
 interface Props {
-  viewModel: HomeViewModel;
+  viewModel: Readonly<HomeViewModel>;
 }
 
 export const BalanceView: FC<Props> = observer(({ viewModel }) => {
-  const domain = Defaults.apiEndPoint.network === 'mainnet-beta' ? '.p2p.sol' : '.p2p';
+  const domain = Defaults.apiEndpoint.network === 'mainnet-beta' ? '.p2p.sol' : '.p2p';
 
   return (
     <Wrapper>

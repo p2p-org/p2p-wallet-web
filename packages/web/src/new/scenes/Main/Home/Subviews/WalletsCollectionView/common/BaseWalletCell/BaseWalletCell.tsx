@@ -5,10 +5,11 @@ import { Link } from 'react-router-dom';
 import { styled } from '@linaria/react';
 import { borders, theme, up, useIsMobile, useIsTablet } from '@p2p-wallet-web/ui';
 
-import { SwipeToRevealActions } from 'components/common/SwipeToRevealActions';
 import { Icon } from 'components/ui';
 import type { Wallet } from 'new/sdk/SolanaSDK';
-import { TokenAvatarStyled, WalletRowContent } from 'new/ui/components/common/WalletRowContent';
+import { BaseWalletCellContent } from 'new/ui/components/common/BaseWalletCellContent';
+import { TokenAvatarStyled } from 'new/ui/components/common/BaseWalletCellContent/styled';
+import { SwipeToRevealActions } from 'new/ui/components/common/SwipeToRevealActions';
 
 import { MenuStyled, TokenMenu } from './TokenMenu';
 
@@ -81,7 +82,7 @@ export const BaseWalletCell: FC<Props> = ({
   if (isPlaceholder) {
     return (
       <Wrapper>
-        <WalletRowContent isPlaceholder={isPlaceholder} />
+        <BaseWalletCellContent isPlaceholder={isPlaceholder} />
       </Wrapper>
     );
   }
@@ -94,13 +95,13 @@ export const BaseWalletCell: FC<Props> = ({
   ];
 
   // Mobile and not SOL
-  const SwipeOrFragment =
-    isMobile && !wallet?.token.isNativeSOL ? SwipeToRevealActions : React.Fragment;
+  const shouldHasSwipe = isMobile && !wallet?.token.isNativeSOL;
+  const SwipeOrFragment = shouldHasSwipe ? SwipeToRevealActions : React.Fragment;
 
   return (
-    <SwipeOrFragment {...(isMobile ? actions : undefined)}>
+    <SwipeOrFragment {...(shouldHasSwipe ? { actions } : {})}>
       <WrapperLink to={wallet ? `/wallet/${wallet.pubkey}` : ''}>
-        <WalletRowContent wallet={wallet} />
+        <BaseWalletCellContent wallet={wallet} />
         {isTablet && wallet ? (
           <TokenMenuStyled wallet={wallet} isHidden={isHidden} onToggleClick={onToggleClick!} />
         ) : undefined}

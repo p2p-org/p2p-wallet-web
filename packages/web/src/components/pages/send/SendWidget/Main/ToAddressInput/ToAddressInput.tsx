@@ -94,7 +94,7 @@ const ClearWrapper = styled.div`
   height: 32px;
 
   background: ${theme.colors.bg.primary};
-  border: 1px solid #d3d4de;
+  border: 1px solid ${theme.colors.stroke.primary};
   border-radius: 8px;
   cursor: pointer;
 `;

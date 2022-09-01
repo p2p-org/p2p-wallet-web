@@ -41,7 +41,7 @@ const titleBottomNameEl = (
   </>
 );
 
-const titleBottomValueEl = (titleBottomValue: string) =>
+const titleBottomValueEl = (titleBottomValue: string | ReactElement) =>
   titleBottomValue ? (
     <AccordionTitleSecondaryValue>{titleBottomValue}</AccordionTitleSecondaryValue>
   ) : null;
@@ -49,7 +49,7 @@ const titleBottomValueEl = (titleBottomValue: string) =>
 interface Props {
   title: string;
   titleBottomName: string | ReactElement;
-  titleBottomValue: string;
+  titleBottomValue: string | ReactElement;
 }
 
 export const AccordionTitle: FC<Props> = ({ title, titleBottomName, titleBottomValue }) => {

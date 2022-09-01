@@ -9,9 +9,8 @@ import { observer } from 'mobx-react-lite';
 import { Icon } from 'components/ui';
 import type { Wallet } from 'new/sdk/SolanaSDK';
 import type { WalletsRepository } from 'new/services/Repositories';
-import { StaticSectionsCollectionView } from 'new/ui/components/common/StaticSectionsCollectionView';
 
-import { Title } from '../common/styled';
+import { StaticSectionsCollectionViewStyled, Title } from '../common/styled';
 import { HidedWalletCell } from './HidedWalletCell';
 
 const ChevronIcon = styled(Icon)`
@@ -38,7 +37,7 @@ const ChevronWrapper = styled.div`
 `;
 
 interface Props {
-  viewModel: WalletsRepository;
+  viewModel: Readonly<WalletsRepository>;
 }
 
 export const HiddenWalletsSection: FC<Props> = observer(({ viewModel }) => {
@@ -74,7 +73,7 @@ export const HiddenWalletsSection: FC<Props> = observer(({ viewModel }) => {
         </ChevronWrapper>
       </Title>
       {viewModel.isHiddenWalletsShown ? (
-        <StaticSectionsCollectionView<Wallet>
+        <StaticSectionsCollectionViewStyled<Wallet>
           viewModel={viewModel}
           renderPlaceholder={(key) => <HidedWalletCell key={key} isPlaceholder />}
           renderItem={(wallet: Wallet) => (

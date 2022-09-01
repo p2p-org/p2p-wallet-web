@@ -14,6 +14,7 @@ import {
 } from 'new/services/BuyService/structures';
 import { LocationService } from 'new/services/LocationService';
 import { SolanaService } from 'new/services/SolanaService';
+import { numberToString } from 'new/utils/NumberExtensions';
 
 const UPDATE_INTERVAL = 10 * 1000; // 10 secs
 
@@ -170,7 +171,9 @@ export class BuyViewModel extends ViewModel {
         this.minCryptoAmount = minCryptoAmount;
 
         const newMinFiatAmount = Number(
-          Math.max(Math.ceil(minCryptoAmount * exchangeRate), minFiatAmount).toFixed(2),
+          numberToString(Math.max(Math.ceil(minCryptoAmount * exchangeRate), minFiatAmount), {
+            maximumFractionDigits: 2,
+          }),
         );
 
         this.minFiatAmount = newMinFiatAmount;

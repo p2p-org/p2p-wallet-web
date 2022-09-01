@@ -115,21 +115,23 @@ export class Token {
         'https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/CDJWUqTcYTVAKXAVXoQZFes5JUFc7owSeq7eMQcDSbo5/logo.png',
       extensions: {
         website: 'https://renproject.io/',
-        bridgeContract: null,
-        assetContract: null,
-        address: null,
-        explorer: null,
-        twitter: null,
-        github: null,
-        medium: null,
-        tgann: null,
-        tggroup: null,
-        discord: null,
-        serumV3Usdt: null,
         serumV3Usdc: '74Ciu5yRzhe8TFTHvQuEVbFZJrbnCMRoohBK33NNiPtv',
         coingeckoId: 'renbtc',
-        imageUrl: null,
-        description: null,
+      },
+    });
+  }
+
+  static get usdc(): Token {
+    return new Token({
+      chainId: 101,
+      address: SolanaSDKPublicKey.renBTCMint.toString(),
+      symbol: 'USDC',
+      name: 'USDC',
+      decimals: 8,
+      logoURI:
+        'https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v/logo.png',
+      extensions: {
+        coingeckoId: 'usd-coin',
       },
     });
   }

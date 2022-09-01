@@ -28,6 +28,7 @@ export class ModalService implements ModalServiceType {
     });
   }
 
+  // TODO: change order of types
   openModal<T, S extends {}>(modalType: ModalType, props?: S): Promise<T | void> {
     ++this._modalIdCounter;
 

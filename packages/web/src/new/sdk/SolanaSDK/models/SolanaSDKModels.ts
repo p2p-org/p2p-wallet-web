@@ -1,6 +1,7 @@
 import { u64 } from '@solana/spl-token';
 import type { TokenAmount } from '@solana/web3.js';
 
+export type TransactionID = string;
 export type Lamports = u64;
 
 export class TokenAccountBalance {

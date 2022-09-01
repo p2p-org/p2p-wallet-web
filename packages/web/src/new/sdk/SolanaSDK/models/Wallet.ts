@@ -1,11 +1,11 @@
 import { ZERO } from '@orca-so/sdk';
-import type { u64 } from '@solana/spl-token';
 import { makeAutoObservable } from 'mobx';
 import { isEmpty } from 'ramda';
 
 import { Defaults } from 'new/services/Defaults';
 import type { CurrentPrice } from 'new/services/PriceAPIs/PricesService';
 
+import type { Lamports } from './SolanaSDKModels';
 import { Token, TokenAmount } from './SolanaToken';
 
 interface SolanaWalletUserInfo {
@@ -24,8 +24,8 @@ const defaultSolanaWalletUserInfo: SolanaWalletUserInfo = {
 export class Wallet {
   // Properties
 
-  pubkey: string;
-  lamports: u64 | null;
+  pubkey?: string | null;
+  lamports?: Lamports | null;
   token: Token;
   userInfo: object | null = null;
 
@@ -34,12 +34,12 @@ export class Wallet {
   }
 
   constructor({
-    pubkey,
+    pubkey = null,
     lamports = null,
     token,
   }: {
-    pubkey: string;
-    lamports?: u64 | null;
+    pubkey?: string | null;
+    lamports?: Lamports | null;
     token: Token;
   }) {
     this.pubkey = pubkey;
@@ -55,7 +55,13 @@ export class Wallet {
   }
 
   // Fabric methods
-  static nativeSolana({ pubkey, lamports }: { pubkey: string; lamports?: u64 }): Wallet {
+  static nativeSolana({
+    pubkey = null,
+    lamports = null,
+  }: {
+    pubkey?: string | null;
+    lamports?: Lamports | null;
+  }): Wallet {
     return new Wallet({ pubkey, lamports, token: Token.nativeSolana });
   }
 
@@ -115,6 +121,20 @@ export class Wallet {
 
   getParsedUserInfo(): SolanaWalletUserInfo {
     return (this.userInfo as SolanaWalletUserInfo) ?? { ...defaultSolanaWalletUserInfo };
+  }
+
+  increaseBalance(diffInLamports: Lamports): void {
+    const currentBalance = this.lamports ?? ZERO;
+    this.lamports = currentBalance.add(diffInLamports);
+  }
+
+  decreaseBalance(diffInLamports: Lamports): void {
+    const currentBalance = this.lamports ?? ZERO;
+    if (currentBalance.gte(diffInLamports)) {
+      this.lamports = currentBalance.sub(diffInLamports);
+    } else {
+      this.lamports = ZERO;
+    }
   }
 
   static defaultSorter(lhs: Wallet, rhs: Wallet): number {

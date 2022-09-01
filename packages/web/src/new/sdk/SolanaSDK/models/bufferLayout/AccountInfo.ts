@@ -16,7 +16,12 @@ export class AccountInfo {
   closeAuthority: PublicKey | null;
 
   static decode(data: Buffer) {
-    return new AccountInfo(data);
+    // TODO: need try catch or more complex conditions?
+    try {
+      return new AccountInfo(data);
+    } catch {
+      return null;
+    }
   }
 
   constructor(data: Buffer) {

@@ -9,7 +9,7 @@ export class SolanaService extends SolanaSDK.SolanaSDK {
   constructor(protected solanaModel: SolanaModel) {
     super({
       provider: solanaModel.provider,
-      endpoint: Defaults.apiEndPoint,
+      endpoint: Defaults.apiEndpoint,
     });
   }
 }

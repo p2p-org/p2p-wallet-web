@@ -1,8 +1,7 @@
 import React, { useMemo } from 'react';
 
-import { styled } from '@linaria/react';
-import { computed } from 'mobx';
 import { observer } from 'mobx-react-lite';
+import { expr } from 'mobx-utils';
 import { nanoid } from 'nanoid';
 
 import type { ISDListViewModel } from 'new/core/viewmodels/SDListViewModel';
@@ -10,15 +9,14 @@ import { SDFetcherState } from 'new/core/viewmodels/SDViewModel';
 
 import { SDCollectionViewItem } from './models/SDCollectionViewItem';
 
-const Wrapper = styled.div``;
-
 interface Props<T> {
-  viewModel: ISDListViewModel<T>;
+  viewModel: Readonly<ISDListViewModel<T>>;
   numberOfLoadingCells?: number;
   renderPlaceholder: (key: string) => React.ReactNode;
   renderItem: (item: T, index: number) => React.ReactNode;
   renderEmpty?: (key: string) => React.ReactNode;
   customFilter?: (item: T) => boolean;
+  className?: string;
 }
 
 export const StaticSectionsCollectionView = observer(
@@ -29,10 +27,11 @@ export const StaticSectionsCollectionView = observer(
     renderItem,
     renderEmpty,
     customFilter,
+    className,
   }: Props<T>) => {
     const items = useMemo(
       () =>
-        computed(() => {
+        expr(() => {
           let _items = viewModel.data;
 
           if (customFilter) {
@@ -60,10 +59,14 @@ export const StaticSectionsCollectionView = observer(
           return collectionViewItems;
         }),
       [customFilter, numberOfLoadingCells, renderEmpty, viewModel.data, viewModel.state],
-    ).get();
+    );
+
+    if (items.length === 0) {
+      return null;
+    }
 
     return (
-      <Wrapper>
+      <div className={className}>
         {items.map((item, index) => {
           if (!item.isEmptyCell) {
             if (item.isPlaceholder) {
@@ -79,7 +82,7 @@ export const StaticSectionsCollectionView = observer(
 
           return null;
         })}
-      </Wrapper>
+      </div>
     );
   },
 );
