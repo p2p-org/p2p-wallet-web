@@ -54,7 +54,7 @@ export const SettingsNetwork: FC = observer(() => {
     <Layout
       breadcrumb={{
         currentName: 'Network',
-        backTo: { pathname: '/settingsNew', state: { fromPage: location.pathname } },
+        backTo: { pathname: '/settings', state: { fromPage: location.pathname } },
       }}
     >
       <WidgetPage icon="branch" title="Network">

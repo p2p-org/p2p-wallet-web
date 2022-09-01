@@ -12,8 +12,8 @@ import { ToastManager } from 'components/common/ToastManager';
 import { Main } from 'new/scenes/Main';
 import { Buy } from 'new/scenes/Main/Buy';
 import { Home } from 'new/scenes/Main/Home';
-import { Settings as SettingsNew } from 'new/scenes/Main/Settings';
-import { SettingsNetwork as SettingsNetworkNew } from 'new/scenes/Main/SettingsNetwork';
+import { Settings } from 'new/scenes/Main/Settings';
+import { SettingsNetwork } from 'new/scenes/Main/SettingsNetwork';
 import { Root } from 'new/scenes/Root';
 import { LocationManager } from 'new/ui/components/root/LocationManager';
 import { ModalManager } from 'new/ui/modals/ModalManager';
@@ -21,8 +21,6 @@ import { Auth } from 'pages/Auth';
 import { Landing } from 'pages/Landing';
 import { Receive } from 'pages/Receive';
 import { Send } from 'pages/Send';
-import { Settings } from 'pages/Settings';
-import { SettingsNetwork } from 'pages/SettingsNetwork';
 import { Swap } from 'pages/Swap';
 import { Wallet } from 'pages/Wallet';
 import { WalletSettings } from 'pages/WalletSettings';
@@ -57,8 +55,6 @@ const App: React.FC = () => {
                   <AuthRequiredRoute path="/send/:publicKey/:status(result)" component={Send} />
                   <AuthRequiredRoute path="/send/:publicKey?" component={Send} />
                   <AuthRequiredRoute path="/swap/(settings)?/:symbol?" component={Swap} />
-                  <AuthRequiredRoute path="/settings/networkNew" component={SettingsNetworkNew} />
-                  <AuthRequiredRoute path="/settingsNew" component={SettingsNew} />
                   <AuthRequiredRoute path="/settings/network" component={SettingsNetwork} />
                   <AuthRequiredRoute path="/settings" component={Settings} />
                 </Main>

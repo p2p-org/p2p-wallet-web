@@ -242,14 +242,14 @@ export const Settings: FC = observer(() => {
               <ItemTitle>Network</ItemTitle>
               <ItemAction
                 onClick={() => {
-                  history.push('/settings/networkNew');
+                  history.push('/settings/network');
                 }}
                 style={{ cursor: 'pointer' }}
               >
                 <Title title={Defaults.apiEndPoint.address}>{Defaults.apiEndPoint.address}</Title>
                 <ChevronWrapper
                   onClick={() => {
-                    history.push('/settings/networkNew');
+                    history.push('/settings/network');
                   }}
                 >
                   <ChevronIcon name="chevron" />
