@@ -19,6 +19,7 @@ import * as SolanaSDK from 'new/sdk/SolanaSDK';
 import { convertToBalance, SolanaSDKError, SolanaSDKPublicKey, toLamport } from 'new/sdk/SolanaSDK';
 import { OrcaSwapService } from 'new/services/OrcaSwapService';
 import { WalletsRepository } from 'new/services/Repositories';
+import { SendServiceError } from 'new/services/SendService/SendServiceError';
 import { SolanaService } from 'new/services/SolanaService';
 
 import { FeeService } from '../FeeService';
@@ -116,7 +117,7 @@ export class SendService implements SendServiceType {
     this._feeRelayerAPIClient = new FeeRelayerAPIClient();
     this._relayService = new FeeRelayerRelay({
       owner: this._solanaSDK.provider.wallet.publicKey,
-      apiClient: this._feeRelayerAPIClient,
+      feeRelayerAPIClient: this._feeRelayerAPIClient,
       solanaClient: this._feeRelayerRelaySolanaClient,
       orcaSwapClient: this._orcaSwap,
       deviceType: StatsInfoDeviceType.web,
@@ -330,10 +331,10 @@ export class SendService implements SendServiceType {
     let transactionFee: u64 = ZERO;
 
     // owner's signature
-    transactionFee = transactionFee.add(lamportsPerSignature);
+    transactionFee = new u64(transactionFee.add(lamportsPerSignature));
 
     // feePayer's signature
-    transactionFee = transactionFee.add(lamportsPerSignature);
+    transactionFee = new u64(transactionFee.add(lamportsPerSignature));
 
     let isAssociatedTokenUnregister: boolean;
     if (wallet.mintAddress === SolanaSDKPublicKey.wrappedSOLMint.toString()) {
@@ -353,7 +354,7 @@ export class SendService implements SendServiceType {
       })
     ) {
       // subtract the fee payer signature cost
-      transactionFee = transactionFee.sub(lamportsPerSignature);
+      transactionFee = new u64(transactionFee.sub(lamportsPerSignature));
     }
 
     const expectedFee = new SolanaSDK.FeeAmount({
@@ -372,7 +373,7 @@ export class SendService implements SendServiceType {
 
     return this._relayService.calculateNeededTopUpAmount({
       expectedFee,
-      payingTokenMint,
+      payingTokenMint: payingTokenMint ? new PublicKey(payingTokenMint) : undefined,
     });
   }
 
@@ -433,7 +434,7 @@ export class SendService implements SendServiceType {
     wallet: Wallet;
     receiver: string;
     amount: number;
-    payingFeeToken?: FeeRelayer.Relay.TokenInfo | null;
+    payingFeeToken?: FeeRelayer.TokenAccount | null;
     recentBlockhash?: string;
     lamportsPerSignature?: SolanaSDK.Lamports;
     minRentExemption?: SolanaSDK.Lamports;
@@ -459,7 +460,7 @@ export class SendService implements SendServiceType {
     // when free transaction is not available and user is paying with sol, let him do this the normal way (don't use fee relayer)
     if (
       this._isFreeTransactionNotAvailableAndUserIsPayingWithSOL({
-        payingTokenMint: payingFeeToken?.mint,
+        payingTokenMint: payingFeeToken?.mint.toString(),
       })
     ) {
       feePayer = null;
@@ -516,19 +517,22 @@ export class SendService implements SendServiceType {
     payingFeeWallet,
   }: {
     payingFeeWallet?: Wallet | null;
-  }): FeeRelayer.Relay.TokenInfo | null {
+  }): FeeRelayer.TokenAccount | null {
     if (!payingFeeWallet) {
       return null;
     }
 
-    const address = payingFeeWallet.pubkey;
-    if (!address) {
-      throw SolanaSDKError.other('Paying fee wallet is not valid');
+    const addressString = payingFeeWallet.pubkey;
+    if (!addressString) {
+      throw SendServiceError.invalidPayingFeeWallet();
     }
 
-    return new FeeRelayer.Relay.TokenInfo({
+    const address = new PublicKey(addressString);
+    const mintAddress = new PublicKey(payingFeeWallet.mintAddress);
+
+    return new FeeRelayer.TokenAccount({
       address,
-      mint: payingFeeWallet.mintAddress,
+      mint: mintAddress,
     });
   }
 
@@ -537,9 +541,9 @@ export class SendService implements SendServiceType {
   }: {
     payingTokenMint?: string;
   }): boolean {
-    const expectedTransactionFee = (
-      this._relayService.cache.lamportsPerSignature ?? new u64(5000)
-    ).muln(2);
+    const expectedTransactionFee = new u64(
+      (this._relayService.cache.lamportsPerSignature ?? new u64(5000)).muln(2),
+    );
     return (
       payingTokenMint === SolanaSDKPublicKey.wrappedSOLMint.toString() &&
       this._relayService.cache.freeTransactionFeeLimit?.isFreeTransactionFeeAvailable({

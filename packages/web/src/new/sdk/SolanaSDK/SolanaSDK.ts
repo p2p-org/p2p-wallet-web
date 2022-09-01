@@ -65,11 +65,12 @@ export class SolanaSDK {
   }: {
     account: string;
     decodedTo: { decode(data: Buffer): T };
-  }): Promise<BufferInfo<T>> {
+  }): Promise<BufferInfo<T> | null> {
     const pubkey = new PublicKey(account);
     return this.provider.connection.getAccountInfo(pubkey).then((info) => {
       if (!info) {
-        throw SolanaSDKError.couldNotRetrieveAccountInfo();
+        return null;
+        // throw SolanaSDKError.couldNotRetrieveAccountInfo();
       }
 
       return {
@@ -206,7 +207,7 @@ export class SolanaSDK {
     return this.provider.connection
       .getAccountInfo(associatedTokenAccount)
       .then((info) => {
-        if (info === null) {
+        if (!info) {
           throw SolanaSDKError.couldNotRetrieveAccountInfo();
         }
 
@@ -535,14 +536,14 @@ export class SolanaSDK {
 
     let isAssociatedTokenAddressRegistered: boolean;
     try {
-      const info: BufferInfo<AccountInfo | null> = await this.getAccountInfo({
+      const info: BufferInfo<AccountInfo | null> | null = await this.getAccountInfo({
         account: associatedAddress.toString(),
         decodedTo: AccountInfo,
       });
 
       if (
-        info.owner.toString() === SolanaSDKPublicKey.tokenProgramId.toString() &&
-        info.data?.owner.toString() === owner.toString()
+        info?.owner.toString() === SolanaSDKPublicKey.tokenProgramId.toString() &&
+        info?.data?.owner.toString() === owner.toString()
       ) {
         isAssociatedTokenAddressRegistered = true;
       } else {
@@ -632,7 +633,7 @@ export class SolanaSDK {
         account: destination,
         decodedTo: EmptyInfo,
       });
-      if (accountInfo.owner.toString() !== SolanaSDKPublicKey.programId.toString()) {
+      if (accountInfo?.owner.toString() !== SolanaSDKPublicKey.programId.toString()) {
         throw SolanaSDKError.other('Invalid account info');
       }
     } catch (error) {

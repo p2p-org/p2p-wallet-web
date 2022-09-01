@@ -27,7 +27,7 @@ export class DefaultFeeCalculator implements FeeCalculator {
 
   async calculateNetworkFee(transaction: Transaction, connection: Connection): Promise<FeeAmount> {
     transaction.recentBlockhash = 'BdA9gRatFvvwszr9uU5fznkHoMVQE8tf6ZFi8Mp6xdKs'; // fake for estimate
-    const transactionFee = await transaction.getEstimatedFee(connection);
+    const transactionFee = new u64((await transaction.getEstimatedFee(connection)) ?? 0);
     let accountCreationFee: Lamports = ZERO;
     let depositFee: Lamports = ZERO;
     for (const instruction of transaction.instructions) {
@@ -63,17 +63,17 @@ export class DefaultFeeCalculator implements FeeCalculator {
 
         // If account is closed after creation, increase the deposit fee
         if (isAccountClosedAfterCreation) {
-          depositFee = depositFee.add(this._lamportsPerSignature);
+          depositFee = new u64(depositFee.add(this._lamportsPerSignature));
         }
         // Otherwise, there will be an account creation fee
         else {
-          accountCreationFee = accountCreationFee.add(this._minRentExemption);
+          accountCreationFee = new u64(accountCreationFee.add(this._minRentExemption));
         }
       }
     }
 
     return new FeeAmount({
-      transaction: new u64(transactionFee),
+      transaction: transactionFee,
       accountBalances: accountCreationFee,
       deposit: depositFee,
     });

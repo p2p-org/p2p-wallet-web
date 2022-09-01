@@ -380,15 +380,15 @@ export class OrcaSwap implements OrcaSwapType {
     const expectedFee = SolanaSDK.FeeAmount.zero();
 
     // fee for owner's signature
-    expectedFee.transaction = expectedFee.transaction.add(
-      numberOfTransactions.mul(lamportsPerSignature),
+    expectedFee.transaction = new u64(
+      expectedFee.transaction.add(numberOfTransactions.mul(lamportsPerSignature)),
     );
 
     // when source token is native SOL
     if (fromWalletPubkey === owner.toBase58()) {
       // WSOL's signature
-      expectedFee.transaction = expectedFee.transaction.add(lamportsPerSignature);
-      expectedFee.deposit = expectedFee.deposit.add(minRentExempt);
+      expectedFee.transaction = new u64(expectedFee.transaction.add(lamportsPerSignature));
+      expectedFee.deposit = new u64(expectedFee.deposit.add(minRentExempt));
     }
 
     // when there is intermediary token
@@ -406,8 +406,8 @@ export class OrcaSwap implements OrcaSwapType {
           if (mint) {
             // when intermediary token is SOL, a deposit fee for creating WSOL is needed (will be returned after transaction)
             if (intermediaryToken.tokenName === 'SOL') {
-              expectedFee.transaction = expectedFee.transaction.add(lamportsPerSignature);
-              expectedFee.deposit = expectedFee.deposit.add(minRentExempt);
+              expectedFee.transaction = new u64(expectedFee.transaction.add(lamportsPerSignature));
+              expectedFee.deposit = new u64(expectedFee.deposit.add(minRentExempt));
             }
             // Check if intermediary token creation is needed
             else {
@@ -421,13 +421,13 @@ export class OrcaSwap implements OrcaSwapType {
 
     // when needed to create destination
     if (!toWalletPubkey) {
-      expectedFee.accountBalances = expectedFee.accountBalances.add(minRentExempt);
+      expectedFee.accountBalances = new u64(expectedFee.accountBalances.add(minRentExempt));
     }
 
     return isIntermediaryTokenCreatedRequest.then((needsCreateIntermediaryToken) => {
       // Intermediary token needs to be created, so add the fee
       if (needsCreateIntermediaryToken) {
-        expectedFee.accountBalances = expectedFee.accountBalances.add(minRentExempt);
+        expectedFee.accountBalances = new u64(expectedFee.accountBalances.add(minRentExempt));
       }
 
       return expectedFee;
@@ -761,7 +761,7 @@ export class OrcaSwap implements OrcaSwapType {
         additionalSigners.push(...wsolAccountInstructions.signers);
         instructions.unshift(...wsolAccountInstructions.instructions);
         instructions.push(...wsolAccountInstructions.cleanupInstructions);
-        accountCreationFee = accountCreationFee.add(minRentExemption);
+        accountCreationFee = new u64(accountCreationFee.add(minRentExemption));
       }
 
       return [
@@ -841,7 +841,7 @@ export class OrcaSwap implements OrcaSwapType {
       } else {
         instructions.push(...initAccountInstructions.instructions);
         if (!initAccountInstructions.instructions.length) {
-          accountCreationFee = accountCreationFee.add(minRentExemption);
+          accountCreationFee = new u64(accountCreationFee.add(minRentExemption));
         }
         // omit clean up instructions
       }
@@ -850,7 +850,7 @@ export class OrcaSwap implements OrcaSwapType {
       } else {
         instructions.push(...destAccountInstructions.instructions);
         if (!destAccountInstructions.instructions.length) {
-          accountCreationFee = accountCreationFee.add(minRentExemption);
+          accountCreationFee = new u64(accountCreationFee.add(minRentExemption));
         }
       }
 

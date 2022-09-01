@@ -165,6 +165,7 @@ export class TransactionHandler implements TransactionHandlerType {
       // observe confirmations
       this.observe({ index, transactionId });
     } catch (error) {
+      console.error(error);
       // update status
       // TODO: notification this._notificationsService.showInAppNotification(error(error));
 

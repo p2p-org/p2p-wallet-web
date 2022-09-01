@@ -1,3 +1,4 @@
+import { ZERO } from '@orca-so/sdk';
 import { u64 } from '@solana/spl-token';
 import { Connection, PublicKey } from '@solana/web3.js';
 import { computed, makeObservable } from 'mobx';
@@ -54,7 +55,7 @@ export class AccountObservableService {
         // Token Account
         else {
           const info = AccountInfo.decode(accountInfo.data);
-          const lamports = info.amount;
+          const lamports = info?.amount ?? ZERO; // TODO: check it works right
           cb({ pubkey, lamports });
         }
       },

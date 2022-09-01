@@ -165,9 +165,9 @@ export class Cache {
 
 // Top up
 export class TopUpWithSwapParams {
-  userSourceTokenAccountPubkey: string;
-  sourceTokenMintPubkey: string;
-  userAuthorityPubkey: string;
+  userSourceTokenAccountPubkey: PublicKey;
+  sourceTokenMintPubkey: PublicKey;
+  userAuthorityPubkey: PublicKey;
   topUpSwap: SwapData;
   feeAmount: u64;
   signatures: SwapTransactionSignatures;
@@ -185,9 +185,9 @@ export class TopUpWithSwapParams {
     deviceType,
     buildNumber,
   }: {
-    userSourceTokenAccountPubkey: string;
-    sourceTokenMintPubkey: string;
-    userAuthorityPubkey: string;
+    userSourceTokenAccountPubkey: PublicKey;
+    sourceTokenMintPubkey: PublicKey;
+    userAuthorityPubkey: PublicKey;
     topUpSwap: SwapData;
     feeAmount: u64;
     signatures: SwapTransactionSignatures;
@@ -205,18 +205,18 @@ export class TopUpWithSwapParams {
     this.statsInfo = new StatsInfo({
       operationType: StatsInfoOperationType.topUp,
       deviceType,
-      currency: sourceTokenMintPubkey,
+      currency: sourceTokenMintPubkey.toString(),
       build: buildNumber,
     });
   }
 
   toJSON() {
     return {
-      user_source_token_account_pubkey: this.userSourceTokenAccountPubkey,
-      source_token_mint_pubkey: this.sourceTokenMintPubkey,
-      user_authority_pubkey: this.userAuthorityPubkey,
+      user_source_token_account_pubkey: this.userSourceTokenAccountPubkey.toString(),
+      source_token_mint_pubkey: this.sourceTokenMintPubkey.toString(),
+      user_authority_pubkey: this.userAuthorityPubkey.toString(),
       top_up_swap: this.topUpSwap.toJSON(),
-      fee_amount: this.feeAmount.toNumber,
+      fee_amount: this.feeAmount.toNumber(),
       signatures: this.signatures.toJSON(),
       blockhash: this.blockhash,
       info: this.statsInfo,
@@ -562,14 +562,14 @@ export class TransitiveSwapData implements FeeRelayerRelaySwapType {
 }
 
 export class DirectSwapData implements FeeRelayerRelaySwapType {
-  programId: PublicKey;
-  accountPubkey: PublicKey;
-  authorityPubkey: PublicKey;
-  transferAuthorityPubkey: PublicKey;
-  sourcePubkey: PublicKey;
-  destinationPubkey: PublicKey;
-  poolTokenMintPubkey: PublicKey;
-  poolFeeAccountPubkey: PublicKey;
+  programId: string;
+  accountPubkey: string;
+  authorityPubkey: string;
+  transferAuthorityPubkey: string;
+  sourcePubkey: string;
+  destinationPubkey: string;
+  poolTokenMintPubkey: string;
+  poolFeeAccountPubkey: string;
   amountIn: u64;
   minimumAmountOut: u64;
 
@@ -585,14 +585,14 @@ export class DirectSwapData implements FeeRelayerRelaySwapType {
     amountIn,
     minimumAmountOut,
   }: {
-    programId: PublicKey;
-    accountPubkey: PublicKey;
-    authorityPubkey: PublicKey;
-    transferAuthorityPubkey: PublicKey;
-    sourcePubkey: PublicKey;
-    destinationPubkey: PublicKey;
-    poolTokenMintPubkey: PublicKey;
-    poolFeeAccountPubkey: PublicKey;
+    programId: string;
+    accountPubkey: string;
+    authorityPubkey: string;
+    transferAuthorityPubkey: string;
+    sourcePubkey: string;
+    destinationPubkey: string;
+    poolTokenMintPubkey: string;
+    poolFeeAccountPubkey: string;
     amountIn: u64;
     minimumAmountOut: u64;
   }) {
@@ -661,33 +661,23 @@ export class RelayAccountStatus {
     this._balance = balance;
   }
 
-  static notYetCreated() {
+  static notYetCreated(): RelayAccountStatus {
     return new RelayAccountStatus({
       type: RelayAccountStatusType.notYetCreated,
     });
   }
 
-  static created(balance: u64) {
+  static created(balance: u64): RelayAccountStatus {
     return new RelayAccountStatus({ balance, type: RelayAccountStatusType.created });
   }
 
-  get balance() {
+  get balance(): u64 | null {
     switch (this.type) {
       case RelayAccountStatusType.notYetCreated:
         return null;
       case RelayAccountStatusType.created:
-        return this._balance;
+        return this._balance ? new u64(this._balance) : null;
     }
-  }
-}
-
-export class TokenInfo {
-  address: string;
-  mint: string;
-
-  constructor({ address, mint }: { address: string; mint: string }) {
-    this.address = address;
-    this.mint = mint;
   }
 }
 

@@ -207,7 +207,7 @@ export class Pool {
 
   getMinimumAmountOut(inputAmount: u64, slippage: number): u64 {
     const estimatedOutputAmount = this.getOutputAmount(inputAmount);
-    return estimatedOutputAmount.muln(1 - slippage);
+    return new u64(estimatedOutputAmount.muln(1 - slippage));
   }
 
   getInputAmountSlippage(minimumReceiveAmount: u64, slippage: number): u64 | null {
@@ -434,14 +434,14 @@ export class Pool {
         instructions.push(...sourceAccountInstructions.instructions);
         cleanupInstructions.push(...sourceAccountInstructions.cleanupInstructions);
         if (!sourceAccountInstructions.instructions.length) {
-          accountCreationFee = accountCreationFee.add(minRentExemption);
+          accountCreationFee = new u64(accountCreationFee.add(minRentExemption));
         }
 
         // destination
         instructions.push(...destinationAccountInstructions.instructions);
         cleanupInstructions.push(...destinationAccountInstructions.cleanupInstructions);
         if (!destinationAccountInstructions.instructions.length) {
-          accountCreationFee = accountCreationFee.add(minRentExemption);
+          accountCreationFee = new u64(accountCreationFee.add(minRentExemption));
         }
 
         // swap instructions
@@ -496,7 +496,7 @@ export class Pool {
       feeDenominator: this.ownerTradeFeeDenominator,
     });
 
-    return tradingFee.add(ownerFee);
+    return new u64(tradingFee.add(ownerFee));
   }
 
   private _getOutputAmount(inputAmount: u64): u64 {
@@ -521,7 +521,7 @@ export class Pool {
           invariant,
           poolInputAmount.add(inputAmount),
         ).quotient;
-        return poolOutputAmount.sub(newPoolOutputAmount);
+        return new u64(poolOutputAmount.sub(newPoolOutputAmount));
       }
       default: {
         throw OrcaSwapError.unknown();
@@ -542,7 +542,7 @@ export class Pool {
       return ZERO;
     }
 
-    return baseAmount.mul(feeNumerator).div(feeDenominator);
+    return new u64(baseAmount.mul(feeNumerator).div(feeDenominator));
   }
 }
 

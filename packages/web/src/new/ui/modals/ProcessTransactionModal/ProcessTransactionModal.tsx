@@ -1,7 +1,6 @@
 import type { FC } from 'react';
 import { useLayoutEffect } from 'react';
 
-import { styled } from '@linaria/react';
 import { observer } from 'mobx-react-lite';
 
 import {
@@ -18,8 +17,6 @@ import type { RawTransactionType } from 'new/ui/modals/ProcessTransactionModal/P
 import { HeaderLabel } from 'new/ui/modals/ProcessTransactionModal/Status/HeaderLabel';
 
 import { ProcessTransactionModalViewModel } from './ProcessTransactionModal.ViewModel';
-
-const Wrapper = styled.div``;
 
 export interface ProcessTransactionModalProps {
   transaction: RawTransactionType;

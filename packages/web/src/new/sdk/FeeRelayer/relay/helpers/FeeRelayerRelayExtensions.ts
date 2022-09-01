@@ -16,10 +16,10 @@ export function getSwapData({
   minAmountOut: u64;
 }): DirectSwapData {
   return new DirectSwapData({
-    programId: pool.swapProgramId,
+    programId: pool.swapProgramId.toString(),
     accountPubkey: pool.account,
     authorityPubkey: pool.authority,
-    transferAuthorityPubkey,
+    transferAuthorityPubkey: transferAuthorityPubkey.toString(),
     sourcePubkey: pool.tokenAccountA,
     destinationPubkey: pool.tokenAccountB,
     poolTokenMintPubkey: pool.poolTokenMint,

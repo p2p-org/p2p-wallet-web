@@ -8,7 +8,11 @@ import { Account, PublicKey, SystemProgram, Transaction } from '@solana/web3.js'
 import promiseRetry from 'promise-retry';
 
 import type { FeeRelayerConfiguration, StatsInfoDeviceType } from 'new/sdk/FeeRelayer';
-import { StatsInfoOperationType } from 'new/sdk/FeeRelayer';
+import {
+  DestinationAnalysator,
+  StatsInfoOperationType,
+  TransitTokenAccountAnalysator,
+} from 'new/sdk/FeeRelayer';
 import type { FeeRelayerAPIClientType } from 'new/sdk/FeeRelayer/apiClient/FeeRelayerAPIClient';
 import { FeeRelayerError } from 'new/sdk/FeeRelayer/models/FeeRelayerError';
 import { FeeRelayerRequestType } from 'new/sdk/FeeRelayer/models/FeeRelayerRequestType';
@@ -26,6 +30,7 @@ import {
   SolanaSDKPublicKey,
 } from 'new/sdk/SolanaSDK';
 
+import type { TokenAccount } from '../models';
 import type { FeeRelayerRelaySwapType } from './helpers';
 import {
   Cache,
@@ -36,7 +41,6 @@ import {
   RelayTransactionParam,
   SwapData,
   SwapTransactionSignatures,
-  TokenInfo,
   TopUpPreparedParams,
   TopUpWithSwapParams,
   TransitiveSwapData,
@@ -75,7 +79,7 @@ export interface FeeRelayerRelayType {
     payingTokenMint,
   }: {
     expectedFee: SolanaSDK.FeeAmount;
-    payingTokenMint?: string;
+    payingTokenMint?: PublicKey;
   }): Promise<SolanaSDK.FeeAmount>;
 
   /// Calculate fee needed in paying token
@@ -94,7 +98,7 @@ export interface FeeRelayerRelayType {
     config,
   }: {
     transaction: SolanaSDK.PreparedTransaction;
-    fee?: TokenInfo | null;
+    fee?: TokenAccount | null;
     config: FeeRelayerConfiguration;
   }): Promise<TransactionID>;
 
@@ -105,7 +109,7 @@ export interface FeeRelayerRelayType {
     config,
   }: {
     transactions: SolanaSDK.PreparedTransaction[];
-    fee?: TokenInfo;
+    fee?: TokenAccount;
     config: FeeRelayerConfiguration;
   }): Promise<TransactionID[]>;
 
@@ -116,7 +120,7 @@ export interface FeeRelayerRelayType {
     payingTokenMint,
   }: {
     swapTransactions: OrcaSwap.PreparedSwapTransaction[];
-    payingTokenMint?: string;
+    payingTokenMint?: PublicKey;
   }): Promise<SolanaSDK.FeeAmount>;
 
   /// Top up relay account and swap natively
@@ -127,7 +131,7 @@ export interface FeeRelayerRelayType {
   }: {
     swapTransactions: OrcaSwap.PreparedSwapTransaction[];
     feePayer: PublicKey;
-    payingFeeToken?: TokenInfo;
+    payingFeeToken?: TokenAccount;
   }): Promise<string[]>;
 
   /// SPECIAL METHODS FOR SWAP WITH RELAY PROGRAM
@@ -139,9 +143,9 @@ export interface FeeRelayerRelayType {
     destinationAddress,
   }: {
     swapPools?: OrcaSwap.PoolsPair;
-    sourceTokenMint: string;
-    destinationTokenMint: string;
-    destinationAddress?: string;
+    sourceTokenMint: PublicKey;
+    destinationTokenMint: PublicKey;
+    destinationAddress?: PublicKey;
   }): Promise<SolanaSDK.FeeAmount>;
 
   /// Prepare swap transaction for relay using RelayProgram
@@ -154,10 +158,10 @@ export interface FeeRelayerRelayType {
     inputAmount,
     slippage,
   }: {
-    sourceToken: TokenInfo;
-    destinationTokenMint: string;
-    destinationAddress?: string;
-    payingFeeToken: TokenInfo;
+    sourceToken: TokenAccount;
+    destinationTokenMint: PublicKey;
+    destinationAddress?: PublicKey;
+    payingFeeToken: TokenAccount;
     swapPools: OrcaSwap.PoolsPair;
     inputAmount: u64;
     slippage: number;
@@ -169,7 +173,7 @@ export interface FeeRelayerRelayType {
 
 export class FeeRelayerRelay implements FeeRelayerRelayType {
   // Dependencies
-  apiClient: FeeRelayerAPIClientType;
+  feeRelayerAPIClient: FeeRelayerAPIClientType;
   solanaClient: FeeRelayerRelaySolanaClient;
   // accountStorage: SolanaSDKAccountStorage;
   orcaSwapClient: OrcaSwap.OrcaSwapType;
@@ -177,20 +181,19 @@ export class FeeRelayerRelay implements FeeRelayerRelayType {
   // Properties
   cache: Cache;
   owner: PublicKey;
-  userRelayAddress: PublicKey;
   deviceType: StatsInfoDeviceType;
   buildNumber: string | null;
 
   constructor({
     owner,
-    apiClient,
+    feeRelayerAPIClient,
     solanaClient,
     orcaSwapClient,
     deviceType,
     buildNumber,
   }: {
     owner: PublicKey;
-    apiClient: FeeRelayerAPIClientType;
+    feeRelayerAPIClient: FeeRelayerAPIClientType;
     solanaClient: FeeRelayerRelaySolanaClient;
     // accountStorage: SolanaSDKAccountStorage,
     orcaSwapClient: OrcaSwap.OrcaSwapType;
@@ -202,15 +205,11 @@ export class FeeRelayerRelay implements FeeRelayerRelayType {
     //   throw FeeRelayerError.unauthorized();
     // }
 
-    this.apiClient = apiClient;
+    this.feeRelayerAPIClient = feeRelayerAPIClient;
     this.solanaClient = solanaClient;
     // this.accountStorage = accountStorage;
     this.orcaSwapClient = orcaSwapClient;
     this.owner = owner;
-    this.userRelayAddress = FeeRelayerRelayProgram.getUserRelayAddress({
-      user: this.owner,
-      network: this.solanaClient.endpoint.network,
-    });
     this.cache = new Cache();
     this.deviceType = deviceType;
     this.buildNumber = buildNumber;
@@ -226,7 +225,7 @@ export class FeeRelayerRelay implements FeeRelayerRelayType {
       // get minimum relay account balance
       this.solanaClient.getMinimumBalanceForRentExemption(0),
       // get fee payer address
-      this.apiClient.getFeePayerPubkey(),
+      this.feeRelayerAPIClient.getFeePayerPubkey(),
       // get lamportsPerSignature
       this.solanaClient.getLamportsPerSignature(),
       // get relayAccount status
@@ -277,7 +276,7 @@ export class FeeRelayerRelay implements FeeRelayerRelayType {
     relayAccountStatus,
   }: {
     expectedFee: SolanaSDK.FeeAmount;
-    payingTokenMint?: string;
+    payingTokenMint?: PublicKey;
     freeTransactionFeeLimit: FreeTransactionFeeLimit;
     relayAccountStatus: RelayAccountStatus;
   }): SolanaSDK.FeeAmount {
@@ -289,7 +288,7 @@ export class FeeRelayerRelay implements FeeRelayerRelayType {
     });
     // Correct amount if it's too small
     if (amount.total.gtn(0) && amount.total.ltn(1000)) {
-      amount.transaction = amount.transaction.add(new u64(1000).sub(amount.total));
+      amount.transaction = new u64(amount.transaction.add(new u64(1000).sub(amount.total)));
     }
     return amount;
   }
@@ -302,15 +301,15 @@ export class FeeRelayerRelay implements FeeRelayerRelayType {
     relayAccountStatus,
   }: {
     expectedFee: SolanaSDK.FeeAmount;
-    payingTokenMint?: string;
+    payingTokenMint?: PublicKey;
     freeTransactionFeeLimit: FreeTransactionFeeLimit;
     relayAccountStatus: RelayAccountStatus;
   }): SolanaSDK.FeeAmount {
-    const neededAmount = expectedFee;
+    const neededAmount = expectedFee.clone();
 
     // expected fees
-    const expectedTopUpNetworkFee = new u64(2).mul(
-      this.cache.lamportsPerSignature ?? new u64(5000),
+    const expectedTopUpNetworkFee = new u64(
+      (this.cache.lamportsPerSignature ?? new u64(5000)).muln(2),
     );
     const expectedTransactionNetworkFee = expectedFee.transaction;
 
@@ -337,7 +336,7 @@ export class FeeRelayerRelay implements FeeRelayerRelayType {
       neededTransactionNetworkFee = ZERO;
     }
 
-    neededAmount.transaction = neededTopUpNetworkFee.add(neededTransactionNetworkFee);
+    neededAmount.transaction = new u64(neededTopUpNetworkFee.add(neededTransactionNetworkFee));
 
     // transaction is totally free
     if (neededAmount.total.eqn(0)) {
@@ -351,11 +350,11 @@ export class FeeRelayerRelay implements FeeRelayerRelayType {
     let relayAccountBalance = relayAccountStatus.balance;
     if (relayAccountBalance) {
       if (relayAccountBalance.lt(minimumRelayAccountBalance)) {
-        neededAmount.transaction = neededAmount.transaction.add(
-          minimumRelayAccountBalance.sub(relayAccountBalance),
+        neededAmount.transaction = new u64(
+          neededAmount.transaction.add(minimumRelayAccountBalance.sub(relayAccountBalance)),
         );
       } else {
-        relayAccountBalance = relayAccountBalance.sub(minimumRelayAccountBalance);
+        relayAccountBalance = new u64(relayAccountBalance.sub(minimumRelayAccountBalance));
 
         // if relayAccountBalance has enough balance to cover transaction fee
         if (relayAccountBalance.gte(neededAmount.transaction)) {
@@ -367,25 +366,24 @@ export class FeeRelayerRelay implements FeeRelayerRelayType {
           }
           // Relay account balance can cover part of account creation fee
           else {
-            neededAmount.accountBalances = neededAmount.accountBalances.sub(
-              relayAccountBalance.sub(neededAmount.transaction),
+            neededAmount.accountBalances = new u64(
+              neededAmount.accountBalances
+                .sub(relayAccountBalance.sub(neededAmount.transaction))
+                .toString(),
             );
           }
         }
         // if not, relayAccountBalance can cover part of transaction fee
         else {
-          neededAmount.transaction = neededAmount.transaction.sub(relayAccountBalance);
+          neededAmount.transaction = new u64(neededAmount.transaction.sub(relayAccountBalance));
         }
       }
     } else {
-      neededAmount.transaction = neededAmount.transaction.add(minimumRelayAccountBalance);
+      neededAmount.transaction = new u64(neededAmount.transaction.add(minimumRelayAccountBalance));
     }
 
     // if relay account could not cover all fees and paying token is WSOL, the compensation will be done without the existense of relay account
-    if (
-      neededAmount.total.gtn(0) &&
-      payingTokenMint === SolanaSDKPublicKey.wrappedSOLMint.toString()
-    ) {
+    if (neededAmount.total.gtn(0) && payingTokenMint?.equals(SolanaSDKPublicKey.wrappedSOLMint)) {
       return neededAmountWithoutCheckingRelayAccount;
     }
 
@@ -397,7 +395,7 @@ export class FeeRelayerRelay implements FeeRelayerRelayType {
     payingTokenMint,
   }: {
     expectedFee: SolanaSDK.FeeAmount;
-    payingTokenMint?: string;
+    payingTokenMint?: PublicKey;
   }): Promise<SolanaSDK.FeeAmount> {
     let freeTransactionFeeLimitRequest: Promise<FreeTransactionFeeLimit>;
     const _freeTransactionFeeLimit = this.cache.freeTransactionFeeLimit;
@@ -418,7 +416,8 @@ export class FeeRelayerRelay implements FeeRelayerRelayType {
         freeTransactionFeeLimit,
         relayAccountStatus,
       });
-    } catch {
+    } catch (error) {
+      console.error(error);
       return expectedFee;
     }
   }
@@ -462,7 +461,7 @@ export class FeeRelayerRelay implements FeeRelayerRelayType {
     config,
   }: {
     transaction: SolanaSDK.PreparedTransaction;
-    fee?: TokenInfo | null;
+    fee?: TokenAccount | null;
     config: FeeRelayerConfiguration;
   }): Promise<TransactionID> {
     const result = (
@@ -484,7 +483,7 @@ export class FeeRelayerRelay implements FeeRelayerRelayType {
     config,
   }: {
     transactions: SolanaSDK.PreparedTransaction[];
-    fee?: TokenInfo | null;
+    fee?: TokenAccount | null;
     config: FeeRelayerConfiguration;
   }): Promise<TransactionID[]> {
     const expectedFees = transactions.map((tx) => tx.expectedFee);
@@ -549,7 +548,7 @@ export class FeeRelayerRelay implements FeeRelayerRelayType {
     transferAuthorityAccount: Account | null;
   } {
     // preconditions
-    if (!pools.length || pools.length > 2) {
+    if (pools.length === 0 || pools.length > 2) {
       throw FeeRelayerError.swapPoolsNotFound();
     }
 
@@ -628,60 +627,9 @@ export class FeeRelayerRelay implements FeeRelayerRelayType {
     }
   }
 
-  getTransitTokenMintPubkey(pools: OrcaSwap.PoolsPair): PublicKey | null {
-    let transitTokenMintPubkey: PublicKey | null = null;
-    if (pools.length === 2) {
-      const interTokenName = pools[0]!.tokenBName.toString();
-      const mint = this.orcaSwapClient.getMint(interTokenName);
-      transitTokenMintPubkey = mint ? new PublicKey(mint) : null;
-    }
-    return transitTokenMintPubkey;
-  }
-
-  getTransitToken(pools: OrcaSwap.PoolsPair): TokenInfo | null {
-    const transitTokenMintPubkey = this.getTransitTokenMintPubkey(pools);
-
-    let transitTokenAccountAddress: PublicKey | null = null;
-    if (transitTokenMintPubkey) {
-      transitTokenAccountAddress = FeeRelayerRelayProgram.getTransitTokenAccountAddress({
-        user: this.owner,
-        transitTokenMint: transitTokenMintPubkey,
-        network: this.solanaClient.endpoint.network,
-      });
-    }
-
-    if (transitTokenMintPubkey && transitTokenAccountAddress) {
-      return new TokenInfo({
-        address: transitTokenAccountAddress.toString(),
-        mint: transitTokenMintPubkey.toString(),
-      });
-    }
-    return null;
-  }
-
-  checkIfNeedsCreateTransitTokenAccount(transitToken: TokenInfo | null): Promise<boolean | null> {
-    if (!transitToken) {
-      return Promise.resolve(null);
-    }
-
-    return this.solanaClient
-      .getAccountInfo({
-        account: transitToken.address,
-        decodedTo: SolanaSDK.AccountInfo,
-      })
-      .then((info) => {
-        // detect if destination address is already a SPLToken address
-        if (info?.data?.mint.toString() === transitToken.mint) {
-          return false;
-        }
-        return true;
-      })
-      .catch(() => true);
-  }
-
   /// Update free transaction fee limit
   updateFreeTransactionFeeLimit(): Promise<void> {
-    return this.apiClient.requestFreeFeeLimits(this.owner.toString()).then((info) => {
+    return this.feeRelayerAPIClient.requestFreeFeeLimits(this.owner.toString()).then((info) => {
       const infoNew = new FreeTransactionFeeLimit({
         maxUsage: info.limits.maxCount,
         currentUsage: info.processedFee.count,
@@ -693,9 +641,15 @@ export class FeeRelayerRelay implements FeeRelayerRelayType {
     });
   }
 
+  // TODO: context
   updateRelayAccountStatus(): Promise<void> {
     return this.solanaClient
-      .getRelayAccountStatus(this.userRelayAddress.toString())
+      .getRelayAccountStatus(
+        FeeRelayerRelayProgram.getUserRelayAddress({
+          user: this.owner,
+          network: this.solanaClient.endpoint.network,
+        }).toString(),
+      )
       .then((info) => {
         this.cache.relayAccountStatus = info;
       });
@@ -720,10 +674,10 @@ export class FeeRelayerRelay implements FeeRelayerRelayType {
     inputAmount,
     slippage,
   }: {
-    sourceToken: TokenInfo;
-    destinationTokenMint: string;
-    destinationAddress?: string;
-    payingFeeToken?: TokenInfo;
+    sourceToken: TokenAccount;
+    destinationTokenMint: PublicKey;
+    destinationAddress?: PublicKey;
+    payingFeeToken?: TokenAccount;
     swapPools: OrcaSwap.PoolsPair;
     inputAmount: u64;
     slippage: number;
@@ -731,7 +685,12 @@ export class FeeRelayerRelay implements FeeRelayerRelayType {
     transactions: SolanaSDK.PreparedTransaction[];
     additionalPaybackFee: u64;
   }> {
-    const transitToken = this.getTransitToken(swapPools);
+    const transitToken = TransitTokenAccountAnalysator.getTransitToken({
+      solanaApiClient: this.solanaClient,
+      orcaSwap: this.orcaSwapClient,
+      account: this.owner,
+      pools: swapPools,
+    });
     // get fresh data by ignoring cache
     return Promise.all([
       Promise.all([[this.updateRelayAccountStatus(), this.updateFreeTransactionFeeLimit()]]).then(
@@ -746,12 +705,17 @@ export class FeeRelayerRelay implements FeeRelayerRelayType {
           });
         },
       ),
-      this._getFixedDestination({
-        destinationTokenMint,
-        destinationAddress,
+      DestinationAnalysator.analyseDestination({
+        apiClient: this.solanaClient,
+        destination: destinationAddress,
+        mint: destinationTokenMint,
+        account: this.owner,
       }),
       this.solanaClient.getRecentBlockhash(),
-      this.checkIfNeedsCreateTransitTokenAccount(transitToken),
+      TransitTokenAccountAnalysator.checkIfNeedsCreateTransitTokenAccount({
+        solanaApiClient: this.solanaClient,
+        transitToken,
+      }),
     ]).then(([preparedParams, destination, recentBlockhash, needsCreateTransitTokenAccount]) => {
       // get needed info
       const minimumTokenAccountBalance = this.cache.minimumTokenAccountBalance;
@@ -761,9 +725,9 @@ export class FeeRelayerRelay implements FeeRelayerRelayType {
         throw FeeRelayerError.relayInfoMissing();
       }
 
-      const destinationToken = destination.destinationToken;
+      const destinationToken = destination.destination;
       // const userDestinationAccountOwnerAddress = destination.userDestinationAccountOwnerAddress;
-      const needsCreateDestinationTokenAccount = destination.needsCreateDestinationTokenAccount;
+      const needsCreateDestinationTokenAccount = destination.needCreateDestination;
 
       const swapFeesAndPools = preparedParams.actionFeesAndPools;
       // const swappingFee = swapFeesAndPools.fee.total;
@@ -794,13 +758,15 @@ export class FeeRelayerRelay implements FeeRelayerRelayType {
     destinationAddress,
   }: {
     swapPools?: OrcaSwap.PoolsPair;
-    sourceTokenMint: string;
-    destinationTokenMint: string;
-    destinationAddress?: string;
+    sourceTokenMint: PublicKey;
+    destinationTokenMint: PublicKey;
+    destinationAddress?: PublicKey;
   }): Promise<SolanaSDK.FeeAmount> {
-    return this._getFixedDestination({
-      destinationTokenMint,
-      destinationAddress,
+    return DestinationAnalysator.analyseDestination({
+      apiClient: this.solanaClient,
+      destination: destinationAddress,
+      mint: destinationTokenMint,
+      account: this.owner,
     }).then((destination) => {
       const lamportsPerSignature = this.cache.lamportsPerSignature;
       const minimumTokenAccountBalance = this.cache.minimumTokenAccountBalance;
@@ -809,42 +775,46 @@ export class FeeRelayerRelay implements FeeRelayerRelayType {
         throw FeeRelayerError.relayInfoMissing();
       }
 
-      const needsCreateDestinationTokenAccount = destination.needsCreateDestinationTokenAccount;
+      const needsCreateDestinationTokenAccount = destination.needCreateDestination;
 
       const expectedFee = SolanaSDK.FeeAmount.zero();
 
       // fee for payer's signature
-      expectedFee.transaction = expectedFee.transaction.add(lamportsPerSignature);
+      expectedFee.transaction = new u64(expectedFee.transaction.add(lamportsPerSignature));
 
       // fee for owner's signature
-      expectedFee.transaction = expectedFee.transaction.add(lamportsPerSignature);
+      expectedFee.transaction = new u64(expectedFee.transaction.add(lamportsPerSignature));
 
       // when source token is native SOL
-      if (sourceTokenMint === SolanaSDKPublicKey.wrappedSOLMint.toString()) {
+      if (sourceTokenMint.equals(SolanaSDKPublicKey.wrappedSOLMint)) {
         // WSOL's signature
-        expectedFee.transaction = expectedFee.transaction.add(lamportsPerSignature);
+        expectedFee.transaction = new u64(expectedFee.transaction.add(lamportsPerSignature));
       }
 
       // when needed to create destination
       if (
         needsCreateDestinationTokenAccount &&
-        destinationTokenMint !== SolanaSDKPublicKey.wrappedSOLMint.toString()
+        !destinationTokenMint.equals(SolanaSDKPublicKey.wrappedSOLMint)
       ) {
-        expectedFee.accountBalances = expectedFee.accountBalances.add(minimumTokenAccountBalance);
+        expectedFee.accountBalances = new u64(
+          expectedFee.accountBalances.add(minimumTokenAccountBalance),
+        );
       }
 
       // when destination is native SOL
-      if (destinationTokenMint === SolanaSDKPublicKey.wrappedSOLMint.toString()) {
-        expectedFee.transaction = expectedFee.transaction.add(lamportsPerSignature);
+      if (destinationTokenMint.equals(SolanaSDKPublicKey.wrappedSOLMint)) {
+        expectedFee.transaction = new u64(expectedFee.transaction.add(lamportsPerSignature));
       }
 
       // in transitive swap, there will be situation when swapping from SOL -> SPL that needs spliting transaction to 2 transactions
       if (
         swapPools?.length === 2 &&
-        sourceTokenMint === SolanaSDKPublicKey.wrappedSOLMint.toString() &&
+        sourceTokenMint.equals(SolanaSDKPublicKey.wrappedSOLMint) &&
         destinationAddress === null
       ) {
-        expectedFee.transaction = expectedFee.transaction.add(lamportsPerSignature.muln(2));
+        expectedFee.transaction = new u64(
+          expectedFee.transaction.add(lamportsPerSignature.muln(2)),
+        );
       }
 
       return expectedFee;
@@ -873,8 +843,8 @@ export class FeeRelayerRelay implements FeeRelayerRelayType {
   }: // transitTokenAccountAddress,
   {
     network: Network;
-    sourceToken: TokenInfo;
-    destinationToken: TokenInfo;
+    sourceToken: TokenAccount;
+    destinationToken: TokenAccount;
     // userDestinationAccountOwnerAddress?: string;
 
     pools: OrcaSwap.PoolsPair;
@@ -927,7 +897,7 @@ export class FeeRelayerRelay implements FeeRelayerRelayType {
 
     // check source
     let sourceWSOLNewAccount: Account | null = null;
-    if (sourceToken.mint === SolanaSDKPublicKey.wrappedSOLMint.toString()) {
+    if (sourceToken.mint.equals(SolanaSDKPublicKey.wrappedSOLMint)) {
       sourceWSOLNewAccount = new Account();
       instructions.push(
         ...[
@@ -952,7 +922,7 @@ export class FeeRelayerRelay implements FeeRelayerRelayType {
         ],
       );
       userSourceTokenAccountAddress = sourceWSOLNewAccount.publicKey;
-      additionalPaybackFee = additionalPaybackFee.add(minimumTokenAccountBalance);
+      additionalPaybackFee = new u64(additionalPaybackFee.add(minimumTokenAccountBalance));
     }
 
     // check destination
@@ -979,8 +949,8 @@ export class FeeRelayerRelay implements FeeRelayerRelayType {
             ),
           ],
         );
-        userDestinationTokenAccountAddress = destinationNewAccount.publicKey.toString();
-        accountCreationFee = accountCreationFee.add(minimumTokenAccountBalance);
+        userDestinationTokenAccountAddress = destinationNewAccount.publicKey;
+        accountCreationFee = new u64(accountCreationFee.add(minimumTokenAccountBalance));
       } else {
         // For other token, create associated token address
         const associatedAddress = await Token.getAssociatedTokenAddress(
@@ -1010,9 +980,9 @@ export class FeeRelayerRelay implements FeeRelayerRelayType {
           });
         } else {
           instructions.push(instruction);
-          accountCreationFee = accountCreationFee.add(minimumTokenAccountBalance);
+          accountCreationFee = new u64(accountCreationFee.add(minimumTokenAccountBalance));
         }
-        userDestinationTokenAccountAddress = associatedAddress.toString();
+        userDestinationTokenAccountAddress = associatedAddress;
       }
     }
 
@@ -1139,7 +1109,7 @@ export class FeeRelayerRelay implements FeeRelayerRelayType {
           }),
         ],
       );
-      accountCreationFee = accountCreationFee.sub(minimumTokenAccountBalance);
+      accountCreationFee = new u64(accountCreationFee.sub(minimumTokenAccountBalance));
     }
 
     // resign transaction
@@ -1224,10 +1194,10 @@ export class FeeRelayerRelay implements FeeRelayerRelayType {
     swapPools,
     reuseCache,
   }: {
-    sourceToken: TokenInfo;
-    destinationTokenMint: string;
-    destinationAddress?: string;
-    payingFeeToken?: TokenInfo;
+    sourceToken: TokenAccount;
+    destinationTokenMint: PublicKey;
+    destinationAddress?: PublicKey;
+    payingFeeToken?: TokenAccount;
     swapPools: OrcaSwap.PoolsPair;
     reuseCache: boolean;
   }): Promise<TopUpAndActionPreparedParams> {
@@ -1246,7 +1216,7 @@ export class FeeRelayerRelay implements FeeRelayerRelayType {
       let tradablePoolsPairRequest: Promise<OrcaSwap.PoolsPair[]>;
       if (payingFeeToken) {
         tradablePoolsPairRequest = this.orcaSwapClient.getTradablePoolsPairs({
-          fromMint: payingFeeToken.mint,
+          fromMint: payingFeeToken.mint.toString(),
           toMint: SolanaSDKPublicKey.wrappedSOLMint.toString(),
         });
       } else {
@@ -1266,7 +1236,7 @@ export class FeeRelayerRelay implements FeeRelayerRelayType {
           // TOP UP
           let topUpPreparedParam: TopUpPreparedParams | null;
 
-          if (payingFeeToken?.mint === SolanaSDKPublicKey.wrappedSOLMint.toString()) {
+          if (payingFeeToken?.mint.equals(SolanaSDKPublicKey.wrappedSOLMint)) {
             topUpPreparedParam = null;
           } else {
             const relayAccountBalance = relayAccountStatus.balance;
@@ -1324,70 +1294,13 @@ export class FeeRelayerRelay implements FeeRelayerRelayType {
     return request;
   }
 
-  /// Get fixed destination
-  private _getFixedDestination({
-    destinationTokenMint,
-    destinationAddress,
-  }: {
-    destinationTokenMint: string;
-    destinationAddress?: string;
-  }): Promise<{
-    destinationToken: TokenInfo;
-    userDestinationAccountOwnerAddress: PublicKey | null;
-    needsCreateDestinationTokenAccount: boolean;
-  }> {
-    // Redefine destination
-    let userDestinationAccountOwnerAddress: PublicKey | null;
-    let destinationRequest: Promise<SolanaSDK.SPLTokenDestinationAddress>;
-
-    if (SolanaSDKPublicKey.wrappedSOLMint.toString() === destinationTokenMint) {
-      // Swap to native SOL account
-      userDestinationAccountOwnerAddress = this.owner;
-      destinationRequest = Promise.resolve(
-        new SolanaSDK.SPLTokenDestinationAddress({
-          destination: this.owner,
-          isUnregisteredAsocciatedToken: true,
-        }),
-      );
-    } else {
-      // Swap to other SPL
-      userDestinationAccountOwnerAddress = null;
-
-      if (destinationAddress) {
-        const destinationAddressNew: PublicKey = new PublicKey(destinationAddress);
-        destinationRequest = Promise.resolve(
-          new SolanaSDK.SPLTokenDestinationAddress({
-            destination: destinationAddressNew,
-            isUnregisteredAsocciatedToken: false,
-          }),
-        );
-      } else {
-        destinationRequest = this.solanaClient.findSPLTokenDestinationAddress({
-          mintAddress: destinationTokenMint,
-          destinationAddress: this.owner.toString(),
-        });
-      }
-    }
-
-    return destinationRequest.then(({ destination, isUnregisteredAsocciatedToken }) => {
-      return {
-        destinationToken: new TokenInfo({
-          address: destination.toString(),
-          mint: destinationTokenMint,
-        }),
-        userDestinationAccountOwnerAddress,
-        needsCreateDestinationTokenAccount: isUnregisteredAsocciatedToken,
-      };
-    });
-  }
-
   // FeeRelayerRelayNativeSwap
   calculateNeededTopUpAmountNative({
     swapTransactions,
     payingTokenMint,
   }: {
     swapTransactions: OrcaSwap.PreparedSwapTransaction[];
-    payingTokenMint?: string;
+    payingTokenMint?: PublicKey;
   }): Promise<SolanaSDK.FeeAmount> {
     const lamportsPerSignature = this.cache.lamportsPerSignature;
     if (!lamportsPerSignature) {
@@ -1416,7 +1329,7 @@ export class FeeRelayerRelay implements FeeRelayerRelayType {
   }: {
     swapTransactions: OrcaSwap.PreparedSwapTransaction[];
     feePayer: PublicKey;
-    payingFeeToken?: TokenInfo;
+    payingFeeToken?: TokenAccount;
   }): Promise<string[]> {
     return Promise.all([
       this.updateRelayAccountStatus(),
@@ -1480,7 +1393,7 @@ export class FeeRelayerRelay implements FeeRelayerRelayType {
   }: {
     swapTransaction: OrcaSwap.PreparedSwapTransaction;
     feePayer: PublicKey;
-    payingFeeToken?: TokenInfo;
+    payingFeeToken?: TokenAccount;
   }): Promise<string[]> {
     return this.solanaClient
       .prepareTransaction({
@@ -1505,7 +1418,7 @@ export class FeeRelayerRelay implements FeeRelayerRelayType {
 
   // FeeRelayerRelayTopUp
 
-  topUp({
+  async topUp({
     needsCreateUserRelayAddress,
     sourceToken,
     targetAmount,
@@ -1513,106 +1426,110 @@ export class FeeRelayerRelay implements FeeRelayerRelayType {
     expectedFee,
   }: {
     needsCreateUserRelayAddress: boolean;
-    sourceToken: TokenInfo;
+    sourceToken: TokenAccount;
     targetAmount: u64;
     topUpPools: OrcaSwap.PoolsPair;
     expectedFee: u64;
   }): Promise<string[]> {
-    const transitToken = this.getTransitToken(topUpPools);
-    return Promise.all([
+    const transitToken = TransitTokenAccountAnalysator.getTransitToken({
+      solanaApiClient: this.solanaClient,
+      orcaSwap: this.orcaSwapClient,
+      account: this.owner,
+      pools: topUpPools,
+    });
+
+    const needsCreateTransitTokenAccount =
+      await TransitTokenAccountAnalysator.checkIfNeedsCreateTransitTokenAccount({
+        solanaApiClient: this.solanaClient,
+        transitToken,
+      });
+
+    const [blockhash, _] = await Promise.all([
       this.solanaClient.getRecentBlockhash(),
       this.updateFreeTransactionFeeLimit(),
-      this.checkIfNeedsCreateTransitTokenAccount(transitToken),
-    ]).then(async ([recentBlockhash, _, needsCreateTransitTokenAccount]) => {
-      const minimumRelayAccountBalance = this.cache.minimumRelayAccountBalance;
-      const minimumTokenAccountBalance = this.cache.minimumTokenAccountBalance;
-      const feePayerAddress = this.cache.feePayerAddress;
-      const lamportsPerSignature = this.cache.lamportsPerSignature;
-      const freeTransactionFeeLimit = this.cache.freeTransactionFeeLimit;
-      if (
-        !minimumRelayAccountBalance ||
-        !minimumTokenAccountBalance ||
-        !feePayerAddress ||
-        !lamportsPerSignature ||
-        !freeTransactionFeeLimit
-      ) {
-        throw FeeRelayerError.relayInfoMissing();
-      }
+    ]);
 
-      // STEP 3: prepare for topUp
-      const topUpTransaction = await this.prepareForTopUp({
+    const minimumRelayAccountBalance = this.cache.minimumRelayAccountBalance;
+    const minimumTokenAccountBalance = this.cache.minimumTokenAccountBalance;
+    const feePayerAddress = this.cache.feePayerAddress;
+    const lamportsPerSignature = this.cache.lamportsPerSignature;
+    const freeTransactionFeeLimit = this.cache.freeTransactionFeeLimit;
+
+    if (
+      !minimumRelayAccountBalance ||
+      !minimumTokenAccountBalance ||
+      !feePayerAddress ||
+      !lamportsPerSignature ||
+      !freeTransactionFeeLimit
+    ) {
+      throw FeeRelayerError.relayInfoMissing();
+    }
+
+    // STEP 3: prepare for topUp
+    const topUpTransaction = await this.prepareForTopUp({
+      network: this.solanaClient.endpoint.network,
+      sourceToken,
+      userAuthorityAddress: this.owner,
+      userRelayAddress: FeeRelayerRelayProgram.getUserRelayAddress({
+        user: this.owner,
         network: this.solanaClient.endpoint.network,
-        sourceToken,
-        userAuthorityAddress: this.owner,
-        userRelayAddress: this.userRelayAddress,
-        topUpPools,
-        targetAmount,
-        expectedFee,
-        blockhash: recentBlockhash,
-        minimumRelayAccountBalance,
-        minimumTokenAccountBalance,
-        needsCreateUserRelayAccount: needsCreateUserRelayAddress,
-        feePayerAddress,
-        // lamportsPerSignature,
-        // freeTransactionFeeLimit,
-        needsCreateTransitTokenAccount,
-        transitTokenMintPubkey: transitToken?.mint ? new PublicKey(transitToken.mint) : null,
-        transitTokenAccountAddress: transitToken?.address
-          ? new PublicKey(transitToken.address)
-          : null,
-      });
-
-      // STEP 4: send transaction
-      const signatures = topUpTransaction.preparedTransaction.transaction.signatures;
-      if (signatures.length < 2) {
-        throw FeeRelayerError.invalidSignature();
-      }
-
-      // the second signature is the owner's signature
-      const ownerSignature = getSignature(signatures, 1);
-
-      // the third signature (optional) is the transferAuthority's signature
-      let transferAuthoritySignature = null;
-      try {
-        transferAuthoritySignature = getSignature(signatures, 2);
-      } catch {
-        // ignore
-      }
-
-      const topUpSignatures = new SwapTransactionSignatures({
-        userAuthoritySignature: ownerSignature,
-        transferAuthoritySignature,
-      });
-
-      // TODO: retry
-      return this.apiClient
-        .sendTransaction(
-          FeeRelayerRequestType.relayTopUpWithSwap(
-            new TopUpWithSwapParams({
-              userSourceTokenAccountPubkey: sourceToken.address,
-              sourceTokenMintPubkey: sourceToken.mint,
-              userAuthorityPubkey: this.owner.toString(),
-              topUpSwap: new SwapData(topUpTransaction.swapData),
-              feeAmount: expectedFee,
-              signatures: topUpSignatures,
-              blockhash: recentBlockhash,
-              deviceType: this.deviceType,
-              buildNumber: this.buildNumber,
-            }),
-          ),
-        )
-        .then((txId) => {
-          return [txId];
-        })
-        .finally(() => {
-          Logger.log(
-            `Top up ${targetAmount.toString()} into ${this.userRelayAddress.toString()} completed`,
-            LogEvent.info,
-          );
-
-          this.markTransactionAsCompleted(lamportsPerSignature.muln(2));
-        });
+      }),
+      topUpPools,
+      targetAmount,
+      expectedFee,
+      blockhash,
+      minimumRelayAccountBalance,
+      minimumTokenAccountBalance,
+      needsCreateUserRelayAccount: needsCreateUserRelayAddress,
+      feePayerAddress,
+      needsCreateTransitTokenAccount,
+      transitTokenMintPubkey: transitToken?.mint ? new PublicKey(transitToken.mint) : null,
+      transitTokenAccountAddress: transitToken?.address
+        ? new PublicKey(transitToken.address)
+        : null,
     });
+
+    // STEP 4: send transaction
+    const signatures = topUpTransaction.preparedTransaction.transaction.signatures;
+    console.log(555);
+    signatures.map((a) => console.log(a.publicKey.toString(), a.signature));
+    if (signatures.length < 2) {
+      throw FeeRelayerError.invalidSignature();
+    }
+
+    // the second signature is the owner's signature
+    const ownerSignature = getSignature(signatures, 1);
+
+    // the third signature (optional) is the transferAuthority's signature
+    let transferAuthoritySignature = null;
+    try {
+      transferAuthoritySignature = getSignature(signatures, 2);
+    } catch {
+      // ignore
+    }
+
+    const topUpSignatures = new SwapTransactionSignatures({
+      userAuthoritySignature: ownerSignature,
+      transferAuthoritySignature,
+    });
+
+    const result = await this.feeRelayerAPIClient.sendTransaction(
+      FeeRelayerRequestType.relayTopUpWithSwap(
+        new TopUpWithSwapParams({
+          userSourceTokenAccountPubkey: sourceToken.address,
+          sourceTokenMintPubkey: sourceToken.mint,
+          userAuthorityPubkey: this.owner,
+          topUpSwap: new SwapData(topUpTransaction.swapData),
+          feeAmount: expectedFee,
+          signatures: topUpSignatures,
+          blockhash,
+          deviceType: this.deviceType,
+          buildNumber: this.buildNumber,
+        }),
+      ),
+    );
+
+    return [result];
   }
 
   // FeeRelayerRelayTopUp Helpers
@@ -1624,14 +1541,14 @@ export class FeeRelayerRelay implements FeeRelayerRelayType {
     forceUsingTransitiveSwap = false, // true for testing purpose only
   }: {
     topUpAmount: SolanaSDK.Lamports;
-    payingFeeToken: TokenInfo;
+    payingFeeToken: TokenAccount;
     relayAccountStatus: RelayAccountStatus;
     freeTransactionFeeLimit?: FreeTransactionFeeLimit;
     forceUsingTransitiveSwap?: boolean;
   }): Promise<TopUpPreparedParams | null> {
     // form request
     const tradableTopUpPoolsPair = await this.orcaSwapClient.getTradablePoolsPairs({
-      fromMint: payingFeeToken.mint,
+      fromMint: payingFeeToken.mint.toString(),
       toMint: SolanaSDKPublicKey.wrappedSOLMint.toString(),
     });
 
@@ -1705,7 +1622,7 @@ export class FeeRelayerRelay implements FeeRelayerRelayType {
     }
 
     expectedFee = expectedFee.add(minimumTokenAccountBalance);
-    return expectedFee;
+    return new u64(expectedFee.toString());
   }
 
   /// Prepare transaction and expected fee for a given relay transaction
@@ -1729,7 +1646,7 @@ export class FeeRelayerRelay implements FeeRelayerRelayType {
     transitTokenAccountAddress,
   }: {
     network: Network;
-    sourceToken: TokenInfo;
+    sourceToken: TokenAccount;
     userAuthorityAddress: PublicKey;
     userRelayAddress: PublicKey;
     topUpPools: OrcaSwap.PoolsPair;
@@ -1750,19 +1667,20 @@ export class FeeRelayerRelay implements FeeRelayerRelayType {
     preparedTransaction: SolanaSDK.PreparedTransaction;
   }> {
     // assertion
-    const userSourceTokenAccountAddress = sourceToken.address
-      ? new PublicKey(sourceToken.address)
-      : null;
-    const sourceTokenMintAddress = sourceToken.mint ? new PublicKey(sourceToken.mint) : null;
-    const feePayerAddressNew = feePayerAddress ? new PublicKey(feePayerAddress) : null;
-    if (!userSourceTokenAccountAddress || !sourceTokenMintAddress || !feePayerAddressNew) {
-      throw FeeRelayerError.wrongAddress();
+    const userSourceTokenAccountAddress = new PublicKey(sourceToken.address);
+    const sourceTokenMintAddress = new PublicKey(sourceToken.mint);
+    const feePayerAddressNew = new PublicKey(feePayerAddress);
+    let associatedTokenAddress;
+    try {
+      associatedTokenAddress = getAssociatedTokenAddressSync(
+        sourceTokenMintAddress,
+        feePayerAddressNew,
+      );
+    } catch {
+      throw FeeRelayerError.unknown();
     }
-    const associatedTokenAddress = getAssociatedTokenAddressSync(
-      sourceTokenMintAddress,
-      feePayerAddressNew,
-    );
-    if (!userSourceTokenAccountAddress.equals(associatedTokenAddress)) {
+
+    if (userSourceTokenAccountAddress.equals(associatedTokenAddress)) {
       throw FeeRelayerError.wrongAddress();
     }
 
@@ -1779,7 +1697,7 @@ export class FeeRelayerRelay implements FeeRelayerRelayType {
           lamports: minimumRelayAccountBalance.toNumber(),
         }),
       );
-      accountCreationFee = accountCreationFee.add(minimumRelayAccountBalance);
+      accountCreationFee = new u64(accountCreationFee.add(minimumRelayAccountBalance));
     }
 
     // top up swap
@@ -1787,7 +1705,7 @@ export class FeeRelayerRelay implements FeeRelayerRelayType {
       pools: topUpPools,
       inputAmount: null,
       minAmountOut: targetAmount,
-      slippage: 0.01,
+      slippage: 0.03,
       transitTokenMintPubkey,
       needsCreateTransitTokenAccount: needsCreateTransitTokenAccount === true,
     });
@@ -1796,7 +1714,7 @@ export class FeeRelayerRelay implements FeeRelayerRelayType {
     const swapNew = swap.swapData;
     switch (swapNew.constructor) {
       case DirectSwapData: {
-        accountCreationFee = accountCreationFee.add(minimumTokenAccountBalance);
+        accountCreationFee = new u64(accountCreationFee.add(minimumTokenAccountBalance));
         // approve
         if (userTransferAuthority) {
           instructions.push(
@@ -1854,13 +1772,13 @@ export class FeeRelayerRelay implements FeeRelayerRelayType {
         }
 
         // Destination WSOL account funding
-        accountCreationFee = accountCreationFee.add(minimumTokenAccountBalance);
+        accountCreationFee = new u64(accountCreationFee.add(minimumTokenAccountBalance));
 
         // top up
         instructions.push(
           FeeRelayerRelayProgram.topUpSwapInstruction({
             network,
-            topUpSwap: swap,
+            topUpSwap: swapNew,
             userAuthorityAddress,
             userSourceTokenAccountAddress,
             feePayerAddress: feePayerAddressNew,
@@ -1901,16 +1819,25 @@ export class FeeRelayerRelay implements FeeRelayerRelayType {
     if (tranferAuthority) {
       signers.push(tranferAuthority);
     }
-    transaction.sign(...signers);
+    if (signers.length !== 0) {
+      transaction.sign(...signers);
+    }
 
-    const decodedTransaction = JSON.stringify(transaction);
-    Logger.log(decodedTransaction, LogEvent.info);
+    console.log(
+      444,
+      signers.map((signer) => signer.publicKey.toString()),
+    );
+
+    const signedTransaction = await this.solanaClient.provider.wallet.signTransaction(transaction);
+
+    // const decodedTransaction = JSON.stringify(transaction);
+    // Logger.log(decodedTransaction, LogEvent.info);
 
     return {
       swapData: swap.swapData,
       preparedTransaction: new SolanaSDK.PreparedTransaction({
         owner: this.owner,
-        transaction,
+        transaction: signedTransaction,
         signers,
         expectedFee: expectedFeeNew,
       }),
@@ -1924,10 +1851,10 @@ export class FeeRelayerRelay implements FeeRelayerRelayType {
     payingFeeToken,
   }: {
     expectedFee: SolanaSDK.FeeAmount;
-    payingFeeToken?: TokenInfo | null;
+    payingFeeToken?: TokenAccount | null;
   }): Promise<string[] | null> {
     // if paying fee token is solana, skip the top up
-    if (payingFeeToken?.mint === SolanaSDKPublicKey.wrappedSOLMint.toString()) {
+    if (payingFeeToken?.mint.equals(SolanaSDKPublicKey.wrappedSOLMint)) {
       return Promise.resolve(null);
     }
 
@@ -1995,7 +1922,7 @@ export class FeeRelayerRelay implements FeeRelayerRelayType {
     currency,
   }: {
     preparedTransaction: SolanaSDK.PreparedTransaction;
-    payingFeeToken?: TokenInfo | null;
+    payingFeeToken?: TokenAccount | null;
     relayAccountStatus: RelayAccountStatus;
     additionalPaybackFee: u64;
     operationType: StatsInfoOperationType;
@@ -2015,7 +1942,9 @@ export class FeeRelayerRelay implements FeeRelayerRelayType {
 
     // Calculate the fee to send back to feePayer
     // Account creation fee (accountBalances) is a must-pay-back fee
-    let paybackFee = additionalPaybackFee.add(preparedTransaction.expectedFee.accountBalances);
+    let paybackFee = new u64(
+      additionalPaybackFee.add(preparedTransaction.expectedFee.accountBalances),
+    );
 
     // The transaction fee, on the other hand, is only be paid if user used more than number of free transaction fee
     if (
@@ -2023,7 +1952,7 @@ export class FeeRelayerRelay implements FeeRelayerRelayType {
         transactionFee: preparedTransaction.expectedFee.transaction,
       })
     ) {
-      paybackFee = paybackFee.add(preparedTransaction.expectedFee.transaction);
+      paybackFee = new u64(paybackFee.add(preparedTransaction.expectedFee.transaction));
     }
 
     // transfer sol back to feerelayer's feePayer
@@ -2031,7 +1960,7 @@ export class FeeRelayerRelay implements FeeRelayerRelayType {
     const preparedTransactionNew = preparedTransaction;
     if (paybackFee.gtn(0)) {
       if (
-        payingFeeToken?.mint === SolanaSDKPublicKey.wrappedSOLMint.toString() &&
+        payingFeeToken?.mint.equals(SolanaSDKPublicKey.wrappedSOLMint) &&
         (relayAccountStatus.balance ?? ZERO).lt(paybackFee)
       ) {
         preparedTransactionNew.transaction.instructions.push(
@@ -2064,7 +1993,7 @@ export class FeeRelayerRelay implements FeeRelayerRelayType {
     }
 
     return [
-      await this.apiClient.sendTransaction(
+      await this.feeRelayerAPIClient.sendTransaction(
         FeeRelayerRequestType.relayTransaction(new RelayTransactionParam(preparedTransactionNew)),
       ),
     ];

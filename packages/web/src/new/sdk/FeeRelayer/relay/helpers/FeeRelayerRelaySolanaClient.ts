@@ -9,9 +9,15 @@ import type {
 import { injectable } from 'tsyringe';
 
 import { SolanaModel } from 'new/models/SolanaModel';
+import { FeeRelayerError } from 'new/sdk/FeeRelayer';
 import type * as SolanaSDK from 'new/sdk/SolanaSDK';
 import type { FeeCalculator } from 'new/sdk/SolanaSDK';
-import { AccountInfo, SolanaSDK as SolanaSDKClass, SolanaSDKError } from 'new/sdk/SolanaSDK';
+import {
+  AccountInfo,
+  getAssociatedTokenAddressSync,
+  SolanaSDK as SolanaSDKClass,
+  SolanaSDKPublicKey,
+} from 'new/sdk/SolanaSDK';
 import { Defaults } from 'new/services/Defaults';
 
 import * as Relay from '../index';
@@ -53,7 +59,7 @@ interface FeeRelayerRelaySolanaClientType {
   }: {
     account: string;
     decodedTo: { decode(data: Buffer): T };
-  }): Promise<BufferInfo<T>>;
+  }): Promise<BufferInfo<T> | null>;
 }
 
 // TODO: dont use all sdk
@@ -75,20 +81,41 @@ export class FeeRelayerRelaySolanaClient
     });
   }
 
-  getRelayAccountStatus(relayAccountAddress: string): Promise<Relay.RelayAccountStatus> {
-    return this.getAccountInfo<AccountInfo | null>({
+  async getRelayAccountStatus(relayAccountAddress: string): Promise<Relay.RelayAccountStatus> {
+    const account = await this.getAccountInfo<AccountInfo | null>({
       account: relayAccountAddress,
       decodedTo: AccountInfo,
-    })
-      .then((accountInfo) => {
-        return Relay.RelayAccountStatus.created(new u64(accountInfo.lamports));
-      })
-      .catch((error: Error) => {
-        if (error.message === SolanaSDKError.couldNotRetrieveAccountInfo().message) {
-          return Relay.RelayAccountStatus.notYetCreated();
-        }
+    });
+    if (!account) {
+      return Relay.RelayAccountStatus.notYetCreated();
+    }
+    return Relay.RelayAccountStatus.created(new u64(account.lamports));
+  }
 
-        throw error;
-      });
+  /// Retrieves associated SPL Token address for ``address``.
+  ///
+  /// - Returns: The associated address.
+  async getAssociatedSPLTokenAddress({
+    address,
+    mint,
+  }: {
+    address: PublicKey;
+    mint: PublicKey;
+  }): Promise<PublicKey> {
+    const account = await this.getAccountInfo<AccountInfo | null>({
+      account: address.toString(),
+      decodedTo: AccountInfo,
+    });
+
+    // The account doesn't exists
+    if (!account) {
+      return getAssociatedTokenAddressSync(mint, address);
+    }
+
+    // The native account
+    if (account.owner.equals(SolanaSDKPublicKey.programId)) {
+      throw FeeRelayerError.wrongAddress();
+    }
+    return getAssociatedTokenAddressSync(mint, address);
   }
 }
