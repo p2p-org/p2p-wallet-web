@@ -141,7 +141,6 @@ const Text = styled.div`
 export const Settings: FC = observer(() => {
   const viewModel = useViewModel(SettingsViewModel);
   const history = useHistory();
-  const domain = Defaults.apiEndPoint.network === 'mainnet-beta' ? '.p2p.sol' : '.p2p';
   const { disconnect } = useWallet();
 
   return (
@@ -210,7 +209,7 @@ export const Settings: FC = observer(() => {
                     </Text>
                     <UsernameAddressWidget
                       address={viewModel.pubkeyBase58}
-                      username={`${viewModel.username}${domain}`}
+                      username={withNameServiceDomain(viewModel.username)}
                     />
                   </>
                 ) : (
