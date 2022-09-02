@@ -65,7 +65,7 @@ export const SettingsNetwork: FC = observer(() => {
                 <RadioButton
                   label={endpoint.address}
                   value={endpoint}
-                  checked={endpoint.address === Defaults.apiEndPoint.address}
+                  checked={endpoint.address === Defaults.apiEndpoint.address}
                   onChange={() => viewModel.setAPIEndpoint(endpoint)}
                 />
               </RadioButtonItem>

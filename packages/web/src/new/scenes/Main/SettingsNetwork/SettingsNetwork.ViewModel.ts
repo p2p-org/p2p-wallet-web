@@ -19,7 +19,7 @@ export class SettingsNetworkViewModel extends ViewModel {
   protected override afterReactionsRemoved() {}
 
   setAPIEndpoint(apiEndpoint: APIEndpoint) {
-    runInAction(() => (Defaults.apiEndPoint = apiEndpoint));
+    runInAction(() => (Defaults.apiEndpoint = apiEndpoint));
     this._locationService.reload();
   }
 }

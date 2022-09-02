@@ -248,7 +248,7 @@ export const Settings: FC = observer(() => {
                 }}
                 style={{ cursor: 'pointer' }}
               >
-                <Title title={Defaults.apiEndPoint.address}>{Defaults.apiEndPoint.address}</Title>
+                <Title title={Defaults.apiEndpoint.address}>{Defaults.apiEndpoint.address}</Title>
                 <ChevronWrapper
                   onClick={() => {
                     history.push('/settings/network');
