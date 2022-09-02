@@ -31,7 +31,7 @@ jobs:
 
       - name: Build site
         env:
-          REACT_APP_BASENAME: p2p-wallet-web/
+          REACT_APP_BASENAME: ${{ secrets.REACT_APP_BASENAME }}
           REACT_APP_CRYPTO_COMPARE_API_KEY: ${{ secrets.REACT_APP_CRYPTO_COMPARE_API_KEY }}
           REACT_APP_FEE_RELAYER_URL: ${{ secrets.REACT_APP_FEE_RELAYER_URL }}
           REACT_APP_AMPLITUDE_API_KEY: ${{ secrets.REACT_APP_AMPLITUDE_API_KEY }}
