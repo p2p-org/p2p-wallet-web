@@ -32,7 +32,7 @@ export const MoonpayIframeWidget: FC<BuyViewModelProps> = observer(({ viewModel 
         ...baseParams,
         currencyCode: viewModel.crypto.moonpayCode,
         baseCurrencyAmount: viewModel.output.total,
-        walletAddress: viewModel.publicKeyString,
+        walletAddress: viewModel.pubkeyBase58,
       })}`,
   ).get();
 

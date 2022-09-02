@@ -21,9 +21,7 @@ const Content = styled.div`
   padding: 16px 16px 0;
 `;
 
-interface Props {}
-
-export const ReceiveTokensWidget: FC<Props> = () => {
+export const ReceiveTokensWidget: FC = () => {
   const { tokens } = useTokensContext();
   const isTablet = useIsTablet();
 

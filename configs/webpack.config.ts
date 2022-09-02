@@ -89,6 +89,7 @@ const config: ConfigFn = (env, argv) => {
           REACT_APP_INTERCOM_APP_ID: JSON.stringify(process.env.REACT_APP_INTERCOM_APP_ID),
           REACT_APP_MOONPAY_API_KEY: JSON.stringify(process.env.REACT_APP_MOONPAY_API_KEY),
           REACT_APP_MOONPAY_SIGNER_URL: JSON.stringify(process.env.REACT_APP_MOONPAY_SIGNER_URL),
+          REACT_APP_STAGING: JSON.stringify(process.env.REACT_APP_STAGING),
           REACT_APP_SENTRY_DSN_ENDPOINT: JSON.stringify(process.env.REACT_APP_SENTRY_DSN_ENDPOINT),
           REACT_APP_SENTRY_MODE: JSON.stringify(process.env.REACT_APP_SENTRY_MODE),
           REACT_APP_SENTRY_TRACES_SAMPLE_RATE: JSON.stringify(
@@ -97,6 +98,7 @@ const config: ConfigFn = (env, argv) => {
           REACT_APP_SENTRY_RELEASE: JSON.stringify(process.env.REACT_APP_SENTRY_RELEASE),
           REACT_APP_FIREBASE_API_KEY: JSON.stringify(process.env.REACT_APP_FIREBASE_API_KEY),
           REACT_APP_FIREBASE_APP_ID: JSON.stringify(process.env.REACT_APP_FIREBASE_APP_ID),
+          REACT_APP_RPCPOOL_API_KEY: JSON.stringify(process.env.REACT_APP_RPCPOOL_API_KEY),
         },
       }),
       new CleanWebpackPlugin(),

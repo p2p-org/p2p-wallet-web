@@ -6,7 +6,7 @@ import { observer } from 'mobx-react-lite';
 import { Button, Icon } from 'components/ui';
 import type { BuyViewModelProps } from 'new/scenes/Main/Buy/Subviews/Moonpay/types';
 import { CryptoCurrency, FiatCurrency } from 'new/services/BuyService/structures';
-import { formatNumberToUSD } from 'utils/format';
+import { numberToFiatString } from 'new/utils/NumberExtensions';
 
 const IconWrapper = styled(Icon)`
   width: 24px;
@@ -38,7 +38,7 @@ export const MoonpayButton: FC<BuyViewModelProps> = observer(({ viewModel }) => 
   ) {
     return (
       <Button disabled primary full>
-        Minimum amount {formatNumberToUSD(viewModel.minFiatAmount)}
+        Minimum amount {numberToFiatString(viewModel.minFiatAmount)}
       </Button>
     );
   }

@@ -29,7 +29,7 @@ const StatusItem = styled.li`
 
   border-bottom: 1px solid #f6f6f8;
 
-  &:nth-last-child() {
+  &:last-child {
     border-bottom: none;
   }
 `;

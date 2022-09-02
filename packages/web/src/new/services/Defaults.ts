@@ -6,6 +6,12 @@ import type { CurrentPrice } from 'new/services/PriceAPIs/PricesService';
 
 import { APIEndpoint } from '../sdk/SolanaSDK/models/APIEndpoint';
 
+export enum Appearance {
+  system = 'system',
+  light = 'light',
+  dark = 'dark',
+}
+
 function makeLocalStorage<T>(_this: { fromJSON(json: T): T }, name: string) {
   const storedJson = localStorage.getItem(name);
   if (storedJson) {
@@ -45,6 +51,9 @@ class _Defaults implements DefaultsKeys {
   prices: { [key in string]: CurrentPrice } = {};
   payingTokenMint: string = SolanaSDKPublicKey.wrappedSOLMint.toString();
 
+  appearance: Appearance = Appearance.system;
+  useFreeTransactions = false;
+
   constructor() {
     makeObservable(this, {
       apiEndpoint: observable,
@@ -58,6 +67,9 @@ class _Defaults implements DefaultsKeys {
       fiat: observable,
       prices: observable,
       payingTokenMint: observable,
+
+      appearance: observable,
+      useFreeTransactions: observable,
     });
     makeLocalStorage(this, 'defaults');
   }

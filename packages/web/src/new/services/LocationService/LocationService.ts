@@ -56,4 +56,9 @@ export class LocationService {
     this._assertHistory();
     this._history?.push(pathname, props);
   }
+
+  reload(): void {
+    this._assertHistory();
+    this._history?.go(0);
+  }
 }

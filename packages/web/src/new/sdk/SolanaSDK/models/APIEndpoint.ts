@@ -28,8 +28,9 @@ export class APIEndpoint {
   static get defaultEndpoints(): APIEndpoint[] {
     const endpoints: APIEndpoint[] = [
       new APIEndpoint({
-        address: 'https://p2p.rpcpool.com/78306120-3a44-4ede-89f4-6133642ccab2',
+        address: 'https://p2p.rpcpool.com',
         network: 'mainnet-beta',
+        additionalQuery: process.env.REACT_APP_RPCPOOL_API_KEY,
       }),
       new APIEndpoint({
         address: 'https://solana-api.projectserum.com',
