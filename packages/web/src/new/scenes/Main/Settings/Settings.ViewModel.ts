@@ -1,4 +1,4 @@
-import { action, makeObservable, observable, runInAction } from 'mobx';
+import { action, makeObservable, observable } from 'mobx';
 import { singleton } from 'tsyringe';
 
 import { Fiat } from 'new/app/models/Fiat';
@@ -22,6 +22,11 @@ export class SettingsViewModel extends ViewModel {
 
     makeObservable(this, {
       username: observable,
+
+      setFiat: action,
+      setAppearance: action,
+      setHideZeroBalances: action,
+      setUseFreeTransactions: action,
     });
   }
 
@@ -40,19 +45,19 @@ export class SettingsViewModel extends ViewModel {
   }
 
   setFiat(fiat: Fiat) {
-    runInAction(() => (Defaults.fiat = new Fiat(fiat.type)));
+    Defaults.fiat = new Fiat(fiat.type);
     this._pricesService.fetchAllTokensPriceInWatchList();
   }
 
   setAppearance(appearance: Appearance): void {
-    runInAction(() => (Defaults.appearance = appearance));
+    Defaults.appearance = appearance;
   }
 
   setHideZeroBalances(value: boolean): void {
-    runInAction(() => (Defaults.hideZeroBalances = value));
+    Defaults.hideZeroBalances = value;
   }
 
   setUseFreeTransactions(value: boolean): void {
-    runInAction(() => (Defaults.useFreeTransactions = value));
+    Defaults.useFreeTransactions = value;
   }
 }

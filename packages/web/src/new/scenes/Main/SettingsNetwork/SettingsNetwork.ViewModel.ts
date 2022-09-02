@@ -1,4 +1,4 @@
-import { runInAction } from 'mobx';
+import { action, makeObservable } from 'mobx';
 import { singleton } from 'tsyringe';
 
 import { ViewModel } from 'new/core/viewmodels/ViewModel';
@@ -10,6 +10,10 @@ import { LocationService } from 'new/services/LocationService';
 export class SettingsNetworkViewModel extends ViewModel {
   constructor(private _locationService: LocationService) {
     super();
+
+    makeObservable(this, {
+      setAPIEndpoint: action,
+    });
   }
 
   protected override setDefaults() {}
@@ -19,7 +23,7 @@ export class SettingsNetworkViewModel extends ViewModel {
   protected override afterReactionsRemoved() {}
 
   setAPIEndpoint(apiEndpoint: APIEndpoint) {
-    runInAction(() => (Defaults.apiEndpoint = apiEndpoint));
+    Defaults.apiEndpoint = apiEndpoint;
     this._locationService.reload();
   }
 }
