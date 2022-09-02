@@ -143,6 +143,14 @@ export const Settings: FC = observer(() => {
   const history = useHistory();
   const { disconnect } = useWallet();
 
+  const handleNetworkClick = () => {
+    history.push('/settings/network');
+  };
+
+  const handleLogoutClick = () => {
+    void disconnect().then(() => history.go(0));
+  };
+
   return (
     <Layout>
       <Wrapper>
@@ -242,18 +250,9 @@ export const Settings: FC = observer(() => {
             </AccordionItem>
             <Item>
               <ItemTitle>Network</ItemTitle>
-              <ItemAction
-                onClick={() => {
-                  history.push('/settings/network');
-                }}
-                style={{ cursor: 'pointer' }}
-              >
+              <ItemAction onClick={handleNetworkClick} style={{ cursor: 'pointer' }}>
                 <Title title={Defaults.apiEndpoint.address}>{Defaults.apiEndpoint.address}</Title>
-                <ChevronWrapper
-                  onClick={() => {
-                    history.push('/settings/network');
-                  }}
-                >
+                <ChevronWrapper onClick={handleNetworkClick}>
                   <ChevronIcon name="chevron" />
                 </ChevronWrapper>
               </ItemAction>
@@ -278,7 +277,7 @@ export const Settings: FC = observer(() => {
             </Item>*/}
           </ItemsWrapper>
           <LogoutWrapper>
-            <Logout onClick={() => void disconnect()}>Logout now</Logout>
+            <Logout onClick={handleLogoutClick}>Logout now</Logout>
           </LogoutWrapper>
         </WidgetPage>
       </Wrapper>
