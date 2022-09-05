@@ -31,7 +31,7 @@ jobs:
 
       - name: Build site
         env:
-          REACT_APP_BASENAME: p2p-wallet-web/mvvm/
+          REACT_APP_BASENAME: /p2p-wallet-web/mvvm
           REACT_APP_CRYPTO_COMPARE_API_KEY: ${{ secrets.REACT_APP_CRYPTO_COMPARE_API_KEY }}
           REACT_APP_FEE_RELAYER_URL: ${{ secrets.REACT_APP_FEE_RELAYER_URL }}
           REACT_APP_SWAP_HOST_FEE_ADDRESS: ${{ secrets.REACT_APP_SWAP_HOST_FEE_ADDRESS }}
@@ -40,10 +40,14 @@ jobs:
           REACT_APP_INTERCOM_APP_ID: ${{ secrets.REACT_APP_INTERCOM_APP_ID }}
           REACT_APP_MOONPAY_API_KEY: ${{ secrets.REACT_APP_MOONPAY_API_KEY }}
           REACT_APP_MOONPAY_SIGNER_URL: ${{ secrets.REACT_APP_MOONPAY_SIGNER_URL }}
+          REACT_APP_STAGING: true
           REACT_APP_SENTRY_DSN_ENDPOINT: ${{ secrets.REACT_APP_SENTRY_DSN_ENDPOINT }}
           REACT_APP_SENTRY_MODE: mvvm
           REACT_APP_SENTRY_TRACES_SAMPLE_RATE: 0.9
           REACT_APP_SENTRY_RELEASE: p2p-wallet-web_mvvm_${{ steps.vars.outputs.sha_short }}
+          REACT_APP_FIREBASE_API_KEY: ${{ secrets.REACT_APP_FIREBASE_API_KEY }}
+          REACT_APP_FIREBASE_APP_ID: ${{ secrets.REACT_APP_FIREBASE_APP_ID }}
+          REACT_APP_RPCPOOL_API_KEY: ${{ secrets.REACT_APP_RPCPOOL_API_KEY }}
         run: yarn build
 
       - uses: JamesIves/github-pages-deploy-action@v4
