@@ -16,7 +16,7 @@ import { Send } from 'new/scenes/Main/Send';
 import { Settings } from 'new/scenes/Main/Settings';
 import { SettingsNetwork } from 'new/scenes/Main/SettingsNetwork';
 import { Root } from 'new/scenes/Root';
-import { LocationManager } from 'new/ui/components/root/LocationManager';
+import { LocationManager } from 'new/ui/managers/LocationManager';
 import { ModalManager } from 'new/ui/modals/ModalManager';
 import { Auth } from 'pages/Auth';
 import { Landing } from 'pages/Landing';
