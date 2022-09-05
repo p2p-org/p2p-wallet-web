@@ -1,5 +1,6 @@
 export * from './apiClient';
-export * from './FeeRelayer';
+export * from './helpers';
 export * from './models';
-export * as Relay from './relay';
+export * from './relay';
+export * from './relayProgram';
 export * from './swap';

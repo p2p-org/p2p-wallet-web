@@ -36,6 +36,9 @@ interface DefaultsKeys {
   fiat: Fiat;
   prices: { [key in string]: CurrentPrice };
   payingTokenMint: string;
+
+  appearance: Appearance;
+  useFreeTransactions: boolean;
 }
 
 class _Defaults implements DefaultsKeys {

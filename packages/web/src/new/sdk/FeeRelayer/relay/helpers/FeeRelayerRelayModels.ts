@@ -3,10 +3,11 @@ import type { PublicKey } from '@solana/web3.js';
 import bs58 from 'bs58';
 
 import type { StatsInfoDeviceType } from 'new/sdk/FeeRelayer';
-import { StatsInfo, StatsInfoOperationType } from 'new/sdk/FeeRelayer';
+import { StatsInfo, StatsInfoOperationType, UsageStatus } from 'new/sdk/FeeRelayer';
 import { FeeRelayerError } from 'new/sdk/FeeRelayer/models/FeeRelayerError';
 import type { PoolsPair } from 'new/sdk/OrcaSwap/models/Pools';
 import type * as SolanaSDK from 'new/sdk/SolanaSDK';
+import type { Lamports } from 'new/sdk/SolanaSDK';
 
 export type FeeRelayerRelaySwapType = {};
 
@@ -27,7 +28,7 @@ interface ProcessedFee {
   count: number;
 }
 
-export type FeeLimitForAuthorityResponseType = {
+export type FeeLimitForAuthorityResponseJSON = {
   authority: number[];
   limits: {
     use_free_fee: boolean;
@@ -63,7 +64,16 @@ export class FeeLimitForAuthorityResponse {
     this.processedFee = processedFee;
   }
 
-  static fromJSON(data: FeeLimitForAuthorityResponseType) {
+  asUsageStatus(): UsageStatus {
+    return new UsageStatus({
+      maxUsage: this.limits.maxCount,
+      currentUsage: this.processedFee.count,
+      maxAmount: this.limits.maxAmount,
+      amountUsed: this.processedFee.totalAmount,
+    });
+  }
+
+  static fromJSON(data: FeeLimitForAuthorityResponseJSON) {
     const authority = data.authority;
     const limits = <Limits>{
       useFreeFee: data.limits.use_free_fee,
@@ -84,82 +94,6 @@ export class FeeLimitForAuthorityResponse {
       limits,
       processedFee,
     });
-  }
-}
-
-export class FreeTransactionFeeLimit {
-  maxUsage: number;
-  currentUsage: number;
-  maxAmount: u64;
-  amountUsed: u64;
-
-  constructor({
-    maxUsage,
-    currentUsage,
-    maxAmount,
-    amountUsed,
-  }: {
-    maxUsage: number;
-    currentUsage: number;
-    maxAmount: u64;
-    amountUsed: u64;
-  }) {
-    this.maxUsage = maxUsage;
-    this.currentUsage = currentUsage;
-    this.maxAmount = maxAmount;
-    this.amountUsed = amountUsed;
-  }
-
-  isFreeTransactionFeeAvailable({
-    transactionFee,
-    forNextTransaction = false,
-  }: {
-    transactionFee: u64;
-    forNextTransaction?: boolean;
-  }): boolean {
-    let currentUsage = this.currentUsage;
-    if (forNextTransaction) {
-      currentUsage += 1;
-    }
-
-    return currentUsage < this.maxUsage && this.amountUsed.add(transactionFee).lte(this.maxAmount);
-  }
-}
-
-// Relay info
-export class Cache {
-  minimumTokenAccountBalance?: u64;
-  minimumRelayAccountBalance?: u64;
-  feePayerAddress?: string;
-  lamportsPerSignature?: u64;
-  relayAccountStatus?: RelayAccountStatus;
-  preparedParams?: TopUpAndActionPreparedParams;
-  freeTransactionFeeLimit?: FreeTransactionFeeLimit;
-
-  constructor({
-    minimumTokenAccountBalance,
-    minimumRelayAccountBalance,
-    feePayerAddress,
-    lamportsPerSignature,
-    relayAccountStatus,
-    preparedParams,
-    freeTransactionFeeLimit,
-  }: {
-    minimumTokenAccountBalance?: u64;
-    minimumRelayAccountBalance?: u64;
-    feePayerAddress?: string;
-    lamportsPerSignature?: u64;
-    relayAccountStatus?: RelayAccountStatus;
-    preparedParams?: TopUpAndActionPreparedParams;
-    freeTransactionFeeLimit?: FreeTransactionFeeLimit;
-  } = {}) {
-    this.minimumTokenAccountBalance = minimumTokenAccountBalance;
-    this.minimumRelayAccountBalance = minimumRelayAccountBalance;
-    this.feePayerAddress = feePayerAddress;
-    this.lamportsPerSignature = lamportsPerSignature;
-    this.relayAccountStatus = relayAccountStatus;
-    this.preparedParams = preparedParams;
-    this.freeTransactionFeeLimit = freeTransactionFeeLimit;
   }
 }
 
@@ -531,7 +465,7 @@ export class SwapData {
 export class TransitiveSwapData implements FeeRelayerRelaySwapType {
   from: DirectSwapData;
   to: DirectSwapData;
-  transitTokenMintPubkey: PublicKey;
+  transitTokenMintPubkey: string;
   needsCreateTransitTokenAccount: boolean;
 
   constructor({
@@ -542,7 +476,7 @@ export class TransitiveSwapData implements FeeRelayerRelaySwapType {
   }: {
     from: DirectSwapData;
     to: DirectSwapData;
-    transitTokenMintPubkey: PublicKey;
+    transitTokenMintPubkey: string;
     needsCreateTransitTokenAccount: boolean;
   }) {
     this.from = from;
@@ -555,7 +489,7 @@ export class TransitiveSwapData implements FeeRelayerRelaySwapType {
     return {
       from: this.from.toJSON(),
       to: this.to.toJSON(),
-      transit_token_mint_pubkey: this.transitTokenMintPubkey.toString(),
+      transit_token_mint_pubkey: this.transitTokenMintPubkey,
       needs_create_transit_token_account: this.needsCreateTransitTokenAccount,
     };
   }
@@ -679,50 +613,153 @@ export class RelayAccountStatus {
         return this._balance ? new u64(this._balance) : null;
     }
   }
+
+  equals(rhs: RelayAccountStatus) {
+    if (this.type !== rhs.type) {
+      return false;
+    }
+    if (this.balance?.toString() !== rhs.balance?.toString()) {
+      return false;
+    }
+    return true;
+  }
 }
 
-export class TopUpPreparedParams {
+export interface TopUpPreparedParams {
   amount: u64;
   expectedFee: u64;
   poolsPair: PoolsPair;
-
-  constructor({
-    amount,
-    expectedFee,
-    poolsPair,
-  }: {
-    amount: u64;
-    expectedFee: u64;
-    poolsPair: PoolsPair;
-  }) {
-    this.amount = amount;
-    this.expectedFee = expectedFee;
-    this.poolsPair = poolsPair;
-  }
 }
 
-export class TopUpAndActionPreparedParams {
+export interface TopUpAndActionPreparedParams {
   topUpPreparedParam?: TopUpPreparedParams | null;
   actionFeesAndPools: FeesAndPools;
+}
+
+export interface FeesAndPools {
+  fee: SolanaSDK.FeeAmount;
+  poolsPair: PoolsPair;
+}
+
+export interface FeesAndTopUpAmount {
+  feeInSOL: SolanaSDK.FeeAmount;
+  topUpAmountInSOL?: u64 | null;
+  feeInPayingToken?: SolanaSDK.FeeAmount | null;
+  topUpAmountInPayingToen?: u64 | null;
+}
+
+export class TransferSolParams {
+  sender: string;
+  recipient: string;
+  amount: Lamports;
+  signature: string;
+  blockhash: string;
+  statsInfo: StatsInfo;
 
   constructor({
-    topUpPreparedParam,
-    actionFeesAndPools,
+    sender,
+    recipient,
+    amount,
+    signature,
+    blockhash,
+    deviceType,
+    buildNumber,
   }: {
-    topUpPreparedParam?: TopUpPreparedParams | null;
-    actionFeesAndPools: FeesAndPools;
+    sender: string;
+    recipient: string;
+    amount: Lamports;
+    signature: string;
+    blockhash: string;
+    deviceType: StatsInfoDeviceType;
+    buildNumber: string | null;
   }) {
-    this.topUpPreparedParam = topUpPreparedParam;
-    this.actionFeesAndPools = actionFeesAndPools;
+    this.sender = sender;
+    this.recipient = recipient;
+    this.amount = amount;
+    this.signature = signature;
+    this.blockhash = blockhash;
+    this.statsInfo = new StatsInfo({
+      operationType: StatsInfoOperationType.transfer,
+      deviceType,
+      currency: 'SOL',
+      build: buildNumber,
+    });
+  }
+
+  toJSON() {
+    return {
+      sender_pubkey: this.sender,
+      recipient_pubkey: this.recipient,
+      lamports: this.amount,
+      signature: this.signature,
+      blockhash: this.blockhash,
+      info: this.statsInfo,
+    };
   }
 }
 
-export class FeesAndPools {
-  fee: SolanaSDK.FeeAmount;
-  poolsPair: PoolsPair;
+// Transfer SPL Tokens
+export class TransferSPLTokenParams {
+  sender: string;
+  recipient: string;
+  mintAddress: string;
+  authority: string;
+  amount: Lamports;
+  decimals: number;
+  signature: string;
+  blockhash: string;
+  statsInfo: StatsInfo;
 
-  constructor({ fee, poolsPair }: { fee: SolanaSDK.FeeAmount; poolsPair: PoolsPair }) {
-    this.fee = fee;
-    this.poolsPair = poolsPair;
+  constructor({
+    sender,
+    recipient,
+    mintAddress,
+    authority,
+    amount,
+    decimals,
+    signature,
+    blockhash,
+    deviceType,
+    buildNumber,
+  }: {
+    sender: string;
+    recipient: string;
+    mintAddress: string;
+    authority: string;
+    amount: Lamports;
+    decimals: number;
+    signature: string;
+    blockhash: string;
+    deviceType: StatsInfoDeviceType;
+    buildNumber: string | null;
+  }) {
+    this.sender = sender;
+    this.recipient = recipient;
+    this.mintAddress = mintAddress;
+    this.authority = authority;
+    this.amount = amount;
+    this.decimals = decimals;
+    this.signature = signature;
+    this.blockhash = blockhash;
+    this.statsInfo = new StatsInfo({
+      operationType: StatsInfoOperationType.transfer,
+      deviceType,
+      currency: mintAddress,
+      build: buildNumber,
+    });
+  }
+
+  toJSON() {
+    return {
+      sender_token_account_pubkey: this.sender,
+      recipient_pubkey: this.recipient,
+      token_mint_pubkey: this.mintAddress,
+      authority_pubkey: this.authority,
+      amount: this.amount,
+      decimals: this.decimals,
+      signature: this.signature,
+      blockhash: this.blockhash,
+      info: this.statsInfo,
+    };
   }
 }

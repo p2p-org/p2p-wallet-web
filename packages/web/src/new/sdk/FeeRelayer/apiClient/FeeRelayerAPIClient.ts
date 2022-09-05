@@ -1,7 +1,6 @@
 import type { AxiosRequestConfig } from 'axios';
 import axios from 'axios';
 
-import { FeeRelayer } from '../FeeRelayer';
 import type { FeeRelayerRequestType } from '../models/FeeRelayerRequestType';
 import * as Relay from '../relay/helpers/FeeRelayerRelayModels';
 
@@ -14,13 +13,17 @@ export interface FeeRelayerAPIClientType {
   sendTransaction(requestType: FeeRelayerRequestType): Promise<string>;
 }
 
+// TODO: APIClientError
+
 export class FeeRelayerAPIClient implements FeeRelayerAPIClientType {
   // Properties
   version: number;
+  private _baseUrlString: string;
 
   // Initializers
   constructor(version = 1) {
     this.version = version;
+    this._baseUrlString = 'https://solana-fee-relayer.wallet.p2p.org'; // TODO: from params
   }
 
   // Methods
@@ -28,7 +31,7 @@ export class FeeRelayerAPIClient implements FeeRelayerAPIClientType {
   /// Get fee payer for free transaction
   /// - Returns: Account's public key that is responsible for paying fee
   async getFeePayerPubkey(): Promise<string> {
-    let url = FeeRelayer.feeRelayerUrl;
+    let url = this._baseUrlString;
     if (this.version > 1) {
       url += `/v${this.version}`;
     }
@@ -38,14 +41,14 @@ export class FeeRelayerAPIClient implements FeeRelayerAPIClientType {
   }
 
   requestFreeFeeLimits(authority: string): Promise<Relay.FeeLimitForAuthorityResponse> {
-    let url = FeeRelayer.feeRelayerUrl;
+    let url = this._baseUrlString;
     if (this.version > 1) {
       url += `/v${this.version}`;
     }
     url += `/free_fee_limits/${authority}`;
 
     return request
-      .get<Relay.FeeLimitForAuthorityResponseType>(url)
+      .get<Relay.FeeLimitForAuthorityResponseJSON>(url)
       .then(({ data }) => Relay.FeeLimitForAuthorityResponse.fromJSON(data));
   }
 
@@ -62,7 +65,7 @@ export class FeeRelayerAPIClient implements FeeRelayerAPIClientType {
   }
 
   private _urlRequest(requestType: FeeRelayerRequestType): AxiosRequestConfig {
-    let url = FeeRelayer.feeRelayerUrl;
+    let url = this._baseUrlString;
     if (this.version > 1) {
       url += `/v${this.version}`;
     }

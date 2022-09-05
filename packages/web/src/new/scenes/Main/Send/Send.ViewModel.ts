@@ -5,7 +5,6 @@ import { delay, inject, Lifecycle, scoped } from 'tsyringe';
 import { LoadableRelay, LoadableState } from 'new/app/models/LoadableRelay';
 import { SDFetcherState } from 'new/core/viewmodels/SDViewModel';
 import { ViewModel } from 'new/core/viewmodels/ViewModel';
-import { ChooseWalletViewModel } from 'new/scenes/Main/Send/ChooseWallet/ChooseWallet.ViewModel';
 import type { SelectAddressError } from 'new/scenes/Main/Send/SelectAddress/SelectAddress.ViewModel';
 import { SelectAddressViewModel } from 'new/scenes/Main/Send/SelectAddress/SelectAddress.ViewModel';
 import type * as FeeRelayer from 'new/sdk/FeeRelayer';
@@ -16,7 +15,8 @@ import { Defaults } from 'new/services/Defaults';
 import { ModalService, ModalType } from 'new/services/ModalService';
 import { PricesService } from 'new/services/PriceAPIs/PricesService';
 import { WalletsRepository } from 'new/services/Repositories';
-import { RelayMethod, SendService } from 'new/services/SendService';
+import { SendRelayMethod, SendService } from 'new/services/SendService';
+import { ChooseWalletViewModel } from 'new/ui/components/common/ChooseWallet/ChooseWallet.ViewModel';
 import type { ConfirmSendModalProps } from 'new/ui/modals/confirmModals/ConfirmSendModal/ConfirmSendModal';
 import * as ProcessTransaction from 'new/ui/modals/ProcessTransactionModal/ProcessTransaction.Models';
 import type { ProcessTransactionModalProps } from 'new/ui/modals/ProcessTransactionModal/ProcessTransactionModal';
@@ -45,14 +45,14 @@ export type FeeInfo = {
 };
 
 export interface SendViewModelType {
-  relayMethod: RelayMethod;
+  relayMethod: SendRelayMethod;
 
   // SendTokenChooseRecipientAndNetworkViewModelType
   get getSelectedWallet(): Wallet | null;
   getPrice(symbol: string): number;
   getPrices(symbols: string[]): Record<string, number>;
   get getFeeInCurrentFiat(): string;
-  getFreeTransactionFeeLimit(): Promise<FeeRelayer.Relay.FreeTransactionFeeLimit>;
+  getFreeTransactionFeeLimit(): Promise<FeeRelayer.UsageStatus>;
 
   chooseWallet(wallet: Wallet): void;
 
@@ -81,7 +81,7 @@ export class SendViewModel extends ViewModel implements SendViewModelType {
   loadingState: LoadableState;
   payingWallet: Wallet | null;
   feeInfo: LoadableRelay<FeeInfo>;
-  relayMethod: RelayMethod;
+  relayMethod: SendRelayMethod;
 
   // ChooseTokenAndAmount
   // currencyMode: CurrencyMode = CurrencyMode.token;
@@ -101,7 +101,7 @@ export class SendViewModel extends ViewModel implements SendViewModelType {
     super();
 
     // TODO: relayMethod in constructor
-    this.relayMethod = RelayMethod.default;
+    this.relayMethod = SendRelayMethod.default;
 
     this.wallet = null;
     this.amount = 0;
@@ -146,7 +146,7 @@ export class SendViewModel extends ViewModel implements SendViewModelType {
   }
 
   protected override setDefaults() {
-    this.relayMethod = RelayMethod.default;
+    this.relayMethod = SendRelayMethod.default;
 
     this.wallet = null;
     this.amount = 0;
@@ -413,7 +413,7 @@ export class SendViewModel extends ViewModel implements SendViewModelType {
     return `~${Defaults.fiat.symbol}${numberToString(fee, { maximumFractionDigits: 2 })}`;
   }
 
-  getFreeTransactionFeeLimit(): Promise<FeeRelayer.Relay.FreeTransactionFeeLimit> {
+  getFreeTransactionFeeLimit(): Promise<FeeRelayer.UsageStatus> {
     return this._sendService.getFreeTransactionFeeLimit();
   }
 

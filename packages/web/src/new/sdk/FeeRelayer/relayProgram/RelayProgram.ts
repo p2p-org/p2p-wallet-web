@@ -8,17 +8,16 @@ import BufferLayout from 'buffer-layout';
 
 import { readonly, SolanaSDKPublicKey, writable } from 'new/sdk/SolanaSDK';
 
-import type { FeeRelayerRelaySwapType } from '../index';
-import { DirectSwapData, TransitiveSwapData } from '../index';
+import type { FeeRelayerRelaySwapType } from '../relay';
+import { DirectSwapData, TransitiveSwapData } from '../relay';
 
-export class FeeRelayerRelayProgram {
+export class RelayProgram {
   static id(network: Network): PublicKey {
     switch (network) {
       case 'mainnet-beta':
       default:
         return new PublicKey('12YKFL4mnZz6CBEGePrf293mEzueQM3h8VLPUJsKpGs9');
       case 'devnet':
-        return new PublicKey('6xKJFyuM6UHCT8F5SBxnjGt6ZrZYjsVfnAnAeHPU775k');
       case 'testnet':
         return new PublicKey('6xKJFyuM6UHCT8F5SBxnjGt6ZrZYjsVfnAnAeHPU775k');
     }
@@ -27,7 +26,7 @@ export class FeeRelayerRelayProgram {
   static getUserRelayAddress({ user, network }: { user: PublicKey; network: Network }): PublicKey {
     return findProgramAddressSync(
       [user.toBuffer(), Buffer.from('relay')],
-      FeeRelayerRelayProgram.id(network),
+      RelayProgram.id(network),
     )[0];
   }
 
@@ -40,7 +39,7 @@ export class FeeRelayerRelayProgram {
   }): PublicKey {
     return findProgramAddressSync(
       [user.toBuffer(), Buffer.from('temporary_wsol')],
-      FeeRelayerRelayProgram.id(network),
+      RelayProgram.id(network),
     )[0];
   }
 
@@ -55,7 +54,7 @@ export class FeeRelayerRelayProgram {
   }): PublicKey {
     return findProgramAddressSync(
       [user.toBuffer(), transitTokenMint.toBuffer(), Buffer.from('transit')],
-      FeeRelayerRelayProgram.id(network),
+      RelayProgram.id(network),
     )[0];
   }
 
@@ -113,7 +112,7 @@ export class FeeRelayerRelayProgram {
           ),
           userSourceTokenAccount: userSourceTokenAccountAddress,
           userDestinationTokenAccount: userTemporarilyWSOLAddress,
-          transitTokenMint: (swap as TransitiveSwapData).transitTokenMintPubkey,
+          transitTokenMint: new PublicKey((swap as TransitiveSwapData).transitTokenMintPubkey),
           swapFromProgramId: new PublicKey((swap as TransitiveSwapData).from.programId),
           swapFromAccount: new PublicKey((swap as TransitiveSwapData).from.accountPubkey),
           swapFromAuthority: new PublicKey((swap as TransitiveSwapData).from.authorityPubkey),

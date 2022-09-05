@@ -219,13 +219,19 @@ export class Pool {
     return this.getInputAmount(estimatedAmount);
   }
 
-  createSwapInstruction(
-    userTransferAuthorityPubkey: PublicKey,
-    sourceTokenAddress: PublicKey,
-    destinationTokenAddress: PublicKey,
-    amountIn: u64,
-    minAmountOut: u64,
-  ): TransactionInstruction {
+  createSwapInstruction({
+    userTransferAuthorityPubkey,
+    sourceTokenAddress,
+    destinationTokenAddress,
+    amountIn,
+    minAmountOut,
+  }: {
+    userTransferAuthorityPubkey: PublicKey;
+    sourceTokenAddress: PublicKey;
+    destinationTokenAddress: PublicKey;
+    amountIn: u64;
+    minAmountOut: u64;
+  }): TransactionInstruction {
     return TokenSwap.swapInstruction(
       new PublicKey(this.account),
       new PublicKey(this.authority),

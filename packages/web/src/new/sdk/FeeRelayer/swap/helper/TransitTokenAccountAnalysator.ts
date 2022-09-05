@@ -2,7 +2,7 @@ import { PublicKey } from '@solana/web3.js';
 
 import { TokenAccount } from 'new/sdk/FeeRelayer';
 import type { FeeRelayerRelaySolanaClient } from 'new/sdk/FeeRelayer/relay';
-import { FeeRelayerRelayProgram } from 'new/sdk/FeeRelayer/relay/RelayProgram';
+import { RelayProgram } from 'new/sdk/FeeRelayer/RelayProgram';
 import type * as OrcaSwap from 'new/sdk/OrcaSwap';
 import * as SolanaSDK from 'new/sdk/SolanaSDK';
 
@@ -26,7 +26,7 @@ export class TransitTokenAccountAnalysator {
       return null;
     }
 
-    const transitTokenAccountAddress = FeeRelayerRelayProgram.getTransitTokenAccountAddress({
+    const transitTokenAccountAddress = RelayProgram.getTransitTokenAccountAddress({
       user: account,
       transitTokenMint: transitTokenMintPubkey,
       network: solanaApiClient.endpoint.network,
