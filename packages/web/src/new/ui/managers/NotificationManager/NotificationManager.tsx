@@ -6,7 +6,6 @@ import { observer } from 'mobx-react-lite';
 import { expr } from 'mobx-utils';
 
 import { NotifyToast } from 'components/common/NotifyToast';
-import { Toast } from 'components/common/ToastManager';
 import { useViewModel } from 'new/core/viewmodels/useViewModel';
 import { NotificationManagerViewModel } from 'new/ui/managers/NotificationManager/NotificationManager.ViewModel';
 
@@ -101,9 +100,6 @@ const DefaultRenderer = (props: RendererParams) => <NotifyToast {...props} />;
 export const NotificationManager: FC = observer(() => {
   const viewModel = useViewModel(NotificationManagerViewModel);
 
-  const onMouseEnter = () => {};
-  const onMouseLeave = () => {};
-
   const renderedToasts = expr(() => {
     const { currentToasts } = viewModel;
 
@@ -112,6 +108,7 @@ export const NotificationManager: FC = observer(() => {
         const isOffsetCalculated = bottomOffset !== undefined;
 
         const render = renderer || DefaultRenderer;
+        const onCloseClick = (hideId: number) => viewModel.hideToast(hideId);
 
         return (
           <ToastContainer
@@ -129,18 +126,14 @@ export const NotificationManager: FC = observer(() => {
                 isHiding,
               })}
             >
-              {render ? (
-                render({
-                  type,
-                  header,
-                  text,
-                  onClose: () => {
-                    // this.onCloseClick(id)
-                  },
-                })
-              ) : (
-                <Toast>{header}</Toast>
-              )}
+              {render({
+                type,
+                header,
+                text,
+                onClose: () => {
+                  onCloseClick(id);
+                },
+              })}
             </ToastWrapper>
           </ToastContainer>
         );
@@ -148,7 +141,14 @@ export const NotificationManager: FC = observer(() => {
     );
   });
   return (
-    <Wrapper onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
+    <Wrapper
+      onMouseEnter={() => {
+        viewModel.disableDeferredHiding();
+      }}
+      onMouseLeave={() => {
+        viewModel.enableDeferredHiding();
+      }}
+    >
       {renderedToasts}
     </Wrapper>
   );

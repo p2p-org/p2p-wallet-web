@@ -16,16 +16,19 @@ export type CurrentToastParams = { id: number; isHiding?: boolean } & ToastParam
 
 const LIMIT = 3;
 const HIDE_TIMEOUT = 7000;
-// const HIDE_LEAVE_TIMEOUT = 5000;
+const HIDE_LEAVE_TIMEOUT = 5000;
 
 @singleton()
 export class NotificationService {
   currentToasts: CurrentToastParams[] = [];
+
   _delayedQueue: ToastParams[] = [];
 
-  _hideTimeouts: number[] = [];
-  _clearingTimeouts: number[] = [];
-  _lastId = 0;
+  private _hideTimeouts: number[] = [];
+  private _removeTimeouts: number[] = [];
+  private _lastId = 0;
+
+  private _noHide = false;
 
   constructor() {
     makeObservable(this, {
@@ -48,15 +51,18 @@ export class NotificationService {
     this._showToast(toastParams);
   }
 
-  private _setToastHideTimeout(id: number): void {
+  private _setToastHideTimeout(id: number, timeout = HIDE_TIMEOUT): void {
+    const timerIdx = this._hideTimeouts.length;
+
     const timeoutId = window.setTimeout(() => {
-      this._startToastsHiding(id);
-    }, HIDE_TIMEOUT);
+      this._hideTimeouts.splice(timerIdx, 1);
+      this.startToastsHiding(id);
+    }, timeout);
 
     this._hideTimeouts.push(timeoutId);
   }
 
-  private _startToastsHiding(ids: number | number[]) {
+  startToastsHiding(ids: number | number[]) {
     let idsArray: number[];
     if (!Array.isArray(ids)) {
       idsArray = [ids];
@@ -79,11 +85,12 @@ export class NotificationService {
 
     this._checkDelayedQueue();
 
-    this._clearingTimeouts.push(
-      window.setTimeout(() => {
-        this._removeToasts(idsArray);
-      }, 400),
-    );
+    const timerIdx = this._removeTimeouts.length;
+    const timeoutId = window.setTimeout(() => {
+      this._removeTimeouts.splice(timerIdx, 1);
+      this._removeToasts(idsArray);
+    }, 400);
+    this._removeTimeouts.push(timeoutId);
   }
 
   private _removeToasts(ids: number[]): void {
@@ -118,9 +125,46 @@ export class NotificationService {
       });
     });
 
-    // if (!isHovered) {
-    this._setToastHideTimeout(id);
-    // }
+    if (!this._noHide) {
+      this._setToastHideTimeout(id);
+    }
+  }
+
+  eraseData(): void {
+    this.currentToasts = [];
+    this._delayedQueue = [];
+
+    this._noHide = false;
+
+    // clean timeouts
+    for (const id of this._hideTimeouts) {
+      clearTimeout(id);
+    }
+
+    for (const id of this._removeTimeouts) {
+      clearTimeout(id);
+    }
+
+    this._hideTimeouts = [];
+    this._removeTimeouts = [];
+  }
+
+  disableDeferredHiding(): void {
+    this._noHide = true;
+
+    for (const id of this._hideTimeouts) {
+      clearTimeout(id);
+    }
+  }
+
+  enableDeferredHiding(): void {
+    this._noHide = false;
+
+    if (this.currentToasts.length === 0) {
+      return;
+    }
+
+    this.currentToasts.forEach(({ id }) => this._setToastHideTimeout(id, HIDE_LEAVE_TIMEOUT));
   }
 
   info(header: string, text?: string): void {

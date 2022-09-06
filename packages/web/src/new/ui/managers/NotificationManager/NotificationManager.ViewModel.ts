@@ -8,7 +8,7 @@ import { ViewModel } from 'new/core/viewmodels/ViewModel';
 import type { CurrentToastParams } from 'new/services/NotificationService/NotificationService';
 import { NotificationService } from 'new/services/NotificationService/NotificationService';
 
-type SizeType = Record<string, number>;
+type SizeType = { [toastId: string]: number };
 type ToastRefType = RefObject<HTMLDivElement>;
 
 export type CurrentToastForRenderParams = CurrentToastParams & {
@@ -19,7 +19,7 @@ export type CurrentToastForRenderParams = CurrentToastParams & {
 @singleton()
 export class NotificationManagerViewModel extends ViewModel {
   private _heights: SizeType;
-  private _toastsRefs: Record<string, ToastRefType>;
+  private _toastsRefs: { [toastId: string]: RefObject<HTMLDivElement> };
 
   _bottomOffsets: SizeType;
 
@@ -32,6 +32,7 @@ export class NotificationManagerViewModel extends ViewModel {
 
     makeObservable(this, {
       _bottomOffsets: observable,
+
       currentToasts: computed,
     });
   }
@@ -48,13 +49,22 @@ export class NotificationManagerViewModel extends ViewModel {
       reaction(
         () => this._notificationService.currentToasts,
         (currentToasts) => {
+          this._cleanRefs(currentToasts);
           setTimeout(() => this._checkHeights(currentToasts), 0);
         },
       ),
     );
   }
 
-  protected override afterReactionsRemoved() {}
+  protected override afterReactionsRemoved() {
+    this._notificationService.eraseData();
+  }
+
+  private _cleanRefs(currentToasts: CurrentToastParams[]): void {
+    Object.keys(this._toastsRefs)
+      .filter((toastId) => !currentToasts.some((toast) => toast.id === Number(toastId)))
+      .forEach((toastId) => delete this._toastsRefs[toastId]);
+  }
 
   private _checkHeights(currentToasts: CurrentToastParams[]): void {
     const newHeights: SizeType = {};
@@ -121,5 +131,17 @@ export class NotificationManagerViewModel extends ViewModel {
         ref: this._toastsRefs[toast.id] as ToastRefType,
       };
     });
+  }
+
+  hideToast(id: number): void {
+    this._notificationService.startToastsHiding(id);
+  }
+
+  disableDeferredHiding(): void {
+    this._notificationService.disableDeferredHiding();
+  }
+
+  enableDeferredHiding(): void {
+    this._notificationService.enableDeferredHiding();
   }
 }
