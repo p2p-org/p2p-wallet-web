@@ -35,6 +35,8 @@ export class NotificationManagerViewModel extends ViewModel {
 
       currentToasts: computed,
     });
+
+    setTimeout(() => this._checkHeights(this._notificationService.currentToasts), 0);
   }
 
   protected override setDefaults() {
@@ -70,23 +72,19 @@ export class NotificationManagerViewModel extends ViewModel {
     const newHeights: SizeType = {};
     let heightsUpdated = false;
 
-    for (const id of Object.keys(this._toastsRefs)) {
+    currentToasts.forEach(({ id, isHiding }) => {
       const ref = this._toastsRefs[id];
 
       if (ref?.current) {
-        const foundToast = currentToasts.find((toast) => toast.id === Number(id));
+        const height = isHiding ? 0 : ref.current.clientHeight;
 
-        if (foundToast) {
-          const height = foundToast.isHiding ? 0 : ref.current.clientHeight;
+        newHeights[id] = height;
 
-          newHeights[id] = height;
-
-          if (this._heights[id] === undefined || this._heights[id] !== height) {
-            heightsUpdated = true;
-          }
+        if (this._heights[id] === undefined || this._heights[id] !== height) {
+          heightsUpdated = true;
         }
       }
-    }
+    });
 
     if (heightsUpdated) {
       this._heights = newHeights;
@@ -94,7 +92,7 @@ export class NotificationManagerViewModel extends ViewModel {
     }
   }
 
-  private _calcOffsets() {
+  private _calcOffsets(): void {
     const newBottomOffsets: SizeType = {};
     let totalOffset = 0;
 

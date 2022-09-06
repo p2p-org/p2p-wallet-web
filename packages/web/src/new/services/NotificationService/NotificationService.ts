@@ -17,15 +17,16 @@ export type CurrentToastParams = { id: number; isHiding?: boolean } & ToastParam
 const LIMIT = 3;
 const HIDE_TIMEOUT = 7000;
 const HIDE_LEAVE_TIMEOUT = 5000;
+const REMOVE_TIMEOUT = 400;
 
 @singleton()
 export class NotificationService {
   currentToasts: CurrentToastParams[] = [];
 
-  _delayedQueue: ToastParams[] = [];
+  private _queue: ToastParams[] = [];
 
-  private _hideTimeouts: number[] = [];
-  private _removeTimeouts: number[] = [];
+  private _hideTimeouts: Set<number> = new Set();
+  private _removeTimeouts: Set<number> = new Set();
   private _lastId = 0;
 
   private _noHide = false;
@@ -36,6 +37,15 @@ export class NotificationService {
     });
 
     window.service = this;
+
+    // this.info('startup Header');
+    // setTimeout(() => this.warn('warn'), 2000);
+    // setTimeout(() => this.warn('warn'), 3000);
+    // setTimeout(() => this.warn('warn'), 4000);
+    // setTimeout(() => this.warn('warn'), 5100);
+    // setTimeout(() => this.warn('warn'), 6100);
+    // setTimeout(() => this.warn('warn'), 7100);
+    // setTimeout(() => this.warn('warn'), 8100);
   }
 
   private _getActiveToastsCount(): number {
@@ -44,7 +54,7 @@ export class NotificationService {
 
   private _addToast(toastParams: ToastParams): void {
     if (this._getActiveToastsCount() >= LIMIT) {
-      this._delayedQueue = this._delayedQueue.concat(toastParams);
+      this._queue = this._queue.concat(toastParams);
       return;
     }
 
@@ -52,45 +62,12 @@ export class NotificationService {
   }
 
   private _setToastHideTimeout(id: number, timeout = HIDE_TIMEOUT): void {
-    const timerIdx = this._hideTimeouts.length;
-
     const timeoutId = window.setTimeout(() => {
-      this._hideTimeouts.splice(timerIdx, 1);
+      this._hideTimeouts.delete(timeoutId);
       this.startToastsHiding(id);
     }, timeout);
 
-    this._hideTimeouts.push(timeoutId);
-  }
-
-  startToastsHiding(ids: number | number[]) {
-    let idsArray: number[];
-    if (!Array.isArray(ids)) {
-      idsArray = [ids];
-    } else {
-      idsArray = ids;
-    }
-
-    runInAction(() => {
-      this.currentToasts = this.currentToasts.map((toast) => {
-        if (idsArray.includes(toast.id)) {
-          return {
-            ...toast,
-            isHiding: true,
-          };
-        }
-
-        return toast;
-      });
-    });
-
-    this._checkDelayedQueue();
-
-    const timerIdx = this._removeTimeouts.length;
-    const timeoutId = window.setTimeout(() => {
-      this._removeTimeouts.splice(timerIdx, 1);
-      this._removeToasts(idsArray);
-    }, 400);
-    this._removeTimeouts.push(timeoutId);
+    this._hideTimeouts.add(timeoutId);
   }
 
   private _removeToasts(ids: number[]): void {
@@ -99,15 +76,15 @@ export class NotificationService {
     });
   }
 
-  private _checkDelayedQueue(): void {
-    if (this._delayedQueue.length > 0 && this._getActiveToastsCount() < LIMIT) {
-      const [firstToast, ...other] = this._delayedQueue;
+  private _checkQueue(): void {
+    if (this._queue.length > 0 && this._getActiveToastsCount() < LIMIT) {
+      const [firstToast, ...other] = this._queue;
 
-      this._delayedQueue = other;
+      this._queue = other;
 
       this._showToast(firstToast!);
 
-      this._checkDelayedQueue();
+      this._checkQueue();
     }
   }
 
@@ -130,9 +107,42 @@ export class NotificationService {
     }
   }
 
+  startToastsHiding(ids: number | number[]): void {
+    let idsArray: number[];
+    if (!Array.isArray(ids)) {
+      idsArray = [ids];
+    } else {
+      idsArray = ids;
+    }
+
+    runInAction(() => {
+      this.currentToasts = this.currentToasts.map((toast) => {
+        if (idsArray.includes(toast.id)) {
+          return {
+            ...toast,
+            isHiding: true,
+          };
+        }
+
+        return toast;
+      });
+    });
+
+    this._checkQueue();
+
+    const timeoutId = window.setTimeout(() => {
+      this._removeTimeouts.delete(timeoutId);
+      this._removeToasts(idsArray);
+    }, REMOVE_TIMEOUT);
+
+    this._removeTimeouts.add(timeoutId);
+  }
+
   eraseData(): void {
-    this.currentToasts = [];
-    this._delayedQueue = [];
+    runInAction(() => {
+      this.currentToasts = [];
+    });
+    this._queue = [];
 
     this._noHide = false;
 
@@ -145,8 +155,8 @@ export class NotificationService {
       clearTimeout(id);
     }
 
-    this._hideTimeouts = [];
-    this._removeTimeouts = [];
+    this._hideTimeouts.clear();
+    this._removeTimeouts.clear();
   }
 
   disableDeferredHiding(): void {
@@ -155,6 +165,8 @@ export class NotificationService {
     for (const id of this._hideTimeouts) {
       clearTimeout(id);
     }
+
+    this._hideTimeouts.clear();
   }
 
   enableDeferredHiding(): void {
