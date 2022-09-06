@@ -68,7 +68,7 @@ export class SwapFeeRelayer implements SwapFeeRelayerType {
     owner: PublicKey;
     solanaApiClient: FeeRelayerRelaySolanaClient;
     orcaSwap: OrcaSwap;
-    feeRelayerCalculator: FeeRelayerCalculator;
+    feeRelayerCalculator?: FeeRelayerCalculator;
   }) {
     this._owner = owner;
     this._solanaApiClient = solanaApiClient;
@@ -99,8 +99,8 @@ export class SwapFeeRelayer implements SwapFeeRelayerType {
     context: FeeRelayerContext;
     sourceToken: TokenAccount;
     destinationTokenMint: PublicKey;
-    destinationAddress?: PublicKey;
-    fee?: TokenAccount;
+    destinationAddress?: PublicKey | null;
+    fee?: TokenAccount | null;
     swapPools: PoolsPair;
     inputAmount: u64;
     slippage: number;

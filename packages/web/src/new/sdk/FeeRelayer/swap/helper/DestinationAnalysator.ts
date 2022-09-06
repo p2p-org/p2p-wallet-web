@@ -12,7 +12,7 @@ export class DestinationAnalysator {
     userAccount,
   }: {
     apiClient: FeeRelayerRelaySolanaClient; // TODO: change type
-    destination?: PublicKey;
+    destination?: PublicKey | null;
     mint: PublicKey;
     userAccount: PublicKey;
   }): Promise<{

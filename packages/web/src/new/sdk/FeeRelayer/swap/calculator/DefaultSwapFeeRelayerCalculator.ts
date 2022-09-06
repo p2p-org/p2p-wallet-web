@@ -17,7 +17,7 @@ export interface SwapFeeRelayerCalculator {
     destinationAddress,
   }: {
     context: FeeRelayerContext;
-    swapPools?: OrcaSwap.PoolsPair;
+    swapPools?: OrcaSwap.PoolsPair | null;
     sourceTokenMint: PublicKey;
     destinationTokenMint: PublicKey;
     destinationAddress?: PublicKey | null;
@@ -47,10 +47,10 @@ export class DefaultSwapFeeRelayerCalculator implements SwapFeeRelayerCalculator
     destinationAddress,
   }: {
     context: FeeRelayerContext;
-    swapPools?: OrcaSwap.PoolsPair;
+    swapPools?: OrcaSwap.PoolsPair | null;
     sourceTokenMint: PublicKey;
     destinationTokenMint: PublicKey;
-    destinationAddress?: PublicKey;
+    destinationAddress?: PublicKey | null;
   }): Promise<SolanaSDK.FeeAmount> {
     const destinationInfo = await DestinationAnalysator.analyseDestination({
       apiClient: this.solanaApiClient,
