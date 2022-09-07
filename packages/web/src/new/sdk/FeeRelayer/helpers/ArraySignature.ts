@@ -1,7 +1,7 @@
 import type { SignaturePubkeyPair, TransactionSignature } from '@solana/web3.js';
 import bs58 from 'bs58';
 
-import { FeeRelayerError } from 'new/sdk/FeeRelayer/models/FeeRelayerError';
+import { FeeRelayerError } from 'new/sdk/FeeRelayer';
 
 export function getSignature(
   signatures: SignaturePubkeyPair[],

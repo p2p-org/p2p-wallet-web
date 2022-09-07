@@ -4,8 +4,8 @@ import { styled } from '@linaria/react';
 import { observer } from 'mobx-react-lite';
 
 import type { SendViewModel } from 'new/scenes/Main/Send';
-import { ChooseWallet } from 'new/scenes/Main/Send/ChooseWallet';
 import type { Wallet } from 'new/sdk/SolanaSDK';
+import { ChooseWallet } from 'new/ui/components/common/ChooseWallet';
 
 import { WalletSelectorContent } from './WalletSelectorContent';
 

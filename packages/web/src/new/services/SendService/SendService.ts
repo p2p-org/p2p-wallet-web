@@ -3,45 +3,37 @@ import { u64 } from '@solana/spl-token';
 import { PublicKey } from '@solana/web3.js';
 import { injectable } from 'tsyringe';
 
-import type { FeeRelayerAPIClientType } from 'new/sdk/FeeRelayer';
-import * as FeeRelayer from 'new/sdk/FeeRelayer';
-import {
-  FeeRelayerAPIClient,
-  FeeRelayerConfiguration,
-  StatsInfoDeviceType,
-  StatsInfoOperationType,
-} from 'new/sdk/FeeRelayer';
-import { FeeRelayerError } from 'new/sdk/FeeRelayer/models/FeeRelayerError';
-import { FeeRelayerRelay, FeeRelayerRelaySolanaClient } from 'new/sdk/FeeRelayer/relay';
-import type * as OrcaSwap from 'new/sdk/OrcaSwap';
+import type { FeeRelayerAPIClientType, UsageStatus } from 'new/sdk/FeeRelayer';
+import { FeeRelayerAPIClient, StatsInfoDeviceType } from 'new/sdk/FeeRelayer';
+import { FeeRelayer, FeeRelayerRelaySolanaClient } from 'new/sdk/FeeRelayer/relay';
+import { FeeRelayerContextManager } from 'new/sdk/FeeRelayer/relay/FeeRelayerContextManager';
 import type { Wallet } from 'new/sdk/SolanaSDK';
 import * as SolanaSDK from 'new/sdk/SolanaSDK';
-import { convertToBalance, SolanaSDKError, SolanaSDKPublicKey, toLamport } from 'new/sdk/SolanaSDK';
+import { SolanaSDKPublicKey, toLamport } from 'new/sdk/SolanaSDK';
 import { OrcaSwapService } from 'new/services/OrcaSwapService';
 import { WalletsRepository } from 'new/services/Repositories';
 import { SendServiceError } from 'new/services/SendService/SendServiceError';
+import { SendServiceRelayMethod } from 'new/services/SendService/SendServiceRelayMethod';
 import { SolanaService } from 'new/services/SolanaService';
 
-import { FeeService } from '../FeeService';
-
-export enum RelayMethodType {
+export enum SendRelayMethodType {
   relay,
   // reward,
 }
 
-export class RelayMethod {
-  type: RelayMethodType;
+export class SendRelayMethod {
+  type: SendRelayMethodType;
 
-  static get relay(): RelayMethod {
-    return new RelayMethod(RelayMethodType.relay);
+  static get relay(): SendRelayMethod {
+    return new SendRelayMethod(SendRelayMethodType.relay);
   }
 
-  constructor(type: RelayMethodType) {
+  constructor(type: SendRelayMethodType) {
     this.type = type;
   }
 
-  static get default(): RelayMethod {
-    return RelayMethod.relay;
+  static get default(): SendRelayMethod {
+    return SendRelayMethod.relay;
   }
 }
 
@@ -66,6 +58,7 @@ export interface SendServiceType {
     network: Network;
     payingTokenMint?: string;
   }): Promise<SolanaSDK.FeeAmount | null>;
+
   getFeesInPayingToken({
     feeInSOL,
     payingFeeWallet,
@@ -74,7 +67,8 @@ export interface SendServiceType {
     payingFeeWallet: Wallet;
   }): Promise<SolanaSDK.FeeAmount | null>;
 
-  getFreeTransactionFeeLimit(): Promise<FeeRelayer.Relay.FreeTransactionFeeLimit>;
+  // TODO: hide direct usage of ``UsageStatus``
+  getFreeTransactionFeeLimit(): Promise<UsageStatus>;
 
   getAvailableWalletsToPayFee({ feeInSOL }: { feeInSOL: SolanaSDK.FeeAmount }): Promise<Wallet[]>;
 
@@ -95,70 +89,61 @@ export interface SendServiceType {
 
 @injectable()
 export class SendService implements SendServiceType {
-  relayMethod: RelayMethod;
+  relayMethod: SendRelayMethod;
 
   private _feeRelayerAPIClient: FeeRelayerAPIClientType;
-  private _relayService: FeeRelayer.Relay.FeeRelayerRelayType;
+  private _feeRelayer: FeeRelayer;
   // private _renVMBurnAndReleaseService: RenVMBurnAndReleaseServiceType;
+  private _contextManager: FeeRelayerContextManager;
 
-  private _cachedFeePayerPubkey?: string;
-  private _cachedPoolsSPLToSOL: { [mint in string]: OrcaSwap.PoolsPair[] } = {}; // [Mint: Pools]
+  private _sendServiceRelayMethod: SendServiceRelayMethod;
 
   constructor(
-    private _solanaSDK: SolanaService,
+    private _solanaAPIClient: SolanaService,
     private _orcaSwap: OrcaSwapService,
     // renVMBurnAndReleaseService: RenVMBurnAndReleaseServiceType,
     private _feeRelayerRelaySolanaClient: FeeRelayerRelaySolanaClient,
-    private _feeService: FeeService,
     private _walletsRepository: WalletsRepository,
   ) {
-    this.relayMethod = RelayMethod.default;
+    this.relayMethod = SendRelayMethod.default;
 
     this._feeRelayerAPIClient = new FeeRelayerAPIClient();
-    this._relayService = new FeeRelayerRelay({
-      owner: this._solanaSDK.provider.wallet.publicKey,
+    this._feeRelayer = new FeeRelayer({
+      orcaSwap: this._orcaSwap,
+      owner: this._solanaAPIClient.provider.wallet.publicKey,
+      solanaApiClient: this._feeRelayerRelaySolanaClient,
       feeRelayerAPIClient: this._feeRelayerAPIClient,
-      solanaClient: this._feeRelayerRelaySolanaClient,
-      orcaSwapClient: this._orcaSwap,
       deviceType: StatsInfoDeviceType.web,
       buildNumber: '1', // TODO: pass build number from environment
     });
     // this._renVMBurnAndReleaseService = renVMBurnAndReleaseService;
+    this._contextManager = new FeeRelayerContextManager({
+      owner: this._solanaAPIClient.provider.wallet.publicKey,
+      solanaAPIClient: this._feeRelayerRelaySolanaClient,
+      feeRelayerAPIClient: this._feeRelayerAPIClient,
+    });
+
+    // Subclasses
+    this._sendServiceRelayMethod = new SendServiceRelayMethod({
+      solanaAPIClient: this._solanaAPIClient,
+      feeRelayer: this._feeRelayer,
+    });
   }
 
   // Methods
 
   async load(): Promise<void> {
-    await this._feeService.load();
-    if (this.relayMethod.type === RelayMethod.relay.type) {
-      await this._orcaSwap.load();
-      await this._relayService.load();
-      // load all pools
-      await Promise.all(
-        this._walletsRepository
-          .getWallets()
-          .filter((wallet) => (wallet.lamports ?? ZERO).gt(ZERO))
-          .map((wallet) => {
-            return this._orcaSwap
-              .getTradablePoolsPairs({
-                fromMint: wallet.mintAddress,
-                toMint: SolanaSDKPublicKey.wrappedSOLMint.toString(),
-              })
-              .then((poolsPair) => {
-                this._cachedPoolsSPLToSOL[wallet.mintAddress] = poolsPair;
-              });
-          }),
-      );
-    }
+    await this._orcaSwap.load();
+    await this._contextManager.update();
   }
 
   checkAccountValidation(account: string): Promise<boolean> {
-    return this._solanaSDK.checkAccountValidation(account);
+    return this._solanaAPIClient.checkAccountValidation(account);
   }
 
   isTestNet(): boolean {
     // TODO: move to Network class isTestnet check
-    return this._solanaSDK.endpoint.network !== 'mainnet-beta';
+    return this._solanaAPIClient.endpoint.network !== 'mainnet-beta';
   }
 
   // Fees calculator
@@ -193,8 +178,9 @@ export class SendService implements SendServiceType {
         }
 
         switch (this.relayMethod.type) {
-          case RelayMethodType.relay: {
-            return this._getFeeViaRelayMethod({
+          case SendRelayMethodType.relay: {
+            return this._sendServiceRelayMethod.getFeeViaRelayMethod({
+              context: await this._contextManager.getCurrentContext(),
               wallet,
               receiver,
               payingTokenMint,
@@ -218,10 +204,11 @@ export class SendService implements SendServiceType {
             return (wallet.lamports ?? ZERO).gte(feeInSOL.total) ? wallet : null;
           }
 
-          return this._relayService
+          return this._feeRelayer.feeCalculator
             .calculateFeeInPayingToken({
+              orcaSwap: this._orcaSwap,
               feeInSOL,
-              payingFeeTokenMint: wallet.mintAddress,
+              payingFeeTokenMint: new PublicKey(wallet.mintAddress),
             })
             .then((fee) => (fee.total ?? ZERO).lte(wallet.lamports ?? ZERO))
             .then((flag) => (flag ? wallet : null))
@@ -238,7 +225,7 @@ export class SendService implements SendServiceType {
     feeInSOL: SolanaSDK.FeeAmount;
     payingFeeWallet: Wallet;
   }): Promise<SolanaSDK.FeeAmount | null> {
-    if (this.relayMethod.type !== RelayMethodType.relay) {
+    if (this.relayMethod.type !== SendRelayMethodType.relay) {
       return null;
     }
 
@@ -246,19 +233,20 @@ export class SendService implements SendServiceType {
       return feeInSOL;
     }
 
-    return this._relayService.calculateFeeInPayingToken({
+    return this._feeRelayer.feeCalculator.calculateFeeInPayingToken({
+      orcaSwap: this._orcaSwap,
       feeInSOL,
-      payingFeeTokenMint: payingFeeWallet.mintAddress,
+      payingFeeTokenMint: new PublicKey(payingFeeWallet.mintAddress),
     });
   }
 
-  getFreeTransactionFeeLimit(): Promise<FeeRelayer.Relay.FreeTransactionFeeLimit> {
-    return this._relayService.getFreeTransactionFeeLimit();
+  async getFreeTransactionFeeLimit(): Promise<UsageStatus> {
+    return (await this._contextManager.getCurrentContext()).usageStatus;
   }
 
   // Send method
 
-  send({
+  async send({
     wallet,
     receiver,
     amount,
@@ -271,14 +259,16 @@ export class SendService implements SendServiceType {
     network: Network;
     payingFeeWallet?: Wallet | null; // null for relayMethod === RelayMethod.reward
   }): Promise<string> {
+    await this._contextManager.update();
+
     const amountNew = toLamport(amount, wallet.token.decimals);
     const sender = wallet.pubkey;
     if (!sender) {
-      throw SolanaSDKError.other('Source wallet is not valid');
+      throw SendServiceError.invalidSourceWallet();
     }
     // form request
     if (receiver === sender) {
-      throw SolanaSDKError.other('You can not send tokens to yourself');
+      throw SendServiceError.sendToYourself();
     }
 
     // detect network
@@ -286,8 +276,9 @@ export class SendService implements SendServiceType {
     switch (network) {
       case Network.solana: {
         switch (this.relayMethod.type) {
-          case RelayMethodType.relay: {
-            request = this._sendToSolanaBCViaRelayMethod({
+          case SendRelayMethodType.relay: {
+            request = this._sendServiceRelayMethod.sendToSolanaBCViaRelayMethod({
+              context: await this._contextManager.getCurrentContext(),
               wallet,
               receiver,
               amount: amountNew,
@@ -308,247 +299,5 @@ export class SendService implements SendServiceType {
     }
 
     return request;
-  }
-
-  // Relay method
-
-  private async _getFeeViaRelayMethod({
-    wallet,
-    receiver,
-    payingTokenMint,
-  }: {
-    wallet: Wallet;
-    receiver: string;
-    payingTokenMint?: string;
-  }): Promise<SolanaSDK.FeeAmount | null> {
-    // get fee calculator
-    const lamportsPerSignature = this._relayService.cache.lamportsPerSignature;
-    const minRentExemption = this._relayService.cache.minimumTokenAccountBalance;
-    if (!lamportsPerSignature || !minRentExemption) {
-      throw FeeRelayerError.unknown();
-    }
-
-    let transactionFee: u64 = ZERO;
-
-    // owner's signature
-    transactionFee = new u64(transactionFee.add(lamportsPerSignature));
-
-    // feePayer's signature
-    transactionFee = new u64(transactionFee.add(lamportsPerSignature));
-
-    let isAssociatedTokenUnregister: boolean;
-    if (wallet.mintAddress === SolanaSDKPublicKey.wrappedSOLMint.toString()) {
-      isAssociatedTokenUnregister = false;
-    } else {
-      const destinationInfo = await this._solanaSDK.findSPLTokenDestinationAddress({
-        mintAddress: wallet.mintAddress,
-        destinationAddress: receiver,
-      });
-      isAssociatedTokenUnregister = destinationInfo.isUnregisteredAsocciatedToken;
-    }
-
-    // when free transaction is not available and user is paying with sol, let him do this the normal way (don't use fee relayer)
-    if (
-      this._isFreeTransactionNotAvailableAndUserIsPayingWithSOL({
-        payingTokenMint,
-      })
-    ) {
-      // subtract the fee payer signature cost
-      transactionFee = new u64(transactionFee.sub(lamportsPerSignature));
-    }
-
-    const expectedFee = new SolanaSDK.FeeAmount({
-      transaction: transactionFee,
-      accountBalances: isAssociatedTokenUnregister ? minRentExemption : ZERO,
-    });
-
-    // when free transaction is not available and user is paying with sol, let him do this the normal way (don't use fee relayer)
-    if (
-      this._isFreeTransactionNotAvailableAndUserIsPayingWithSOL({
-        payingTokenMint,
-      })
-    ) {
-      return expectedFee;
-    }
-
-    return this._relayService.calculateNeededTopUpAmount({
-      expectedFee,
-      payingTokenMint: payingTokenMint ? new PublicKey(payingTokenMint) : undefined,
-    });
-  }
-
-  private async _sendToSolanaBCViaRelayMethod({
-    wallet,
-    receiver,
-    amount,
-    payingFeeWallet,
-  }: {
-    wallet: Wallet;
-    receiver: string;
-    amount: SolanaSDK.Lamports;
-    payingFeeWallet?: Wallet | null;
-  }): Promise<string> {
-    // get paying fee token
-    const payingFeeTokenNew = this._getPayingFeeToken({
-      payingFeeWallet,
-    });
-
-    const currency = wallet.mintAddress;
-
-    const { preparedTransaction, useFeeRelayer } =
-      await this._prepareForSendingToSolanaNetworkViaRelayMethod({
-        wallet,
-        receiver,
-        amount: convertToBalance(amount, wallet.token.decimals),
-        payingFeeToken: payingFeeTokenNew,
-      });
-    // preparedTransaction.transaction.recentBlockhash = await this._solanaSDK.getRecentBlockhash();
-
-    if (useFeeRelayer) {
-      // using fee relayer
-      return this._relayService.topUpAndRelayTransaction({
-        transaction: preparedTransaction,
-        fee: payingFeeTokenNew,
-        config: new FeeRelayerConfiguration({
-          operationType: StatsInfoOperationType.transfer,
-          currency,
-        }),
-      });
-    } else {
-      // send normally, paid by SOL
-      return this._solanaSDK.sendTransaction({
-        preparedTransaction,
-      });
-    }
-  }
-
-  private async _prepareForSendingToSolanaNetworkViaRelayMethod({
-    wallet,
-    receiver,
-    amount,
-    payingFeeToken,
-    recentBlockhash,
-    minRentExemption,
-    usingCachedFeePayerPubkey,
-  }: {
-    wallet: Wallet;
-    receiver: string;
-    amount: number;
-    payingFeeToken?: FeeRelayer.TokenAccount | null;
-    recentBlockhash?: string;
-    lamportsPerSignature?: SolanaSDK.Lamports;
-    minRentExemption?: SolanaSDK.Lamports;
-    usingCachedFeePayerPubkey?: boolean;
-  }): Promise<{
-    preparedTransaction: SolanaSDK.PreparedTransaction;
-    useFeeRelayer: boolean;
-  }> {
-    const amountNew = toLamport(amount, wallet.token.decimals);
-    const sender = wallet.pubkey;
-    if (!sender) {
-      throw SolanaSDKError.other('Source wallet is not valid');
-    }
-    // form request
-    if (receiver === sender) {
-      throw SolanaSDKError.other('You can not send tokens to yourself');
-    }
-
-    // prepare fee payer
-    let feePayer: string | null;
-    let useFeeRelayer: boolean;
-
-    // when free transaction is not available and user is paying with sol, let him do this the normal way (don't use fee relayer)
-    if (
-      this._isFreeTransactionNotAvailableAndUserIsPayingWithSOL({
-        payingTokenMint: payingFeeToken?.mint.toString(),
-      })
-    ) {
-      feePayer = null;
-      useFeeRelayer = false;
-    }
-    // otherwise send to fee relayer
-    else {
-      const pubkey = this._cachedFeePayerPubkey;
-      if (usingCachedFeePayerPubkey && pubkey) {
-        feePayer = pubkey;
-      } else {
-        feePayer = await this._feeRelayerAPIClient.getFeePayerPubkey();
-        this._cachedFeePayerPubkey = feePayer;
-      }
-      useFeeRelayer = true;
-    }
-
-    const feePayerNew = !feePayer ? null : new PublicKey(feePayer);
-
-    let preparedTransaction: SolanaSDK.PreparedTransaction;
-    if (wallet.isNativeSOL) {
-      preparedTransaction = await this._solanaSDK.prepareSendingNativeSOL({
-        account: this._solanaSDK.provider.wallet.publicKey,
-        destination: receiver,
-        amount: amountNew,
-        feePayer: feePayerNew,
-      });
-    }
-    // other tokens
-    else {
-      preparedTransaction = (
-        await this._solanaSDK.prepareSendingSPLTokens({
-          account: this._solanaSDK.provider.wallet.publicKey,
-          mintAddress: wallet.mintAddress,
-          decimals: wallet.token.decimals,
-          fromPublicKey: sender,
-          destinationAddress: receiver,
-          amount: amountNew,
-          feePayer: feePayerNew,
-          transferChecked: useFeeRelayer, // create transferChecked instruction when using fee relayer
-          minRentExemption,
-        })
-      ).preparedTransaction;
-    }
-
-    // preparedTransaction.transaction.recentBlockhash = recentBlockhash;
-    return {
-      preparedTransaction,
-      useFeeRelayer,
-    };
-  }
-
-  private _getPayingFeeToken({
-    payingFeeWallet,
-  }: {
-    payingFeeWallet?: Wallet | null;
-  }): FeeRelayer.TokenAccount | null {
-    if (!payingFeeWallet) {
-      return null;
-    }
-
-    const addressString = payingFeeWallet.pubkey;
-    if (!addressString) {
-      throw SendServiceError.invalidPayingFeeWallet();
-    }
-
-    const address = new PublicKey(addressString);
-    const mintAddress = new PublicKey(payingFeeWallet.mintAddress);
-
-    return new FeeRelayer.TokenAccount({
-      address,
-      mint: mintAddress,
-    });
-  }
-
-  private _isFreeTransactionNotAvailableAndUserIsPayingWithSOL({
-    payingTokenMint,
-  }: {
-    payingTokenMint?: string;
-  }): boolean {
-    const expectedTransactionFee = new u64(
-      (this._relayService.cache.lamportsPerSignature ?? new u64(5000)).muln(2),
-    );
-    return (
-      payingTokenMint === SolanaSDKPublicKey.wrappedSOLMint.toString() &&
-      this._relayService.cache.freeTransactionFeeLimit?.isFreeTransactionFeeAvailable({
-        transactionFee: expectedTransactionFee,
-      }) === false
-    );
   }
 }

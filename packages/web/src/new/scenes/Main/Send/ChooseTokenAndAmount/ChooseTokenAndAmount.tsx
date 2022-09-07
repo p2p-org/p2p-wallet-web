@@ -10,10 +10,10 @@ import { Icon } from 'components/ui';
 import { InputAmount } from 'components/ui/InputAmount';
 import type { SendViewModel } from 'new/scenes/Main/Send';
 import { WalletSelectorContent } from 'new/scenes/Main/Send/ChooseTokenAndAmount/WalletSelectorContent';
-import { ChooseWallet } from 'new/scenes/Main/Send/ChooseWallet';
 import type { Wallet } from 'new/sdk/SolanaSDK';
 import { Defaults } from 'new/services/Defaults';
 import { AmountTypeButton } from 'new/ui/components/common/AmountTypeButton';
+import { ChooseWallet } from 'new/ui/components/common/ChooseWallet';
 import { numberToString } from 'new/utils/NumberExtensions';
 
 import { CurrencyMode } from './ChooseTokenAndAmount.ViewModel';
@@ -174,25 +174,6 @@ export const ChooseTokenAndAmount: FC<Props> = observer(({ viewModel }) => {
 
   const handleAmountChange = (value: string) => {
     viewModel.enterAmount(Number(value));
-
-    // const wallet = vm.wallet;
-    // const totalLamports = wallet?.lamports;
-    // let amount = Number(value);
-    // if (!wallet || !totalLamports || !amount) {
-    //   return;
-    // }
-    //
-    // // convert value
-    // if (vm.currencyMode === CurrencyMode.fiat && wallet.priceInCurrentFiat > 0) {
-    //   amount = amount / wallet.priceInCurrentFiat;
-    // }
-    //
-    // // calculate lamports
-    // let lamports = toLamport(amount, wallet.token.decimals);
-    // if (lamports.gt(totalLamports)) {
-    //   lamports = totalLamports;
-    // }
-    // viewModel.enterAmount(convertToBalance(lamports, wallet.token.decimals));
   };
 
   // error
@@ -236,12 +217,11 @@ export const ChooseTokenAndAmount: FC<Props> = observer(({ viewModel }) => {
         />
         <InputWrapper>
           <InputAmount
-            placeholder={
-              vm.wallet
-                ? numberToString(0, { maximumFractionDigits: vm.wallet.token.decimals })
-                : '0'
-            }
+            placeholder={numberToString(0, {
+              maximumFractionDigits: vm.wallet?.token.decimals ?? 0,
+            })}
             value={viewModel.amount === 0 ? undefined : viewModel.amount}
+            decimals={viewModel.wallet?.token.decimals}
             onChange={handleAmountChange}
           />
         </InputWrapper>

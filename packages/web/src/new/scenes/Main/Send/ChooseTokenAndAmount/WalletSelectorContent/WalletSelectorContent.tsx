@@ -6,7 +6,7 @@ import classNames from 'classnames';
 import { observer } from 'mobx-react-lite';
 
 import { Icon } from 'components/ui';
-import type { ChooseWalletViewModel } from 'new/scenes/Main/Send/ChooseWallet/ChooseWallet.ViewModel';
+import type { ChooseWalletViewModel } from 'new/ui/components/common/ChooseWallet/ChooseWallet.ViewModel';
 import { TokenAvatar } from 'new/ui/components/common/TokenAvatar';
 
 const Wrapper = styled.div`

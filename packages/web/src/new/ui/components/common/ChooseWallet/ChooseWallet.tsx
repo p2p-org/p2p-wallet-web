@@ -9,9 +9,9 @@ import classNames from 'classnames';
 import { observer } from 'mobx-react-lite';
 
 import { Icon } from 'components/ui';
-import type { ChooseWalletViewModel } from 'new/scenes/Main/Send/ChooseWallet/ChooseWallet.ViewModel';
-import { CollectionView } from 'new/scenes/Main/Send/ChooseWallet/CollectionView';
 import type { Wallet } from 'new/sdk/SolanaSDK';
+import type { ChooseWalletViewModel } from 'new/ui/components/common/ChooseWallet/ChooseWallet.ViewModel';
+import { CollectionView } from 'new/ui/components/common/ChooseWallet/CollectionView';
 import { SearchInput } from 'new/ui/components/ui/SearchInput';
 
 const ChevronIcon = styled(Icon)`

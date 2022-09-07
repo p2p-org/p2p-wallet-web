@@ -9,12 +9,12 @@ export class DestinationAnalysator {
     apiClient,
     destination,
     mint,
-    account,
+    userAccount,
   }: {
     apiClient: FeeRelayerRelaySolanaClient; // TODO: change type
-    destination?: PublicKey;
+    destination?: PublicKey | null;
     mint: PublicKey;
-    account: PublicKey;
+    userAccount: PublicKey;
   }): Promise<{
     destination: TokenAccount;
     destinationOwner: PublicKey | null;
@@ -23,8 +23,8 @@ export class DestinationAnalysator {
     if (SolanaSDKPublicKey.wrappedSOLMint.equals(mint)) {
       // Target is SOL Token
       return {
-        destination: new TokenAccount({ address: account, mint }),
-        destinationOwner: account,
+        destination: new TokenAccount({ address: userAccount, mint }),
+        destinationOwner: userAccount,
         needCreateDestination: true,
       };
     } else {
@@ -33,7 +33,7 @@ export class DestinationAnalysator {
         // User already has SPL account
         return {
           destination: new TokenAccount({ address: destination, mint }),
-          destinationOwner: account,
+          destinationOwner: userAccount,
           needCreateDestination: false,
         };
       } else {
@@ -41,7 +41,7 @@ export class DestinationAnalysator {
 
         // Try to get associated account
         const address = await apiClient.getAssociatedSPLTokenAddress({
-          address: account,
+          address: userAccount,
           mint,
         });
 
@@ -50,12 +50,12 @@ export class DestinationAnalysator {
           account: address.toString(),
           decodedTo: AccountInfo,
         });
-        const needsCreateDestinationTokenAccount = !info.owner.equals(
+        const needsCreateDestinationTokenAccount = !info?.owner.equals(
           SolanaSDKPublicKey.tokenProgramId,
         );
         return {
           destination: new TokenAccount({
-            address: account,
+            address: userAccount,
             mint,
           }),
           destinationOwner: null,
