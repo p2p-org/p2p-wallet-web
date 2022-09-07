@@ -8,7 +8,7 @@ import { CurrencySelect } from 'new/scenes/Main/Buy/Subviews/Moonpay/CurrencySel
 import { Details } from 'new/scenes/Main/Buy/Subviews/Moonpay/Details/Details';
 import { Inputs } from 'new/scenes/Main/Buy/Subviews/Moonpay/Inputs';
 import type { BuyViewModelProps } from 'new/scenes/Main/Buy/Subviews/Moonpay/types';
-import { WidgetPageBuy } from 'new/ui/components/pages/buy/WidgetPageBuy';
+import { WidgetPageBuy } from 'new/scenes/Main/Buy/Subviews/Moonpay/WidgetPageBuy';
 
 export const MoonpayWidget: FC<BuyViewModelProps> = observer(({ viewModel }) => {
   const isMobile = useIsMobile();
