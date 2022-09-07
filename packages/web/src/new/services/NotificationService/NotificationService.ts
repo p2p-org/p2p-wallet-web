@@ -35,17 +35,6 @@ export class NotificationService {
     makeObservable(this, {
       currentToasts: observable,
     });
-
-    window.service = this;
-
-    // this.info('startup Header');
-    // setTimeout(() => this.warn('warn'), 2000);
-    // setTimeout(() => this.warn('warn'), 3000);
-    // setTimeout(() => this.warn('warn'), 4000);
-    // setTimeout(() => this.warn('warn'), 5100);
-    // setTimeout(() => this.warn('warn'), 6100);
-    // setTimeout(() => this.warn('warn'), 7100);
-    // setTimeout(() => this.warn('warn'), 8100);
   }
 
   private _getActiveToastsCount(): number {

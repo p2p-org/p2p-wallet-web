@@ -2,21 +2,35 @@ import type { FunctionComponent } from 'react';
 import * as React from 'react';
 
 import { styled } from '@linaria/react';
+import { theme } from '@p2p-wallet-web/ui';
 import classNames from 'classnames';
 
-import type { RendererParams } from 'components/common/ToastManager';
-import { Toast } from 'components/common/ToastManager';
-import { TokenAvatar } from 'components/common/TokenAvatar';
 import { Icon } from 'components/ui';
+import type { Token } from 'new/sdk/SolanaSDK';
+import { TokenAvatar } from 'new/ui/components/common/TokenAvatar';
+import type { RendererParams } from 'new/ui/managers/NotificationManager';
 
-const ToastStyled = styled(Toast)`
+const ToastStyled = styled.div`
   position: relative;
 
+  display: flex;
   align-items: flex-start;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+  min-height: 40px;
+  padding: 16px;
 
-  color: #000;
+  word-break: break-word;
 
-  background-color: #fff;
+  background: ${theme.colors.bg.primary};
+  border-radius: 8px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  cursor: initial;
+
+  @media (min-width: 500px) {
+    width: 282px;
+  }
 `;
 
 const ToastIconWrapper = styled.div`
@@ -140,8 +154,9 @@ type TransferParams = {
     | 'warning'
     | 'confirmingDeposit'
     | 'confirmedDeposit';
-  symbol?: string;
-  symbolB?: string;
+  token?: Token;
+  tokenB?: Token;
+  tokenBTC?: Token;
   button?: React.ReactNode;
 };
 
@@ -152,8 +167,9 @@ export const NotifyToast: FunctionComponent<Props> = ({
   header,
   text,
   status,
-  symbol,
-  symbolB,
+  token,
+  tokenB,
+  tokenBTC,
   onClose,
   button,
 }) => {
@@ -172,13 +188,13 @@ export const NotifyToast: FunctionComponent<Props> = ({
       break;
     case 'transfer':
     case 'transferChecked':
-      icon = <TokenAvatar symbol={symbol} size={44} />;
+      icon = <TokenAvatar token={token} size={44} />;
       break;
     case 'swap':
       icon = (
         <SwapAvatarsWrapper>
-          <TokenAvatar symbol={symbol} size={32} />
-          <TokenAvatar symbol={symbolB} size={32} />
+          <TokenAvatar token={token} size={32} />
+          <TokenAvatar token={tokenB} size={32} />
         </SwapAvatarsWrapper>
       );
       break;
@@ -190,7 +206,7 @@ export const NotifyToast: FunctionComponent<Props> = ({
       );
       break;
     case 'confirmingDeposit':
-      icon = <TokenAvatar symbol="BTC" size={44} />;
+      icon = <TokenAvatar token={tokenBTC} size={44} />;
       break;
     default:
       icon = null;

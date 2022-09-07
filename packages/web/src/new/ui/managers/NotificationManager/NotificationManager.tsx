@@ -5,8 +5,8 @@ import classNames from 'classnames';
 import { observer } from 'mobx-react-lite';
 import { expr } from 'mobx-utils';
 
-import { NotifyToast } from 'components/common/NotifyToast';
 import { useViewModel } from 'new/core/viewmodels/useViewModel';
+import { NotifyToast } from 'new/ui/components/common/NotifyToast';
 import { NotificationManagerViewModel } from 'new/ui/managers/NotificationManager/NotificationManager.ViewModel';
 
 const IS_RIGHT = false;
