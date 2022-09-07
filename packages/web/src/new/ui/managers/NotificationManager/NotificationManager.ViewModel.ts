@@ -5,8 +5,8 @@ import { computed, makeObservable, observable, reaction, runInAction } from 'mob
 import { singleton } from 'tsyringe';
 
 import { ViewModel } from 'new/core/viewmodels/ViewModel';
-import type { CurrentToastParams } from 'new/services/NotificationService/NotificationService';
-import { NotificationService } from 'new/services/NotificationService/NotificationService';
+import type { CurrentToastParams } from 'new/services/NotificationService';
+import { NotificationService } from 'new/services/NotificationService';
 
 type SizeType = { [toastId: string]: number };
 type ToastRefType = RefObject<HTMLDivElement>;
@@ -42,8 +42,7 @@ export class NotificationManagerViewModel extends ViewModel {
   protected override setDefaults() {
     this._heights = {};
     this._toastsRefs = {};
-
-    runInAction(() => (this._bottomOffsets = {}));
+    this._bottomOffsets = {};
   }
 
   protected override onInitialize() {
