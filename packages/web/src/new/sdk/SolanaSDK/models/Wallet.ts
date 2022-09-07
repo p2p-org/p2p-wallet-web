@@ -2,11 +2,12 @@ import { ZERO } from '@orca-so/sdk';
 import { makeAutoObservable } from 'mobx';
 import { isEmpty } from 'ramda';
 
+import { convertToBalance } from 'new/sdk/SolanaSDK';
 import { Defaults } from 'new/services/Defaults';
 import type { CurrentPrice } from 'new/services/PriceAPIs/PricesService';
 
 import type { Lamports } from './SolanaSDKModels';
-import { Token, TokenAmount } from './SolanaToken';
+import { Token } from './SolanaToken';
 
 interface SolanaWalletUserInfo {
   price?: CurrentPrice | null;
@@ -50,8 +51,8 @@ export class Wallet {
   }
 
   // Computed properties
-  get amount(): TokenAmount {
-    return new TokenAmount(this.token, this.lamports ?? ZERO);
+  get amount(): number {
+    return this.lamports ? convertToBalance(this.lamports, this.token.decimals) : 0;
   }
 
   // Fabric methods
@@ -88,7 +89,7 @@ export class Wallet {
       return true;
     } else if (Defaults.unhiddenWalletPubkey.includes(this.pubkey)) {
       return false;
-    } else if (Defaults.hideZeroBalances && this.amount.equalTo(0)) {
+    } else if (Defaults.hideZeroBalances && this.amount === 0) {
       return true;
     }
 
@@ -110,7 +111,7 @@ export class Wallet {
   }
 
   get amountInCurrentFiat(): number {
-    return this.amount.asNumber * this.priceInCurrentFiat;
+    return this.amount * this.priceInCurrentFiat;
   }
 
   updateVisibility() {
@@ -155,8 +156,8 @@ export class Wallet {
       return !isEmpty(lhs.token.symbol) ? -1 : 1;
     }
 
-    if (!lhs.amount.equalTo(rhs.amount)) {
-      return lhs.amount.greaterThan(rhs.amount) ? -1 : 1;
+    if (lhs.amount !== rhs.amount) {
+      return lhs.amount > rhs.amount ? -1 : 1;
     }
 
     if (lhs.token.symbol !== rhs.token.symbol) {

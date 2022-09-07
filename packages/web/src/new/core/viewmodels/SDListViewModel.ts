@@ -6,6 +6,8 @@ import { SDViewModel } from './SDViewModel';
 export interface ISDListViewModel<T> {
   state: SDFetcherState;
   data: T[];
+
+  customFilter?(item: T): boolean;
 }
 
 export abstract class SDListViewModel<T> extends SDViewModel<T[]> implements ISDListViewModel<T> {

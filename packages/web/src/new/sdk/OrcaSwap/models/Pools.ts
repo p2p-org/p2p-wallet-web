@@ -1,5 +1,5 @@
 import type { u64 } from '@solana/spl-token';
-import type { PublicKey, Signer } from '@solana/web3.js';
+import type { PublicKey } from '@solana/web3.js';
 
 import type { TokenValue } from 'new/sdk/OrcaSwap';
 import type { Lamports } from 'new/sdk/SolanaSDK';
@@ -33,7 +33,7 @@ export function constructExchange({
   pools: PoolsPair;
   tokens: Map<string, TokenValue>;
   solanaClient: OrcaSwapSolanaClient;
-  owner: Signer;
+  owner: PublicKey;
   fromTokenPubkey: string;
   intermediaryTokenAddress?: string;
   toTokenPubkey?: string;

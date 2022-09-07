@@ -69,4 +69,13 @@ export class APIEndpoint {
     }
     return url;
   }
+
+  getSocketURL(): string {
+    let url = this.socketUrl;
+    const query = this.additionalQuery;
+    if (query) {
+      url += '/' + query;
+    }
+    return url;
+  }
 }

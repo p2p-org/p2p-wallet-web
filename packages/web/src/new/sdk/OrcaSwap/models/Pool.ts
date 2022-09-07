@@ -201,6 +201,14 @@ export class Pool {
     return reversedPool;
   }
 
+  getTokenBDecimals(): number | null {
+    return this.tokenBBalance?.decimals ?? null;
+  }
+
+  getTokenADecimals(): number | null {
+    return this.tokenABalance?.decimals ?? null;
+  }
+
   get swapProgramId(): PublicKey {
     return SolanaSDKPublicKey.orcaSwapId(this.programVersion === VERSION_2 ? VERSION_2 : VERSION_1);
   }
@@ -340,7 +348,7 @@ export class Pool {
   }: {
     tokens: Map<string, TokenValue>;
     solanaClient: OrcaSwapSolanaClient;
-    owner: Signer;
+    owner: PublicKey;
     fromTokenPubkey: string;
     intermediaryTokenAddress?: string;
     toTokenPubkey?: string;
@@ -362,14 +370,11 @@ export class Pool {
     // Create fromTokenAccount when needed
     let prepareSourceRequest: Promise<AccountInstructions>;
 
-    if (
-      fromMint.equals(SolanaSDKPublicKey.wrappedSOLMint) &&
-      owner.publicKey.equals(fromTokenPubkeyNew)
-    ) {
+    if (fromMint.equals(SolanaSDKPublicKey.wrappedSOLMint) && owner.equals(fromTokenPubkeyNew)) {
       prepareSourceRequest = solanaClient.prepareCreatingWSOLAccountAndCloseWhenDone(
-        owner.publicKey,
+        owner,
         amount,
-        feePayer ?? owner.publicKey,
+        feePayer ?? owner,
       );
     } else {
       prepareSourceRequest = Promise.resolve(
@@ -383,7 +388,7 @@ export class Pool {
     // If destination token is Solana, create WSOL if needed
     if (toMint.equals(SolanaSDKPublicKey.wrappedSOLMint)) {
       const toTokenPubkeyNew = toTokenPubkey ? new PublicKey(toTokenPubkey) : null;
-      if (toTokenPubkeyNew && !toTokenPubkeyNew?.equals(owner.publicKey)) {
+      if (toTokenPubkeyNew && !toTokenPubkeyNew?.equals(owner)) {
         // wrapped sol has already been created, just return it, then close later
         prepareDestinationRequest = Promise.resolve(
           new AccountInstructions({
@@ -392,8 +397,8 @@ export class Pool {
               Token.createCloseAccountInstruction(
                 SolanaSDKPublicKey.tokenProgramId,
                 toTokenPubkeyNew,
-                owner.publicKey,
-                owner.publicKey,
+                owner,
+                owner,
                 [],
               ),
             ],
@@ -402,9 +407,9 @@ export class Pool {
       } else {
         // create wrapped sol
         prepareDestinationRequest = solanaClient.prepareCreatingWSOLAccountAndCloseWhenDone(
-          owner.publicKey,
+          owner,
           ZERO,
-          feePayer ?? owner.publicKey,
+          feePayer ?? owner,
         );
       }
     } else {
@@ -420,9 +425,9 @@ export class Pool {
       // Create associated token address
       else {
         prepareDestinationRequest = solanaClient.prepareForCreatingAssociatedTokenAccount(
-          owner.publicKey,
+          owner,
           toMint,
-          feePayer ?? owner.publicKey,
+          feePayer ?? owner,
           false,
         );
       }
@@ -457,13 +462,13 @@ export class Pool {
         //   throw OrcaSwapError.couldNotEstimatedMinimumOutAmount();
         // }
 
-        const swapInstruction = this.createSwapInstruction(
-          owner.publicKey,
-          sourceAccountInstructions.account,
-          destinationAccountInstructions.account,
-          amount,
+        const swapInstruction = this.createSwapInstruction({
+          userTransferAuthorityPubkey: owner,
+          sourceTokenAddress: sourceAccountInstructions.account,
+          destinationTokenAddress: destinationAccountInstructions.account,
+          amountIn: amount,
           minAmountOut,
-        );
+        });
 
         instructions.push(swapInstruction);
 

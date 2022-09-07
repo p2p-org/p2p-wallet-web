@@ -29,15 +29,15 @@ interface DefaultsKeys {
 
   walletName: { [pubkey in string]: string };
 
+  appearance: Appearance;
+  slippage: number;
+  fiat: Fiat;
   hiddenWalletPubkey: string[];
   unhiddenWalletPubkey: string[];
   hideZeroBalances: boolean;
-
-  fiat: Fiat;
   prices: { [key in string]: CurrentPrice };
   payingTokenMint: string;
 
-  appearance: Appearance;
   useFreeTransactions: boolean;
 }
 
@@ -46,15 +46,15 @@ class _Defaults implements DefaultsKeys {
 
   walletName: { [pubkey in string]: string } = {};
 
+  appearance: Appearance = Appearance.system;
+  slippage = 0.01;
+  fiat: Fiat = Fiat.usd;
   hiddenWalletPubkey: string[] = [];
   unhiddenWalletPubkey: string[] = [];
   hideZeroBalances = true;
-
-  fiat: Fiat = Fiat.usd;
   prices: { [key in string]: CurrentPrice } = {};
   payingTokenMint: string = SolanaSDKPublicKey.wrappedSOLMint.toString();
 
-  appearance: Appearance = Appearance.system;
   useFreeTransactions = false;
 
   constructor() {
@@ -63,15 +63,15 @@ class _Defaults implements DefaultsKeys {
 
       walletName: observable,
 
+      appearance: observable,
+      slippage: observable,
+      fiat: observable,
       hiddenWalletPubkey: observable,
       unhiddenWalletPubkey: observable,
       hideZeroBalances: observable,
-
-      fiat: observable,
       prices: observable,
       payingTokenMint: observable,
 
-      appearance: observable,
       useFreeTransactions: observable,
     });
     makeLocalStorage(this, 'defaults');

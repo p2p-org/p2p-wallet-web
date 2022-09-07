@@ -20,7 +20,7 @@ import {
 import type { FeeRelayerAPIClientType } from 'new/sdk/FeeRelayer/apiClient/FeeRelayerAPIClient';
 import { FeeRelayerError } from 'new/sdk/FeeRelayer/models/FeeRelayerError';
 import { FeeRelayerRequestType } from 'new/sdk/FeeRelayer/models/FeeRelayerRequestType';
-import { RelayProgram } from 'new/sdk/FeeRelayer/relayProgram/RelayProgram';
+import { RelayProgram } from 'new/sdk/FeeRelayer/relayProgram';
 import type * as OrcaSwap from 'new/sdk/OrcaSwap';
 import type { TransactionID } from 'new/sdk/SolanaSDK';
 import * as SolanaSDK from 'new/sdk/SolanaSDK';

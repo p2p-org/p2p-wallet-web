@@ -20,9 +20,9 @@ export const CollectionView: FC<Props> = observer(({ viewModel, onWalletClick })
       renderPlaceholder={(key) => <Cell key={key} isPlaceholder />}
       renderItem={(wallet: Wallet) => (
         <Cell
-          key={wallet.pubkey}
+          key={wallet.mintAddress}
           wallet={wallet}
-          isSelected={wallet.pubkey === viewModel.selectedWallet?.pubkey}
+          isSelected={wallet.mintAddress === viewModel.selectedWallet?.mintAddress}
           onWalletClick={() => onWalletClick(wallet)}
         />
       )}

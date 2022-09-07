@@ -359,7 +359,7 @@ export class SendViewModel extends ViewModel implements SendViewModelType {
     const totalFee = this.feeInfo.value?.feeAmount;
     if (totalFee && totalFee.total.gtn(0) && this.payingWallet?.pubkey === wallet.pubkey) {
       const feeAmount = convertToBalance(totalFee.total, this.payingWallet?.token.decimals);
-      if (amount + feeAmount > wallet.amount.asNumber) {
+      if (amount + feeAmount > wallet.amount) {
         amount -= feeAmount;
       }
     }

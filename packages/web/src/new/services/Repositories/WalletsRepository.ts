@@ -49,6 +49,10 @@ export class WalletsRepository extends SDListViewModel<Wallet> {
     });
   }
 
+  protected override setDefaults() {
+    // don't clean
+  }
+
   protected onInitialize(): void {
     this._bind();
     this._startObserving();

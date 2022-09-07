@@ -11,7 +11,7 @@ export enum FeeTypeEnum {
   depositWillBeReturned,
 }
 
-class FeeType {
+export class FeeType {
   type: FeeTypeEnum;
   private readonly _token?: string;
 
@@ -20,7 +20,7 @@ class FeeType {
     this._token = token;
   }
 
-  static liquidityProviderFee(): FeeType {
+  static get liquidityProviderFee(): FeeType {
     return new FeeType({ type: FeeTypeEnum.liquidityProviderFee });
   }
 
@@ -28,15 +28,15 @@ class FeeType {
     return new FeeType({ type: FeeTypeEnum.accountCreationFee, token });
   }
 
-  static orderCreationFee(): FeeType {
+  static get orderCreationFee(): FeeType {
     return new FeeType({ type: FeeTypeEnum.orderCreationFee });
   }
 
-  static transactionFee(): FeeType {
+  static get transactionFee(): FeeType {
     return new FeeType({ type: FeeTypeEnum.transactionFee });
   }
 
-  static depositWillBeReturned(): FeeType {
+  static get depositWillBeReturned(): FeeType {
     return new FeeType({ type: FeeTypeEnum.depositWillBeReturned });
   }
 
@@ -61,19 +61,13 @@ class FeeType {
   }
 }
 
-type Info = {
-  alertTitle: string;
-  alertDescription: string;
-  payBy?: string;
-};
-
 export class PayingFee {
   type: FeeType;
   lamports: SolanaSDK.Lamports;
   token: SolanaSDK.Token;
 
   isFree: boolean;
-  info?: Info | null;
+  info?: PayingFeeInfo | null;
 
   constructor({
     type,
@@ -86,7 +80,7 @@ export class PayingFee {
     lamports: SolanaSDK.Lamports;
     token: SolanaSDK.Token;
     isFree?: boolean;
-    info?: Info | null;
+    info?: PayingFeeInfo | null;
   }) {
     this.type = type;
     this.lamports = lamports;
@@ -94,6 +88,12 @@ export class PayingFee {
     this.isFree = isFree;
     this.info = info;
   }
+}
+
+export interface PayingFeeInfo {
+  alertTitle: string;
+  alertDescription: string;
+  payBy?: string;
 }
 
 export function networkFeesAll(fees: PayingFee[]): SolanaSDK.FeeAmount | null {
