@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { BrowserRouter, HashRouter, Route, Switch } from 'react-router-dom';
 
+import { styled } from '@linaria/react';
 import * as Sentry from '@sentry/react';
 import dayjs from 'dayjs';
 import localizedFormat from 'dayjs/plugin/localizedFormat';
@@ -34,14 +35,23 @@ import { Providers } from './Providers';
 
 dayjs.extend(localizedFormat);
 
+const LoaderWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  width: 100%;
+  height: 100%;
+`;
+
 const App: React.FC = observer(() => {
   const Router: React.ElementType = process.env.REACT_APP_STAGING ? HashRouter : BrowserRouter;
 
   if (!RemoteConfigService.isInitialized) {
     return (
-      <div style={{ margin: '50% auto' }}>
+      <LoaderWrapper>
         <Loader size={'100'} />
-      </div>
+      </LoaderWrapper>
     );
   }
 
