@@ -18,7 +18,7 @@ import { Send } from 'new/scenes/Main/Send';
 import { Settings } from 'new/scenes/Main/Settings';
 import { SettingsNetwork } from 'new/scenes/Main/SettingsNetwork';
 import { Root } from 'new/scenes/Root';
-import { RemoteConfigService } from 'new/services/RemoteConfigService';
+import { RemoteConfig } from 'new/services/RemoteConfigService';
 import { Loader } from 'new/ui/components/common/Loader';
 import { LocationManager } from 'new/ui/managers/LocationManager';
 import { NotificationManager } from 'new/ui/managers/NotificationManager';
@@ -47,7 +47,7 @@ const LoaderWrapper = styled.div`
 const App: React.FC = observer(() => {
   const Router: React.ElementType = process.env.REACT_APP_STAGING ? HashRouter : BrowserRouter;
 
-  if (!RemoteConfigService.isInitialized) {
+  if (!RemoteConfig.isInitialized) {
     return (
       <LoaderWrapper>
         <Loader size={'100'} />

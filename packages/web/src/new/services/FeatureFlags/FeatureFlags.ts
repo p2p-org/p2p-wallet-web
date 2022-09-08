@@ -2,7 +2,7 @@ import { action, makeObservable, observable, when } from 'mobx';
 
 import { defaultFlags } from 'new/services/FeatureFlags/defaultFlags';
 import type { Features } from 'new/services/FeatureFlags/features';
-import { RemoteConfigService } from 'new/services/RemoteConfigService';
+import { RemoteConfig } from 'new/services/RemoteConfigService';
 
 class _FeatureFlags {
   isInitialized = false;
@@ -15,9 +15,9 @@ class _FeatureFlags {
     });
 
     void when(
-      () => RemoteConfigService.isInitialized,
+      () => RemoteConfig.isInitialized,
       action(() => {
-        this.featureFlags = { ...defaultFlags, ...RemoteConfigService.featureFlags };
+        this.featureFlags = { ...defaultFlags, ...RemoteConfig.featureFlags };
         this.isInitialized = true;
       }),
     );

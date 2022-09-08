@@ -1,5 +1,5 @@
 import { initializeApp } from 'firebase/app';
-import type { RemoteConfig, Value } from 'firebase/remote-config';
+import type { RemoteConfig as RemoteConfigType, Value } from 'firebase/remote-config';
 import { fetchAndActivate, getAll, getRemoteConfig, setLogLevel } from 'firebase/remote-config';
 import { makeObservable, observable, runInAction } from 'mobx';
 import assert from 'ts-invariant';
@@ -11,8 +11,8 @@ import { firebaseConfig } from 'new/services/RemoteConfigService/firebaseConfig'
 
 type NetworkValue = { urlString: string; network: string; additionalQuery?: string };
 
-class _RemoteConfigService {
-  private readonly _remoteConfig: RemoteConfig;
+class _RemoteConfig {
+  private readonly _remoteConfig: RemoteConfigType;
 
   isInitialized = false;
 
@@ -60,4 +60,4 @@ class _RemoteConfigService {
   }
 }
 
-export const RemoteConfigService = new _RemoteConfigService();
+export const RemoteConfig = new _RemoteConfig();

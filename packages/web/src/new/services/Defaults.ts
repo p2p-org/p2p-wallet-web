@@ -3,7 +3,7 @@ import { autorun, makeObservable, observable, set, toJS, when } from 'mobx';
 import { Fiat } from 'new/app/models/Fiat';
 import { SolanaSDKPublicKey } from 'new/sdk/SolanaSDK';
 import type { CurrentPrice } from 'new/services/PriceAPIs/PricesService';
-import { RemoteConfigService } from 'new/services/RemoteConfigService';
+import { RemoteConfig } from 'new/services/RemoteConfigService';
 
 import { APIEndpoint } from '../sdk/SolanaSDK/models/APIEndpoint';
 
@@ -88,7 +88,7 @@ class _Defaults implements DefaultsKeys {
 }
 
 when(
-  () => RemoteConfigService.isInitialized,
+  () => RemoteConfig.isInitialized,
   () => (Defaults = new _Defaults()),
 );
 

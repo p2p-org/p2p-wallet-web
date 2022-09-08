@@ -1,7 +1,7 @@
 import type { Network } from '@saberhq/solana-contrib';
 import { clusterApiUrl } from '@solana/web3.js';
 
-import { RemoteConfigService } from 'new/services/RemoteConfigService';
+import { RemoteConfig } from 'new/services/RemoteConfigService';
 
 enum APIKeysNames {
   rpcpool = 'rpcpool',
@@ -73,7 +73,7 @@ export class APIEndpoint {
   }
 
   static get definedEndpoints(): APIEndpoint[] {
-    const definedEndpoints = RemoteConfigService.definedEndpoints.map(
+    const definedEndpoints = RemoteConfig.definedEndpoints.map(
       ({ urlString, network, additionalQuery }) =>
         new APIEndpoint({ address: urlString, network: network as Network, additionalQuery }),
     );

@@ -1,1 +1,1 @@
-export * from './RemoteConfigService';
+export * from './RemoteConfig';
