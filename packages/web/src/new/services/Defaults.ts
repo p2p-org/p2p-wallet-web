@@ -1,8 +1,9 @@
-import { autorun, makeObservable, observable, set, toJS } from 'mobx';
+import { autorun, makeObservable, observable, set, toJS, when } from 'mobx';
 
 import { Fiat } from 'new/app/models/Fiat';
 import { SolanaSDKPublicKey } from 'new/sdk/SolanaSDK';
 import type { CurrentPrice } from 'new/services/PriceAPIs/PricesService';
+import { RemoteConfigService } from 'new/services/RemoteConfigService';
 
 import { APIEndpoint } from '../sdk/SolanaSDK/models/APIEndpoint';
 
@@ -39,7 +40,7 @@ interface DefaultsKeys {
 }
 
 class _Defaults implements DefaultsKeys {
-  apiEndpoint: APIEndpoint = APIEndpoint.defaultEndpoints[0]!;
+  apiEndpoint: APIEndpoint = APIEndpoint.definedEndpoints[0]!;
 
   walletName: { [pubkey in string]: string } = {};
 
@@ -83,4 +84,9 @@ class _Defaults implements DefaultsKeys {
   }
 }
 
-export const Defaults = new _Defaults();
+when(
+  () => RemoteConfigService.isInitialized,
+  () => (Defaults = new _Defaults()),
+);
+
+export let Defaults: DefaultsKeys;

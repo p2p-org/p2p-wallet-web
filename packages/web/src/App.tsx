@@ -4,6 +4,7 @@ import { BrowserRouter, HashRouter, Route, Switch } from 'react-router-dom';
 import * as Sentry from '@sentry/react';
 import dayjs from 'dayjs';
 import localizedFormat from 'dayjs/plugin/localizedFormat';
+import { observer } from 'mobx-react-lite';
 
 import { FeaturesToggle } from 'components/common/FeaturesToggle';
 import { Intercom } from 'components/common/Intercom';
@@ -16,6 +17,8 @@ import { Send } from 'new/scenes/Main/Send';
 import { Settings } from 'new/scenes/Main/Settings';
 import { SettingsNetwork } from 'new/scenes/Main/SettingsNetwork';
 import { Root } from 'new/scenes/Root';
+import { RemoteConfigService } from 'new/services/RemoteConfigService';
+import { Loader } from 'new/ui/components/common/Loader';
 import { LocationManager } from 'new/ui/components/root/LocationManager';
 import { ModalManager } from 'new/ui/modals/ModalManager';
 import { Auth } from 'pages/Auth';
@@ -30,8 +33,16 @@ import { Providers } from './Providers';
 
 dayjs.extend(localizedFormat);
 
-const App: React.FC = () => {
+const App: React.FC = observer(() => {
   const Router: React.ElementType = process.env.REACT_APP_STAGING ? HashRouter : BrowserRouter;
+
+  if (!RemoteConfigService.isInitialized) {
+    return (
+      <div style={{ margin: '50% auto' }}>
+        <Loader size={'100'} />
+      </div>
+    );
+  }
 
   return (
     <>
@@ -69,7 +80,7 @@ const App: React.FC = () => {
       </Sentry.ErrorBoundary>
     </>
   );
-};
+});
 
 // eslint-disable-next-line import/no-default-export
 export default App;

@@ -59,7 +59,7 @@ export const SettingsNetwork: FC = observer(() => {
     >
       <WidgetPage icon="branch" title="Network">
         <RadioButtonsWrapper>
-          {APIEndpoint.defaultEndpoints.map((endpoint) => {
+          {APIEndpoint.definedEndpoints.map((endpoint) => {
             return (
               <RadioButtonItem key={endpoint.address}>
                 <RadioButton

@@ -1,4 +1,4 @@
-import { FIREBASE_API_KEY, FIREBASE_APP_ID } from 'new/services/FeatureFlags/constants';
+import { FIREBASE_API_KEY, FIREBASE_APP_ID } from 'new/services/RemoteConfigService/constants';
 
 export const firebaseConfig = {
   apiKey: FIREBASE_API_KEY,
