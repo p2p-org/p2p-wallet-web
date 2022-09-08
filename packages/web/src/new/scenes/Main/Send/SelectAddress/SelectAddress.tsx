@@ -87,7 +87,7 @@ export const SelectAddress: FC<Props> = observer(({ viewModel }) => {
     <Wrapper>
       <CommonWrapper>
         <TopWrapper>
-          <Title>From</Title>
+          <Title>To</Title>
         </TopWrapper>
         {isSearching ? (
           <AddressInputView viewModel={vm} />

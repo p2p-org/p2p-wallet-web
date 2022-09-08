@@ -1,4 +1,4 @@
-export const appStorePath = 'https://testflight.apple.com/join/hxaQVX0E';
+export const appStorePath = 'https://apps.apple.com/vn/app/p2p-wallet/id1605603333';
 export const playStorePath = 'https://play.google.com/store/apps/details?id=org.p2p.wallet';
 
 export const SENTRY_DSN_ENDPOINT = process.env.REACT_APP_SENTRY_DSN_ENDPOINT;

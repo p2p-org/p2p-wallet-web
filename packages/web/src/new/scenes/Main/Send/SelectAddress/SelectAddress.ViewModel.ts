@@ -6,7 +6,7 @@ import { LoadableStateType } from 'new/app/models/LoadableRelay';
 import { ViewModel } from 'new/core/viewmodels/ViewModel';
 import { RecipientsListViewModel } from 'new/scenes/Main/Send/SelectAddress/Subviews/RecipientsCollectionView';
 import { convertToBalance } from 'new/sdk/SolanaSDK';
-import { RelayMethodType } from 'new/services/SendService';
+import { SendRelayMethodType } from 'new/services/SendService';
 import { numberToString } from 'new/utils/NumberExtensions';
 
 import type { Recipient } from '../Send.ViewModel';
@@ -184,7 +184,7 @@ export class SelectAddressViewModel extends ViewModel implements SelectAddressVi
     switch (network) {
       case Network.solana:
         switch (this.sendViewModel.relayMethod.type) {
-          case RelayMethodType.relay: {
+          case SendRelayMethodType.relay: {
             switch (feeInfo.state.type) {
               case LoadableStateType.notRequested:
                 return SelectAddressError.chooseTheTokenToPayFees;

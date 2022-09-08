@@ -54,4 +54,5 @@ jobs:
           clean-exclude: |
             pr-preview/
             release*
+            mvvm/
           force: false

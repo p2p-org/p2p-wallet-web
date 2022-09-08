@@ -12,7 +12,7 @@ import { Network } from 'new/scenes/Main/Send';
 import type * as SolanaSDK from 'new/sdk/SolanaSDK';
 import { convertToBalance } from 'new/sdk/SolanaSDK';
 import { Defaults } from 'new/services/Defaults';
-import { RelayMethodType } from 'new/services/SendService';
+import { SendRelayMethodType } from 'new/services/SendService';
 import { numberToString } from 'new/utils/NumberExtensions';
 
 import { FeeTransactionTooltip } from './FeeTransactionTooltip';
@@ -119,7 +119,7 @@ export const FeesView: FC<Props> = observer(({ viewModel }) => {
   });
 
   const payingFeeTokenIsHidden = expr(() => {
-    if (viewModel.relayMethod.type !== RelayMethodType.relay) {
+    if (viewModel.relayMethod.type !== SendRelayMethodType.relay) {
       return true;
     }
 

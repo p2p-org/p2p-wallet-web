@@ -3,9 +3,9 @@ import { delay, inject, injectable } from 'tsyringe';
 
 import { ViewModel } from 'new/core/viewmodels/ViewModel';
 import { Network, SendViewModel } from 'new/scenes/Main/Send';
-import { ChooseWalletViewModel } from 'new/scenes/Main/Send/ChooseWallet/ChooseWallet.ViewModel';
 import type { Wallet } from 'new/sdk/SolanaSDK';
 import { LogEvent, Logger } from 'new/sdk/SolanaSDK';
+import { ChooseWalletViewModel } from 'new/ui/components/common/ChooseWallet/ChooseWallet.ViewModel';
 
 export enum CurrencyMode {
   token = 'token',

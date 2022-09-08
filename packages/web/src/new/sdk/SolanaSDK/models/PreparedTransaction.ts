@@ -53,4 +53,8 @@ export class PreparedTransaction {
 
     return bs58.encode(signature);
   }
+
+  clone(): PreparedTransaction {
+    return Object.assign(Object.create(Object.getPrototypeOf(this)), this);
+  }
 }
