@@ -1,27 +1,36 @@
 import type { Network } from '@saberhq/solana-contrib';
 import { clusterApiUrl } from '@solana/web3.js';
 
+enum APIKeysNames {
+  rpcpool = 'rpcpool',
+}
+
+const API_KEYS: Record<APIKeysNames, string> = {
+  rpcpool: process.env.REACT_APP_RPCPOOL_API_KEY as string,
+};
+
+export type APIEndpointProps = {
+  address: string;
+  network: Network;
+  socketUrl?: string;
+  additionalQuery?: string;
+};
+
 export class APIEndpoint {
   address: string;
   network: Network;
   socketUrl: string;
   additionalQuery?: string;
 
-  constructor({
-    address,
-    network,
-    socketUrl,
-    additionalQuery,
-  }: {
-    address: string;
-    network: Network;
-    socketUrl?: string;
-    additionalQuery?: string;
-  }) {
+  private _apiKeyName?: APIKeysNames;
+
+  constructor({ address, network, socketUrl, additionalQuery }: APIEndpointProps) {
     this.address = address;
     this.network = network;
     this.socketUrl = socketUrl ?? address.replace('http', 'ws');
-    this.additionalQuery = additionalQuery;
+
+    this._apiKeyName = additionalQuery as APIKeysNames;
+    this.additionalQuery = API_KEYS[this._apiKeyName];
   }
 
   // TODO: defaults
@@ -30,7 +39,7 @@ export class APIEndpoint {
       new APIEndpoint({
         address: 'https://p2p.rpcpool.com',
         network: 'mainnet-beta',
-        additionalQuery: process.env.REACT_APP_RPCPOOL_API_KEY,
+        additionalQuery: APIKeysNames.rpcpool,
       }),
       new APIEndpoint({
         address: 'https://solana-api.projectserum.com',
@@ -68,5 +77,15 @@ export class APIEndpoint {
       url += '/' + query;
     }
     return url;
+  }
+
+  toJSON(): APIEndpointProps {
+    const { address, network, socketUrl, _apiKeyName } = this;
+    return {
+      address,
+      network,
+      socketUrl,
+      additionalQuery: _apiKeyName,
+    };
   }
 }
