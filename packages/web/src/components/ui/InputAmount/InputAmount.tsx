@@ -99,12 +99,12 @@ export const InputAmount: FC<Props> = ({
   }, [value]);
 
   // react to decimals change and notify parent with fixed value
-  useUpdateEffect(() => {
-    if (onChange) {
-      const _value = toFixed(String(value), decimals);
-      onChange(_value);
-    }
-  }, [decimals]);
+  // useUpdateEffect(() => {
+  //   if (onChange) {
+  //     const _value = toFixed(String(value), decimals);
+  //     onChange(_value);
+  //   }
+  // }, [decimals]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     let nextValue = e.target.value.replace(/^0(\d+)/, '$1');

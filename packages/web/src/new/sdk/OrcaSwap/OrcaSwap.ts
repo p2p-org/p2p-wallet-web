@@ -285,7 +285,7 @@ export class OrcaSwap implements OrcaSwapType {
         continue;
       }
 
-      if (estimatedAmount > bestEstimatedAmount) {
+      if (estimatedAmount.gt(bestEstimatedAmount)) {
         bestEstimatedAmount = estimatedAmount;
         bestPools = pair;
       }

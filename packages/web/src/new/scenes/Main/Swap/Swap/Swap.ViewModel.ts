@@ -1,18 +1,33 @@
-import { action, makeObservable, observable, reaction, when } from 'mobx';
+import { ZERO } from '@orca-so/sdk';
+import { action, computed, makeObservable, observable, reaction, when } from 'mobx';
 import { singleton } from 'tsyringe';
 
 import { LoadableRelay, LoadableState, LoadableStateType } from 'new/app/models/LoadableRelay';
 import type { PayingFee } from 'new/app/models/PayingFee';
-import { networkFees } from 'new/app/models/PayingFee';
+import { FeeType, networkFees, transactionFees } from 'new/app/models/PayingFee';
 import { SDFetcherState } from 'new/core/viewmodels/SDViewModel';
 import { ViewModel } from 'new/core/viewmodels/ViewModel';
+import { ActiveInputField, VerificationError } from 'new/scenes/Main/Swap/Swap/types';
 import type { PoolsPair } from 'new/sdk/OrcaSwap';
+import { getInputAmount, getMinimumAmountOut, getOutputAmount } from 'new/sdk/OrcaSwap';
 import type { Wallet } from 'new/sdk/SolanaSDK';
-import { convertToBalance } from 'new/sdk/SolanaSDK';
+import { convertToBalance, toLamport } from 'new/sdk/SolanaSDK';
 import { Defaults } from 'new/services/Defaults';
+import { ModalService, ModalType } from 'new/services/ModalService';
 import { WalletsRepository } from 'new/services/Repositories';
-import { SwapService } from 'new/services/Swap';
+import {
+  findBestPoolsPairForEstimatedAmount,
+  findBestPoolsPairForInputAmount,
+  SwapService,
+  totalDecimal,
+  totalLamport,
+  totalToken,
+} from 'new/services/Swap';
 import { ChooseWalletViewModel } from 'new/ui/components/common/ChooseWallet/ChooseWallet.ViewModel';
+import type { ConfirmSwapModalProps } from 'new/ui/modals/confirmModals/ConfirmSwapModal';
+import * as ProcessTransaction from 'new/ui/modals/ProcessTransactionModal/ProcessTransaction.Models';
+import type { ProcessTransactionModalProps } from 'new/ui/modals/ProcessTransactionModal/ProcessTransactionModal';
+import { maxSlippage, rounded } from 'new/utils/NumberExtensions';
 
 interface SwapViewModelType {
   sourceWallet: Wallet | null;
@@ -30,9 +45,12 @@ interface SwapViewModelType {
 
 @singleton()
 export class SwapViewModel extends ViewModel implements SwapViewModelType {
+  isUsingAllBalance: boolean;
+
   loadingState: LoadableState;
   sourceWallet: Wallet | null;
   destinationWallet: Wallet | null;
+  tradablePoolsPairs: LoadableRelay<PoolsPair[]>;
   bestPoolsPair: PoolsPair | null;
   availableAmount: number | null;
   inputAmount: number | null;
@@ -40,19 +58,25 @@ export class SwapViewModel extends ViewModel implements SwapViewModelType {
   fees: LoadableRelay<PayingFee[]>;
   slippage: number;
   payingWallet: Wallet | null;
-  isUsingAllBalance: boolean;
+
+  error: VerificationError | null;
+  activeInputField: ActiveInputField;
 
   constructor(
     public swapService: SwapService,
     public chooseSourceWalletViewModel: ChooseWalletViewModel,
     public chooseDestinationWalletViewModel: ChooseWalletViewModel,
     private _walletsRepository: WalletsRepository,
+    private _modalService: ModalService,
   ) {
     super();
+
+    this.isUsingAllBalance = false;
 
     this.loadingState = LoadableState.notRequested;
     this.sourceWallet = null;
     this.destinationWallet = null;
+    this.tradablePoolsPairs = new LoadableRelay<PoolsPair[]>(Promise.resolve([]));
     this.bestPoolsPair = null;
     this.availableAmount = null;
     this.inputAmount = null;
@@ -60,12 +84,17 @@ export class SwapViewModel extends ViewModel implements SwapViewModelType {
     this.fees = new LoadableRelay<PayingFee[]>(Promise.resolve([]));
     this.slippage = Defaults.slippage; // TODO: check maybe computed
     this.payingWallet = null;
-    this.isUsingAllBalance = false;
+
+    this.error = null;
+    this.activeInputField = ActiveInputField.none;
 
     makeObservable(this, {
+      isUsingAllBalance: observable,
+
       loadingState: observable,
       sourceWallet: observable,
       destinationWallet: observable,
+      tradablePoolsPairs: observable,
       bestPoolsPair: observable,
       availableAmount: observable,
       inputAmount: observable,
@@ -73,20 +102,30 @@ export class SwapViewModel extends ViewModel implements SwapViewModelType {
       fees: observable,
       slippage: observable,
       payingWallet: observable,
-      isUsingAllBalance: observable,
+
+      error: observable,
+      activeInputField: observable,
+
+      minimumReceiveAmount: computed,
 
       swapSourceAndDestination: action,
       useAllBalance: action,
       enterInputAmount: action,
       enterEstimatedAmount: action,
       walletDidSelect: action,
+      changeFeePayingToken: action,
+
+      setActiveInputField: action,
     });
   }
 
   protected override setDefaults(): void {
+    this.isUsingAllBalance = false;
+
     this.loadingState = LoadableState.notRequested;
     this.sourceWallet = null;
     this.destinationWallet = null;
+    this.tradablePoolsPairs = new LoadableRelay<PoolsPair[]>(Promise.resolve([]));
     this.bestPoolsPair = null;
     this.availableAmount = null;
     this.inputAmount = null;
@@ -94,7 +133,9 @@ export class SwapViewModel extends ViewModel implements SwapViewModelType {
     this.fees = new LoadableRelay<PayingFee[]>(Promise.resolve([]));
     this.slippage = Defaults.slippage;
     this.payingWallet = null;
-    this.isUsingAllBalance = false;
+
+    this.error = null;
+    this.activeInputField = ActiveInputField.none;
   }
 
   protected override onInitialize(): void {
@@ -132,7 +173,29 @@ export class SwapViewModel extends ViewModel implements SwapViewModelType {
     }
 
     // update wallet after swapping
-    // TODO: code
+    // TODO: check that is needed
+    // this.addReaction(
+    //   reaction(
+    //     () => this._walletsRepository.data, // TODO: should skip(1)
+    //     (wallets) => {
+    //       if (this.sourceWallet?.pubkey) {
+    //         const wallet = wallets.find((wallet) => wallet.pubkey === this.sourceWallet?.pubkey);
+    //         if (wallet) {
+    //           this.sourceWallet = wallet;
+    //         }
+    //
+    //         if (this.destinationWallet?.pubkey) {
+    //           const wallet = wallets.find(
+    //             (wallet) => wallet.pubkey === this.destinationWallet?.pubkey,
+    //           );
+    //           if (wallet) {
+    //             this.destinationWallet = wallet;
+    //           }
+    //         }
+    //       }
+    //     },
+    //   ),
+    // );
 
     // available amount
     this.addReaction(
@@ -153,13 +216,62 @@ export class SwapViewModel extends ViewModel implements SwapViewModelType {
     );
 
     // auto fill balance after tapping max
-    // TODO: code
+    this.addReaction(
+      reaction(
+        () => this.availableAmount,
+        (availableAmount) => {
+          const inputAmount = this.inputAmount;
+          if (!this.isUsingAllBalance || !inputAmount || !availableAmount) {
+            return false;
+          }
+
+          return (
+            this.isUsingAllBalance &&
+            rounded(inputAmount, this.sourceWallet?.token.decimals) >
+              rounded(availableAmount, this.sourceWallet?.token.decimals)
+          );
+        },
+      ),
+    );
 
     // get tradable pools pair for each token pair
-    // TODO: code
+    this.addReaction(
+      reaction(
+        () => ({
+          sourceWallet: this.sourceWallet,
+          destinationWallet: this.destinationWallet,
+        }),
+        ({ sourceWallet, destinationWallet }) => {
+          if (!sourceWallet || !destinationWallet) {
+            this.tradablePoolsPairs.request = Promise.resolve([]);
+            this.tradablePoolsPairs.reload();
+            return;
+          }
+
+          this.tradablePoolsPairs.request = this.swapService.getPoolPair({
+            sourceMint: sourceWallet.token.address,
+            destinationMint: destinationWallet.token.address,
+          });
+          this.tradablePoolsPairs.reload();
+        },
+      ),
+    );
 
     // Fill input amount and estimated amount after loaded
-    // TODO: code
+    this.addReaction(
+      reaction(
+        () => this.tradablePoolsPairs.state.type === LoadableStateType.loaded,
+        () => {
+          const inputAmount = this.inputAmount;
+          const estimatedAmount = this.estimatedAmount;
+          if (inputAmount && this.activeInputField !== ActiveInputField.destination) {
+            this.enterInputAmount(inputAmount);
+          } else if (estimatedAmount) {
+            this.enterEstimatedAmount(estimatedAmount);
+          }
+        },
+      ),
+    );
 
     // fees
     this.addReaction(
@@ -182,22 +294,143 @@ export class SwapViewModel extends ViewModel implements SwapViewModelType {
     // Smart selection fee token paying
 
     // Input wallet was changed
-    // TODO: code
+    this.addReaction(
+      reaction(
+        () => this.sourceWallet,
+        (wallet) => {
+          if (!wallet) {
+            return;
+          }
+          this.payingWallet = wallet;
+        },
+      ),
+    );
 
     // Input amount was changed
-    // TODO: code
+    this.addReaction(
+      reaction(
+        () => this.inputAmount,
+        async (input) => {
+          const availableAmount = this.availableAmount;
+          if (!input || !availableAmount) {
+            return;
+          }
+          const fees = await this._feesRequest();
+
+          // If paying token fee equals input token
+          // TODO: check that equality by reference works
+          if (this.payingWallet === this.sourceWallet && !this.payingWallet?.isNativeSOL) {
+            // Selected wallet can not covert fee
+            if (
+              input + totalDecimal(fees) > availableAmount &&
+              (this._walletsRepository.nativeWallet?.amount ?? 0) > 0
+            ) {
+              const solWallet = this._walletsRepository.nativeWallet;
+              if (!solWallet) {
+                return;
+              }
+              this.changeFeePayingToken(solWallet);
+            }
+          }
+        },
+      ),
+    );
 
     // Error
-    // TODO: code
+    this.addReaction(
+      reaction(
+        () => ({
+          loadingState: this.loadingState,
+          sourceWallet: this.sourceWallet,
+          destinationWallet: this.destinationWallet,
+          tradablePoolsPairs: this.tradablePoolsPairs.state,
+          bestPoolsPair: this.bestPoolsPair,
+          fees: this.fees.value,
+          payingWallet: this.payingWallet,
+        }),
+        () => {
+          this.error = this._verify();
+        },
+      ),
+    );
+  }
+
+  get minimumReceiveAmount(): number | null {
+    const poolsPair = this.bestPoolsPair;
+    const _inputAmount = this.inputAmount;
+    const slippage = this.slippage;
+    const sourceWallet = this.sourceWallet;
+    const destinationWallet = this.destinationWallet;
+
+    const sourceDecimals = sourceWallet?.token.decimals;
+    if (!_inputAmount || !sourceDecimals) {
+      return null;
+    }
+    const inputAmount = toLamport(_inputAmount, sourceDecimals);
+    const destinationDecimals = destinationWallet?.token.decimals;
+    if (!poolsPair || !inputAmount || !destinationDecimals) {
+      return null;
+    }
+
+    const minimumAmountOut = getMinimumAmountOut(poolsPair, inputAmount, slippage);
+    if (!minimumAmountOut) {
+      return null;
+    }
+    return convertToBalance(minimumAmountOut, destinationDecimals);
   }
 
   // Actions
 
-  // TODO:
-  authenticateAndSwap(): void {}
+  authenticateAndSwap(): void {
+    // TODO: authenticationHandler
+    this._swap();
+  }
 
-  // TODO:
-  swap(): void {}
+  private _swap(): void {
+    if (this._verify()) {
+      return;
+    }
+
+    const authority = this._walletsRepository.nativeWallet?.pubkey;
+    const sourceWallet = this.sourceWallet!;
+    const destinationWallet = this.destinationWallet!;
+    const bestPoolsPair = this.bestPoolsPair!;
+    const inputAmount = this.inputAmount!;
+    const estimatedAmount = this.estimatedAmount!;
+    const payingWallet = this.payingWallet;
+    const slippage = this.slippage;
+    const fees = this.fees.value?.filter((fee) => fee.type !== FeeType.liquidityProviderFee) ?? [];
+
+    const swapMAX = this.availableAmount === inputAmount;
+
+    // log
+    const receiveAmount = this.minimumReceiveAmount ?? 0;
+    const receivePricePair = destinationWallet.priceInCurrentFiat ?? 0.0;
+    const swapUSD = receiveAmount * receivePricePair;
+
+    // show processing scene
+    void this._modalService.openModal<void, ProcessTransactionModalProps>(
+      ModalType.SHOW_MODAL_PROCESS_TRANSACTION,
+      {
+        transaction: new ProcessTransaction.SwapTransaction({
+          swapService: this.swapService,
+          sourceWallet,
+          destinationWallet,
+          payingWallet,
+          authority,
+          poolsPair: bestPoolsPair,
+          amount: inputAmount,
+          estimatedAmount,
+          slippage,
+          fees,
+          metaInfo: {
+            swapMAX,
+            swapUSD,
+          },
+        }),
+      },
+    );
+  }
 
   reload(): void {
     this.loadingState = LoadableState.loading;
@@ -233,14 +466,72 @@ export class SwapViewModel extends ViewModel implements SwapViewModelType {
     }
   }
 
-  // TODO:
   enterInputAmount(amount: number | null): void {
-    this.inputAmount = amount;
+    const _amount = amount ? rounded(amount, this.sourceWallet?.token.decimals) : null;
+    this.inputAmount = _amount;
+
+    // calculate estimated amount
+    const sourceDecimals = this.sourceWallet?.token.decimals;
+    const destinationDecimals = this.destinationWallet?.token.decimals;
+    const poolsPairs = this.tradablePoolsPairs.value;
+    let inputAmount, bestPoolsPair, bestEstimatedAmountU64, bestEstimatedAmount;
+    if (
+      sourceDecimals &&
+      destinationDecimals &&
+      (inputAmount = _amount ? toLamport(_amount, sourceDecimals) : null) &&
+      poolsPairs &&
+      (bestPoolsPair = findBestPoolsPairForInputAmount({
+        poolsPairs,
+        inputAmount,
+      })) &&
+      (bestEstimatedAmountU64 = inputAmount ? getOutputAmount(bestPoolsPair, inputAmount) : null) &&
+      (bestEstimatedAmount = bestEstimatedAmountU64
+        ? rounded(
+            convertToBalance(bestEstimatedAmountU64, destinationDecimals),
+            destinationDecimals,
+          )
+        : null)
+    ) {
+      this.estimatedAmount = bestEstimatedAmount;
+      this.bestPoolsPair = bestPoolsPair;
+    } else {
+      this.estimatedAmount = null;
+      this.bestPoolsPair = null;
+    }
   }
 
-  // TODO:
   enterEstimatedAmount(amount: number | null): void {
-    this.estimatedAmount = amount;
+    const _amount = amount ? rounded(amount, this.destinationWallet?.token.decimals) : null;
+    this.estimatedAmount = _amount;
+
+    // calculate input amount
+    const sourceDecimals = this.sourceWallet?.token.decimals;
+    const destinationDecimals = this.destinationWallet?.token.decimals;
+    const poolsPairs = this.tradablePoolsPairs.value;
+    let estimatedAmount, bestPoolsPair, bestInputAmountU64, bestInputAmount;
+    if (
+      sourceDecimals &&
+      destinationDecimals &&
+      (estimatedAmount = _amount ? toLamport(_amount, destinationDecimals) : null) &&
+      poolsPairs &&
+      (bestPoolsPair = findBestPoolsPairForEstimatedAmount({
+        poolsPairs,
+        estimatedAmount,
+      })) &&
+      (bestInputAmountU64 = estimatedAmount
+        ? getInputAmount(bestPoolsPair, estimatedAmount)
+        : null) &&
+      (bestInputAmount = rounded(
+        convertToBalance(bestInputAmountU64, sourceDecimals),
+        sourceDecimals,
+      ))
+    ) {
+      this.inputAmount = bestInputAmount;
+      this.bestPoolsPair = bestPoolsPair;
+    } else {
+      this.inputAmount = null;
+      this.bestPoolsPair = null;
+    }
   }
 
   /**
@@ -256,7 +547,139 @@ export class SwapViewModel extends ViewModel implements SwapViewModelType {
     }
   }
 
+  changeFeePayingToken(payingToken: Wallet): void {
+    this.payingWallet = payingToken;
+  }
+
+  setActiveInputField(value: ActiveInputField): void {
+    this.activeInputField = value;
+  }
+
   // OrcaSwapV2.Helper
+
+  // Verify error in current context IN ORDER
+  // - Returns: String or nil if no error
+  private _verify(): VerificationError | null {
+    // loading state
+    if (this.loadingState.type !== LoadableStateType.loaded) {
+      return VerificationError.swappingIsNotAvailable;
+    }
+
+    // source wallet
+    const sourceWallet = this.sourceWallet;
+    if (!sourceWallet) {
+      return VerificationError.sourceWalletIsEmpty;
+    }
+
+    // destination wallet
+    const destinationWallet = this.destinationWallet;
+    if (!destinationWallet) {
+      return VerificationError.destinationWalletIsEmpty;
+    }
+
+    // prevent swap the same token
+    if (sourceWallet.token.address === destinationWallet.token.address) {
+      return VerificationError.canNotSwapToItSelf;
+    }
+
+    // pools pairs
+    if (this.tradablePoolsPairs.state.type !== LoadableStateType.loaded) {
+      return VerificationError.tradablePoolsPairsNotLoaded;
+    }
+
+    if (!this.tradablePoolsPairs.value || this.tradablePoolsPairs.value.length === 0) {
+      return VerificationError.tradingPairNotSupported;
+    }
+
+    // inputAmount
+    const inputAmount = this.inputAmount;
+    if (!inputAmount) {
+      return VerificationError.inputAmountIsEmpty;
+    }
+
+    if (rounded(inputAmount, sourceWallet.token.decimals) <= 0) {
+      return VerificationError.inputAmountIsNotValid;
+    }
+
+    // TODO: check "?? 0" right
+    if (
+      rounded(inputAmount, sourceWallet.token.decimals) >
+      rounded(this.availableAmount ?? 0, sourceWallet.token.decimals)
+    ) {
+      return VerificationError.insufficientFunds;
+    }
+
+    // estimated amount
+    const estimatedAmount = this.estimatedAmount;
+    if (!estimatedAmount) {
+      return VerificationError.estimatedAmountIsNotValid;
+    }
+
+    if (rounded(estimatedAmount, destinationWallet.token.decimals) <= 0) {
+      return VerificationError.estimatedAmountIsNotValid;
+    }
+
+    // best pools pairs
+    if (!this.bestPoolsPair) {
+      return VerificationError.bestPoolsPairsIsEmpty;
+    }
+
+    // fees
+    if (this.fees.state.isError) {
+      return VerificationError.couldNotCalculatingFees;
+    }
+
+    if (this.fees.state.type !== LoadableStateType.loaded) {
+      return VerificationError.feesIsBeingCalculated;
+    }
+
+    const payingWallet = this.payingWallet;
+    if (!payingWallet) {
+      return VerificationError.payingFeeWalletNotFound;
+    }
+
+    // paying with SOL
+    if (payingWallet.isNativeSOL) {
+      const wallet = this._walletsRepository.nativeWallet;
+      if (!wallet) {
+        return VerificationError.nativeWalletNotFound;
+      }
+
+      const feeInSOL = this.fees.value ? transactionFees(this.fees.value, 'SOL') : ZERO;
+
+      if (feeInSOL.gt(wallet.lamports ?? ZERO)) {
+        return VerificationError.notEnoughSOLToCoverFees;
+      }
+    }
+
+    // paying with SPL token
+    else {
+      // TODO: - fee compensation
+      //                if (!feeCompensationPool) {
+      //                    return 'Fee compensation pool not found';
+      //                }
+      const feeTotal = this.fees.value ? totalLamport(this.fees.value) : null;
+      if (feeTotal) {
+        const feeTotalTokenSymbol = this.fees.value ? totalToken(this.fees.value)?.symbol : null;
+        if (payingWallet.token.symbol === feeTotalTokenSymbol) {
+          if (feeTotal.gt(payingWallet.lamports ?? ZERO)) {
+            return VerificationError.notEnoughBalanceToCoverFees;
+          }
+        }
+      }
+    }
+
+    // slippage
+    if (!this._isSlippageValid()) {
+      return VerificationError.slippageIsNotValid;
+    }
+
+    return null;
+  }
+
+  private _isSlippageValid(): boolean {
+    return this.slippage <= maxSlippage && this.slippage > 0;
+  }
 
   private async _feesRequest(): Promise<PayingFee[]> {
     const sourceWallet = this.sourceWallet;
@@ -276,6 +699,17 @@ export class SwapViewModel extends ViewModel implements SwapViewModelType {
         slippage: this.slippage,
       })
     ).fees;
+  }
+
+  // own code
+
+  openConfirmModal(): Promise<void> {
+    return this._modalService.openModal<void, ConfirmSwapModalProps>(
+      ModalType.SHOW_MODAL_CONFIRM_SWAP,
+      {
+        viewModel: this,
+      },
+    );
   }
 }
 

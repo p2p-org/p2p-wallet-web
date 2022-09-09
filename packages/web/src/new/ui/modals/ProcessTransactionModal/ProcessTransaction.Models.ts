@@ -42,7 +42,7 @@ class RawTransactionBase {
 }
 
 type MetaInfo = {
-  swapMax: boolean;
+  swapMAX: boolean;
   swapUSD: number;
 };
 

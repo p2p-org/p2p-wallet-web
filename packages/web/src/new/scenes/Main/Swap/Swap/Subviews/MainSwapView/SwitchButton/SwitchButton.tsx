@@ -10,7 +10,10 @@ const Wrapper = styled.div`
   z-index: 1;
 
   display: flex;
+  height: 1px;
   padding-left: 72px;
+
+  background: ${theme.colors.stroke.tertiary};
 
   ${up.tablet} {
     justify-content: center;

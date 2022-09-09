@@ -1,3 +1,4 @@
+import { ZERO } from '@orca-so/sdk';
 import type { u64 } from '@solana/spl-token';
 import type { PublicKey } from '@solana/web3.js';
 
@@ -119,7 +120,7 @@ export class SwapFeeRelayer implements SwapFeeRelayerType {
 
     const latestBlockhash = await this._solanaApiClient.getRecentBlockhash();
 
-    const buildContext = <BuildContext>{
+    const buildContext: BuildContext = {
       feeRelayerContext: context,
       solanaApiClient: this._solanaApiClient,
       orcaSwap: this._orcaSwap,
@@ -133,7 +134,12 @@ export class SwapFeeRelayer implements SwapFeeRelayerType {
         destinationAddress,
         blockhash: latestBlockhash,
       },
-      env: {},
+      env: {
+        instructions: [],
+        signers: [],
+        accountCreationFee: ZERO,
+        additionalPaybackFee: ZERO,
+      },
     };
 
     return SwapTransactionBuilder.prepareSwapTransaction(buildContext);

@@ -1,7 +1,7 @@
 import { action, computed, flow, makeObservable, observable } from 'mobx';
 import type { CancellablePromise } from 'mobx/dist/api/flow';
 
-import { ViewModel } from 'new/core/viewmodels/ViewModel';
+import { ViewModel } from './ViewModel';
 
 export enum SDFetcherState {
   initializing = 'initializing',

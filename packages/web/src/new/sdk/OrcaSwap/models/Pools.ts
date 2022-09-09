@@ -128,7 +128,12 @@ export function getOutputAmount(pools: PoolsPair, inputAmount: u64): u64 | null 
 
   const pool0 = pools[0];
 
-  const estimatedAmountOfPool0 = pool0?.getOutputAmount(inputAmount);
+  let estimatedAmountOfPool0;
+  try {
+    estimatedAmountOfPool0 = pool0?.getOutputAmount(inputAmount);
+  } catch {
+    // ignore
+  }
   if (!estimatedAmountOfPool0) {
     return null;
   }
@@ -140,7 +145,12 @@ export function getOutputAmount(pools: PoolsPair, inputAmount: u64): u64 | null 
   // transitive
   else {
     const pool1 = pools[1];
-    const estimatedAmountOfPool1 = pool1?.getOutputAmount(estimatedAmountOfPool0);
+    let estimatedAmountOfPool1;
+    try {
+      estimatedAmountOfPool1 = pool1?.getOutputAmount(estimatedAmountOfPool0);
+    } catch {
+      // ignore
+    }
     if (!estimatedAmountOfPool1) {
       return null;
     }
@@ -153,30 +163,40 @@ export function getInputAmount(pools: PoolsPair, estimatedAmount: u64): u64 | nu
   if (!pools.length) {
     return null;
   }
+  const pool0 = pools[0];
 
   // direct
   if (pools.length === 1) {
-    const pool0 = pools[0];
-
-    const inputAmountOfPool0 = pool0?.getInputAmount(estimatedAmount);
-    if (!inputAmountOfPool0) {
+    let inputAmount;
+    try {
+      inputAmount = pool0?.getInputAmount(estimatedAmount);
+    } catch {
+      // ignore
+    }
+    if (!inputAmount) {
       return null;
     }
 
-    return inputAmountOfPool0;
+    return inputAmount;
   }
   // transitive
   else {
     const pool1 = pools[1];
-
-    const inputAmountOfPool1 = pool1?.getInputAmount(estimatedAmount);
+    let inputAmountOfPool1;
+    try {
+      inputAmountOfPool1 = pool1?.getInputAmount(estimatedAmount);
+    } catch {
+      // ignore
+    }
     if (!inputAmountOfPool1) {
       return null;
     }
-
-    const pool0 = pools[0];
-
-    const inputAmountOfPool0 = pool0?.getInputAmount(inputAmountOfPool1);
+    let inputAmountOfPool0;
+    try {
+      inputAmountOfPool0 = pool0?.getInputAmount(inputAmountOfPool1);
+    } catch {
+      // ignore
+    }
     if (!inputAmountOfPool0) {
       return null;
     }
@@ -193,11 +213,16 @@ export function getInputAmountSlippage(
   if (pools.length === 0) {
     return null;
   }
+  const pool0 = pools[0];
 
   //direct
   if (pools.length === 1) {
-    const pool0 = pools[0];
-    const inputAmount = pool0?.getInputAmountSlippage(minimumAmountOut, slippage);
+    let inputAmount;
+    try {
+      inputAmount = pool0?.getInputAmountSlippage(minimumAmountOut, slippage);
+    } catch {
+      // ignore
+    }
     if (!inputAmount) {
       return null;
     }
@@ -206,17 +231,75 @@ export function getInputAmountSlippage(
   // transitive
   else {
     const pool1 = pools[1];
-    const inputAmountPool1 = pool1?.getInputAmountSlippage(minimumAmountOut, slippage);
+    let inputAmountPool1;
+    try {
+      inputAmountPool1 = pool1?.getInputAmountSlippage(minimumAmountOut, slippage);
+    } catch {
+      // ignore
+    }
     if (!inputAmountPool1) {
       return null;
     }
 
-    const pool0 = pools[0];
-    const inputAmountPool0 = pool0?.getInputAmountSlippage(inputAmountPool1, slippage);
+    let inputAmountPool0;
+    try {
+      inputAmountPool0 = pool0?.getInputAmountSlippage(inputAmountPool1, slippage);
+    } catch {
+      // ignore
+    }
     if (!inputAmountPool0) {
       return null;
     }
     return inputAmountPool0;
+  }
+}
+
+export function getMinimumAmountOut(
+  pools: PoolsPair,
+  inputAmount: u64,
+  slippage: number,
+): u64 | null {
+  if (pools.length === 0) {
+    return null;
+  }
+  const pool0 = pools[0];
+
+  //direct
+  if (pools.length === 1) {
+    let minimumAmountOut;
+    try {
+      minimumAmountOut = pool0?.getMinimumAmountOut(inputAmount, slippage);
+    } catch {
+      // ignore
+    }
+    if (!minimumAmountOut) {
+      return null;
+    }
+    return minimumAmountOut;
+  }
+  // transitive
+  else {
+    let outputAmountOfPool0;
+    try {
+      outputAmountOfPool0 = pool0?.getOutputAmount(inputAmount);
+    } catch {
+      // ignore
+    }
+    if (!outputAmountOfPool0) {
+      return null;
+    }
+
+    const pool1 = pools[1];
+    let minimumAmountOut;
+    try {
+      minimumAmountOut = pool1?.getMinimumAmountOut(outputAmountOfPool0, slippage);
+    } catch {
+      // ignore
+    }
+    if (!minimumAmountOut) {
+      return null;
+    }
+    return minimumAmountOut;
   }
 }
 

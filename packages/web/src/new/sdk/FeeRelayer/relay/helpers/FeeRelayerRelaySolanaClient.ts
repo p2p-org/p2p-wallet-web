@@ -112,9 +112,11 @@ export class FeeRelayerRelaySolanaClient
       return getAssociatedTokenAddressSync(mint, address);
     }
 
-    // The native account
-    if (account.owner.equals(SolanaSDKPublicKey.programId)) {
-      throw FeeRelayerError.wrongAddress();
+    // The account is already token account
+    if (account.data?.mint.equals(mint)) {
+      if (account.owner.equals(SolanaSDKPublicKey.programId)) {
+        throw FeeRelayerError.wrongAddress();
+      }
     }
     return getAssociatedTokenAddressSync(mint, address);
   }

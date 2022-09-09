@@ -215,7 +215,8 @@ export class Pool {
 
   getMinimumAmountOut(inputAmount: u64, slippage: number): u64 {
     const estimatedOutputAmount = this.getOutputAmount(inputAmount);
-    return new u64(estimatedOutputAmount.muln(1 - slippage));
+    // don't lose precision
+    return new u64(estimatedOutputAmount.toNumber() * (1 - slippage));
   }
 
   getInputAmountSlippage(minimumReceiveAmount: u64, slippage: number): u64 | null {
@@ -258,10 +259,15 @@ export class Pool {
     );
   }
 
+  getOutputAmount(inputAmount: u64): u64 {
+    const fees = this.getFee(inputAmount);
+    const inputAmountLessFee = inputAmount.sub(fees);
+    return this._getOutputAmount(inputAmountLessFee);
+  }
+
   getInputAmount(estimatedAmount: u64): u64 | null {
     const poolInputAmount = this.tokenABalance?.amountInU64;
     const poolOutputAmount = this.tokenBBalance?.amountInU64;
-
     if (!poolInputAmount || !poolOutputAmount) {
       throw OrcaSwapError.accountBalanceNotFound();
     }
@@ -319,12 +325,6 @@ export class Pool {
         return null;
       }
     }
-  }
-
-  getOutputAmount(inputAmount: u64): u64 {
-    const fees = this.getFee(inputAmount);
-    const inputAmountLessFee = inputAmount.sub(fees);
-    return this._getOutputAmount(inputAmountLessFee);
   }
 
   calculatingFees(inputAmount: u64): u64 {

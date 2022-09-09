@@ -24,7 +24,7 @@ interface Configuration {
 
   sourceAccount: TokenAccount;
   destinationTokenMint: PublicKey;
-  destinationAddress?: PublicKey;
+  destinationAddress?: PublicKey | null;
 
   blockhash: string;
 }

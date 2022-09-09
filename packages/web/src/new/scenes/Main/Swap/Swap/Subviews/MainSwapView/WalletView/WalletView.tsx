@@ -8,6 +8,7 @@ import { expr } from 'mobx-utils';
 import { InputAmount } from 'components/ui/InputAmount';
 import { WalletSelectorContent } from 'new/scenes/Main/Send/ChooseTokenAndAmount/WalletSelectorContent';
 import type { SwapViewModel } from 'new/scenes/Main/Swap/Swap/Swap.ViewModel';
+import { ActiveInputField } from 'new/scenes/Main/Swap/Swap/types';
 import type { Wallet } from 'new/sdk/SolanaSDK';
 import { ChooseWallet } from 'new/ui/components/common/ChooseWallet';
 import { numberToString } from 'new/utils/NumberExtensions';
@@ -18,16 +19,10 @@ const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
 
-  margin-bottom: -1px;
   padding: 16px 20px;
-
-  border: 1px solid #f6f6f8;
-  border-radius: 0 0 12px 12px;
 
   &:first-child {
     padding-bottom: 32px;
-
-    border-radius: 12px 12px 0 0;
 
     ${up.tablet} {
       padding-bottom: 16px;
@@ -91,9 +86,14 @@ export const WalletView: FC<Props> = observer(({ type, viewModel }) => {
       let destinationMints: string[] = [];
       const sourceWallet = viewModel.sourceWallet;
       if (sourceWallet) {
-        const validMints = viewModel.swapService.findPosibleDestinationMints(
-          sourceWallet.token.address,
-        );
+        let validMints: string[] = [];
+        try {
+          validMints = viewModel.swapService.findPosibleDestinationMints(
+            sourceWallet.token.address,
+          );
+        } catch {
+          // ignore
+        }
         if (validMints.length !== 0) {
           destinationMints = validMints;
         }
@@ -139,6 +139,16 @@ export const WalletView: FC<Props> = observer(({ type, viewModel }) => {
     }
   };
 
+  const handleFocus = () => {
+    viewModel.setActiveInputField(
+      type === 'source' ? ActiveInputField.source : ActiveInputField.destination,
+    );
+  };
+
+  const handleBlur = () => {
+    viewModel.setActiveInputField(ActiveInputField.none);
+  };
+
   return (
     <Wrapper>
       <TopWrapper>
@@ -160,6 +170,8 @@ export const WalletView: FC<Props> = observer(({ type, viewModel }) => {
             value={amount}
             decimals={wallet?.token.decimals}
             onChange={handleAmountChange}
+            onFocus={handleFocus}
+            onBlur={handleBlur}
           />
         </InputWrapper>
       </MainWrapper>

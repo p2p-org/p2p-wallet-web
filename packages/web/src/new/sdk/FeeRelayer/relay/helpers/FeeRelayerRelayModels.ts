@@ -308,7 +308,7 @@ export class TransferParam {
 // RelayTransactionParam
 export class RelayTransactionParam {
   instructions: RequestInstruction[];
-  signatures: { [key in string]: string };
+  signatures: Record<string, string>;
   pubkeys: string[];
   blockhash: string;
 

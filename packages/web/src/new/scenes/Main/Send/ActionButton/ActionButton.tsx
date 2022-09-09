@@ -20,12 +20,12 @@ interface Props {
 export const ActionButton: FC<Props> = observer(({ viewModel }) => {
   const isDisabled = Boolean(viewModel.error);
 
-  const handleSendClick = () => {
+  const handleClick = () => {
     void viewModel.openConfirmModal();
   };
 
   return (
-    <Button primary full disabled={isDisabled} onClick={handleSendClick}>
+    <Button primary full disabled={isDisabled} onClick={handleClick}>
       {viewModel.error?.buttonSuggestion ?? (
         <>
           <SendIcon name="top" />

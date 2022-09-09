@@ -19,6 +19,7 @@ export function convertToBalance(value: BN, decimals?: number): number {
 
 // Number
 
+// TODO: find better precision way for bignumber
 export function toLamport(value: number, decimals: number): u64 {
-  return new u64(value * 10 ** decimals);
+  return new u64(Math.round(value * 10 ** decimals));
 }
