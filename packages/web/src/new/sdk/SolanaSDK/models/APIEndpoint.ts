@@ -31,8 +31,10 @@ export class APIEndpoint {
     this.network = network;
     this.socketUrl = socketUrl ?? address.replace('http', 'ws');
 
-    this._apiKeyName = additionalQuery as APIKeysNames;
-    this.additionalQuery = API_KEYS[this._apiKeyName];
+    const apiKeyName = additionalQuery as APIKeysNames;
+    this.additionalQuery = API_KEYS[apiKeyName] || additionalQuery;
+
+    this._apiKeyName = API_KEYS[apiKeyName] ? apiKeyName : undefined;
   }
 
   // TODO: defaults
@@ -95,12 +97,12 @@ export class APIEndpoint {
   }
 
   toJSON(): APIEndpointProps {
-    const { address, network, socketUrl, _apiKeyName } = this;
+    const { address, network, socketUrl, additionalQuery, _apiKeyName } = this;
     return {
       address,
       network,
       socketUrl,
-      additionalQuery: _apiKeyName,
+      additionalQuery: _apiKeyName || additionalQuery,
     };
   }
 }
