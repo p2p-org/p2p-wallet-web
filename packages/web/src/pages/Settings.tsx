@@ -145,6 +145,8 @@ export const Settings: FunctionComponent = () => {
   const { settings, updateSettings } = useSettings();
   const { username, domain } = useUsername();
 
+  const formattedAddress = endpoint.replace(/\/[\w\d-]+$/, '');
+
   const handleLogoutClick = () => {
     history.push('/login');
     trackEvent('Sign_Out');
@@ -258,7 +260,7 @@ export const Settings: FunctionComponent = () => {
                 }}
                 style={{ cursor: 'pointer' }}
               >
-                <Title title={endpoint}>{endpoint}</Title>
+                <Title title={formattedAddress}>{formattedAddress}</Title>
                 <ChevronWrapper
                   onClick={() => {
                     history.push('/settings/network');

@@ -70,10 +70,12 @@ export const Network: FunctionComponent = () => {
 
   const renderClustersRadioButtons = () =>
     visibleNetworks.map((networkItem) => {
+      const address = networkItem.endpointLabel || networkItem.endpoint;
+      const formattedAddress = address.replace(/\/[\w\d-]+$/, '');
       return (
         <RadioButtonItem key={networkItem.name}>
           <RadioButton
-            label={networkItem.endpointLabel || networkItem.endpoint}
+            label={formattedAddress}
             value={networkItem}
             checked={networkItem.endpoint === endpoint}
             onChange={handleChange}
