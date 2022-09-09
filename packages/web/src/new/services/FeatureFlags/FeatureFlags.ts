@@ -2,7 +2,7 @@ import { action, makeObservable, observable, when } from 'mobx';
 
 import { defaultFlags } from 'new/services/FeatureFlags/defaultFlags';
 import type { Features } from 'new/services/FeatureFlags/features';
-import { RemoteConfig } from 'new/services/RemoteConfigService';
+import { RemoteConfig } from 'new/services/RemoteConfig';
 
 class _FeatureFlags {
   isInitialized = false;

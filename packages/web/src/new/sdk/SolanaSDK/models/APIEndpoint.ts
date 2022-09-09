@@ -1,7 +1,7 @@
 import type { Network } from '@saberhq/solana-contrib';
 import { clusterApiUrl } from '@solana/web3.js';
 
-import { RemoteConfig } from 'new/services/RemoteConfigService';
+import { RemoteConfig } from 'new/services/RemoteConfig';
 
 enum APIKeysNames {
   rpcpool = 'rpcpool',

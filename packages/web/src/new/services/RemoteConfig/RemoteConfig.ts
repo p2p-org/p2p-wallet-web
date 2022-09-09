@@ -5,8 +5,8 @@ import { action, makeObservable, observable } from 'mobx';
 
 import type { FeatureFlagsType } from 'new/services/FeatureFlags/defaultFlags';
 import { Features } from 'new/services/FeatureFlags/features';
-import { ConfigKeys, defaultConfig } from 'new/services/RemoteConfigService/defaultConfig';
-import { firebaseConfig } from 'new/services/RemoteConfigService/firebaseConfig';
+import { ConfigKeys, defaultConfig } from 'new/services/RemoteConfig/defaultConfig';
+import { firebaseConfig } from 'new/services/RemoteConfig/firebaseConfig';
 
 type NetworkValue = { urlString: string; network: string; additionalQuery?: string };
 
