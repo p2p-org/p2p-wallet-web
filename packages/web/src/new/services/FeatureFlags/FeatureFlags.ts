@@ -15,9 +15,9 @@ class _FeatureFlags {
     });
 
     void when(
-      () => RemoteConfig.isInitialized,
+      () => RemoteConfig.isActivated,
       action(() => {
-        this.featureFlags = { ...defaultFlags, ...RemoteConfig.featureFlags };
+        this.featureFlags = RemoteConfig.featureFlags;
         this.isInitialized = true;
       }),
     );

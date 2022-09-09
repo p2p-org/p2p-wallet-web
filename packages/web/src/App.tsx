@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { BrowserRouter, HashRouter, Route, Switch } from 'react-router-dom';
 
-import { styled } from '@linaria/react';
 import * as Sentry from '@sentry/react';
 import dayjs from 'dayjs';
 import localizedFormat from 'dayjs/plugin/localizedFormat';
@@ -18,8 +17,6 @@ import { Send } from 'new/scenes/Main/Send';
 import { Settings } from 'new/scenes/Main/Settings';
 import { SettingsNetwork } from 'new/scenes/Main/SettingsNetwork';
 import { Root } from 'new/scenes/Root';
-import { RemoteConfig } from 'new/services/RemoteConfigService';
-import { Loader } from 'new/ui/components/common/Loader';
 import { LocationManager } from 'new/ui/managers/LocationManager';
 import { NotificationManager } from 'new/ui/managers/NotificationManager';
 import { ModalManager } from 'new/ui/modals/ModalManager';
@@ -35,25 +32,8 @@ import { Providers } from './Providers';
 
 dayjs.extend(localizedFormat);
 
-const LoaderWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-
-  width: 100%;
-  height: 100%;
-`;
-
 const App: React.FC = observer(() => {
   const Router: React.ElementType = process.env.REACT_APP_STAGING ? HashRouter : BrowserRouter;
-
-  if (!RemoteConfig.isInitialized) {
-    return (
-      <LoaderWrapper>
-        <Loader size={'100'} />
-      </LoaderWrapper>
-    );
-  }
 
   return (
     <>

@@ -1,11 +1,8 @@
-import { autorun, makeObservable, observable, set, toJS, when } from 'mobx';
+import { autorun, makeObservable, observable, set, toJS } from 'mobx';
 
 import { Fiat } from 'new/app/models/Fiat';
-import { SolanaSDKPublicKey } from 'new/sdk/SolanaSDK';
+import { APIEndpoint, SolanaSDKPublicKey } from 'new/sdk/SolanaSDK';
 import type { CurrentPrice } from 'new/services/PriceAPIs/PricesService';
-import { RemoteConfig } from 'new/services/RemoteConfigService';
-
-import { APIEndpoint } from '../sdk/SolanaSDK/models/APIEndpoint';
 
 export enum Appearance {
   system = 'system',
@@ -87,9 +84,4 @@ class _Defaults implements DefaultsKeys {
   }
 }
 
-when(
-  () => RemoteConfig.isInitialized,
-  () => (Defaults = new _Defaults()),
-);
-
-export let Defaults: DefaultsKeys;
+export const Defaults = new _Defaults();

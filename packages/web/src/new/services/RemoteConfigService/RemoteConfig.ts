@@ -1,8 +1,7 @@
 import { initializeApp } from 'firebase/app';
 import type { RemoteConfig as RemoteConfigType, Value } from 'firebase/remote-config';
-import { fetchAndActivate, getAll, getRemoteConfig, setLogLevel } from 'firebase/remote-config';
-import { makeObservable, observable, runInAction } from 'mobx';
-import assert from 'ts-invariant';
+import { fetchAndActivate, getAll, getRemoteConfig } from 'firebase/remote-config';
+import { action, makeObservable, observable } from 'mobx';
 
 import type { FeatureFlagsType } from 'new/services/FeatureFlags/defaultFlags';
 import { Features } from 'new/services/FeatureFlags/features';
@@ -14,11 +13,11 @@ type NetworkValue = { urlString: string; network: string; additionalQuery?: stri
 class _RemoteConfig {
   private readonly _remoteConfig: RemoteConfigType;
 
-  isInitialized = false;
+  isActivated = false;
 
   constructor() {
     makeObservable(this, {
-      isInitialized: observable,
+      isActivated: observable,
     });
 
     const app = initializeApp(firebaseConfig);
@@ -29,18 +28,13 @@ class _RemoteConfig {
     // @ts-ignore
     if (__DEVELOPMENT__ || process.env.REACT_APP_STAGING) {
       this._remoteConfig.settings.minimumFetchIntervalMillis = 10000; // default value is 12 hours
-      setLogLevel(this._remoteConfig, 'debug');
+      // setLogLevel(this._remoteConfig, 'debug');
     }
 
-    void fetchAndActivate(this._remoteConfig).then(() => {
-      runInAction(() => {
-        this.isInitialized = true;
-      });
-    });
+    void fetchAndActivate(this._remoteConfig).then(action(() => (this.isActivated = true)));
   }
 
   private _getConfig(): Record<string, Value> {
-    assert(this.isInitialized, 'Remote Config is not initialized');
     return getAll(this._remoteConfig);
   }
 
