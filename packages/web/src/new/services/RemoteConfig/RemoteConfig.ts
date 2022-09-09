@@ -1,6 +1,6 @@
 import { initializeApp } from 'firebase/app';
 import type { RemoteConfig as RemoteConfigType, Value } from 'firebase/remote-config';
-import { fetchAndActivate, getAll, getRemoteConfig } from 'firebase/remote-config';
+import { activate, fetchConfig, getAll, getRemoteConfig } from 'firebase/remote-config';
 import { action, makeObservable, observable } from 'mobx';
 
 import type { FeatureFlagsType } from 'new/services/FeatureFlags/defaultFlags';
@@ -31,7 +31,9 @@ class _RemoteConfig {
       // setLogLevel(this._remoteConfig, 'debug');
     }
 
-    void fetchAndActivate(this._remoteConfig).then(action(() => (this.isActivated = true)));
+    void activate(this._remoteConfig)
+      .then(action(() => (this.isActivated = true)))
+      .then(() => void fetchConfig(this._remoteConfig));
   }
 
   private _getConfig(): Record<string, Value> {

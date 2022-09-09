@@ -14,7 +14,7 @@ class _FeatureFlags {
       featureFlags: observable,
     });
 
-    void when(
+    when(
       () => RemoteConfig.isActivated,
       action(() => {
         this.featureFlags = RemoteConfig.featureFlags;
