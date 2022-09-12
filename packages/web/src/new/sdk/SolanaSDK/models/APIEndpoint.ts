@@ -1,36 +1,49 @@
 import type { Network } from '@saberhq/solana-contrib';
 import { clusterApiUrl } from '@solana/web3.js';
 
+import { RemoteConfig } from 'new/services/RemoteConfig';
+
+enum APIKeysNames {
+  rpcpool = 'rpcpool',
+}
+
+const API_KEYS: Record<APIKeysNames, string> = {
+  rpcpool: process.env.REACT_APP_RPCPOOL_API_KEY as string,
+};
+
+export type APIEndpointProps = {
+  address: string;
+  network: Network;
+  socketUrl?: string;
+  additionalQuery?: string;
+};
+
 export class APIEndpoint {
   address: string;
   network: Network;
   socketUrl: string;
   additionalQuery?: string;
 
-  constructor({
-    address,
-    network,
-    socketUrl,
-    additionalQuery,
-  }: {
-    address: string;
-    network: Network;
-    socketUrl?: string;
-    additionalQuery?: string;
-  }) {
+  private _apiKeyName?: APIKeysNames;
+
+  constructor({ address, network, socketUrl, additionalQuery }: APIEndpointProps) {
     this.address = address;
     this.network = network;
     this.socketUrl = socketUrl ?? address.replace('http', 'ws');
-    this.additionalQuery = additionalQuery;
+
+    const apiKeyName = additionalQuery as APIKeysNames;
+    this.additionalQuery = API_KEYS[apiKeyName] || additionalQuery;
+
+    this._apiKeyName = API_KEYS[apiKeyName] ? apiKeyName : undefined;
   }
 
   // TODO: defaults
-  static get defaultEndpoints(): APIEndpoint[] {
+  static get _defaultEndpoints(): APIEndpoint[] {
     const endpoints: APIEndpoint[] = [
       new APIEndpoint({
         address: 'https://p2p.rpcpool.com',
         network: 'mainnet-beta',
-        additionalQuery: process.env.REACT_APP_RPCPOOL_API_KEY,
+        additionalQuery: APIKeysNames.rpcpool,
       }),
       new APIEndpoint({
         address: 'https://solana-api.projectserum.com',
@@ -61,6 +74,19 @@ export class APIEndpoint {
     return endpoints;
   }
 
+  static get definedEndpoints(): APIEndpoint[] {
+    const definedEndpoints = RemoteConfig.definedEndpoints.map(
+      ({ urlString, network, additionalQuery }) =>
+        new APIEndpoint({ address: urlString, network: network as Network, additionalQuery }),
+    );
+
+    if (definedEndpoints.length) {
+      return definedEndpoints;
+    } else {
+      return APIEndpoint._defaultEndpoints;
+    }
+  }
+
   getURL(): string {
     let url = this.address;
     const query = this.additionalQuery;
@@ -68,5 +94,24 @@ export class APIEndpoint {
       url += '/' + query;
     }
     return url;
+  }
+
+  getSocketURL(): string {
+    let url = this.socketUrl;
+    const query = this.additionalQuery;
+    if (query) {
+      url += '/' + query;
+    }
+    return url;
+  }
+
+  toJSON(): APIEndpointProps {
+    const { address, network, socketUrl, additionalQuery, _apiKeyName } = this;
+    return {
+      address,
+      network,
+      socketUrl,
+      additionalQuery: _apiKeyName || additionalQuery,
+    };
   }
 }

@@ -26,7 +26,7 @@ export class AccountObservableService {
 
   constructor() {
     this._connection = new Connection(Defaults.apiEndpoint.getURL(), {
-      wsEndpoint: Defaults.apiEndpoint.socketUrl,
+      wsEndpoint: Defaults.apiEndpoint.getSocketURL(),
     });
 
     makeObservable(this, {

@@ -1,10 +1,8 @@
 import { autorun, makeObservable, observable, set, toJS } from 'mobx';
 
 import { Fiat } from 'new/app/models/Fiat';
-import { SolanaSDKPublicKey } from 'new/sdk/SolanaSDK';
+import { APIEndpoint, SolanaSDKPublicKey } from 'new/sdk/SolanaSDK';
 import type { CurrentPrice } from 'new/services/PriceAPIs/PricesService';
-
-import { APIEndpoint } from '../sdk/SolanaSDK/models/APIEndpoint';
 
 export enum Appearance {
   system = 'system',
@@ -42,7 +40,7 @@ interface DefaultsKeys {
 }
 
 class _Defaults implements DefaultsKeys {
-  apiEndpoint: APIEndpoint = APIEndpoint.defaultEndpoints[0]!;
+  apiEndpoint: APIEndpoint = APIEndpoint.definedEndpoints[0]!;
 
   walletName: { [pubkey in string]: string } = {};
 
