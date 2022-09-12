@@ -96,6 +96,15 @@ export class APIEndpoint {
     return url;
   }
 
+  getSocketURL(): string {
+    let url = this.socketUrl;
+    const query = this.additionalQuery;
+    if (query) {
+      url += '/' + query;
+    }
+    return url;
+  }
+
   toJSON(): APIEndpointProps {
     const { address, network, socketUrl, additionalQuery, _apiKeyName } = this;
     return {
