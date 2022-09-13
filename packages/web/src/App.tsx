@@ -13,6 +13,7 @@ import { ToastManager } from 'components/common/ToastManager';
 import { Main } from 'new/scenes/Main';
 import { Buy } from 'new/scenes/Main/Buy';
 import { Home } from 'new/scenes/Main/Home';
+import { Receive } from 'new/scenes/Main/Receive';
 import { Send } from 'new/scenes/Main/Send';
 import { Settings } from 'new/scenes/Main/Settings';
 import { SettingsNetwork } from 'new/scenes/Main/SettingsNetwork';
@@ -22,7 +23,7 @@ import { NotificationManager } from 'new/ui/managers/NotificationManager';
 import { ModalManager } from 'new/ui/modals/ModalManager';
 import { Auth } from 'pages/Auth';
 import { Landing } from 'pages/Landing';
-import { Receive } from 'pages/Receive';
+import { ReceiveOld } from 'pages/Receive';
 import { Swap } from 'pages/Swap';
 import { Wallet } from 'pages/Wallet';
 import { WalletSettings } from 'pages/WalletSettings';
@@ -53,6 +54,7 @@ const App: React.FC = observer(() => {
                   />
                   <AuthRequiredRoute path="/wallet/:publicKey" exact component={Wallet} />
                   <AuthRequiredRoute path="/buy/:symbol?" component={Buy} />
+                  <AuthRequiredRoute path="/receiveOld/(tokens)?" component={ReceiveOld} />
                   <AuthRequiredRoute path="/receive/(tokens)?" component={Receive} />
                   <AuthRequiredRoute path="/send/:publicKey/:status(result)" component={Send} />
                   <AuthRequiredRoute path="/send/:publicKey?" component={Send} />

@@ -12,6 +12,8 @@ export interface ModalServiceType {
   closeTopModal: () => void;
 }
 
+export type ModalPromise<T> = Promise<T | void> & { modalId: number };
+
 @singleton()
 export class ModalService implements ModalServiceType {
   modals: ModalState[] = [];
@@ -29,7 +31,7 @@ export class ModalService implements ModalServiceType {
   }
 
   // TODO: change order of types
-  openModal<T, S extends {}>(modalType: ModalType, props?: S): Promise<T | void> {
+  openModal<T, S extends {}>(modalType: ModalType, props?: S): ModalPromise<T> {
     ++this._modalIdCounter;
 
     this.modals.push({
@@ -43,9 +45,8 @@ export class ModalService implements ModalServiceType {
         modalId: this._modalIdCounter,
         resolve,
       });
-    });
+    }) as ModalPromise<T>;
 
-    // @ts-ignore
     promise.modalId = this._modalIdCounter;
 
     return promise;
