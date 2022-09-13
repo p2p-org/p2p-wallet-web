@@ -27,6 +27,7 @@ export const Swap: FC = observer(() => {
     >
       <Wrapper>
         <MainSwapView viewModel={viewModel} />
+        {viewModel.payingWallet?.token.symbol}
       </Wrapper>
     </WidgetPageWithBottom>
   );

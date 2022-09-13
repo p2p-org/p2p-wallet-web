@@ -28,6 +28,8 @@ export class RecipientsListViewModel extends SDListViewModel<Recipient> {
     super();
   }
 
+  protected override setDefaults() {}
+
   protected override onInitialize() {}
 
   protected override afterReactionsRemoved() {}

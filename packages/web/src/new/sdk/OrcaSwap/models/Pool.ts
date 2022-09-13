@@ -335,7 +335,7 @@ export class Pool {
   // Public methods
 
   /// Construct exchange
-  constructExchange({
+  async constructExchange({
     tokens,
     solanaClient,
     owner,
@@ -368,125 +368,122 @@ export class Pool {
     }
 
     // Create fromTokenAccount when needed
-    let prepareSourceRequest: Promise<AccountInstructions>;
+    let sourceAccountInstructions: AccountInstructions;
 
     if (fromMint.equals(SolanaSDKPublicKey.wrappedSOLMint) && owner.equals(fromTokenPubkeyNew)) {
-      prepareSourceRequest = solanaClient.prepareCreatingWSOLAccountAndCloseWhenDone(
+      sourceAccountInstructions = await solanaClient.prepareCreatingWSOLAccountAndCloseWhenDone(
         owner,
         amount,
         feePayer ?? owner,
       );
     } else {
-      prepareSourceRequest = Promise.resolve(
-        new AccountInstructions({ account: fromTokenPubkeyNew }),
-      );
+      sourceAccountInstructions = new AccountInstructions({ account: fromTokenPubkeyNew });
     }
 
     // If necessary, create a TokenAccount for the output token
-    let prepareDestinationRequest: Promise<AccountInstructions>;
+    let destinationAccountInstructions: AccountInstructions;
 
     // If destination token is Solana, create WSOL if needed
     if (toMint.equals(SolanaSDKPublicKey.wrappedSOLMint)) {
       const toTokenPubkeyNew = toTokenPubkey ? new PublicKey(toTokenPubkey) : null;
       if (toTokenPubkeyNew && !toTokenPubkeyNew?.equals(owner)) {
         // wrapped sol has already been created, just return it, then close later
-        prepareDestinationRequest = Promise.resolve(
-          new AccountInstructions({
-            account: toTokenPubkeyNew,
-            cleanupInstructions: [
-              Token.createCloseAccountInstruction(
-                SolanaSDKPublicKey.tokenProgramId,
-                toTokenPubkeyNew,
-                owner,
-                owner,
-                [],
-              ),
-            ],
-          }),
-        );
+        destinationAccountInstructions = new AccountInstructions({
+          account: toTokenPubkeyNew,
+          cleanupInstructions: [
+            Token.createCloseAccountInstruction(
+              SolanaSDKPublicKey.tokenProgramId,
+              toTokenPubkeyNew,
+              owner,
+              owner,
+              [],
+            ),
+          ],
+        });
       } else {
         // create wrapped sol
-        prepareDestinationRequest = solanaClient.prepareCreatingWSOLAccountAndCloseWhenDone(
-          owner,
-          ZERO,
-          feePayer ?? owner,
-        );
+        destinationAccountInstructions =
+          await solanaClient.prepareCreatingWSOLAccountAndCloseWhenDone(
+            owner,
+            ZERO,
+            feePayer ?? owner,
+          );
       }
     } else {
       // If destination is another token and has already been created
       const toTokenPubkeyNew = toTokenPubkey ? new PublicKey(toTokenPubkey) : null;
       if (toTokenPubkeyNew) {
-        prepareDestinationRequest = Promise.resolve(
-          new AccountInstructions({
-            account: toTokenPubkeyNew,
-          }),
-        );
+        destinationAccountInstructions = new AccountInstructions({
+          account: toTokenPubkeyNew,
+        });
       }
       // Create associated token address
       else {
-        prepareDestinationRequest = solanaClient.prepareForCreatingAssociatedTokenAccount(
-          owner,
-          toMint,
-          feePayer ?? owner,
-          false,
-        );
+        destinationAccountInstructions =
+          await solanaClient.prepareForCreatingAssociatedTokenAccount(
+            owner,
+            toMint,
+            feePayer ?? owner,
+            false,
+          );
       }
     }
 
     // Combine request
-    return Promise.all([prepareSourceRequest, prepareDestinationRequest]).then(
-      ([sourceAccountInstructions, destinationAccountInstructions]) => {
-        // form instructions
-        const instructions: TransactionInstruction[] = [];
-        const cleanupInstructions: TransactionInstruction[] = [];
-        let accountCreationFee: u64 = ZERO;
 
-        // source
-        instructions.push(...sourceAccountInstructions.instructions);
-        cleanupInstructions.push(...sourceAccountInstructions.cleanupInstructions);
-        if (!sourceAccountInstructions.instructions.length) {
-          accountCreationFee = new u64(accountCreationFee.add(minRentExemption));
-        }
+    // form instructions
+    const instructions: TransactionInstruction[] = [];
+    const cleanupInstructions: TransactionInstruction[] = [];
+    let accountCreationFee: u64 = ZERO;
 
-        // destination
-        instructions.push(...destinationAccountInstructions.instructions);
-        cleanupInstructions.push(...destinationAccountInstructions.cleanupInstructions);
-        if (!destinationAccountInstructions.instructions.length) {
-          accountCreationFee = new u64(accountCreationFee.add(minRentExemption));
-        }
+    // source
+    instructions.push(...sourceAccountInstructions.instructions);
+    cleanupInstructions.push(...sourceAccountInstructions.cleanupInstructions);
+    if (!sourceAccountInstructions.instructions.length) {
+      accountCreationFee = new u64(accountCreationFee.add(minRentExemption));
+    }
 
-        // swap instructions
-        const minAmountOut = this.getMinimumAmountOut(amount, slippage);
-        // TODO: check
-        // if (!minAmountOut) {
-        //   throw OrcaSwapError.couldNotEstimatedMinimumOutAmount();
-        // }
+    // destination
+    instructions.push(...destinationAccountInstructions.instructions);
+    cleanupInstructions.push(...destinationAccountInstructions.cleanupInstructions);
+    if (!destinationAccountInstructions.instructions.length) {
+      accountCreationFee = new u64(accountCreationFee.add(minRentExemption));
+    }
 
-        const swapInstruction = this.createSwapInstruction({
-          userTransferAuthorityPubkey: owner,
-          sourceTokenAddress: sourceAccountInstructions.account,
-          destinationTokenAddress: destinationAccountInstructions.account,
-          amountIn: amount,
-          minAmountOut,
-        });
+    // swap instructions
+    let minAmountOut;
+    try {
+      minAmountOut = this.getMinimumAmountOut(amount, slippage);
+    } catch {
+      // ignore
+    }
+    if (!minAmountOut) {
+      throw OrcaSwapError.couldNotEstimatedMinimumOutAmount();
+    }
 
-        instructions.push(swapInstruction);
+    const swapInstruction = this.createSwapInstruction({
+      userTransferAuthorityPubkey: owner,
+      sourceTokenAddress: sourceAccountInstructions.account,
+      destinationTokenAddress: destinationAccountInstructions.account,
+      amountIn: amount,
+      minAmountOut,
+    });
 
-        const signers: Signer[] = [];
-        signers.push(...sourceAccountInstructions.signers);
-        signers.push(...destinationAccountInstructions.signers);
+    instructions.push(swapInstruction);
 
-        return [
-          new AccountInstructions({
-            account: destinationAccountInstructions.account,
-            instructions,
-            cleanupInstructions,
-            signers,
-          }),
-          accountCreationFee,
-        ];
-      },
-    );
+    const signers: Signer[] = [];
+    signers.push(...sourceAccountInstructions.signers);
+    signers.push(...destinationAccountInstructions.signers);
+
+    return [
+      new AccountInstructions({
+        account: destinationAccountInstructions.account,
+        instructions,
+        cleanupInstructions,
+        signers,
+      }),
+      accountCreationFee,
+    ];
   }
 
   // Helpers

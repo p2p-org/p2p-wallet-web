@@ -2,8 +2,6 @@ import type { u64 } from '@solana/spl-token';
 import type { Account, TransactionInstruction } from '@solana/web3.js';
 import { Transaction } from '@solana/web3.js';
 
-import type { BuildContext } from 'new/sdk/FeeRelayer';
-import { FeeRelayerError } from 'new/sdk/FeeRelayer';
 import {
   calculateTransactionFee,
   FeeAmount,
@@ -11,6 +9,8 @@ import {
   PreparedTransaction,
 } from 'new/sdk/SolanaSDK';
 
+import { FeeRelayerError } from '../../models';
+import type { BuildContext } from './BuildContext';
 import {
   buildSwapData,
   checkClosingAccount,
@@ -108,16 +108,12 @@ export class SwapTransactionBuilder {
     transaction.recentBlockhash = blockhash;
     transaction.feePayer = context.feeRelayerContext.feePayerAddress;
 
-    console.log(100, signers);
     if (signers.length > 0) {
       transaction.partialSign(...signers);
     }
-    console.log(111);
     // const signedTransaction = await context.solanaApiClient.provider.wallet.signTransaction(
     //   transaction,
     // );
-
-    console.log(122, transaction, transaction);
 
     // calculate fee first
     const expectedFee = new FeeAmount({

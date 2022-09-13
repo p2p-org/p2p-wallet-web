@@ -285,7 +285,10 @@ export class SendService implements SendServiceType {
         break;
       }
       case Network.bitcoin: {
-        request = this._renVMBurnAndReleaseService.burn();
+        request = this._renVMBurnAndReleaseService.burnAndRelease({
+          recipient: receiver,
+          amount,
+        });
         break;
       }
     }

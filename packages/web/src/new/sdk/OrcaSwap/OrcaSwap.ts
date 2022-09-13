@@ -123,8 +123,8 @@ export type OrcaSwapType = {
 
 export class OrcaSwap implements OrcaSwapType {
   // Properties
-  protected _apiClient: APIClient;
-  protected _solanaClient: OrcaSwapSolanaClient;
+  protected _apiClient: APIClient; // TODO: make OrcaSwapAPIClient
+  protected _solanaClient: OrcaSwapSolanaClient; // TODO: make SolanaAPIClient
 
   private _info: SwapInfo | null = null;
   private _balancesCache: BalancesCache = new BalancesCache();
@@ -157,7 +157,7 @@ export class OrcaSwap implements OrcaSwapType {
 
     // find all available routes
     const routes = _findAllAvailableRoutes(tokens, pools);
-    const tokenNames = [...tokens].reduce((result, token) => {
+    const tokenNames = Array.from(tokens).reduce((result, token) => {
       result.set(token[1].mint, token[0]);
       return result;
     }, new Map<string, string>());
@@ -237,7 +237,6 @@ export class OrcaSwap implements OrcaSwapType {
     if (!fromTokenName || !toTokenName || !currentRoutes) {
       return [];
     }
-
     const poolsPairs: PoolsPair[] = [];
     const group = await Promise.all(
       currentRoutes.map((route) => {
@@ -996,7 +995,7 @@ export class OrcaSwap implements OrcaSwapType {
 }
 
 function _findAllAvailableRoutes(tokens: Map<string, TokenValue>, pools: Pools): Routes {
-  const filteredTokens = [...tokens]
+  const filteredTokens = Array.from(tokens)
     .filter(([, token]) => token.poolToken !== true)
     .map(([tokenName]) => tokenName);
 
@@ -1065,7 +1064,7 @@ function _getRoutes(tokenA: string, tokenB: string, pools: Pools): Route[] {
 
   // Find all pools that contain the same tokens.
   // Checking tokenAName and tokenBName will find Stable pools.
-  [...pools].forEach(([poolId, poolConfig]) => {
+  pools.forEach((poolConfig, poolId) => {
     if (
       (poolConfig.tokenAName.toString() === tokenA &&
         poolConfig.tokenBName.toString() === tokenB) ||
@@ -1076,7 +1075,7 @@ function _getRoutes(tokenA: string, tokenB: string, pools: Pools): Route[] {
   });
 
   // Find all pools that contain the first token but not the second
-  const firstLegPools = [...pools]
+  const firstLegPools = Array.from(pools)
     .filter(
       ([, poolConfig]) =>
         (poolConfig.tokenAName.toString() === tokenA &&
@@ -1084,7 +1083,7 @@ function _getRoutes(tokenA: string, tokenB: string, pools: Pools): Route[] {
         (poolConfig.tokenBName.toString() === tokenA &&
           poolConfig.tokenAName.toString() !== tokenB),
     )
-    .map<[string, string]>(([poolId, poolConfig]) => [
+    .map(([poolId, poolConfig]) => [
       poolId,
       poolConfig.tokenBName.toString() === tokenA
         ? poolConfig.tokenAName.toString()
@@ -1093,14 +1092,14 @@ function _getRoutes(tokenA: string, tokenB: string, pools: Pools): Route[] {
 
   // Find all routes that can include firstLegPool and a second pool.
   firstLegPools.forEach(([firstLegPoolId, intermediateTokenName]) => {
-    [...pools].forEach(([secondLegPoolId, poolConfig]) => {
+    pools.forEach((poolConfig, secondLegPoolId) => {
       if (
         (poolConfig.tokenAName.toString() === intermediateTokenName &&
           poolConfig.tokenBName.toString() === tokenB) ||
         (poolConfig.tokenBName.toString() === intermediateTokenName &&
           poolConfig.tokenAName.toString() === tokenB)
       ) {
-        routes.push([firstLegPoolId, secondLegPoolId]);
+        routes.push([firstLegPoolId!, secondLegPoolId]);
       }
     });
   });

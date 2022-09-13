@@ -5,22 +5,6 @@ import { Token, u64 } from '@solana/spl-token';
 import type { TransactionInstruction } from '@solana/web3.js';
 import { Account, PublicKey, SystemProgram, Transaction } from '@solana/web3.js';
 
-import type {
-  FeeRelayerCalculator,
-  FeeRelayerContext,
-  StatsInfoDeviceType,
-  StatsInfoOperationType,
-} from 'new/sdk/FeeRelayer';
-import {
-  DefaultFeeRelayerCalculator,
-  FeeRelayerConstants,
-  getSignature,
-  TransitTokenAccountAnalysator,
-} from 'new/sdk/FeeRelayer';
-import type { FeeRelayerAPIClientType } from 'new/sdk/FeeRelayer/apiClient/FeeRelayerAPIClient';
-import { FeeRelayerError } from 'new/sdk/FeeRelayer/models/FeeRelayerError';
-import { FeeRelayerRequestType } from 'new/sdk/FeeRelayer/models/FeeRelayerRequestType';
-import { RelayProgram } from 'new/sdk/FeeRelayer/relayProgram';
 import type * as OrcaSwap from 'new/sdk/OrcaSwap';
 import type { TransactionID } from 'new/sdk/SolanaSDK';
 import * as SolanaSDK from 'new/sdk/SolanaSDK';
@@ -30,11 +14,20 @@ import {
   SolanaSDKPublicKey,
 } from 'new/sdk/SolanaSDK';
 
-import type { TokenAccount } from '../models';
+import type { FeeRelayerAPIClientType } from '../apiClient';
+import { getSignature } from '../helpers';
+import type { StatsInfoDeviceType, StatsInfoOperationType, TokenAccount } from '../models';
+import { FeeRelayerError, FeeRelayerRequestType } from '../models';
+import { RelayProgram } from '../relayProgram';
+import { TransitTokenAccountAnalysator } from '../swap';
+import { getSwapData } from '../swap/transactionBuilder/checking';
+import type { FeeRelayerCalculator } from './FeeRelayerCalculator';
+import { DefaultFeeRelayerCalculator } from './FeeRelayerCalculator';
+import { FeeRelayerConstants } from './FeeRelayerConstants';
+import type { FeeRelayerContext } from './FeeRelayerContext';
 import type { FeeRelayerRelaySwapType, RelayAccountStatus, TopUpPreparedParams } from './helpers';
 import {
   DirectSwapData,
-  getSwapData,
   RelayAccountStatusType,
   RelayTransactionParam,
   SwapData,
@@ -216,6 +209,7 @@ export class FeeRelayer implements FeeRelayerType {
 
       return trx;
     } catch (error) {
+      console.error(error);
       if (res) {
         throw FeeRelayerError.topUpSuccessButTransactionThrows();
       }
@@ -625,13 +619,12 @@ export class FeeRelayer implements FeeRelayerType {
       accountBalances: accountCreationFee,
     });
 
-    console.log('_prepareForTopUp');
     const signedTransaction = await this._solanaApiClient.provider.wallet.signTransaction(
       transaction,
     );
 
     // resign transaction
-    const signers: Account[] = [];
+    const signers: Account[] = []; // there was account
     const transferAuthority = swap.transferAuthorityAccount;
     if (transferAuthority) {
       signers.push(transferAuthority);
@@ -639,6 +632,11 @@ export class FeeRelayer implements FeeRelayerType {
     if (signers.length > 0) {
       signedTransaction.partialSign(...signers);
     }
+
+    console.log(
+      111111,
+      signedTransaction.compileMessage().accountKeys.map((p) => p.toString()),
+    );
 
     return {
       swapData: swap.swapData,
@@ -795,7 +793,6 @@ export class FeeRelayer implements FeeRelayerType {
     // transfer sol back to feerelayer's feePayer
     // TODO: check references
     const preparedTransactionNew = preparedTransaction.clone();
-    console.log(444, preparedTransaction, preparedTransactionNew);
     if (paybackFee.gtn(0)) {
       if (
         payingFeeToken?.mint.equals(SolanaSDKPublicKey.wrappedSOLMint) &&
@@ -819,8 +816,6 @@ export class FeeRelayer implements FeeRelayerType {
         );
       }
     }
-
-    console.log(888, preparedTransactionNew.transaction);
 
     preparedTransactionNew.transaction =
       await this._solanaApiClient.provider.wallet.signTransaction(

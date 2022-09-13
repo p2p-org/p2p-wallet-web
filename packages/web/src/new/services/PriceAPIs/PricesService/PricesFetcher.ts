@@ -9,7 +9,7 @@ export abstract class PricesFetcher {
   }: {
     coins: Token[];
     fiat: string;
-  }): Promise<{ [key in string]: CurrentPrice | null }>;
+  }): Promise<Record<string, CurrentPrice | null>>;
 
   send<T>({ path }: { path: string }): Promise<T> {
     Logger.log(`${this.endpoint}${path}`, LogEvent.request, 'getPrices');

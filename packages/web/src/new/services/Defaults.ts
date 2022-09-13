@@ -27,7 +27,7 @@ function makeLocalStorage<T>(_this: { fromJSON(json: T): T }, name: string) {
 interface DefaultsKeys {
   apiEndpoint: APIEndpoint;
 
-  walletName: { [pubkey in string]: string };
+  walletName: Record<string, string>;
 
   appearance: Appearance;
   slippage: number;
@@ -35,7 +35,7 @@ interface DefaultsKeys {
   hiddenWalletPubkey: string[];
   unhiddenWalletPubkey: string[];
   hideZeroBalances: boolean;
-  prices: { [key in string]: CurrentPrice };
+  prices: Record<string, CurrentPrice>;
   payingTokenMint: string;
 
   useFreeTransactions: boolean;
@@ -44,7 +44,7 @@ interface DefaultsKeys {
 class _Defaults implements DefaultsKeys {
   apiEndpoint: APIEndpoint = APIEndpoint.defaultEndpoints[0]!;
 
-  walletName: { [pubkey in string]: string } = {};
+  walletName: Record<string, string> = {};
 
   appearance: Appearance = Appearance.system;
   slippage = 0.01;
@@ -52,7 +52,7 @@ class _Defaults implements DefaultsKeys {
   hiddenWalletPubkey: string[] = [];
   unhiddenWalletPubkey: string[] = [];
   hideZeroBalances = true;
-  prices: { [key in string]: CurrentPrice } = {};
+  prices: Record<string, CurrentPrice> = {};
   payingTokenMint: string = SolanaSDKPublicKey.wrappedSOLMint.toString();
 
   useFreeTransactions = false;

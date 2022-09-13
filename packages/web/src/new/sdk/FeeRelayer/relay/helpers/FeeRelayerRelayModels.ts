@@ -2,12 +2,12 @@ import { u64 } from '@solana/spl-token';
 import type { PublicKey } from '@solana/web3.js';
 import bs58 from 'bs58';
 
-import type { StatsInfoDeviceType } from 'new/sdk/FeeRelayer';
-import { StatsInfo, StatsInfoOperationType, UsageStatus } from 'new/sdk/FeeRelayer';
-import { FeeRelayerError } from 'new/sdk/FeeRelayer/models/FeeRelayerError';
-import type { PoolsPair } from 'new/sdk/OrcaSwap/models/Pools';
+import type { PoolsPair } from 'new/sdk/OrcaSwap';
 import type * as SolanaSDK from 'new/sdk/SolanaSDK';
 import type { Lamports } from 'new/sdk/SolanaSDK';
+
+import type { StatsInfoDeviceType } from '../../models';
+import { FeeRelayerError, StatsInfo, StatsInfoOperationType, UsageStatus } from '../../models';
 
 export type FeeRelayerRelaySwapType = {};
 
@@ -344,14 +344,12 @@ export class RelayTransactionParam {
       });
     });
 
-    const signatures: { [key in string]: string } = {};
+    const signatures: Record<string, string> = {};
 
     // extract publicKeys from signers and add owner
-    const publicKeys: PublicKey[] = [preparedTransaction.owner];
-    for (const signer of preparedTransaction.signers) {
-      publicKeys.push(signer.publicKey);
-    }
-
+    const signers = preparedTransaction.signers.map((signer) => signer.publicKey);
+    // owner first
+    const publicKeys: PublicKey[] = [preparedTransaction.owner].concat(signers);
     for (const publicKey of publicKeys) {
       const idx = this.pubkeys.findIndex((pubkey) => pubkey === publicKey.toString());
       if (idx) {
@@ -576,7 +574,7 @@ export class SwapTransactionSignatures {
   toJSON() {
     return {
       user_authority_signature: this.userAuthoritySignature,
-      transfer_authority_signature: this.transferAuthoritySignature,
+      transfer_authority_signature: this.transferAuthoritySignature ?? undefined,
     };
   }
 }

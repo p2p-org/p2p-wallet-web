@@ -1,10 +1,11 @@
 import type { u64 } from '@solana/spl-token';
 import type { Account, PublicKey, TransactionInstruction } from '@solana/web3.js';
 
-import type { TokenAccount } from 'new/sdk/FeeRelayer';
-import type { FeeRelayerContext, FeeRelayerRelaySolanaClient } from 'new/sdk/FeeRelayer/relay';
 import type { OrcaSwap, PoolsPair } from 'new/sdk/OrcaSwap';
 import type { Lamports, PreparedTransaction } from 'new/sdk/SolanaSDK';
+
+import type { TokenAccount } from '../../models';
+import type { FeeRelayerContext, FeeRelayerRelaySolanaClient } from '../../relay';
 
 export interface BuildContext {
   feeRelayerContext: FeeRelayerContext;

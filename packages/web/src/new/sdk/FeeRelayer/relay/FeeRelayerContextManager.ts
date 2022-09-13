@@ -1,8 +1,12 @@
-import { AccountLayout } from '@solana/spl-token';
 import { PublicKey } from '@solana/web3.js';
 
-import type { FeeRelayerAPIClientType, FeeRelayerRelaySolanaClient } from 'new/sdk/FeeRelayer';
-import { FeeRelayerContext, FeeRelayerError, RelayProgram } from 'new/sdk/FeeRelayer';
+import { AccountInfo } from 'new/sdk/SolanaSDK';
+
+import type { FeeRelayerAPIClientType } from '../apiClient';
+import { FeeRelayerError } from '../models';
+import { RelayProgram } from '../relayProgram';
+import { FeeRelayerContext } from './FeeRelayerContext';
+import type { FeeRelayerRelaySolanaClient } from './helpers';
 
 interface FeeRelayerContextManagerType {
   getCurrentContext(): Promise<FeeRelayerContext>;
@@ -64,7 +68,7 @@ export class FeeRelayerContextManager implements FeeRelayerContextManagerType {
       relayAccountStatus,
       usageStatus,
     ] = await Promise.all([
-      this._solanaAPIClient.getMinimumBalanceForRentExemption(AccountLayout.span), // 165
+      this._solanaAPIClient.getMinimumBalanceForRentExemption(AccountInfo.span), // 165
       this._solanaAPIClient.getMinimumBalanceForRentExemption(0),
       this._solanaAPIClient.getLamportsPerSignature(),
       this._feeRelayerAPIClient.getFeePayerPubkey(),

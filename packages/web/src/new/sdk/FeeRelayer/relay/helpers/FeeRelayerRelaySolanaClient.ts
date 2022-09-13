@@ -9,7 +9,6 @@ import type {
 import { injectable } from 'tsyringe';
 
 import { SolanaModel } from 'new/models/SolanaModel';
-import { FeeRelayerError } from 'new/sdk/FeeRelayer';
 import type * as SolanaSDK from 'new/sdk/SolanaSDK';
 import type { FeeCalculator } from 'new/sdk/SolanaSDK';
 import {
@@ -20,6 +19,7 @@ import {
 } from 'new/sdk/SolanaSDK';
 import { Defaults } from 'new/services/Defaults';
 
+import { FeeRelayerError } from '../../models';
 import * as Relay from '../index';
 
 interface FeeRelayerRelaySolanaClientType {

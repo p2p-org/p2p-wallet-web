@@ -10,11 +10,11 @@ import type { CurrentPrice } from 'new/services/PriceAPIs/PricesService/PricesFe
 import { CoingeckoPricesFetcher } from '../Coingecko';
 import { PricesStorage } from './PricesStorage';
 
-class PricesLoadableRelay extends LoadableRelay<{ [key in string]: CurrentPrice }> {
+class PricesLoadableRelay extends LoadableRelay<Record<string, CurrentPrice>> {
   override map(
-    oldData: { [key in string]: CurrentPrice } | null,
-    newData: { [key in string]: CurrentPrice },
-  ): { [key in string]: CurrentPrice } {
+    oldData: Record<string, CurrentPrice> | null,
+    newData: Record<string, CurrentPrice>,
+  ): Record<string, CurrentPrice> {
     const data = oldData;
     if (!data) {
       return newData;
@@ -29,7 +29,7 @@ class PricesLoadableRelay extends LoadableRelay<{ [key in string]: CurrentPrice 
 
 export interface PricesServiceType {
   // Observables
-  currentPrices: LoadableRelay<{ [key in string]: CurrentPrice }>;
+  currentPrices: LoadableRelay<Record<string, CurrentPrice>>;
 
   // Getters
   getWatchList(): Set<Token>;
@@ -82,7 +82,7 @@ export class PricesService implements PricesServiceType {
 
   private async _getCurrentPricesRequest(
     tokens: Token[] | null = null,
-  ): Promise<{ [key in string]: CurrentPrice }> {
+  ): Promise<Record<string, CurrentPrice>> {
     let coins = tokens ?? Array.from(this._watchList);
     coins = uniq(coins); // .filter((token) => !token.includes('-') && !token.includes('/'));
 
@@ -107,7 +107,7 @@ export class PricesService implements PricesServiceType {
 
   //
 
-  get currentPrices(): LoadableRelay<{ [key in string]: CurrentPrice }> {
+  get currentPrices(): LoadableRelay<Record<string, CurrentPrice>> {
     return this._currentPrices;
   }
 
