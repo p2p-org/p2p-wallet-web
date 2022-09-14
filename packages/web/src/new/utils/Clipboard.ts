@@ -1,7 +1,27 @@
 import { ToastManager } from 'components/common/ToastManager';
+import { browserName, BrowserNames } from 'new/utils/UserAgent';
+
+export const isImageCopyAvailable = browserName !== BrowserNames.FIREFOX;
+
+export const copyStringToClipboard = async (
+  str: string,
+  callback: () => void,
+  errorCallback?: (err: Error) => void,
+) => {
+  try {
+    await navigator.clipboard.writeText(str);
+    callback && callback();
+  } catch (error) {
+    errorCallback && errorCallback(error as Error);
+  }
+};
 
 // Promise is needed for Safari. But Chrome also can work with such flow
-export const setToClipboard = async (qrElement: HTMLCanvasElement, callback: () => void) => {
+export const copyImageToClipboard = async (
+  qrElement: HTMLCanvasElement,
+  callback: () => void,
+  errorCallback?: (err: Error) => void,
+) => {
   try {
     const data = [
       new ClipboardItem({
@@ -18,10 +38,8 @@ export const setToClipboard = async (qrElement: HTMLCanvasElement, callback: () 
     ];
     await navigator.clipboard.write(data);
 
-    if (typeof callback === 'function') {
-      callback();
-    }
+    callback && callback();
   } catch (error) {
-    ToastManager.error((error as Error).message);
+    errorCallback && errorCallback(error as Error);
   }
 };

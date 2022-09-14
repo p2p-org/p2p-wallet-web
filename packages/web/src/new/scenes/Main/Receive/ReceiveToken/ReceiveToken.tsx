@@ -4,11 +4,11 @@ import { NavLink } from 'react-router-dom';
 import { styled } from '@linaria/react';
 import { theme } from '@p2p-wallet-web/ui';
 
-import { ReceiveBitcoin } from 'components/pages/receive/ReceiveWidget/ReceiveBitcoin';
-import { ReceiveSolana } from 'components/pages/receive/ReceiveWidget/ReceiveSolana';
 import { Content } from 'new/scenes/Main/Receive/common/styled';
 import type { ReceiveViewModel } from 'new/scenes/Main/Receive/Receive.ViewModel';
+import { ReceiveBitcoin } from 'new/scenes/Main/Receive/ReceiveBitcoin';
 import { NetworkSelect } from 'new/scenes/Main/Receive/ReceiveToken/NetworkSelect';
+import { ReceiveSolana } from 'new/scenes/Main/Receive/Solana';
 import { Layout } from 'new/ui/components/common/Layout';
 import { WidgetPage } from 'new/ui/components/common/WidgetPage';
 

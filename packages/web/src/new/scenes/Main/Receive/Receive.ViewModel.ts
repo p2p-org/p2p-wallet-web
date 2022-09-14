@@ -1,5 +1,5 @@
 import { action, makeObservable, observable } from 'mobx';
-import { delay, inject, singleton } from 'tsyringe';
+import { singleton } from 'tsyringe';
 
 import { ViewModel } from 'new/core/viewmodels/ViewModel';
 import { SupportedTokensViewModel } from 'new/scenes/Main/Receive/SupportedTokens/SupportedTokens.ViewModel';
@@ -63,8 +63,7 @@ export class ReceiveViewModel extends ViewModel {
     private _walletsRepository: WalletsRepository,
     private _solanaSDK: SolanaService,
     private _modalService: ModalService,
-    @inject(delay(() => SupportedTokensViewModel))
-    public supportedTokensViewModel: Readonly<SupportedTokensViewModel>,
+    public supportedTokensViewModel: SupportedTokensViewModel,
   ) {
     super();
 
@@ -103,9 +102,9 @@ export class ReceiveViewModel extends ViewModel {
 
   switchTokenType(tokenType: TokenType): void {
     this.tokenType = tokenType;
-    if (tokenType.type === 'btc') {
-      // receiveBitcoinViewModel.acceptConditionAndLoadAddress();
-    }
+    /*if (tokenType.type === 'btc') {
+      this._receiveBitcoinViewModel.acceptConditionAndLoadAddress();
+    }*/
   }
 
   openReceiveBitcoinModal<T>(): ModalPromise<T> {
