@@ -1,40 +1,24 @@
 import type { FC } from 'react';
+import { Route, useRouteMatch } from 'react-router';
+import { Switch } from 'react-router-dom';
 
-import { observer } from 'mobx-react-lite';
-
-import { ReceiveBitcoin } from 'components/pages/receive/ReceiveWidget/ReceiveBitcoin';
-import { ReceiveSolana } from 'components/pages/receive/ReceiveWidget/ReceiveSolana';
 import { useViewModel } from 'new/core/viewmodels/useViewModel';
-import { Content } from 'new/scenes/Main/Receive/common/styled';
-import { NetworkSelect } from 'new/scenes/Main/Receive/NetworkSelect';
 import { ReceiveViewModel } from 'new/scenes/Main/Receive/Receive.ViewModel';
-import { Layout } from 'new/ui/components/common/Layout';
-import { WidgetPage } from 'new/ui/components/common/WidgetPage';
+import { ReceiveToken } from 'new/scenes/Main/Receive/ReceiveToken';
+import { SupportedTokens } from 'new/scenes/Main/Receive/SupportedTokens';
 
-export const Receive: FC = observer(() => {
+export const Receive: FC = () => {
+  const match = useRouteMatch();
   const viewModel = useViewModel(ReceiveViewModel);
-  const isTokenListAvailable = viewModel.tokenType.isSolana();
-
-  const renderSourceNetworkReceivePanel = () => {
-    if (viewModel.tokenType.isSolana()) {
-      return <ReceiveSolana />;
-    } else {
-      return <ReceiveBitcoin />;
-    }
-  };
 
   return (
-    <Layout>
-      <WidgetPage title="Receive" icon="bottom">
-        <Content>
-          <NetworkSelect viewModel={viewModel} />{' '}
-          {/*isTokenListAvailable ? (
-          <WhatCanReceiveLink to="/receive/tokens">What tokens can I receive?</WhatCanReceiveLink>
-        ) : undefined*/}
-        </Content>
-
-        {renderSourceNetworkReceivePanel()}
-      </WidgetPage>
-    </Layout>
+    <Switch>
+      <Route path={`${match.path}/tokens`}>
+        <SupportedTokens viewModel={viewModel.supportedTokensViewModel} />
+      </Route>
+      <Route path={match.path} exact>
+        <ReceiveToken viewModel={viewModel} />
+      </Route>
+    </Switch>
   );
-});
+};

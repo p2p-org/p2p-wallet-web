@@ -1,7 +1,8 @@
 import { action, makeObservable, observable } from 'mobx';
-import { singleton } from 'tsyringe';
+import { delay, inject, singleton } from 'tsyringe';
 
 import { ViewModel } from 'new/core/viewmodels/ViewModel';
+import { SupportedTokensViewModel } from 'new/scenes/Main/Receive/SupportedTokens/SupportedTokens.ViewModel';
 import type { Token } from 'new/sdk/SolanaSDK';
 import { SolanaSDKPublicKey } from 'new/sdk/SolanaSDK';
 import type { ModalPromise } from 'new/services/ModalService';
@@ -60,8 +61,10 @@ export class ReceiveViewModel extends ViewModel {
   constructor(
     private _notificationService: NotificationService,
     private _walletsRepository: WalletsRepository,
-    private _solanaService: SolanaService,
+    private _solanaSDK: SolanaService,
     private _modalService: ModalService,
+    @inject(delay(() => SupportedTokensViewModel))
+    public supportedTokensViewModel: Readonly<SupportedTokensViewModel>,
   ) {
     super();
 
@@ -73,11 +76,11 @@ export class ReceiveViewModel extends ViewModel {
       switchTokenType: action,
     });
 
-    void this._solanaService
+    void this._solanaSDK
       .getToken(TokenType.solana.mint)
       .then(action((token) => (this.solanaToken = token)));
 
-    void this._solanaService
+    void this._solanaSDK
       .getToken(TokenType.btc.mint)
       .then(action((token) => (this.btcToken = token)));
   }
@@ -86,9 +89,13 @@ export class ReceiveViewModel extends ViewModel {
     this.tokenType = TokenType.solana;
   }
 
-  protected override onInitialize() {}
+  protected override onInitialize() {
+    this.supportedTokensViewModel.initialize();
+  }
 
-  protected override afterReactionsRemoved() {}
+  protected override afterReactionsRemoved() {
+    this.supportedTokensViewModel.end();
+  }
 
   isRenBtcCreated(): boolean {
     return this._walletsRepository.getWallets().some((wallet) => wallet.token.isRenBTC);
@@ -96,6 +103,9 @@ export class ReceiveViewModel extends ViewModel {
 
   switchTokenType(tokenType: TokenType): void {
     this.tokenType = tokenType;
+    if (tokenType.type === 'btc') {
+      // receiveBitcoinViewModel.acceptConditionAndLoadAddress();
+    }
   }
 
   openReceiveBitcoinModal<T>(): ModalPromise<T> {

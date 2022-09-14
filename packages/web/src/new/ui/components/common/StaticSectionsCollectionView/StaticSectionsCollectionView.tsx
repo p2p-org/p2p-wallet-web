@@ -16,6 +16,7 @@ interface Props<T> {
   renderItem: (item: T, index: number) => React.ReactNode;
   renderEmpty?: (key: string) => React.ReactNode;
   customFilter?: (item: T) => boolean;
+  transformer?: (items: T[]) => T[];
   className?: string;
 }
 
@@ -27,6 +28,7 @@ export const StaticSectionsCollectionView = observer(
     renderItem,
     renderEmpty,
     customFilter,
+    transformer,
     className,
   }: Props<T>) => {
     const items = useMemo(
@@ -36,6 +38,10 @@ export const StaticSectionsCollectionView = observer(
 
           if (customFilter) {
             _items = _items.filter(customFilter);
+          }
+
+          if (transformer) {
+            _items = transformer(_items);
           }
 
           const collectionViewItems = _items.map(
