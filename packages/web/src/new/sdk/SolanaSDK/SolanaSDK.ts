@@ -271,7 +271,10 @@ export class SolanaSDK {
     const blockhash = await this.getRecentBlockhash();
     transaction.recentBlockhash = blockhash;
 
-    const signedTransaction = await this.provider.wallet.signTransaction(transaction);
+    let signedTransaction = transaction;
+    if (owner) {
+      signedTransaction = await this.provider.wallet.signTransaction(transaction);
+    }
 
     // resign transaction
     if (signers.length > 0) {

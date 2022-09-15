@@ -117,6 +117,8 @@ export class RenBTCStatusService {
       instructions: [instruction],
       feePayer,
     });
+    // hack
+    preparedTransaction.owner = owner;
 
     await this._feeRelayerContextManager.update();
 

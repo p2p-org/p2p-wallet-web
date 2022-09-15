@@ -349,7 +349,9 @@ export class RelayTransactionParam {
     // extract publicKeys from signers and add owner
     const signers = preparedTransaction.signers.map((signer) => signer.publicKey);
     // owner first
-    const publicKeys: PublicKey[] = [preparedTransaction.owner].concat(signers);
+    const publicKeys: PublicKey[] = (
+      preparedTransaction.owner ? [preparedTransaction.owner] : []
+    ).concat(signers);
     for (const publicKey of publicKeys) {
       const idx = this.pubkeys.findIndex((pubkey) => pubkey === publicKey.toString());
       if (idx) {
