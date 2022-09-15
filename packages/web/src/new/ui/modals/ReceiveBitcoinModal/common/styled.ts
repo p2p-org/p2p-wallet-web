@@ -20,3 +20,10 @@ export const List = styled.ul`
 `;
 
 export const Row = styled.li``;
+
+export const LoaderWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 100%;
+`;

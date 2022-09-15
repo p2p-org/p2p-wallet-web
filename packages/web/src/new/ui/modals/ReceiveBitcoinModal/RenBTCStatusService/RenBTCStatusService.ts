@@ -48,21 +48,15 @@ export class RenBTCStatusService {
   }
 
   async load() {
-    try {
-      await this._orcaSwap.load();
+    await this._orcaSwap.load();
 
-      this._minRentExemption = await this._feeRelayerAPIClient.getMinimumBalanceForRentExemption(
-        AccountInfo.span,
-      );
+    this._minRentExemption = await this._feeRelayerAPIClient.getMinimumBalanceForRentExemption(
+      AccountInfo.span,
+    );
 
-      this._lamportsPerSignature = await this._feeRelayerAPIClient.getLamportsPerSignature();
+    this._lamportsPerSignature = await this._feeRelayerAPIClient.getLamportsPerSignature();
 
-      this._rentExemptMinimum = await this._feeRelayerAPIClient.getMinimumBalanceForRentExemption(
-        0,
-      );
-    } catch (error) {
-      console.error((error as Error).message);
-    }
+    this._rentExemptMinimum = await this._feeRelayerAPIClient.getMinimumBalanceForRentExemption(0);
   }
 
   async getPayableWallets(): Promise<Wallet[]> {
@@ -186,10 +180,6 @@ export class RenBTCStatusService {
       feeInSOL: feeInSOL,
       payingFeeTokenMint: pubkey,
     });
-
-    if (feeInToken.total) {
-      console.error('Could not calculating fees');
-    }
 
     return feeInToken.total;
   }

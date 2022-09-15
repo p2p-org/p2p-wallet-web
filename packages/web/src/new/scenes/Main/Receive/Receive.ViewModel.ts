@@ -7,7 +7,6 @@ import type { Token } from 'new/sdk/SolanaSDK';
 import { SolanaSDKPublicKey } from 'new/sdk/SolanaSDK';
 import type { ModalPromise } from 'new/services/ModalService';
 import { ModalService, ModalType } from 'new/services/ModalService';
-import { NotificationService } from 'new/services/NotificationService';
 import { WalletsRepository } from 'new/services/Repositories';
 import { SolanaService } from 'new/services/SolanaService';
 
@@ -59,7 +58,6 @@ export class ReceiveViewModel extends ViewModel {
   tokenType = TokenType.solana;
 
   constructor(
-    private _notificationService: NotificationService,
     private _walletsRepository: WalletsRepository,
     private _solanaSDK: SolanaService,
     private _modalService: ModalService,

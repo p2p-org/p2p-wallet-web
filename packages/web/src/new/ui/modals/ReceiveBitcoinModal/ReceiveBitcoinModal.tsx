@@ -6,7 +6,7 @@ import { observer } from 'mobx-react-lite';
 import { useViewModel } from 'new/core/viewmodels/useViewModel';
 import { Loader } from 'new/ui/components/common/Loader';
 import type { ModalPropsType } from 'new/ui/modals/ModalManager';
-import { WrapperModal } from 'new/ui/modals/ReceiveBitcoinModal/common/styled';
+import { LoaderWrapper, WrapperModal } from 'new/ui/modals/ReceiveBitcoinModal/common/styled';
 import { Create } from 'new/ui/modals/ReceiveBitcoinModal/Create';
 import {
   ReceiveBitcoinModalViewModel,
@@ -14,22 +14,19 @@ import {
 } from 'new/ui/modals/ReceiveBitcoinModal/ReceiveBitcoinModal.ViewModel';
 import { TopUp } from 'new/ui/modals/ReceiveBitcoinModal/TopUp';
 
-const LoaderWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
+const LoaderWrapperStyled = styled(LoaderWrapper)`
   height: 300px;
 `;
 
 export const ReceiveBitcoinModal: FC<ModalPropsType> = observer((props) => {
   const viewModel = useViewModel(ReceiveBitcoinModalViewModel);
 
-  if (viewModel.isLoading) {
+  if (!viewModel.accountStatus && viewModel.isLoading) {
     return (
       <WrapperModal close={() => {}}>
-        <LoaderWrapper>
+        <LoaderWrapperStyled>
           <Loader size="100" />
-        </LoaderWrapper>
+        </LoaderWrapperStyled>
       </WrapperModal>
     );
   }
@@ -38,5 +35,5 @@ export const ReceiveBitcoinModal: FC<ModalPropsType> = observer((props) => {
     return <TopUp close={props.close} />;
   }
 
-  return <Create close={props.close} />;
+  return <Create viewModel={viewModel} close={props.close} />;
 });

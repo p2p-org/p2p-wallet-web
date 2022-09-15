@@ -1,56 +1,41 @@
 import type { FC } from 'react';
-import { useState } from 'react';
 
-import type { TokenAccount } from '@p2p-wallet-web/core';
-import { useSolana, useUserTokenAccounts } from '@p2p-wallet-web/core';
-import { Bitcoin } from '@renproject/chains-bitcoin';
-import { Solana } from '@renproject/chains-solana';
-import type { Token } from '@saberhq/token-utils';
-import { Feature } from 'flagged';
+import { observer } from 'mobx-react-lite';
 
-import type { ModalPropsType } from 'app/contexts';
 import { ButtonCancel } from 'components/common/ButtonCancel';
-import { FeePaySelector } from 'components/common/FeePaySelector';
-import { HMSCountdown } from 'components/common/HMSCountdown';
-import { ToastManager } from 'components/common/ToastManager';
 import { Button } from 'components/ui';
-import { FEATURE_PAY_BY } from 'config/featureFlags';
-import { getRemainingGatewayTime } from 'utils/hooks/renBridge/useLockAndMint';
-import { useRenNetwork } from 'utils/hooks/renBridge/useNetwork';
-import { useLockAndMintProvider } from 'utils/providers/LockAndMintProvider';
+import { convertToBalance } from 'new/sdk/SolanaSDK';
+import { Loader } from 'new/ui/components/common/Loader';
+import type { ModalPropsType } from 'new/ui/modals/ModalManager';
+import {
+  List,
+  LoaderWrapper,
+  Row,
+  Section,
+  WrapperModal,
+} from 'new/ui/modals/ReceiveBitcoinModal/common/styled';
+import type { ReceiveBitcoinModalViewModel } from 'new/ui/modals/ReceiveBitcoinModal/ReceiveBitcoinModal.ViewModel';
+import { numberToTokenString } from 'new/utils/NumberExtensions';
 
-import { List, Row, Section, WrapperModal } from '../common/styled';
+type Props = { viewModel: ReceiveBitcoinModalViewModel };
 
-type Props = ModalPropsType;
-
-export const Create: FC<Props> = ({ close }) => {
-  const solanaProvider = useSolana();
-  const network = useRenNetwork();
-  const tokenAccounts = useUserTokenAccounts();
-  const { expiryTime } = useLockAndMintProvider();
-
-  // TODO: use for progress bar in Modal. Add this feature to modal
-  const [creating, setCreating] = useState(false);
-
-  const handleFeeTokenAccountChange = (
-    _nextToken: Token,
-    nextTokenAccount: TokenAccount | null,
-  ) => {
-    if (!nextTokenAccount?.key) {
-      return;
-    }
-  };
+export const Create: FC<ModalPropsType & Props> = observer(({ viewModel, close }) => {
+  const feeInTokenString =
+    viewModel.totalFee && viewModel.payingWallet
+      ? numberToTokenString(
+          convertToBalance(viewModel.totalFee, viewModel.payingWallet.token.decimals),
+          viewModel.payingWallet.token,
+        )
+      : '';
+  const buttonText = `Pay ${feeInTokenString} & Continue`;
 
   const handleCreateAccountClick = async () => {
     try {
-      setCreating(true);
-      await new Solana(solanaProvider, network).createAssociatedTokenAccount(Bitcoin.asset);
+      await viewModel.createRenBTC();
       close(true);
     } catch (error) {
-      ToastManager.error((error as Error).message);
+      viewModel.errorNotification((error as Error).message);
       console.error(error);
-    } finally {
-      setCreating(false);
     }
   };
 
@@ -64,12 +49,17 @@ export const Create: FC<Props> = ({ close }) => {
       footer={
         <>
           <Button primary onClick={handleCreateAccountClick}>
-            Pay 0.002928 SOL & Continue
+            {buttonText}
           </Button>
           <ButtonCancel onClick={() => close(false)} />
         </>
       }
     >
+      {viewModel.isLoading ? (
+        <LoaderWrapper>
+          <Loader size="100" />
+        </LoaderWrapper>
+      ) : null}
       <Section>
         <List>
           <Row>
@@ -79,13 +69,13 @@ export const Create: FC<Props> = ({ close }) => {
           </Row>
         </List>
 
-        <Feature name={FEATURE_PAY_BY}>
+        {/*<Feature name={FEATURE_PAY_BY}>
           <FeePaySelector
             tokenAccounts={tokenAccounts}
             onTokenAccountChange={handleFeeTokenAccountChange}
             isShortList
           />
-        </Feature>
+        </Feature>*/}
 
         <List>
           <Row>
@@ -97,7 +87,8 @@ export const Create: FC<Props> = ({ close }) => {
           </Row>
           <Row>
             <strong>
-              <HMSCountdown milliseconds={getRemainingGatewayTime(expiryTime)} />
+              {/*<HMSCountdown milliseconds={getRemainingGatewayTime(expiryTime)} />*/}
+              35:59:59
             </strong>
             &nbsp; is the remaining time to safely send the assets
           </Row>
@@ -105,4 +96,4 @@ export const Create: FC<Props> = ({ close }) => {
       </Section>
     </WrapperModal>
   );
-};
+});
