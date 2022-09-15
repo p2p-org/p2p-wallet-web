@@ -7,14 +7,14 @@ import { Defaults } from 'new/services/Defaults';
 import type { CurrentPrice } from './PricesFetcher';
 
 interface IPricesStorage {
-  retrivePrices(): { [key in string]: CurrentPrice };
-  savePrices(prices: { [key in string]: CurrentPrice }): void;
+  retrivePrices(): Record<string, CurrentPrice>;
+  savePrices(prices: Record<string, CurrentPrice>): void;
 }
 
 @singleton()
 export class PricesStorage implements IPricesStorage {
-  retrivePrices(): { [key in string]: CurrentPrice } {
-    let prices: { [key in string]: CurrentPrice } = {};
+  retrivePrices(): Record<string, CurrentPrice> {
+    let prices: Record<string, CurrentPrice> = {};
     const data = Defaults.prices;
     if (!isEmpty(data)) {
       prices = data;
@@ -22,7 +22,7 @@ export class PricesStorage implements IPricesStorage {
     return prices;
   }
 
-  savePrices(prices: { [key in string]: CurrentPrice }) {
+  savePrices(prices: Record<string, CurrentPrice>) {
     runInAction(() => {
       Defaults.prices = prices;
     });

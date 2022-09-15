@@ -1,7 +1,6 @@
 import { findProgramAddressSync } from '@project-serum/anchor/dist/cjs/utils/pubkey';
 import type { Network } from '@saberhq/solana-contrib';
-import type { u64 } from '@solana/spl-token';
-import { NATIVE_MINT, TOKEN_PROGRAM_ID } from '@solana/spl-token';
+import { u64 } from '@solana/spl-token';
 import { PublicKey, TransactionInstruction } from '@solana/web3.js';
 import { Buffer } from 'buffer';
 import BufferLayout from 'buffer-layout';
@@ -14,8 +13,8 @@ import { DirectSwapData, TransitiveSwapData } from '../relay';
 export class RelayProgram {
   static id(network: Network): PublicKey {
     switch (network) {
-      case 'mainnet-beta':
       default:
+      case 'mainnet-beta':
         return new PublicKey('12YKFL4mnZz6CBEGePrf293mEzueQM3h8VLPUJsKpGs9');
       case 'devnet':
       case 'testnet':
@@ -24,10 +23,7 @@ export class RelayProgram {
   }
 
   static getUserRelayAddress({ user, network }: { user: PublicKey; network: Network }): PublicKey {
-    return findProgramAddressSync(
-      [user.toBuffer(), Buffer.from('relay')],
-      RelayProgram.id(network),
-    )[0];
+    return findProgramAddressSync([user.toBuffer(), Buffer.from('relay')], this.id(network))[0];
   }
 
   static getUserTemporaryWSOLAddress({
@@ -39,7 +35,7 @@ export class RelayProgram {
   }): PublicKey {
     return findProgramAddressSync(
       [user.toBuffer(), Buffer.from('temporary_wsol')],
-      RelayProgram.id(network),
+      this.id(network),
     )[0];
   }
 
@@ -54,7 +50,7 @@ export class RelayProgram {
   }): PublicKey {
     return findProgramAddressSync(
       [user.toBuffer(), transitTokenMint.toBuffer(), Buffer.from('transit')],
-      RelayProgram.id(network),
+      this.id(network),
     )[0];
   }
 
@@ -175,7 +171,7 @@ export class RelayProgram {
     dataLayout.encode(
       {
         instruction: 2,
-        amount: lamports.toBuffer(),
+        amount: new u64(lamports.toString()).toBuffer(),
       },
       data,
     );
@@ -426,11 +422,11 @@ export class RelayProgram {
     network: Network;
   }): TransactionInstruction {
     const keys = [
-      readonly({ pubkey: NATIVE_MINT, isSigner: false }),
+      readonly({ pubkey: SolanaSDKPublicKey.wrappedSOLMint, isSigner: false }),
       writable({ pubkey: feePayer, isSigner: true }),
       readonly({ pubkey: userAuthority, isSigner: true }),
       writable({ pubkey: userRelayAccount, isSigner: false }),
-      readonly({ pubkey: TOKEN_PROGRAM_ID, isSigner: false }),
+      readonly({ pubkey: SolanaSDKPublicKey.tokenProgramId, isSigner: false }),
       readonly({ pubkey: userTransferAuthority, isSigner: true }),
       writable({ pubkey: userSourceTokenAccount, isSigner: false }),
       writable({

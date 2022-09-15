@@ -1,4 +1,4 @@
-import type { BuildContext } from 'new/sdk/FeeRelayer';
+import type { BuildContext } from '../BuildContext';
 
 export function checkSigners(context: BuildContext): void {
   // context.env.signers.push(context.config.userAccount) // can't do it on web

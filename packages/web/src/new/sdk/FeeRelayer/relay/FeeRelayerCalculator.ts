@@ -2,13 +2,14 @@ import { ZERO } from '@orca-so/sdk';
 import { u64 } from '@solana/spl-token';
 import type { PublicKey } from '@solana/web3.js';
 
-import { FeeRelayerError } from 'new/sdk/FeeRelayer';
-import type { FeeRelayerContext } from 'new/sdk/FeeRelayer/relay/FeeRelayerContext';
-import { RelayAccountStatusType } from 'new/sdk/FeeRelayer/relay/helpers';
 import type { OrcaSwapType } from 'new/sdk/OrcaSwap';
 import { getInputAmountSlippage } from 'new/sdk/OrcaSwap';
 import * as SolanaSDK from 'new/sdk/SolanaSDK';
 import { SolanaSDKPublicKey } from 'new/sdk/SolanaSDK';
+
+import { FeeRelayerError } from '../models';
+import type { FeeRelayerContext } from './FeeRelayerContext';
+import { RelayAccountStatusType } from './helpers';
 
 export interface FeeRelayerCalculator {
   /// Calculate a top up amount for user's relayer account.

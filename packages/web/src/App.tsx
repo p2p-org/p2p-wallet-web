@@ -17,6 +17,7 @@ import { Receive } from 'new/scenes/Main/Receive';
 import { Send } from 'new/scenes/Main/Send';
 import { Settings } from 'new/scenes/Main/Settings';
 import { SettingsNetwork } from 'new/scenes/Main/SettingsNetwork';
+import { SwapPage } from 'new/scenes/Main/Swap';
 import { Root } from 'new/scenes/Root';
 import { LocationManager } from 'new/ui/managers/LocationManager';
 import { NotificationManager } from 'new/ui/managers/NotificationManager';
@@ -58,7 +59,8 @@ const App: React.FC = observer(() => {
                   <AuthRequiredRoute path="/receive/(tokens)?" component={Receive} />
                   <AuthRequiredRoute path="/send/:publicKey/:status(result)" component={Send} />
                   <AuthRequiredRoute path="/send/:publicKey?" component={Send} />
-                  <AuthRequiredRoute path="/swap/(settings)?/:symbol?" component={Swap} />
+                  <AuthRequiredRoute path="/swap/(settings)?/:symbol?" component={SwapPage} />
+                  <AuthRequiredRoute path="/swapold/(settings)?/:symbol?" component={Swap} />
                   <AuthRequiredRoute path="/settings/network" component={SettingsNetwork} />
                   <AuthRequiredRoute path="/settings" component={Settings} />
                 </Main>

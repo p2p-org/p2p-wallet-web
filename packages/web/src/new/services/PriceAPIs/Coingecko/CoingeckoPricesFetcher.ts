@@ -28,7 +28,7 @@ export class CoingeckoPricesFetcher extends PricesFetcher {
   }: {
     coins: Token[];
     fiat: string;
-  }): Promise<{ [key in string]: CurrentPrice | null }> {
+  }): Promise<Record<string, CurrentPrice | null>> {
     const param = uniq(
       coins
         .map((coin) => coin.extensions?.coingeckoId)
@@ -48,6 +48,6 @@ export class CoingeckoPricesFetcher extends PricesFetcher {
         },
       };
       return partialResult;
-    }, {} as { [key in string]: CurrentPrice | null });
+    }, {} as Record<string, CurrentPrice | null>);
   }
 }

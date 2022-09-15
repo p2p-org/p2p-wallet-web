@@ -1,23 +1,25 @@
+import { ZERO } from '@orca-so/sdk';
 import type { u64 } from '@solana/spl-token';
 import type { PublicKey } from '@solana/web3.js';
 
-import type { BuildContext } from 'new/sdk/FeeRelayer';
-import { DefaultSwapFeeRelayerCalculator, FeeRelayerError } from 'new/sdk/FeeRelayer';
-import type { TokenAccount } from 'new/sdk/FeeRelayer/models';
+import type { OrcaSwap, PoolsPair } from 'new/sdk/OrcaSwap';
+import type { PreparedTransaction } from 'new/sdk/SolanaSDK';
+import { SolanaSDKPublicKey } from 'new/sdk/SolanaSDK';
+
+import type { TokenAccount } from '../models';
+import { FeeRelayerError } from '../models';
 import type {
   FeeRelayerCalculator,
   FeeRelayerContext,
   FeeRelayerRelaySolanaClient,
   TopUpAndActionPreparedParams,
   TopUpPreparedParams,
-} from 'new/sdk/FeeRelayer/relay';
-import { DefaultFeeRelayerCalculator } from 'new/sdk/FeeRelayer/relay';
-import { SwapTransactionBuilder } from 'new/sdk/FeeRelayer/swap/transactionBuilder/SwapTransactionBuilder';
-import type { OrcaSwap, PoolsPair } from 'new/sdk/OrcaSwap';
-import type { PreparedTransaction } from 'new/sdk/SolanaSDK';
-import { SolanaSDKPublicKey } from 'new/sdk/SolanaSDK';
-
+} from '../relay';
+import { DefaultFeeRelayerCalculator } from '../relay';
+import { SwapTransactionBuilder } from '../swap/transactionBuilder/SwapTransactionBuilder';
 import type { SwapFeeRelayerCalculator } from './calculator';
+import { DefaultSwapFeeRelayerCalculator } from './calculator';
+import type { BuildContext } from './transactionBuilder';
 
 interface SwapFeeRelayerType {
   calculator: SwapFeeRelayerCalculator;
@@ -119,7 +121,7 @@ export class SwapFeeRelayer implements SwapFeeRelayerType {
 
     const latestBlockhash = await this._solanaApiClient.getRecentBlockhash();
 
-    const buildContext = <BuildContext>{
+    const buildContext: BuildContext = {
       feeRelayerContext: context,
       solanaApiClient: this._solanaApiClient,
       orcaSwap: this._orcaSwap,
@@ -133,7 +135,12 @@ export class SwapFeeRelayer implements SwapFeeRelayerType {
         destinationAddress,
         blockhash: latestBlockhash,
       },
-      env: {},
+      env: {
+        instructions: [],
+        signers: [],
+        accountCreationFee: ZERO,
+        additionalPaybackFee: ZERO,
+      },
     };
 
     return SwapTransactionBuilder.prepareSwapTransaction(buildContext);

@@ -1,11 +1,13 @@
-import type { FunctionComponent } from 'react';
+import type { FC } from 'react';
+import { useCallback } from 'react';
+import { generatePath, useHistory, useParams } from 'react-router';
 
 import { styled } from '@linaria/react';
 import { theme } from '@p2p-wallet-web/ui';
 
 import { Button, Icon } from 'components/ui';
 
-import { useShowSettings } from '../../hooks/useShowSettings';
+import type { SwapRouteParams } from '../../types';
 
 const ActionIcon = styled(Icon)`
   width: 16px;
@@ -19,8 +21,13 @@ const ButtonStyled = styled(Button)`
   border: 1px solid ${theme.colors.stroke.primary};
 `;
 
-export const SettingsButton: FunctionComponent = () => {
-  const { handleShowSettings } = useShowSettings();
+export const SettingsButton: FC = () => {
+  const history = useHistory();
+  const { symbol } = useParams<SwapRouteParams>();
+
+  const handleShowSettings = useCallback(() => {
+    history.push(generatePath('/swap/settings/:symbol?', { symbol }));
+  }, [history, symbol]);
 
   return (
     <ButtonStyled small onClick={handleShowSettings}>

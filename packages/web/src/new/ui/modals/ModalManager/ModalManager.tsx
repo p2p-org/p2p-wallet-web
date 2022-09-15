@@ -76,6 +76,7 @@ const modalsMap = new Map<ModalType, LazyExoticComponent<ModalPropsType & any>>(
     lazy(() => import('components/modals/TransactionConfirmModal')),
   ],
   [ModalType.SHOW_MODAL_CONFIRM_SEND, lazy(() => import('../confirmModals/ConfirmSendModal'))],
+  [ModalType.SHOW_MODAL_CONFIRM_SWAP, lazy(() => import('../confirmModals/ConfirmSwapModal'))],
   [ModalType.SHOW_MODAL_PROCESS_TRANSACTION, lazy(() => import('../ProcessTransactionModal'))],
   [
     ModalType.SHOW_MODAL_TRANSACTION_DETAILS,

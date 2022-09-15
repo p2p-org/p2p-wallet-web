@@ -3,14 +3,15 @@ import { u64 } from '@solana/spl-token';
 import { PublicKey } from '@solana/web3.js';
 import { injectable } from 'tsyringe';
 
-import type { FeeRelayerAPIClientType, UsageStatus } from 'new/sdk/FeeRelayer';
-import { FeeRelayerAPIClient, StatsInfoDeviceType } from 'new/sdk/FeeRelayer';
-import { FeeRelayer, FeeRelayerRelaySolanaClient } from 'new/sdk/FeeRelayer/relay';
+import type { UsageStatus } from 'new/sdk/FeeRelayer';
+import { FeeRelayerAPIClient } from 'new/sdk/FeeRelayer';
+import { FeeRelayerRelaySolanaClient } from 'new/sdk/FeeRelayer/relay';
 import { FeeRelayerContextManager } from 'new/sdk/FeeRelayer/relay/FeeRelayerContextManager';
 import type { Wallet } from 'new/sdk/SolanaSDK';
 import * as SolanaSDK from 'new/sdk/SolanaSDK';
 import { SolanaSDKPublicKey, toLamport } from 'new/sdk/SolanaSDK';
 import { OrcaSwapService } from 'new/services/OrcaSwapService';
+import { RelayService } from 'new/services/RelayService';
 import { WalletsRepository } from 'new/services/Repositories';
 import { SendServiceError } from 'new/services/SendService/SendServiceError';
 import { SendServiceRelayMethod } from 'new/services/SendService/SendServiceRelayMethod';
@@ -91,8 +92,6 @@ export interface SendServiceType {
 export class SendService implements SendServiceType {
   relayMethod: SendRelayMethod;
 
-  private _feeRelayerAPIClient: FeeRelayerAPIClientType;
-  private _feeRelayer: FeeRelayer;
   // private _renVMBurnAndReleaseService: RenVMBurnAndReleaseServiceType;
   private _contextManager: FeeRelayerContextManager;
 
@@ -102,25 +101,18 @@ export class SendService implements SendServiceType {
     private _solanaAPIClient: SolanaService,
     private _orcaSwap: OrcaSwapService,
     // renVMBurnAndReleaseService: RenVMBurnAndReleaseServiceType,
+    private _feeRelayer: RelayService,
     private _feeRelayerRelaySolanaClient: FeeRelayerRelaySolanaClient,
     private _walletsRepository: WalletsRepository,
   ) {
     this.relayMethod = SendRelayMethod.default;
 
-    this._feeRelayerAPIClient = new FeeRelayerAPIClient();
-    this._feeRelayer = new FeeRelayer({
-      orcaSwap: this._orcaSwap,
-      owner: this._solanaAPIClient.provider.wallet.publicKey,
-      solanaApiClient: this._feeRelayerRelaySolanaClient,
-      feeRelayerAPIClient: this._feeRelayerAPIClient,
-      deviceType: StatsInfoDeviceType.web,
-      buildNumber: '1', // TODO: pass build number from environment
-    });
+    const feeRelayerAPIClient = new FeeRelayerAPIClient();
     // this._renVMBurnAndReleaseService = renVMBurnAndReleaseService;
     this._contextManager = new FeeRelayerContextManager({
       owner: this._solanaAPIClient.provider.wallet.publicKey,
       solanaAPIClient: this._feeRelayerRelaySolanaClient,
-      feeRelayerAPIClient: this._feeRelayerAPIClient,
+      feeRelayerAPIClient,
     });
 
     // Subclasses
@@ -293,7 +285,10 @@ export class SendService implements SendServiceType {
         break;
       }
       case Network.bitcoin: {
-        request = this._renVMBurnAndReleaseService.burn();
+        request = this._renVMBurnAndReleaseService.burnAndRelease({
+          recipient: receiver,
+          amount,
+        });
         break;
       }
     }

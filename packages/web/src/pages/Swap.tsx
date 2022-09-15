@@ -33,10 +33,10 @@ export const Swap: FunctionComponent = () => {
     <Layout mobileAction={mobileHeaderButton}>
       <SwapProvider initialState={{ inputTokenName: symbol }}>
         <Switch>
-          <Route path={`/swap/settings/:symbol?`}>
+          <Route path={`/swapold/settings/:symbol?`}>
             <SwapSlippageWidget />
           </Route>
-          <Route path={'/swap/:symbol?'}>
+          <Route path={'/swapold/:symbol?'}>
             <SwapWidget />
           </Route>
         </Switch>

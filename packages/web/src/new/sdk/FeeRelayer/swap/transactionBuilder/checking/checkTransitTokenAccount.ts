@@ -1,5 +1,5 @@
-import type { BuildContext } from 'new/sdk/FeeRelayer';
-import { TransitTokenAccountAnalysator } from 'new/sdk/FeeRelayer';
+import { TransitTokenAccountAnalysator } from '../../helper';
+import type { BuildContext } from '../BuildContext';
 
 export async function checkTransitTokenAccount(context: BuildContext): Promise<void> {
   const transitToken = TransitTokenAccountAnalysator.getTransitToken({

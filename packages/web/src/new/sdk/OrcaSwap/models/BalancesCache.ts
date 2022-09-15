@@ -2,7 +2,7 @@ import type { Pool } from 'new/sdk/OrcaSwap';
 import type { TokenAccountBalance } from 'new/sdk/SolanaSDK';
 
 export class BalancesCache {
-  balancesCache: { [address in string]: TokenAccountBalance } = {};
+  balancesCache: Record<string, TokenAccountBalance> = {};
 
   getTokenABalance(pool: Pool): TokenAccountBalance | undefined {
     return pool.tokenABalance ?? this.balancesCache[pool.tokenAccountA.toString()];

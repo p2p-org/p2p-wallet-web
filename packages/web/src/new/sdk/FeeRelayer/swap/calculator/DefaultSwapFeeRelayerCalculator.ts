@@ -1,12 +1,12 @@
 import { u64 } from '@solana/spl-token';
 import type { PublicKey } from '@solana/web3.js';
 
-import { DestinationAnalysator } from 'new/sdk/FeeRelayer';
-import type { FeeRelayerRelaySolanaClient } from 'new/sdk/FeeRelayer/relay';
-import type { FeeRelayerContext } from 'new/sdk/FeeRelayer/relay/FeeRelayerContext';
 import type * as OrcaSwap from 'new/sdk/OrcaSwap';
 import * as SolanaSDK from 'new/sdk/SolanaSDK';
 import { SolanaSDKPublicKey } from 'new/sdk/SolanaSDK';
+
+import type { FeeRelayerContext, FeeRelayerRelaySolanaClient } from '../../relay';
+import { DestinationAnalysator } from '../helper';
 
 export interface SwapFeeRelayerCalculator {
   calculateSwappingNetworkFees({

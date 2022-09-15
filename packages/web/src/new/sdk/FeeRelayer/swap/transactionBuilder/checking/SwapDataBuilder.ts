@@ -3,10 +3,11 @@ import type { u64 } from '@solana/spl-token';
 import type { PublicKey } from '@solana/web3.js';
 import { Account } from '@solana/web3.js';
 
-import { FeeRelayerError } from 'new/sdk/FeeRelayer';
-import type { FeeRelayerRelaySwapType } from 'new/sdk/FeeRelayer/relay';
-import { getSwapData, TransitiveSwapData } from 'new/sdk/FeeRelayer/relay';
-import type { PoolsPair } from 'new/sdk/OrcaSwap';
+import type { Pool, PoolsPair } from 'new/sdk/OrcaSwap';
+
+import { FeeRelayerError } from '../../../models';
+import type { FeeRelayerRelaySwapType } from '../../../relay';
+import { DirectSwapData, TransitiveSwapData } from '../../../relay';
 
 export interface SwapData {
   swapData: FeeRelayerRelaySwapType;
@@ -48,7 +49,7 @@ export function buildSwapData({
     const pool = pools[0]!;
 
     const amountIn = inputAmount ?? pool.getInputAmountSlippage(minAmountOut!, slippage);
-    const minAmountOutNew = minAmountOut ?? pool.getInputAmountSlippage(inputAmount!, slippage);
+    const minAmountOutNew = minAmountOut ?? pool.getMinimumAmountOut(inputAmount!, slippage);
     if (!amountIn || !minAmountOutNew) {
       throw FeeRelayerError.invalidAmount();
     }
@@ -109,4 +110,31 @@ export function buildSwapData({
       transferAuthorityAccount: newTransferAuthority ? transferAuthority : null,
     };
   }
+}
+
+// Pool extension
+
+export function getSwapData({
+  pool,
+  transferAuthorityPubkey,
+  amountIn,
+  minAmountOut,
+}: {
+  pool: Pool;
+  transferAuthorityPubkey: PublicKey;
+  amountIn: u64;
+  minAmountOut: u64;
+}): DirectSwapData {
+  return new DirectSwapData({
+    programId: pool.swapProgramId.toString(),
+    accountPubkey: pool.account,
+    authorityPubkey: pool.authority,
+    transferAuthorityPubkey: transferAuthorityPubkey.toString(),
+    sourcePubkey: pool.tokenAccountA,
+    destinationPubkey: pool.tokenAccountB,
+    poolTokenMintPubkey: pool.poolTokenMint,
+    poolFeeAccountPubkey: pool.feeAccount,
+    amountIn,
+    minimumAmountOut: minAmountOut,
+  });
 }

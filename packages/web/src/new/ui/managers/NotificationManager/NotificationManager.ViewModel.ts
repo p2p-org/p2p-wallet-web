@@ -8,7 +8,7 @@ import { ViewModel } from 'new/core/viewmodels/ViewModel';
 import type { CurrentToastParams } from 'new/services/NotificationService';
 import { NotificationService } from 'new/services/NotificationService';
 
-type SizeType = { [toastId: string]: number };
+type SizeType = Record<string, number>;
 type ToastRefType = RefObject<HTMLDivElement>;
 
 export type CurrentToastForRenderParams = CurrentToastParams & {
@@ -19,7 +19,7 @@ export type CurrentToastForRenderParams = CurrentToastParams & {
 @singleton()
 export class NotificationManagerViewModel extends ViewModel {
   private _heights: SizeType;
-  private _toastsRefs: { [toastId: string]: RefObject<HTMLDivElement> };
+  private _toastsRefs: Record<string, RefObject<HTMLDivElement>>;
 
   _bottomOffsets: SizeType;
 

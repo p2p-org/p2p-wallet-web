@@ -1,8 +1,9 @@
 import { Token } from '@solana/spl-token';
 import { Account, SystemProgram } from '@solana/web3.js';
 
-import type { BuildContext } from 'new/sdk/FeeRelayer';
 import { AccountInfo, SolanaSDKPublicKey } from 'new/sdk/SolanaSDK';
+
+import type { BuildContext } from '../BuildContext';
 
 export function checkSource(context: BuildContext): void {
   let sourceWSOLNewAccount: Account | undefined;

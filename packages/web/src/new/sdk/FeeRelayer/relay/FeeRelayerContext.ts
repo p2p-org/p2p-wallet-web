@@ -1,8 +1,8 @@
 import type { u64 } from '@solana/spl-token';
 import type { PublicKey } from '@solana/web3.js';
 
-import type { UsageStatus } from 'new/sdk/FeeRelayer';
-import type { RelayAccountStatus } from 'new/sdk/FeeRelayer/relay/helpers';
+import type { UsageStatus } from '../models';
+import type { RelayAccountStatus } from './helpers';
 
 export class FeeRelayerContext {
   minimumTokenAccountBalance: u64;

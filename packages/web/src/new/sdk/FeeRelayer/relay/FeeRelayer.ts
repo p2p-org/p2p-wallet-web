@@ -5,32 +5,29 @@ import { Token, u64 } from '@solana/spl-token';
 import type { TransactionInstruction } from '@solana/web3.js';
 import { Account, PublicKey, SystemProgram, Transaction } from '@solana/web3.js';
 
-import type {
-  FeeRelayerCalculator,
-  FeeRelayerContext,
-  StatsInfoDeviceType,
-  StatsInfoOperationType,
-} from 'new/sdk/FeeRelayer';
-import {
-  DefaultFeeRelayerCalculator,
-  FeeRelayerConstants,
-  getSignature,
-  TransitTokenAccountAnalysator,
-} from 'new/sdk/FeeRelayer';
-import type { FeeRelayerAPIClientType } from 'new/sdk/FeeRelayer/apiClient/FeeRelayerAPIClient';
-import { FeeRelayerError } from 'new/sdk/FeeRelayer/models/FeeRelayerError';
-import { FeeRelayerRequestType } from 'new/sdk/FeeRelayer/models/FeeRelayerRequestType';
-import { RelayProgram } from 'new/sdk/FeeRelayer/relayProgram/RelayProgram';
 import type * as OrcaSwap from 'new/sdk/OrcaSwap';
 import type { TransactionID } from 'new/sdk/SolanaSDK';
 import * as SolanaSDK from 'new/sdk/SolanaSDK';
-import { getAssociatedTokenAddressSync, SolanaSDKPublicKey } from 'new/sdk/SolanaSDK';
+import {
+  calculateTransactionFee,
+  getAssociatedTokenAddressSync,
+  SolanaSDKPublicKey,
+} from 'new/sdk/SolanaSDK';
 
-import type { TokenAccount } from '../models';
+import type { FeeRelayerAPIClientType } from '../apiClient';
+import { getSignature } from '../helpers';
+import type { StatsInfoDeviceType, StatsInfoOperationType, TokenAccount } from '../models';
+import { FeeRelayerError, FeeRelayerRequestType } from '../models';
+import { RelayProgram } from '../relayProgram';
+import { TransitTokenAccountAnalysator } from '../swap';
+import { getSwapData } from '../swap/transactionBuilder/checking';
+import type { FeeRelayerCalculator } from './FeeRelayerCalculator';
+import { DefaultFeeRelayerCalculator } from './FeeRelayerCalculator';
+import { FeeRelayerConstants } from './FeeRelayerConstants';
+import type { FeeRelayerContext } from './FeeRelayerContext';
 import type { FeeRelayerRelaySwapType, RelayAccountStatus, TopUpPreparedParams } from './helpers';
 import {
   DirectSwapData,
-  getSwapData,
   RelayAccountStatusType,
   RelayTransactionParam,
   SwapData,
@@ -212,6 +209,7 @@ export class FeeRelayer implements FeeRelayerType {
 
       return trx;
     } catch (error) {
+      console.error(error);
       if (res) {
         throw FeeRelayerError.topUpSuccessButTransactionThrows();
       }
@@ -364,6 +362,7 @@ export class FeeRelayer implements FeeRelayerType {
     const minimumRelayAccountBalance = context.minimumRelayAccountBalance;
     const minimumTokenAccountBalance = context.minimumTokenAccountBalance;
     const feePayerAddress = context.feePayerAddress;
+    const lamportsPerSignature = context.lamportsPerSignature;
 
     // STEP 3: prepare for topUp
     const topUpTransaction = await this._prepareForTopUp({
@@ -382,6 +381,7 @@ export class FeeRelayer implements FeeRelayerType {
       minimumTokenAccountBalance,
       needsCreateUserRelayAccount: needsCreateUserRelayAddress,
       feePayerAddress,
+      lamportsPerSignature,
       needsCreateTransitTokenAccount,
       transitTokenMintPubkey: transitToken?.mint,
       transitTokenAccountAddress: transitToken?.address,
@@ -441,7 +441,7 @@ export class FeeRelayer implements FeeRelayerType {
     minimumTokenAccountBalance,
     needsCreateUserRelayAccount,
     feePayerAddress,
-    // lamportsPerSignature,
+    lamportsPerSignature,
     // freeTransactionFeeLimit,
     needsCreateTransitTokenAccount = false,
     transitTokenMintPubkey,
@@ -459,7 +459,7 @@ export class FeeRelayer implements FeeRelayerType {
     minimumTokenAccountBalance: u64;
     needsCreateUserRelayAccount: boolean;
     feePayerAddress: PublicKey;
-    // lamportsPerSignature: u64;
+    lamportsPerSignature: u64;
     // freeTransactionFeeLimit?: FreeTransactionFeeLimit;
     needsCreateTransitTokenAccount?: boolean | null;
     transitTokenMintPubkey?: PublicKey | null;
@@ -611,24 +611,31 @@ export class FeeRelayer implements FeeRelayerType {
 
     // calculate fee first
     const expectedFeeNew = new SolanaSDK.FeeAmount({
-      transaction: new u64(
-        await transaction.getEstimatedFee(this._solanaApiClient.provider.connection),
-      ),
+      // TODO: return than works
+      // transaction: new u64(
+      //   await transaction.getEstimatedFee(this._solanaApiClient.provider.connection),
+      // ),
+      transaction: calculateTransactionFee(transaction, lamportsPerSignature),
       accountBalances: accountCreationFee,
     });
 
-    // resign transaction
-    const signers: Account[] = [];
-    const tranferAuthority = swap.transferAuthorityAccount;
-    if (tranferAuthority) {
-      signers.push(tranferAuthority);
-    }
-    if (signers.length !== 0) {
-      transaction.sign(...signers);
-    }
-
     const signedTransaction = await this._solanaApiClient.provider.wallet.signTransaction(
       transaction,
+    );
+
+    // resign transaction
+    const signers: Account[] = []; // there was account
+    const transferAuthority = swap.transferAuthorityAccount;
+    if (transferAuthority) {
+      signers.push(transferAuthority);
+    }
+    if (signers.length > 0) {
+      signedTransaction.partialSign(...signers);
+    }
+
+    console.log(
+      111111,
+      signedTransaction.compileMessage().accountKeys.map((p) => p.toString()),
     );
 
     return {
@@ -763,8 +770,8 @@ export class FeeRelayer implements FeeRelayerType {
   }): Promise<TransactionID[]> {
     const feePayer = context.feePayerAddress;
 
-    // verify fee payer // TODO: check
-    if (preparedTransaction.transaction.feePayer?.equals(feePayer)) {
+    // verify fee payer
+    if (!preparedTransaction.transaction.feePayer?.equals(feePayer)) {
       throw FeeRelayerError.invalidFeePayer();
     }
 
@@ -810,12 +817,15 @@ export class FeeRelayer implements FeeRelayerType {
       }
     }
 
-    console.log(preparedTransactionNew.transaction);
-
+    preparedTransactionNew.transaction =
+      await this._solanaApiClient.provider.wallet.signTransaction(
+        preparedTransactionNew.transaction,
+      );
     // resign transaction
-    if (preparedTransactionNew.signers.length !== 0) {
-      preparedTransactionNew.transaction.sign(...preparedTransactionNew.signers);
+    if (preparedTransactionNew.signers.length > 0) {
+      preparedTransactionNew.transaction.partialSign(...preparedTransactionNew.signers);
     }
+
     return [
       await this._feeRelayerAPIClient.sendTransaction(
         FeeRelayerRequestType.relayTransaction(new RelayTransactionParam(preparedTransactionNew)),

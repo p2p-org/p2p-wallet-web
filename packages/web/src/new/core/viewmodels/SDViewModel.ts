@@ -1,7 +1,7 @@
 import { action, computed, flow, makeObservable, observable } from 'mobx';
 import type { CancellablePromise } from 'mobx/dist/api/flow';
 
-import { ObservableReactionContainer } from '../ObservableReactionContainer';
+import { ViewModel } from './ViewModel';
 
 export enum SDFetcherState {
   initializing = 'initializing',
@@ -10,7 +10,7 @@ export enum SDFetcherState {
   error = 'error',
 }
 
-export abstract class SDViewModel<T> extends ObservableReactionContainer {
+export abstract class SDViewModel<T> extends ViewModel {
   readonly initialData: T;
   requestDisposable?: CancellablePromise<T>;
 

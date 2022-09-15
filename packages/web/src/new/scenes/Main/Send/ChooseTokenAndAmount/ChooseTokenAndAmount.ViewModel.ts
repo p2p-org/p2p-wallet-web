@@ -156,7 +156,7 @@ export class ChooseTokenAndAmountViewModel
     }
 
     // all amount
-    let availableAmount = wallet.amount.asNumber;
+    let availableAmount = wallet.amount;
 
     // convert to fiat in fiat mode
     if (this.currencyMode === CurrencyMode.fiat) {

@@ -1,11 +1,16 @@
-import { u64 } from '@solana/spl-token';
+import type { u64 } from '@solana/spl-token';
 import type { Account, TransactionInstruction } from '@solana/web3.js';
 import { Transaction } from '@solana/web3.js';
 
-import type { BuildContext } from 'new/sdk/FeeRelayer';
-import { FeeRelayerError } from 'new/sdk/FeeRelayer';
-import { FeeAmount, getAssociatedTokenAddressSync, PreparedTransaction } from 'new/sdk/SolanaSDK';
+import {
+  calculateTransactionFee,
+  FeeAmount,
+  getAssociatedTokenAddressSync,
+  PreparedTransaction,
+} from 'new/sdk/SolanaSDK';
 
+import { FeeRelayerError } from '../../models';
+import type { BuildContext } from './BuildContext';
 import {
   buildSwapData,
   checkClosingAccount,
@@ -103,19 +108,29 @@ export class SwapTransactionBuilder {
     transaction.recentBlockhash = blockhash;
     transaction.feePayer = context.feeRelayerContext.feePayerAddress;
 
-    transaction.sign(...signers);
+    if (signers.length > 0) {
+      transaction.partialSign(...signers);
+    }
+    // const signedTransaction = await context.solanaApiClient.provider.wallet.signTransaction(
+    //   transaction,
+    // );
 
     // calculate fee first
     const expectedFee = new FeeAmount({
-      transaction: new u64(
-        await transaction.getEstimatedFee(context.solanaApiClient.provider.connection),
+      // TODO: return when works
+      // transaction: new u64(
+      //   await signedTransaction.getEstimatedFee(context.solanaApiClient.provider.connection),
+      // ),
+      transaction: calculateTransactionFee(
+        transaction,
+        context.feeRelayerContext.lamportsPerSignature,
       ),
       accountBalances: accountCreationFee,
     });
 
     return new PreparedTransaction({
       owner: context.config.userAccount, // instead of signers with owner
-      transaction,
+      transaction: transaction,
       signers,
       expectedFee,
     });
