@@ -94,29 +94,28 @@ export class RenBTCStatusService {
       );
   }
 
-  async createAccount(address: string, mint: string): Promise<void> {
-    const addressPubkey = new PublicKey(address);
-    const mintPubkey = new PublicKey(mint);
-    const ownerPubkey = this._feeRelayerAPIClient.provider.wallet.publicKey;
+  async createAccount(_address: string, _mint: string): Promise<void> {
+    const address = new PublicKey(_address);
+    const mint = new PublicKey(_mint);
+    const owner = this._feeRelayerAPIClient.provider.wallet.publicKey;
 
-    const associatedAccount = getAssociatedTokenAddressSync(mintPubkey, ownerPubkey);
+    const associatedAccount = getAssociatedTokenAddressSync(mint, owner);
 
     // prepare transaction
     const feePayer = (await this._feeRelayerContextManager.getCurrentContext()).feePayerAddress;
 
-    const instructions = SPLToken.createAssociatedTokenAccountInstruction(
+    const instruction = SPLToken.createAssociatedTokenAccountInstruction(
       SolanaSDKPublicKey.splAssociatedTokenAccountProgramId,
       SolanaSDKPublicKey.tokenProgramId,
       SolanaSDKPublicKey.renBTCMint,
       associatedAccount,
-      ownerPubkey,
+      owner,
       feePayer,
     );
 
     const preparedTransaction = await this._feeRelayerAPIClient.prepareTransaction({
-      owner: this._feeRelayerAPIClient.provider.wallet.publicKey,
-      instructions: [instructions],
-      feePayer: feePayer,
+      instructions: [instruction],
+      feePayer,
     });
 
     await this._feeRelayerContextManager.update();
@@ -125,10 +124,10 @@ export class RenBTCStatusService {
     const tx = await this._feeRelayer.topUpAndRelayTransaction({
       context,
       transaction: preparedTransaction,
-      fee: new TokenAccount({ address: addressPubkey, mint: mintPubkey }),
+      fee: new TokenAccount({ address: address, mint: mint }),
       config: new FeeRelayerConfiguration({
         operationType: StatsInfoOperationType.transfer,
-        currency: mintPubkey.toBase58(),
+        currency: mint.toBase58(),
       }),
     });
 

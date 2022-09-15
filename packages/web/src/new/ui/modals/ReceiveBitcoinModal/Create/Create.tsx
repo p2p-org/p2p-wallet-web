@@ -7,13 +7,7 @@ import { Button } from 'components/ui';
 import { convertToBalance } from 'new/sdk/SolanaSDK';
 import { Loader } from 'new/ui/components/common/Loader';
 import type { ModalPropsType } from 'new/ui/modals/ModalManager';
-import {
-  List,
-  LoaderWrapper,
-  Row,
-  Section,
-  WrapperModal,
-} from 'new/ui/modals/ReceiveBitcoinModal/common/styled';
+import { List, Row, Section, WrapperModal } from 'new/ui/modals/ReceiveBitcoinModal/common/styled';
 import type { ReceiveBitcoinModalViewModel } from 'new/ui/modals/ReceiveBitcoinModal/ReceiveBitcoinModal.ViewModel';
 import { numberToTokenString } from 'new/utils/NumberExtensions';
 
@@ -48,18 +42,13 @@ export const Create: FC<ModalPropsType & Props> = observer(({ viewModel, close }
       close={() => close(false)}
       footer={
         <>
-          <Button primary onClick={handleCreateAccountClick}>
-            {buttonText}
+          <Button primary disabled={viewModel.isLoading} onClick={handleCreateAccountClick}>
+            {viewModel.isLoading ? <Loader /> : buttonText}
           </Button>
           <ButtonCancel onClick={() => close(false)} />
         </>
       }
     >
-      {viewModel.isLoading ? (
-        <LoaderWrapper>
-          <Loader size="100" />
-        </LoaderWrapper>
-      ) : null}
       <Section>
         <List>
           <Row>
