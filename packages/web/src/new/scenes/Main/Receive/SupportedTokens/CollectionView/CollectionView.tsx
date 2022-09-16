@@ -9,7 +9,7 @@ import { EmptyError } from 'new/scenes/Main/Receive/SupportedTokens/common/Empty
 import { Hint } from 'new/scenes/Main/Receive/SupportedTokens/common/Hint';
 import type { SupportedTokensViewModel } from 'new/scenes/Main/Receive/SupportedTokens/SupportedTokens.ViewModel';
 import { Token } from 'new/sdk/SolanaSDK';
-import { StaticSectionsCollectionView } from 'new/ui/components/common/StaticSectionsCollectionView';
+import { StaticSectionsCollectionVirtualizedView } from 'new/ui/components/common/StaticSectionsCollectionVitualizedView';
 
 const Wrapper = styled.div`
   height: 600px;
@@ -20,7 +20,7 @@ const Wrapper = styled.div`
   }
 `;
 
-type ListItemType = Token | string;
+type TokenOrStringType = Token | string;
 
 interface Props {
   viewModel: Readonly<SupportedTokensViewModel>;
@@ -29,7 +29,7 @@ interface Props {
 export const CollectionView: FC<Props> = observer(({ viewModel }) => {
   const isMobile = useIsMobile();
 
-  const renderItem = (token: ListItemType) => {
+  const renderItem = (token: TokenOrStringType) => {
     if (token instanceof Token) {
       return <Cell key={token.address} token={token} />;
     }
@@ -43,11 +43,11 @@ export const CollectionView: FC<Props> = observer(({ viewModel }) => {
     ? (key: string) => <EmptyError key={key} searchText={viewModel.keyword} />
     : undefined;
 
-  const transformer = isMobile ? (tokens: ListItemType[]) => ['hint', ...tokens] : undefined;
+  const transformer = isMobile ? (tokens: TokenOrStringType[]) => ['hint', ...tokens] : undefined;
 
   return (
     <Wrapper>
-      <StaticSectionsCollectionView<ListItemType>
+      <StaticSectionsCollectionVirtualizedView<TokenOrStringType>
         viewModel={viewModel}
         renderPlaceholder={(key: string) => <Cell key={key} isPlaceholder />}
         renderItem={renderItem}
