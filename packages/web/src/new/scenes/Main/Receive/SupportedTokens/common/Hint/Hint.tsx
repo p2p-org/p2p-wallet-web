@@ -3,9 +3,10 @@ import { forwardRef } from 'react';
 import * as React from 'react';
 
 import { styled } from '@linaria/react';
-import { borders, theme } from '@p2p-wallet-web/ui';
+import { borders, theme, up } from '@p2p-wallet-web/ui';
 
 const Wrapper = styled.div`
+  margin-bottom: 8px;
   padding: 16px 20px;
 
   color: ${theme.colors.textIcon.primary};
@@ -16,6 +17,10 @@ const Wrapper = styled.div`
   background: ${theme.colors.bg.app};
   border-radius: 12px;
   ${borders.primaryRGBA}
+
+  ${up.tablet} {
+    margin-bottom: 0;
+  }
 `;
 
 interface Props extends React.HTMLAttributes<HTMLDivElement> {
