@@ -1,6 +1,7 @@
-import React, { useMemo } from 'react';
-import { Virtuoso } from 'react-virtuoso';
+import React, { useMemo, useRef } from 'react';
+import { useVirtual } from 'react-virtual';
 
+import { styled } from '@linaria/react';
 import { observer } from 'mobx-react-lite';
 import { expr } from 'mobx-utils';
 import { nanoid } from 'nanoid';
@@ -9,12 +10,19 @@ import type { ISDListViewModel } from 'new/core/viewmodels/SDListViewModel';
 import { SDFetcherState } from 'new/core/viewmodels/SDViewModel';
 import { SDCollectionViewItem } from 'new/ui/components/common/StaticSectionsCollectionView/models/SDCollectionViewItem';
 
+const Wrapper = styled.div`
+  height: 100px;
+  overflow-y: auto;
+`;
+
+const Container = styled.div``;
+
 interface Props<T> {
   viewModel: Readonly<ISDListViewModel<T>>;
   numberOfLoadingCells?: number;
-  renderPlaceholder: (key: string) => React.ReactNode;
-  renderItem: (item: T, index: number) => React.ReactNode;
-  renderEmpty?: (key: string) => React.ReactNode;
+  renderPlaceholder: () => React.ReactNode;
+  renderItem: (item: T) => React.ReactNode;
+  renderEmpty?: () => React.ReactNode;
   customFilter?: (item: T) => boolean;
   transformer?: (items: T[]) => T[];
   className?: string;
@@ -29,7 +37,10 @@ export const StaticSectionsCollectionVirtualizedView = observer(
     renderEmpty,
     customFilter,
     transformer,
+    className,
   }: Props<T>) => {
+    const parentRef = useRef<HTMLDivElement>(null);
+
     const items = useMemo(
       () =>
         expr(() => {
@@ -66,31 +77,60 @@ export const StaticSectionsCollectionVirtualizedView = observer(
       [customFilter, numberOfLoadingCells, renderEmpty, viewModel.data, viewModel.state],
     );
 
+    const rowVirtualizer = useVirtual({
+      paddingStart: 0,
+      paddingEnd: 8,
+      size: items.length,
+      parentRef: parentRef,
+      overscan: 6,
+    });
+
     if (items.length === 0) {
       return null;
     }
 
+    const renderRow = (item: SDCollectionViewItem<T>) => {
+      if (!item.isEmptyCell) {
+        if (item.isPlaceholder) {
+          return renderPlaceholder();
+        }
+
+        return renderItem(item.value!);
+      }
+
+      if (item.isEmptyCell && renderEmpty) {
+        return renderEmpty();
+      }
+
+      return null;
+    };
+
     return (
-      <Virtuoso
-        style={{ height: '100%' }}
-        data={items}
-        overscan={6}
-        itemContent={(index, item) => {
-          if (!item.isEmptyCell) {
-            if (item.isPlaceholder) {
-              return renderPlaceholder(item.placeholderIndex!);
-            }
-
-            return renderItem(item.value!, index);
-          }
-
-          if (item.isEmptyCell && renderEmpty) {
-            return renderEmpty(item.emptyCellIndex!);
-          }
-
-          return null;
-        }}
-      ></Virtuoso>
+      <Wrapper className={className} ref={parentRef}>
+        <Container
+          style={{
+            position: 'relative',
+            width: '100%',
+            height: rowVirtualizer.totalSize,
+          }}
+        >
+          {rowVirtualizer.virtualItems.map((virtualRow) => (
+            <div
+              ref={virtualRow.measureRef}
+              key={virtualRow.index}
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                width: '100%',
+                transform: `translateY(${virtualRow.start}px)`,
+              }}
+            >
+              {renderRow(items[virtualRow.index]!)}
+            </div>
+          ))}
+        </Container>
+      </Wrapper>
     );
   },
 );
