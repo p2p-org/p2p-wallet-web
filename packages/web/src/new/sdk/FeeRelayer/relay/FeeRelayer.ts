@@ -633,11 +633,6 @@ export class FeeRelayer implements FeeRelayerType {
       signedTransaction.partialSign(...signers);
     }
 
-    console.log(
-      111111,
-      signedTransaction.compileMessage().accountKeys.map((p) => p.toString()),
-    );
-
     return {
       swapData: swap.swapData,
       preparedTransaction: new SolanaSDK.PreparedTransaction({

@@ -469,7 +469,7 @@ export class SolanaSDK {
       signedTransaction.partialSign(...signers);
       const serializedTransaction = signedTransaction.serialize().toString('base64');
 
-      const decodedTransaction = JSON.stringify(transaction);
+      const decodedTransaction = transaction;
       Logger.log(decodedTransaction, LogEvent.info);
       Logger.log(serializedTransaction, LogEvent.info);
 

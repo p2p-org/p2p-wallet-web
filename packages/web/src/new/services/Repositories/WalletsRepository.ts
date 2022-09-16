@@ -300,20 +300,20 @@ export class WalletsRepository extends SDListViewModel<Wallet> {
         // sent
         // TODO: WLNotification
         Logger.log(
-          JSON.stringify({
+          {
             account: notification.pubkey,
             lamports: oldLamportsValue.sub(newLamportsValue),
-          }),
+          },
           LogEvent.info,
         );
       } else if (oldLamportsValue.lt(newLamportsValue)) {
         // received
         // TODO: WLNotification
         Logger.log(
-          JSON.stringify({
+          {
             account: notification.pubkey,
             lamports: newLamportsValue.sub(oldLamportsValue),
-          }),
+          },
           LogEvent.info,
         );
       }

@@ -4,13 +4,13 @@ import { delay, inject, injectable } from 'tsyringe';
 
 import { LoadableStateType } from 'new/app/models/LoadableRelay';
 import { ViewModel } from 'new/core/viewmodels/ViewModel';
-import { RecipientsListViewModel } from 'new/scenes/Main/Send/SelectAddress/Subviews/RecipientsCollectionView';
 import { convertToBalance } from 'new/sdk/SolanaSDK';
 import { SendRelayMethodType } from 'new/services/SendService';
 import { numberToString } from 'new/utils/NumberExtensions';
 
 import type { Recipient } from '../Send.ViewModel';
 import { Network, SendViewModel } from '../Send.ViewModel';
+import { RecipientsListViewModel } from './Subviews/RecipientsCollectionView';
 
 export enum SelectAddressErrorType {
   chooseTheRecipientToProceed = 'chooseTheRecipientToProceed',

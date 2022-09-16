@@ -1,10 +1,10 @@
 import { ZERO } from '@orca-so/sdk';
 import { action, computed, makeObservable, observable, reaction, when } from 'mobx';
-import { singleton } from 'tsyringe';
+import { delay, inject, singleton } from 'tsyringe';
 
 import { LoadableRelay, LoadableState, LoadableStateType } from 'new/app/models/LoadableRelay';
 import type { PayingFee } from 'new/app/models/PayingFee';
-import { FeeType, networkFees, transactionFees } from 'new/app/models/PayingFee';
+import { FeeType, FeeTypeEnum, networkFees, transactionFees } from 'new/app/models/PayingFee';
 import { SDFetcherState } from 'new/core/viewmodels/SDViewModel';
 import { ViewModel } from 'new/core/viewmodels/ViewModel';
 import { ActiveInputField, VerificationError } from 'new/scenes/Main/Swap/Swap/types';
@@ -14,6 +14,7 @@ import type { Wallet } from 'new/sdk/SolanaSDK';
 import { convertToBalance, toLamport } from 'new/sdk/SolanaSDK';
 import { Defaults } from 'new/services/Defaults';
 import { ModalService, ModalType } from 'new/services/ModalService';
+import { PricesService } from 'new/services/PriceAPIs/PricesService';
 import { WalletsRepository } from 'new/services/Repositories';
 import {
   findBestPoolsPairForEstimatedAmount,
@@ -23,11 +24,13 @@ import {
   totalLamport,
   totalToken,
 } from 'new/services/Swap';
-import { ChooseWalletViewModel } from 'new/ui/components/common/ChooseWallet/ChooseWallet.ViewModel';
+import { ChooseWalletViewModel } from 'new/ui/components/common/ChooseWallet';
 import type { ConfirmSwapModalProps } from 'new/ui/modals/confirmModals/ConfirmSwapModal';
 import * as ProcessTransaction from 'new/ui/modals/ProcessTransactionModal/ProcessTransaction.Models';
 import type { ProcessTransactionModalProps } from 'new/ui/modals/ProcessTransactionModal/ProcessTransactionModal';
 import { maxSlippage, rounded } from 'new/utils/NumberExtensions';
+
+import { SwapSettingsViewModel } from '../SwapSettings/SwapSettings.ViewModel';
 
 interface SwapViewModelType {
   sourceWallet: Wallet | null;
@@ -43,6 +46,7 @@ interface SwapViewModelType {
   walletDidSelect(wallet: Wallet, isSelectingSourceWallet: boolean): void;
 }
 
+// for ability of resolve in SwapSettings.ViewModel
 @singleton()
 export class SwapViewModel extends ViewModel implements SwapViewModelType {
   isUsingAllBalance: boolean;
@@ -66,7 +70,9 @@ export class SwapViewModel extends ViewModel implements SwapViewModelType {
     public swapService: SwapService,
     public chooseSourceWalletViewModel: ChooseWalletViewModel,
     public chooseDestinationWalletViewModel: ChooseWalletViewModel,
+    @inject(delay(() => SwapSettingsViewModel)) public swapSettingsViewModel: SwapSettingsViewModel,
     private _walletsRepository: WalletsRepository,
+    private _pricesService: PricesService,
     private _modalService: ModalService,
   ) {
     super();
@@ -107,6 +113,8 @@ export class SwapViewModel extends ViewModel implements SwapViewModelType {
       activeInputField: observable,
 
       minimumReceiveAmount: computed,
+      isSendingMaxAmount: computed,
+      isShowingShowDetailsButton: computed,
 
       swapSourceAndDestination: action,
       useAllBalance: action,
@@ -116,6 +124,9 @@ export class SwapViewModel extends ViewModel implements SwapViewModelType {
       changeFeePayingToken: action,
 
       setActiveInputField: action,
+      setSlippage: action,
+
+      totalFees: computed,
     });
   }
 
@@ -141,6 +152,7 @@ export class SwapViewModel extends ViewModel implements SwapViewModelType {
   protected override onInitialize(): void {
     this.chooseSourceWalletViewModel.initialize();
     this.chooseDestinationWalletViewModel.initialize();
+    this.swapSettingsViewModel.initialize();
 
     this.addReaction(
       when(
@@ -157,6 +169,7 @@ export class SwapViewModel extends ViewModel implements SwapViewModelType {
   protected override afterReactionsRemoved(): void {
     this.chooseSourceWalletViewModel.end();
     this.chooseDestinationWalletViewModel.end();
+    this.swapSettingsViewModel.end();
   }
 
   private _bind(initialWallet: Wallet | null): void {
@@ -318,8 +331,10 @@ export class SwapViewModel extends ViewModel implements SwapViewModelType {
           const fees = await this._feesRequest();
 
           // If paying token fee equals input token
-          // TODO: check that equality by reference works
-          if (this.payingWallet === this.sourceWallet && !this.payingWallet?.isNativeSOL) {
+          if (
+            this.payingWallet?.pubkey === this.sourceWallet?.pubkey &&
+            !this.payingWallet?.isNativeSOL
+          ) {
             // Selected wallet can not covert fee
             if (
               input + totalDecimal(fees) > availableAmount &&
@@ -353,30 +368,6 @@ export class SwapViewModel extends ViewModel implements SwapViewModelType {
         },
       ),
     );
-  }
-
-  get minimumReceiveAmount(): number | null {
-    const poolsPair = this.bestPoolsPair;
-    const _inputAmount = this.inputAmount;
-    const slippage = this.slippage;
-    const sourceWallet = this.sourceWallet;
-    const destinationWallet = this.destinationWallet;
-
-    const sourceDecimals = sourceWallet?.token.decimals;
-    if (!_inputAmount || !sourceDecimals) {
-      return null;
-    }
-    const inputAmount = toLamport(_inputAmount, sourceDecimals);
-    const destinationDecimals = destinationWallet?.token.decimals;
-    if (!poolsPair || !inputAmount || !destinationDecimals) {
-      return null;
-    }
-
-    const minimumAmountOut = getMinimumAmountOut(poolsPair, inputAmount, slippage);
-    if (!minimumAmountOut) {
-      return null;
-    }
-    return convertToBalance(minimumAmountOut, destinationDecimals);
   }
 
   // Actions
@@ -432,6 +423,53 @@ export class SwapViewModel extends ViewModel implements SwapViewModelType {
     );
   }
 
+  get minimumReceiveAmount(): number | null {
+    const poolsPair = this.bestPoolsPair;
+    const _inputAmount = this.inputAmount;
+    const slippage = this.slippage;
+    const sourceWallet = this.sourceWallet;
+    const destinationWallet = this.destinationWallet;
+
+    const sourceDecimals = sourceWallet?.token.decimals;
+    if (!_inputAmount || !sourceDecimals) {
+      return null;
+    }
+    const inputAmount = toLamport(_inputAmount, sourceDecimals);
+    const destinationDecimals = destinationWallet?.token.decimals;
+    if (!poolsPair || !inputAmount || !destinationDecimals) {
+      return null;
+    }
+
+    const minimumAmountOut = getMinimumAmountOut(poolsPair, inputAmount, slippage);
+    if (!minimumAmountOut) {
+      return null;
+    }
+    return convertToBalance(minimumAmountOut, destinationDecimals);
+  }
+
+  get exchangeRate(): number | null {
+    const inputAmount = this.inputAmount;
+    const estimatedAmount = this.estimatedAmount;
+    if (inputAmount && estimatedAmount && inputAmount > 0 && estimatedAmount > 0) {
+      return estimatedAmount / inputAmount;
+    }
+    return null;
+  }
+
+  get isSendingMaxAmount(): boolean {
+    const availableAmount = this.availableAmount;
+    const currentAmount = this.inputAmount;
+    return availableAmount === currentAmount;
+  }
+
+  get isShowingShowDetailsButton(): boolean {
+    return Boolean(this.sourceWallet) && Boolean(this.destinationWallet);
+  }
+
+  getPrice(symbol: string): number | null {
+    return this._pricesService.currentPrice(symbol)?.value ?? null;
+  }
+
   reload(): void {
     this.loadingState = LoadableState.loading;
 
@@ -462,7 +500,9 @@ export class SwapViewModel extends ViewModel implements SwapViewModelType {
     const fees = this.fees.value;
     if (fees && fees.length && this.availableAmount !== this.inputAmount) {
       // TODO:  notificationsService.showInAppNotification
-      console.log('This value is calculated by subtracting the transaction fee from your balance.');
+      console.warn(
+        'This value is calculated by subtracting the transaction fee from your balance.',
+      );
     }
   }
 
@@ -710,6 +750,45 @@ export class SwapViewModel extends ViewModel implements SwapViewModelType {
         viewModel: this,
       },
     );
+  }
+
+  setSlippage(slippage: number): void {
+    this.slippage = slippage;
+  }
+
+  get totalFees(): {
+    totalFeesSymbol: string;
+    decimals: number;
+    amount: number;
+    amountInFiat: number;
+  } | null {
+    const fees = this.fees.value ?? [];
+
+    const totalFeesSymbol = fees.find((fee) => fee.type.type === FeeTypeEnum.transactionFee)?.token
+      .symbol;
+    if (totalFeesSymbol) {
+      const totalFees = fees.filter(
+        (fee) =>
+          fee.token.symbol === totalFeesSymbol &&
+          fee.type.type !== FeeTypeEnum.liquidityProviderFee,
+      );
+      const decimals = totalFees[0]?.token.decimals ?? 0;
+      const amount = convertToBalance(
+        totalFees.reduce((acc, curr) => acc.add(curr.lamports), ZERO),
+        decimals,
+      );
+      const price = this.getPrice(totalFeesSymbol) ?? 0;
+      const amountInFiat = amount * price;
+
+      return {
+        totalFeesSymbol,
+        decimals,
+        amount,
+        amountInFiat,
+      };
+    }
+
+    return null;
   }
 }
 

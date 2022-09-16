@@ -1,10 +1,9 @@
 import { action, flow, makeObservable, observable, when } from 'mobx';
 import assert from 'ts-invariant';
-import { delay, inject, injectable } from 'tsyringe';
+import { injectable } from 'tsyringe';
 
 import { SDListViewModel } from 'new/core/viewmodels/SDListViewModel';
 import { SDFetcherState } from 'new/core/viewmodels/SDViewModel';
-import { SendViewModel } from 'new/scenes/Main/Send';
 import { excludingSpecialTokens, Wallet } from 'new/sdk/SolanaSDK';
 import { PricesService } from 'new/services/PriceAPIs/PricesService';
 import { WalletsRepository } from 'new/services/Repositories';
@@ -23,7 +22,6 @@ export class ChooseWalletViewModel extends SDListViewModel<Wallet> {
     // private _tokensRepository: TokensRepository,
     private _solanaSDK: SolanaService,
     private _pricesService: PricesService,
-    @inject(delay(() => SendViewModel)) public sendViewModel: Readonly<SendViewModel>,
   ) {
     super();
 

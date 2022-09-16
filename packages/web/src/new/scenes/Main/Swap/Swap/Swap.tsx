@@ -5,17 +5,23 @@ import { useIsMobile } from '@p2p-wallet-web/ui';
 import { observer } from 'mobx-react-lite';
 
 import { WidgetPageWithBottom } from 'components/common/WidgetPageWithBottom';
-import { useViewModel } from 'new/core/viewmodels/useViewModel';
 
 import { ActionButton } from './ActionButton';
 import { SettingsButton } from './SettingsButton';
+import { DetailsView } from './Subviews/DetailsView';
 import { MainSwapView } from './Subviews/MainSwapView';
-import { SwapViewModel } from './Swap.ViewModel';
+import type { SwapViewModel } from './Swap.ViewModel';
 
-const Wrapper = styled.div``;
+const Wrapper = styled.div`
+  display: grid;
+  grid-gap: 16px;
+`;
 
-export const Swap: FC = observer(() => {
-  const viewModel = useViewModel(SwapViewModel);
+interface Props {
+  viewModel: Readonly<SwapViewModel>;
+}
+
+export const Swap: FC<Props> = observer(({ viewModel }) => {
   const isMobile = useIsMobile();
 
   return (
@@ -27,7 +33,7 @@ export const Swap: FC = observer(() => {
     >
       <Wrapper>
         <MainSwapView viewModel={viewModel} />
-        {viewModel.payingWallet?.token.symbol}
+        {viewModel.isShowingShowDetailsButton ? <DetailsView viewModel={viewModel} /> : null}
       </Wrapper>
     </WidgetPageWithBottom>
   );

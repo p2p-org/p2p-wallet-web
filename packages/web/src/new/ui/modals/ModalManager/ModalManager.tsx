@@ -18,11 +18,10 @@ import type { ModalPropsType } from './types';
 const Wrapper = styled.div`
   position: fixed;
   top: 0;
+  right: 0;
+  bottom: 0;
   left: 0;
   z-index: ${zIndexes.modal};
-
-  width: 100vw;
-  height: 100vh;
 
   background-color: rgba(0, 0, 0, 0.6);
 
@@ -86,14 +85,6 @@ const modalsMap = new Map<ModalType, LazyExoticComponent<ModalPropsType & any>>(
     lazy(() => import('components/modals/TransactionInfoModals/TransactionDetailsModal')),
   ],
   [
-    ModalType.SHOW_MODAL_TRANSACTION_STATUS_SEND,
-    lazy(() => import('components/modals/TransactionInfoModals/TransactionStatusSendModal')),
-  ],
-  [
-    ModalType.SHOW_MODAL_TRANSACTION_STATUS_SWAP,
-    lazy(() => import('components/modals/TransactionInfoModals/TransactionStatusSwapModal')),
-  ],
-  [
     ModalType.SHOW_MODAL_CLOSE_TOKEN_ACCOUNT,
     lazy(() => import('components/modals/CloseTokenAccountModal')),
   ],
@@ -142,7 +133,7 @@ export const ModalManager: FC = observer(() => {
               <ModalComponent
                 {...modal.props}
                 key={modal.modalId}
-                close={(result?: any) => vm.closeModal(modal.modalId, result)}
+                close={(result?: unknown) => vm.closeModal(modal.modalId, result)}
               />
             </ModalWrapper>
           </ModalContainer>

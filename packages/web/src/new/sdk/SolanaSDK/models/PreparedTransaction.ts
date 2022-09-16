@@ -36,7 +36,7 @@ export class PreparedTransaction {
     const serializedTransaction = transaction.serialize().toString('base64');
 
     Logger.log(serializedTransaction, LogEvent.info);
-    const decodedTransaction = JSON.stringify(transaction);
+    const decodedTransaction = transaction;
     Logger.log(decodedTransaction, LogEvent.info);
 
     return serializedTransaction;

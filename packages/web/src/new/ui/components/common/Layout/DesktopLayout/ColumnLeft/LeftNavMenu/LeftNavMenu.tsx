@@ -205,17 +205,6 @@ export const LeftNavMenu: FunctionComponent = () => {
         </NavButton>
       </NavLinkMenu>
       <NavLinkMenu
-        to={{ pathname: '/swapold', state: { fromPage: location.pathname } }}
-        className="button"
-      >
-        <NavButton>
-          <IconBlock>
-            <NavIcon name="swap" />
-          </IconBlock>
-          <Name>SwapOld</Name>
-        </NavButton>
-      </NavLinkMenu>
-      <NavLinkMenu
         to={{ pathname: '/settings', state: { fromPage: location.pathname } }}
         className="button"
       >
