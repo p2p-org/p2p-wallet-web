@@ -74,6 +74,6 @@ const CellOrigin: FC<Props> = ({ forwardedRef, token, isPlaceholder, style }) =>
   );
 };
 
-export const Cell = forwardRef<HTMLDivElement, Props>((props, ref: React.Ref<HTMLDivElement>) => (
+export const Cell = forwardRef<HTMLDivElement, Props>((props, ref) => (
   <CellOrigin {...props} forwardedRef={ref} />
 ));

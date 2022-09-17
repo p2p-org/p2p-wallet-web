@@ -28,6 +28,7 @@ interface Props<T> {
   className?: string;
 }
 
+//TODO: make this component to be used instead of StaticSectionsCollectionView
 export const StaticSectionsCollectionVirtualizedView = observer(
   <T,>({
     viewModel,

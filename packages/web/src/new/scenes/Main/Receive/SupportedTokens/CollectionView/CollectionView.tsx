@@ -11,7 +11,6 @@ import type { SupportedTokensViewModel } from 'new/scenes/Main/Receive/Supported
 import { Token } from 'new/sdk/SolanaSDK';
 import { StaticSectionsCollectionVirtualizedView } from 'new/ui/components/common/StaticSectionsCollectionVitualizedView';
 
-//TODO: make this component to be used instead of StaticSectionsCollectionView
 const StaticSectionsCollectionVirtualizedViewStyled = styled(
   StaticSectionsCollectionVirtualizedView,
 )`
