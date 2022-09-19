@@ -3,6 +3,7 @@ import { NavLink } from 'react-router-dom';
 
 import { styled } from '@linaria/react';
 import { theme } from '@p2p-wallet-web/ui';
+import { observer } from 'mobx-react-lite';
 
 import { Content } from 'new/scenes/Main/Receive/common/styled';
 import type { ReceiveViewModel } from 'new/scenes/Main/Receive/Receive.ViewModel';
@@ -26,7 +27,7 @@ type Props = {
   viewModel: ReceiveViewModel;
 };
 
-export const ReceiveToken: FC<Props> = ({ viewModel }) => {
+export const ReceiveToken: FC<Props> = observer(({ viewModel }) => {
   const isTokenListAvailable = viewModel.tokenType.isSolana();
 
   const renderSourceNetworkReceivePanel = () => {
@@ -53,4 +54,4 @@ export const ReceiveToken: FC<Props> = ({ viewModel }) => {
       </WidgetPage>
     </Layout>
   );
-};
+});
