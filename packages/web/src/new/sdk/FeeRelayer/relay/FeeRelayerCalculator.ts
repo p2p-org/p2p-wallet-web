@@ -2,6 +2,7 @@ import { ZERO } from '@orca-so/sdk';
 import { u64 } from '@solana/spl-token';
 import type { PublicKey } from '@solana/web3.js';
 
+import { FeeRelayerConstants } from 'new/sdk/FeeRelayer';
 import type { OrcaSwapType } from 'new/sdk/OrcaSwap';
 import { getInputAmountSlippage } from 'new/sdk/OrcaSwap';
 import * as SolanaSDK from 'new/sdk/SolanaSDK';
@@ -217,8 +218,16 @@ export class DefaultFeeRelayerCalculator implements FeeRelayerCalculator {
       throw FeeRelayerError.swapPoolsNotFound();
     }
 
-    const transactionFee = getInputAmountSlippage(topUpPools, feeInSOL.transaction, 0.03);
-    const accountCreationFee = getInputAmountSlippage(topUpPools, feeInSOL.accountBalances, 0.03);
+    const transactionFee = getInputAmountSlippage(
+      topUpPools,
+      feeInSOL.transaction,
+      FeeRelayerConstants.topUpSlippage,
+    );
+    const accountCreationFee = getInputAmountSlippage(
+      topUpPools,
+      feeInSOL.accountBalances,
+      FeeRelayerConstants.topUpSlippage,
+    );
 
     return new SolanaSDK.FeeAmount({
       transaction: transactionFee ?? ZERO,

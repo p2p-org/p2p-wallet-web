@@ -642,6 +642,7 @@ export class SwapViewModel extends ViewModel implements SwapViewModelType {
     }
 
     // TODO: check "?? 0" right
+    // TODO: need to do it early for error on "max amount"
     if (
       rounded(inputAmount, sourceWallet.token.decimals) >
       rounded(this.availableAmount ?? 0, sourceWallet.token.decimals)

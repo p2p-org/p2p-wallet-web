@@ -1,46 +1,36 @@
 import type { FC, ReactNode } from 'react';
-import { useCallback } from 'react';
-import { generatePath, useHistory, useParams } from 'react-router';
 
-import { styled } from '@linaria/react';
-import { theme } from '@p2p-wallet-web/ui';
 import { observer } from 'mobx-react-lite';
 import * as R from 'ramda';
 
-import { Icon } from 'components/ui';
 import { ListWrapper, Row, Text } from 'components/ui/AccordionDetails/common';
+import type { LoadableRelay } from 'new/app/models/LoadableRelay';
 import { LoadableStateType } from 'new/app/models/LoadableRelay';
 import type { PayingFee } from 'new/app/models/PayingFee';
-import { FeesView } from 'new/scenes/Main/Swap/Subviews/FeesView';
-import type { SwapViewModel } from 'new/scenes/Main/Swap/Swap/Swap.ViewModel';
-import type { SwapRouteParams } from 'new/scenes/Main/Swap/Swap/types';
 import { convertToBalance } from 'new/sdk/SolanaSDK';
 import { Defaults } from 'new/services/Defaults';
 import { numberToString } from 'new/utils/NumberExtensions';
 
-const PenIcon = styled(Icon)`
-  width: 16px;
-  height: 16px;
+import { FeeTransactionTooltip } from './FeeTransactionTooltip';
 
-  margin: auto 0;
-
-  color: ${theme.colors.textIcon.secondary};
-
-  cursor: pointer;
-`;
-
-interface Props {
-  viewModel: Readonly<SwapViewModel>;
+interface DetailFeesViewVieModelType {
+  readonly fees: LoadableRelay<PayingFee[]>;
+  getPrice(symbol: string): number | null;
+  readonly totalFees: {
+    totalFeesSymbol: string;
+    decimals: number;
+    amount: number;
+    amountInFiat: number;
+  } | null;
 }
 
-export const DetailFeesView: FC<Props> = observer(({ viewModel }) => {
-  const history = useHistory();
-  const { symbol } = useParams<SwapRouteParams>();
+interface Props {
+  viewModel: Readonly<DetailFeesViewVieModelType>;
+  slippageView?: ReactNode;
+  feesView?: ReactNode;
+}
 
-  const handleShowSettings = useCallback(() => {
-    history.push(generatePath('/swap/settings/:symbol?', { symbol }));
-  }, [history, symbol]);
-
+export const DetailFeesView: FC<Props> = observer(({ viewModel, slippageView, feesView }) => {
   const formatAmount = ({ fee, withFiat }: { fee: PayingFee; withFiat: boolean }) => {
     const amount = convertToBalance(fee.lamports, fee.token.decimals);
     const price = viewModel.getPrice(fee.token.symbol) ?? 0;
@@ -52,7 +42,7 @@ export const DetailFeesView: FC<Props> = observer(({ viewModel }) => {
         {fee.token.symbol}
         {withFiat ? (
           <Text className="gray">
-            (~${Defaults.fiat.symbol}$
+            (~{Defaults.fiat.symbol}
             {numberToString(amountInFiat, {
               maximumFractionDigits: 2,
             })}
@@ -94,9 +84,11 @@ export const DetailFeesView: FC<Props> = observer(({ viewModel }) => {
   const freeFee = ({ fee, index }: { fee: PayingFee; index: number }) => {
     const payBy = fee.info?.payBy;
     return (
-      <Text key={index} className="right">
-        Free {payBy ? <Text className="green inline-flex">({payBy})</Text> : null}
-        {/*{fee.info ? <FeeTransactionTooltip viewModel={viewModel} /> : null}*/}
+      <Text key={index} className="inline-flex">
+        <Text className="right">
+          Free {payBy ? <Text className="green">({payBy})</Text> : null}
+        </Text>
+        {fee.info ? <FeeTransactionTooltip info={fee.info} /> : null}
       </Text>
     );
   };
@@ -139,12 +131,7 @@ export const DetailFeesView: FC<Props> = observer(({ viewModel }) => {
         <>
           <ListWrapper>
             {/* Slippage */}
-            <Row>
-              <Text className="gray">Max price slippage</Text>
-              <Text>
-                {viewModel.slippage * 100}% <PenIcon name="pen" onClick={handleShowSettings} />
-              </Text>
-            </Row>
+            {slippageView ? slippageView : null}
 
             {/* Fee categories*/}
             {Object.entries(group).map((el) => {
@@ -169,9 +156,7 @@ export const DetailFeesView: FC<Props> = observer(({ viewModel }) => {
             })}
           </ListWrapper>
 
-          <ListWrapper className="flat">
-            <FeesView items={viewModel.swapSettingsViewModel.feesContent} flat />
-          </ListWrapper>
+          {feesView ? <ListWrapper className="flat">{feesView}</ListWrapper> : null}
 
           {/* Total */}
           <ListWrapper className="total">
