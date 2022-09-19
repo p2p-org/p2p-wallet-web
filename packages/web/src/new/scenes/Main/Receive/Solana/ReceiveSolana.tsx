@@ -24,7 +24,7 @@ export const ReceiveSolana: FC = () => {
       </Content>
       <BottomWrapper>
         <ExplorerA
-          href={`"https://explorer.solana.com/address/${viewModel.pubkeyBase58}"`}
+          href={`https://explorer.solana.com/address/${viewModel.pubkeyBase58}`}
           target="_blank"
           rel="noopener noreferrer noindex"
           className="button"
