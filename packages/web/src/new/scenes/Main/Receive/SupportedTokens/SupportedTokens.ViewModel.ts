@@ -20,7 +20,9 @@ export class SupportedTokensViewModel extends SDListViewModel<Token> {
     });
   }
 
-  protected override setDefaults() {}
+  protected override setDefaults() {
+    this.keyword = '';
+  }
 
   protected override onInitialize() {
     this.reload();
