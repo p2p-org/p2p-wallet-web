@@ -5,8 +5,9 @@ import { styled } from '@linaria/react';
 import { theme } from '@p2p-wallet-web/ui';
 import { observer } from 'mobx-react-lite';
 
+import { useViewModel } from 'new/core/viewmodels/useViewModel';
 import { Content } from 'new/scenes/Main/Receive/common/styled';
-import type { ReceiveViewModel } from 'new/scenes/Main/Receive/Receive.ViewModel';
+import { ReceiveViewModel } from 'new/scenes/Main/Receive/Receive.ViewModel';
 import { ReceiveBitcoin } from 'new/scenes/Main/Receive/ReceiveBitcoin';
 import { NetworkSelect } from 'new/scenes/Main/Receive/ReceiveToken/NetworkSelect';
 import { ReceiveSolana } from 'new/scenes/Main/Receive/Solana';
@@ -23,11 +24,9 @@ const WhatTokensCanIReceiveLink = styled(NavLink)`
   text-decoration: none;
 `;
 
-type Props = {
-  viewModel: ReceiveViewModel;
-};
+export const ReceiveToken: FC = observer(() => {
+  const viewModel = useViewModel(ReceiveViewModel);
 
-export const ReceiveToken: FC<Props> = observer(({ viewModel }) => {
   const isTokenListAvailable = viewModel.tokenType.isSolana();
 
   const renderSourceNetworkReceivePanel = () => {

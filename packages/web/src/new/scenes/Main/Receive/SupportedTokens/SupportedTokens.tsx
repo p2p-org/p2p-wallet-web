@@ -3,21 +3,19 @@ import type { FC } from 'react';
 import { useIsTablet } from '@p2p-wallet-web/ui';
 import { observer } from 'mobx-react-lite';
 
+import { useViewModel } from 'new/core/viewmodels/useViewModel';
 import { Content } from 'new/scenes/Main/Receive/common/styled';
 import { CollectionView } from 'new/scenes/Main/Receive/SupportedTokens/CollectionView';
 import { EmptyError } from 'new/scenes/Main/Receive/SupportedTokens/common/EmptyError';
 import { Hint } from 'new/scenes/Main/Receive/SupportedTokens/common/Hint';
-import type { SupportedTokensViewModel } from 'new/scenes/Main/Receive/SupportedTokens/SupportedTokens.ViewModel';
+import { SupportedTokensViewModel } from 'new/scenes/Main/Receive/SupportedTokens/SupportedTokens.ViewModel';
 import { Layout } from 'new/ui/components/common/Layout';
 import { WidgetPage } from 'new/ui/components/common/WidgetPage';
 import { SearchInput } from 'new/ui/components/ui/SearchInput';
 
-type Props = {
-  viewModel: Readonly<SupportedTokensViewModel>;
-};
-
-export const SupportedTokens: FC<Props> = observer(({ viewModel }) => {
+export const SupportedTokens: FC = observer(() => {
   const isTablet = useIsTablet();
+  const viewModel = useViewModel(SupportedTokensViewModel);
 
   return (
     <Layout>

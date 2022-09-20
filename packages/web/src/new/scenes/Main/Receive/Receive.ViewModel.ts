@@ -2,7 +2,6 @@ import { action, makeObservable, observable } from 'mobx';
 import { singleton } from 'tsyringe';
 
 import { ViewModel } from 'new/core/viewmodels/ViewModel';
-import { SupportedTokensViewModel } from 'new/scenes/Main/Receive/SupportedTokens/SupportedTokens.ViewModel';
 import type { Token } from 'new/sdk/SolanaSDK';
 import { SolanaSDKPublicKey } from 'new/sdk/SolanaSDK';
 import type { ModalPromise } from 'new/services/ModalService';
@@ -61,7 +60,6 @@ export class ReceiveViewModel extends ViewModel {
     private _walletsRepository: WalletsRepository,
     private _solanaSDK: SolanaService,
     private _modalService: ModalService,
-    public supportedTokensViewModel: SupportedTokensViewModel,
   ) {
     super();
 
@@ -86,13 +84,9 @@ export class ReceiveViewModel extends ViewModel {
     this.tokenType = TokenType.solana;
   }
 
-  protected override onInitialize() {
-    this.supportedTokensViewModel.initialize();
-  }
+  protected override onInitialize() {}
 
-  protected override afterReactionsRemoved() {
-    this.supportedTokensViewModel.end();
-  }
+  protected override afterReactionsRemoved() {}
 
   isRenBtcCreated(): boolean {
     return this._walletsRepository.getWallets().some((wallet) => wallet.token.isRenBTC);

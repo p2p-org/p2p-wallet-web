@@ -1,12 +1,12 @@
 import { action, flow, makeObservable, observable } from 'mobx';
-import { injectable } from 'tsyringe';
+import { singleton } from 'tsyringe';
 
 import { SDListViewModel } from 'new/core/viewmodels/SDListViewModel';
 import type { Token } from 'new/sdk/SolanaSDK';
 import { excludingSpecialTokens } from 'new/sdk/SolanaSDK';
 import { SolanaService } from 'new/services/SolanaService';
 
-@injectable()
+@singleton()
 export class SupportedTokensViewModel extends SDListViewModel<Token> {
   keyword = '';
 
