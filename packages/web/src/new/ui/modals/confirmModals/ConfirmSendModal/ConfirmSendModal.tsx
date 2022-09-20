@@ -118,7 +118,7 @@ export const ConfirmSendModal: FC<ConfirmSendModalProps & ModalPropsType> = obse
 
     return (
       <WrapperModal
-        title={<ModalTitle>Confirm sending</ModalTitle>}
+        title={<ModalTitle>Confirm sending {viewModel.wallet?.token.symbol ?? ''}</ModalTitle>}
         close={handleCloseClick}
         footer={
           <>

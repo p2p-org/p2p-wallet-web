@@ -2,7 +2,11 @@ import type { Network } from '@saberhq/solana-contrib';
 
 const SOLANA_BASE_URL = 'https://explorer.solana.com/';
 
-export const getExplorerUrl = (type = 'tx', address: string, cluster: Network): string => {
+export const getExplorerUrl = (
+  type = 'tx',
+  address: string,
+  cluster: Network = 'mainnet-beta',
+): string => {
   const baseUrlWithAddress = `${SOLANA_BASE_URL}${type}/${address}`;
   switch (cluster) {
     case 'devnet':

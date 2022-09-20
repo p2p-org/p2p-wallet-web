@@ -6,19 +6,23 @@ import { expr } from 'mobx-utils';
 
 import { TransactionStatusType } from 'new/app/models/PendingTransaction';
 import { FeeRelayerError } from 'new/sdk/FeeRelayer';
-import * as ProcessTransaction from 'new/ui/modals/ProcessTransactionModal/ProcessTransaction.Models';
 
+import * as ProcessTransaction from '../../ProcessTransaction.Models';
 import type { ProcessTransactionModalViewModel } from '../../ProcessTransactionModal.ViewModel';
 
 const Wrapper = styled.div``;
 
 interface Props {
-  viewModel: ProcessTransactionModalViewModel;
+  viewModel: Readonly<ProcessTransactionModalViewModel>;
 }
 
 export const HeaderLabel: FC<Props> = observer(({ viewModel }) => {
   const text = expr(() => {
     const info = viewModel.pendingTransaction;
+    if (!info) {
+      return '';
+    }
+
     const originalText = info.rawTransaction.isSwap
       ? 'The swap is being processed'
       : 'The transaction is being processed';

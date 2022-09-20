@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import { useLayoutEffect } from 'react';
+import { useState } from 'react';
 
 import { styled } from '@linaria/react';
 import { theme } from '@p2p-wallet-web/ui';
@@ -9,10 +9,10 @@ import { Modal } from 'components/ui/Modal';
 import { useViewModel } from 'new/core/viewmodels/useViewModel';
 import type { SwapViewModel } from 'new/scenes/Main/Swap';
 import { ButtonCancel } from 'new/ui/components/common/ButtonCancel';
-import { PasswordInput } from 'new/ui/components/common/PasswordInput';
 
 import type { ModalPropsType } from '../../ModalManager';
 import { ArrowDown } from '../common/ArrowDown';
+import { SectionPassword } from '../common/SectionPassword';
 import { Section } from '../common/styled';
 import { ActionButton } from './ActionButton';
 import { ConfirmSwapModalViewModel } from './ConfirmSwapModal.ViewModel';
@@ -30,17 +30,6 @@ const ModalTitle = styled.div`
   text-align: center;
 `;
 
-const SubTitle = styled.span`
-  display: flex;
-  margin-bottom: 8px;
-
-  color: ${theme.colors.textIcon.primary};
-  font-weight: 500;
-  font-size: 16px;
-  line-height: 140%;
-  letter-spacing: 0.01em;
-`;
-
 const ActionTitle = styled.div`
   padding: 16px;
 
@@ -51,10 +40,6 @@ const ActionTitle = styled.div`
   letter-spacing: 0.01em;
 `;
 
-const PasswordInputStyled = styled(PasswordInput)`
-  height: 46px;
-`;
-
 export interface ConfirmSwapModalProps {
   viewModel: Readonly<SwapViewModel>;
 }
@@ -62,63 +47,35 @@ export interface ConfirmSwapModalProps {
 export const ConfirmSwapModal: FC<ConfirmSwapModalProps & ModalPropsType> = observer(
   ({ close, viewModel }) => {
     const vm = useViewModel(ConfirmSwapModalViewModel);
+    vm.setSwapViewModel(viewModel);
 
-    useLayoutEffect(() => {
-      vm.setSwapViewModel(viewModel);
-    }, [viewModel, vm]);
+    const [isDisabled, setIsDisabled] = useState(true);
 
-    // const { walletProviderInfo } = useWallet();
-    // const tryUnlockSeedAndMnemonic = useTryUnlockSeedAndMnemonic();
-    //
-    // const [password, setPassword] = useState('');
-    // const [hasError, setHasError] = useState(false);
-    //
     const handleCloseClick = () => {
       close(false);
     };
-    //
-    // const validatePassword = async (value: string) => {
-    //   try {
-    //     await tryUnlockSeedAndMnemonic(value);
-    //     setHasError(false);
-    //   } catch (error) {
-    //     setHasError(true);
-    //   }
-    // };
-    //
-    // const handlePasswordChange = (value: string) => {
-    //   setPassword(value);
-    //
-    //   if (value) {
-    //     void validatePassword(value);
-    //   }
-    // };
 
     const handleConfirmClick = () => {
-      // close(true);
-      // viewModel.authenticateAndSwap();
+      close(true);
+      vm.authenticateAndSwap();
     };
 
-    // const isSecretKeyWallet =
-    //   walletProviderInfo?.name === DEFAULT_WALLET_PROVIDERS[DefaultWalletType.SecretKey].name;
-    // const isDisabled =
-    //   (isSecretKeyWallet && (!password || hasError)) ||
-    //   !viewModel.wallet ||
-    //   !viewModel.amount ||
-    //   !viewModel.recipient;
+    const handleDisabledChange = (flag: boolean) => {
+      setIsDisabled(flag);
+    };
 
     return (
       <WrapperModal
         title={
           <ModalTitle>
-            Confirm swapping {viewModel.sourceWallet?.token.symbol ?? ''} →{' '}
-            {viewModel.destinationWallet?.token.symbol ?? ''}
+            Confirm swapping {vm.sourceWallet?.token.symbol ?? ''} →{' '}
+            {vm.destinationWallet?.token.symbol ?? ''}
           </ModalTitle>
         }
         close={handleCloseClick}
         footer={
           <>
-            <ActionButton viewModel={vm} onClick={handleConfirmClick} />
+            <ActionButton viewModel={vm} disabled={isDisabled} onClick={handleConfirmClick} />
             <ButtonCancel onClick={handleCloseClick} />
           </>
         }
@@ -133,17 +90,7 @@ export const ConfirmSwapModal: FC<ConfirmSwapModalProps & ModalPropsType> = obse
           </div>
           <DetailsView viewModel={vm} />
         </Section>
-        {/*{isSecretKeyWallet ? (*/}
-        {/*  <Section className="password">*/}
-        {/*    <SubTitle>Enter password to confirm</SubTitle>*/}
-        {/*    <PasswordInputStyled*/}
-        {/*      value={password}*/}
-        {/*      onChange={handlePasswordChange}*/}
-        {/*      isError={hasError}*/}
-        {/*    />*/}
-        {/*    {hasError ? <ErrorHint error="The password is not correct" noIcon /> : null}*/}
-        {/*  </Section>*/}
-        {/*) : null}*/}
+        <SectionPassword onChange={handleDisabledChange} />
       </WrapperModal>
     );
   },

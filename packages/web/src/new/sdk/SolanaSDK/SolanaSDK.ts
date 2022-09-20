@@ -690,12 +690,12 @@ export class SolanaSDK {
   }> {
     const feePayerNew = feePayer ?? account;
 
-    let minRentExemptionNew: Lamports;
-    if (minRentExemption) {
-      minRentExemptionNew = minRentExemption;
-    } else {
-      minRentExemptionNew = await this.getMinimumBalanceForRentExemption(AccountInfo.span);
-    }
+    // let minRentExemptionNew: Lamports;
+    // if (minRentExemption) {
+    //   minRentExemptionNew = minRentExemption;
+    // } else {
+    //   minRentExemptionNew = await this.getMinimumBalanceForRentExemption(AccountInfo.span);
+    // }
     const splDestination = await this.findSPLTokenDestinationAddress({
       mintAddress,
       destinationAddress,
