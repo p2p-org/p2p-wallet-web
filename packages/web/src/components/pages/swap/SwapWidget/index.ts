@@ -1,1 +1,0 @@
-export { SwapWidget } from './SwapWidget';

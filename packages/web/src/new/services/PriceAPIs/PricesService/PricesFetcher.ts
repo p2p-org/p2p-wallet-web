@@ -18,7 +18,7 @@ export abstract class PricesFetcher {
         throw new Error(response.statusText);
       }
 
-      Logger.log(await response.clone().text(), LogEvent.response, 'getPrices');
+      Logger.log(await response.clone().json(), LogEvent.response, 'getPrices');
 
       return response.json();
     });

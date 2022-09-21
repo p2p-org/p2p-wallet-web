@@ -139,7 +139,7 @@ const Wrapper = styled.button`
   }
 `;
 
-type Props = {
+interface Props extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   primary?: boolean;
   secondary?: boolean;
   dark?: boolean;
@@ -154,9 +154,9 @@ type Props = {
   medium?: boolean;
   big?: boolean;
   full?: boolean;
-};
+}
 
-export const Button: FunctionComponent<Props & React.ButtonHTMLAttributes<HTMLButtonElement>> = ({
+export const Button: FunctionComponent<Props> = ({
   type = 'button',
   primary,
   secondary,

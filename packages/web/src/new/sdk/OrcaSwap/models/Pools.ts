@@ -1,3 +1,4 @@
+import { ZERO } from '@orca-so/sdk';
 import type { u64 } from '@solana/spl-token';
 import type { PublicKey } from '@solana/web3.js';
 
@@ -126,7 +127,7 @@ export function getOutputAmount(pools: PoolsPair, inputAmount: u64): u64 | null 
   } catch {
     // ignore
   }
-  if (!estimatedAmountOfPool0) {
+  if (!estimatedAmountOfPool0 || estimatedAmountOfPool0.eq(ZERO)) {
     return null;
   }
 
@@ -180,7 +181,7 @@ export function getInputAmount(pools: PoolsPair, estimatedAmount: u64): u64 | nu
     } catch {
       // ignore
     }
-    if (!inputAmountOfPool1) {
+    if (!inputAmountOfPool1 || inputAmountOfPool1.eq(ZERO)) {
       return null;
     }
     let inputAmountOfPool0;
@@ -218,6 +219,7 @@ export function getInputAmountSlippage(
     if (!inputAmount) {
       return null;
     }
+
     return inputAmount;
   }
   // transitive
@@ -229,7 +231,7 @@ export function getInputAmountSlippage(
     } catch {
       // ignore
     }
-    if (!inputAmountPool1) {
+    if (!inputAmountPool1 || inputAmountPool1.eq(ZERO)) {
       return null;
     }
 
@@ -277,7 +279,7 @@ export function getMinimumAmountOut(
     } catch {
       // ignore
     }
-    if (!outputAmountOfPool0) {
+    if (!outputAmountOfPool0 || outputAmountOfPool0.eq(ZERO)) {
       return null;
     }
 

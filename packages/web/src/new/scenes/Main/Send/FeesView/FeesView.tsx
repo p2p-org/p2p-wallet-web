@@ -152,13 +152,27 @@ export const FeesView: FC<Props> = observer(({ viewModel }) => {
     });
   });
 
+  const totalFeeHeader = expr(() => {
+    const feeAmount = viewModel.feeInfo.value?.feeAmount;
+    if (!feeAmount) {
+      return '';
+    }
+
+    const payingWallet = viewModel.payingWallet;
+    const decimals = payingWallet?.token.decimals;
+    const symbol = payingWallet?.token.symbol ?? '';
+
+    const fee = convertToBalance(feeAmount.total, decimals ?? 0);
+    return `${numberToString(fee, { maximumFractionDigits: 9 })} ${symbol}`;
+  });
+
   return (
     <Accordion
       title={
         <AccordionTitle
           title="Transaction details"
-          titleBottomName="Total"
-          titleBottomValue="value"
+          titleBottomName="Total fee"
+          titleBottomValue={totalFeeHeader}
           // titleBottomName={titleBottomNameEl(isAddressNotMatchNetwork)}
           // titleBottomValue={titleBottomValueEl(isAddressNotMatchNetwork, details.totalAmount || '')}
         />
@@ -192,7 +206,7 @@ export const FeesView: FC<Props> = observer(({ viewModel }) => {
       ) : null}
       <ListWrapper className="total">
         <Row>
-          <Text>Total</Text>
+          <Text>Total fee</Text>
           {totalFee}
         </Row>
       </ListWrapper>

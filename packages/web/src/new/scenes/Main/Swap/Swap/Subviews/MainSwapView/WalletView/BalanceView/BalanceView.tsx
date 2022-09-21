@@ -7,6 +7,7 @@ import { expr } from 'mobx-utils';
 
 import { Icon } from 'components/ui';
 import type { SwapViewModel } from 'new/scenes/Main/Swap/Swap/Swap.ViewModel';
+import { VerificationError } from 'new/scenes/Main/Swap/Swap/types';
 import { numberToString } from 'new/utils/NumberExtensions';
 
 const Wrapper = styled.div`
@@ -25,6 +26,14 @@ const Wrapper = styled.div`
     cursor: auto;
 
     pointer-events: none;
+  }
+
+  &.error {
+    color: ${theme.colors.system.errorMain};
+  }
+
+  &.success {
+    color: ${theme.colors.system.successMain};
   }
 `;
 
@@ -47,6 +56,23 @@ interface Props {
 }
 
 export const BalanceView: FC<Props> = observer(({ type, viewModel }) => {
+  const classNameStatus = expr(() => {
+    if (type !== 'source') {
+      return undefined;
+    }
+
+    const isErrorState =
+      viewModel.error === VerificationError.insufficientFunds ||
+      viewModel.error === VerificationError.inputAmountIsNotValid;
+    const isSendingMax = viewModel.isSendingMaxAmount;
+    if (isErrorState) {
+      return 'error';
+    } else if (isSendingMax) {
+      return 'success';
+    }
+    return undefined;
+  });
+
   // available amount
   const balanceText = expr(() => {
     if (type === 'source') {
@@ -60,7 +86,7 @@ export const BalanceView: FC<Props> = observer(({ type, viewModel }) => {
 
   const maxButtonIsHidden = expr(() => {
     if (type === 'source') {
-      return false;
+      return viewModel.isSendingMaxAmount;
     }
     return true;
   });
@@ -71,7 +97,7 @@ export const BalanceView: FC<Props> = observer(({ type, viewModel }) => {
   };
 
   return (
-    <Wrapper>
+    <Wrapper className={classNameStatus}>
       {balanceText ? <WalletBalanceIcon name="wallet" /> : null}
       {balanceText}
       {maxButtonIsHidden ? null : <Max onClick={useAllBalance}>MAX</Max>}

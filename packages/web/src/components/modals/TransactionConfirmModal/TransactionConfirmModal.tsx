@@ -23,8 +23,8 @@ import { trackEvent } from 'utils/analytics';
 import { Section } from './common/styled';
 import type { TransferParams } from './Send';
 import { Send } from './Send';
-import type { SwapParams } from './Swap';
-import { Swap } from './Swap';
+// import type { SwapParams } from './Swap';
+// import { Swap } from './Swap';
 
 const WrapperModal = styled(Modal)`
   flex-basis: 524px;
@@ -70,7 +70,7 @@ const SendIcon = styled(Icon)`
 
 type ModalParams = {
   type: 'send' | 'swap';
-  params: TransferParams | SwapParams;
+  params: TransferParams /*| SwapParams;*/;
 };
 
 export type TransactionConfirmModalProps = TransactionDetailsProps &
@@ -128,11 +128,7 @@ export const TransactionConfirmModal: FunctionComponent<
   const renderTitle = () => {
     switch (type) {
       case 'send':
-        return (
-          <ModalTitle>
-            Confirm sending {(params as TransferParams).source.balance?.token.symbol}
-          </ModalTitle>
-        );
+        return <ModalTitle>Confirm sending {params.source.balance?.token.symbol}</ModalTitle>;
       default:
         return (
           <ModalTitle>
@@ -159,7 +155,7 @@ export const TransactionConfirmModal: FunctionComponent<
         action = (
           <>
             <SendIcon name="top" />
-            Send {(params as TransferParams).amount.formatUnits()}
+            Send {params.amount.formatUnits()}
           </>
         );
         break;
@@ -184,11 +180,11 @@ export const TransactionConfirmModal: FunctionComponent<
     >
       {type === 'send' ? <ActionTitle>You are going to send</ActionTitle> : undefined}
       {type === 'send' ? (
-        <Send params={params as TransferParams} sendState={sendState} btcAddress={btcAddress} />
+        <Send params={params} sendState={sendState} btcAddress={btcAddress} />
       ) : undefined}
-      {type === 'swap' ? (
-        <Swap params={params as SwapParams} swapInfo={swapInfo} showTitle={true} />
-      ) : undefined}
+      {/*{type === 'swap' ? (*/}
+      {/*  <Swap params={params as SwapParams} swapInfo={swapInfo} showTitle={true} />*/}
+      {/*) : undefined}*/}
 
       {isSecretKeyWallet ? (
         <Section className="password">

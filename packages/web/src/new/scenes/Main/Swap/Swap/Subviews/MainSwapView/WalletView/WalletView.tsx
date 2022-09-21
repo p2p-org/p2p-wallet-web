@@ -10,6 +10,7 @@ import { WalletSelectorContent } from 'new/scenes/Main/Send/ChooseTokenAndAmount
 import type { SwapViewModel } from 'new/scenes/Main/Swap/Swap/Swap.ViewModel';
 import { ActiveInputField } from 'new/scenes/Main/Swap/Swap/types';
 import type { Wallet } from 'new/sdk/SolanaSDK';
+import { AccountCreationFeeTooltip } from 'new/ui/components/common/AccountCreationFeeTooltip';
 import { ChooseWallet } from 'new/ui/components/common/ChooseWallet';
 import { numberToString } from 'new/utils/NumberExtensions';
 
@@ -54,6 +55,10 @@ const MainWrapper = styled.div`
 
 const InputWrapper = styled.div`
   display: flex;
+`;
+
+const AccountCreationFeeTooltipStyled = styled(AccountCreationFeeTooltip)`
+  margin-left: 4px;
 `;
 
 interface Props {
@@ -173,6 +178,9 @@ export const WalletView: FC<Props> = observer(({ type, viewModel }) => {
             onFocus={handleFocus}
             onBlur={handleBlur}
           />
+          {type === 'source' && viewModel.isSendingMaxAmount ? (
+            <AccountCreationFeeTooltipStyled />
+          ) : null}
         </InputWrapper>
       </MainWrapper>
     </Wrapper>

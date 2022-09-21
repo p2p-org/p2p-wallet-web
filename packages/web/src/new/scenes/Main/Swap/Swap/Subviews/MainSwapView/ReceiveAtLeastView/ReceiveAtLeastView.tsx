@@ -25,6 +25,14 @@ const Wrapper = styled.div`
   &.isHidden {
     visibility: hidden;
   }
+
+  & > :first-child {
+    white-space: nowrap;
+  }
+
+  & > :last-child {
+    text-align: right;
+  }
 `;
 
 const Black = styled.span`

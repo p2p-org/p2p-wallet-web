@@ -25,7 +25,6 @@ import { ModalManager } from 'new/ui/modals/ModalManager';
 import { Auth } from 'pages/Auth';
 import { Landing } from 'pages/Landing';
 import { ReceiveOld } from 'pages/Receive';
-import { Swap } from 'pages/Swap';
 import { Wallet } from 'pages/Wallet';
 import { WalletSettings } from 'pages/WalletSettings';
 import { AuthRequiredRoute } from 'utils/routes/UserRequiredRoute';
@@ -60,7 +59,6 @@ const App: React.FC = observer(() => {
                   <AuthRequiredRoute path="/send/:publicKey/:status(result)" component={Send} />
                   <AuthRequiredRoute path="/send/:publicKey?" component={Send} />
                   <AuthRequiredRoute path="/swap/(settings)?/:symbol?" component={SwapPage} />
-                  <AuthRequiredRoute path="/swapold/(settings)?/:symbol?" component={Swap} />
                   <AuthRequiredRoute path="/settings/network" component={SettingsNetwork} />
                   <AuthRequiredRoute path="/settings" component={Settings} />
                   <ModalManager />

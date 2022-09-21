@@ -5,7 +5,6 @@ import { useHistory, useLocation } from 'react-router';
 import { styled } from '@linaria/react';
 import { observer } from 'mobx-react-lite';
 
-import { useConfig } from 'app/contexts';
 import { Menu, MenuItem } from 'components/ui';
 import type { Wallet } from 'new/sdk/SolanaSDK';
 
@@ -27,7 +26,6 @@ export const TokenMenu: FC<Props> = observer(
   ({ wallet, isHidden = false, onToggleClick, className }) => {
     const history = useHistory();
     const location = useLocation();
-    const { tokenConfigs } = useConfig();
 
     const handleButtonClick = useCallback(
       (route: string) => () => {
@@ -47,7 +45,7 @@ export const TokenMenu: FC<Props> = observer(
           <MenuItem icon="top" onItemClick={handleButtonClick(`/send/${wallet.pubkey}`)}>
             Send {wallet.token.symbol}
           </MenuItem>
-          {wallet.token.symbol && tokenConfigs[wallet.token.symbol] ? (
+          {wallet.token.symbol ? (
             <MenuItem icon="swap" onItemClick={handleButtonClick(`/swap/${wallet.token.symbol}`)}>
               Swap {wallet.token.symbol}
             </MenuItem>

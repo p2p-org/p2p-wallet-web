@@ -9,9 +9,12 @@ export enum ModalType {
   SHOW_MODAL_CLOSE_TOKEN_ACCOUNT,
   SHOW_MODAL_ERROR,
   SHOW_MODAL_PROCEED_USERNAME,
-  SHOW_MODAL_ADD_COIN,
   SHOW_MODAL_CHOOSE_BUY_TOKEN_MOBILE,
-  SHOW_MODAL_TRANSACTION_STATUS_SWAP,
-  SHOW_MODAL_TRANSACTION_STATUS_SEND,
   SHOW_MODAL_SELECT_LIST_MOBILE,
 }
+
+export type ModalPropsType<T = boolean, P = any> = {
+  close: (result?: T) => void;
+} & {
+  [K in keyof P]: P[K];
+};

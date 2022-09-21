@@ -11,6 +11,7 @@ export const Section = styled.div`
   &.swap {
     position: relative;
 
+    grid-gap: 36px;
     padding: 0;
   }
 
@@ -22,13 +23,6 @@ export const Section = styled.div`
   &.password {
     padding: 8px 0 24px;
   }
-`;
-
-export const SectionTitle = styled.div`
-  color: ${theme.colors.bg.buttonDisabled};
-  font-weight: 600;
-  font-size: 14px;
-  line-height: 140%;
 `;
 
 export const FieldInfo = styled.div`
@@ -101,51 +95,6 @@ export const InfoValue = styled.div`
   letter-spacing: 0.01em;
 `;
 
-export const Subtitle = styled.div`
-  margin-top: 16px;
-  margin-bottom: 16px;
-  margin-left: 20px;
-
-  font-weight: 500;
-  font-size: 16px;
-  line-height: 140%;
-`;
-
 export const Wrapper = styled.div`
   margin-bottom: 8px;
-`;
-
-export const FromToWrapper = styled.div`
-  position: absolute;
-  top: 64px;
-  left: 27px;
-
-  width: 32px;
-  height: 32px;
-
-  color: ${theme.colors.textIcon.active};
-
-  background: ${theme.colors.bg.primary};
-
-  border: 1px solid ${theme.colors.stroke.secondary};
-  border-radius: 40%;
-
-  svg {
-    width: 20px;
-    height: 20px;
-  }
-`;
-
-export const Overlay = styled.div`
-  position: absolute;
-  top: 5px;
-  left: -2px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 34px;
-  height: 19px;
-
-  background: ${theme.colors.bg.primary};
 `;
