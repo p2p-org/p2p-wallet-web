@@ -3,37 +3,17 @@ import type { FC } from 'react';
 import { observer } from 'mobx-react-lite';
 
 import { ButtonCancel } from 'components/common/ButtonCancel';
-import { Button } from 'components/ui';
-import { convertToBalance } from 'new/sdk/SolanaSDK';
-import { Loader } from 'new/ui/components/common/Loader';
 import type { ModalPropsType } from 'new/ui/modals/ModalManager';
-import { numberToTokenString } from 'new/utils/NumberExtensions';
+import { RenBTCButton } from 'new/ui/modals/ReceiveBitcoinModal/Create/RenBTCButton';
 
 import { List, Row, Section, WrapperModal } from '../common/styled';
 import type { ReceiveBitcoinModalViewModel } from '../ReceiveBitcoinModal.ViewModel';
 
-type Props = { viewModel: ReceiveBitcoinModalViewModel };
+interface Props {
+  viewModel: Readonly<ReceiveBitcoinModalViewModel>;
+}
 
-export const Create: FC<ModalPropsType & Props> = observer(({ viewModel, close }) => {
-  const feeInTokenString =
-    viewModel.totalFee && viewModel.payingWallet
-      ? numberToTokenString(
-          convertToBalance(viewModel.totalFee, viewModel.payingWallet.token.decimals),
-          viewModel.payingWallet.token,
-        )
-      : '';
-  const buttonText = `Pay ${feeInTokenString} & Continue`;
-
-  const handleCreateAccountClick = async () => {
-    try {
-      await viewModel.createRenBTC();
-      close(true);
-    } catch (error) {
-      viewModel.errorNotification((error as Error).message);
-      console.error(error);
-    }
-  };
-
+export const Create: FC<Props & ModalPropsType> = observer(({ viewModel, close }) => {
   return (
     <WrapperModal
       title="Receiving via Bitcoin network"
@@ -43,9 +23,7 @@ export const Create: FC<ModalPropsType & Props> = observer(({ viewModel, close }
       close={() => close(false)}
       footer={
         <>
-          <Button primary disabled={viewModel.isLoading} onClick={handleCreateAccountClick}>
-            {viewModel.isLoading ? <Loader /> : buttonText}
-          </Button>
+          <RenBTCButton viewModel={viewModel} close={close} />
           <ButtonCancel onClick={() => close(false)} />
         </>
       }
@@ -58,6 +36,7 @@ export const Create: FC<ModalPropsType & Props> = observer(({ viewModel, close }
             below.
           </Row>
         </List>
+        {viewModel.payingWallet?.token.symbol}
 
         {/*<Feature name={FEATURE_PAY_BY}>
           <FeePaySelector

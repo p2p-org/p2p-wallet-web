@@ -63,12 +63,12 @@ const App: React.FC = observer(() => {
                   <AuthRequiredRoute path="/swapold/(settings)?/:symbol?" component={Swap} />
                   <AuthRequiredRoute path="/settings/network" component={SettingsNetwork} />
                   <AuthRequiredRoute path="/settings" component={Settings} />
+                  <ModalManager />
                 </Main>
               </Switch>
               <Intercom />
               <FeaturesToggle />
               <ToastManager anchor="left" renderToast={(props) => <NotifyToast {...props} />} />
-              <ModalManager />
               <NotificationManager />
             </Root>
           </Providers>

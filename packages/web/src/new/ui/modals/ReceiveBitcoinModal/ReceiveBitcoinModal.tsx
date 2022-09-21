@@ -19,9 +19,9 @@ const LoaderWrapperStyled = styled(LoaderWrapper)`
 export const ReceiveBitcoinModal: FC<ModalPropsType> = observer(({ close }) => {
   const viewModel = useViewModel(ReceiveBitcoinModalViewModel);
 
-  if (viewModel.isLoading && !viewModel.accountStatus) {
+  if (viewModel.isLoading) {
     return (
-      <WrapperModal close={() => {}}>
+      <WrapperModal close={() => close(false)}>
         <LoaderWrapperStyled>
           <Loader size="100" />
         </LoaderWrapperStyled>

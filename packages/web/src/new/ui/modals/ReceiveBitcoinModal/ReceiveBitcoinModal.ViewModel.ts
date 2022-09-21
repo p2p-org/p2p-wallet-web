@@ -1,10 +1,9 @@
-import { action, computed, makeObservable, observable, reaction } from 'mobx';
+import { action, computed, makeObservable, observable, reaction, runInAction } from 'mobx';
 import { singleton } from 'tsyringe';
 
 import { ViewModel } from 'new/core/viewmodels/ViewModel';
 import type { Wallet } from 'new/sdk/SolanaSDK';
 import { convertToBalance } from 'new/sdk/SolanaSDK';
-import { NotificationService } from 'new/services/NotificationService';
 import { PricesService } from 'new/services/PriceAPIs/PricesService';
 import { WalletsRepository } from 'new/services/Repositories';
 
@@ -30,7 +29,6 @@ export class ReceiveBitcoinModalViewModel extends ViewModel {
     private _renBTCStatusService: RenBTCStatusService,
     private _priceService: PricesService,
     private _walletsRepository: WalletsRepository,
-    private _notificationService: NotificationService,
   ) {
     super();
 
@@ -85,19 +83,26 @@ export class ReceiveBitcoinModalViewModel extends ViewModel {
       await this._renBTCStatusService.load();
       const payableWallets = await this._renBTCStatusService.getPayableWallets();
 
-      this.error = null;
-      this.accountStatus = payableWallets.length
-        ? RenBTCAccountStatus.payingWalletAvailable
-        : RenBTCAccountStatus.topUpRequired;
-      this.payableWallets = payableWallets;
-      this.payingWallet = payableWallets[0] ?? null;
+      runInAction(() => {
+        this.error = null;
+        this.accountStatus = payableWallets.length
+          ? RenBTCAccountStatus.payingWalletAvailable
+          : RenBTCAccountStatus.topUpRequired;
+        this.payableWallets = payableWallets;
+        this.payingWallet = payableWallets[0] ?? null;
+      });
     } catch (error) {
-      this.error = (error as Error).message;
-      this.accountStatus = null;
-      this.payableWallets = [];
-      this.payingWallet = null;
+      runInAction(() => {
+        console.error(error);
+        this.error = (error as Error).message;
+        this.accountStatus = null;
+        this.payableWallets = [];
+        this.payingWallet = null;
+      });
     } finally {
-      this.isLoading = false;
+      runInAction(() => {
+        this.isLoading = false;
+      });
     }
   }
 
@@ -112,9 +117,14 @@ export class ReceiveBitcoinModalViewModel extends ViewModel {
           }
           try {
             const fee = await this._renBTCStatusService.getCreationFee(wallet.mintAddress);
-            this.totalFee = convertToBalance(fee, wallet.token.decimals);
+            console.log(600, fee.toString(), wallet.mintAddress);
+            runInAction(() => {
+              this.totalFee = convertToBalance(fee, wallet.token.decimals);
+            });
           } catch {
-            this.totalFee = null;
+            runInAction(() => {
+              this.totalFee = null;
+            });
           }
         },
       ),
@@ -154,13 +164,10 @@ export class ReceiveBitcoinModalViewModel extends ViewModel {
       await this._renBTCStatusService.createAccount(address, mintAddress);
       this.error = null;
     } catch (error) {
+      console.error(error);
       this.error = (error as Error).message;
     } finally {
       this.isLoading = false;
     }
-  }
-
-  errorNotification(message: string): void {
-    this._notificationService.error(message);
   }
 }

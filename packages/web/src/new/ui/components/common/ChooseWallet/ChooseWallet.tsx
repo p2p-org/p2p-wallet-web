@@ -70,7 +70,7 @@ interface Props {
   viewModel: Readonly<ChooseWalletViewModel>;
   selector: React.ReactNode;
   selectedWallet: Wallet | null;
-  customFilter: (wallet: Wallet) => boolean;
+  customFilter?: (wallet: Wallet) => boolean;
   showOtherWallets: boolean;
   onWalletChange: (wallet: Wallet) => void;
 }
@@ -82,7 +82,9 @@ export const ChooseWallet: FC<Props> = observer(
 
     useLayoutEffect(() => {
       viewModel.selectWallet(selectedWallet);
-      viewModel.setCustomFilter(customFilter);
+      if (customFilter) {
+        viewModel.setCustomFilter(customFilter);
+      }
       viewModel.setShowOtherWallets(showOtherWallets);
       viewModel.reload();
     }, [customFilter, selectedWallet, showOtherWallets, viewModel]);

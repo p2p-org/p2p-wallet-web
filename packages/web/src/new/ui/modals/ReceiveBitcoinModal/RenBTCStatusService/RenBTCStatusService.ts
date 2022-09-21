@@ -175,6 +175,12 @@ export class RenBTCStatusService {
       feeInSOL: feeInSOL,
       payingFeeTokenMint: mintAddress,
     });
+    console.log(500, {
+      mintAddress: _mintAddress,
+      feeAmount: feeAmount.toJSON(),
+      feeInSOL: feeInSOL.toJSON(),
+      feeInToken: feeInToken.toJSON(),
+    });
 
     return feeInToken.total;
   }

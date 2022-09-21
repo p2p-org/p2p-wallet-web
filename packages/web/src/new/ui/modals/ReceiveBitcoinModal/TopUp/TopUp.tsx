@@ -7,9 +7,7 @@ import type { ModalPropsType } from 'new/ui/modals/ModalManager';
 
 import { List, Row, Section, WrapperModal } from '../common/styled';
 
-type Props = ModalPropsType;
-
-export const TopUp: FC<Props> = ({ close }) => {
+export const TopUp: FC<ModalPropsType> = ({ close }) => {
   const history = useHistory();
 
   const handleTopUpClick = () => {
