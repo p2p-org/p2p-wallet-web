@@ -1,13 +1,14 @@
-import { ZERO } from '@orca-so/sdk';
-import { computed, makeObservable, observable, runInAction } from 'mobx';
+import { action, computed, makeObservable, observable, reaction } from 'mobx';
 import { singleton } from 'tsyringe';
 
 import { ViewModel } from 'new/core/viewmodels/ViewModel';
 import type { Wallet } from 'new/sdk/SolanaSDK';
+import { convertToBalance } from 'new/sdk/SolanaSDK';
 import { NotificationService } from 'new/services/NotificationService';
 import { PricesService } from 'new/services/PriceAPIs/PricesService';
 import { WalletsRepository } from 'new/services/Repositories';
-import { RenBTCStatusService } from 'new/ui/modals/ReceiveBitcoinModal/RenBTCStatusService';
+
+import { RenBTCStatusService } from './RenBTCStatusService';
 
 export enum RenBTCAccountStatus {
   topUpRequired,
@@ -20,9 +21,10 @@ export class ReceiveBitcoinModalViewModel extends ViewModel {
   error: string | null = null;
   accountStatus: RenBTCAccountStatus | null = null;
   payableWallets: Wallet[] = [];
+
   payingWallet: Wallet | null = null;
-  totalFee = ZERO;
-  feeInFiat = 0;
+  totalFee: number | null = null;
+  feeInFiat: number | null = null;
 
   constructor(
     private _renBTCStatusService: RenBTCStatusService,
@@ -37,11 +39,15 @@ export class ReceiveBitcoinModalViewModel extends ViewModel {
       error: observable,
       accountStatus: observable,
       payableWallets: observable,
+
       payingWallet: observable,
       totalFee: observable,
       feeInFiat: observable,
 
       solanaPubkey: computed,
+
+      reload: action,
+      createRenBTC: action,
     });
   }
 
@@ -50,12 +56,14 @@ export class ReceiveBitcoinModalViewModel extends ViewModel {
     this.accountStatus = null;
     this.payableWallets = [];
     this.payingWallet = null;
-    this.totalFee = ZERO;
-    this.feeInFiat = 0;
+
+    this.totalFee = null;
+    this.feeInFiat = null;
   }
 
   protected override onInitialize() {
     void this.reload();
+    void this._bind();
   }
 
   protected override afterReactionsRemoved() {}
@@ -64,52 +72,91 @@ export class ReceiveBitcoinModalViewModel extends ViewModel {
     return this._walletsRepository.nativeWallet?.pubkey ?? null;
   }
 
+  // Methods
+
   async reload(): Promise<void> {
-    await this._renBTCStatusService.load();
+    this.isLoading = true;
+    this.error = null;
+    this.accountStatus = null;
+    this.payableWallets = [];
+    this.payingWallet = null;
 
-    const payableWallets = await this._renBTCStatusService.getPayableWallets();
+    try {
+      await this._renBTCStatusService.load();
+      const payableWallets = await this._renBTCStatusService.getPayableWallets();
 
-    const payingWallet = payableWallets.length ? payableWallets[0]! : null;
-
-    const totalFee = payingWallet
-      ? await this._renBTCStatusService.getCreationFee(payingWallet.mintAddress)
-      : ZERO;
-
-    const currentPrice = payingWallet
-      ? this._priceService.currentPrice(payingWallet.token.symbol)?.value || 0
-      : 0;
-    const feeInFiat = totalFee.toNumber() * currentPrice;
-
-    runInAction(() => {
-      this.isLoading = false;
+      this.error = null;
       this.accountStatus = payableWallets.length
         ? RenBTCAccountStatus.payingWalletAvailable
         : RenBTCAccountStatus.topUpRequired;
       this.payableWallets = payableWallets;
-      this.payingWallet = payingWallet;
-      this.totalFee = totalFee;
-      this.feeInFiat = feeInFiat;
-    });
+      this.payingWallet = payableWallets[0] ?? null;
+    } catch (error) {
+      this.error = (error as Error).message;
+      this.accountStatus = null;
+      this.payableWallets = [];
+      this.payingWallet = null;
+    } finally {
+      this.isLoading = false;
+    }
+  }
+
+  private _bind(): void {
+    this.addReaction(
+      reaction(
+        () => this.payingWallet,
+        async (wallet) => {
+          if (!wallet) {
+            this.totalFee = null;
+            return;
+          }
+          try {
+            const fee = await this._renBTCStatusService.getCreationFee(wallet.mintAddress);
+            this.totalFee = convertToBalance(fee, wallet.token.decimals);
+          } catch {
+            this.totalFee = null;
+          }
+        },
+      ),
+    );
+
+    this.addReaction(
+      reaction(
+        () => this.totalFee,
+        (fee) => {
+          const symbol = this.payingWallet?.token.symbol;
+          if (!fee || !symbol) {
+            this.feeInFiat = null;
+            return;
+          }
+          const price = this._priceService.currentPrice(symbol)?.value;
+          if (!price) {
+            this.feeInFiat = null;
+            return;
+          }
+          this.feeInFiat = fee * price;
+        },
+      ),
+    );
   }
 
   async createRenBTC() {
     const mintAddress = this.payingWallet?.mintAddress;
     const address = this.payingWallet?.pubkey;
-
     if (!mintAddress || !address) {
       return;
     }
 
-    runInAction(() => {
-      this.isLoading = true;
-    });
+    this.isLoading = true;
+    this.error = null;
 
     try {
       await this._renBTCStatusService.createAccount(address, mintAddress);
+      this.error = null;
+    } catch (error) {
+      this.error = (error as Error).message;
     } finally {
-      runInAction(() => {
-        this.isLoading = false;
-      });
+      this.isLoading = false;
     }
   }
 

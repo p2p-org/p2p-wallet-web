@@ -236,7 +236,7 @@ export class SolanaSDK {
     feePayer,
     feeCalculator,
   }: {
-    owner: PublicKey;
+    owner?: PublicKey;
     instructions: TransactionInstruction[];
     signers?: Signer[];
     feePayer: PublicKey;

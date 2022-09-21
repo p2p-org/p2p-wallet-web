@@ -7,9 +7,10 @@ import { Button } from 'components/ui';
 import { convertToBalance } from 'new/sdk/SolanaSDK';
 import { Loader } from 'new/ui/components/common/Loader';
 import type { ModalPropsType } from 'new/ui/modals/ModalManager';
-import { List, Row, Section, WrapperModal } from 'new/ui/modals/ReceiveBitcoinModal/common/styled';
-import type { ReceiveBitcoinModalViewModel } from 'new/ui/modals/ReceiveBitcoinModal/ReceiveBitcoinModal.ViewModel';
 import { numberToTokenString } from 'new/utils/NumberExtensions';
+
+import { List, Row, Section, WrapperModal } from '../common/styled';
+import type { ReceiveBitcoinModalViewModel } from '../ReceiveBitcoinModal.ViewModel';
 
 type Props = { viewModel: ReceiveBitcoinModalViewModel };
 
