@@ -3,8 +3,10 @@ import Sticky from 'react-stickynode';
 
 import { styled } from '@linaria/react';
 import { up } from '@p2p-wallet-web/ui';
+import { observer } from 'mobx-react-lite';
 
-import { Features, isEnabled } from 'new/services/FeatureFlags';
+import { isEnabled } from 'new/services/FeatureFlags';
+import { Features } from 'new/services/FeatureFlags/features';
 import {
   COLUMN_LEFT_WIDTH,
   COLUMN_LEFT_WIDTH_MOBILE,
@@ -33,7 +35,7 @@ const Wrapper = styled.div`
   grid-template-rows: min-content;
 `;
 
-export const ColumnLeft: FC = () => {
+export const ColumnLeft: FC = observer(() => {
   return (
     <ColumnLeftSticky top={HEADER_HEIGHT + CONTAINER_PADDING_TOP}>
       <Wrapper>
@@ -42,4 +44,4 @@ export const ColumnLeft: FC = () => {
       </Wrapper>
     </ColumnLeftSticky>
   );
-};
+});

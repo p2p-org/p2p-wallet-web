@@ -4,6 +4,7 @@ import { BrowserRouter, HashRouter, Route, Switch } from 'react-router-dom';
 import * as Sentry from '@sentry/react';
 import dayjs from 'dayjs';
 import localizedFormat from 'dayjs/plugin/localizedFormat';
+import { observer } from 'mobx-react-lite';
 
 import { FeaturesToggle } from 'components/common/FeaturesToggle';
 import { Intercom } from 'components/common/Intercom';
@@ -31,7 +32,7 @@ import { Providers } from './Providers';
 
 dayjs.extend(localizedFormat);
 
-const App: React.FC = () => {
+const App: React.FC = observer(() => {
   const Router: React.ElementType = process.env.REACT_APP_STAGING ? HashRouter : BrowserRouter;
 
   return (
@@ -71,7 +72,7 @@ const App: React.FC = () => {
       </Sentry.ErrorBoundary>
     </>
   );
-};
+});
 
 // eslint-disable-next-line import/no-default-export
 export default App;
