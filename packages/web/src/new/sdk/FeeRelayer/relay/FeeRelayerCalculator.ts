@@ -93,14 +93,12 @@ export class DefaultFeeRelayerCalculator implements FeeRelayerCalculator {
     const neededAmount = expectedFee.clone();
 
     // expected fees
-    const expectedTopUpNetworkFee = new u64(
-      (context.lamportsPerSignature ?? new u64(5000)).muln(2),
-    );
-    const expectedTransactionNetworkFee = expectedFee.transaction;
+    const expectedTopUpNetworkFee = new u64(context.lamportsPerSignature.muln(2));
+    const expectedTransactionNetworkFee = new u64(expectedFee.transaction);
 
     // real fees
-    let neededTopUpNetworkFee = expectedTopUpNetworkFee;
-    let neededTransactionNetworkFee = expectedTransactionNetworkFee;
+    let neededTopUpNetworkFee = new u64(expectedTopUpNetworkFee);
+    let neededTransactionNetworkFee = new u64(expectedTransactionNetworkFee);
 
     // is Top up free
     if (
@@ -128,7 +126,7 @@ export class DefaultFeeRelayerCalculator implements FeeRelayerCalculator {
       return neededAmount;
     }
 
-    const neededAmountWithoutCheckingRelayAccount = neededAmount;
+    const neededAmountWithoutCheckingRelayAccount = neededAmount.clone();
     const minimumRelayAccountBalance = context.minimumRelayAccountBalance;
 
     // check if relay account current balance can cover part of needed amount
