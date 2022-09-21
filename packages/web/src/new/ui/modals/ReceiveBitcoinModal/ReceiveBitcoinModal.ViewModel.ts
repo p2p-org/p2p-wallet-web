@@ -6,16 +6,34 @@ import type { Wallet } from 'new/sdk/SolanaSDK';
 import { convertToBalance } from 'new/sdk/SolanaSDK';
 import { PricesService } from 'new/services/PriceAPIs/PricesService';
 import { WalletsRepository } from 'new/services/Repositories';
+import { ChooseWalletViewModel } from 'new/ui/components/common/ChooseWallet';
+import { numberToString } from 'new/utils/NumberExtensions';
 
 import { RenBTCStatusService } from './RenBTCStatusService';
 
 export enum RenBTCAccountStatus {
-  topUpRequired,
-  payingWalletAvailable,
+  topUpRequired = 'topUpRequired',
+  payingWalletAvailable = 'payingWalletAvailable',
+}
+
+interface ReceiveBitcoinModalViewModelType {
+  readonly solanaPubkey: string | null;
+  readonly isLoading: boolean;
+  readonly error: string | null;
+  readonly accountStatus: RenBTCAccountStatus | null;
+  readonly payingWallet: Wallet | null;
+  readonly totalFee: number | null;
+  readonly feeInFiat: number | null;
+
+  reload(): void;
+  createRenBTC(): void;
 }
 
 @singleton()
-export class ReceiveBitcoinModalViewModel extends ViewModel {
+export class ReceiveBitcoinModalViewModel
+  extends ViewModel
+  implements ReceiveBitcoinModalViewModelType
+{
   isLoading = true;
   error: string | null = null;
   accountStatus: RenBTCAccountStatus | null = null;
@@ -29,6 +47,7 @@ export class ReceiveBitcoinModalViewModel extends ViewModel {
     private _renBTCStatusService: RenBTCStatusService,
     private _priceService: PricesService,
     private _walletsRepository: WalletsRepository,
+    public choosePayingWalletViewModel: ChooseWalletViewModel,
   ) {
     super();
 
@@ -43,13 +62,15 @@ export class ReceiveBitcoinModalViewModel extends ViewModel {
       feeInFiat: observable,
 
       solanaPubkey: computed,
+      feeInText: computed,
 
       reload: action,
+      walletDidSelect: action,
       createRenBTC: action,
     });
   }
 
-  protected override setDefaults() {
+  protected override setDefaults(): void {
     this.isLoading = false;
     this.accountStatus = null;
     this.payableWallets = [];
@@ -59,15 +80,28 @@ export class ReceiveBitcoinModalViewModel extends ViewModel {
     this.feeInFiat = null;
   }
 
-  protected override onInitialize() {
+  protected override onInitialize(): void {
+    this.choosePayingWalletViewModel.initialize();
+
     void this.reload();
     void this._bind();
   }
 
-  protected override afterReactionsRemoved() {}
+  protected override afterReactionsRemoved(): void {
+    this.choosePayingWalletViewModel.end();
+  }
 
   get solanaPubkey(): string | null {
     return this._walletsRepository.nativeWallet?.pubkey ?? null;
+  }
+
+  get feeInText(): string | null {
+    const fee = this.totalFee;
+    const wallet = this.payingWallet;
+    if (!fee || !wallet) {
+      return null;
+    }
+    return `${numberToString(fee, { maximumFractionDigits: 9 })} ${wallet.token.symbol}`;
   }
 
   // Methods
@@ -117,7 +151,6 @@ export class ReceiveBitcoinModalViewModel extends ViewModel {
           }
           try {
             const fee = await this._renBTCStatusService.getCreationFee(wallet.mintAddress);
-            console.log(600, fee.toString(), wallet.mintAddress);
             runInAction(() => {
               this.totalFee = convertToBalance(fee, wallet.token.decimals);
             });
@@ -150,7 +183,11 @@ export class ReceiveBitcoinModalViewModel extends ViewModel {
     );
   }
 
-  async createRenBTC() {
+  walletDidSelect(wallet: Wallet): void {
+    this.payingWallet = wallet;
+  }
+
+  async createRenBTC(): Promise<void> {
     const mintAddress = this.payingWallet?.mintAddress;
     const address = this.payingWallet?.pubkey;
     if (!mintAddress || !address) {

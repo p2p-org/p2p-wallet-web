@@ -37,4 +37,14 @@ export class UsageStatus {
 
     return currentUsage < this.maxUsage && this.amountUsed.add(transactionFee).lte(this.maxAmount);
   }
+
+  // for debug
+  toJSON() {
+    return {
+      maxUsage: this.maxUsage,
+      currentUsage: this.currentUsage,
+      maxAmount: this.maxAmount.toString(),
+      amountUsed: this.amountUsed.toString(),
+    };
+  }
 }

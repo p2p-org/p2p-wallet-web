@@ -71,20 +71,30 @@ interface Props {
   selector: React.ReactNode;
   selectedWallet: Wallet | null;
   customFilter?: (wallet: Wallet) => boolean;
+  staticWallets: Wallet[] | null;
   showOtherWallets: boolean;
   onWalletChange: (wallet: Wallet) => void;
+  className?: string;
 }
 
 export const ChooseWallet: FC<Props> = observer(
-  ({ viewModel, selector, selectedWallet, customFilter, showOtherWallets, onWalletChange }) => {
+  ({
+    viewModel,
+    selector,
+    selectedWallet,
+    customFilter,
+    staticWallets = null,
+    showOtherWallets,
+    onWalletChange,
+    className,
+  }) => {
     const selectorRef = useRef<HTMLDivElement>(null);
     const dropdownRef = useRef<HTMLDivElement>(null);
 
     useLayoutEffect(() => {
       viewModel.selectWallet(selectedWallet);
-      if (customFilter) {
-        viewModel.setCustomFilter(customFilter);
-      }
+      viewModel.setCustomFilter(customFilter);
+      viewModel.setStaticWallets(staticWallets);
       viewModel.setShowOtherWallets(showOtherWallets);
       viewModel.reload();
     }, [customFilter, selectedWallet, showOtherWallets, viewModel]);
@@ -121,7 +131,7 @@ export const ChooseWallet: FC<Props> = observer(
         <SelectorWrapper
           ref={selectorRef}
           onClick={handleSelectorClick}
-          className={classNames({ isOpen: viewModel.isOpen })}
+          className={classNames(className, { isOpen: viewModel.isOpen })}
         >
           {selector}
           <ChevronWrapper>

@@ -623,6 +623,14 @@ export class RelayAccountStatus {
     }
     return true;
   }
+
+  // for debug
+  toJSON() {
+    return {
+      type: this.type,
+      balance: this._balance?.toString(),
+    };
+  }
 }
 
 export interface TopUpPreparedParams {

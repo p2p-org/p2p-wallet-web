@@ -1,19 +1,35 @@
 import type { FC } from 'react';
 
+import { styled } from '@linaria/react';
+import { theme } from '@p2p-wallet-web/ui';
 import { observer } from 'mobx-react-lite';
 
 import { ButtonCancel } from 'components/common/ButtonCancel';
+import type { Wallet } from 'new/sdk/SolanaSDK';
+import { ChooseWallet } from 'new/ui/components/common/ChooseWallet';
 import type { ModalPropsType } from 'new/ui/modals/ModalManager';
-import { RenBTCButton } from 'new/ui/modals/ReceiveBitcoinModal/Create/RenBTCButton';
 
 import { List, Row, Section, WrapperModal } from '../common/styled';
 import type { ReceiveBitcoinModalViewModel } from '../ReceiveBitcoinModal.ViewModel';
+import { RenBTCButton } from './RenBTCButton';
+import { WalletSelectorContent } from './WalletSelectorContent';
+
+const ChooseWalletStyled = styled(ChooseWallet)`
+  padding: 12px 20px;
+
+  border: 1px solid ${theme.colors.stroke.secondary};
+  border-radius: 12px;
+`;
 
 interface Props {
   viewModel: Readonly<ReceiveBitcoinModalViewModel>;
 }
 
 export const Create: FC<Props & ModalPropsType> = observer(({ viewModel, close }) => {
+  const handleWalletChange = (wallet: Wallet) => {
+    viewModel.walletDidSelect(wallet);
+  };
+
   return (
     <WrapperModal
       title="Receiving via Bitcoin network"
@@ -36,16 +52,16 @@ export const Create: FC<Props & ModalPropsType> = observer(({ viewModel, close }
             below.
           </Row>
         </List>
-        {viewModel.payingWallet?.token.symbol}
-
-        {/*<Feature name={FEATURE_PAY_BY}>
-          <FeePaySelector
-            tokenAccounts={tokenAccounts}
-            onTokenAccountChange={handleFeeTokenAccountChange}
-            isShortList
+        <div style={{ position: 'relative' }}>
+          <ChooseWalletStyled
+            viewModel={viewModel.choosePayingWalletViewModel}
+            selector={<WalletSelectorContent viewModel={viewModel} />}
+            selectedWallet={viewModel.payingWallet}
+            onWalletChange={handleWalletChange}
+            staticWallets={viewModel.payableWallets}
+            showOtherWallets={false}
           />
-        </Feature>*/}
-
+        </div>
         <List>
           <Row>
             This address accepts <strong>only Bitcoin</strong>. You may lose assets by sending

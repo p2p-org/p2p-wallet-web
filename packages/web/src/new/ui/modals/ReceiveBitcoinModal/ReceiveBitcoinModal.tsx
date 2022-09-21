@@ -19,7 +19,7 @@ const LoaderWrapperStyled = styled(LoaderWrapper)`
 export const ReceiveBitcoinModal: FC<ModalPropsType> = observer(({ close }) => {
   const viewModel = useViewModel(ReceiveBitcoinModalViewModel);
 
-  if (viewModel.isLoading) {
+  if (viewModel.isLoading || !viewModel.accountStatus) {
     return (
       <WrapperModal close={() => close(false)}>
         <LoaderWrapperStyled>
@@ -29,9 +29,10 @@ export const ReceiveBitcoinModal: FC<ModalPropsType> = observer(({ close }) => {
     );
   }
 
-  if (viewModel.accountStatus === RenBTCAccountStatus.topUpRequired) {
-    return <TopUp close={close} />;
+  switch (viewModel.accountStatus) {
+    case RenBTCAccountStatus.topUpRequired:
+      return <TopUp close={close} />;
+    case RenBTCAccountStatus.payingWalletAvailable:
+      return <Create viewModel={viewModel} close={close} />;
   }
-
-  return <Create viewModel={viewModel} close={close} />;
 });

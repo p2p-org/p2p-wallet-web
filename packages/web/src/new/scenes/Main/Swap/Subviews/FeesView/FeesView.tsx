@@ -38,7 +38,7 @@ const Label = styled.span`
   }
 `;
 
-const SwapLabelWrapper = styled.div`
+const LabelWrapper = styled.div`
   display: grid;
   grid-row-gap: 2px;
 `;
@@ -60,10 +60,10 @@ export const FeesView: FC<Props> = observer(({ items, flat = false }) => {
           <TokenAvatarStyled token={selectedItem?.wallet?.token} size={44} />
           <Fees>
             <Top>
-              <SwapLabelWrapper>
+              <LabelWrapper>
                 <Label>Pay swap fees with</Label>
                 <Label className="primary">{selectedItem?.wallet?.token.symbol}</Label>
-              </SwapLabelWrapper>
+              </LabelWrapper>
             </Top>
           </Fees>
         </SelectorValue>

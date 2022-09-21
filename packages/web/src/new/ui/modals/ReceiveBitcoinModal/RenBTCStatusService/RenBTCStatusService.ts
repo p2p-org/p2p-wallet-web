@@ -2,6 +2,7 @@ import { ZERO } from '@orca-so/sdk';
 import { SPLToken } from '@saberhq/token-utils';
 import { u64 } from '@solana/spl-token';
 import { PublicKey } from '@solana/web3.js';
+import { zip } from 'ramda';
 import { injectable } from 'tsyringe';
 
 import {
@@ -63,17 +64,11 @@ export class RenBTCStatusService {
 
     // At lease one wallet is payable
     const group = await Promise.all(
-      wallets.map(async (w): Promise<[Wallet, u64 | null]> => {
-        try {
-          return [w, await this.getCreationFee(w.mintAddress)];
-        } catch {
-          return [w, null];
-        }
-      }),
+      wallets.map((w): Promise<u64 | null> => this.getCreationFee(w.mintAddress).catch(() => null)),
     );
 
     const walletsNew: Wallet[] = [];
-    for (const [w, fee] of group) {
+    for (const [w, fee] of zip(wallets, group)) {
       if (fee && fee.lte(w.lamports ?? ZERO)) {
         // Special case where wallet is native sol,
         // needs to keeps rentExemptMinimum lamports in account to prevent error
@@ -174,12 +169,6 @@ export class RenBTCStatusService {
       orcaSwap: this._orcaSwap,
       feeInSOL: feeInSOL,
       payingFeeTokenMint: mintAddress,
-    });
-    console.log(500, {
-      mintAddress: _mintAddress,
-      feeAmount: feeAmount.toJSON(),
-      feeInSOL: feeInSOL.toJSON(),
-      feeInToken: feeInToken.toJSON(),
     });
 
     return feeInToken.total;
