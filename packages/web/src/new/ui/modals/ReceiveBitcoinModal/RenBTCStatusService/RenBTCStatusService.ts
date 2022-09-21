@@ -2,10 +2,7 @@ import { ZERO } from '@orca-so/sdk';
 import { SPLToken } from '@saberhq/token-utils';
 import { u64 } from '@solana/spl-token';
 import { PublicKey } from '@solana/web3.js';
-import { zip } from 'ramda';
 import { injectable } from 'tsyringe';
-
-import { RelayService } from 'new/services/RelayService';
 
 import {
   FeeRelayerAPIClient,
@@ -14,7 +11,7 @@ import {
   FeeRelayerRelaySolanaClient,
   StatsInfoOperationType,
   TokenAccount,
-} from '../../../../sdk/FeeRelayer';
+} from 'new/sdk/FeeRelayer';
 import {
   AccountInfo,
   FeeAmount,
@@ -22,20 +19,22 @@ import {
   SolanaSDKPublicKey,
   Token,
   Wallet,
-} from '../../../../sdk/SolanaSDK';
-import { OrcaSwapService } from '../../../../services/OrcaSwapService';
-import { WalletsRepository } from '../../../../services/Repositories';
+} from 'new/sdk/SolanaSDK';
+import { OrcaSwapService } from 'new/services/OrcaSwapService';
+import { RelayService } from 'new/services/RelayService';
+import { WalletsRepository } from 'new/services/Repositories';
 
 @injectable()
 export class RenBTCStatusService {
+  private _feeRelayerContextManager: FeeRelayerContextManager;
+
   private _minRentExemption?: u64;
   private _lamportsPerSignature?: u64;
   private _rentExemptMinimum?: u64;
-  private _feeRelayerContextManager: FeeRelayerContextManager;
 
   constructor(
-    private _orcaSwap: OrcaSwapService,
     private _feeRelayerAPIClient: FeeRelayerRelaySolanaClient,
+    private _orcaSwap: OrcaSwapService,
     private _walletsRepository: WalletsRepository,
     private _feeRelayer: RelayService,
   ) {
@@ -53,9 +52,7 @@ export class RenBTCStatusService {
     this._minRentExemption = await this._feeRelayerAPIClient.getMinimumBalanceForRentExemption(
       AccountInfo.span,
     );
-
     this._lamportsPerSignature = await this._feeRelayerAPIClient.getLamportsPerSignature();
-
     this._rentExemptMinimum = await this._feeRelayerAPIClient.getMinimumBalanceForRentExemption(0);
   }
 
@@ -65,33 +62,30 @@ export class RenBTCStatusService {
       .filter((wallet) => wallet.lamports?.gt(ZERO));
 
     // At lease one wallet is payable
-    return Promise.all(
-      wallets.map((wallet) => {
-        return this.getCreationFee(wallet.mintAddress);
+    const group = await Promise.all(
+      wallets.map(async (w): Promise<[Wallet, u64 | null]> => {
+        try {
+          return [w, await this.getCreationFee(w.mintAddress)];
+        } catch {
+          return [w, null];
+        }
       }),
-    )
-      .then((fees) => zip(wallets, fees))
-      .then((zipped) =>
-        zipped
-          .filter(([wallet, fee]) => {
-            if (fee?.lte(wallet.lamports || ZERO)) {
-              // Special case where wallet is native sol,
-              // needs to keeps rentExemptMinimum lamports in account to prevent error
-              // Transaction leaves an account with a lower balance than rent-exempt minimum
-              if (
-                wallet.isNativeSOL &&
-                (wallet.lamports || ZERO).sub(fee).lt(this._rentExemptMinimum || ZERO)
-              ) {
-                return false;
-              } else {
-                return true;
-              }
-            } else {
-              return false;
-            }
-          })
-          .map(([wallet]) => wallet),
-      );
+    );
+
+    const walletsNew: Wallet[] = [];
+    for (const [w, fee] of group) {
+      if (fee && fee.lte(w.lamports ?? ZERO)) {
+        // Special case where wallet is native sol,
+        // needs to keeps rentExemptMinimum lamports in account to prevent error
+        // Transaction leaves an account with a lower balance than rent-exempt minimum
+        if (w.isNativeSOL && (w.lamports ?? ZERO).sub(fee).lt(this._rentExemptMinimum ?? ZERO)) {
+          continue;
+        } else {
+          walletsNew.push(w);
+        }
+      }
+    }
+    return walletsNew;
   }
 
   async createAccount(_address: string, _mint: string): Promise<void> {
@@ -99,28 +93,30 @@ export class RenBTCStatusService {
     const mint = new PublicKey(_mint);
     const owner = this._feeRelayerAPIClient.provider.wallet.publicKey;
 
-    const associatedAccount = getAssociatedTokenAddressSync(mint, owner);
+    const associatedAccount = getAssociatedTokenAddressSync(SolanaSDKPublicKey.renBTCMint, owner);
 
     // prepare transaction
     const feePayer = (await this._feeRelayerContextManager.getCurrentContext()).feePayerAddress;
-
-    const instruction = SPLToken.createAssociatedTokenAccountInstruction(
-      SolanaSDKPublicKey.splAssociatedTokenAccountProgramId,
-      SolanaSDKPublicKey.tokenProgramId,
-      SolanaSDKPublicKey.renBTCMint,
-      associatedAccount,
-      owner,
-      feePayer,
-    );
-
-    const preparedTransaction = await this._feeRelayerAPIClient.prepareTransaction({
-      instructions: [instruction],
+    const preparing = this._feeRelayerAPIClient.prepareTransaction({
+      instructions: [
+        SPLToken.createAssociatedTokenAccountInstruction(
+          SolanaSDKPublicKey.splAssociatedTokenAccountProgramId,
+          SolanaSDKPublicKey.tokenProgramId,
+          SolanaSDKPublicKey.renBTCMint,
+          associatedAccount,
+          owner,
+          feePayer,
+        ),
+      ],
       feePayer,
     });
+
+    const updating = this._feeRelayerContextManager.update();
+
+    const [preparedTransaction] = await Promise.all([preparing, updating]);
+
     // hack
     preparedTransaction.owner = owner;
-
-    await this._feeRelayerContextManager.update();
 
     const context = await this._feeRelayerContextManager.getCurrentContext();
     const tx = await this._feeRelayer.topUpAndRelayTransaction({
@@ -146,7 +142,7 @@ export class RenBTCStatusService {
         nativeWalletAddress,
       );
 
-      if (!wallets.some((wallet) => wallet.pubkey === SolanaSDKPublicKey.renBTCMint.toBase58())) {
+      if (!wallets.some((wallet) => wallet.pubkey === SolanaSDKPublicKey.renBTCMint.toString())) {
         wallets.push(
           new Wallet({
             pubkey: renBTCAddress.toBase58(),
@@ -160,26 +156,24 @@ export class RenBTCStatusService {
     });
   }
 
-  async getCreationFee(mintAddress: string): Promise<u64> {
-    const pubkey = new PublicKey(mintAddress);
+  async getCreationFee(_mintAddress: string): Promise<u64> {
+    const mintAddress = new PublicKey(_mintAddress);
 
     const feeAmount = new FeeAmount({
-      transaction: this._lamportsPerSignature || new u64(5000),
-      accountBalances: this._minRentExemption || new u64(2_039_280),
+      transaction: this._lamportsPerSignature ?? new u64(5000),
+      accountBalances: this._minRentExemption ?? new u64(2_039_280),
     });
 
-    const context = await this._feeRelayerContextManager.getCurrentContext();
-
     const feeInSOL = this._feeRelayer.feeCalculator.calculateNeededTopUpAmount({
-      context,
+      context: await this._feeRelayerContextManager.getCurrentContext(),
       expectedFee: feeAmount,
-      payingTokenMint: pubkey,
+      payingTokenMint: mintAddress,
     });
 
     const feeInToken = await this._feeRelayer.feeCalculator.calculateFeeInPayingToken({
       orcaSwap: this._orcaSwap,
       feeInSOL: feeInSOL,
-      payingFeeTokenMint: pubkey,
+      payingFeeTokenMint: mintAddress,
     });
 
     return feeInToken.total;
