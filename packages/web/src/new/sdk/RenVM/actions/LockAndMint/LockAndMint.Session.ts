@@ -1,4 +1,4 @@
-import { RenVMError } from 'new/sdk/RenBTC/Models/RenVMError';
+import { RenVMError } from '../../models/RenVMError';
 
 export const getSessionDay = () => Math.floor(Date.now() / 1000 / 60 / 60 / 24);
 export const getSessionExpiry = () => (getSessionDay() + 3) * 60 * 60 * 24 * 1000;

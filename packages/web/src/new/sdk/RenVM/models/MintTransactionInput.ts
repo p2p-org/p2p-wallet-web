@@ -1,8 +1,8 @@
 import { toBase64 } from '@renproject/utils/internal/common';
 
-import { RenVMError } from 'new/sdk/RenBTC/Models/RenVMError';
-import type { State } from 'new/sdk/RenBTC/Models/RenVMState';
-import type { Selector } from 'new/sdk/RenBTC/Models/Selector';
+import { RenVMError } from './RenVMError';
+import type { State } from './RenVMState';
+import type { Selector } from './Selector';
 
 export class MintTransactionInput {
   txid: string;

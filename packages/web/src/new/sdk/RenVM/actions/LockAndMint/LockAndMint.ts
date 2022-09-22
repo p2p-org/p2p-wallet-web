@@ -3,14 +3,11 @@ import { hash160 } from '@renproject/chains-bitcoin/utils/utils';
 import { generateGHash, generateNHash, generatePHash, generateSHash } from '@renproject/utils';
 import { fromHex, toBase64 } from '@renproject/utils/internal/common';
 
-import { LockAndMintSession } from 'new/sdk/RenBTC/Actions/LockAndMint/LockAndMint.Session';
-import type { RenVMChainType } from 'new/sdk/RenBTC/Chains/RenVMChainType';
-import { MintTransactionInput } from 'new/sdk/RenBTC/Models/MintTransactionInput';
-import { RenVMError } from 'new/sdk/RenBTC/Models/RenVMError';
-import { State } from 'new/sdk/RenBTC/Models/RenVMState';
-import type { Selector } from 'new/sdk/RenBTC/Models/Selector';
-import { Direction } from 'new/sdk/RenBTC/Models/Selector';
-import type { RenVMRpcClientType } from 'new/sdk/RenBTC/RPCClient/RPCClient';
+import type { RenVMChainType } from '../../chains/RenVMChainType';
+import type { Selector } from '../../models';
+import { Direction, MintTransactionInput, RenVMError, State } from '../../models';
+import type { RenVMRpcClientType } from '../../RPCClient/RPCClient';
+import { LockAndMintSession } from './LockAndMint.Session';
 
 export type GatewayAddressResponse = {
   gatewayAddress: Uint8Array;

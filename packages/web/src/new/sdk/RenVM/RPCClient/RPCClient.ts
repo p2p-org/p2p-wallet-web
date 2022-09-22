@@ -1,5 +1,5 @@
-import type { LockAndMintIncomingTransaction } from 'new/sdk/RenBTC/Actions/LockAndMint/LockAndMint.IncomingTransaction';
-import type { Network } from 'new/sdk/RenBTC/Models/Network';
+import type { LockAndMintIncomingTransaction } from '../actions/LockAndMint';
+import type { Network } from '../models';
 
 export interface RenVMRpcClientType {
   network: Network;

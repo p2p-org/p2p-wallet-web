@@ -1,20 +1,20 @@
 import { singleton } from 'tsyringe';
 
-import type { GatewayAddressResponse } from 'new/sdk/RenBTC/Actions/LockAndMint/LockAndMint';
-import { LockAndMint } from 'new/sdk/RenBTC/Actions/LockAndMint/LockAndMint';
+import type { GatewayAddressResponse } from '../../../actions/LockAndMint';
 import {
+  LockAndMint,
   LockAndMintProcessingTx,
+  LockAndMintSession,
   ValidationStatus,
-} from 'new/sdk/RenBTC/Actions/LockAndMint/LockAndMint.ProcessingTx';
-import { LockAndMintSession } from 'new/sdk/RenBTC/Actions/LockAndMint/LockAndMint.Session';
-import type { RenVMChainType } from 'new/sdk/RenBTC/Chains/RenVMChainType';
-import { RenVMError } from 'new/sdk/RenBTC/Models/RenVMError';
-import { RenVMRpcClientType } from 'new/sdk/RenBTC/RPCClient/RPCClient';
-import { ChainProvider } from 'new/sdk/RenBTC/Services/ChainProvider';
-import type { LockAndMintServiceDelegate } from 'new/sdk/RenBTC/Services/LockAndMintService/LoackAndMintServiceDelegate';
-import type { LockAndMintService } from 'new/sdk/RenBTC/Services/LockAndMintService/LockAndMintService';
-import { MintToken } from 'new/sdk/RenBTC/Services/LockAndMintService/LockAndMintServiceImpl/Models';
-import { LockAndMintServicePersistentStore } from 'new/sdk/RenBTC/Services/LockAndMintService/LockAndMintServicePersistentStore';
+} from '../../../actions/LockAndMint';
+import type { RenVMChainType } from '../../../chains/RenVMChainType';
+import { RenVMError } from '../../../models';
+import { RenVMRpcClientType } from '../../../RPCClient/RPCClient';
+import { ChainProvider } from '../../ChainProvider';
+import type { LockAndMintServiceDelegate } from '../LoackAndMintServiceDelegate';
+import type { LockAndMintService } from '../LockAndMintService';
+import { LockAndMintServicePersistentStore } from '../LockAndMintServicePersistentStore';
+import { MintToken } from './Models';
 
 @singleton()
 export class LockAndMintServiceImpl implements LockAndMintService {
@@ -245,7 +245,7 @@ export class LockAndMintServiceImpl implements LockAndMintService {
     // mint
     const repeatMint = async () => {
       try {
-        await this.lockAndMint!.mint(state, account.secret);
+        await this.lockAndMint.mint(state, account.secret);
       } catch (error) {
         // other error
         if (!this.chain?.isAlreadyMintedError(error as Error)) {

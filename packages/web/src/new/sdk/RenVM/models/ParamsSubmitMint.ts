@@ -1,4 +1,4 @@
-import type { MintTransactionInput } from 'new/sdk/RenBTC/Models/MintTransactionInput';
+import type { MintTransactionInput } from './MintTransactionInput';
 
 export class ParamsSubmitMint {
   //@ts-ignore

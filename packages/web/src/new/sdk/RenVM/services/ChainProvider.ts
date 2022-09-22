@@ -1,4 +1,4 @@
-import type { RenVMChainType } from 'new/sdk/RenBTC/Chains/RenVMChainType';
+import type { RenVMChainType } from '../chains/RenVMChainType';
 
 export interface ChainProvider {
   getAccount: () => Promise<{ publicKey: Uint8Array; secret: Uint8Array }>;

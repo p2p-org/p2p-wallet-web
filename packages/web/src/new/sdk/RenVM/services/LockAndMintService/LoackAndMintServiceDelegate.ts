@@ -1,4 +1,4 @@
-import type { LockAndMintProcessingTx } from 'new/sdk/RenBTC/Actions/LockAndMint/LockAndMint.ProcessingTx';
+import type { LockAndMintProcessingTx } from '../../actions/LockAndMint';
 
 export interface LockAndMintServiceDelegate {
   // MARK: - Loading

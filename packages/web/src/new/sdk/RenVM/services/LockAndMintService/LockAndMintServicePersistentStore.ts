@@ -1,13 +1,12 @@
 import { instanceToPlain, plainToInstance } from 'class-transformer';
 import { singleton } from 'tsyringe';
 
-import type { LockAndMintIncomingTransaction } from 'new/sdk/RenBTC/Actions/LockAndMint/LockAndMint.IncomingTransaction';
+import type { LockAndMintIncomingTransaction, SessionType } from '../../actions/LockAndMint';
 import {
   LockAndMintProcessingTx,
+  LockAndMintSession,
   ValidationStatus,
-} from 'new/sdk/RenBTC/Actions/LockAndMint/LockAndMint.ProcessingTx';
-import type { SessionType } from 'new/sdk/RenBTC/Actions/LockAndMint/LockAndMint.Session';
-import { LockAndMintSession } from 'new/sdk/RenBTC/Actions/LockAndMint/LockAndMint.Session';
+} from '../../actions/LockAndMint';
 
 const keyForSession = 'renbtc_session';
 const keyForGatewayAddress = 'renbtc_gateway_address';

@@ -1,5 +1,3 @@
-import { capitalizingFirstLetter } from 'new/utils/StringExtensions';
-
 export enum Direction {
   to = 'to',
   from = 'from',
@@ -27,4 +25,11 @@ export class Selector {
   toString(): string {
     return `${this.mintTokenSymbol}/${this.direction}${capitalizingFirstLetter(this.chainName)}`;
   }
+}
+
+function capitalizingFirstLetter(str?: string): string | undefined {
+  if (!str) {
+    return str;
+  }
+  return `${str[0]!.toUpperCase()}${str.slice(1)}`;
 }

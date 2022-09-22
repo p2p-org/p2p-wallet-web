@@ -1,6 +1,6 @@
 import { Type } from 'class-transformer';
 
-import { LockAndMintIncomingTransaction } from 'new/sdk/RenBTC/Actions/LockAndMint/LockAndMint.IncomingTransaction';
+import { LockAndMintIncomingTransaction } from './LockAndMint.IncomingTransaction';
 
 enum ValidationType {
   valid = 'valid',

@@ -1,5 +1,5 @@
 /// Service that is responsible for LockAndMint action
-import type { LockAndMintServiceDelegate } from 'new/sdk/RenBTC/Services/LockAndMintService/LoackAndMintServiceDelegate';
+import type { LockAndMintServiceDelegate } from './LoackAndMintServiceDelegate';
 
 export interface LockAndMintService {
   /// Is loading

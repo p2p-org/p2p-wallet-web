@@ -1,7 +1,6 @@
 import type { PublicKey } from '@solana/web3.js';
 
-import type { ResponseQueryTxMint } from 'new/sdk/RenBTC/Models/ResponseQueryTxMint';
-import type { Direction, Selector } from 'new/sdk/RenBTC/Models/Selector';
+import type { Direction, ResponseQueryTxMint, Selector } from '../models';
 
 export interface RenVMChainType {
   chainName: string;

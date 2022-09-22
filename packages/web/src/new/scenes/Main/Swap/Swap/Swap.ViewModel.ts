@@ -26,8 +26,8 @@ import {
 } from 'new/services/Swap';
 import { ChooseWalletViewModel } from 'new/ui/components/common/ChooseWallet';
 import type { ConfirmSwapModalProps } from 'new/ui/modals/confirmModals/ConfirmSwapModal';
+import type { ProcessTransactionModalProps } from 'new/ui/modals/ProcessTransactionModal';
 import * as ProcessTransaction from 'new/ui/modals/ProcessTransactionModal/ProcessTransaction.Models';
-import type { ProcessTransactionModalProps } from 'new/ui/modals/ProcessTransactionModal/ProcessTransactionModal';
 import { maxSlippage, rounded } from 'new/utils/NumberExtensions';
 
 import { SwapSettingsViewModel } from '../SwapSettings/SwapSettings.ViewModel';
