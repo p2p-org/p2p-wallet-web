@@ -28,6 +28,13 @@ export function withNameServiceDomain(text: string): string {
   return `${text}${nameServiceDomain}`;
 }
 
+export function capitalizingFirstLetter(str?: string): string | undefined {
+  if (!str) {
+    return str;
+  }
+  return `${str[0]!.toUpperCase()}${str.slice(1)}`;
+}
+
 // @web
 export const getExplorerUrl = (
   type = 'tx',
