@@ -1,4 +1,8 @@
+import { u64 } from '@solana/spl-token';
 import { Type } from 'class-transformer';
+
+import { convertToBalance } from 'new/sdk/SolanaSDK';
+import { numberToString } from 'new/utils/NumberExtensions';
 
 import { LockAndMintIncomingTransaction } from './LockAndMint.IncomingTransaction';
 
@@ -104,5 +108,31 @@ export class LockAndMintProcessingTx implements ProcessingTxType {
       },
       { minted: [], submitted: [], confirmed: [], received: [] } as GroupedTxsType,
     );
+  }
+
+  get statusString(): string {
+    if (this.mintedAt) {
+      return `Successfully minted ${numberToString(convertToBalance(new u64(this.tx.value), 8), {
+        maximumFractionDigits: 9,
+      })} renBTC!`;
+    }
+
+    if (this.submittedAt) {
+      return 'Minting';
+    }
+
+    if (this.confirmedAt) {
+      return 'Submitting to RenVM';
+    }
+
+    if (this.receivedAt) {
+      return `Waiting for deposit confirmation ${this.tx.vout}/${LockAndMintProcessingTx.maxVote}`;
+    }
+
+    return '';
+  }
+
+  get value(): number {
+    return convertToBalance(new u64(this.tx.value), 8);
   }
 }

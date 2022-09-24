@@ -8,9 +8,9 @@ import {
   ValidationStatus,
 } from '../../actions/LockAndMint';
 
-const keyForSession = 'renbtc_session';
-const keyForGatewayAddress = 'renbtc_gateway_address';
-const keyForProcessingTransactions = 'renbtc_processing_transaction';
+const keyForSession = 'renVMSession';
+const keyForGatewayAddress = 'renVMGatewayAddress';
+const keyForProcessingTransactions = 'renVMProcessingTxs';
 
 @singleton()
 export class LockAndMintServicePersistentStore {

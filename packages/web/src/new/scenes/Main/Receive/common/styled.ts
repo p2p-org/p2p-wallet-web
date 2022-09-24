@@ -28,6 +28,10 @@ export const ExplorerA = styled.a`
   font-weight: 500;
   font-size: 16px;
   line-height: 140%;
+
+  &.disabled {
+    pointer-events: none;
+  }
 `;
 
 export const BottomWrapper = styled.div`

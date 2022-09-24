@@ -6,9 +6,10 @@ import { theme } from '@p2p-wallet-web/ui';
 import { observer } from 'mobx-react-lite';
 
 import { useViewModel } from 'new/core/viewmodels/useViewModel';
+import { ReceiveBitcoin } from 'new/scenes/Main/Receive/Bitcoin';
 import { Content } from 'new/scenes/Main/Receive/common/styled';
 import { ReceiveViewModel } from 'new/scenes/Main/Receive/Receive.ViewModel';
-import { ReceiveBitcoin } from 'new/scenes/Main/Receive/ReceiveBitcoin';
+// import { ReceiveBitcoin } from 'new/scenes/Main/Receive/ReceiveBitcoin';
 import { NetworkSelect } from 'new/scenes/Main/Receive/ReceiveToken/NetworkSelect';
 import { ReceiveSolana } from 'new/scenes/Main/Receive/Solana';
 import { Layout } from 'new/ui/components/common/Layout';
@@ -30,7 +31,8 @@ export const ReceiveToken: FC = observer(() => {
   const isTokenListAvailable = viewModel.tokenType.isSolana();
 
   const renderSourceNetworkReceivePanel = () => {
-    if (viewModel.tokenType.isSolana()) {
+    //TODO: develop
+    if (!viewModel.tokenType.isSolana()) {
       return <ReceiveSolana />;
     } else {
       return <ReceiveBitcoin />;
