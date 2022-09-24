@@ -1,108 +1,106 @@
 import { Type } from 'class-transformer';
 
-import { LockAndMintIncomingTransaction } from './LockAndMint.IncomingTransaction';
+import { IncomingTransaction } from './LockAndMint.IncomingTransaction';
 
 enum ValidationType {
   valid = 'valid',
   invalid = 'invalid',
 }
 
-type GroupedTxsType = {
-  minted: LockAndMintProcessingTx[];
-  submitted: LockAndMintProcessingTx[];
-  confirmed: LockAndMintProcessingTx[];
-  received: LockAndMintProcessingTx[];
-};
-
 export class ValidationStatus {
-  private _type: ValidationType;
-  private _reason?: string;
+  type: ValidationType;
+  reason?: string;
 
-  constructor(reason?: string) {
-    if (reason) {
-      this._type = ValidationType.invalid;
-      this._reason = reason;
-    } else {
-      this._type = ValidationType.valid;
-    }
+  private constructor({ type, reason }: { type: ValidationType; reason?: string }) {
+    this.type = type;
+    this.reason = reason;
   }
 
   static valid(): ValidationStatus {
-    return new ValidationStatus();
+    return new ValidationStatus({ type: ValidationType.valid });
   }
 
   static invalid(reason: string): ValidationStatus {
-    return new ValidationStatus(reason);
+    return new ValidationStatus({ type: ValidationType.invalid, reason });
   }
 }
 
-export type ProcessingTxType = {
-  tx: LockAndMintIncomingTransaction;
-  receivedAt?: number;
-  oneVoteAt?: number;
-  twoVoteAt?: number;
-  threeVoteAt?: number;
-  confirmedAt?: number;
-  submittedAt?: number;
-  mintedAt?: number;
+export interface ProcessingTxType {
+  tx: IncomingTransaction;
+  receivedAt?: Date;
+  oneVoteAt?: Date;
+  twoVoteAt?: Date;
+  threeVoteAt?: Date;
+  confirmedAt?: Date;
+  submittedAt?: Date;
+  mintedAt?: Date;
   validationStatus?: ValidationStatus;
   isProcessing?: boolean;
-};
+}
 
-export class LockAndMintProcessingTx implements ProcessingTxType {
-  @Type(() => LockAndMintIncomingTransaction)
-  //@ts-ignore
-  tx: LockAndMintIncomingTransaction;
-  receivedAt?: number;
-  oneVoteAt?: number;
-  twoVoteAt?: number;
-  threeVoteAt?: number;
-  confirmedAt?: number;
-  submittedAt?: number;
-  mintedAt?: number;
+export class ProcessingTx implements ProcessingTxType {
+  @Type(() => IncomingTransaction)
+  tx: IncomingTransaction;
+  receivedAt?: Date;
+  oneVoteAt?: Date;
+  twoVoteAt?: Date;
+  threeVoteAt?: Date;
+  confirmedAt?: Date;
+  submittedAt?: Date;
+  mintedAt?: Date;
   @Type(() => ValidationStatus)
-  validationStatus = ValidationStatus.valid();
-  isProcessing = false;
+  validationStatus?: ValidationStatus;
+  isProcessing?: boolean;
 
-  constructor(props: ProcessingTxType) {
-    if (!props) {
-      return;
-    }
-
-    this.tx = props.tx;
-    this.receivedAt = props.receivedAt;
-    this.oneVoteAt = props.oneVoteAt;
-    this.twoVoteAt = props.twoVoteAt;
-    this.threeVoteAt = props.threeVoteAt;
-    this.confirmedAt = props.confirmedAt;
-    this.submittedAt = props.submittedAt;
-    this.mintedAt = props.mintedAt;
-    props.validationStatus && (this.validationStatus = props.validationStatus);
-    props.isProcessing && (this.isProcessing = props.isProcessing);
+  constructor({
+    tx,
+    receivedAt,
+    oneVoteAt,
+    twoVoteAt,
+    threeVoteAt,
+    confirmedAt,
+    submittedAt,
+    mintedAt,
+    validationStatus = ValidationStatus.valid(),
+    isProcessing = false,
+  }: ProcessingTxType) {
+    this.tx = tx;
+    this.receivedAt = receivedAt;
+    this.oneVoteAt = oneVoteAt;
+    this.twoVoteAt = twoVoteAt;
+    this.threeVoteAt = threeVoteAt;
+    this.confirmedAt = confirmedAt;
+    this.submittedAt = submittedAt;
+    this.mintedAt = mintedAt;
+    this.validationStatus = validationStatus;
+    this.isProcessing = isProcessing;
   }
 
   static get maxVote(): number {
     return 3;
   }
 
-  static grouped(txs: LockAndMintProcessingTx[]): GroupedTxsType {
-    return txs.reduce(
-      (acc, tx) => {
-        if (tx.mintedAt) {
-          acc.minted.push(tx);
-        }
-        if (tx.submittedAt) {
-          acc.submitted.push(tx);
-        }
-        if (tx.confirmedAt) {
-          acc.confirmed.push(tx);
-        }
-        if (tx.receivedAt) {
-          acc.received.push(tx);
-        }
-        return acc;
-      },
-      { minted: [], submitted: [], confirmed: [], received: [] } as GroupedTxsType,
-    );
+  static grouped(txs: ProcessingTx[]): {
+    minted: ProcessingTx[];
+    submitted: ProcessingTx[];
+    confirmed: ProcessingTx[];
+    received: ProcessingTx[];
+  } {
+    const minted: ProcessingTx[] = [];
+    const submitted: ProcessingTx[] = [];
+    const confirmed: ProcessingTx[] = [];
+    const received: ProcessingTx[] = [];
+    for (const tx of txs) {
+      if (tx.mintedAt) {
+        minted.push(tx);
+      } else if (tx.submittedAt) {
+        submitted.push(tx);
+      } else if (tx.confirmedAt) {
+        confirmed.push(tx);
+      } else if (tx.receivedAt) {
+        received.push(tx);
+      }
+    }
+    return { minted, submitted, confirmed, received };
   }
 }

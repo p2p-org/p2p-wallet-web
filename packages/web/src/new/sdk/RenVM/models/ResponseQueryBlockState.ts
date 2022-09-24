@@ -22,11 +22,13 @@ class T {}
 class V {
   //@ts-ignore
   btc: BTCValue;
+  // @ios:
   //            let bch, btc, dgb, doge: StructBCH?
   //            let fil, luna: StructFIL?
   //            let system: StructSystem?
   //            let zec: StructBCH?
 
+  // TODO: CodingKeys
   static get btc(): string {
     return 'BTC';
   }

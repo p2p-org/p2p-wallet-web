@@ -1,10 +1,10 @@
 export class Network {
-  chain: string;
-  endpoint: string;
-  lightNode: string;
-  gatewayRegistry: string;
-  genesisHash: string;
-  p2shPrefix: number;
+  readonly chain: string;
+  readonly endpoint: string;
+  readonly lightNode: string;
+  readonly gatewayRegistry: string;
+  readonly genesisHash: string;
+  readonly p2shPrefix: number;
 
   constructor({
     chain,
@@ -27,10 +27,6 @@ export class Network {
     this.gatewayRegistry = gatewayRegistry;
     this.genesisHash = genesisHash;
     this.p2shPrefix = p2shPrefix;
-  }
-
-  get isTestnet(): boolean {
-    return this.chain !== 'mainnet';
   }
 
   static get mainnet(): Network {
@@ -64,5 +60,9 @@ export class Network {
       genesisHash: '4uhcVJyU9pJkvQyS88uRDiswHXSCkY3zQawwpjk2NsNY',
       p2shPrefix: 0xc4,
     });
+  }
+
+  get isTestnet(): boolean {
+    return this.chain !== 'mainnet';
   }
 }

@@ -1,28 +1,26 @@
 import { Type } from 'class-transformer';
 
-type BlockstreamInfoStatusType = {
-  confirmed: boolean;
-  blockHeight?: number;
-  blockHash?: string;
-  blockTime?: number;
-};
-
-export class BlockstreamInfoStatus implements BlockstreamInfoStatusType {
-  //@ts-ignore
+export class BlockstreamInfoStatus {
   confirmed: boolean;
   blockHeight?: number;
   blockHash?: string;
   blockTime?: number;
 
-  constructor(props: BlockstreamInfoStatusType) {
-    if (!props) {
-      return;
-    }
-
-    this.confirmed = props.confirmed;
-    this.blockHeight = props.blockHeight;
-    this.blockHash = props.blockHash;
-    this.blockTime = props.blockTime;
+  constructor({
+    confirmed,
+    blockHeight,
+    blockHash,
+    blockTime,
+  }: {
+    confirmed: boolean;
+    blockHeight?: number;
+    blockHash?: string;
+    blockTime?: number;
+  }) {
+    this.confirmed = confirmed;
+    this.blockHeight = blockHeight;
+    this.blockHash = blockHash;
+    this.blockTime = blockTime;
   }
 }
 
@@ -33,25 +31,27 @@ export type IncomingTransactionType = {
   value: number;
 };
 
-export class LockAndMintIncomingTransaction {
-  //@ts-ignore
+export class IncomingTransaction {
   txid: string;
-  //@ts-ignore
   vout: number;
   @Type(() => BlockstreamInfoStatus)
-  //@ts-ignore
   status: BlockstreamInfoStatus;
-  //@ts-ignore
   value: number;
 
-  constructor(props: IncomingTransactionType) {
-    if (!props) {
-      return;
-    }
-
-    this.txid = props.txid;
-    this.vout = props.vout;
-    this.status = props.status;
-    this.value = props.value;
+  constructor({
+    txid,
+    vout,
+    status,
+    value,
+  }: {
+    txid: string;
+    vout: number;
+    status: BlockstreamInfoStatus;
+    value: number;
+  }) {
+    this.txid = txid;
+    this.vout = vout;
+    this.status = status;
+    this.value = value;
   }
 }

@@ -1,7 +1,8 @@
 import type { LockAndMintProcessingTx } from '../../actions/LockAndMint';
 
 export interface LockAndMintServiceDelegate {
-  // MARK: - Loading
+  // Loading
+
   /// Start loading
   lockAndMintServiceWillStartLoading: () => void;
 
@@ -11,7 +12,7 @@ export interface LockAndMintServiceDelegate {
   /// Stop loading with error
   lockAndMintServiceWithError: () => void;
 
-  // MARK: - Transaction events
+  // Transaction events
 
   /// Transactions updated
   lockAndMintServiceUpdated: (processingTransactions: LockAndMintProcessingTx[]) => void;

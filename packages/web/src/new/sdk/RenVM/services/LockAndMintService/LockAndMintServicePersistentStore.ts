@@ -1,12 +1,8 @@
 import { instanceToPlain, plainToInstance } from 'class-transformer';
 import { singleton } from 'tsyringe';
 
-import type { LockAndMintIncomingTransaction, SessionType } from '../../actions/LockAndMint';
-import {
-  LockAndMintProcessingTx,
-  LockAndMintSession,
-  ValidationStatus,
-} from '../../actions/LockAndMint';
+import type { IncomingTransaction, SessionJSONType } from '../../actions/LockAndMint';
+import { ProcessingTx, Session, ValidationStatus } from '../../actions/LockAndMint';
 
 const keyForSession = 'renbtc_session';
 const keyForGatewayAddress = 'renbtc_gateway_address';
@@ -14,17 +10,17 @@ const keyForProcessingTransactions = 'renbtc_processing_transaction';
 
 @singleton()
 export class LockAndMintServicePersistentStore {
-  get session(): LockAndMintSession {
+  get session(): Session {
     const data = localStorage.getItem(keyForSession);
 
     if (!data) {
-      return LockAndMintSession.default;
+      return Session.default;
     }
 
-    return new LockAndMintSession(JSON.parse(data) as SessionType);
+    return Session.fromJSON(JSON.parse(data) as SessionJSONType);
   }
 
-  saveSession(session: LockAndMintSession): void {
+  saveSession(session: Session): void {
     localStorage.setItem(keyForSession, JSON.stringify(session));
   }
 
@@ -36,21 +32,21 @@ export class LockAndMintServicePersistentStore {
     localStorage.setItem(keyForGatewayAddress, gatewayAddres);
   }
 
-  get processingTransactions(): LockAndMintProcessingTx[] {
+  get processingTransactions(): ProcessingTx[] {
     const data = localStorage.getItem(keyForProcessingTransactions);
 
     if (!data) {
       return [];
     }
 
-    return plainToInstance(LockAndMintProcessingTx, JSON.parse(data));
+    return plainToInstance(ProcessingTx, JSON.parse(data));
   }
 
-  saveProcessingTransactions(txs: LockAndMintProcessingTx[]): void {
+  saveProcessingTransactions(txs: ProcessingTx[]): void {
     localStorage.setItem(keyForProcessingTransactions, JSON.stringify(instanceToPlain(txs)));
   }
 
-  markAsProcessing(transaction: LockAndMintProcessingTx): void {
+  markAsProcessing(transaction: ProcessingTx): void {
     this._save((current) => {
       const curTx = current.find((tx) => tx.tx.txid === transaction.tx.txid);
       if (!curTx) {
@@ -70,11 +66,11 @@ export class LockAndMintServicePersistentStore {
     });
   }
 
-  markAsReceived(tx: LockAndMintIncomingTransaction, date: number): void {
+  markAsReceived(tx: IncomingTransaction, date: number): void {
     this._save((current) => {
       const curTx = current.find((_tx) => _tx.tx.txid === tx.txid);
       if (!curTx) {
-        current.push(new LockAndMintProcessingTx({ tx, receivedAt: date }));
+        current.push(new ProcessingTx({ tx, receivedAt: date }));
         return true;
       }
 
@@ -95,11 +91,11 @@ export class LockAndMintServicePersistentStore {
     });
   }
 
-  markAsConfirmed(tx: LockAndMintIncomingTransaction, date: number): void {
+  markAsConfirmed(tx: IncomingTransaction, date: number): void {
     this._save((current) => {
       const curTx = current.find((_tx) => _tx.tx.txid === tx.txid);
       if (!curTx) {
-        current.push(new LockAndMintProcessingTx({ tx, confirmedAt: date }));
+        current.push(new ProcessingTx({ tx, confirmedAt: date }));
         return true;
       }
       curTx.confirmedAt = date;
@@ -107,11 +103,11 @@ export class LockAndMintServicePersistentStore {
     });
   }
 
-  markAsSubmitted(tx: LockAndMintIncomingTransaction, date: number): void {
+  markAsSubmitted(tx: IncomingTransaction, date: number): void {
     this._save((current) => {
       const curTx = current.find((_tx) => _tx.tx.txid === tx.txid);
       if (!curTx) {
-        current.push(new LockAndMintProcessingTx({ tx, submittedAt: date }));
+        current.push(new ProcessingTx({ tx, submittedAt: date }));
         return true;
       }
       curTx.submittedAt = date;
@@ -119,11 +115,11 @@ export class LockAndMintServicePersistentStore {
     });
   }
 
-  markAsMinted(tx: LockAndMintIncomingTransaction, date: number): void {
+  markAsMinted(tx: IncomingTransaction, date: number): void {
     this._save((current) => {
       const curTx = current.find((_tx) => _tx.tx.txid === tx.txid);
       if (!curTx) {
-        current.push(new LockAndMintProcessingTx({ tx, mintedAt: date }));
+        current.push(new ProcessingTx({ tx, mintedAt: date }));
         return true;
       }
       curTx.mintedAt = date;
@@ -142,7 +138,7 @@ export class LockAndMintServicePersistentStore {
     });
   }
 
-  private _save(modify: (current: LockAndMintProcessingTx[]) => boolean): void {
+  private _save(modify: (current: ProcessingTx[]) => boolean): void {
     const txs = this.processingTransactions || [];
     const shouldSave = modify(txs);
     if (shouldSave) {

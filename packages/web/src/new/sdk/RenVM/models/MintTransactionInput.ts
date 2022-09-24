@@ -1,4 +1,5 @@
-import { toBase64 } from '@renproject/utils/internal/common';
+import { v2 } from '@renproject/rpc';
+import { toURLBase64 } from '@renproject/utils/internal/common';
 
 import { RenVMError } from './RenVMError';
 import type { State } from './RenVMState';
@@ -59,7 +60,7 @@ export class MintTransactionInput {
     amount,
     pHash,
     to,
-    txindex,
+    txIndex,
     txid,
   }: {
     gHash: Uint8Array;
@@ -69,18 +70,18 @@ export class MintTransactionInput {
     amount: string;
     pHash: Uint8Array;
     to: string;
-    txindex: string;
+    txIndex: string;
     txid: Uint8Array;
   }): MintTransactionInput {
     return new MintTransactionInput({
-      txid: toBase64(txid),
-      txindex,
-      ghash: toBase64(gHash),
-      gpubkey: toBase64(gPubkey),
-      nhash: toBase64(nHash),
-      nonce: toBase64(nonce),
+      txid: toURLBase64(txid),
+      txindex: txIndex,
+      ghash: toURLBase64(gHash),
+      gpubkey: toURLBase64(gPubkey),
+      nhash: toURLBase64(nHash),
+      nonce: toURLBase64(nonce),
       payload: '',
-      phash: toBase64(pHash),
+      phash: toURLBase64(pHash),
       to,
       amount,
     });
@@ -88,26 +89,39 @@ export class MintTransactionInput {
 
   static fromState({ state, nonce }: { state: State; nonce: Uint8Array }): MintTransactionInput {
     const { gHash, nHash, amount, pHash, txIndex, txid, sendTo } = state;
-
     if (!(gHash && nHash && amount && pHash && txIndex && txid && sendTo)) {
-      throw RenVMError.paramMissing();
+      throw RenVMError.paramsMissing();
     }
+
     return new MintTransactionInput({
-      txid: toBase64(txid),
+      txid: toURLBase64(txid),
       txindex: txIndex,
-      ghash: toBase64(gHash),
-      gpubkey: state.gPubkey ? toBase64(state.gPubkey) : '',
-      nhash: toBase64(nHash),
-      nonce: toBase64(nonce),
+      ghash: toURLBase64(gHash),
+      gpubkey: state.gPubkey ? toURLBase64(state.gPubkey) : '',
+      nhash: toURLBase64(nHash),
+      nonce: toURLBase64(nonce),
       payload: '',
-      phash: toBase64(pHash),
+      phash: toURLBase64(pHash),
       to: sendTo,
       amount: amount,
     });
   }
 
-  hash(selector: Selector, version: string): Uint8Array {
-    // implement code
-    return Uint8Array.of();
+  hash({ selector, version }: { selector: Selector; version: string }): Uint8Array {
+    return v2.hashTransaction(version, selector.toString(), {
+      t: v2.mintParamsType(),
+      v: {
+        txid: this.txid,
+        txindex: this.txindex,
+        ghash: this.ghash,
+        gpubkey: this.gpubkey,
+        nhash: this.nhash,
+        nonce: this.nonce,
+        payload: this.payload,
+        phash: this.phash,
+        to: this.to,
+        amount: this.amount,
+      },
+    });
   }
 }

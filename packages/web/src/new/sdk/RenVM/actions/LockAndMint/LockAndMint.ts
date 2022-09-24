@@ -1,28 +1,32 @@
 import { createAddressArray } from '@renproject/chains-bitcoin/script';
 import { hash160 } from '@renproject/chains-bitcoin/utils/utils';
 import { generateGHash, generateNHash, generatePHash, generateSHash } from '@renproject/utils';
-import { fromHex, toBase64 } from '@renproject/utils/internal/common';
+import { fromHex } from '@renproject/utils/internal/common';
+import { toURLBase64 } from '@renproject/utils/module/internal/common';
 
 import type { RenVMChainType } from '../../chains/RenVMChainType';
-import type { Selector } from '../../models';
-import { Direction, MintTransactionInput, RenVMError, State } from '../../models';
+import type { Selector, State } from '../../models';
+import { Direction, MintTransactionInput, RenVMError } from '../../models';
 import type { RenVMRpcClientType } from '../../RPCClient/RPCClient';
-import { LockAndMintSession } from './LockAndMint.Session';
+import { Session } from './LockAndMint.Session';
 
-export type GatewayAddressResponse = {
+export interface GatewayAddressResponse {
   gatewayAddress: Uint8Array;
   sendTo: Uint8Array;
   gHash: Uint8Array;
   gPubkey: Uint8Array;
-};
+}
 
 export class LockAndMint {
-  rpcClient: RenVMRpcClientType;
-  chain: RenVMChainType;
-  mintTokenSymbol: string;
-  version: string;
-  destinationAddress: Uint8Array;
-  session: LockAndMintSession;
+  // Dependencies
+  private _rpcClient: RenVMRpcClientType;
+  private _chain: RenVMChainType;
+  private _mintTokenSymbol: string;
+  private _version: string;
+  private _destinationAddress: Uint8Array;
+
+  // State
+  private _session: Session;
 
   constructor({
     rpcClient,
@@ -37,38 +41,44 @@ export class LockAndMint {
     mintTokenSymbol: string;
     version: string;
     destinationAddress: Uint8Array;
-    session: LockAndMintSession;
+    session: Session;
   }) {
-    this.rpcClient = rpcClient;
-    this.chain = chain;
-    this.mintTokenSymbol = mintTokenSymbol;
-    this.version = version;
-    this.destinationAddress = destinationAddress;
+    this._rpcClient = rpcClient;
+    this._chain = chain;
+    this._mintTokenSymbol = mintTokenSymbol;
+    this._version = version;
+    this._destinationAddress = destinationAddress;
 
-    session = session || new LockAndMintSession({});
-    this.session = session;
+    if (session) {
+      this._session = session;
+    } else {
+      this._session = new Session();
+    }
   }
 
   async generateGatewayAddress(): Promise<GatewayAddressResponse> {
-    const sendTo = this.chain.getAssociatedTokenAddress(
-      this.destinationAddress,
-      this.mintTokenSymbol,
+    const sendTo = this._chain.getAssociatedTokenAddress({
+      address: this._destinationAddress,
+      mintTokenSymbol: this._mintTokenSymbol,
+    });
+    const tokenGatewayContractHex = generateSHash(this._selector(Direction.to).toString());
+    const gHash = generateGHash(
+      generatePHash(),
+      tokenGatewayContractHex,
+      sendTo,
+      fromHex(this._session.nonce),
     );
-    const sHash = generateSHash(this._selector(Direction.to).toString());
-    const pHash = generatePHash();
-    const gHash = generateGHash(pHash, sHash, sendTo, new Buffer(this.session.nonce, 'hex'));
 
-    let gPubkey;
-    try {
-      gPubkey = await this.rpcClient.selectPublicKey(this.mintTokenSymbol);
-    } catch (e) {
+    const gPubkey = await this._rpcClient.selectPublicKey(this._mintTokenSymbol);
+
+    if (!gPubkey) {
       throw new RenVMError("Provider's public key not found");
     }
 
     const gatewayAddress = createAddressArray(
       hash160(gPubkey),
       gHash,
-      Uint8Array.of(this.rpcClient.network.p2shPrefix),
+      Uint8Array.from([this._rpcClient.network.p2shPrefix]),
     );
 
     return { gatewayAddress, sendTo, gHash, gPubkey };
@@ -89,36 +99,38 @@ export class LockAndMint {
     gHash: Uint8Array;
     gPubkey: Uint8Array;
   }): State {
-    const nonce = fromHex(this.session.nonce);
+    const nonce = fromHex(this._session.nonce);
     const txid = fromHex(reverseHex(transactionHash));
-    const nHash = generateNHash(nonce, txid, txIndex);
+    const nHash = generateNHash(nonce, txid, txIndex ?? '0');
     const pHash = generatePHash();
 
-    const mintTx = new MintTransactionInput({
+    const mintTx = MintTransactionInput.fromBuffer({
       gHash,
       gPubkey,
       nHash,
       nonce,
       amount,
       pHash,
-      to: this.chain.dataToAddress(to),
+      to: this._chain.dataToAddress(to),
       txIndex,
       txid,
     });
 
-    const txHash = toBase64(mintTx.hash(this._selector(Direction.to), this.version));
+    const txHash = toURLBase64(
+      mintTx.hash({ selector: this._selector(Direction.to), version: this._version }),
+    );
 
-    const state = new State({
+    const state: State = {
       gHash,
       gPubkey,
-      sendTo: this.chain.dataToAddress(to),
+      sendTo: this._chain.dataToAddress(to),
       txid,
       nHash,
       pHash,
       txHash,
       txIndex,
       amount,
-    });
+    };
 
     return state;
   }
@@ -127,11 +139,16 @@ export class LockAndMint {
     const selector = this._selector(Direction.to);
 
     // get input
-    const mintTx = new MintTransactionInput({ state, nonce: fromHex(this.session.nonce) });
-    const hash = toBase64(mintTx.hash(selector, this.version).base64urlEncodedString());
+    const mintTx = MintTransactionInput.fromState({ state, nonce: fromHex(this._session.nonce) });
+    const hash = toURLBase64(mintTx.hash({ selector, version: this._version }));
 
     // send transaction
-    await this.rpcClient.submitTx(hash, selector, this.version, mintTx);
+    await this._rpcClient.submitTx({
+      hash,
+      selector,
+      version: this._version,
+      input: mintTx,
+    });
 
     return hash;
   }
@@ -142,38 +159,39 @@ export class LockAndMint {
       throw new RenVMError('txHash not found');
     }
 
-    const response = await this.rpcClient.queryMint(txHash);
+    const response = await this._rpcClient.queryMint(txHash);
 
-    if (response.tx.out.v.revert) {
-      throw new RenVMError(response.tx.out.v.revert);
+    const revert = response.tx.out.v.revert;
+    if (revert) {
+      throw new RenVMError(revert);
     }
 
     if (response.txStatus !== 'done') {
-      throw RenVMError.paramMissing();
+      throw RenVMError.paramsMissing();
     }
 
     const amountOut = response.tx.out.v.amount;
 
-    const signature = this.chain.submitMint(
-      this.destinationAddress,
-      this.mintTokenSymbol,
+    const signature = this._chain.submitMint({
+      address: this._destinationAddress,
+      mintTokenSymbol: this._mintTokenSymbol,
       signer,
-      response,
-    );
+      responseQueryMint: response,
+    });
 
     return { amountOut, signature };
   }
 
   private _selector(direction: Direction): Selector {
-    return this.chain.selector(this.mintTokenSymbol, direction);
+    return this._chain.selector({ mintTokenSymbol: this._mintTokenSymbol, direction });
   }
 }
 
-const reverseHex = (src: string): string => {
+function reverseHex(src: string): string {
   return (
     src
       .match(/[a-fA-F0-9]{2}/g)
       ?.reverse()
       .join('') ?? ''
   );
-};
+}

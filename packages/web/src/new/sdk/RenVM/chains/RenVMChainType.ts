@@ -1,31 +1,61 @@
 import type { PublicKey } from '@solana/web3.js';
 
-import type { Direction, ResponseQueryTxMint, Selector } from '../models';
+import type * as BurnAndRelease from '../actions/BurnAndRelease';
+import type { Direction, ResponseQueryTxMint } from '../models';
+import { Selector } from '../models';
 
-export interface RenVMChainType {
-  chainName: string;
-  getAssociatedTokenAddress: (address: Uint8Array, mintTokenSymbol: string) => Uint8Array;
-  dataToAddress: (data: Uint8Array) => string;
-  signatureToData: (signature: string) => Uint8Array;
+export abstract class RenVMChainType {
+  abstract chainName: string;
+  abstract getAssociatedTokenAddress({
+    address,
+    mintTokenSymbol,
+  }: {
+    address: Uint8Array;
+    mintTokenSymbol: string;
+  }): Uint8Array; // represent as data, because there might be different encoding methods for various of chains
+  abstract dataToAddress(data: Uint8Array): string;
 
-  submitMint: (
-    address: Uint8Array,
-    mintTokenSymbol: string,
-    signer: Uint8Array,
-    responceQueryMint: ResponseQueryTxMint,
-  ) => string;
+  abstract signatureToData(signature: string): Uint8Array;
 
-  submitBurn: (
-    mintTokenSymbol: string,
-    account: PublicKey,
-    amount: string,
-    recipient: string,
-    signer: PublicKey,
-  ) => Promise<BurnAndRelease.BurnDetails>;
+  abstract submitMint({
+    address,
+    mintTokenSymbol,
+    owner,
+    responseQueryMint,
+  }: {
+    address: Uint8Array;
+    mintTokenSymbol: string;
+    owner: PublicKey;
+    responseQueryMint: ResponseQueryTxMint;
+  }): Promise<string>;
 
-  waitForConfirmation: (signature: string) => Promise<void>;
+  abstract submitBurn({
+    mintTokenSymbol,
+    account,
+    amount,
+    recipient,
+    owner,
+  }: {
+    mintTokenSymbol: string;
+    account: Uint8Array;
+    amount: string;
+    recipient: string;
+    owner: PublicKey;
+  }): Promise<BurnAndRelease.BurnDetails>;
 
-  isAlreadyMintedError: (error: Error) => boolean;
+  abstract waitForConfirmation(signature: string): Promise<void>;
 
-  selector: (mintTokenSymbol: string, direction: Direction) => Selector;
+  abstract isAlreadyMintedError(error: Error): boolean;
+
+  // extension
+
+  selector({
+    mintTokenSymbol,
+    direction,
+  }: {
+    mintTokenSymbol: string;
+    direction: Direction;
+  }): Selector {
+    return new Selector({ mintTokenSymbol, chainName: this.chainName, direction });
+  }
 }
