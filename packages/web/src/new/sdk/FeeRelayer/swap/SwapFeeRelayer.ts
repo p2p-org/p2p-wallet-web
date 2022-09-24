@@ -207,7 +207,7 @@ export class SwapFeeRelayer implements SwapFeeRelayerType {
 
       topUpPreparedParam = {
         amount: topUpAmount,
-        expectedFee: expectedFee,
+        expectedFee,
         poolsPair: topUpPools,
       };
     } else {

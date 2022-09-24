@@ -271,12 +271,12 @@ export class SolanaSDK {
     const blockhash = await this.getRecentBlockhash();
     transaction.recentBlockhash = blockhash;
 
-    const signedTransaction = await this.provider.wallet.signTransaction(transaction);
-
     // resign transaction
     if (signers.length > 0) {
-      signedTransaction.partialSign(...signers);
+      transaction.partialSign(...signers);
     }
+
+    const signedTransaction = await this.provider.wallet.signTransaction(transaction);
 
     return new PreparedTransaction({
       owner,
@@ -465,8 +465,8 @@ export class SolanaSDK {
       transaction.instructions = instructions;
       transaction.feePayer = _feePayer;
       transaction.recentBlockhash = _recentBlockhash;
+      transaction.partialSign(...signers);
       const signedTransaction = await this.provider.wallet.signTransaction(transaction);
-      signedTransaction.partialSign(...signers);
       const serializedTransaction = signedTransaction.serialize().toString('base64');
 
       const decodedTransaction = transaction;

@@ -1,4 +1,4 @@
-import type { u64 } from '@solana/spl-token';
+import { u64 } from '@solana/spl-token';
 import { PublicKey } from '@solana/web3.js';
 import { last } from 'ramda';
 import { injectable } from 'tsyringe';
@@ -312,6 +312,8 @@ export class SwapService implements SwapServiceType {
     });
   }
 
+  // Helpers
+
   private _getLiquidityProviderFees({
     poolsPair,
     destinationAddress,
@@ -402,7 +404,7 @@ export class SwapService implements SwapServiceType {
         payingTokenMint: payingWallet.mintAddress,
       })
     ) {
-      networkFee.transaction = networkFee.transaction.sub(context.lamportsPerSignature);
+      networkFee.transaction = new u64(networkFee.transaction.sub(context.lamportsPerSignature));
     } else {
       // send via fee relayer
       networkFee = this._relayService.feeCalculator.calculateNeededTopUpAmount({
@@ -570,12 +572,13 @@ export class SwapService implements SwapServiceType {
     expectedTransactionFee?: u64 | null;
     payingTokenMint?: string;
   }): boolean {
-    const _expectedTransactionFee = expectedTransactionFee ?? context.lamportsPerSignature.muln(2);
+    const _expectedTransactionFee =
+      expectedTransactionFee ?? new u64(context.lamportsPerSignature.muln(2));
     return (
       payingTokenMint === SolanaSDKPublicKey.wrappedSOLMint.toString() &&
-      !context.usageStatus.isFreeTransactionFeeAvailable({
+      context.usageStatus.isFreeTransactionFeeAvailable({
         transactionFee: _expectedTransactionFee,
-      })
+      }) === false
     );
   }
 }

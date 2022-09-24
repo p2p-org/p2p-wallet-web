@@ -619,10 +619,6 @@ export class FeeRelayer implements FeeRelayerType {
       accountBalances: accountCreationFee,
     });
 
-    const signedTransaction = await this._solanaApiClient.provider.wallet.signTransaction(
-      transaction,
-    );
-
     // resign transaction
     const signers: Account[] = []; // there was account
     const transferAuthority = swap.transferAuthorityAccount;
@@ -630,8 +626,12 @@ export class FeeRelayer implements FeeRelayerType {
       signers.push(transferAuthority);
     }
     if (signers.length > 0) {
-      signedTransaction.partialSign(...signers);
+      transaction.partialSign(...signers);
     }
+
+    const signedTransaction = await this._solanaApiClient.provider.wallet.signTransaction(
+      transaction,
+    );
 
     return {
       swapData: swap.swapData,
@@ -786,7 +786,6 @@ export class FeeRelayer implements FeeRelayerType {
     }
 
     // transfer sol back to feerelayer's feePayer
-    // TODO: check references
     const preparedTransactionNew = preparedTransaction.clone();
     if (paybackFee.gtn(0)) {
       if (
@@ -796,7 +795,7 @@ export class FeeRelayer implements FeeRelayerType {
         preparedTransactionNew.transaction.instructions.push(
           SystemProgram.transfer({
             fromPubkey: this.account,
-            toPubkey: new PublicKey(feePayer),
+            toPubkey: feePayer,
             lamports: paybackFee.toNumber(),
           }),
         );
@@ -804,7 +803,7 @@ export class FeeRelayer implements FeeRelayerType {
         preparedTransactionNew.transaction.instructions.push(
           RelayProgram.transferSolInstruction({
             userAuthorityAddress: this.account,
-            recipient: new PublicKey(feePayer),
+            recipient: feePayer,
             lamports: paybackFee,
             network: this._solanaApiClient.endpoint.network,
           }),
@@ -812,14 +811,14 @@ export class FeeRelayer implements FeeRelayerType {
       }
     }
 
-    preparedTransactionNew.transaction =
-      await this._solanaApiClient.provider.wallet.signTransaction(
-        preparedTransactionNew.transaction,
-      );
     // resign transaction
     if (preparedTransactionNew.signers.length > 0) {
       preparedTransactionNew.transaction.partialSign(...preparedTransactionNew.signers);
     }
+    preparedTransactionNew.transaction =
+      await this._solanaApiClient.provider.wallet.signTransaction(
+        preparedTransactionNew.transaction,
+      );
 
     return [
       await this._feeRelayerAPIClient.sendTransaction(
