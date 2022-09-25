@@ -2,13 +2,6 @@ import type { FC } from 'react';
 
 import { styled } from '@linaria/react';
 import { borders, theme } from '@p2p-wallet-web/ui';
-import { Bitcoin } from '@renproject/chains-bitcoin';
-import classNames from 'classnames';
-
-import { HMSCountdown } from 'components/common/HMSCountdown';
-import { Loader } from 'components/common/Loader';
-import { getRemainingGatewayTime } from 'utils/hooks/renBridge/useLockAndMint';
-import { useFetchFees } from 'utils/providers/LockAndMintProvider';
 
 const Wrapper = styled.div`
   padding: 16px;
@@ -43,14 +36,10 @@ const MinimumTxAmount = styled.div`
 `;
 
 interface Props {
-  expiryTime: number;
+  remainingTime: string;
 }
 
-export const Hint: FC<Props> = ({ expiryTime }) => {
-  const { fees, pending: isFetchingFee } = useFetchFees();
-
-  const timeRemained = getRemainingGatewayTime(expiryTime);
-
+export const Hint: FC<Props> = ({ remainingTime }) => {
   return (
     <Wrapper>
       <List>
@@ -59,20 +48,13 @@ export const Hint: FC<Props> = ({ expiryTime }) => {
           coin.
         </Row>
         <Row>
-          <MinimumTxAmount className={classNames({ inline: isFetchingFee })}>
+          <MinimumTxAmount>
             Minimum transaction amount of &nbsp;
-            {isFetchingFee ? (
-              <Loader />
-            ) : (
-              <>
-                <strong>{`${(fees.lock / 10 ** 8) * 2} ${Bitcoin.asset}`}</strong>.
-              </>
-            )}
+            <strong>0.000112 BTC</strong>.
           </MinimumTxAmount>
         </Row>
         <Row>
-          <HMSCountdown milliseconds={timeRemained} /> is the remaining time to safely send the
-          assets.
+          <strong>{remainingTime}</strong> is the remaining time to safely send the assets.
         </Row>
       </List>
     </Wrapper>

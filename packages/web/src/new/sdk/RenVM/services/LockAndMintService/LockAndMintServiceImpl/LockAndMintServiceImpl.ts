@@ -11,8 +11,8 @@ import type { RenVMChainType } from '../../../chains/RenVMChainType';
 import { RenVMError } from '../../../models';
 import { RenVMRpcClientType } from '../../../RPCClient/RPCClient';
 import { ChainProvider } from '../../ChainProvider';
-import type { LockAndMintServiceDelegate } from '../LoackAndMintServiceDelegate';
 import type { LockAndMintService } from '../LockAndMintService';
+import type { LockAndMintServiceDelegate } from '../LockAndMintServiceDelegate';
 import { LockAndMintServicePersistentStore } from '../LockAndMintServicePersistentStore';
 import { MintToken } from './Models';
 

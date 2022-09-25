@@ -1,10 +1,11 @@
+import type { u64 } from '@solana/spl-token';
 import { Type } from 'class-transformer';
 
 export class BlockstreamInfoStatus {
   confirmed: boolean;
-  blockHeight?: number;
+  blockHeight?: u64;
   blockHash?: string;
-  blockTime?: number;
+  blockTime?: u64;
 
   constructor({
     confirmed,
@@ -13,9 +14,9 @@ export class BlockstreamInfoStatus {
     blockTime,
   }: {
     confirmed: boolean;
-    blockHeight?: number;
+    blockHeight?: u64;
     blockHash?: string;
-    blockTime?: number;
+    blockTime?: u64;
   }) {
     this.confirmed = confirmed;
     this.blockHeight = blockHeight;
@@ -24,19 +25,12 @@ export class BlockstreamInfoStatus {
   }
 }
 
-export type IncomingTransactionType = {
-  txid: string;
-  vout: number;
-  status: BlockstreamInfoStatus;
-  value: number;
-};
-
 export class IncomingTransaction {
   txid: string;
-  vout: number;
+  vout: u64;
   @Type(() => BlockstreamInfoStatus)
   status: BlockstreamInfoStatus;
-  value: number;
+  value: u64;
 
   constructor({
     txid,
@@ -45,9 +39,9 @@ export class IncomingTransaction {
     value,
   }: {
     txid: string;
-    vout: number;
+    vout: u64;
     status: BlockstreamInfoStatus;
-    value: number;
+    value: u64;
   }) {
     this.txid = txid;
     this.vout = vout;

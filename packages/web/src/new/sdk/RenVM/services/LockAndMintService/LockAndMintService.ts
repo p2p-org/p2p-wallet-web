@@ -1,5 +1,5 @@
 /// Service that is responsible for LockAndMint action
-import type { LockAndMintServiceDelegate } from './LoackAndMintServiceDelegate';
+import type { LockAndMintServiceDelegate } from './LockAndMintServiceDelegate';
 
 export interface LockAndMintService {
   /// Is loading

@@ -10,9 +10,9 @@ import { Layout } from 'new/ui/components/common/Layout';
 import { WidgetPage } from 'new/ui/components/common/WidgetPage';
 
 import { ReceiveViewModel } from '../Receive.ViewModel';
+import { ReceiveBitcoin } from './Bitcoin';
 import { Content } from './common/styled';
 import { NetworkSelect } from './NetworkSelect';
-import { ReceiveBitcoin } from './ReceiveBitcoin';
 import { ReceiveSolana } from './Solana';
 
 const WhatTokensCanIReceiveLink = styled(NavLink)`
