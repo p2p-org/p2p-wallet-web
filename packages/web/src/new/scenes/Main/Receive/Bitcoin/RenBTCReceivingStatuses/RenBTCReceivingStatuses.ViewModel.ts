@@ -35,7 +35,6 @@ export class RenBTCReceivingStatusesViewModel extends SDListViewModel<LockAndMin
       ),
     );
 
-    //TODO: for debug
     runInAction(() => {
       this.data = this._receiveBitcoinViewModel.processingTxs.reverse();
     });

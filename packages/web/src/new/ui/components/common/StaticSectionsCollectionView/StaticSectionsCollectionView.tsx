@@ -12,7 +12,7 @@ import { SDCollectionViewItem } from './models/SDCollectionViewItem';
 interface Props<T> {
   viewModel: Readonly<ISDListViewModel<T>>;
   numberOfLoadingCells?: number;
-  renderPlaceholder: (key: string) => React.ReactNode;
+  renderPlaceholder?: (key: string) => React.ReactNode;
   renderItem: (item: T, index: number) => React.ReactNode;
   renderEmpty?: (key: string) => React.ReactNode;
   customFilter?: (item: T) => boolean;

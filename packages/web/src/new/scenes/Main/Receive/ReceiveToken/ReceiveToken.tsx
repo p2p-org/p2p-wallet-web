@@ -31,8 +31,7 @@ export const ReceiveToken: FC = observer(() => {
   const isTokenListAvailable = viewModel.tokenType.isSolana();
 
   const renderSourceNetworkReceivePanel = () => {
-    //TODO: develop
-    if (!viewModel.tokenType.isSolana()) {
+    if (viewModel.tokenType.isSolana()) {
       return <ReceiveSolana />;
     } else {
       return <ReceiveBitcoin />;

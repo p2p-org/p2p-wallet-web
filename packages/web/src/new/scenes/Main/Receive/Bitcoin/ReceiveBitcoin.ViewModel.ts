@@ -2,17 +2,16 @@ import { action, makeObservable, observable, reaction, runInAction } from 'mobx'
 import { singleton } from 'tsyringe';
 
 import { ViewModel } from 'new/core/viewmodels/ViewModel';
-import { getFormattedHMS } from 'new/scenes/Main/Receive/Bitcoin/utils';
-import {
-  BlockstreamInfoStatus,
-  LockAndMintIncomingTransaction,
-  LockAndMintProcessingTx,
-} from 'new/sdk/RenVM/actions/LockAndMint';
+import type { LockAndMintProcessingTx } from 'new/sdk/RenVM/actions/LockAndMint';
 import type { LockAndMintServiceDelegate } from 'new/sdk/RenVM/services/LockAndMintService/LoackAndMintServiceDelegate';
+import { LockAndMintService } from 'new/sdk/RenVM/services/LockAndMintService/LockAndMintService';
+import { LockAndMintServicePersistentStore } from 'new/sdk/RenVM/services/LockAndMintService/LockAndMintServicePersistentStore';
+
+import { getFormattedHMS } from './utils';
 
 @singleton()
 export class ReceiveBitcoinViewModel extends ViewModel implements LockAndMintServiceDelegate {
-  address?: string;
+  address?: string | null;
   processingTxs: LockAndMintProcessingTx[] = [];
   sessionEndDate: number | null = null;
   isLoading = false;
@@ -21,8 +20,10 @@ export class ReceiveBitcoinViewModel extends ViewModel implements LockAndMintSer
 
   timer?: NodeJS.Timer;
 
-  constructor() {
-    // private _lockAndMintService: LockAndMintService, // private _persistentStore: LockAndMintServicePersistentStore,
+  constructor(
+    private _lockAndMintService: LockAndMintService,
+    private _persistentStore: LockAndMintServicePersistentStore,
+  ) {
     super();
 
     makeObservable(this, {
@@ -39,7 +40,8 @@ export class ReceiveBitcoinViewModel extends ViewModel implements LockAndMintSer
       lockAndMintServiceUpdated: action,
     });
 
-    runInAction(() => {
+    //TODO: for developing
+    /*runInAction(() => {
       this.processingTxs = [
         new LockAndMintProcessingTx({
           tx: new LockAndMintIncomingTransaction({
@@ -76,16 +78,27 @@ export class ReceiveBitcoinViewModel extends ViewModel implements LockAndMintSer
       ];
 
       this.address = '2NAeYXJnuPXCkBRHY5Qf8AFEe6PyZP81Zz6';
-    });
+    });*/
   }
 
-  protected override setDefaults() {}
+  protected override setDefaults() {
+    this.address = null;
+    this.processingTxs = [];
+    this.sessionEndDate = null;
+    this.isLoading = false;
+    this.secondsPassed = -1;
+    this.remainingTime = '35:59:59';
+
+    this.timer = undefined;
+  }
 
   protected override onInitialize() {
     this._bind();
   }
 
-  protected override afterReactionsRemoved() {}
+  protected override afterReactionsRemoved() {
+    clearInterval(this.timer);
+  }
 
   private _bind(): void {
     // update remainingTime
@@ -105,24 +118,26 @@ export class ReceiveBitcoinViewModel extends ViewModel implements LockAndMintSer
       ),
     );
 
-    //TODO: debug
+    this.addReaction(
+      reaction(
+        () => this._persistentStore.gatewayAddress,
+        action((gatewayAddress) => (this.address = gatewayAddress)),
+      ),
+    );
 
     // timer
 
-    // this.timer = setInterval(() => this._checkSessionEnd(), 1_000);
-    // this._checkSessionEnd();
+    this.timer = setInterval(() => this._checkSessionEnd(), 1_000);
+    this._checkSessionEnd();
 
     // listen to lockAndMintService
-    // this._lockAndMintService.delegate = this;
+    this._lockAndMintService.delegate = this;
 
-    // if (this._lockAndMintService.isLoading) {
-    //   runInAction(() => (this.isLoading = true));
-    // }
+    if (this._lockAndMintService.isLoading) {
+      runInAction(() => (this.isLoading = true));
+    }
 
-    // const address = this._persistentStore.gatewayAddress;
-    // if (address) {
-    //   runInAction(() => (this.address = address));
-    // }
+    runInAction(() => (this.address = this._persistentStore.gatewayAddress));
   }
 
   _checkSessionEnd(): void {
@@ -130,7 +145,6 @@ export class ReceiveBitcoinViewModel extends ViewModel implements LockAndMintSer
 
     if (Date.now() >= endAt) {
       clearInterval(this.timer);
-      this.timer = undefined;
 
       this._lockAndMintService.expireCurrentSession();
     } else {

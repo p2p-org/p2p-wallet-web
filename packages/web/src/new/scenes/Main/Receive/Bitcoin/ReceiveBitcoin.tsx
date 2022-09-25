@@ -23,12 +23,14 @@ export const ReceiveBitcoin: FC = observer(() => {
     return <LoaderBlock />;
   }
 
+  const showReceivingStatuses = viewModel.processingTxs.length;
+
   return (
     <>
       <Content className="noTopPadding">
         {viewModel.address ? <UsernameAddressWidget address={viewModel.address} /> : null}
         <Hint remainingTime={viewModel.remainingTime} />
-        <RenBTCReceivingStatuses />
+        {showReceivingStatuses ? <RenBTCReceivingStatuses /> : null}
       </Content>
       <BottomWrapper>
         <ExplorerA
