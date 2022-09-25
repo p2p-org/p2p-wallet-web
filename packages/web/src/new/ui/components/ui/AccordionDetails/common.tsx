@@ -76,6 +76,12 @@ export const Text = styled.div`
     flex-shrink: 0;
   }
 
+  &.contentVerticalCenter {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
   &.gray {
     color: ${theme.colors.textIcon.secondary};
   }

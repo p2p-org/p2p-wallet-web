@@ -13,9 +13,10 @@ type AccordionRowValue = React.ReactNode | (React.ReactNode | AccordionRowValueE
 
 type AccordionRow = {
   id: number;
-  titleClassName?: string;
   title: string | ReactElement;
   value: AccordionRowValue;
+  titleClassName?: string;
+  valueClassName?: string;
 };
 
 export type AccordionItem = {
@@ -41,7 +42,7 @@ export const AccordionDetails: FC<Props> = (props) => {
           {list.rows.map((row) => (
             <Row key={row.id}>
               <Text className={row.titleClassName}>{row.title}</Text>
-              <Text>
+              <Text className={row.valueClassName}>
                 {Array.isArray(row.value)
                   ? row.value.map((el) =>
                       (el as AccordionRowValueElement).value ? (

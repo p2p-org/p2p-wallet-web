@@ -10,7 +10,7 @@ export enum Status {
   minted = 'minted',
 }
 
-export class RenBTCReceivingStatusesRecord {
+export class Record {
   txid: string;
   status: Status;
   time: number;
