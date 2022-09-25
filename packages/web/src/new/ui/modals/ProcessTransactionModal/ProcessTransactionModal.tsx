@@ -22,6 +22,13 @@ import { ProcessTransactionModalViewModel } from './ProcessTransactionModal.View
 import { HeaderLabel } from './Status/HeaderLabel';
 import { ProgressView } from './Status/ProgressView';
 
+const PaddedHeader = styled(Header)`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 12px 20px;
+`;
+
 const Section = styled.div`
   display: flex;
   flex-direction: column;
@@ -63,17 +70,15 @@ export const ProcessTransactionModal: FC<ProcessTransactionModalProps & ModalPro
 
     return (
       <WrapperModal close={handleCloseClick}>
-        <Section>
-          <Header>
-            <HeaderLabel viewModel={viewModel} />
-            {/*{viewModel.getMainDescription}*/}
-            <CloseWrapper onClick={handleCloseClick}>
-              <CloseIcon name="close" />
-            </CloseWrapper>
-            <Description>{viewModel.getMainDescription}</Description>
-            {/*<DateView viewModel={viewModel} />*/}
-          </Header>
-        </Section>
+        <PaddedHeader>
+          <HeaderLabel viewModel={viewModel} />
+          {/*{viewModel.getMainDescription}*/}
+          <CloseWrapper onClick={handleCloseClick}>
+            <CloseIcon name="close" />
+          </CloseWrapper>
+          <Description>{viewModel.getMainDescription}</Description>
+          {/*<DateView viewModel={viewModel} />*/}
+        </PaddedHeader>
         <ProgressView viewModel={viewModel} /*label={'Swap status:'}*/ />
         {/*<Section>*/}
         {/*  {viewModel.observingTransactionIndex !== null &&*/}

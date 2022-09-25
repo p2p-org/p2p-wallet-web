@@ -54,6 +54,7 @@ export class DestinationAnalysator {
         const needsCreateDestinationTokenAccount = !info?.owner.equals(
           SolanaSDKPublicKey.tokenProgramId,
         );
+
         return {
           destination: new TokenAccount({
             address: userAccount,

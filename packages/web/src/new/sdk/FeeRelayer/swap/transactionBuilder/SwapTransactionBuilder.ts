@@ -111,9 +111,10 @@ export class SwapTransactionBuilder {
     if (signers.length > 0) {
       transaction.partialSign(...signers);
     }
-    // const signedTransaction = await context.solanaApiClient.provider.wallet.signTransaction(
-    //   transaction,
-    // );
+
+    // let signedTransaction = transaction;
+    // transaction.setSigners(context.config.userAccount);
+    // signedTransaction = await context.solanaApiClient.provider.wallet.signTransaction(transaction);
 
     // calculate fee first
     const expectedFee = new FeeAmount({
@@ -130,7 +131,7 @@ export class SwapTransactionBuilder {
 
     return new PreparedTransaction({
       owner: context.config.userAccount, // instead of signers with owner
-      transaction: transaction,
+      transaction,
       signers,
       expectedFee,
     });

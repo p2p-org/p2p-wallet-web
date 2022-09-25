@@ -10,7 +10,9 @@ import { FeeRelayerError } from 'new/sdk/FeeRelayer';
 import * as ProcessTransaction from '../../ProcessTransaction.Models';
 import type { ProcessTransactionModalViewModel } from '../../ProcessTransactionModal.ViewModel';
 
-const Wrapper = styled.div``;
+const Wrapper = styled.div`
+  padding: 0 30px;
+`;
 
 interface Props {
   viewModel: Readonly<ProcessTransactionModalViewModel>;
