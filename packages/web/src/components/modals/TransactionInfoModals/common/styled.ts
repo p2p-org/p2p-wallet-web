@@ -102,7 +102,6 @@ export const Desc = styled.div`
 
 export const CloseWrapper = styled.div`
   position: absolute;
-  top: 0;
   right: 0;
 
   display: flex;
