@@ -4,12 +4,13 @@ import { styled } from '@linaria/react';
 import { theme, useIsMobile } from '@p2p-wallet-web/ui';
 import { observer } from 'mobx-react-lite';
 
-import type { ReceiveViewModel, TokenTypeName } from 'new/scenes/Main/Receive/Receive.ViewModel';
-import { TokenType } from 'new/scenes/Main/Receive/Receive.ViewModel';
 import type { Token } from 'new/sdk/SolanaSDK';
 import { Select, SelectItem } from 'new/ui/components/common/Select';
 import { TokenAvatar } from 'new/ui/components/common/TokenAvatar';
 import { getAvatarSize } from 'new/utils/common';
+
+import type { ReceiveViewModel, TokenTypeName } from '../../Receive.ViewModel';
+import { TokenType } from '../../Receive.ViewModel';
 
 const InfoWrapper = styled.div`
   margin-left: 12px;

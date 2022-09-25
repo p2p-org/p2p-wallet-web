@@ -3,18 +3,14 @@ import { useMemo } from 'react';
 
 import { getRenNetworkDetails } from '@renproject/interfaces';
 
-import {
-  BottomWrapper,
-  Content,
-  ExplorerA,
-  ShareIcon,
-} from 'new/scenes/Main/Receive/common/styled';
-import { DepositStatus } from 'new/scenes/Main/Receive/ReceiveBitcoin/DepositStatus';
-import { Hint } from 'new/scenes/Main/Receive/ReceiveBitcoin/Hint';
 import { LoaderBlock } from 'new/ui/components/common/LoaderBlock';
 import { UsernameAddressWidget } from 'new/ui/components/common/UsernameAddressWidget';
 import { useRenNetwork } from 'utils/hooks/renBridge/useNetwork';
 import { useLockAndMintProvider } from 'utils/providers/LockAndMintProvider';
+
+import { BottomWrapper, Content, ExplorerA, ShareIcon } from '../common/styled';
+import { DepositStatus } from './DepositStatus';
+import { Hint } from './Hint';
 
 export const ReceiveBitcoin: FC = () => {
   const network = useRenNetwork();

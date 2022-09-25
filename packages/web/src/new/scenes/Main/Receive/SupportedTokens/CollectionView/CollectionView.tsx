@@ -4,12 +4,13 @@ import { styled } from '@linaria/react';
 import { up, useIsMobile } from '@p2p-wallet-web/ui';
 import { observer } from 'mobx-react-lite';
 
-import { Cell } from 'new/scenes/Main/Receive/SupportedTokens/CollectionView/Cell';
-import { EmptyError } from 'new/scenes/Main/Receive/SupportedTokens/common/EmptyError';
-import { Hint } from 'new/scenes/Main/Receive/SupportedTokens/common/Hint';
-import type { SupportedTokensViewModel } from 'new/scenes/Main/Receive/SupportedTokens/SupportedTokens.ViewModel';
 import { Token } from 'new/sdk/SolanaSDK';
 import { StaticSectionsCollectionVirtualizedView } from 'new/ui/components/common/StaticSectionsCollectionVitualizedView';
+
+import { EmptyError } from '../common/EmptyError';
+import { Hint } from '../common/Hint';
+import type { SupportedTokensViewModel } from '../SupportedTokens.ViewModel';
+import { Cell } from './Cell';
 
 const StaticSectionsCollectionVirtualizedViewStyled = styled(
   StaticSectionsCollectionVirtualizedView,

@@ -4,14 +4,15 @@ import { useIsTablet } from '@p2p-wallet-web/ui';
 import { observer } from 'mobx-react-lite';
 
 import { useViewModel } from 'new/core/viewmodels/useViewModel';
-import { Content } from 'new/scenes/Main/Receive/common/styled';
-import { CollectionView } from 'new/scenes/Main/Receive/SupportedTokens/CollectionView';
-import { EmptyError } from 'new/scenes/Main/Receive/SupportedTokens/common/EmptyError';
-import { Hint } from 'new/scenes/Main/Receive/SupportedTokens/common/Hint';
-import { SupportedTokensViewModel } from 'new/scenes/Main/Receive/SupportedTokens/SupportedTokens.ViewModel';
 import { Layout } from 'new/ui/components/common/Layout';
 import { WidgetPage } from 'new/ui/components/common/WidgetPage';
 import { SearchInput } from 'new/ui/components/ui/SearchInput';
+
+import { Content } from '../ReceiveToken/common/styled';
+import { CollectionView } from './CollectionView';
+import { EmptyError } from './common/EmptyError';
+import { Hint } from './common/Hint';
+import { SupportedTokensViewModel } from './SupportedTokens.ViewModel';
 
 export const SupportedTokens: FC = observer(() => {
   const isTablet = useIsTablet();

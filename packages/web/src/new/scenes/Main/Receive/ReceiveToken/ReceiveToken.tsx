@@ -6,13 +6,14 @@ import { theme } from '@p2p-wallet-web/ui';
 import { observer } from 'mobx-react-lite';
 
 import { useViewModel } from 'new/core/viewmodels/useViewModel';
-import { Content } from 'new/scenes/Main/Receive/common/styled';
-import { ReceiveViewModel } from 'new/scenes/Main/Receive/Receive.ViewModel';
-import { ReceiveBitcoin } from 'new/scenes/Main/Receive/ReceiveBitcoin';
-import { NetworkSelect } from 'new/scenes/Main/Receive/ReceiveToken/NetworkSelect';
-import { ReceiveSolana } from 'new/scenes/Main/Receive/Solana';
 import { Layout } from 'new/ui/components/common/Layout';
 import { WidgetPage } from 'new/ui/components/common/WidgetPage';
+
+import { ReceiveViewModel } from '../Receive.ViewModel';
+import { Content } from './common/styled';
+import { NetworkSelect } from './NetworkSelect';
+import { ReceiveBitcoin } from './ReceiveBitcoin';
+import { ReceiveSolana } from './Solana';
 
 const WhatTokensCanIReceiveLink = styled(NavLink)`
   color: ${theme.colors.textIcon.active};

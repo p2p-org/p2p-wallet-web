@@ -7,9 +7,10 @@ import {
   ShareIcon,
 } from 'components/pages/receive/ReceiveWidget/common/styled';
 import { useViewModel } from 'new/core/viewmodels/useViewModel';
-import { ReceiveSolanaViewModel } from 'new/scenes/Main/Receive/Solana/ReceiveSolana.ViewModel';
 import { UsernameAddressWidget } from 'new/ui/components/common/UsernameAddressWidget';
 import { withNameServiceDomain } from 'new/utils/StringExtensions';
+
+import { ReceiveSolanaViewModel } from './ReceiveSolana.ViewModel';
 
 export const ReceiveSolana: FC = () => {
   const viewModel = useViewModel(ReceiveSolanaViewModel);
