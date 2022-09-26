@@ -228,9 +228,7 @@ export class LockAndMintServiceImpl implements LockAndMintService {
       if (transaction.status.confirmed) {
         // check if transaction is invalid
         const tx: ProcessingTx | undefined = this._persistentStore.processingTransactions.find(
-          (_tx) => {
-            return _tx.tx.txid === transaction.txid;
-          },
+          (_tx) => _tx.tx.txid === transaction.txid,
         );
         if (tx && tx.validationStatus.type !== ValidationStatusType.valid) {
           if (this._showLog) {

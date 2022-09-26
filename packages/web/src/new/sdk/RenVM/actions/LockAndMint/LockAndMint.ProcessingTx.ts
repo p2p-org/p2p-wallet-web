@@ -21,10 +21,8 @@ export class ValidationStatus {
       return;
     }
 
-    const { type, reason } = props;
-
-    this.type = type;
-    this.reason = reason;
+    this.type = props.type;
+    this.reason = props.reason;
   }
 
   static valid(): ValidationStatus {
@@ -53,12 +51,19 @@ export class ProcessingTx {
   @Type(() => IncomingTransaction)
   // @ts-ignore
   tx: IncomingTransaction;
+  @Type(() => Date)
   receivedAt?: Date;
+  @Type(() => Date)
   oneVoteAt?: Date;
+  @Type(() => Date)
   twoVoteAt?: Date;
+  @Type(() => Date)
   threeVoteAt?: Date;
+  @Type(() => Date)
   confirmedAt?: Date;
+  @Type(() => Date)
   submittedAt?: Date;
+  @Type(() => Date)
   mintedAt?: Date;
   @Type(() => ValidationStatus)
   // @ts-ignore
