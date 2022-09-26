@@ -24,7 +24,6 @@ import { NotificationManager } from 'new/ui/managers/NotificationManager';
 import { ModalManager } from 'new/ui/modals/ModalManager';
 import { Auth } from 'pages/Auth';
 import { Landing } from 'pages/Landing';
-import { ReceiveOld } from 'pages/Receive';
 import { Wallet } from 'pages/Wallet';
 import { WalletSettings } from 'pages/WalletSettings';
 import { AuthRequiredRoute } from 'utils/routes/UserRequiredRoute';
@@ -54,7 +53,6 @@ const App: React.FC = observer(() => {
                   />
                   <AuthRequiredRoute path="/wallet/:publicKey" exact component={Wallet} />
                   <AuthRequiredRoute path="/buy/:symbol?" component={Buy} />
-                  <AuthRequiredRoute path="/receiveOld/(tokens)?" component={ReceiveOld} />
                   <AuthRequiredRoute path="/receive/(tokens)?" component={Receive} />
                   <AuthRequiredRoute path="/send/:publicKey/:status(result)" component={Send} />
                   <AuthRequiredRoute path="/send/:publicKey?" component={Send} />
