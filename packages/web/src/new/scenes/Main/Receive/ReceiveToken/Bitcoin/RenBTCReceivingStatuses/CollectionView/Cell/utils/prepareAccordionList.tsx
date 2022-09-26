@@ -51,7 +51,7 @@ export const prepareAccordionList = (records: Record[]): AccordionList => {
 
   return records.map<AccordionItem>((record) => {
     const item: AccordionItem = {
-      id: record.txid,
+      id: `${record.txid}${record.status}`,
       className: 'slim',
       rows: [
         {

@@ -34,10 +34,10 @@ interface Props {
   accordion: AccordionList;
 }
 
-export const AccordionDetails: FC<Props> = (props) => {
+export const AccordionDetails: FC<Props> = ({ accordion, ...props }) => {
   return (
     <Accordion title={<AccordionTitle {...props} />} noContentPadding>
-      {props.accordion.map((list) => (
+      {accordion.map((list) => (
         <ListWrapper key={list.id} className={list.className}>
           {list.rows.map((row) => (
             <Row key={row.id}>
