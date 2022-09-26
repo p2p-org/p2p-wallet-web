@@ -1,5 +1,3 @@
-import type { PublicKey } from '@solana/web3.js';
-
 import type * as BurnAndRelease from '../actions/BurnAndRelease';
 import type { Direction, ResponseQueryTxMint } from '../models';
 import { Selector } from '../models';
@@ -20,12 +18,12 @@ export abstract class RenVMChainType {
   abstract submitMint({
     address,
     mintTokenSymbol,
-    owner,
+    account,
     responseQueryMint,
   }: {
     address: Uint8Array;
     mintTokenSymbol: string;
-    owner: PublicKey;
+    account: Uint8Array;
     responseQueryMint: ResponseQueryTxMint;
   }): Promise<string>;
 
@@ -34,13 +32,11 @@ export abstract class RenVMChainType {
     account,
     amount,
     recipient,
-    owner,
   }: {
     mintTokenSymbol: string;
     account: Uint8Array;
     amount: string;
     recipient: string;
-    owner: PublicKey;
   }): Promise<BurnAndRelease.BurnDetails>;
 
   abstract waitForConfirmation(signature: string): Promise<void>;

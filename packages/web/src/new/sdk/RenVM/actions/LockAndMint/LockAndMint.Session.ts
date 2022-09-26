@@ -24,7 +24,7 @@ export class Session {
       throw RenVMError.other('Invalid session');
     }
 
-    this.nonce = nonce ?? generateNonce(Math.floor(Date.now() / 1000 / 60 / 60 / 24));
+    this.nonce = nonce ?? _generateNonce(Math.floor(Date.now() / 1000 / 60 / 60 / 24));
     this.createdAt = createdAt;
 
     this.endAt = endAt ?? new Date(this.createdAt.setHours(this.createdAt.getHours() + 36));
@@ -34,7 +34,7 @@ export class Session {
     return this.endAt > new Date();
   }
 
-  fromJSON(json: SessionJSONType): Session {
+  static fromJSON(json: SessionJSONType): Session {
     return new Session({
       nonce: json.nonce,
       createdAt: new Date(json.createdAt),
@@ -43,6 +43,6 @@ export class Session {
   }
 }
 
-function generateNonce(sessionDay: number): string {
+function _generateNonce(sessionDay: number): string {
   return Buffer.from(sessionDay.toString(16).padStart(32)).toString('hex');
 }

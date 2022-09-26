@@ -1,6 +1,6 @@
 import { generateGHash, generateNHash, generatePHash, generateSHash } from '@renproject/utils';
 import { toURLBase64 } from '@renproject/utils/internal/common';
-import type { u64 } from '@solana/spl-token';
+import { u64 } from '@solana/spl-token';
 import bech32 from 'bech32';
 import BN from 'bn.js';
 import base58 from 'bs58';
@@ -10,18 +10,60 @@ import type { State } from '../models';
 import { Direction, MintTransactionInput, Selector } from '../models';
 import type { RenVMRpcClientType } from '../RPCClient';
 
-export interface BurnDetails {
+export interface BurnDetailsJSONType {
+  confirmedSignature: string;
+  nonce: string;
+  recipient: string;
+  amount: string;
+}
+
+export class BurnDetails {
   confirmedSignature: string;
   nonce: u64;
   recipient: string;
   amount: string;
+
+  constructor({
+    confirmedSignature,
+    nonce,
+    recipient,
+    amount,
+  }: {
+    confirmedSignature: string;
+    nonce: u64;
+    recipient: string;
+    amount: string;
+  }) {
+    this.confirmedSignature = confirmedSignature;
+    this.nonce = nonce;
+    this.recipient = recipient;
+    this.amount = amount;
+  }
+
+  static fromJSON(data: BurnDetailsJSONType) {
+    return new BurnDetails({
+      confirmedSignature: data.confirmedSignature,
+      nonce: new u64(data.nonce),
+      recipient: data.recipient,
+      amount: data.amount,
+    });
+  }
+
+  toJSON(): BurnDetailsJSONType {
+    return {
+      confirmedSignature: this.confirmedSignature,
+      nonce: this.nonce.toString(),
+      recipient: this.recipient,
+      amount: this.amount,
+    };
+  }
 }
 
 export class BurnAndRelease {
   private _rpcClient: RenVMRpcClientType;
   private _chain: RenVMChainType;
-  private _mintTokenSymbol: string;
-  private _version: string;
+  private readonly _mintTokenSymbol: string;
+  private readonly _version: string;
   private _burnToChainName: string; // Ex.: Bitcoin
 
   constructor({
@@ -48,19 +90,16 @@ export class BurnAndRelease {
     account,
     amount,
     recipient,
-    signer,
   }: {
-    account: Buffer;
+    account: Uint8Array;
     amount: string;
     recipient: string;
-    signer: Buffer;
   }): Promise<BurnDetails> {
     return this._chain.submitBurn({
       mintTokenSymbol: this._mintTokenSymbol,
       account,
       amount,
       recipient,
-      signer,
     });
   }
 
@@ -118,7 +157,7 @@ export class BurnAndRelease {
     };
   }
 
-  async release(state: State, details: BurnDetails): Promise<string> {
+  async release({ state, details }: { state: State; details: BurnDetails }): Promise<string> {
     const selector = this._selector(Direction.from);
     const nonceBuffer = this._getNonceBuffer(new BN(details.nonce));
 

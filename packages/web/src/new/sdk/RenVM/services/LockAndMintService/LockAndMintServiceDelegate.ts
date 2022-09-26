@@ -1,19 +1,19 @@
-import type { LockAndMintProcessingTx } from '../../actions/LockAndMint';
+import type { ProcessingTx } from '../../actions/LockAndMint';
 
 export interface LockAndMintServiceDelegate {
   // Loading
 
   /// Start loading
-  lockAndMintServiceWillStartLoading: () => void;
+  lockAndMintServiceWillStartLoading(): void;
 
   /// Loaded
-  lockAndMintServiceLoaded: (gatewayAddress: string) => void;
+  lockAndMintServiceLoaded(gatewayAddress: string): void;
 
   /// Stop loading with error
-  lockAndMintServiceWithError: () => void;
+  lockAndMintServiceWithError(): void;
 
   // Transaction events
 
   /// Transactions updated
-  lockAndMintServiceUpdated: (processingTransactions: LockAndMintProcessingTx[]) => void;
+  lockAndMintServiceUpdated(processingTransactions: ProcessingTx[]): void;
 }

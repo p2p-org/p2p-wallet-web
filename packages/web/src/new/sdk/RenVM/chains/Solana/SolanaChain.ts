@@ -17,7 +17,7 @@ import {
   SolanaSDKPublicKey,
 } from 'new/sdk/SolanaSDK';
 
-import type { BurnDetails } from '../../actions/BurnAndRelease';
+import { BurnDetails } from '../../actions/BurnAndRelease';
 import type { ResponseQueryTxMint } from '../../models';
 import { Direction, RenVMError } from '../../models';
 import type { RenVMRpcClientType } from '../../RPCClient';
@@ -60,7 +60,7 @@ export class SolanaChain extends RenVMChainType {
   }: {
     client: RenVMRpcClientType;
     apiClient: SolanaSDK;
-    // TODO: apiClient and blochainClient after SolanaSDK decomposition
+    // TODO: apiClient and blockchainClient after SolanaSDK decomposition
   }): Promise<SolanaChain> {
     const pubkey = new PublicKey(client.network.gatewayRegistry);
     const stateKey = PublicKey.findProgramAddressSync(
@@ -175,12 +175,12 @@ export class SolanaChain extends RenVMChainType {
   async submitMint({
     address,
     mintTokenSymbol,
-    owner,
+    account,
     responseQueryMint,
   }: {
     address: Uint8Array;
     mintTokenSymbol: string;
-    owner: PublicKey; // instead of signer
+    account: Uint8Array; // instead of signer
     responseQueryMint: ResponseQueryTxMint;
   }): Promise<string> {
     const pHash = fromBase64(responseQueryMint.valueIn.phash);
@@ -232,7 +232,7 @@ export class SolanaChain extends RenVMChainType {
     )[0];
 
     const mintInstruction = RenProgram.mintInstruction({
-      account: owner,
+      account: new PublicKey(account),
       gatewayAccount: gatewayAccountId,
       tokenMint,
       recipientTokenAccount,
@@ -261,8 +261,8 @@ export class SolanaChain extends RenVMChainType {
 
     const preparedTransaction = await this.apiClient.prepareTransaction({
       instructions: [mintInstruction, secpInstruction],
-      owner,
-      feePayer: owner,
+      owner: new PublicKey(account),
+      feePayer: new PublicKey(account),
     });
     return this.apiClient.sendTransaction({
       preparedTransaction,
@@ -274,13 +274,11 @@ export class SolanaChain extends RenVMChainType {
     account,
     amount,
     recipient,
-    owner,
   }: {
     mintTokenSymbol: string;
-    account: Uint8Array;
+    account: Uint8Array; // instead of signer
     amount: string;
     recipient: string;
-    owner: PublicKey; // instead of signer
   }): Promise<BurnDetails> {
     const amountNew = new u64(amount);
     // TODO: condition to throw
@@ -338,20 +336,20 @@ export class SolanaChain extends RenVMChainType {
 
     const preparedTransaction = await this.apiClient.prepareTransaction({
       instructions: [burnCheckedInstruction, burnInstruction],
-      owner,
-      feePayer: owner,
+      owner: accountNew,
+      feePayer: accountNew,
     });
 
     const signature = await this.apiClient.sendTransaction({
       preparedTransaction,
     });
 
-    return {
+    return new BurnDetails({
       confirmedSignature: signature,
       nonce,
       recipient,
       amount,
-    };
+    });
   }
 
   async findMintByDepositDetail({

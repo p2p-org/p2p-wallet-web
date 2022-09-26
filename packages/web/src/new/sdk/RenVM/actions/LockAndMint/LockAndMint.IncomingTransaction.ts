@@ -1,51 +1,30 @@
-import type { u64 } from '@solana/spl-token';
-import { Type } from 'class-transformer';
+import { u64 } from '@solana/spl-token';
+import { Transform, Type } from 'class-transformer';
 
 export class BlockstreamInfoStatus {
+  // @ts-ignore
   confirmed: boolean;
+  @Type(() => u64)
+  @Transform(({ value }) => new u64(value))
   blockHeight?: u64;
   blockHash?: string;
+  @Type(() => u64)
+  @Transform(({ value }) => new u64(value))
   blockTime?: u64;
-
-  constructor({
-    confirmed,
-    blockHeight,
-    blockHash,
-    blockTime,
-  }: {
-    confirmed: boolean;
-    blockHeight?: u64;
-    blockHash?: string;
-    blockTime?: u64;
-  }) {
-    this.confirmed = confirmed;
-    this.blockHeight = blockHeight;
-    this.blockHash = blockHash;
-    this.blockTime = blockTime;
-  }
 }
 
 export class IncomingTransaction {
+  // @ts-ignore
   txid: string;
+  @Type(() => u64)
+  @Transform(({ value }) => new u64(value))
+  // @ts-ignore
   vout: u64;
   @Type(() => BlockstreamInfoStatus)
+  // @ts-ignore
   status: BlockstreamInfoStatus;
+  @Type(() => u64)
+  @Transform(({ value }) => new u64(value))
+  // @ts-ignore
   value: u64;
-
-  constructor({
-    txid,
-    vout,
-    status,
-    value,
-  }: {
-    txid: string;
-    vout: u64;
-    status: BlockstreamInfoStatus;
-    value: u64;
-  }) {
-    this.txid = txid;
-    this.vout = vout;
-    this.status = status;
-    this.value = value;
-  }
 }

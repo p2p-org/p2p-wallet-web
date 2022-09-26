@@ -18,7 +18,7 @@ class In {
   v: MintTransactionInput;
 }
 
-class TypeIn {
+export class TypeIn {
   static get struct(): Record<string, string> {
     return {
       txid: 'bytes',

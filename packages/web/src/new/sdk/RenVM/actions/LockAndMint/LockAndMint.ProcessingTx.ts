@@ -6,30 +6,30 @@ import { numberToString } from 'new/utils/NumberExtensions';
 
 import { IncomingTransaction } from './LockAndMint.IncomingTransaction';
 
-enum ValidationType {
+export enum ValidationStatusType {
   valid = 'valid',
   invalid = 'invalid',
 }
 
 export class ValidationStatus {
-  type: ValidationType;
+  type: ValidationStatusType;
   reason?: string;
 
-  private constructor({ type, reason }: { type: ValidationType; reason?: string }) {
+  private constructor({ type, reason }: { type: ValidationStatusType; reason?: string }) {
     this.type = type;
     this.reason = reason;
   }
 
   static valid(): ValidationStatus {
-    return new ValidationStatus({ type: ValidationType.valid });
+    return new ValidationStatus({ type: ValidationStatusType.valid });
   }
 
-  static invalid(reason: string): ValidationStatus {
-    return new ValidationStatus({ type: ValidationType.invalid, reason });
+  static invalid(reason?: string): ValidationStatus {
+    return new ValidationStatus({ type: ValidationStatusType.invalid, reason });
   }
 }
 
-export interface ProcessingTxType {
+interface ProcessingTxType {
   tx: IncomingTransaction;
   receivedAt?: Date;
   oneVoteAt?: Date;
@@ -42,7 +42,7 @@ export interface ProcessingTxType {
   isProcessing?: boolean;
 }
 
-export class ProcessingTx implements ProcessingTxType {
+export class ProcessingTx {
   @Type(() => IncomingTransaction)
   tx: IncomingTransaction;
   receivedAt?: Date;
@@ -53,8 +53,8 @@ export class ProcessingTx implements ProcessingTxType {
   submittedAt?: Date;
   mintedAt?: Date;
   @Type(() => ValidationStatus)
-  validationStatus?: ValidationStatus;
-  isProcessing?: boolean;
+  validationStatus: ValidationStatus;
+  isProcessing: boolean;
 
   constructor({
     tx,

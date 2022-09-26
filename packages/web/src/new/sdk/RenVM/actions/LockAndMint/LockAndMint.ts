@@ -41,7 +41,7 @@ export class LockAndMint {
     mintTokenSymbol: string;
     version: string;
     destinationAddress: Uint8Array;
-    session: Session;
+    session: Session | null;
   }) {
     this._rpcClient = rpcClient;
     this._chain = chain;
@@ -153,7 +153,13 @@ export class LockAndMint {
     return hash;
   }
 
-  async mint(state: State, signer: Uint8Array): Promise<{ amountOut?: string; signature: string }> {
+  async mint({
+    state,
+    account,
+  }: {
+    state: State;
+    account: Uint8Array;
+  }): Promise<{ amountOut?: string; signature: string }> {
     const txHash = state.txHash;
     if (!txHash) {
       throw new RenVMError('txHash not found');
@@ -172,10 +178,10 @@ export class LockAndMint {
 
     const amountOut = response.tx.out.v.amount;
 
-    const signature = this._chain.submitMint({
+    const signature = await this._chain.submitMint({
       address: this._destinationAddress,
       mintTokenSymbol: this._mintTokenSymbol,
-      signer,
+      account,
       responseQueryMint: response,
     });
 

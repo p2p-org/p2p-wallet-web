@@ -1,4 +1,4 @@
-import { plainToClass } from 'class-transformer';
+import { plainToInstance } from 'class-transformer';
 
 import type { Pools, ProgramIDS, TokenValue } from 'new/sdk/OrcaSwap';
 import { OrcaInfoResponse } from 'new/sdk/OrcaSwap';
@@ -26,13 +26,13 @@ export class APIClient implements OrcaSwapAPIClient {
 
   async getTokens(): Promise<Map<string, TokenValue>> {
     const data = await this.configProvider.getConfigs<OrcaInfoResponse>();
-    const response = plainToClass(OrcaInfoResponse, data);
+    const response = plainToInstance(OrcaInfoResponse, data);
     return response.value.tokens;
   }
 
   async getPools(): Promise<Pools> {
     const data = await this.configProvider.getConfigs<OrcaInfoResponse>();
-    const response = plainToClass(OrcaInfoResponse, data);
+    const response = plainToInstance(OrcaInfoResponse, data);
     const pools = new Map();
     response.value.pools.forEach((pool, key) => {
       if (!pool.deprecated) {
@@ -44,7 +44,7 @@ export class APIClient implements OrcaSwapAPIClient {
 
   async getProgramID(): Promise<ProgramIDS> {
     const data = await this.configProvider.getConfigs<OrcaInfoResponse>();
-    const response = plainToClass(OrcaInfoResponse, data);
+    const response = plainToInstance(OrcaInfoResponse, data);
     return response.value.programIds;
   }
 }

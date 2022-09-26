@@ -3,7 +3,8 @@ import { singleton } from 'tsyringe';
 
 import { ViewModel } from 'new/core/viewmodels/ViewModel';
 import type { LockAndMintServiceDelegate, ProcessingTx } from 'new/sdk/RenVM';
-import { LockAndMintService, LockAndMintServicePersistentStore } from 'new/sdk/RenVM';
+import { LockAndMintService } from 'new/sdk/RenVM';
+import { LockAndMintServicePersistentStore } from 'new/services/RenVM';
 
 import { getFormattedHMS } from './utils';
 
@@ -15,7 +16,7 @@ export class ReceiveBitcoinViewModel extends ViewModel implements LockAndMintSer
   secondsPassed = -1;
   processingTxs: ProcessingTx[] = []; // @web: processingTransactions
 
-  sessionEndDate: number | null = null;
+  sessionEndDate: Date | null = null;
 
   remainingTime = '35:59:59';
 
@@ -113,7 +114,7 @@ export class ReceiveBitcoinViewModel extends ViewModel implements LockAndMintSer
             return '35:59:59';
           }
 
-          const millisecondsRemains = Date.now() - endAt;
+          const millisecondsRemains = Date.now() - endAt.getTime();
 
           this.remainingTime = getFormattedHMS(millisecondsRemains);
         },
@@ -144,7 +145,7 @@ export class ReceiveBitcoinViewModel extends ViewModel implements LockAndMintSer
   _checkSessionEnd(): void {
     const endAt = this._persistentStore.session.endAt;
 
-    if (Date.now() >= endAt) {
+    if (Date.now() >= endAt.getTime()) {
       clearInterval(this.timer);
 
       this._lockAndMintService.expireCurrentSession();
