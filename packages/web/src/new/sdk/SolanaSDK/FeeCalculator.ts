@@ -1,7 +1,7 @@
 import { ZERO } from '@orca-so/sdk';
 import { u64 } from '@solana/spl-token';
-import type { Connection, PublicKey, Transaction } from '@solana/web3.js';
-import { SYSTEM_INSTRUCTION_LAYOUTS } from '@solana/web3.js';
+import type { Connection, PublicKey } from '@solana/web3.js';
+import { SYSTEM_INSTRUCTION_LAYOUTS, Transaction } from '@solana/web3.js';
 
 import type { Lamports } from '.';
 import { FeeAmount, SolanaSDKPublicKey } from '.';
@@ -25,9 +25,10 @@ export class DefaultFeeCalculator implements FeeCalculator {
     this._minRentExemption = minRentExemption;
   }
 
-  async calculateNetworkFee(transaction: Transaction, connection: Connection): Promise<FeeAmount> {
-    transaction.recentBlockhash = 'BdA9gRatFvvwszr9uU5fznkHoMVQE8tf6ZFi8Mp6xdKs'; // fake for estimate
-    const transactionFee = new u64((await transaction.getEstimatedFee(connection)) ?? 0);
+  async calculateNetworkFee(transaction: Transaction, _connection: Connection): Promise<FeeAmount> {
+    // TODO: return than works
+    // const transactionFee = new u64((await transaction.getEstimatedFee(connection)) ?? 0);
+    const transactionFee = calculateTransactionFee(transaction, this._lamportsPerSignature);
     let accountCreationFee: Lamports = ZERO;
     let depositFee: Lamports = ZERO;
     for (const instruction of transaction.instructions) {
@@ -78,4 +79,14 @@ export class DefaultFeeCalculator implements FeeCalculator {
       deposit: depositFee,
     });
   }
+}
+
+// TODO: temp, use getEstimatedFee instead
+export function calculateTransactionFee(transaction: Transaction, lamportsPerSignatures: u64): u64 {
+  const _transaction = new Transaction();
+  _transaction.instructions = transaction.instructions;
+  _transaction.recentBlockhash = 'BdA9gRatFvvwszr9uU5fznkHoMVQE8tf6ZFi8Mp6xdKs'; // fake
+  _transaction.feePayer = transaction.feePayer;
+  const message = _transaction.compileMessage();
+  return new u64(message.header.numRequiredSignatures).mul(lamportsPerSignatures);
 }

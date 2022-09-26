@@ -42,11 +42,6 @@ type GetPresetFn = (modal?: ModalType) => Preset;
 type Preset = 'nav' | 'regular';
 
 const modalsMap = new Map<ModalType, LoadableComponent<ModalPropsType & any>>([
-  // [SHOW_MODAL_ADD_COIN, loadable(() => import('components/modals/__AddCoinModal'))],
-  [
-    ModalType.SHOW_MODAL_ACTIONS_MOBILE,
-    loadable(() => import('components/modals/ActionsMobileModal')),
-  ],
   [
     ModalType.SHOW_MODAL_RECEIVE_BITCOIN,
     loadable(() => import('components/modals/ReceiveBitcoinModal')),
@@ -60,24 +55,12 @@ const modalsMap = new Map<ModalType, LoadableComponent<ModalPropsType & any>>([
     loadable(() => import('components/modals/TransactionInfoModals/TransactionDetailsModal')),
   ],
   [
-    ModalType.SHOW_MODAL_TRANSACTION_STATUS_SEND,
-    loadable(() => import('components/modals/TransactionInfoModals/TransactionStatusSendModal')),
-  ],
-  [
-    ModalType.SHOW_MODAL_TRANSACTION_STATUS_SWAP,
-    loadable(() => import('components/modals/TransactionInfoModals/TransactionStatusSwapModal')),
-  ],
-  [
     ModalType.SHOW_MODAL_CLOSE_TOKEN_ACCOUNT,
     loadable(() => import('components/modals/CloseTokenAccountModal')),
   ],
   [
     ModalType.SHOW_MODAL_PROCEED_USERNAME,
     loadable(() => import('components/modals/ProceedUsernameModal')),
-  ],
-  [
-    ModalType.SHOW_MODAL_CHOOSE_BUY_TOKEN_MOBILE,
-    loadable(() => import('components/modals/ChooseBuyTokenMobileModal')),
   ],
   [
     ModalType.SHOW_MODAL_SELECT_LIST_MOBILE,

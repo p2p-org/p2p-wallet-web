@@ -1,8 +1,9 @@
-import { Token } from '@solana/spl-token';
+import { Token, u64 } from '@solana/spl-token';
 import { Account, SystemProgram } from '@solana/web3.js';
 
-import type { BuildContext } from 'new/sdk/FeeRelayer';
 import { AccountInfo, SolanaSDKPublicKey } from 'new/sdk/SolanaSDK';
+
+import type { BuildContext } from '../BuildContext';
 
 export function checkSource(context: BuildContext): void {
   let sourceWSOLNewAccount: Account | undefined;
@@ -18,7 +19,9 @@ export function checkSource(context: BuildContext): void {
         SystemProgram.createAccount({
           fromPubkey: context.feeRelayerContext.feePayerAddress,
           newAccountPubkey: sourceWSOLNewAccount.publicKey,
-          lamports: context.feeRelayerContext.minimumTokenAccountBalance.toNumber(),
+          lamports: context.feeRelayerContext.minimumTokenAccountBalance
+            .add(context.config.inputAmount)
+            .toNumber(),
           space: AccountInfo.span,
           programId: SolanaSDKPublicKey.tokenProgramId,
         }),
@@ -31,8 +34,8 @@ export function checkSource(context: BuildContext): void {
       ],
     );
     context.env.userSource = sourceWSOLNewAccount.publicKey;
-    context.env.additionalPaybackFee = context.env.additionalPaybackFee.add(
-      context.feeRelayerContext.minimumTokenAccountBalance,
+    context.env.additionalPaybackFee = new u64(
+      context.env.additionalPaybackFee.add(context.feeRelayerContext.minimumTokenAccountBalance),
     );
   }
 

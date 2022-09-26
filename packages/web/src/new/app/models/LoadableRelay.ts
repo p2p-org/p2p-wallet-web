@@ -1,4 +1,4 @@
-import { action, flow, makeObservable, observable, runInAction } from 'mobx';
+import { action, flow, makeObservable, observable } from 'mobx';
 import type { CancellablePromise } from 'mobx/dist/api/flow';
 
 export enum LoadableStateType {
@@ -96,18 +96,18 @@ export class LoadableRelay<T> {
     // Load request
     this.disposable = this.createRequest();
     this.disposable
-      .then((data) => {
-        runInAction(() => {
+      .then(
+        action((data) => {
           this.value = this.map(this.value, data);
           this.state = LoadableState.loaded;
-        });
-      })
-      .catch((error) => {
-        console.error(error);
-        runInAction(() => {
+        }),
+      )
+      .catch(
+        action((error) => {
+          console.error(error);
           this.state = LoadableState.error(error);
-        });
-      });
+        }),
+      );
   }
 
   // Mapping

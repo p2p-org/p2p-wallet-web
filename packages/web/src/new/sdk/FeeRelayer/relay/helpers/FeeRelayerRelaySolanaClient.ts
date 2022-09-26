@@ -9,7 +9,6 @@ import type {
 import { injectable } from 'tsyringe';
 
 import { SolanaModel } from 'new/models/SolanaModel';
-import { FeeRelayerError } from 'new/sdk/FeeRelayer';
 import type * as SolanaSDK from 'new/sdk/SolanaSDK';
 import type { FeeCalculator } from 'new/sdk/SolanaSDK';
 import {
@@ -20,6 +19,7 @@ import {
 } from 'new/sdk/SolanaSDK';
 import { Defaults } from 'new/services/Defaults';
 
+import { FeeRelayerError } from '../../models';
 import * as Relay from '../index';
 
 interface FeeRelayerRelaySolanaClientType {
@@ -112,9 +112,11 @@ export class FeeRelayerRelaySolanaClient
       return getAssociatedTokenAddressSync(mint, address);
     }
 
-    // The native account
-    if (account.owner.equals(SolanaSDKPublicKey.programId)) {
-      throw FeeRelayerError.wrongAddress();
+    // The account is already token account
+    if (account.data?.mint.equals(mint)) {
+      if (account.owner.equals(SolanaSDKPublicKey.programId)) {
+        throw FeeRelayerError.wrongAddress();
+      }
     }
     return getAssociatedTokenAddressSync(mint, address);
   }

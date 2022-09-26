@@ -1,0 +1,111 @@
+diff --git a/node_modules/@solana/web3.js/lib/index.browser.cjs.js b/node_modules/@solana/web3.js/lib/index.browser.cjs.js
+index 4f682b4..2b89106 100644
+--- a/node_modules/@solana/web3.js/lib/index.browser.cjs.js
++++ b/node_modules/@solana/web3.js/lib/index.browser.cjs.js
+@@ -1521,8 +1521,9 @@ class Transaction {
+         return x.isWritable ? -1 : 1;
+       } // Otherwise, sort by pubkey, stringwise.
+ 
+-
+-      return x.pubkey.toBase58().localeCompare(y.pubkey.toBase58());
++      // TODO: wait until we will use fresh sdk on Fee Relayer side
++      // return x.pubkey.toBase58().localeCompare(y.pubkey.toBase58());
++      return 1;
+     }); // Move fee payer to the front
+ 
+     const feePayerIndex = uniqueMetas.findIndex(x => {
+diff --git a/node_modules/@solana/web3.js/lib/index.browser.esm.js b/node_modules/@solana/web3.js/lib/index.browser.esm.js
+index af39705..e15706e 100644
+--- a/node_modules/@solana/web3.js/lib/index.browser.esm.js
++++ b/node_modules/@solana/web3.js/lib/index.browser.esm.js
+@@ -1491,8 +1491,9 @@ class Transaction {
+         return x.isWritable ? -1 : 1;
+       } // Otherwise, sort by pubkey, stringwise.
+ 
+-
+-      return x.pubkey.toBase58().localeCompare(y.pubkey.toBase58());
++      // TODO: wait until we will use fresh sdk on Fee Relayer side
++      // return x.pubkey.toBase58().localeCompare(y.pubkey.toBase58());
++      return 1;
+     }); // Move fee payer to the front
+ 
+     const feePayerIndex = uniqueMetas.findIndex(x => {
+diff --git a/node_modules/@solana/web3.js/lib/index.cjs.js b/node_modules/@solana/web3.js/lib/index.cjs.js
+index 7d6702e..56bd34e 100644
+--- a/node_modules/@solana/web3.js/lib/index.cjs.js
++++ b/node_modules/@solana/web3.js/lib/index.cjs.js
+@@ -1527,8 +1527,9 @@ class Transaction {
+         return x.isWritable ? -1 : 1;
+       } // Otherwise, sort by pubkey, stringwise.
+ 
+-
+-      return x.pubkey.toBase58().localeCompare(y.pubkey.toBase58());
++      // TODO: wait until we will use fresh sdk on Fee Relayer side
++      // return x.pubkey.toBase58().localeCompare(y.pubkey.toBase58());
++      return 1;
+     }); // Move fee payer to the front
+ 
+     const feePayerIndex = uniqueMetas.findIndex(x => {
+diff --git a/node_modules/@solana/web3.js/lib/index.esm.js b/node_modules/@solana/web3.js/lib/index.esm.js
+index 6de386b..a33239b 100644
+--- a/node_modules/@solana/web3.js/lib/index.esm.js
++++ b/node_modules/@solana/web3.js/lib/index.esm.js
+@@ -1494,8 +1494,9 @@ class Transaction {
+         return x.isWritable ? -1 : 1;
+       } // Otherwise, sort by pubkey, stringwise.
+ 
+-
+-      return x.pubkey.toBase58().localeCompare(y.pubkey.toBase58());
++      // TODO: wait until we will use fresh sdk on Fee Relayer side
++      // return x.pubkey.toBase58().localeCompare(y.pubkey.toBase58());
++      return 1;
+     }); // Move fee payer to the front
+ 
+     const feePayerIndex = uniqueMetas.findIndex(x => {
+diff --git a/node_modules/@solana/web3.js/lib/index.iife.js b/node_modules/@solana/web3.js/lib/index.iife.js
+index 7c8cf3c..55e5c14 100644
+--- a/node_modules/@solana/web3.js/lib/index.iife.js
++++ b/node_modules/@solana/web3.js/lib/index.iife.js
+@@ -11979,8 +11979,9 @@ var solanaWeb3 = (function (exports) {
+ 	        return x.isWritable ? -1 : 1;
+ 	      } // Otherwise, sort by pubkey, stringwise.
+ 
+-
+-	      return x.pubkey.toBase58().localeCompare(y.pubkey.toBase58());
++				// TODO: wait until we will use fresh sdk on Fee Relayer side
++	      // return x.pubkey.toBase58().localeCompare(y.pubkey.toBase58());
++				return 1;
+ 	    }); // Move fee payer to the front
+ 
+ 	    const feePayerIndex = uniqueMetas.findIndex(x => {
+diff --git a/node_modules/@solana/web3.js/lib/index.native.js b/node_modules/@solana/web3.js/lib/index.native.js
+index 4d7c137..edc7dab 100644
+--- a/node_modules/@solana/web3.js/lib/index.native.js
++++ b/node_modules/@solana/web3.js/lib/index.native.js
+@@ -1521,8 +1521,9 @@ class Transaction {
+         return x.isWritable ? -1 : 1;
+       } // Otherwise, sort by pubkey, stringwise.
+ 
+-
+-      return x.pubkey.toBase58().localeCompare(y.pubkey.toBase58());
++      // TODO: wait until we will use fresh sdk on Fee Relayer side
++      // return x.pubkey.toBase58().localeCompare(y.pubkey.toBase58());
++      return 1;
+     }); // Move fee payer to the front
+ 
+     const feePayerIndex = uniqueMetas.findIndex(x => {
+diff --git a/node_modules/@solana/web3.js/src/transaction/legacy.ts b/node_modules/@solana/web3.js/src/transaction/legacy.ts
+index c2daec2..1e5b8c1 100644
+--- a/node_modules/@solana/web3.js/src/transaction/legacy.ts
++++ b/node_modules/@solana/web3.js/src/transaction/legacy.ts
+@@ -421,7 +421,9 @@ export class Transaction {
+         return x.isWritable ? -1 : 1;
+       }
+       // Otherwise, sort by pubkey, stringwise.
+-      return x.pubkey.toBase58().localeCompare(y.pubkey.toBase58());
++      // TODO: wait until we will use fresh sdk on Fee Relayer side
++      // return x.pubkey.toBase58().localeCompare(y.pubkey.toBase58());
++      return 1;
+     });
+ 
+     // Move fee payer to the front

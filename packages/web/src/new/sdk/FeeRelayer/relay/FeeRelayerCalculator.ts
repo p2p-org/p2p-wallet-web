@@ -2,13 +2,15 @@ import { ZERO } from '@orca-so/sdk';
 import { u64 } from '@solana/spl-token';
 import type { PublicKey } from '@solana/web3.js';
 
-import { FeeRelayerError } from 'new/sdk/FeeRelayer';
-import type { FeeRelayerContext } from 'new/sdk/FeeRelayer/relay/FeeRelayerContext';
-import { RelayAccountStatusType } from 'new/sdk/FeeRelayer/relay/helpers';
+import { FeeRelayerConstants } from 'new/sdk/FeeRelayer';
 import type { OrcaSwapType } from 'new/sdk/OrcaSwap';
 import { getInputAmountSlippage } from 'new/sdk/OrcaSwap';
 import * as SolanaSDK from 'new/sdk/SolanaSDK';
 import { SolanaSDKPublicKey } from 'new/sdk/SolanaSDK';
+
+import { FeeRelayerError } from '../models';
+import type { FeeRelayerContext } from './FeeRelayerContext';
+import { RelayAccountStatusType } from './helpers';
 
 export interface FeeRelayerCalculator {
   /// Calculate a top up amount for user's relayer account.
@@ -91,14 +93,12 @@ export class DefaultFeeRelayerCalculator implements FeeRelayerCalculator {
     const neededAmount = expectedFee.clone();
 
     // expected fees
-    const expectedTopUpNetworkFee = new u64(
-      (context.lamportsPerSignature ?? new u64(5000)).muln(2),
-    );
-    const expectedTransactionNetworkFee = expectedFee.transaction;
+    const expectedTopUpNetworkFee = new u64(context.lamportsPerSignature.muln(2));
+    const expectedTransactionNetworkFee = new u64(expectedFee.transaction);
 
     // real fees
-    let neededTopUpNetworkFee = expectedTopUpNetworkFee;
-    let neededTransactionNetworkFee = expectedTransactionNetworkFee;
+    let neededTopUpNetworkFee = new u64(expectedTopUpNetworkFee);
+    let neededTransactionNetworkFee = new u64(expectedTransactionNetworkFee);
 
     // is Top up free
     if (
@@ -126,7 +126,7 @@ export class DefaultFeeRelayerCalculator implements FeeRelayerCalculator {
       return neededAmount;
     }
 
-    const neededAmountWithoutCheckingRelayAccount = neededAmount;
+    const neededAmountWithoutCheckingRelayAccount = neededAmount.clone();
     const minimumRelayAccountBalance = context.minimumRelayAccountBalance;
 
     // check if relay account current balance can cover part of needed amount
@@ -216,8 +216,16 @@ export class DefaultFeeRelayerCalculator implements FeeRelayerCalculator {
       throw FeeRelayerError.swapPoolsNotFound();
     }
 
-    const transactionFee = getInputAmountSlippage(topUpPools, feeInSOL.transaction, 0.03);
-    const accountCreationFee = getInputAmountSlippage(topUpPools, feeInSOL.accountBalances, 0.03);
+    const transactionFee = getInputAmountSlippage(
+      topUpPools,
+      feeInSOL.transaction,
+      FeeRelayerConstants.topUpSlippage,
+    );
+    const accountCreationFee = getInputAmountSlippage(
+      topUpPools,
+      feeInSOL.accountBalances,
+      FeeRelayerConstants.topUpSlippage,
+    );
 
     return new SolanaSDK.FeeAmount({
       transaction: transactionFee ?? ZERO,

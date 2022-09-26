@@ -18,12 +18,12 @@ const TooltipContent = styled.div`
 
 interface Props {
   viewModel: Readonly<{
-    getFreeTransactionFeeLimit(): Promise<FeeRelayer.FreeTransactionFeeLimit>;
+    getFreeTransactionFeeLimit(): Promise<FeeRelayer.UsageStatus>;
   }>;
 }
 
 export const FeeTransactionTooltip: FC<Props> = ({ viewModel }) => {
-  const [limit, setLimit] = useState<FeeRelayer.FreeTransactionFeeLimit | null>(null);
+  const [limit, setLimit] = useState<FeeRelayer.UsageStatus | null>(null);
 
   const handleChange = useCallback(
     (isOver: boolean) => {

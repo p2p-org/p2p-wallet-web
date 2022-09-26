@@ -1,5 +1,6 @@
 import { ZERO } from '@orca-so/sdk';
 import { PublicKey } from '@solana/web3.js';
+import { makeAutoObservable } from 'mobx';
 
 import { networkFeesAll } from 'new/app/models/PayingFee';
 import * as SolanaSDK from 'new/sdk/SolanaSDK';
@@ -8,15 +9,17 @@ import {
   getAssociatedTokenAddressSync,
   SolanaSDKPublicKey,
 } from 'new/sdk/SolanaSDK';
+import type { ParsedTransactionInfoType } from 'new/sdk/TransactionParser';
+import { ParsedTransaction, Status, SwapInfo, TransferInfo } from 'new/sdk/TransactionParser';
 import type { PricesServiceType } from 'new/services/PriceAPIs/PricesService';
 import type { RawTransactionType } from 'new/ui/modals/ProcessTransactionModal';
 import * as ProcessTransaction from 'new/ui/modals/ProcessTransactionModal/ProcessTransaction.Models';
 
 export enum TransactionStatusType {
-  sending,
-  confirmed,
-  finalized,
-  error,
+  sending = 'sending',
+  confirmed = 'confirmed',
+  finalized = 'finalized',
+  error = 'error',
 }
 
 export class TransactionStatus {
@@ -159,6 +162,8 @@ export class PendingTransaction {
     this.rawTransaction = rawTransaction;
     this.status = status;
     this.slot = slot;
+
+    makeAutoObservable(this);
   }
 
   parse({
@@ -167,28 +172,28 @@ export class PendingTransaction {
   }: {
     pricesService: PricesServiceType;
     authority?: string | null;
-  }): SolanaSDK.ParsedTransaction | null {
+  }): ParsedTransaction | null {
     // status
-    let status: SolanaSDK.Status;
+    let status: Status;
 
     switch (this.status.type) {
       case TransactionStatusType.sending:
-        status = SolanaSDK.Status.requesting();
+        status = Status.requesting();
         break;
       case TransactionStatusType.confirmed:
-        status = SolanaSDK.Status.processing(0);
+        status = Status.processing(0);
         break;
       case TransactionStatusType.finalized:
-        status = SolanaSDK.Status.confirmed();
+        status = Status.confirmed();
         break;
       case TransactionStatusType.error:
-        status = SolanaSDK.Status.error(this.status.error?.message);
+        status = Status.error(this.status.error?.message);
         break;
     }
 
     const signature = this.transactionId;
 
-    let value: SolanaSDK.ParsedTransactionValueType | null;
+    let value: ParsedTransactionInfoType | null;
     let amountInFiat: number | null;
     let fee: SolanaSDK.FeeAmount | null;
 
@@ -199,7 +204,7 @@ export class PendingTransaction {
           (transaction as ProcessTransaction.SendTransaction).amount,
           (transaction as ProcessTransaction.SendTransaction).sender.token.decimals,
         );
-        value = new SolanaSDK.TransferTransaction({
+        value = new TransferInfo({
           source: (transaction as ProcessTransaction.SendTransaction).sender,
           destination: new SolanaSDK.Wallet({
             pubkey: (transaction as ProcessTransaction.SendTransaction).receiver.address,
@@ -208,8 +213,8 @@ export class PendingTransaction {
           }),
           authority,
           destinationAuthority: null,
-          amount,
-          myAccount: (transaction as ProcessTransaction.SendTransaction).sender.pubkey,
+          rawAmount: amount,
+          account: (transaction as ProcessTransaction.SendTransaction).sender.pubkey,
         });
         amountInFiat =
           amount *
@@ -235,12 +240,12 @@ export class PendingTransaction {
           ).toString();
         }
 
-        value = new SolanaSDK.SwapTransaction({
+        value = new SwapInfo({
           source: (transaction as ProcessTransaction.SwapTransaction).sourceWallet,
           sourceAmount: (transaction as ProcessTransaction.SwapTransaction).amount,
           destination: destinationWallet,
           destinationAmount: (transaction as ProcessTransaction.SwapTransaction).estimatedAmount,
-          myAccountSymbol: null,
+          accountSymbol: null,
         });
         amountInFiat =
           (transaction as ProcessTransaction.SwapTransaction).amount *
@@ -254,10 +259,10 @@ export class PendingTransaction {
         return null;
     }
 
-    return new SolanaSDK.ParsedTransaction({
+    return new ParsedTransaction({
       status,
       signature,
-      value,
+      info: value,
       amountInFiat,
       slot: this.slot,
       blockTime: this.sentAt,

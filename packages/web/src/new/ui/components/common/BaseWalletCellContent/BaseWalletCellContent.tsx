@@ -55,7 +55,11 @@ export const BaseWalletCellContent: FC<Props> = observer(
       return <TokenName title={wallet.mintAddress}>{tokenName}</TokenName>;
     };
 
-    const elTokenBalance = <TokenBalance>{wallet.amount.formatUnits()}</TokenBalance>;
+    const elTokenBalance = (
+      <TokenBalance>
+        {numberToString(wallet.amount, { maximumFractionDigits: 9 })} {wallet.token.symbol}
+      </TokenBalance>
+    );
 
     const renderTokenUSD = () => {
       if (wallet.amountInCurrentFiat) {

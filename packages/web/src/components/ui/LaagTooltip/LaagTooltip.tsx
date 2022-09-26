@@ -27,8 +27,8 @@ const TooltipContent = styled.div`
 `;
 
 const QuestionIcon = styled(Icon)<AnchorProps>`
-  width: 16px;
-  height: 16px;
+  width: 24px;
+  height: 24px;
 
   color: ${(props) => props.iconColor || theme.colors.textIcon.secondary};
 `;
@@ -78,6 +78,7 @@ interface TooltipProps {
   elContent: string | ReactElement;
   elAnchor?: string | ReactElement;
   withClose?: boolean;
+  className?: string;
 }
 
 type LaagProps = Pick<UseLayerOptions, 'auto' | 'snap' | 'possiblePlacements' | 'placement'> &
@@ -101,6 +102,7 @@ export const LaagTooltip: FunctionComponent<OuterProps> = ({
   elContent,
   elAnchor,
   onChange,
+  className,
 }) => {
   const [isOver, hoverProps, close] = useHover({ hideOnScroll: hideOnScroll });
   const { onMouseEnter, onTouchEnd, onTouchStart } = hoverProps;
@@ -134,7 +136,7 @@ export const LaagTooltip: FunctionComponent<OuterProps> = ({
 
   return (
     <>
-      <Anchor {...triggerProps} {...anchorProps}>
+      <Anchor {...triggerProps} {...anchorProps} className={className}>
         {elTooltipAnchor}
       </Anchor>
       {isOver &&

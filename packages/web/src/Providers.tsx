@@ -22,7 +22,6 @@ import {
   SettingsProvider,
 } from 'app/contexts';
 import { ToastManager } from 'components/common/ToastManager';
-import { Providers as SwapProviders } from 'components/pages/swap/Providers';
 import { LockAndMintProvider } from 'utils/providers/LockAndMintProvider';
 
 const PUBLIC_KEY_LENGTH_FOR_TRIMMING = 20;
@@ -93,9 +92,7 @@ export const Providers: FC = ({ children }) => {
               <SettingsProvider>
                 <BlockchainProvider>
                   <LockAndMintProvider>
-                    <SwapProviders>
-                      <ModalsProvider>{children}</ModalsProvider>
-                    </SwapProviders>
+                    <ModalsProvider>{children}</ModalsProvider>
                   </LockAndMintProvider>
                 </BlockchainProvider>
               </SettingsProvider>

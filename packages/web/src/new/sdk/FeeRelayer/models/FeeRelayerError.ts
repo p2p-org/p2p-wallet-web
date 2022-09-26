@@ -38,9 +38,9 @@ class ErrorDetail {
 
 class ErrorData {
   array?: string[];
-  dict?: { [key in string]: u64 }[];
+  dict?: Record<string, u64>[];
 
-  constructor(array?: string[], dict?: { [key in string]: u64 }[]) {
+  constructor(array?: string[], dict?: Record<string, u64>[]) {
     this.array = array;
     this.dict = dict;
   }

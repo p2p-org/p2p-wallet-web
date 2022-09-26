@@ -9,7 +9,7 @@ export abstract class PricesFetcher {
   }: {
     coins: Token[];
     fiat: string;
-  }): Promise<{ [key in string]: CurrentPrice | null }>;
+  }): Promise<Record<string, CurrentPrice | null>>;
 
   send<T>({ path }: { path: string }): Promise<T> {
     Logger.log(`${this.endpoint}${path}`, LogEvent.request, 'getPrices');
@@ -18,7 +18,7 @@ export abstract class PricesFetcher {
         throw new Error(response.statusText);
       }
 
-      Logger.log(await response.clone().text(), LogEvent.response, 'getPrices');
+      Logger.log(await response.clone().json(), LogEvent.response, 'getPrices');
 
       return response.json();
     });

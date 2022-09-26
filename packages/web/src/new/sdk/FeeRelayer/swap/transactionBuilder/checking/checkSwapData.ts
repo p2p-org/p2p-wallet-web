@@ -1,11 +1,12 @@
 import { Token } from '@solana/spl-token';
 import { PublicKey } from '@solana/web3.js';
 
-import type { BuildContext } from 'new/sdk/FeeRelayer';
-import { FeeRelayerError, RelayProgram } from 'new/sdk/FeeRelayer';
-import { DirectSwapData, TransitiveSwapData } from 'new/sdk/FeeRelayer/relay';
 import { SolanaSDKPublicKey } from 'new/sdk/SolanaSDK';
 
+import { FeeRelayerError } from '../../../models';
+import { DirectSwapData, TransitiveSwapData } from '../../../relay';
+import { RelayProgram } from '../../../relayProgram';
+import type { BuildContext } from '../BuildContext';
 import type { SwapData } from './SwapDataBuilder';
 
 export function checkSwapData(context: BuildContext, swapData: SwapData): void {

@@ -1,8 +1,9 @@
 import { Token, u64 } from '@solana/spl-token';
 import { SystemProgram } from '@solana/web3.js';
 
-import type { BuildContext } from 'new/sdk/FeeRelayer';
 import { SolanaSDKPublicKey } from 'new/sdk/SolanaSDK';
+
+import type { BuildContext } from '../BuildContext';
 
 export function checkClosingAccount(context: BuildContext): void {
   const newAccount = context.env.sourceWSOLNewAccount;

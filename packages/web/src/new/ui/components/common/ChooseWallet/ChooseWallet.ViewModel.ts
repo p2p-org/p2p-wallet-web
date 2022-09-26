@@ -1,9 +1,9 @@
-import { action, flow, makeObservable, observable, reaction } from 'mobx';
+import { action, flow, makeObservable, observable, when } from 'mobx';
 import assert from 'ts-invariant';
-import { delay, inject, injectable } from 'tsyringe';
+import { injectable } from 'tsyringe';
 
 import { SDListViewModel } from 'new/core/viewmodels/SDListViewModel';
-import { SendViewModel } from 'new/scenes/Main/Send';
+import { SDFetcherState } from 'new/core/viewmodels/SDViewModel';
 import { excludingSpecialTokens, Wallet } from 'new/sdk/SolanaSDK';
 import { PricesService } from 'new/services/PriceAPIs/PricesService';
 import { WalletsRepository } from 'new/services/Repositories';
@@ -11,48 +11,57 @@ import { SolanaService } from 'new/services/SolanaService';
 
 @injectable()
 export class ChooseWalletViewModel extends SDListViewModel<Wallet> {
-  selectedWallet: Wallet | null = null;
-  myWallets: Wallet[];
-  showOtherWallets: boolean | null = null;
-  keyword = '';
-
-  isOpen = false;
+  selectedWallet: Wallet | null;
+  _myWallets: Wallet[];
+  showOtherWallets: boolean | null;
+  keyword: string;
+  isOpen: boolean;
 
   constructor(
     private _walletsRepository: WalletsRepository,
     // private _tokensRepository: TokensRepository,
     private _solanaSDK: SolanaService,
     private _pricesService: PricesService,
-    @inject(delay(() => SendViewModel)) public sendViewModel: Readonly<SendViewModel>,
   ) {
     super();
 
-    this.myWallets = this._walletsRepository.getWallets();
+    this.selectedWallet = null;
+    this._myWallets = [];
+    this.showOtherWallets = null;
+    this.keyword = '';
+    this.isOpen = false;
 
     makeObservable(this, {
       selectedWallet: observable,
-      myWallets: observable,
-      keyword: observable,
-
+      _myWallets: observable,
       showOtherWallets: observable,
+      keyword: observable,
       isOpen: observable,
 
       createRequest: flow,
       search: action,
       selectWallet: action,
 
+      setCustomFilter: action,
       setShowOtherWallets: action,
       setIsOpen: action,
     });
   }
 
+  protected override setDefaults() {
+    this.selectedWallet = null;
+    this._myWallets = [];
+    this.showOtherWallets = null;
+    this.keyword = '';
+    this.isOpen = false;
+  }
+
   protected override onInitialize() {
-    // TODO: check that it needed
     this.addReaction(
-      reaction(
-        () => this._walletsRepository.getWallets(),
-        (wallets) => {
-          this.myWallets = wallets;
+      when(
+        () => this._walletsRepository.state === SDFetcherState.loaded, // TODO: really wait until wallets load?
+        () => {
+          this._myWallets = this._walletsRepository.getWallets();
           this.reload();
         },
       ),
@@ -85,20 +94,16 @@ export class ChooseWalletViewModel extends SDListViewModel<Wallet> {
             ),
         )
         .then((wallets) => {
-          return this.myWallets
-            .concat(...wallets)
-            .filter(
+          return this._myWallets.concat(
+            wallets.filter(
               (otherWallet) =>
-                !this.myWallets.some((wallet) => wallet.token.symbol === otherWallet.token.symbol),
-            );
+                !this._myWallets.some((wallet) => wallet.token.symbol === otherWallet.token.symbol),
+            ),
+          );
         });
     }
-    return yield Promise.resolve(this.myWallets);
+    return yield Promise.resolve(this._myWallets);
   });
-
-  override customFilter(wallet: Wallet): boolean {
-    return wallet.amount.greaterThan(0);
-  }
 
   override map(newData: Wallet[]): Wallet[] {
     let data = super.map(newData);
@@ -128,6 +133,10 @@ export class ChooseWalletViewModel extends SDListViewModel<Wallet> {
   }
 
   //
+
+  setCustomFilter(filter: (wallet: Wallet) => boolean): void {
+    this.customFilter = filter;
+  }
 
   setShowOtherWallets(state: boolean): void {
     this.showOtherWallets = state;
