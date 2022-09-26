@@ -1,5 +1,5 @@
 import { action, makeObservable, observable, reaction, runInAction } from 'mobx';
-import { singleton } from 'tsyringe';
+import { Lifecycle, scoped } from 'tsyringe';
 
 import { ViewModel } from 'new/core/viewmodels/ViewModel';
 import type { LockAndMintServiceDelegate, ProcessingTx } from 'new/sdk/RenVM';
@@ -7,7 +7,7 @@ import { LockAndMintService, LockAndMintServicePersistentStore } from 'new/servi
 
 import { getFormattedHMS } from './utils';
 
-@singleton()
+@scoped(Lifecycle.ResolutionScoped)
 export class ReceiveBitcoinViewModel extends ViewModel implements LockAndMintServiceDelegate {
   isLoading = false;
   timer?: NodeJS.Timer;
@@ -40,46 +40,6 @@ export class ReceiveBitcoinViewModel extends ViewModel implements LockAndMintSer
       lockAndMintServiceWithError: action,
       lockAndMintServiceUpdated: action,
     });
-
-    //TODO: for developing
-    /*runInAction(() => {
-      this.processingTxs = [
-        new LockAndMintProcessingTx({
-          tx: new LockAndMintIncomingTransaction({
-            txid: 'qweqwe',
-            vout: 3,
-            value: 150_000,
-            status: new BlockstreamInfoStatus({ confirmed: false }),
-          }),
-          isProcessing: true,
-          receivedAt: Date.now(),
-          oneVoteAt: Date.now() + 10_000,
-          twoVoteAt: Date.now() + 20_000,
-          threeVoteAt: Date.now() + 25_000,
-          confirmedAt: Date.now() + 40_000,
-          submittedAt: Date.now() + 50_000,
-          mintedAt: Date.now() + 100_000,
-        }),
-        new LockAndMintProcessingTx({
-          tx: new LockAndMintIncomingTransaction({
-            txid: 'qweqwe123',
-            vout: 3,
-            value: 2_500_000,
-            status: new BlockstreamInfoStatus({ confirmed: false }),
-          }),
-          isProcessing: true,
-          receivedAt: Date.now(),
-          oneVoteAt: Date.now(),
-          twoVoteAt: Date.now(),
-          threeVoteAt: Date.now(),
-          confirmedAt: Date.now(),
-          submittedAt: Date.now(),
-          mintedAt: Date.now(),
-        }),
-      ];
-
-      this.address = '2NAeYXJnuPXCkBRHY5Qf8AFEe6PyZP81Zz6';
-    });*/
   }
 
   protected override setDefaults() {
