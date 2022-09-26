@@ -8,7 +8,7 @@ import { Defaults } from '../Defaults';
 export class RpcClient extends RpcClientOriginal {
   constructor() {
     super({
-      network: Defaults.apiEndpoint.network ? Network.mainnet : Network.testnet,
+      network: Defaults.apiEndpoint.network === 'mainnet-beta' ? Network.mainnet : Network.testnet,
     });
   }
 }
