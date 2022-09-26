@@ -111,7 +111,7 @@ export class ProcessingTx {
   // TODO: extension. must be in client
   get statusString(): string {
     if (this.mintedAt) {
-      return `Successfully minted ${numberToString(convertToBalance(new u64(this.tx.value), 8), {
+      return `Successfully minted ${numberToString(convertToBalance(this.tx.value, 8), {
         maximumFractionDigits: 9,
       })} renBTC!`;
     }
@@ -133,6 +133,6 @@ export class ProcessingTx {
 
   // TODO: extension. must be in client
   get value(): number {
-    return convertToBalance(new u64(this.tx.value), 8);
+    return convertToBalance(this.tx.value, 8);
   }
 }
