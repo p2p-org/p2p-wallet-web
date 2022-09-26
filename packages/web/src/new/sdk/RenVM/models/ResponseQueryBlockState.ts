@@ -94,7 +94,6 @@ export class ResponseQueryBlockState {
 
   publicKey(mintTokenSymbol: string): string | null {
     if (mintTokenSymbol === 'BTC') {
-      debugger;
       return this.state.v.btc.shards[0]?.pubKey ?? null;
     }
     return null;
