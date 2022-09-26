@@ -267,8 +267,7 @@ export class LockAndMintServiceImpl implements LockAndMintService {
       groupedTransactions.submitted,
     );
     const transactionsToBeProcessed = confirmedAndSubmitedTransactions.filter(
-      (_tx) =>
-        _tx.isProcessing === false && _tx.validationStatus.type === ValidationStatusType.valid,
+      (_tx) => !_tx.isProcessing && _tx.validationStatus.type === ValidationStatusType.valid,
     );
 
     // mark as processing
@@ -340,6 +339,7 @@ export class LockAndMintServiceImpl implements LockAndMintService {
       try {
         await lockAndMint.mint({ state, account });
       } catch (error) {
+        console.error(error);
         // other error
         if (!this._chain?.isAlreadyMintedError(error as Error)) {
           if (RenVMError.equals(error as RenVMError, RenVMError.paramsMissing())) {

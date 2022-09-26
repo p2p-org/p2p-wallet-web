@@ -20,16 +20,13 @@ export const ReceiveBitcoin: FC = observer(() => {
   }
 
   const showReceivingStatuses = viewModel.processingTxs.length;
-  console.log('showReceivingStatuses -', showReceivingStatuses);
 
   return (
     <>
       <Content className="noTopPadding">
         {viewModel.address ? <UsernameAddressWidget address={viewModel.address} /> : null}
         <Hint remainingTime={viewModel.remainingTime} />
-        {showReceivingStatuses ? (
-          <RenBTCReceivingStatuses viewModel={viewModel.renBTCReceivingStatusesViewModel} />
-        ) : null}
+        {showReceivingStatuses ? <RenBTCReceivingStatuses /> : null}
       </Content>
       <BottomWrapper>
         <ExplorerA

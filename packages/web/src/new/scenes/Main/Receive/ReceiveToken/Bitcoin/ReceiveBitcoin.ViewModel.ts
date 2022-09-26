@@ -1,14 +1,13 @@
 import { action, makeObservable, observable, reaction, runInAction } from 'mobx';
-import { Lifecycle, scoped } from 'tsyringe';
+import { singleton } from 'tsyringe';
 
 import { ViewModel } from 'new/core/viewmodels/ViewModel';
 import type { LockAndMintServiceDelegate, ProcessingTx } from 'new/sdk/RenVM';
 import { LockAndMintService, LockAndMintServicePersistentStore } from 'new/services/RenVM';
 
-import { RenBTCReceivingStatusesViewModel } from './RenBTCReceivingStatuses';
 import { getFormattedHMS } from './utils';
 
-@scoped(Lifecycle.ResolutionScoped)
+@singleton()
 export class ReceiveBitcoinViewModel extends ViewModel implements LockAndMintServiceDelegate {
   isLoading = false;
   timer?: NodeJS.Timer;
@@ -23,7 +22,6 @@ export class ReceiveBitcoinViewModel extends ViewModel implements LockAndMintSer
   constructor(
     private _lockAndMintService: LockAndMintService,
     private _persistentStore: LockAndMintServicePersistentStore,
-    public renBTCReceivingStatusesViewModel: RenBTCReceivingStatusesViewModel,
   ) {
     super();
 
@@ -57,14 +55,10 @@ export class ReceiveBitcoinViewModel extends ViewModel implements LockAndMintSer
   }
 
   protected override onInitialize() {
-    this.renBTCReceivingStatusesViewModel.initialize();
-
     this._bind();
   }
 
   protected override afterReactionsRemoved() {
-    this.renBTCReceivingStatusesViewModel.end();
-
     clearInterval(this.timer);
   }
 
@@ -101,10 +95,14 @@ export class ReceiveBitcoinViewModel extends ViewModel implements LockAndMintSer
     this._lockAndMintService.delegate = this;
 
     if (this._lockAndMintService.isLoading) {
-      runInAction(() => (this.isLoading = true));
+      runInAction(() => {
+        this.isLoading = true;
+      });
     }
 
-    runInAction(() => (this.address = this._persistentStore.gatewayAddress));
+    runInAction(() => {
+      this.address = this._persistentStore.gatewayAddress;
+    });
   }
 
   _checkSessionEnd(): void {
@@ -118,7 +116,9 @@ export class ReceiveBitcoinViewModel extends ViewModel implements LockAndMintSer
 
       this._lockAndMintService.expireCurrentSession();
     } else {
-      runInAction(() => this.secondsPassed++);
+      runInAction(() => {
+        this.secondsPassed++;
+      });
     }
   }
 

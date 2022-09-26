@@ -132,8 +132,8 @@ export class SolanaChain extends RenVMChainType {
     return getAssociatedTokenAddressSync(tokenMint, new PublicKey(address)).toBytes();
   }
 
-  dataToAddress(date: Uint8Array): string {
-    return base58.encode(date);
+  dataToAddress(data: Uint8Array): string {
+    return base58.encode(data);
   }
 
   signatureToData(signature: string): Uint8Array {
