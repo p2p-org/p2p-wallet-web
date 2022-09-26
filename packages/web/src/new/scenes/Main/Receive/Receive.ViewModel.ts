@@ -2,6 +2,7 @@ import { action, makeObservable, observable } from 'mobx';
 import { singleton } from 'tsyringe';
 
 import { ViewModel } from 'new/core/viewmodels/ViewModel';
+import { ReceiveBitcoinViewModel } from 'new/scenes/Main/Receive/ReceiveToken/Bitcoin/ReceiveBitcoin.ViewModel';
 import type { Token } from 'new/sdk/SolanaSDK';
 import { SolanaSDKPublicKey } from 'new/sdk/SolanaSDK';
 import type { ModalPromise } from 'new/services/ModalService';
@@ -60,6 +61,7 @@ export class ReceiveViewModel extends ViewModel {
     private _walletsRepository: WalletsRepository,
     private _solanaSDK: SolanaService,
     private _modalService: ModalService,
+    private _receiveBitcoinViewModel: ReceiveBitcoinViewModel,
   ) {
     super();
 
@@ -94,9 +96,9 @@ export class ReceiveViewModel extends ViewModel {
 
   switchTokenType(tokenType: TokenType): void {
     this.tokenType = tokenType;
-    /*if (tokenType.type === 'btc') {
-      this._receiveBitcoinViewModel.acceptConditionAndLoadAddress();
-    }*/
+    if (tokenType.type === 'btc') {
+      void this._receiveBitcoinViewModel.acceptConditionAndLoadAddress();
+    }
   }
 
   openReceiveBitcoinModal<T>(): ModalPromise<T> {

@@ -115,11 +115,12 @@ export class SolanaChain extends RenVMChainType {
   }
 
   getSPLTokenPubkey(mintTokenSymbol: string): PublicKey {
+    debugger;
     const program = this.resolveTokenGatewayContract(mintTokenSymbol);
     const sHash = generateSHash(
       this.selector({ mintTokenSymbol, direction: Direction.to }).toString(),
     );
-    return PublicKey.findProgramAddressSync([sHash], program)[0];
+    return PublicKey.findProgramAddressSync([Buffer.from(sHash)], program)[0];
   }
 
   getAssociatedTokenAddress({

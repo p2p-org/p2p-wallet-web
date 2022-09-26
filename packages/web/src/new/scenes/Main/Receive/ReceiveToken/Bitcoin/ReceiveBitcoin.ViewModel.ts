@@ -127,13 +127,6 @@ export class ReceiveBitcoinViewModel extends ViewModel implements LockAndMintSer
       ),
     );
 
-    this.addReaction(
-      reaction(
-        () => this._persistentStore.gatewayAddress,
-        action((gatewayAddress) => (this.address = gatewayAddress)),
-      ),
-    );
-
     // timer
     this.timer = setInterval(() => this._checkSessionEnd(), 1_000);
     this._checkSessionEnd();

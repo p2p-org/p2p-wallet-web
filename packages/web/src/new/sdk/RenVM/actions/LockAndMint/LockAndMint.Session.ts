@@ -27,7 +27,8 @@ export class Session {
     this.nonce = nonce ?? _generateNonce(Math.floor(Date.now() / 1000 / 60 / 60 / 24));
     this.createdAt = createdAt;
 
-    this.endAt = endAt ?? new Date(this.createdAt.setHours(this.createdAt.getHours() + 36));
+    this.endAt =
+      endAt ?? new Date(new Date(this.createdAt).setHours(this.createdAt.getHours() + 36));
   }
 
   get isValid(): boolean {

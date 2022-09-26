@@ -59,7 +59,15 @@ export const prepareAccordionList = (records: Record[]): AccordionList => {
           title: (
             <Title>
               <Label>{record.stringValue}</Label>
-              <Description>{new Date(record.time).toLocaleString()}</Description>
+              <Description>
+                {new Date(record.time).toLocaleString('en-US', {
+                  month: 'long',
+                  year: 'numeric',
+                  day: 'numeric',
+                  hour: 'numeric',
+                  minute: 'numeric',
+                })}
+              </Description>
             </Title>
           ),
           value: renderValue(record),

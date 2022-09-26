@@ -176,7 +176,7 @@ export class LockAndMintServiceImpl implements LockAndMintService {
       this._tasks.add(previousTask);
 
       // TODO: check cancellation
-      // observe incomming transactions in a seprated task
+      // observe incomming transactions in a separated task
       const observeIncoming = async () => {
         await this._getIncommingTransactionsAndMint();
 
@@ -194,6 +194,8 @@ export class LockAndMintServiceImpl implements LockAndMintService {
       // indicate error
       this.delegate?.lockAndMintServiceWithError();
       this.isLoading = false;
+
+      console.error(error);
     }
   }
 
