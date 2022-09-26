@@ -27,7 +27,9 @@ export const ReceiveBitcoin: FC = observer(() => {
       <Content className="noTopPadding">
         {viewModel.address ? <UsernameAddressWidget address={viewModel.address} /> : null}
         <Hint remainingTime={viewModel.remainingTime} />
-        {showReceivingStatuses ? <RenBTCReceivingStatuses /> : null}
+        {showReceivingStatuses ? (
+          <RenBTCReceivingStatuses viewModel={viewModel.renBTCReceivingStatusesViewModel} />
+        ) : null}
       </Content>
       <BottomWrapper>
         <ExplorerA

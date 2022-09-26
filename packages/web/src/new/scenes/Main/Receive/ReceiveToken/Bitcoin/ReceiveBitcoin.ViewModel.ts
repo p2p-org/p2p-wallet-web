@@ -5,6 +5,7 @@ import { ViewModel } from 'new/core/viewmodels/ViewModel';
 import type { LockAndMintServiceDelegate, ProcessingTx } from 'new/sdk/RenVM';
 import { LockAndMintService, LockAndMintServicePersistentStore } from 'new/services/RenVM';
 
+import { RenBTCReceivingStatusesViewModel } from './RenBTCReceivingStatuses';
 import { getFormattedHMS } from './utils';
 
 @scoped(Lifecycle.ResolutionScoped)
@@ -22,6 +23,7 @@ export class ReceiveBitcoinViewModel extends ViewModel implements LockAndMintSer
   constructor(
     private _lockAndMintService: LockAndMintService,
     private _persistentStore: LockAndMintServicePersistentStore,
+    public renBTCReceivingStatusesViewModel: RenBTCReceivingStatusesViewModel,
   ) {
     super();
 
@@ -55,10 +57,14 @@ export class ReceiveBitcoinViewModel extends ViewModel implements LockAndMintSer
   }
 
   protected override onInitialize() {
+    this.renBTCReceivingStatusesViewModel.initialize();
+
     this._bind();
   }
 
   protected override afterReactionsRemoved() {
+    this.renBTCReceivingStatusesViewModel.end();
+
     clearInterval(this.timer);
   }
 
