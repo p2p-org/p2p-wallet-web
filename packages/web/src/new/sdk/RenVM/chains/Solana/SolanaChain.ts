@@ -104,18 +104,16 @@ export class SolanaChain extends RenVMChainType {
       throw new RenVMError('Could not resolve token gateway contract');
     }
 
-    // TOOD: check comparison
-    const index = this.gatewayRegistryData.selectors.findIndex(
-      (s) => s.toString() === sHash?.toString(),
+    const index = this.gatewayRegistryData.selectors.findIndex((s) =>
+      sHash ? Buffer.from(s).equals(sHash.toBuffer()) : false,
     );
-    if (!index || this.gatewayRegistryData.gateways.length === 0) {
+    if (index === -1 || this.gatewayRegistryData.gateways.length <= index) {
       throw new RenVMError('Could not resolve token gateway contract');
     }
     return this.gatewayRegistryData.gateways[index]!;
   }
 
   getSPLTokenPubkey(mintTokenSymbol: string): PublicKey {
-    debugger;
     const program = this.resolveTokenGatewayContract(mintTokenSymbol);
     const sHash = generateSHash(
       this.selector({ mintTokenSymbol, direction: Direction.to }).toString(),
