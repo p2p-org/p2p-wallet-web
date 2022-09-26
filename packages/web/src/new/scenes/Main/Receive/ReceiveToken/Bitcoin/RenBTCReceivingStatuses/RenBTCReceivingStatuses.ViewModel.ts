@@ -1,5 +1,5 @@
 import { action, reaction, runInAction } from 'mobx';
-import { delay, inject, singleton } from 'tsyringe';
+import { delay, inject, injectable } from 'tsyringe';
 
 import { SDListViewModel } from 'new/core/viewmodels/SDListViewModel';
 import { SDFetcherState } from 'new/core/viewmodels/SDViewModel';
@@ -7,7 +7,7 @@ import type { ProcessingTx } from 'new/sdk/RenVM';
 
 import { ReceiveBitcoinViewModel } from '../ReceiveBitcoin.ViewModel';
 
-@singleton()
+@injectable()
 export class RenBTCReceivingStatusesViewModel extends SDListViewModel<ProcessingTx> {
   override state = SDFetcherState.loaded;
 
