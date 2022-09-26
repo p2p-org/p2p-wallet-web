@@ -20,6 +20,7 @@ export const ReceiveBitcoin: FC = observer(() => {
   }
 
   const showReceivingStatuses = viewModel.processingTxs.length;
+  console.log('showReceivingStatuses -', showReceivingStatuses);
 
   return (
     <>

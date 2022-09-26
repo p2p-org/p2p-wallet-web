@@ -120,7 +120,7 @@ export class ReceiveBitcoinViewModel extends ViewModel implements LockAndMintSer
             return '35:59:59';
           }
 
-          const millisecondsRemains = Date.now() - endAt.getTime();
+          const millisecondsRemains = endAt.getTime() - Date.now();
 
           this.remainingTime = getFormattedHMS(millisecondsRemains);
         },

@@ -228,7 +228,9 @@ export class LockAndMintServiceImpl implements LockAndMintService {
       if (transaction.status.confirmed) {
         // check if transaction is invalid
         const tx: ProcessingTx | undefined = this._persistentStore.processingTransactions.find(
-          (_tx) => _tx.tx.txid === transaction.txid,
+          (_tx) => {
+            return _tx.tx.txid === transaction.txid;
+          },
         );
         if (tx && tx.validationStatus.type !== ValidationStatusType.valid) {
           if (this._showLog) {
@@ -284,7 +286,7 @@ export class LockAndMintServiceImpl implements LockAndMintService {
           await this.submitIfNeededAndMint(tx);
         } catch (error) {
           console.error(error);
-          if ((error as RenVMError).message.startsWith('insufficient amount after fees')) {
+          if ((error as RenVMError).message?.startsWith('insufficient amount after fees')) {
             this._persistentStore.markAsInvalid(tx.tx.txid, (error as RenVMError).message);
             this.delegate?.lockAndMintServiceUpdated(this._persistentStore.processingTransactions);
           }

@@ -60,7 +60,7 @@ const App: React.FC = observer(() => {
                   <AuthRequiredRoute path="/send/:publicKey?" component={Send} />
                   <AuthRequiredRoute path="/swap/(settings)?/:symbol?" component={SwapPage} />
                   <AuthRequiredRoute path="/settings/network" component={SettingsNetwork} />
-                  <AuthRequiredRoute path="/settings" component={Settings} />
+                  <AuthRequiredRoute path="/settings" component={Settings} exact />
                   <ModalManager />
                 </Main>
               </Switch>

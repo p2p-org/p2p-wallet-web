@@ -21,8 +21,10 @@ export class ValidationStatus {
       return;
     }
 
-    this.type = props.type;
-    this.reason = props.reason;
+    const { type, reason } = props;
+
+    this.type = type;
+    this.reason = reason;
   }
 
   static valid(): ValidationStatus {
