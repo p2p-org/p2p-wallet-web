@@ -1,7 +1,8 @@
 import { injectable } from 'tsyringe';
 
 import { isDev } from 'config/constants';
-import { LockAndMintServiceImpl, MintToken, RenVMRpcClientType } from 'new/sdk/RenVM';
+import { LockAndMintServiceImpl, MintToken } from 'new/sdk/RenVM';
+import { RpcClient } from 'new/services/RenVM/RpcClient';
 
 import { LockAndMintServicePersistentStore } from './LockAndMintServicePersistentStore';
 import { RenVMSolanaChainProvider } from './RenVMSolanaChainProvider';
@@ -11,7 +12,7 @@ export class LockAndMintService extends LockAndMintServiceImpl {
   constructor(
     persistentStore: LockAndMintServicePersistentStore,
     chainProvider: RenVMSolanaChainProvider,
-    rpcClient: RenVMRpcClientType,
+    rpcClient: RpcClient,
   ) {
     super({
       persistentStore,

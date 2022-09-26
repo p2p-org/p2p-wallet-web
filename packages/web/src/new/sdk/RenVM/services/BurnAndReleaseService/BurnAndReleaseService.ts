@@ -13,7 +13,7 @@ import type { BurnAndReleasePersistentStore } from './BurnAndReleasePersistentSt
 
 type BurnDetails = BurnAndReleaseBurnDetails;
 
-class DestinationChain {
+export class DestinationChain {
   name: string;
   symbol: string;
   decimals: number;

@@ -1,5 +1,7 @@
 import * as BurnAndRelease from '../../actions/BurnAndRelease';
 
+export const keyForSubmitedBurnTransaction = 'renVMSubmitedBurnTxDetails';
+
 // Persistent store for recovering transaction in case of failure
 interface BurnAndReleasePersistentStoreType {
   /// Get last non released transactions for retrying
