@@ -3,8 +3,7 @@ import { singleton } from 'tsyringe';
 
 import { ViewModel } from 'new/core/viewmodels/ViewModel';
 import type { LockAndMintServiceDelegate, ProcessingTx } from 'new/sdk/RenVM';
-import { LockAndMintService } from 'new/sdk/RenVM';
-import { LockAndMintServicePersistentStore } from 'new/services/RenVM';
+import { LockAndMintService, LockAndMintServicePersistentStore } from 'new/services/RenVM';
 
 import { getFormattedHMS } from './utils';
 
@@ -103,6 +102,13 @@ export class ReceiveBitcoinViewModel extends ViewModel implements LockAndMintSer
     clearInterval(this.timer);
   }
 
+  async acceptConditionAndLoadAddress(): Promise<void> {
+    const session = this._persistentStore.session;
+    if (!session?.isValid) {
+      await this._lockAndMintService.createSession();
+    }
+  }
+
   private _bind(): void {
     // update remainingTime
     this.addReaction(
@@ -143,7 +149,10 @@ export class ReceiveBitcoinViewModel extends ViewModel implements LockAndMintSer
   }
 
   _checkSessionEnd(): void {
-    const endAt = this._persistentStore.session.endAt;
+    const endAt = this._persistentStore.session?.endAt;
+    if (!endAt) {
+      return;
+    }
 
     if (Date.now() >= endAt.getTime()) {
       clearInterval(this.timer);
@@ -151,13 +160,6 @@ export class ReceiveBitcoinViewModel extends ViewModel implements LockAndMintSer
       this._lockAndMintService.expireCurrentSession();
     } else {
       runInAction(() => this.secondsPassed++);
-    }
-  }
-
-  async acceptConditionAndLoadAddress(): Promise<void> {
-    const session = this._persistentStore.session;
-    if (!session?.isValid) {
-      await this._lockAndMintService.createSession();
     }
   }
 
@@ -171,7 +173,7 @@ export class ReceiveBitcoinViewModel extends ViewModel implements LockAndMintSer
   lockAndMintServiceLoaded(gatewayAddress: string): void {
     this.address = gatewayAddress;
 
-    const endAt = this._persistentStore.session.endAt;
+    const endAt = this._persistentStore.session?.endAt ?? null;
     this.sessionEndDate = endAt;
   }
 
