@@ -164,8 +164,8 @@ export class LockAndMintServiceImpl implements LockAndMintService {
       });
 
       // save address
-      const gatewayAddressResponse = await this._lockAndMint.generateGatewayAddress();
-      const address = this._chain.dataToAddress(gatewayAddressResponse.gatewayAddress);
+      this._gatewayAddressResponse = await this._lockAndMint.generateGatewayAddress();
+      const address = this._chain.dataToAddress(this._gatewayAddressResponse.gatewayAddress);
       this._persistentStore.saveGatewayAddress(address);
 
       // TODO: async task
@@ -283,6 +283,7 @@ export class LockAndMintServiceImpl implements LockAndMintService {
         try {
           await this.submitIfNeededAndMint(tx);
         } catch (error) {
+          console.error(error);
           if ((error as RenVMError).message.startsWith('insufficient amount after fees')) {
             this._persistentStore.markAsInvalid(tx.tx.txid, (error as RenVMError).message);
             this.delegate?.lockAndMintServiceUpdated(this._persistentStore.processingTransactions);
@@ -307,7 +308,7 @@ export class LockAndMintServiceImpl implements LockAndMintService {
     const lockAndMint = this._lockAndMint;
     const chain = this._chain;
     if (!response || !lockAndMint || !chain) {
-      throw RenVMError.unknown;
+      throw RenVMError.unknown();
     }
 
     // get state

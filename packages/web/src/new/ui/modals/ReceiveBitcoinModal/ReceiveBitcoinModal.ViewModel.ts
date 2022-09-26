@@ -203,6 +203,7 @@ export class ReceiveBitcoinModalViewModel
     } catch (error) {
       console.error(error);
       this.error = (error as Error).message;
+      throw error;
     } finally {
       this.isLoading = false;
     }

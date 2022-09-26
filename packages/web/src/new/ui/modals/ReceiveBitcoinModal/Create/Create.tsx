@@ -25,6 +25,7 @@ interface Props {
   viewModel: Readonly<ReceiveBitcoinModalViewModel>;
 }
 
+// TODO: show error
 export const Create: FC<Props & ModalPropsType> = observer(({ viewModel, close }) => {
   const handleWalletChange = (wallet: Wallet) => {
     viewModel.walletDidSelect(wallet);
@@ -71,10 +72,7 @@ export const Create: FC<Props & ModalPropsType> = observer(({ viewModel, close }
             Minimum transaction amount of <strong>0.000112 BTC</strong>.
           </Row>
           <Row>
-            <strong>
-              {/*<HMSCountdown milliseconds={getRemainingGatewayTime(expiryTime)} />*/}
-              35:59:59
-            </strong>
+            <strong>35:59:59</strong>
             &nbsp; is the remaining time to safely send the assets
           </Row>
         </List>

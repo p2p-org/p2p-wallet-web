@@ -27,8 +27,12 @@ export const RenBTCButton: FC<Props & ModalPropsType> = observer(({ viewModel, c
   });
 
   const handleClick = async () => {
-    await viewModel.createRenBTC();
-    close(true);
+    try {
+      await viewModel.createRenBTC();
+      close(true);
+    } catch {
+      //
+    }
   };
 
   return (

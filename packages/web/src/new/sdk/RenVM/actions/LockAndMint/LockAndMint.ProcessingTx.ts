@@ -12,12 +12,17 @@ export enum ValidationStatusType {
 }
 
 export class ValidationStatus {
+  // @ts-ignore
   type: ValidationStatusType;
   reason?: string;
 
-  private constructor({ type, reason }: { type: ValidationStatusType; reason?: string }) {
-    this.type = type;
-    this.reason = reason;
+  private constructor(props: { type: ValidationStatusType; reason?: string }) {
+    if (!props) {
+      return;
+    }
+
+    this.type = props.type;
+    this.reason = props.reason;
   }
 
   static valid(): ValidationStatus {
@@ -44,6 +49,7 @@ interface ProcessingTxType {
 
 export class ProcessingTx {
   @Type(() => IncomingTransaction)
+  // @ts-ignore
   tx: IncomingTransaction;
   receivedAt?: Date;
   oneVoteAt?: Date;
@@ -53,31 +59,27 @@ export class ProcessingTx {
   submittedAt?: Date;
   mintedAt?: Date;
   @Type(() => ValidationStatus)
+  // @ts-ignore
   validationStatus: ValidationStatus;
+  // @ts-ignore
   isProcessing: boolean;
 
-  constructor({
-    tx,
-    receivedAt,
-    oneVoteAt,
-    twoVoteAt,
-    threeVoteAt,
-    confirmedAt,
-    submittedAt,
-    mintedAt,
-    validationStatus = ValidationStatus.valid(),
-    isProcessing = false,
-  }: ProcessingTxType) {
-    this.tx = tx;
-    this.receivedAt = receivedAt;
-    this.oneVoteAt = oneVoteAt;
-    this.twoVoteAt = twoVoteAt;
-    this.threeVoteAt = threeVoteAt;
-    this.confirmedAt = confirmedAt;
-    this.submittedAt = submittedAt;
-    this.mintedAt = mintedAt;
-    this.validationStatus = validationStatus;
-    this.isProcessing = isProcessing;
+  constructor(props: ProcessingTxType) {
+    // @web: for class-transformer
+    if (!props) {
+      return;
+    }
+
+    this.tx = props.tx;
+    this.receivedAt = props.receivedAt;
+    this.oneVoteAt = props.oneVoteAt;
+    this.twoVoteAt = props.twoVoteAt;
+    this.threeVoteAt = props.threeVoteAt;
+    this.confirmedAt = props.confirmedAt;
+    this.submittedAt = props.submittedAt;
+    this.mintedAt = props.mintedAt;
+    this.validationStatus = props.validationStatus ?? ValidationStatus.valid();
+    this.isProcessing = props.isProcessing ?? false;
   }
 
   static get maxVote(): u64 {
