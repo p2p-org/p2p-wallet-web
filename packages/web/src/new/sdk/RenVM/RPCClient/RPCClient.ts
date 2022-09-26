@@ -2,6 +2,7 @@ import type { JSONRPCResponse } from '@renproject/provider';
 import type { RenVMParams, RenVMResponses } from '@renproject/rpc/build/module/v2';
 import { mintParamsType, RPCMethod } from '@renproject/rpc/build/module/v2';
 import { retryNTimes, SECONDS } from '@renproject/utils/build/main';
+import { fromBase64 } from '@renproject/utils/internal/common';
 import { u64 } from '@solana/spl-token';
 import axios from 'axios';
 import { plainToInstance } from 'class-transformer';
@@ -216,11 +217,11 @@ export class RpcClient implements RenVMRpcClientType {
 
   async selectPublicKey(mintTokenSymbol: string): Promise<Uint8Array | null> {
     const blockState = await this.queryBlockState();
-    return Buffer.from(blockState.publicKey(mintTokenSymbol) ?? '');
+    return fromBase64(blockState.publicKey(mintTokenSymbol) ?? '');
   }
 
   async getTransactionFee(mintTokenSymbol: string): Promise<u64> {
-    // TODO: - Remove later: Support other tokens
+    // @ios: TODO: - Remove later: Support other tokens
     if (mintTokenSymbol !== 'BTC') {
       throw RenVMError.other('Unsupported token');
     }
