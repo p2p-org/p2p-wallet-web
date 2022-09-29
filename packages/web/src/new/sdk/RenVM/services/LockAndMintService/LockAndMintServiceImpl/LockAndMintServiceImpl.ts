@@ -4,6 +4,8 @@ import {
   pseudoCancellable,
 } from 'real-cancellable-promise';
 
+import type { u64 } from '@solana/spl-token';
+
 import { LogEvent, Logger } from 'new/sdk/SolanaSDK';
 import { cancellablePromiseRetry } from 'new/utils/promise/cancellablePromiseRetry';
 
@@ -370,5 +372,9 @@ export class LockAndMintServiceImpl implements LockAndMintService {
       this._persistentStore.markAsMinted(tx.tx, new Date());
       this.delegate?.lockAndMintServiceUpdated(this._persistentStore.processingTransactions);
     });
+  }
+
+  async getFee(): Promise<u64> {
+    return await this._rpcClient.getTransactionFee(this._mintToken.symbol);
   }
 }

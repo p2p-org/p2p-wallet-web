@@ -1,7 +1,15 @@
 import type { FC } from 'react';
 
 import { styled } from '@linaria/react';
+import { ZERO } from '@orca-so/sdk';
 import { borders, theme } from '@p2p-wallet-web/ui';
+import { u64 } from '@solana/spl-token';
+import { observer } from 'mobx-react-lite';
+
+import { Loader } from 'components/common/Loader';
+import type { ReceiveBitcoinViewModel } from 'new/scenes/Main/Receive/ReceiveToken/Bitcoin/ReceiveBitcoin.ViewModel';
+import { convertToBalance } from 'new/sdk/SolanaSDK';
+import { numberToString } from 'new/utils/NumberExtensions';
 
 const Wrapper = styled.div`
   padding: 16px;
@@ -28,18 +36,14 @@ const Row = styled.li`
 `;
 
 const MinimumTxAmount = styled.div`
-  display: flex;
-
-  &.inline {
-    display: inline;
-  }
+  display: inline-flex;
 `;
 
 interface Props {
-  remainingTime: string;
+  viewModel: ReceiveBitcoinViewModel;
 }
 
-export const Hint: FC<Props> = ({ remainingTime }) => {
+export const Hint: FC<Props> = observer(({ viewModel }) => {
   return (
     <Wrapper>
       <List>
@@ -49,14 +53,25 @@ export const Hint: FC<Props> = ({ remainingTime }) => {
         </Row>
         <Row>
           <MinimumTxAmount>
-            Minimum transaction amount of &nbsp;
-            <strong>0.000112 BTC</strong>.
+            Minimum transaction amount of&nbsp;
+            {viewModel.isFetchingFee ? (
+              <Loader />
+            ) : (
+              <>
+                <strong>{`${numberToString(
+                  convertToBalance(viewModel.fee?.mul(new u64(2)) ?? ZERO, 8),
+                  { maximumFractionDigits: 8 },
+                )} BTC`}</strong>
+                .
+              </>
+            )}
           </MinimumTxAmount>
         </Row>
         <Row>
-          <strong>{remainingTime}</strong> is the remaining time to safely send the assets.
+          <strong>{viewModel.remainingTime}</strong> is the remaining time to safely send the
+          assets.
         </Row>
       </List>
     </Wrapper>
   );
-};
+});

@@ -243,7 +243,8 @@ export class RpcClient implements RenVMRpcClientType {
 
     const gasLimit = new u64(blockState.state.v.btc.gasLimit);
     const gasCap = new u64(blockState.state.v.btc.gasCap);
-    if (!gasLimit || gasCap) {
+
+    if (!gasLimit || !gasCap) {
       throw RenVMError.other('Could not calculate transaction fee');
     }
     return new u64(gasLimit.mul(gasCap));
