@@ -1,4 +1,11 @@
+import {
+  buildCancellablePromise,
+  CancellablePromise,
+  pseudoCancellable,
+} from 'real-cancellable-promise';
+
 import { LogEvent, Logger } from 'new/sdk/SolanaSDK';
+import { cancellablePromiseRetry } from 'new/utils/promise/cancellablePromiseRetry';
 
 import type { GatewayAddressResponse } from '../../../actions/LockAndMint';
 import {
@@ -55,7 +62,7 @@ export class LockAndMintServiceImpl implements LockAndMintService {
   private _chain?: RenVMChainType;
 
   // Tasks for cancellation
-  private _tasks: Set<NodeJS.Timeout> = new Set();
+  private _tasks: Set<CancellablePromise<any>> = new Set();
 
   // Delegate
   delegate?: LockAndMintServiceDelegate;
@@ -136,8 +143,7 @@ export class LockAndMintServiceImpl implements LockAndMintService {
     this._persistentStore.markAllTransactionsAsNotProcessing();
     this.delegate?.lockAndMintServiceUpdated(this._persistentStore.processingTransactions);
 
-    this._tasks.forEach((taskId) => clearTimeout(taskId));
-    this._tasks.clear();
+    this._tasks.forEach((task) => task.cancel('clean'));
   }
 
   // Resume the current session
@@ -168,24 +174,19 @@ export class LockAndMintServiceImpl implements LockAndMintService {
       const address = this._chain.dataToAddress(this._gatewayAddressResponse.gatewayAddress);
       this._persistentStore.saveGatewayAddress(address);
 
-      // TODO: async task
       // continue previous works in a separated task
-      const previousTask = setTimeout(async () => {
-        await this.submitIfNeededAndMintAllTransactionsInQueue();
-      });
+      const previousTask = this.submitIfNeededAndMintAllTransactionsInQueue();
       this._tasks.add(previousTask);
 
-      // TODO: check cancellation
       // observe incomming transactions in a separated task
-      const observeIncoming = async () => {
-        await this._getIncommingTransactionsAndMint();
-
-        this._tasks.delete(observingTask);
-        observingTask = setTimeout(observeIncoming, this._refreshingRate); // 5 seconds
-        this._tasks.add(observingTask);
+      const observingTask = async () => {
+        while (true) {
+          await this._getIncommingTransactionsAndMint();
+          await CancellablePromise.delay(this._refreshingRate);
+        }
       };
-      let observingTask = setTimeout(observeIncoming);
-      this._tasks.add(observingTask);
+      // TODO: think its wrong. we need to cancel last loop
+      this._tasks.add(pseudoCancellable(observingTask()));
 
       // loaded
       this.delegate?.lockAndMintServiceLoaded(address);
@@ -260,102 +261,114 @@ export class LockAndMintServiceImpl implements LockAndMintService {
   }
 
   // Submit if needed and mint array of tx
-  async submitIfNeededAndMintAllTransactionsInQueue(): Promise<void> {
-    // get all transactions that are valid and are not being processed
-    const groupedTransactions = ProcessingTx.grouped(this._persistentStore.processingTransactions);
-    const confirmedAndSubmitedTransactions = groupedTransactions.confirmed.concat(
-      groupedTransactions.submitted,
-    );
-    const transactionsToBeProcessed = confirmedAndSubmitedTransactions.filter(
-      (_tx) => !_tx.isProcessing && _tx.validationStatus.type === ValidationStatusType.valid,
-    );
+  submitIfNeededAndMintAllTransactionsInQueue(): CancellablePromise<void> {
+    return buildCancellablePromise(async (capture) => {
+      // get all transactions that are valid and are not being processed
+      const groupedTransactions = ProcessingTx.grouped(
+        this._persistentStore.processingTransactions,
+      );
+      const confirmedAndSubmitedTransactions = groupedTransactions.confirmed.concat(
+        groupedTransactions.submitted,
+      );
+      const transactionsToBeProcessed = confirmedAndSubmitedTransactions.filter(
+        (_tx) => !_tx.isProcessing && _tx.validationStatus.type === ValidationStatusType.valid,
+      );
 
-    // mark as processing
-    for (const tx of transactionsToBeProcessed) {
-      this._persistentStore.markAsProcessing(tx);
-      this.delegate?.lockAndMintServiceUpdated(this._persistentStore.processingTransactions);
-    }
+      // mark as processing
+      for (const tx of transactionsToBeProcessed) {
+        this._persistentStore.markAsProcessing(tx);
+        this.delegate?.lockAndMintServiceUpdated(this._persistentStore.processingTransactions);
+      }
 
-    // process transactions simutaneously
-    await Promise.all(
-      transactionsToBeProcessed.map(async (tx) => {
-        try {
-          await this.submitIfNeededAndMint(tx);
-        } catch (error) {
-          console.error(error);
-          if ((error as RenVMError).message?.startsWith('insufficient amount after fees')) {
-            this._persistentStore.markAsInvalid(tx.tx.txid, (error as RenVMError).message);
-            this.delegate?.lockAndMintServiceUpdated(this._persistentStore.processingTransactions);
-          }
+      // process transactions simutaneously
+      await capture(
+        CancellablePromise.all(
+          transactionsToBeProcessed.map(async (tx) => {
+            try {
+              await this.submitIfNeededAndMint(tx);
+            } catch (error) {
+              console.error(error);
+              // TODO: check it works
+              if ((error as RenVMError).message.startsWith('insufficient amount after fees')) {
+                this._persistentStore.markAsInvalid(tx.tx.txid, (error as RenVMError).message);
+                this.delegate?.lockAndMintServiceUpdated(
+                  this._persistentStore.processingTransactions,
+                );
+              }
 
-          if (this._showLog) {
-            Logger.log(
-              `Could not mint transaction with id ${tx.tx.txid}, error: ${error}`,
-              LogEvent.error,
-            );
-          }
-        }
-      }),
-    );
+              if (this._showLog) {
+                Logger.log(
+                  `Could not mint transaction with id ${tx.tx.txid}, error: ${error}`,
+                  LogEvent.error,
+                );
+              }
+            }
+          }),
+        ),
+      );
+    });
   }
 
   // Submit if needed and mint tx
-  async submitIfNeededAndMint(tx: ProcessingTx): Promise<void> {
-    const account = await this._chainProvider.getAccount();
+  submitIfNeededAndMint(tx: ProcessingTx): CancellablePromise<void> {
+    return buildCancellablePromise(async (capture) => {
+      const account = await capture(pseudoCancellable(this._chainProvider.getAccount()));
 
-    const response = this._gatewayAddressResponse;
-    const lockAndMint = this._lockAndMint;
-    const chain = this._chain;
-    if (!response || !lockAndMint || !chain) {
-      throw RenVMError.unknown();
-    }
-
-    // get state
-    const state = lockAndMint.getDepositState({
-      transactionHash: tx.tx.txid,
-      txIndex: String(tx.tx.vout),
-      amount: String(tx.tx.value),
-      to: response.sendTo,
-      gHash: response.gHash,
-      gPubkey: response.gPubkey,
-    });
-
-    // submit
-    if (!tx.submittedAt) {
-      try {
-        const hash = await lockAndMint.submitMintTransaction(state);
-        console.debug(`submited transaction with hash: ${hash}`);
-        this._persistentStore.markAsSubmitted(tx.tx, new Date());
-        this.delegate?.lockAndMintServiceUpdated(this._persistentStore.processingTransactions);
-      } catch (error) {
-        console.error(error);
-        // try to mint event if error
+      const response = this._gatewayAddressResponse;
+      const lockAndMint = this._lockAndMint;
+      const chain = this._chain;
+      if (!response || !lockAndMint || !chain) {
+        throw RenVMError.unknown();
       }
-    }
 
-    // TODO: repeat
-    // mint
-    const repeatMint = async () => {
-      try {
-        await lockAndMint.mint({ state, account });
-      } catch (error) {
-        console.error(error);
-        // other error
-        if (!this._chain?.isAlreadyMintedError(error as Error)) {
-          if (RenVMError.equals(error as RenVMError, RenVMError.paramsMissing())) {
-            this._tasks.delete(repeatTask);
-            repeatTask = setTimeout(repeatMint, 5000);
-            this._tasks.add(repeatTask);
-          } else {
-            throw error;
-          }
+      // get state
+      const state = lockAndMint.getDepositState({
+        transactionHash: tx.tx.txid,
+        txIndex: String(tx.tx.vout),
+        amount: String(tx.tx.value),
+        to: response.sendTo,
+        gHash: response.gHash,
+        gPubkey: response.gPubkey,
+      });
+
+      // submit
+      if (!tx.submittedAt) {
+        try {
+          const hash = await capture(lockAndMint.submitMintTransaction(state));
+          console.debug(`submited transaction with hash: ${hash}`);
+          this._persistentStore.markAsSubmitted(tx.tx, new Date());
+          this.delegate?.lockAndMintServiceUpdated(this._persistentStore.processingTransactions);
+        } catch (error) {
+          console.error(error);
+          // try to mint event if error
         }
-        // already minted
       }
-    };
-    let repeatTask = setTimeout(repeatMint);
 
-    this._persistentStore.markAsMinted(tx.tx, new Date());
-    this.delegate?.lockAndMintServiceUpdated(this._persistentStore.processingTransactions);
+      // mint
+      await capture(
+        cancellablePromiseRetry(
+          (retry) => {
+            return lockAndMint.mint({ state, account }).catch((error) => {
+              console.error(error);
+              if (!chain.isAlreadyMintedError(error as Error)) {
+                if (RenVMError.equals(error as RenVMError, RenVMError.paramsMissing())) {
+                  retry(error);
+                } else {
+                  throw error;
+                }
+              }
+              // already minted
+            });
+          },
+          {
+            forever: true,
+            maxTimeout: 5_000,
+          },
+        ),
+      );
+
+      this._persistentStore.markAsMinted(tx.tx, new Date());
+      this.delegate?.lockAndMintServiceUpdated(this._persistentStore.processingTransactions);
+    });
   }
 }

@@ -262,9 +262,9 @@ export class LockAndMintServicePersistentStore implements LockAndMintServicePers
   }
 
   clearAll(): void {
-    this._clearFromUserDefault(keyForSession);
-    this._clearFromUserDefault(keyForGatewayAddress);
-    this._clearFromUserDefault(keyForProcessingTransactions);
+    this._clearFromUserDefault(this._userDefaultKeyForSession);
+    this._clearFromUserDefault(this._userDefaultKeyForGatewayAddress);
+    this._clearFromUserDefault(this._userDefaultKeyForProcessingTransactions);
   }
 
   // Private

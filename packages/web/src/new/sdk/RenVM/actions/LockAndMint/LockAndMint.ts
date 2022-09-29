@@ -1,8 +1,11 @@
 import { createAddressArray } from '@renproject/chains-bitcoin/script';
 import { hash160 } from '@renproject/chains-bitcoin/utils/utils';
+import { TxStatus } from '@renproject/interfaces';
 import { generateGHash, generateNHash, generatePHash, generateSHash } from '@renproject/utils';
 import { fromHex } from '@renproject/utils/internal/common';
 import { toURLBase64 } from '@renproject/utils/module/internal/common';
+import type { CancellablePromise } from 'real-cancellable-promise';
+import { buildCancellablePromise } from 'real-cancellable-promise';
 
 import type { RenVMChainType } from '../../chains/RenVMChainType';
 import type { Selector, State } from '../../models';
@@ -135,57 +138,68 @@ export class LockAndMint {
     return state;
   }
 
-  async submitMintTransaction(state: State): Promise<string> {
-    const selector = this._selector(Direction.to);
+  submitMintTransaction(state: State): CancellablePromise<string> {
+    return buildCancellablePromise(async (capture) => {
+      const selector = this._selector(Direction.to);
 
-    // get input
-    const mintTx = MintTransactionInput.fromState({ state, nonce: fromHex(this._session.nonce) });
-    const hash = toURLBase64(mintTx.hash({ selector, version: this._version }));
+      // get input
+      const mintTx = MintTransactionInput.fromState({ state, nonce: fromHex(this._session.nonce) });
+      const hash = toURLBase64(mintTx.hash({ selector, version: this._version }));
 
-    // send transaction
-    await this._rpcClient.submitTx({
-      hash,
-      selector,
-      version: this._version,
-      input: mintTx,
+      // send transaction
+      await capture(
+        this._rpcClient.submitTx({
+          hash,
+          selector,
+          version: this._version,
+          input: mintTx,
+        }),
+      );
+
+      return hash;
     });
-
-    return hash;
   }
 
-  async mint({
+  mint({
     state,
     account,
   }: {
     state: State;
     account: Uint8Array;
-  }): Promise<{ amountOut?: string; signature: string }> {
-    const txHash = state.txHash;
-    if (!txHash) {
-      throw new RenVMError('txHash not found');
-    }
+  }): CancellablePromise<{ amountOut?: string; signature: string }> {
+    return buildCancellablePromise(async (capture) => {
+      const txHash = state.txHash;
+      if (!txHash) {
+        throw new RenVMError('txHash not found');
+      }
 
-    const response = await this._rpcClient.queryMint(txHash);
+      const response = await capture(this._rpcClient.queryMint(txHash));
 
-    const revert = response.tx.out.v.revert;
-    if (revert) {
-      throw new RenVMError(revert);
-    }
+      if (response.out && response.out.revert) {
+        throw new RenVMError(response.out.revert.toString());
+      }
 
-    if (response.txStatus !== 'done') {
-      throw RenVMError.paramsMissing();
-    }
+      if (response.txStatus !== TxStatus.TxStatusDone) {
+        throw RenVMError.paramsMissing();
+      }
 
-    const amountOut = response.tx.out.v.amount;
+      if (!response.out) {
+        throw RenVMError.paramsMissing();
+      }
 
-    const signature = await this._chain.submitMint({
-      address: this._destinationAddress,
-      mintTokenSymbol: this._mintTokenSymbol,
-      account,
-      responseQueryMint: response,
+      const amountOut = response.out.amount;
+
+      const signature = await capture(
+        this._chain.submitMint({
+          address: this._destinationAddress,
+          mintTokenSymbol: this._mintTokenSymbol,
+          account,
+          responseQueryMint: response,
+        }),
+      );
+
+      return { amountOut, signature };
     });
-
-    return { amountOut, signature };
   }
 
   private _selector(direction: Direction): Selector {

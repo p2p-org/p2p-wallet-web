@@ -277,9 +277,11 @@ export class SolanaSDK {
     }
 
     let signedTransaction = transaction;
+    console.log(signedTransaction.serializeMessage().toString('base64'));
     if (owner) {
       signedTransaction = await this.provider.wallet.signTransaction(transaction);
     }
+    debugger;
 
     return new PreparedTransaction({
       owner,
@@ -331,8 +333,11 @@ export class SolanaSDK {
     recentBlockhash: string;
   }): string {
     const preparedTransactionNew = preparedTransaction;
-    preparedTransactionNew.transaction.recentBlockhash = recentBlockhash;
-    preparedTransactionNew.sign();
+    // preparedTransactionNew.transaction.recentBlockhash = recentBlockhash;
+    // preparedTransactionNew.sign();
+    // preparedTransactionNew.transaction = this.provider.wallet.signTransaction(
+    //   preparedTransactionNew.transaction,
+    // );
     return preparedTransactionNew.serialize();
   }
 

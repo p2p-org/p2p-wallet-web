@@ -1,13 +1,17 @@
 import type { Layout } from '@project-serum/borsh';
 import { array, bool, publicKey, struct, u8, u64 as u64borsh, vec } from '@project-serum/borsh';
+import { RenVmMsgLayout } from '@renproject/chains-solana/build/main/layouts';
+import { createInstructionWithEthAddress2 } from '@renproject/chains-solana/build/main/util';
+import type { LockAndMintTransaction } from '@renproject/interfaces';
 import { generateSHash } from '@renproject/utils';
-import { fromBase64 } from '@renproject/utils/internal/common';
-import { keccak256 } from '@renproject/utils/module/internal/hashes';
+import { keccak256 } from '@renproject/utils/build/main/hash';
 import { Token, u64 } from '@solana/spl-token';
 import type { AccountInfo as BufferInfo } from '@solana/web3.js';
 import { PublicKey } from '@solana/web3.js';
 import { BN } from 'bn.js';
 import base58 from 'bs58';
+import type { CancellablePromise } from 'real-cancellable-promise';
+import { buildCancellablePromise, pseudoCancellable } from 'real-cancellable-promise';
 
 import type { SolanaSDK } from 'new/sdk/SolanaSDK';
 import {
@@ -16,12 +20,11 @@ import {
   SolanaSDKError,
   SolanaSDKPublicKey,
 } from 'new/sdk/SolanaSDK';
+import { isAlreadyInUseSolanaError } from 'new/utils/ErrorExtensions';
 
 import { BurnDetails } from '../../actions/BurnAndRelease';
-import type { ResponseQueryTxMint } from '../../models';
 import { Direction, RenVMError } from '../../models';
 import type { RenVMRpcClientType } from '../../RPCClient';
-import { fixSignatureSimple } from '../../utils/Hash';
 import { RenVMChainType } from '../RenVMChainType';
 import { RenProgram } from './SolanaChainRenProgram';
 
@@ -171,7 +174,7 @@ export class SolanaChain extends RenVMChainType {
     });
   }
 
-  async submitMint({
+  submitMint({
     address,
     mintTokenSymbol,
     account,
@@ -180,91 +183,107 @@ export class SolanaChain extends RenVMChainType {
     address: Uint8Array;
     mintTokenSymbol: string;
     account: Uint8Array; // instead of signer
-    responseQueryMint: ResponseQueryTxMint;
-  }): Promise<string> {
-    const pHash = fromBase64(responseQueryMint.valueIn.phash);
-    const nHash = fromBase64(responseQueryMint.valueIn.nhash);
-    const amount = responseQueryMint.valueOut.amount;
-    if (!pHash || !nHash || !amount) {
-      throw RenVMError.paramsMissing();
-    }
+    responseQueryMint: LockAndMintTransaction;
+  }): CancellablePromise<string> {
+    return buildCancellablePromise(async (capture) => {
+      if (responseQueryMint.out && responseQueryMint.out.revert) {
+        throw new Error(`Transaction reverted: ${responseQueryMint.out.revert.toString()}`);
+      }
+      if (!responseQueryMint.out || !responseQueryMint.out.signature) {
+        throw new Error('Missing signature');
+      }
+      let sig = responseQueryMint.out.signature;
+      // FIXME: Not sure why this happens when retrieving the tx by polling for submission result
+      if (typeof sig === 'string') {
+        sig = Buffer.from(sig, 'hex');
+      }
 
-    const sHash = generateSHash(
-      this.selector({ mintTokenSymbol, direction: Direction.to }).toString(),
-    );
+      const sHash = keccak256(
+        Buffer.from(this.selector({ mintTokenSymbol, direction: Direction.to }).toString()),
+      );
 
-    const _sig = responseQueryMint.valueOut.sig;
-    if (!_sig) {
-      throw RenVMError.paramsMissing();
-    }
+      const program = this.resolveTokenGatewayContract(mintTokenSymbol);
+      const gatewayAccountId: PublicKey = PublicKey.findProgramAddressSync(
+        [new Uint8Array(Buffer.from(this.gatewayStateKey))],
+        program,
+      )[0];
+      const tokenMint = this.getSPLTokenPubkey(mintTokenSymbol);
+      const mintAuthority: PublicKey = PublicKey.findProgramAddressSync(
+        [tokenMint.toBuffer()],
+        program,
+      )[0];
+      const recipientTokenAccount = new PublicKey(
+        this.getAssociatedTokenAddress({
+          address,
+          mintTokenSymbol,
+        }),
+      );
+      const [renvmmsg, renvmMsgSlice] = SolanaChain.buildRenVMMessage({
+        pHash: Buffer.from(responseQueryMint.out.phash.toString('hex'), 'hex'),
+        amount: responseQueryMint.out.amount.toString(),
+        token: Buffer.from(sHash.toString('hex'), 'hex'),
+        to: recipientTokenAccount.toString(),
+        nHash: Buffer.from(responseQueryMint.out.nhash.toString('hex'), 'hex'),
+      });
+      const mintLogAccount: PublicKey = PublicKey.findProgramAddressSync(
+        [keccak256(renvmmsg)],
+        program,
+      )[0];
 
-    const _siga = Buffer.from(fromBase64(_sig));
-    // TODO: this looks weird, check it
-    const fixedSig = fixSignatureSimple(_siga);
-    const sig = Buffer.from(fixedSig); // just clone
-    const program = this.resolveTokenGatewayContract(mintTokenSymbol);
-    const gatewayAccountId: PublicKey = PublicKey.findProgramAddressSync(
-      [Buffer.from(this.gatewayStateKey)],
-      program,
-    )[0];
-    const tokenMint = this.getSPLTokenPubkey(mintTokenSymbol);
-    const mintAuthority: PublicKey = PublicKey.findProgramAddressSync(
-      [tokenMint.toBuffer()],
-      program,
-    )[0];
-    const recipientTokenAccount = new PublicKey(
-      this.getAssociatedTokenAddress({
-        address,
-        mintTokenSymbol,
-      }),
-    );
-    const renVMMessage = SolanaChain.buildRenVMMessage({
-      pHash,
-      amount,
-      token: sHash,
-      to: recipientTokenAccount,
-      nHash,
-    });
-    const mintLogAccount: PublicKey = PublicKey.findProgramAddressSync(
-      [keccak256(renVMMessage)],
-      program,
-    )[0];
-
-    const mintInstruction = RenProgram.mintInstruction({
-      account: new PublicKey(account),
-      gatewayAccount: gatewayAccountId,
-      tokenMint,
-      recipientTokenAccount,
-      mintLogAccount,
-      mintAuthority,
-      programId: program,
-    });
-
-    const response: BufferInfo<GatewayStateData | null> | null =
-      await this.apiClient.getAccountInfo({
-        account: gatewayAccountId.toString(),
-        decodedTo: GatewayStateDataLayout,
+      const mintInstruction = RenProgram.mintInstruction({
+        account: new PublicKey(account),
+        gatewayAccount: gatewayAccountId,
+        tokenMint,
+        recipientTokenAccount,
+        mintLogAccount,
+        mintAuthority,
+        programId: program,
       });
 
-    const gatewayState = response?.data;
-    if (!gatewayState) {
-      throw SolanaSDKError.couldNotRetrieveAccountInfo();
-    }
+      const response: BufferInfo<GatewayStateData | null> | null = await capture(
+        pseudoCancellable(
+          this.apiClient.getAccountInfo({
+            account: gatewayAccountId.toString(),
+            decodedTo: GatewayStateDataLayout,
+          }),
+        ),
+      );
 
-    const secpInstruction = RenProgram.createInstructionWithEthAddress2({
-      ethAddress: Buffer.from(gatewayState.renVMAuthority),
-      message: renVMMessage,
-      signature: sig.slice(0, 64),
-      recoveryId: sig[64]! - 27,
-    });
+      const gatewayState = response?.data;
+      if (!gatewayState) {
+        throw SolanaSDKError.couldNotRetrieveAccountInfo();
+      }
 
-    const preparedTransaction = await this.apiClient.prepareTransaction({
-      instructions: [mintInstruction, secpInstruction],
-      owner: new PublicKey(account),
-      feePayer: new PublicKey(account),
-    });
-    return this.apiClient.sendTransaction({
-      preparedTransaction,
+      // const secpInstruction = RenProgram.createInstructionWithEthAddress2({
+      //   ethAddress: Buffer.from(gatewayState.renVMAuthority),
+      //   message: renVMMessage,
+      //   signature: sig.slice(0, 64),
+      //   recoveryId: sig[64]! - 27,
+      // });
+
+      const secpInstruction = createInstructionWithEthAddress2({
+        ethAddress: Buffer.from(gatewayState.renVMAuthority),
+        message: renvmMsgSlice,
+        signature: sig.slice(0, 64),
+        recoveryId: sig[64]! - 27,
+      });
+      secpInstruction.data = Buffer.from([...secpInstruction.data]);
+
+      const preparedTransaction = await capture(
+        pseudoCancellable(
+          this.apiClient.prepareTransaction({
+            instructions: [mintInstruction, secpInstruction],
+            owner: new PublicKey(account),
+            feePayer: new PublicKey(account),
+          }),
+        ),
+      );
+      debugger;
+      return pseudoCancellable(
+        this.apiClient.sendTransaction({
+          preparedTransaction,
+        }),
+      );
     });
   }
 
@@ -392,17 +411,13 @@ export class SolanaChain extends RenVMChainType {
   }
 
   async waitForConfirmation(signature: string): Promise<void> {
-    // TODO: ignore status
+    // TODO: add ignore status
     return this.apiClient.waitForConfirmation(signature);
   }
 
   isAlreadyMintedError(error: Error): boolean {
-    console.error(error);
-    // TODO:
-    // response.data?.logs?.contains(
-    // starts(with: "Allocate: account Address { address: ") &&
-    //             hasSuffix("} already in use")
-    throw new Error('do it');
+    // TODO: inside function
+    return isAlreadyInUseSolanaError(error);
   }
 
   // Static methods
@@ -414,28 +429,31 @@ export class SolanaChain extends RenVMChainType {
     to,
     nHash,
   }: {
-    pHash: Uint8Array;
+    pHash: Buffer;
     amount: string;
-    token: Uint8Array;
-    to: PublicKey;
-    nHash: Uint8Array;
-  }): Buffer {
+    token: Buffer;
+    to: string;
+    nHash: Buffer;
+  }): [Buffer, Buffer] {
+    const renvmmsg = Buffer.from(new Array(160));
     const preencode = {
-      pHash: new Uint8Array(pHash),
-      amount: new Uint8Array(new BN(amount).toArray('be', 32)),
+      p_hash: new Uint8Array(pHash),
+      amount: new Uint8Array(new BN(amount.toString()).toArray('be', 32)),
       token: new Uint8Array(token),
-      to: new Uint8Array(to.toBuffer()),
-      nHash: new Uint8Array(nHash),
+      to: new Uint8Array(base58.decode(to)),
+      n_hash: new Uint8Array(nHash),
     };
 
     // form data
-    return Buffer.from([
-      ...preencode.pHash,
+    const renvmMsgSlice = Buffer.from([
+      ...preencode.p_hash,
       ...preencode.amount,
       ...preencode.token,
       ...preencode.to,
-      ...preencode.nHash,
+      ...preencode.n_hash,
     ]);
+    RenVmMsgLayout.encode(preencode, renvmmsg);
+    return [renvmmsg, renvmMsgSlice];
   }
 }
 

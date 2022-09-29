@@ -1,13 +1,16 @@
+import type { LockAndMintTransaction } from '@renproject/interfaces';
 import type { JSONRPCResponse } from '@renproject/provider';
 import type { RenVMParams, RenVMResponses } from '@renproject/rpc/build/module/v2';
-import { mintParamsType, RPCMethod } from '@renproject/rpc/build/module/v2';
-import { retryNTimes, SECONDS } from '@renproject/utils/build/main';
+import { mintParamsType, RPCMethod, unmarshalMintTx } from '@renproject/rpc/build/module/v2';
+import { SECONDS } from '@renproject/utils/build/main';
 import { fromBase64 } from '@renproject/utils/internal/common';
 import { u64 } from '@solana/spl-token';
-import axios from 'axios';
 import { plainToInstance } from 'class-transformer';
+import type { CancellablePromise } from 'real-cancellable-promise';
+import { buildCancellablePromise } from 'real-cancellable-promise';
 
 import { LogEvent, Logger } from 'new/sdk/SolanaSDK';
+import { cancellableAxios } from 'new/utils/promise/PromiseExtensions';
 
 import { IncomingTransaction } from '../actions/LockAndMint';
 import type { MintTransactionInput, Network, Selector } from '../models';
@@ -15,7 +18,6 @@ import {
   RenVMError,
   ResponseQueryBlockState,
   ResponseQueryConfig,
-  ResponseQueryTxMint,
   ResponseSubmitTxMint,
 } from '../models';
 
@@ -40,15 +42,15 @@ export interface RenVMRpcClientType {
     log: boolean;
     retry?: number; // @renjs
     timeout?: number; // @renjs
-  }): Promise<RenVMResponses[Method]>;
+  }): CancellablePromise<RenVMResponses[Method]>;
   selectPublicKey(mintTokenSymbol: string): Promise<Uint8Array | null>;
   getIncomingTransactions(address: string): Promise<IncomingTransaction[]>;
 
   // extension
 
-  queryMint(txHash: string): Promise<ResponseQueryTxMint>;
+  queryMint(txHash: string): CancellablePromise<LockAndMintTransaction>;
 
-  queryBlockState(log: boolean): Promise<ResponseQueryBlockState>;
+  queryBlockState(log: boolean): CancellablePromise<ResponseQueryBlockState>;
 
   queryConfig(): Promise<ResponseQueryConfig>;
 
@@ -62,7 +64,7 @@ export interface RenVMRpcClientType {
     selector: Selector;
     version: string;
     input: MintTransactionInput;
-  }): Promise<ResponseSubmitTxMint>;
+  }): CancellablePromise<ResponseSubmitTxMint>;
 
   getTransactionFee(mintTokenSymbol: string): Promise<u64>;
 }
@@ -74,12 +76,11 @@ export class RpcClient implements RenVMRpcClientType {
     this.network = network;
   }
 
-  async call<Method extends keyof RenVMParams>({
+  call<Method extends keyof RenVMParams>({
     endpoint,
     method,
     params,
     log,
-    retry = 2,
     timeout = 120 * SECONDS,
   }: {
     endpoint: string;
@@ -88,51 +89,51 @@ export class RpcClient implements RenVMRpcClientType {
     log: boolean;
     retry?: number; // @renjs
     timeout?: number; // @renjs
-  }): Promise<RenVMResponses[Method]> {
-    try {
-      new URL(endpoint);
-    } catch {
-      throw RenVMError.invalidEndpoint();
-    }
+  }): CancellablePromise<RenVMResponses[Method]> {
+    return buildCancellablePromise(async (capture) => {
+      try {
+        new URL(endpoint);
+      } catch {
+        throw RenVMError.invalidEndpoint();
+      }
 
-    // Log
-    if (log) {
-      Logger.log(
-        `renBTC event ${method} ${JSON.stringify(params, null, '    ')}`,
-        LogEvent.request,
-      );
-    }
+      // Log
+      if (log) {
+        Logger.log(
+          `renBTC event ${method} ${JSON.stringify(params, null, '    ')}`,
+          LogEvent.request,
+        );
+      }
 
-    // prepare urlRequest
-    const body = makeBody(method, params);
+      // prepare urlRequest
+      const body = makeBody(method, params);
 
-    const response = await retryNTimes(
-      async () =>
-        axios.post<JSONRPCResponse<RenVMResponses[Method]>>(
-          endpoint,
-          body,
+      const response = await capture(
+        cancellableAxios<JSONRPCResponse<RenVMResponses[Method]>>({
+          method: 'post',
+          url: endpoint,
+          data: body,
           // Use a 120 second timeout. This could be reduced, but
           // should be done based on the method, since some requests
           // may take a long time, especially on a slow connection.
-          { timeout },
-        ),
-      retry,
-      1 * SECONDS,
-    );
+          timeout,
+        }),
+      );
 
-    const statusCode = response.status ?? 0;
-    const isValidStatus = 200 <= statusCode && statusCode <= 300;
+      const statusCode = response.status ?? 0;
+      const isValidStatus = 200 <= statusCode && statusCode <= 300;
 
-    if (log) {
-      Logger.log(JSON.stringify(response.data.result, null, '    '), LogEvent.response);
-    }
+      if (log) {
+        Logger.log(JSON.stringify(response.data.result, null, '    '), LogEvent.response);
+      }
 
-    const result = response.data.result;
-    if (isValidStatus && result) {
-      return result;
-    }
+      const result = response.data.result;
+      if (isValidStatus && result) {
+        return result;
+      }
 
-    throw response.data.error ?? RenVMError.unknown();
+      throw response.data.error ?? RenVMError.unknown();
+    });
   }
 
   async getIncomingTransactions(address: string): Promise<IncomingTransaction[]> {
@@ -155,24 +156,32 @@ export class RpcClient implements RenVMRpcClientType {
 
   private _emptyParams: Record<string, string> = {};
 
-  async queryMint(txHash: string): Promise<ResponseQueryTxMint> {
-    const result = await this.call({
-      endpoint: this.network.lightNode,
-      method: RPCMethod.QueryTx,
-      params: { txHash: txHash },
-      log: true,
+  queryMint(txHash: string): CancellablePromise<LockAndMintTransaction> {
+    return buildCancellablePromise(async (capture) => {
+      const result = await capture(
+        this.call({
+          endpoint: this.network.lightNode,
+          method: RPCMethod.QueryTx,
+          params: { txHash: txHash },
+          log: true,
+        }),
+      );
+      return unmarshalMintTx(result);
     });
-    return plainToInstance(ResponseQueryTxMint, result);
   }
 
-  async queryBlockState(log = false): Promise<ResponseQueryBlockState> {
-    const result = await this.call({
-      endpoint: this.network.lightNode,
-      method: RPCMethod.QueryBlockState,
-      params: this._emptyParams,
-      log,
+  queryBlockState(log = false): CancellablePromise<ResponseQueryBlockState> {
+    return buildCancellablePromise(async (capture) => {
+      const result = await capture(
+        this.call({
+          endpoint: this.network.lightNode,
+          method: RPCMethod.QueryBlockState,
+          params: this._emptyParams,
+          log,
+        }),
+      );
+      return plainToInstance(ResponseQueryBlockState, result);
     });
-    return plainToInstance(ResponseQueryBlockState, result);
   }
 
   async queryConfig(): Promise<ResponseQueryConfig> {
@@ -185,7 +194,7 @@ export class RpcClient implements RenVMRpcClientType {
     return plainToInstance(ResponseQueryConfig, result);
   }
 
-  async submitTx({
+  submitTx({
     hash,
     selector,
     version,
@@ -195,24 +204,28 @@ export class RpcClient implements RenVMRpcClientType {
     selector: Selector;
     version: string;
     input: MintTransactionInput;
-  }): Promise<ResponseSubmitTxMint> {
-    const result = await this.call({
-      endpoint: this.network.lightNode,
-      method: RPCMethod.SubmitTx,
-      params: {
-        tx: {
-          hash,
-          selector: selector.toString(),
-          version,
-          in: {
-            t: mintParamsType(),
-            v: input,
+  }): CancellablePromise<ResponseSubmitTxMint> {
+    return buildCancellablePromise(async (capture) => {
+      const result = await capture(
+        this.call({
+          endpoint: this.network.lightNode,
+          method: RPCMethod.SubmitTx,
+          params: {
+            tx: {
+              hash,
+              selector: selector.toString(),
+              version,
+              in: {
+                t: mintParamsType(),
+                v: input,
+              },
+            },
           },
-        },
-      },
-      log: true,
+          log: true,
+        }),
+      );
+      return plainToInstance(ResponseSubmitTxMint, result);
     });
-    return plainToInstance(ResponseSubmitTxMint, result);
   }
 
   async selectPublicKey(mintTokenSymbol: string): Promise<Uint8Array | null> {

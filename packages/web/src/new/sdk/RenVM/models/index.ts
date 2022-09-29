@@ -5,6 +5,5 @@ export * from './RenVMError';
 export * from './RenVMState';
 export * from './ResponseQueryBlockState';
 export * from './ResponseQueryConfig';
-export * from './ResponseQueryTxMint';
 export * from './ResponseSubmitTxMint';
 export * from './Selector';
