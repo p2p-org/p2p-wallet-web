@@ -1,10 +1,10 @@
 import type { FC } from 'react';
 
 import { styled } from '@linaria/react';
-import { ZERO } from '@orca-so/sdk';
 import { borders, theme } from '@p2p-wallet-web/ui';
 import { u64 } from '@solana/spl-token';
 import { observer } from 'mobx-react-lite';
+import { expr } from 'mobx-utils';
 
 import { Loader } from 'components/common/Loader';
 import { convertToBalance } from 'new/sdk/SolanaSDK';
@@ -45,6 +45,14 @@ interface Props {
 }
 
 export const Hint: FC<Props> = observer(({ viewModel }) => {
+  const minTransactionValue = expr(() =>
+    !viewModel.fee
+      ? '0'
+      : numberToString(convertToBalance(viewModel.fee.mul(new u64(2)), 8), {
+          maximumFractionDigits: 8,
+        }),
+  );
+
   return (
     <Wrapper>
       <List>
@@ -59,11 +67,7 @@ export const Hint: FC<Props> = observer(({ viewModel }) => {
               <Loader />
             ) : (
               <>
-                <strong>{`${numberToString(
-                  convertToBalance(viewModel.fee?.mul(new u64(2)) ?? ZERO, 8),
-                  { maximumFractionDigits: 8 },
-                )} BTC`}</strong>
-                .
+                <strong>{`${minTransactionValue} BTC`}</strong>.
               </>
             )}
           </MinimumTxAmount>
