@@ -5,7 +5,7 @@ import retry from 'retry';
 
 const hasOwn = Object.prototype.hasOwnProperty;
 
-function isRetryError(err) {
+function isRetryError(err: Error & errcode.Extensions) {
   return err && err.code === 'EPROMISERETRY' && hasOwn.call(err, 'retried');
 }
 

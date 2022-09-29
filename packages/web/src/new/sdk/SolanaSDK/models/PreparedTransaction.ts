@@ -28,7 +28,9 @@ export class PreparedTransaction {
   }
 
   sign() {
-    this.transaction.partialSign(...this.signers);
+    if (this.signers.length > 0) {
+      this.transaction.partialSign(...this.signers);
+    }
   }
 
   serialize(): string {

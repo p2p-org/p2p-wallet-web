@@ -1,8 +1,7 @@
-import type { LockAndMintTransaction } from '@renproject/interfaces';
 import type { CancellablePromise } from 'real-cancellable-promise';
 
 import type * as BurnAndRelease from '../actions/BurnAndRelease';
-import type { Direction } from '../models';
+import type { Direction, ResponseQueryTxMint } from '../models';
 import { Selector } from '../models';
 
 export abstract class RenVMChainType {
@@ -27,7 +26,7 @@ export abstract class RenVMChainType {
     address: Uint8Array;
     mintTokenSymbol: string;
     account: Uint8Array;
-    responseQueryMint: LockAndMintTransaction;
+    responseQueryMint: ResponseQueryTxMint;
   }): CancellablePromise<string>;
 
   abstract submitBurn({

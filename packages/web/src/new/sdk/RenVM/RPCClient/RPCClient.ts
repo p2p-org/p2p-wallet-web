@@ -1,7 +1,6 @@
-import type { LockAndMintTransaction } from '@renproject/interfaces';
 import type { JSONRPCResponse } from '@renproject/provider';
 import type { RenVMParams, RenVMResponses } from '@renproject/rpc/build/module/v2';
-import { mintParamsType, RPCMethod, unmarshalMintTx } from '@renproject/rpc/build/module/v2';
+import { mintParamsType, RPCMethod } from '@renproject/rpc/build/module/v2';
 import { SECONDS } from '@renproject/utils/build/main';
 import { fromBase64 } from '@renproject/utils/internal/common';
 import { u64 } from '@solana/spl-token';
@@ -18,6 +17,7 @@ import {
   RenVMError,
   ResponseQueryBlockState,
   ResponseQueryConfig,
+  ResponseQueryTxMint,
   ResponseSubmitTxMint,
 } from '../models';
 
@@ -48,7 +48,7 @@ export interface RenVMRpcClientType {
 
   // extension
 
-  queryMint(txHash: string): CancellablePromise<LockAndMintTransaction>;
+  queryMint(txHash: string): CancellablePromise<ResponseQueryTxMint>;
 
   queryBlockState(log: boolean): CancellablePromise<ResponseQueryBlockState>;
 
@@ -156,7 +156,7 @@ export class RpcClient implements RenVMRpcClientType {
 
   private _emptyParams: Record<string, string> = {};
 
-  queryMint(txHash: string): CancellablePromise<LockAndMintTransaction> {
+  queryMint(txHash: string): CancellablePromise<ResponseQueryTxMint> {
     return buildCancellablePromise(async (capture) => {
       const result = await capture(
         this.call({
@@ -166,7 +166,7 @@ export class RpcClient implements RenVMRpcClientType {
           log: true,
         }),
       );
-      return unmarshalMintTx(result);
+      return plainToInstance(ResponseQueryTxMint, result);
     });
   }
 

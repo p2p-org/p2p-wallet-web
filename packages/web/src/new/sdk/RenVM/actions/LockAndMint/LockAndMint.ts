@@ -1,6 +1,5 @@
 import { createAddressArray } from '@renproject/chains-bitcoin/script';
 import { hash160 } from '@renproject/chains-bitcoin/utils/utils';
-import { TxStatus } from '@renproject/interfaces';
 import { generateGHash, generateNHash, generatePHash, generateSHash } from '@renproject/utils';
 import { fromHex } from '@renproject/utils/internal/common';
 import { toURLBase64 } from '@renproject/utils/module/internal/common';
@@ -175,19 +174,16 @@ export class LockAndMint {
 
       const response = await capture(this._rpcClient.queryMint(txHash));
 
-      if (response.out && response.out.revert) {
-        throw new RenVMError(response.out.revert.toString());
+      const revert = response.tx.out.v.revert;
+      if (revert) {
+        throw new RenVMError(revert);
       }
 
-      if (response.txStatus !== TxStatus.TxStatusDone) {
+      if (response.txStatus !== 'done') {
         throw RenVMError.paramsMissing();
       }
 
-      if (!response.out) {
-        throw RenVMError.paramsMissing();
-      }
-
-      const amountOut = response.out.amount;
+      const amountOut = response.tx.out.v.amount;
 
       const signature = await capture(
         this._chain.submitMint({
