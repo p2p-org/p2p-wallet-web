@@ -41,7 +41,7 @@ const MinimumTxAmount = styled.div`
 `;
 
 interface Props {
-  viewModel: ReceiveBitcoinViewModel;
+  viewModel: Readonly<ReceiveBitcoinViewModel>;
 }
 
 export const Hint: FC<Props> = observer(({ viewModel }) => {
