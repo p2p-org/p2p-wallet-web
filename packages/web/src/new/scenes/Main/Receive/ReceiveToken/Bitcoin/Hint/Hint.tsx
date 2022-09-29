@@ -7,9 +7,10 @@ import { u64 } from '@solana/spl-token';
 import { observer } from 'mobx-react-lite';
 
 import { Loader } from 'components/common/Loader';
-import type { ReceiveBitcoinViewModel } from 'new/scenes/Main/Receive/ReceiveToken/Bitcoin/ReceiveBitcoin.ViewModel';
 import { convertToBalance } from 'new/sdk/SolanaSDK';
 import { numberToString } from 'new/utils/NumberExtensions';
+
+import type { ReceiveBitcoinViewModel } from '../ReceiveBitcoin.ViewModel';
 
 const Wrapper = styled.div`
   padding: 16px;
