@@ -107,12 +107,15 @@ export class ReceiveBitcoinViewModel extends ViewModel implements LockAndMintSer
 
     // set fee
     runInAction(() => (this.isFetchingFee = true));
-    void this._lockAndMintService.getFee().then(
-      action((feeAmount) => {
-        this.fee = feeAmount;
-        this.isFetchingFee = false;
-      }),
-    );
+    void this._lockAndMintService
+      .getFee()
+      .then(
+        action((feeAmount) => {
+          this.fee = feeAmount;
+          this.isFetchingFee = false;
+        }),
+      )
+      .catch(action(() => (this.isFetchingFee = false)));
   }
 
   _checkSessionEnd(): void {

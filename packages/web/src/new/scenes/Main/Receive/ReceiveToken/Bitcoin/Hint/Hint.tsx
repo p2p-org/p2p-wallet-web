@@ -47,7 +47,7 @@ interface Props {
 export const Hint: FC<Props> = observer(({ viewModel }) => {
   const minTransactionValue = expr(() =>
     !viewModel.fee
-      ? '0'
+      ? '0.000112'
       : numberToString(convertToBalance(viewModel.fee.mul(new u64(2)), 8), {
           maximumFractionDigits: 8,
         }),
