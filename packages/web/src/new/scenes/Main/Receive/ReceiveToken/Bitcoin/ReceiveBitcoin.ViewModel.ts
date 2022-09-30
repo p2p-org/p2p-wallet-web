@@ -1,3 +1,4 @@
+import type { u64 } from '@solana/spl-token';
 import { action, makeObservable, observable, reaction, runInAction } from 'mobx';
 import { singleton } from 'tsyringe';
 
@@ -14,10 +15,10 @@ export class ReceiveBitcoinViewModel extends ViewModel implements LockAndMintSer
   address?: string | null;
   secondsPassed = -1;
   processingTxs: ProcessingTx[] = []; // @web: processingTransactions
-
   sessionEndDate: Date | null = null;
-
   remainingTime = '35:59:59';
+  fee: u64 | null = null;
+  isFetchingFee = false;
 
   constructor(
     private _lockAndMintService: LockAndMintService,
@@ -30,10 +31,10 @@ export class ReceiveBitcoinViewModel extends ViewModel implements LockAndMintSer
       address: observable,
       secondsPassed: observable,
       processingTxs: observable,
-
       sessionEndDate: observable,
-
       remainingTime: observable,
+      fee: observable,
+      isFetchingFee: observable,
 
       lockAndMintServiceWillStartLoading: action,
       lockAndMintServiceLoaded: action,
@@ -103,6 +104,18 @@ export class ReceiveBitcoinViewModel extends ViewModel implements LockAndMintSer
     runInAction(() => {
       this.address = this._persistentStore.gatewayAddress;
     });
+
+    // set fee
+    runInAction(() => (this.isFetchingFee = true));
+    void this._lockAndMintService
+      .getFee()
+      .then(
+        action((feeAmount) => {
+          this.fee = feeAmount;
+          this.isFetchingFee = false;
+        }),
+      )
+      .catch(action(() => (this.isFetchingFee = false)));
   }
 
   _checkSessionEnd(): void {
