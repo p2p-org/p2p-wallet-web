@@ -1,7 +1,10 @@
-class UnauthorizedError extends Error {}
-class InvalidRequestError extends Error {}
-class OtherError extends Error {}
-class UnknownError extends Error {}
+// base class for "instanceof"
+export class SolanaError extends Error {}
+
+class UnauthorizedError extends SolanaError {}
+class InvalidRequestError extends SolanaError {}
+class OtherError extends SolanaError {}
+class UnknownError extends SolanaError {}
 
 export class SolanaSDKError {
   static equals(lhs: Error, rhs: Error) {
@@ -23,6 +26,11 @@ export class SolanaSDKError {
   static invalidRequest(reason?: string): InvalidRequestError {
     return new InvalidRequestError(reason);
   }
+
+  // TODO: invalidResponse
+  // static invalidResponse(reason?: string): InvalidRequestError {
+  //   return new InvalidRequestError(reason);
+  // }
 
   // Other
   static other(message: string): OtherError {

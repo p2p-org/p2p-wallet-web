@@ -132,11 +132,15 @@ const SearchInputOriginal: FunctionComponent<Props> = ({
     }
   };
 
-  const debouncedOnChange = useDebouncedCallback((value: string) => {
-    if (onChange) {
-      onChange(value);
-    }
-  }, 300);
+  const debouncedOnChange = useDebouncedCallback(
+    (value: string) => {
+      if (onChange) {
+        onChange(value);
+      }
+    },
+    300,
+    { trailing: true },
+  );
 
   const handleChange = (e: React.FocusEvent<HTMLInputElement>) => {
     setLocalValue(e.target.value);
@@ -144,7 +148,10 @@ const SearchInputOriginal: FunctionComponent<Props> = ({
   };
 
   const handleClear = () => {
+    debouncedOnChange.cancel();
+
     setLocalValue('');
+
     if (onChange) {
       onChange('');
     }

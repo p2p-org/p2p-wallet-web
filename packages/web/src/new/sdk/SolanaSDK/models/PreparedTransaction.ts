@@ -5,7 +5,7 @@ import { LogEvent, Logger, SolanaSDKError } from '../index';
 import type { FeeAmount } from './FeeAmount';
 
 export class PreparedTransaction {
-  owner: PublicKey;
+  owner?: PublicKey;
   transaction: Transaction;
   signers: Signer[];
   expectedFee: FeeAmount;
@@ -16,7 +16,7 @@ export class PreparedTransaction {
     signers,
     expectedFee,
   }: {
-    owner: PublicKey;
+    owner?: PublicKey;
     transaction: Transaction;
     signers: Signer[];
     expectedFee: FeeAmount;
@@ -28,7 +28,9 @@ export class PreparedTransaction {
   }
 
   sign() {
-    this.transaction.partialSign(...this.signers);
+    if (this.signers.length > 0) {
+      this.transaction.partialSign(...this.signers);
+    }
   }
 
   serialize(): string {

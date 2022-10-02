@@ -69,10 +69,7 @@ const getPreset: GetPresetFn = (modal) => {
 
 const modalsMap = new Map<ModalType, LazyExoticComponent<ModalPropsType & any>>([
   [ModalType.SHOW_MODAL_ACTIONS_MOBILE, lazy(() => import('../ActionsMobileModal'))],
-  [
-    ModalType.SHOW_MODAL_RECEIVE_BITCOIN,
-    lazy(() => import('components/modals/ReceiveBitcoinModal')),
-  ],
+  [ModalType.SHOW_MODAL_RECEIVE_BITCOIN, lazy(() => import('../ReceiveBitcoinModal'))],
   [
     ModalType.SHOW_MODAL_TRANSACTION_CONFIRM,
     lazy(() => import('components/modals/TransactionConfirmModal')),
@@ -96,10 +93,7 @@ const modalsMap = new Map<ModalType, LazyExoticComponent<ModalPropsType & any>>(
     ModalType.SHOW_MODAL_CHOOSE_BUY_TOKEN_MOBILE,
     lazy(() => import('../ChooseBuyTokenMobileModal')),
   ],
-  [
-    ModalType.SHOW_MODAL_SELECT_LIST_MOBILE,
-    lazy(() => import('components/modals/SelectListMobileModal')),
-  ],
+  [ModalType.SHOW_MODAL_SELECT_LIST_MOBILE, lazy(() => import('../SelectListMobileModal'))],
   [ModalType.SHOW_MODAL_ERROR, lazy(() => import('components/modals/ErrorModal'))],
 ]);
 

@@ -53,4 +53,16 @@ export class FeeRelayerContext {
     }
     return true;
   }
+
+  // for debug
+  toJSON() {
+    return {
+      minimumTokenAccountBalance: this.minimumTokenAccountBalance.toString(),
+      minimumRelayAccountBalance: this.minimumRelayAccountBalance.toString(),
+      feePayerAddress: this.feePayerAddress.toString(),
+      lamportsPerSignature: this.lamportsPerSignature.toString(),
+      relayAccountStatus: this.relayAccountStatus.toJSON(),
+      usageStatus: this.usageStatus.toJSON(),
+    };
+  }
 }

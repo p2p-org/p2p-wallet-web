@@ -39,9 +39,10 @@ export class FeeAmount {
   }
 
   static zero(): FeeAmount {
-    return new FeeAmount({ transaction: new u64(0), accountBalances: new u64(0) });
+    return new FeeAmount({ transaction: ZERO, accountBalances: ZERO });
   }
 
+  // for debug
   toJSON() {
     return {
       transaction: this.transaction.toNumber(),

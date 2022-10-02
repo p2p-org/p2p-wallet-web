@@ -150,9 +150,7 @@ export class DefaultFeeRelayerCalculator implements FeeRelayerCalculator {
           // Relay account balance can cover part of account creation fee
           else {
             neededAmount.accountBalances = new u64(
-              neededAmount.accountBalances
-                .sub(relayAccountBalance.sub(neededAmount.transaction))
-                .toString(),
+              neededAmount.accountBalances.sub(relayAccountBalance.sub(neededAmount.transaction)),
             );
           }
         }

@@ -7,7 +7,7 @@ import { useTrackEventOpen } from 'app/hooks/metrics';
 import { Layout } from 'components/common/Layout';
 import { ReceiveTokensWidget, ReceiveWidget } from 'components/pages/receive';
 
-export const Receive: FunctionComponent = () => {
+export const ReceiveOld: FunctionComponent = () => {
   useTrackEventOpen('Receive_Viewed');
 
   const match = useRouteMatch();

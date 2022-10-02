@@ -1,4 +1,4 @@
-import { action, flow, makeObservable, observable, when } from 'mobx';
+import { action, flow, makeObservable, observable, reaction, when } from 'mobx';
 import assert from 'ts-invariant';
 import { injectable } from 'tsyringe';
 
@@ -12,10 +12,11 @@ import { SolanaService } from 'new/services/SolanaService';
 @injectable()
 export class ChooseWalletViewModel extends SDListViewModel<Wallet> {
   selectedWallet: Wallet | null;
-  _myWallets: Wallet[];
+  private _myWallets: Wallet[];
   showOtherWallets: boolean | null;
   keyword: string;
   isOpen: boolean;
+  private _staticWallets: Wallet[] | null;
 
   constructor(
     private _walletsRepository: WalletsRepository,
@@ -30,21 +31,24 @@ export class ChooseWalletViewModel extends SDListViewModel<Wallet> {
     this.showOtherWallets = null;
     this.keyword = '';
     this.isOpen = false;
+    this._staticWallets = null;
 
-    makeObservable(this, {
+    makeObservable<ChooseWalletViewModel, '_myWallets' | '_staticWallets'>(this, {
       selectedWallet: observable,
       _myWallets: observable,
       showOtherWallets: observable,
       keyword: observable,
       isOpen: observable,
+      _staticWallets: observable,
+
+      setCustomFilter: action,
+      setStaticWallets: action,
+      setShowOtherWallets: action,
+      setIsOpen: action,
 
       createRequest: flow,
       search: action,
       selectWallet: action,
-
-      setCustomFilter: action,
-      setShowOtherWallets: action,
-      setIsOpen: action,
     });
   }
 
@@ -54,6 +58,23 @@ export class ChooseWalletViewModel extends SDListViewModel<Wallet> {
     this.showOtherWallets = null;
     this.keyword = '';
     this.isOpen = false;
+    this._staticWallets = null;
+  }
+
+  setCustomFilter(filter?: (wallet: Wallet) => boolean): void {
+    this.customFilter = filter;
+  }
+
+  setStaticWallets(wallets: Wallet[] | null): void {
+    this._staticWallets = wallets;
+  }
+
+  setShowOtherWallets(state: boolean): void {
+    this.showOtherWallets = state;
+  }
+
+  setIsOpen(state: boolean): void {
+    this.isOpen = state;
   }
 
   protected override onInitialize() {
@@ -61,7 +82,17 @@ export class ChooseWalletViewModel extends SDListViewModel<Wallet> {
       when(
         () => this._walletsRepository.state === SDFetcherState.loaded, // TODO: really wait until wallets load?
         () => {
-          this._myWallets = this._walletsRepository.getWallets();
+          this._myWallets = this._staticWallets ?? this._walletsRepository.getWallets();
+          this.reload();
+        },
+      ),
+    );
+
+    this.addReaction(
+      reaction(
+        () => this._staticWallets, // TODO: maybe can do better
+        () => {
+          this._myWallets = this._staticWallets ?? this._walletsRepository.getWallets();
           this.reload();
         },
       ),
@@ -130,20 +161,6 @@ export class ChooseWalletViewModel extends SDListViewModel<Wallet> {
       this._pricesService.addToWatchList([wallet.token]);
       this._pricesService.fetchPrices([wallet.token]);
     }
-  }
-
-  //
-
-  setCustomFilter(filter: (wallet: Wallet) => boolean): void {
-    this.customFilter = filter;
-  }
-
-  setShowOtherWallets(state: boolean): void {
-    this.showOtherWallets = state;
-  }
-
-  setIsOpen(state: boolean): void {
-    this.isOpen = state;
   }
 }
 

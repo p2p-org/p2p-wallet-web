@@ -55,7 +55,7 @@ const chainsCache: any = {};
 const getChains = (network: RenNetwork, solanaProvider: SolanaProvider) => {
   const { bitcoin, solana } = chainsCache;
   if (!bitcoin && !solana) {
-    chainsCache.bitcoin = new Bitcoin();
+    chainsCache.bitcoin = new Bitcoin({ network: 'mainnet' });
     chainsCache.solana = new Solana(solanaProvider, network);
   }
   return chainsCache;
@@ -96,7 +96,9 @@ const DepositWatcher: FC<{
   }, [machine.id, machine.send]);
 
   const mint = useCallback(() => {
-    if (!isAccepted(deposit)) return;
+    if (!isAccepted(deposit)) {
+      return;
+    }
     send({ type: 'CLAIM', data: deposit, params: {} });
   }, [deposit, send]);
 
@@ -146,7 +148,9 @@ const DepositWatcher: FC<{
 };
 
 const getActiveDepositId = (tx: GatewaySession<any>) => {
-  if (isNil(tx.transactions)) return undefined;
+  if (isNil(tx.transactions)) {
+    return undefined;
+  }
   const transactions = Object.values(tx.transactions);
   const activeTransactions = transactions
     .filter((t: any) => !t?.completedAt)
@@ -197,7 +201,9 @@ const LockAndMintSession: FC<{
       return null;
     }
     const deposit = current.context.tx.transactions[activeDepositId];
-    if (!deposit || !current.context.depositMachines) return null;
+    if (!deposit || !current.context.depositMachines) {
+      return null;
+    }
     const machine = current.context.depositMachines[deposit.sourceTxHash];
     return { deposit, machine } as any;
   }, [activeDepositId, current.context]);

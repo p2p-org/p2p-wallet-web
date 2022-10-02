@@ -362,7 +362,7 @@ export class TransactionHandler implements TransactionHandlerType {
 
           // update native wallet
           const index = wallets.findIndex((wallet) => wallet.isNativeSOL);
-          if (index) {
+          if (index !== -1) {
             wallets[index]!.increaseBalance(reimbursedAmount);
           }
 
@@ -381,7 +381,7 @@ export class TransactionHandler implements TransactionHandlerType {
                 wallet.pubkey ===
                 (rawTransaction as ProcessTransaction.SwapTransaction).sourceWallet.pubkey,
             );
-            if (index) {
+            if (index !== -1) {
               wallets[index]!.decreaseBalance(
                 toLamport(
                   (rawTransaction as ProcessTransaction.SwapTransaction).amount,
@@ -398,7 +398,7 @@ export class TransactionHandler implements TransactionHandlerType {
               wallet.pubkey ===
               (rawTransaction as ProcessTransaction.SwapTransaction).destinationWallet.pubkey,
           );
-          if (index) {
+          if (index !== -1) {
             // update only if socket is not connected
             if (!this._socket.isConnected) {
               wallets[index]!.increaseBalance(
@@ -453,7 +453,7 @@ export class TransactionHandler implements TransactionHandlerType {
                   const index = wallets.findIndex(
                     (wallet) => wallet.mintAddress === fee.token.address,
                   );
-                  if (index) {
+                  if (index !== -1) {
                     wallets[index]!.decreaseBalance(fee.lamports);
                   }
                   break;

@@ -236,7 +236,7 @@ export class SolanaSDK {
     feePayer,
     feeCalculator,
   }: {
-    owner: PublicKey;
+    owner?: PublicKey;
     instructions: TransactionInstruction[];
     signers?: Signer[];
     feePayer: PublicKey;
@@ -276,7 +276,10 @@ export class SolanaSDK {
       transaction.partialSign(...signers);
     }
 
-    const signedTransaction = await this.provider.wallet.signTransaction(transaction);
+    let signedTransaction = transaction;
+    if (owner) {
+      signedTransaction = await this.provider.wallet.signTransaction(transaction);
+    }
 
     return new PreparedTransaction({
       owner,
@@ -299,12 +302,13 @@ export class SolanaSDK {
 
     try {
       const recentBlockhash = await this.getRecentBlockhash();
-      const serializedTransaction = this.signAndSerialize({
+      const serializedTransaction = await this.signAndSerialize({
         preparedTransaction,
         recentBlockhash,
       });
       return this.provider.connection.sendEncodedTransaction(serializedTransaction);
     } catch (error) {
+      console.error(error);
       if (numberOfTries <= maxAttemps) {
         let shouldRetry = false;
         if ((error as Error).message.includes('Blockhash not found')) {
@@ -320,16 +324,19 @@ export class SolanaSDK {
     }
   }
 
-  signAndSerialize({
+  async signAndSerialize({
     preparedTransaction,
     recentBlockhash,
   }: {
     preparedTransaction: PreparedTransaction;
     recentBlockhash: string;
-  }): string {
+  }): Promise<string> {
     const preparedTransactionNew = preparedTransaction;
     preparedTransactionNew.transaction.recentBlockhash = recentBlockhash;
     preparedTransactionNew.sign();
+    preparedTransactionNew.transaction = await this.provider.wallet.signTransaction(
+      preparedTransactionNew.transaction,
+    );
     return preparedTransactionNew.serialize();
   }
 

@@ -22,22 +22,22 @@ import { RelayService } from 'new/services/RelayService';
 import { SolanaService } from 'new/services/SolanaService';
 import { SwapRelayService } from 'new/services/SwapRelayService';
 
-enum InputMode {
-  source,
-  target,
-}
+// enum InputMode {
+//   source,
+//   target,
+// }
 
-enum PayingTokenMode {
-  /// Allow to use any token to pay a fee
-  any = 'any',
-  /// Only allow to use native sol to pay a fee
-  onlySol = 'onlySol',
-}
+// enum PayingTokenMode {
+//   /// Allow to use any token to pay a fee
+//   any = 'any',
+//   /// Only allow to use native sol to pay a fee
+//   onlySol = 'onlySol',
+// }
 
-interface SwapInfo {
-  // This property defines a mode for paying fee.
-  payingTokenMode: PayingTokenMode;
-}
+// interface SwapInfo {
+//   // This property defines a mode for paying fee.
+//   payingTokenMode: PayingTokenMode;
+// }
 
 interface FeeInfo {
   /**
