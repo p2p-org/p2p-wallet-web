@@ -103,6 +103,9 @@ export class ReceiveBitcoinViewModel extends ViewModel implements LockAndMintSer
 
     runInAction(() => {
       this.address = this._persistentStore.gatewayAddress;
+
+      const endAt = this._persistentStore.session?.endAt ?? null;
+      this.sessionEndDate = endAt;
     });
 
     // set fee
