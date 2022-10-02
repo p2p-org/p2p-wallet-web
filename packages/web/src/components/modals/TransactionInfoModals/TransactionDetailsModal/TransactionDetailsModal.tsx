@@ -143,6 +143,8 @@ const PaidByBadge = styled.div`
 `;
 
 const PaddedHeader = styled(Header)`
+  display: flex;
+  flex-direction: column;
   padding: 24px;
 `;
 
