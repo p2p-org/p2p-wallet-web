@@ -1,7 +1,7 @@
 import { matchPath } from 'react-router';
 
 import type { History, Location, LocationState, Path, UnregisterCallback } from 'history';
-import { makeObservable, observable, runInAction } from 'mobx';
+import { action, makeObservable, observable } from 'mobx';
 import assert from 'ts-invariant';
 import { singleton } from 'tsyringe';
 
@@ -27,12 +27,16 @@ export class LocationService {
   }
 
   private _listenHistory(): void {
-    this._removeListener && this._removeListener();
+    if (this._removeListener) {
+      this._removeListener();
+    }
 
     this._assertHistory();
-    this._removeListener = this._history?.listen((location) => {
-      runInAction(() => (this._location = location));
-    });
+    this._removeListener = this._history!.listen(
+      action((location) => {
+        this._location = location;
+      }),
+    );
   }
 
   setHistory(history: History): void {
@@ -43,7 +47,7 @@ export class LocationService {
 
   getParams<Params>(pathTemplate: string): Params {
     this._assertLocation();
-    const match = matchPath<Params>(this._location?.pathname || '', { path: pathTemplate });
+    const match = matchPath<Params>(this._location!.pathname || '', { path: pathTemplate });
 
     if (!match) {
       return {} as Params;
@@ -52,13 +56,13 @@ export class LocationService {
     return match.params;
   }
 
-  push(pathname: Path, props: LocationState): void {
+  push(pathname: Path, props?: LocationState): void {
     this._assertHistory();
-    this._history?.push(pathname, props);
+    this._history!.push(pathname, props ?? { fromPage: this._location?.pathname });
   }
 
   reload(): void {
     this._assertHistory();
-    this._history?.go(0);
+    this._history!.go(0);
   }
 }
