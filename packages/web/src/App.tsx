@@ -11,6 +11,7 @@ import { Intercom } from 'components/common/Intercom';
 import { NotifyToast } from 'components/common/NotifyToast';
 import { ToastManager } from 'components/common/ToastManager';
 import { Main } from 'new/scenes/Main';
+import { Auth as AuthTrial } from 'new/scenes/Main/Auth';
 import { Buy } from 'new/scenes/Main/Buy';
 import { Home } from 'new/scenes/Main/Home';
 import { Receive } from 'new/scenes/Main/Receive';
@@ -44,6 +45,7 @@ const App: React.FC = observer(() => {
               <LocationManager />
               <Switch>
                 <Route path="/" exact component={Landing} />
+                <Route path="/trial" exact component={AuthTrial} />
                 <Route path="/:type(signup|login)" exact component={Auth} />
                 <Main>
                   <AuthRequiredRoute path="/wallets" component={Home} />

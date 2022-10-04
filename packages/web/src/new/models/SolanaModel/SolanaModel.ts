@@ -36,7 +36,8 @@ export class SolanaModel extends Model {
 
   protected setUpProvider() {
     const conn = this.connection;
-    const solana = get(window, 'solana');
+    // @FIXME this is a stub
+    const solana = get(window, 'solana') || {};
     if (!solana) {
       throw new Error('~~~ No Solana Object found on window');
     }
