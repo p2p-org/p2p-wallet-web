@@ -18,13 +18,14 @@ import { Send } from 'new/scenes/Main/Send';
 import { Settings } from 'new/scenes/Main/Settings';
 import { SettingsNetwork } from 'new/scenes/Main/SettingsNetwork';
 import { SwapPage } from 'new/scenes/Main/Swap';
+import { WalletDetail } from 'new/scenes/Main/WalletDetail';
 import { Root } from 'new/scenes/Root';
 import { LocationManager } from 'new/ui/managers/LocationManager';
 import { NotificationManager } from 'new/ui/managers/NotificationManager';
 import { ModalManager } from 'new/ui/modals/ModalManager';
 import { Auth } from 'pages/Auth';
 import { Landing } from 'pages/Landing';
-import { Wallet } from 'pages/Wallet';
+import { Wallet as WalletOld } from 'pages/Wallet';
 import { WalletSettings } from 'pages/WalletSettings';
 import { AuthRequiredRoute } from 'utils/routes/UserRequiredRoute';
 
@@ -51,7 +52,8 @@ const App: React.FC = observer(() => {
                     path="/wallet/:publicKey/settings"
                     component={WalletSettings}
                   />
-                  <AuthRequiredRoute path="/wallet/:publicKey" exact component={Wallet} />
+                  <AuthRequiredRoute path="/walletold/:publicKey" exact component={WalletOld} />
+                  <AuthRequiredRoute path="/wallet/:publicKey" exact component={WalletDetail} />
                   <AuthRequiredRoute path="/buy/:symbol?" component={Buy} />
                   <AuthRequiredRoute path="/receive/(tokens)?" component={Receive} />
                   <AuthRequiredRoute path="/send/:publicKey/:status(result)" component={Send} />
