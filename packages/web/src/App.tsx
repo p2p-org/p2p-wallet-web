@@ -23,7 +23,6 @@ import { Root } from 'new/scenes/Root';
 import { LocationManager } from 'new/ui/managers/LocationManager';
 import { NotificationManager } from 'new/ui/managers/NotificationManager';
 import { ModalManager } from 'new/ui/modals/ModalManager';
-import { Auth } from 'pages/Auth';
 import { Landing } from 'pages/Landing';
 import { Wallet } from 'pages/Wallet';
 import { WalletSettings } from 'pages/WalletSettings';
@@ -46,7 +45,8 @@ const App: React.FC = observer(() => {
               <Switch>
                 <Route path="/" exact component={Landing} />
                 <Route path="/trial" exact component={AuthTrial} />
-                <Route path="/:type(signup|login)" exact component={Auth} />
+                <Route path="/:type(create|restore)" exact component={AuthTrial} />
+                {/*<Route path="/:type(signup|login)" exact component={Auth} />*/}
                 <Main>
                   <AuthRequiredRoute path="/wallets" component={Home} />
                   <AuthRequiredRoute

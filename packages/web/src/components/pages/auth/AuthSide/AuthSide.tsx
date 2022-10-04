@@ -14,6 +14,8 @@ import { Ready } from './Ready';
 import { Signup } from './Signup';
 import type { DataType } from './types';
 
+// @TODO REMOVE THIS FILE
+
 const Wrapper = styled.div`
   position: relative;
   z-index: 1;
@@ -109,6 +111,7 @@ export const AuthSide: FC = () => {
   };
 
   const render = () => {
+    // @TODO should be the very last step
     if (data.seed) {
       return <Ready setIsLoading={setIsLoading} data={data} />;
     }

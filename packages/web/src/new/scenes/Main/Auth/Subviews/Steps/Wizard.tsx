@@ -10,11 +10,11 @@ export interface Props {
   onChange: (payload: WizardPayload) => void;
 }
 
-const VIEW_MAP: ViewMap = {
-  [WizardSteps.CHOOSE_FLOW]: <ChooseFlow />,
-};
-
 export const Wizard: FC<Props> = (props) => {
+  const VIEW_MAP: ViewMap = {
+    [WizardSteps.CHOOSE_FLOW]: <ChooseFlow />,
+  };
+
   const elView = VIEW_MAP[props.step];
 
   return <>{elView}</>;
