@@ -16,11 +16,10 @@ export class AuthVewModel extends ViewModel {
   static defaultState: AuthState = {
     step: WizardSteps.CREATE_START,
     authInfo: observable.object<AuthInfo>({
-      type: null,
-      mnemonic: null,
-      seed: null,
-      derivationPath: null,
-      password: null,
+      mnemonic: '',
+      seed: '',
+      derivationPath: '',
+      password: '',
     }),
   };
 

@@ -1,10 +1,13 @@
 import type { FC } from 'react';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import { styled } from '@linaria/react';
+import * as bip39 from 'bip39';
 
 import { Button } from 'components/pages/auth/AuthSide/common/Button';
 import { Checkbox } from 'components/pages/auth/AuthSide/common/Checkbox';
+import { useViewModel } from 'new/core/viewmodels/useViewModel';
+import { AuthVewModel } from 'new/scenes/Main/Auth/Auth.VewModel';
 
 const Wrapper = styled.div`
   display: flex;
@@ -127,20 +130,20 @@ const CheckboxWrapper = styled.div`
   }
 `;
 
-type Props = {
-  mnemonic: string;
-  next: () => void;
-};
+const MNEMONIC_STRENGTH = 256;
 
-export const Mnemonic: FC<Props> = ({ mnemonic, next }) => {
+export const Mnemonic: FC = () => {
   const [checked, setChecked] = useState(false);
+  const mnemonic = useMemo(() => bip39.generateMnemonic(MNEMONIC_STRENGTH), []);
+  const viewModel = useViewModel(AuthVewModel);
 
   const handleCheckChange = (nextChecked: boolean) => {
     setChecked(nextChecked);
   };
 
   const handleContinueClick = () => {
-    next();
+    viewModel.setAuthInfo({ ...viewModel.authInfo, mnemonic });
+    viewModel.nextStep();
   };
 
   return (

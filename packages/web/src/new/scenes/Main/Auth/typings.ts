@@ -6,13 +6,11 @@ export enum WizardSteps {
   RESTORE_START = 'RESTORE_START',
 }
 
-export type AuthInfoVal = string | null;
 export type AuthInfo = {
-  type: AuthInfoVal;
-  mnemonic: AuthInfoVal;
-  seed: AuthInfoVal;
-  derivationPath: AuthInfoVal;
-  password: AuthInfoVal;
+  mnemonic: string;
+  seed: string;
+  derivationPath: string;
+  password: string;
 };
 
 export type AuthState = {
