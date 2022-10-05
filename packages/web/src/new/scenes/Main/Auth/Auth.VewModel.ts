@@ -1,8 +1,8 @@
-import { action, makeObservable, observable } from 'mobx';
+import { action, computed, makeObservable, observable } from 'mobx';
 import { singleton } from 'tsyringe';
 
 import { ViewModel } from 'new/core/viewmodels/ViewModel';
-import type { AuthInfo, AuthState, WizardPayload } from 'new/scenes/Main/Auth/typings';
+import type { AuthInfo, AuthState } from 'new/scenes/Main/Auth/typings';
 import { WizardSteps } from 'new/scenes/Main/Auth/typings';
 
 @singleton()
@@ -11,7 +11,7 @@ export class AuthVewModel extends ViewModel {
   authInfo: AuthInfo;
 
   static defaultState: AuthState = {
-    step: WizardSteps.CHOOSE_FLOW,
+    step: WizardSteps.CREATE_START,
     authInfo: observable.object<AuthInfo>({
       type: null,
       mnemonic: null,
@@ -30,7 +30,10 @@ export class AuthVewModel extends ViewModel {
     makeObservable(this, {
       step: observable,
       authInfo: observable,
-      onWizardChange: action.bound,
+      isRestore: computed,
+      isCreate: computed,
+      setCreateStart: action.bound,
+      setRestoreStart: action.bound,
     });
   }
 
@@ -47,13 +50,23 @@ export class AuthVewModel extends ViewModel {
     this.authInfo = AuthVewModel.defaultState.authInfo;
   }
 
-  onWizardChange(payload: WizardPayload) {
-    // @TODO
-    this.step = payload.step;
-    // console.log(payload);
+  setAuthInfo(info: AuthInfo): void {
+    this.authInfo = info;
   }
 
-  setAuthInfo(info: AuthInfo) {
-    this.authInfo = info;
+  setCreateStart() {
+    this.step = WizardSteps.CREATE_START;
+  }
+
+  setRestoreStart() {
+    this.step = WizardSteps.RESTORE_START;
+  }
+
+  get isRestore(): boolean {
+    return this.step.startsWith('RESTORE');
+  }
+
+  get isCreate(): boolean {
+    return this.step.startsWith('CREATE');
   }
 }
