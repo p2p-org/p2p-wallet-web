@@ -7,6 +7,7 @@ import { observer } from 'mobx-react-lite';
 
 import { LoaderWide } from 'components/common/LoaderWide';
 import app from 'components/pages/auth/app.png';
+import { Back } from 'components/pages/auth/AuthSide/common/Back';
 import logo from 'components/pages/auth/logo.svg';
 import { useViewModel } from 'new/core/viewmodels/useViewModel';
 import { AuthVewModel } from 'new/scenes/Main/Auth/Auth.VewModel';
@@ -43,6 +44,22 @@ const Title = styled.span`
   line-height: 40px;
 `;
 
+const WalletTitle = styled.span`
+  position: relative;
+
+  color: #161616;
+  font-weight: 700;
+  font-size: 26px;
+  font-family: 'GT Super Ds Trial', sans-serif;
+  line-height: 32px;
+  text-align: center;
+`;
+
+const BackStyled = styled(Back)`
+  position: absolute;
+  left: 0;
+`;
+
 const TitleBold = styled.strong`
   display: block;
 
@@ -71,7 +88,6 @@ const TabButton = styled.button`
 
   min-width: 180px;
   height: 50px;
-  background: transparent;
 
   color: #1616164c;
   font-weight: 500;
@@ -81,6 +97,8 @@ const TabButton = styled.button`
   white-space: nowrap;
   text-align: center;
   text-decoration: none;
+
+  background: transparent;
 
   cursor: pointer;
 
@@ -164,7 +182,13 @@ export const CommonLayout: FC = observer((props) => {
             I already have wallet
           </TabButton>
         </Navigate>
-        <ContentContainer>{props.children}</ContentContainer>
+        <ContentContainer>
+          <WalletTitle>
+            {viewModel.showBackButton && <BackStyled onClick={() => null} />}
+            New wallet
+          </WalletTitle>
+          {props.children}
+        </ContentContainer>
         {/*// @FIXME*/}
         {false && <LoaderWide />}
       </MenuContainer>

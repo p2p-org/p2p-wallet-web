@@ -32,8 +32,10 @@ export class AuthVewModel extends ViewModel {
       authInfo: observable,
       isRestore: computed,
       isCreate: computed,
+      showBackButton: computed,
       setCreateStart: action.bound,
       setRestoreStart: action.bound,
+      setStep: action.bound,
     });
   }
 
@@ -54,12 +56,16 @@ export class AuthVewModel extends ViewModel {
     this.authInfo = info;
   }
 
-  setCreateStart() {
+  setCreateStart(): void {
     this.step = WizardSteps.CREATE_START;
   }
 
-  setRestoreStart() {
+  setRestoreStart(): void {
     this.step = WizardSteps.RESTORE_START;
+  }
+
+  setStep(step: WizardSteps): void {
+    this.step = step;
   }
 
   get isRestore(): boolean {
@@ -68,5 +74,9 @@ export class AuthVewModel extends ViewModel {
 
   get isCreate(): boolean {
     return this.step.startsWith('CREATE');
+  }
+
+  get showBackButton(): boolean {
+    return this.step !== WizardSteps.CREATE_START;
   }
 }
