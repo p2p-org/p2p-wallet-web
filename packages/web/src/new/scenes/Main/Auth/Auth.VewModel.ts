@@ -52,4 +52,8 @@ export class AuthVewModel extends ViewModel {
     this.step = payload.step;
     // console.log(payload);
   }
+
+  setAuthInfo(info: AuthInfo) {
+    this.authInfo = info;
+  }
 }

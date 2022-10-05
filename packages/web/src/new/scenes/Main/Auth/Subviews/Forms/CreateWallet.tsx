@@ -8,6 +8,8 @@ import { observer } from 'mobx-react-lite';
 
 import { Password } from 'components/pages/auth/AuthSide/common/Password';
 import { Paste } from 'components/pages/auth/AuthSide/Signup/Paste';
+import { useViewModel } from 'new/core/viewmodels/useViewModel';
+import { AuthVewModel } from 'new/scenes/Main/Auth/Auth.VewModel';
 
 import { Back } from '../components/BackButton';
 import { Mnemonic } from '../components/MnemonicInput';
@@ -51,6 +53,7 @@ const backToPage: {
 };
 
 export const CreateWallet: FC = observer(() => {
+  const viewModel = useViewModel(AuthVewModel);
   const [page, setPage] = useState<PageTypes>('mnemonic');
 
   const mnemonic = useMemo(() => bip39.generateMnemonic(MNEMONIC_STRENGTH), []);
@@ -69,7 +72,7 @@ export const CreateWallet: FC = observer(() => {
 
   const handleContinuePasswordClick = async (password: string) => {
     const seed = await mnemonicToSeed(mnemonic);
-    next({
+    viewModel.setAuthInfo({
       type: 'signup',
       mnemonic,
       seed,

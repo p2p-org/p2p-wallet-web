@@ -9,8 +9,8 @@ import { observer } from 'mobx-react-lite';
 import { LoaderWide } from 'components/common/LoaderWide';
 import app from 'components/pages/auth/app.png';
 import { Login } from 'components/pages/auth/AuthSide/Login';
-import { Signup } from 'components/pages/auth/AuthSide/Signup';
 import logo from 'components/pages/auth/logo.svg';
+import { CreateWallet } from 'new/scenes/Main/Auth/Subviews/Forms/CreateWallet';
 
 const Wrapper = styled.div`
   display: flex;
@@ -160,7 +160,7 @@ export const ChooseFlow: FC = observer(() => {
             <Login setIsLoading={setIsLoading} next={next} />
           </Route>
           <Route path="/create">
-            <Signup next={next} />
+            <CreateWallet />
           </Route>
         </Switch>
         {isLoading && <LoaderWide />}
