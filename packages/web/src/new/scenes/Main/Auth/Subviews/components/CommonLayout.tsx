@@ -184,7 +184,7 @@ export const CommonLayout: FC = observer((props) => {
         </Navigate>
         <ContentContainer>
           <WalletTitle>
-            {viewModel.showBackButton && <BackStyled onClick={() => null} />}
+            {viewModel.showBackButton && <BackStyled onClick={viewModel.previousStep} />}
             New wallet
           </WalletTitle>
           {props.children}

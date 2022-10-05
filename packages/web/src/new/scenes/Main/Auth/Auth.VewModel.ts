@@ -5,6 +5,9 @@ import { ViewModel } from 'new/core/viewmodels/ViewModel';
 import type { AuthInfo, AuthState } from 'new/scenes/Main/Auth/typings';
 import { WizardSteps } from 'new/scenes/Main/Auth/typings';
 
+const createList = [WizardSteps.CREATE_START, WizardSteps.CREATE_CONFIRM_MNEMONIC];
+const restoreList = [WizardSteps.RESTORE_START];
+
 @singleton()
 export class AuthVewModel extends ViewModel {
   step: WizardSteps;
@@ -35,7 +38,8 @@ export class AuthVewModel extends ViewModel {
       showBackButton: computed,
       setCreateStart: action.bound,
       setRestoreStart: action.bound,
-      setStep: action.bound,
+      previousStep: action.bound,
+      nextStep: action.bound,
     });
   }
 
@@ -64,8 +68,34 @@ export class AuthVewModel extends ViewModel {
     this.step = WizardSteps.RESTORE_START;
   }
 
-  setStep(step: WizardSteps): void {
-    this.step = step;
+  nextStep(): WizardSteps | undefined {
+    const currentIdx = this._getCurrent();
+    const list = this._getList();
+
+    if (currentIdx === list.length - 1) {
+      return;
+    }
+
+    if (currentIdx === -1) {
+      return (this.step = list[0] as WizardSteps);
+    }
+
+    return (this.step = list[currentIdx + 1] as WizardSteps);
+  }
+
+  previousStep(): WizardSteps | undefined {
+    const currentIdx = this._getCurrent();
+    const list = this._getList();
+
+    if (currentIdx === 0) {
+      return;
+    }
+
+    if (currentIdx === -1) {
+      return (this.step = list[0] as WizardSteps);
+    }
+
+    return (this.step = list[currentIdx - 1] as WizardSteps);
   }
 
   get isRestore(): boolean {
@@ -78,5 +108,15 @@ export class AuthVewModel extends ViewModel {
 
   get showBackButton(): boolean {
     return this.step !== WizardSteps.CREATE_START;
+  }
+
+  private _getList(): Array<WizardSteps> {
+    return this.isCreate ? createList : restoreList;
+  }
+
+  private _getCurrent(): number {
+    const list = this._getList();
+
+    return list.indexOf(this.step);
   }
 }
