@@ -148,7 +148,9 @@ export const ChooseFlow: FC = observer(() => {
           <NavLinkStyled to="/create">Create new wallet</NavLinkStyled>
           <NavLinkStyled
             to="/restore"
-            isActive={() => ['/restore', '/trial'].includes(location.pathname)}
+            isActive={() => {
+              return ['/restore', '/trial'].includes(location.pathname);
+            }}
           >
             I already have wallet
           </NavLinkStyled>
