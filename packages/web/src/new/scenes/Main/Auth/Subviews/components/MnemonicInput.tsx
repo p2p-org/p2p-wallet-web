@@ -4,10 +4,11 @@ import { useMemo, useState } from 'react';
 import { styled } from '@linaria/react';
 import * as bip39 from 'bip39';
 
-import { Button } from 'components/pages/auth/AuthSide/common/Button';
-import { Checkbox } from 'components/pages/auth/AuthSide/common/Checkbox';
 import { useViewModel } from 'new/core/viewmodels/useViewModel';
 import { AuthVewModel } from 'new/scenes/Main/Auth/Auth.VewModel';
+
+import { Button } from './Button';
+import { Checkbox } from './Checkbox';
 
 const Wrapper = styled.div`
   display: flex;

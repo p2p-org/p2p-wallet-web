@@ -5,7 +5,11 @@ import { ViewModel } from 'new/core/viewmodels/ViewModel';
 import type { AuthInfo, AuthState } from 'new/scenes/Main/Auth/typings';
 import { WizardSteps } from 'new/scenes/Main/Auth/typings';
 
-const createList = [WizardSteps.CREATE_START, WizardSteps.CREATE_CONFIRM_MNEMONIC];
+const createList = [
+  WizardSteps.CREATE_START,
+  WizardSteps.CREATE_CONFIRM_MNEMONIC,
+  WizardSteps.CREATE_SET_PASSWORD,
+];
 const restoreList = [WizardSteps.RESTORE_START];
 
 @singleton()
@@ -15,7 +19,7 @@ export class AuthVewModel extends ViewModel {
 
   static defaultState: AuthState = {
     step: WizardSteps.CREATE_START,
-    authInfo: observable.object<AuthInfo>({
+    authInfo: observable<AuthInfo>({
       mnemonic: '',
       seed: '',
       derivationPath: '',
@@ -39,6 +43,7 @@ export class AuthVewModel extends ViewModel {
       setRestoreStart: action.bound,
       previousStep: action.bound,
       nextStep: action.bound,
+      setPassword: action.bound,
     });
   }
 
@@ -55,6 +60,7 @@ export class AuthVewModel extends ViewModel {
     this.authInfo = AuthVewModel.defaultState.authInfo;
   }
 
+  // @FIXME remove and replace with respective methods
   setAuthInfo(info: AuthInfo): void {
     this.authInfo = info;
   }
@@ -95,6 +101,10 @@ export class AuthVewModel extends ViewModel {
     }
 
     return (this.step = list[currentIdx - 1] as WizardSteps);
+  }
+
+  setPassword(value: string): void {
+    this.authInfo.password = value;
   }
 
   get isRestore(): boolean {

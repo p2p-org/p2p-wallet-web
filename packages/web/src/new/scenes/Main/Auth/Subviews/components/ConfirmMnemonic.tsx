@@ -1,12 +1,15 @@
 import type { FC } from 'react';
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import * as React from 'react';
 
 import { styled } from '@linaria/react';
 import classNames from 'classnames';
 
 import { ErrorHint } from 'components/common/ErrorHint';
-import { Button } from 'components/pages/auth/AuthSide/common/Button';
+import { useViewModel } from 'new/core/viewmodels/useViewModel';
+import { AuthVewModel } from 'new/scenes/Main/Auth/Auth.VewModel';
+
+import { Button } from './Button';
 
 const Wrapper = styled.div`
   display: flex;
@@ -68,38 +71,19 @@ const MnemonicTextarea = styled.textarea`
   }
 `;
 
-interface Props {
-  mnemonic: string;
-  next: () => void;
-}
-
-export const ConfirmMnemonic: FC<Props> = ({ mnemonic, next }) => {
-  const mnemonicRef = useRef<HTMLTextAreaElement | null>(null);
+export const ConfirmMnemonic: FC = () => {
+  const viewModel = useViewModel(AuthVewModel);
   const [userMnemonic, setUserMnemonic] = useState('');
   const [hasError, setHasError] = useState(false);
 
-  useEffect(() => {
-    if (mnemonicRef.current) {
-      mnemonicRef.current.style.height = 'inherit';
-      mnemonicRef.current.style.height = `${mnemonicRef.current.scrollHeight}px`;
-    }
-  }, [mnemonic]);
-
   const validateMnemonic = (value: string) => {
-    setHasError(value !== mnemonic);
+    setHasError(value !== viewModel.authInfo.mnemonic);
   };
 
   const handleMnemonicInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const { value } = e.target;
-    const valueTrimmed = value.trim();
+    setUserMnemonic(e.target.value);
 
-    if (valueTrimmed === mnemonic) {
-      setUserMnemonic(valueTrimmed);
-    } else {
-      setUserMnemonic(value);
-    }
-
-    validateMnemonic(valueTrimmed);
+    validateMnemonic(e.target.value.trim());
   };
 
   const handleMnemonicBlur = (e: React.FocusEvent<HTMLTextAreaElement>) => {
@@ -108,11 +92,7 @@ export const ConfirmMnemonic: FC<Props> = ({ mnemonic, next }) => {
     validateMnemonic(value);
   };
 
-  const handleContinueClick = () => {
-    next();
-  };
-
-  const isDisabled = userMnemonic !== mnemonic || hasError;
+  const isNextDisabled = userMnemonic.trim() !== viewModel.authInfo.mnemonic || hasError;
 
   return (
     <Wrapper>
@@ -123,7 +103,6 @@ export const ConfirmMnemonic: FC<Props> = ({ mnemonic, next }) => {
       </PasteMnemonicHint>
       <MnemonicWrapper>
         <MnemonicTextarea
-          ref={mnemonicRef}
           placeholder="Seed phrase"
           value={userMnemonic}
           onInput={handleMnemonicInput}
@@ -132,7 +111,7 @@ export const ConfirmMnemonic: FC<Props> = ({ mnemonic, next }) => {
         />
         {hasError ? <ErrorHint error="Incorrect seed phrase" /> : undefined}
       </MnemonicWrapper>
-      <Button disabled={isDisabled} onClick={handleContinueClick}>
+      <Button disabled={isNextDisabled} onClick={viewModel.nextStep}>
         Continue
       </Button>
     </Wrapper>
