@@ -203,8 +203,8 @@ export const CommonLayout: FC<Props> = observer((props) => {
           {elHead}
           {props.children}
         </ContentContainer>
-        {/*// @FIXME*/}
-        {false && <LoaderWide />}
+        {/*// @TODO check if working*/}
+        {viewModel.isLoading && <LoaderWide />}
       </MenuContainer>
     </Wrapper>
   );

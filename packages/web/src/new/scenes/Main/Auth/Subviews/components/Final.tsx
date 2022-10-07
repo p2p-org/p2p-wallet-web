@@ -1,14 +1,7 @@
 import type { FC } from 'react';
 import { useState } from 'react';
-import { unstable_batchedUpdates as batch } from 'react-dom';
 
 import { styled } from '@linaria/react';
-import {
-  DefaultWalletType,
-  deriveSecretKeyFromSeed,
-  useSeedAndMnemonic,
-  useWallet,
-} from '@p2p-wallet-web/core';
 
 import LogoImg from 'assets/images/big-logo.png';
 import { ToastManager } from 'components/common/ToastManager';
@@ -85,10 +78,9 @@ const SwitcherText = styled.span`
   line-height: 18px;
 `;
 
+// @FRIDAY proceed with restore wallet
 export const Final: FC = () => {
   const viewModel = useViewModel(AuthVewModel);
-  const { activate } = useWallet();
-  const { setEncryptedSeedAndMnemonic } = useSeedAndMnemonic();
 
   const [isSave, setIsSave] = useState(true);
   const [isShowModal, setIsShowModal] = useState(false);
@@ -108,27 +100,17 @@ export const Final: FC = () => {
   };
 
   const handleFinishClick = () => {
-    batch(async () => {
-      viewModel.setIsLoading(true);
-      try {
-        const secretKey = Array.from(
-          deriveSecretKeyFromSeed(viewModel.authInfo.seed, 0, viewModel.authInfo.derivationPath),
-        );
-        await activate(DefaultWalletType.SecretKey, { secretKey });
-        setEncryptedSeedAndMnemonic(
-          {
-            seed: viewModel.authInfo.seed,
-            mnemonic: viewModel.authInfo.mnemonic,
-          },
-          viewModel.authInfo.password,
-          isSave,
-        );
-      } catch (error) {
-        ToastManager.error((error as Error).message);
-      } finally {
-        viewModel.setIsLoading(false);
-      }
-    });
+    // @TODO look at the original file
+    // there is privateKey and activate methods
+    // they should go into the mnemonic adapter
+    viewModel.setIsLoading(true);
+    try {
+      void viewModel.saveEncryptedMnemonicAndSeed();
+    } catch (error) {
+      ToastManager.error((error as Error).message);
+    } finally {
+      viewModel.setIsLoading(false);
+    }
   };
 
   return (

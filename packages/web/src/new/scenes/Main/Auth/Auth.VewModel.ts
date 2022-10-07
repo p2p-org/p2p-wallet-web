@@ -7,7 +7,7 @@ import { ViewModel } from 'new/core/viewmodels/ViewModel';
 import type { AuthInfo, AuthState } from 'new/scenes/Main/Auth/typings';
 import { WizardSteps } from 'new/scenes/Main/Auth/typings';
 
-import { mnemonicToSeed } from './utils';
+import { generateEncryptedTextAsync, mnemonicToSeed, setStorageValue } from './utils';
 
 const createList = [
   WizardSteps.CREATE_START,
@@ -23,6 +23,7 @@ export class AuthVewModel extends ViewModel {
   isLoading: boolean;
 
   private static _mnemonicStrength = 256;
+  private static _storageKey = 'encryptedSeedAndMnemonic';
 
   static defaultState: AuthState = {
     step: WizardSteps.CREATE_START,
@@ -132,6 +133,17 @@ export class AuthVewModel extends ViewModel {
 
   setIsLoading(value: boolean): void {
     this.isLoading = value;
+  }
+
+  // @TODO do we need another sdk for this logic and utils?
+  async saveEncryptedMnemonicAndSeed() {
+    const plaintext = JSON.stringify({
+      mnemonic: this.authInfo.mnemonic,
+      seed: this.authInfo.seed,
+    });
+    const locked = await generateEncryptedTextAsync(plaintext, this.authInfo.password);
+
+    setStorageValue(AuthVewModel._storageKey, JSON.stringify(locked));
   }
 
   get isRestore(): boolean {
