@@ -86,8 +86,6 @@ const SwitcherText = styled.span`
 `;
 
 export const Final: FC = () => {
-  // @FIXME
-  const setIsLoading = (val: boolean) => null;
   const viewModel = useViewModel(AuthVewModel);
   const { activate } = useWallet();
   const { setEncryptedSeedAndMnemonic } = useSeedAndMnemonic();
@@ -111,7 +109,7 @@ export const Final: FC = () => {
 
   const handleFinishClick = () => {
     batch(async () => {
-      setIsLoading(true);
+      viewModel.setIsLoading(true);
       try {
         const secretKey = Array.from(
           deriveSecretKeyFromSeed(viewModel.authInfo.seed, 0, viewModel.authInfo.derivationPath),
@@ -128,7 +126,7 @@ export const Final: FC = () => {
       } catch (error) {
         ToastManager.error((error as Error).message);
       } finally {
-        setIsLoading(false);
+        viewModel.setIsLoading(false);
       }
     });
   };

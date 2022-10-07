@@ -1,9 +1,13 @@
-import { action, computed, makeObservable, observable } from 'mobx';
+import { DERIVATION_PATH } from '@p2p-wallet-web/core';
+import * as bip39 from 'bip39';
+import { action, computed, makeObservable, observable, runInAction } from 'mobx';
 import { singleton } from 'tsyringe';
 
 import { ViewModel } from 'new/core/viewmodels/ViewModel';
 import type { AuthInfo, AuthState } from 'new/scenes/Main/Auth/typings';
 import { WizardSteps } from 'new/scenes/Main/Auth/typings';
+
+import { mnemonicToSeed } from './utils';
 
 const createList = [
   WizardSteps.CREATE_START,
@@ -16,13 +20,17 @@ const restoreList = [WizardSteps.RESTORE_START];
 export class AuthVewModel extends ViewModel {
   step: WizardSteps;
   authInfo: AuthInfo;
+  isLoading: boolean;
+
+  private static _mnemonicStrength = 256;
 
   static defaultState: AuthState = {
     step: WizardSteps.CREATE_START,
+    isLoading: false,
     authInfo: observable<AuthInfo>({
-      mnemonic: '',
+      mnemonic: bip39.generateMnemonic(AuthVewModel._mnemonicStrength),
       seed: '',
-      derivationPath: '',
+      derivationPath: DERIVATION_PATH.Bip44Change,
       password: '',
     }),
   };
@@ -32,10 +40,12 @@ export class AuthVewModel extends ViewModel {
 
     this.step = AuthVewModel.defaultState.step;
     this.authInfo = AuthVewModel.defaultState.authInfo;
+    this.isLoading = AuthVewModel.defaultState.isLoading;
 
     makeObservable(this, {
       step: observable,
       authInfo: observable,
+      isLoading: observable,
       isRestore: computed,
       isCreate: computed,
       showBackButton: computed,
@@ -44,20 +54,27 @@ export class AuthVewModel extends ViewModel {
       previousStep: action.bound,
       nextStep: action.bound,
       setPassword: action.bound,
+      setIsLoading: action.bound,
     });
   }
 
+  // @TODO how does those methods work?
   protected override afterReactionsRemoved() {
     // @TODO
   }
 
-  protected override onInitialize() {
-    // @TODO
+  protected override async onInitialize(): Promise<void> {
+    const seed = await mnemonicToSeed(this.authInfo.mnemonic);
+
+    runInAction(() => {
+      this.authInfo.seed = seed;
+    });
   }
 
-  protected override setDefaults() {
+  protected override setDefaults(): void {
     this.step = AuthVewModel.defaultState.step;
     this.authInfo = AuthVewModel.defaultState.authInfo;
+    this.isLoading = AuthVewModel.defaultState.isLoading;
   }
 
   setCreateStart(): void {
@@ -111,6 +128,10 @@ export class AuthVewModel extends ViewModel {
 
   setMnemonic(value: string): void {
     this.authInfo.mnemonic = value;
+  }
+
+  setIsLoading(value: boolean): void {
+    this.isLoading = value;
   }
 
   get isRestore(): boolean {

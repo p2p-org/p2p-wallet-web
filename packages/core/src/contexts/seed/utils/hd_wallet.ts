@@ -62,6 +62,7 @@ export const deriveSecretKeyFromSeed = (
 //   };
 // };
 
+// @FIXME possibly remove this file
 export const mnemonicToSeed = async (mnemonic: string) => {
   const bip39 = await import('bip39');
   if (!bip39.validateMnemonic(mnemonic)) {

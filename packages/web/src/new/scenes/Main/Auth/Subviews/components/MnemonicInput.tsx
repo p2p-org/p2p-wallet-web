@@ -1,8 +1,7 @@
 import type { FC } from 'react';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 
 import { styled } from '@linaria/react';
-import * as bip39 from 'bip39';
 
 import { useViewModel } from 'new/core/viewmodels/useViewModel';
 import { AuthVewModel } from 'new/scenes/Main/Auth/Auth.VewModel';
@@ -131,20 +130,12 @@ const CheckboxWrapper = styled.div`
   }
 `;
 
-const MNEMONIC_STRENGTH = 256;
-
 export const Mnemonic: FC = () => {
   const [checked, setChecked] = useState(false);
-  const mnemonic = useMemo(() => bip39.generateMnemonic(MNEMONIC_STRENGTH), []);
   const viewModel = useViewModel(AuthVewModel);
 
   const handleCheckChange = (nextChecked: boolean) => {
     setChecked(nextChecked);
-  };
-
-  const handleContinueClick = () => {
-    viewModel.setMnemonic(mnemonic);
-    viewModel.nextStep();
   };
 
   return (
@@ -159,7 +150,7 @@ export const Mnemonic: FC = () => {
         or lost.
       </SecurityKeyHint>
       <MnemonicWrapper>
-        <MnemonicTextarea placeholder="Seed phrase" value={mnemonic} readOnly />
+        <MnemonicTextarea placeholder="Seed phrase" value={viewModel.authInfo.mnemonic} readOnly />
       </MnemonicWrapper>
       <CheckboxWrapper>
         <Checkbox
@@ -168,7 +159,7 @@ export const Mnemonic: FC = () => {
           onChange={handleCheckChange}
         />
       </CheckboxWrapper>
-      <Button disabled={!checked} onClick={handleContinueClick}>
+      <Button disabled={!checked} onClick={viewModel.nextStep}>
         Continue
       </Button>
     </Wrapper>

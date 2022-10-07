@@ -18,6 +18,7 @@ export type AuthInfo = {
 export type AuthState = {
   step: WizardSteps;
   authInfo: AuthInfo;
+  isLoading: boolean;
 };
 
 export type ViewMap = {

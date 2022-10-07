@@ -10,8 +10,8 @@ import { PasswordInput } from 'components/common/PasswordInput';
 import { useViewModel } from 'new/core/viewmodels/useViewModel';
 import { AuthVewModel } from 'new/scenes/Main/Auth/Auth.VewModel';
 
+import { validatePassword } from '../../utils';
 import { Button } from './Button';
-import { validatePassword } from './utils';
 
 // @FIXME rewrite all hex colors to palette
 const Wrapper = styled.div`
