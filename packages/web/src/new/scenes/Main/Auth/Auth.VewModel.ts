@@ -60,11 +60,6 @@ export class AuthVewModel extends ViewModel {
     this.authInfo = AuthVewModel.defaultState.authInfo;
   }
 
-  // @FIXME remove and replace with respective methods
-  setAuthInfo(info: AuthInfo): void {
-    this.authInfo = info;
-  }
-
   setCreateStart(): void {
     this.step = WizardSteps.CREATE_START;
   }
@@ -73,38 +68,49 @@ export class AuthVewModel extends ViewModel {
     this.step = WizardSteps.RESTORE_START;
   }
 
-  nextStep(): WizardSteps | undefined {
+  nextStep(): void {
     const currentIdx = this._getCurrent();
     const list = this._getList();
 
-    if (currentIdx === list.length - 1) {
-      return;
+    switch (true) {
+      case currentIdx === list.length - 1: {
+        this.step = WizardSteps.FINAL;
+        break;
+      }
+      case currentIdx === -1: {
+        this.step = list[0] as WizardSteps;
+        break;
+      }
+      default: {
+        this.step = list[currentIdx + 1] as WizardSteps;
+      }
     }
-
-    if (currentIdx === -1) {
-      return (this.step = list[0] as WizardSteps);
-    }
-
-    return (this.step = list[currentIdx + 1] as WizardSteps);
   }
 
-  previousStep(): WizardSteps | undefined {
+  previousStep(): void {
     const currentIdx = this._getCurrent();
     const list = this._getList();
 
-    if (currentIdx === 0) {
-      return;
+    switch (true) {
+      case currentIdx === 0: {
+        break;
+      }
+      case currentIdx === -1: {
+        this.step = list[0] as WizardSteps;
+        break;
+      }
+      default: {
+        this.step = list[currentIdx - 1] as WizardSteps;
+      }
     }
-
-    if (currentIdx === -1) {
-      return (this.step = list[0] as WizardSteps);
-    }
-
-    return (this.step = list[currentIdx - 1] as WizardSteps);
   }
 
   setPassword(value: string): void {
     this.authInfo.password = value;
+  }
+
+  setMnemonic(value: string): void {
+    this.authInfo.mnemonic = value;
   }
 
   get isRestore(): boolean {

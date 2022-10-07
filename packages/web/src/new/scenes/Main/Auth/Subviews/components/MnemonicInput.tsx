@@ -143,7 +143,7 @@ export const Mnemonic: FC = () => {
   };
 
   const handleContinueClick = () => {
-    viewModel.setAuthInfo({ ...viewModel.authInfo, mnemonic });
+    viewModel.setMnemonic(mnemonic);
     viewModel.nextStep();
   };
 

@@ -28,7 +28,17 @@ export const Wizard: FC<Props> = (props) => {
         <Password />
       </CommonLayout>
     ),
+    [WizardSteps.FINAL]: (
+      <CommonLayout>
+        <p>FINAL</p>
+      </CommonLayout>
+    ),
     [WizardSteps.RESTORE_START]: <p>slkdf</p>,
+    [WizardSteps.FINAL]: (
+      <CommonLayout>
+        <p>FINAL</p>
+      </CommonLayout>
+    ),
   };
 
   const elView = VIEW_MAP[props.step];

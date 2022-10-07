@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 
 import { styled } from '@linaria/react';
 import classNames from 'classnames';
@@ -11,15 +11,7 @@ import { useViewModel } from 'new/core/viewmodels/useViewModel';
 import { AuthVewModel } from 'new/scenes/Main/Auth/Auth.VewModel';
 
 import { Button } from './Button';
-
-export function validatePassword(password: string) {
-  const isLowerCase = /[a-z]/.test(password);
-  const isUpperCase = /[A-Z]/.test(password);
-  const isNumber = /\d/.test(password);
-  const isMinLength = password.length >= 8;
-
-  return { isLowerCase, isUpperCase, isNumber, isMinLength };
-}
+import { validatePassword } from './utils';
 
 // @FIXME rewrite all hex colors to palette
 const Wrapper = styled.div`
@@ -119,14 +111,12 @@ const ButtonStyled = styled(Button)`
 `;
 
 export const Password: FC = observer(() => {
-  // const [password, setPassword] = useState('');
   const viewModel = useViewModel(AuthVewModel);
   const [passwordRepeat, setPasswordRepeat] = useState('');
   const [hasPasswordRepeatError, setHasPasswordRepeatError] = useState(false);
 
-  const { isLowerCase, isUpperCase, isNumber, isMinLength } = useMemo(
-    () => validatePassword(viewModel.authInfo.password),
-    [viewModel.authInfo.password],
+  const { isLowerCase, isUpperCase, isNumber, isMinLength } = validatePassword(
+    viewModel.authInfo.password,
   );
 
   const handlePasswordRepeatChange = (value: string) => {
@@ -141,11 +131,7 @@ export const Password: FC = observer(() => {
     setHasPasswordRepeatError(viewModel.authInfo.password !== passwordRepeat);
   };
 
-  const handleContinueClick = () => {
-    // next(password);
-  };
-
-  const renderRules = () => {
+  const elRules = () => {
     if (!viewModel.authInfo.password) {
       return;
     }
@@ -206,7 +192,7 @@ export const Password: FC = observer(() => {
         onChange={viewModel.setPassword}
         isError={false}
       />
-      {renderRules()}
+      {elRules()}
       <RepeatPassword>Repeat password</RepeatPassword>
       <PasswordInput
         placeholder="Repeat new password"
@@ -217,7 +203,7 @@ export const Password: FC = observer(() => {
         isError={false}
       />
       {hasPasswordRepeatError ? <ErrorHint error="Passwords doesn’t match" /> : undefined}
-      <ButtonStyled disabled={disabled} onClick={handleContinueClick}>
+      <ButtonStyled disabled={disabled} onClick={viewModel.nextStep}>
         Continue
       </ButtonStyled>
     </Wrapper>
