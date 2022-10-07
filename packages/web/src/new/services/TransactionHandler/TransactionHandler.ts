@@ -13,6 +13,7 @@ import {
   toLamport,
 } from 'new/sdk/SolanaSDK';
 import type { ParsedTransaction } from 'new/sdk/TransactionParser';
+import { NotificationService } from 'new/services/NotificationService';
 import { PricesService } from 'new/services/PriceAPIs/PricesService';
 import { WalletsRepository } from 'new/services/Repositories';
 import { AccountObservableService } from 'new/services/Socket';
@@ -52,6 +53,7 @@ export class TransactionHandler implements TransactionHandlerType {
     private _walletsRepository: WalletsRepository,
     private _pricesService: PricesService,
     private _socket: AccountObservableService,
+    private _notificationService: NotificationService,
   ) {
     makeObservable(this, {
       transactions: observable,
@@ -164,27 +166,21 @@ export class TransactionHandler implements TransactionHandlerType {
     processingTransaction: RawTransactionType;
   }): Promise<void> {
     try {
-      const transactionId = await processingTransaction.createRequest();
+      await processingTransaction.createRequest();
 
       // show notification
-      // this._notificationsService.showInAppNotification(done(transactionHasBeenSent))
+      this._notificationService.info('Transaction has been sent');
 
       // update status
-      this._updateTransactionAtIndex(index, () => {
-        return new PendingTransaction({
-          transactionId,
-          sentAt: new Date(),
-          rawTransaction: processingTransaction,
-          status: TransactionStatus.confirmed(0),
-        });
+      this._updateTransactionAtIndex(index, (currentValue) => {
+        const value = currentValue;
+        value.status = TransactionStatus.finalized();
+        return value;
       });
-
-      // observe confirmations
-      this._observe({ index, transactionId });
     } catch (error) {
       console.error(error);
       // update status
-      // TODO: notification this._notificationsService.showInAppNotification(error(error));
+      this._notificationService.error((error as Error).message);
 
       // mark transaction as failured
       this._updateTransactionAtIndex(index, (currentValue) => {
@@ -251,9 +247,9 @@ export class TransactionHandler implements TransactionHandlerType {
         }
       },
       {
-        retries: 10,
-        minTimeout: 1000,
-        maxTimeout: 60000,
+        retries: 30,
+        minTimeout: 1_000,
+        maxTimeout: 2_000,
         factor: 1,
       },
     );

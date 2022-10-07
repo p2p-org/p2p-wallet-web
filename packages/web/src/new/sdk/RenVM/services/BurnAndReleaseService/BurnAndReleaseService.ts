@@ -169,7 +169,7 @@ export class BurnAndReleaseServiceImpl implements BurnAndReleaseService {
         return burnAndRelease.release({ state, details }).catch(retry);
       },
       {
-        retries: Number.MAX_SAFE_INTEGER,
+        forever: true,
         maxTimeout: 3_000,
       },
     );
