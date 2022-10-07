@@ -142,15 +142,21 @@ const MenuContainer = styled.div`
 `;
 
 const ContentContainer = styled.div`
-  position: relative;
-
   display: flex;
   flex-direction: column;
 
   width: 360px;
 `;
 
-export const CommonLayout: FC = observer((props) => {
+type Props = {
+  showNavigation?: boolean;
+};
+
+const defaultProps = {
+  showNavigation: true,
+};
+
+export const CommonLayout: FC<Props> = observer((props) => {
   const isDesktop = useIsDesktop();
   const viewModel = useViewModel(AuthVewModel);
 
@@ -164,29 +170,37 @@ export const CommonLayout: FC = observer((props) => {
     </Left>
   );
 
+  const elNavigation = props.showNavigation && (
+    <Navigate>
+      <TabButton
+        className={classNames({ isActive: viewModel.isCreate })}
+        onClick={viewModel.setCreateStart}
+      >
+        Create new wallet
+      </TabButton>
+      <TabButton
+        className={classNames({ isActive: viewModel.isRestore })}
+        onClick={viewModel.setRestoreStart}
+      >
+        I already have wallet
+      </TabButton>
+    </Navigate>
+  );
+
+  const elHead = props.showNavigation && (
+    <WalletTitle>
+      {viewModel.showBackButton && <BackStyled onClick={viewModel.previousStep} />}
+      New wallet
+    </WalletTitle>
+  );
+
   return (
     <Wrapper>
       {elBanner}
       <MenuContainer>
-        <Navigate>
-          <TabButton
-            className={classNames({ isActive: viewModel.isCreate })}
-            onClick={viewModel.setCreateStart}
-          >
-            Create new wallet
-          </TabButton>
-          <TabButton
-            className={classNames({ isActive: viewModel.isRestore })}
-            onClick={viewModel.setRestoreStart}
-          >
-            I already have wallet
-          </TabButton>
-        </Navigate>
+        {elNavigation}
         <ContentContainer>
-          <WalletTitle>
-            {viewModel.showBackButton && <BackStyled onClick={viewModel.previousStep} />}
-            New wallet
-          </WalletTitle>
+          {elHead}
           {props.children}
         </ContentContainer>
         {/*// @FIXME*/}
@@ -195,3 +209,5 @@ export const CommonLayout: FC = observer((props) => {
     </Wrapper>
   );
 });
+
+CommonLayout.defaultProps = defaultProps;

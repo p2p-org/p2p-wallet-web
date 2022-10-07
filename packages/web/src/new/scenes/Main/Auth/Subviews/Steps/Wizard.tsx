@@ -7,6 +7,8 @@ import { Password } from 'new/scenes/Main/Auth/Subviews/components/Password';
 import type { ViewMap } from 'new/scenes/Main/Auth/typings';
 import { WizardSteps } from 'new/scenes/Main/Auth/typings';
 
+import { Final } from '../components/Final';
+
 export interface Props {
   step: WizardSteps;
 }
@@ -35,15 +37,15 @@ export const Wizard: FC<Props> = (props) => {
     ),
     [WizardSteps.RESTORE_START]: <p>slkdf</p>,
     [WizardSteps.FINAL]: (
-      <CommonLayout>
-        <p>FINAL</p>
+      <CommonLayout showNavigation={false}>
+        <Final />
       </CommonLayout>
     ),
   };
 
   const elView = VIEW_MAP[props.step];
 
-  return <>{elView}</>;
+  return elView;
 };
 
 export default Wizard;
