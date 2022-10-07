@@ -157,7 +157,7 @@ export const ProgressView: FC<Props> = observer(({ viewModel /*label*/ }) => {
   useEffect(() => {
     let newProgress = INITIAL_PROGRESS;
 
-    if (!isProcessing) {
+    if (!(isProcessing || isSending)) {
       return;
     }
 
