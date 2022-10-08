@@ -5,6 +5,7 @@ import { observer } from 'mobx-react-lite';
 
 import { WidgetPageWithBottom } from 'components/common/WidgetPageWithBottom';
 import { useViewModel } from 'new/core/viewmodels/useViewModel';
+import { NetworkSelect } from 'new/scenes/Main/Send/NetworkSelect';
 import { Layout } from 'new/ui/components/common/Layout';
 
 import { ActionButton } from './ActionButton';
@@ -27,6 +28,9 @@ export const Send: FC = observer(() => {
         <Wrapper>
           <ChooseTokenAndAmount viewModel={viewModel} />
           <SelectAddress viewModel={viewModel} />
+          {viewModel.getSelectedWallet?.token.isRenBTC ? (
+            <NetworkSelect viewModel={viewModel} />
+          ) : null}
           <FeesView viewModel={viewModel} />
         </Wrapper>
       </WidgetPageWithBottom>

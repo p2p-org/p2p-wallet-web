@@ -5,6 +5,7 @@ import { delay, inject, Lifecycle, scoped } from 'tsyringe';
 import { LoadableRelay, LoadableState } from 'new/app/models/LoadableRelay';
 import { SDFetcherState } from 'new/core/viewmodels/SDViewModel';
 import { ViewModel } from 'new/core/viewmodels/ViewModel';
+import type { NetworkSelectViewModelType } from 'new/scenes/Main/Send/NetworkSelect/NetworkSelect.ViewModel';
 import type { SelectAddressError } from 'new/scenes/Main/Send/SelectAddress/SelectAddress.ViewModel';
 import { SelectAddressViewModel } from 'new/scenes/Main/Send/SelectAddress/SelectAddress.ViewModel';
 import type * as FeeRelayer from 'new/sdk/FeeRelayer';
@@ -34,8 +35,8 @@ export type Recipient = {
 };
 
 export enum Network {
-  solana,
-  bitcoin,
+  solana = 'solana',
+  bitcoin = 'bitcoin',
 }
 
 export type FeeInfo = {
@@ -71,7 +72,10 @@ export interface SendViewModelType {
 }
 
 @scoped(Lifecycle.ResolutionScoped)
-export class SendViewModel extends ViewModel implements SendViewModelType {
+export class SendViewModel
+  extends ViewModel
+  implements SendViewModelType, NetworkSelectViewModelType
+{
   // Subject
 
   wallet: Wallet | null;
@@ -133,6 +137,8 @@ export class SendViewModel extends ViewModel implements SendViewModelType {
       getSelectedWallet: computed,
 
       getFeeInCurrentFiat: computed,
+
+      getSelectableNetworks: computed,
 
       chooseWallet: action,
       enterAmount: action,
@@ -411,6 +417,15 @@ export class SendViewModel extends ViewModel implements SendViewModelType {
       fee = feeInSol * this.getPrice('SOL');
     }
     return `~${Defaults.fiat.symbol}${numberToString(fee, { maximumFractionDigits: 2 })}`;
+  }
+
+  get getSelectableNetworks(): Network[] {
+    const networks: Network[] = [Network.solana];
+
+    if (this.getSelectedWallet?.token.isRenBTC) {
+      networks.push(Network.bitcoin);
+    }
+    return networks;
   }
 
   getFreeTransactionFeeLimit(): Promise<FeeRelayer.UsageStatus> {
