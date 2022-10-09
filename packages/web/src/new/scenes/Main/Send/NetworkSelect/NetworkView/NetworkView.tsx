@@ -5,7 +5,8 @@ import { ZERO } from '@orca-so/sdk';
 import { theme } from '@p2p-wallet-web/ui';
 import { observer } from 'mobx-react-lite';
 
-import type { FeeInfo, Network } from 'new/scenes/Main/Send';
+import type { FeeInfo } from 'new/scenes/Main/Send';
+import { Network } from 'new/scenes/Main/Send';
 import type { Token, Wallet } from 'new/sdk/SolanaSDK';
 import { convertToBalance } from 'new/sdk/SolanaSDK';
 import { Defaults } from 'new/services/Defaults';
@@ -75,6 +76,14 @@ type Props = {
 };
 
 export const NetworkView: FC<Props> = observer(({ network, token, payingWallet, feeInfo }) => {
+  // FIXME: remove when Bitcoin fee calculation is known
+  const feeValueElement =
+    network === Network.bitcoin ? (
+      <FeeValue>0.0002 renBTC + 0.0002 SOL</FeeValue>
+    ) : (
+      feeValueEl({ feeInfo, wallet: payingWallet })
+    );
+
   return (
     <>
       <TokenAvatar token={token} size={44} />
@@ -83,7 +92,7 @@ export const NetworkView: FC<Props> = observer(({ network, token, payingWallet, 
           <FirstLineWrapper>{capitalizeFirstLetter(network)} network</FirstLineWrapper>
           <SecondLineWrapper>
             <FeeLabel>Fee:</FeeLabel>
-            {feeValueEl({ feeInfo, wallet: payingWallet })}
+            {feeValueElement}
           </SecondLineWrapper>
         </InfoWrapper>
       </Content>
@@ -91,7 +100,15 @@ export const NetworkView: FC<Props> = observer(({ network, token, payingWallet, 
   );
 });
 
-const feeValueEl = ({ feeInfo, wallet }: { feeInfo: FeeInfo | null; wallet: Wallet | null }) => {
+const feeValueEl = ({
+  feeInfo,
+  wallet,
+  separator = ' + ',
+}: {
+  feeInfo: FeeInfo | null;
+  wallet: Wallet | null;
+  separator?: string;
+}) => {
   // if empty
   if (
     feeInfo?.feeAmount.transaction.eq(ZERO) &&
@@ -109,9 +126,11 @@ const feeValueEl = ({ feeInfo, wallet }: { feeInfo: FeeInfo | null; wallet: Wall
 
   const otherFees =
     feeInfo?.feeAmount.others?.reduce((acc, otherFee) => {
-      acc += `\n${numberToString(otherFee.amount, { maximumFractionDigits: 9 })} ${otherFee.unit}`;
+      acc += `${separator}${numberToString(otherFee.amount, { maximumFractionDigits: 9 })} ${
+        otherFee.unit
+      }`;
       return acc;
     }, '') ?? null;
 
-  return <FeeValue>{fees + (otherFees ? `\n${otherFees}` : '')}</FeeValue>;
+  return <FeeValue>{fees + (otherFees ? `${separator}${otherFees}` : '')}</FeeValue>;
 };
