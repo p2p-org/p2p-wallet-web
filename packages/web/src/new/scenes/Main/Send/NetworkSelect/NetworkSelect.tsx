@@ -54,7 +54,7 @@ const NotificationWrapper = styled.div`
 const cautionEl = () => {
   return (
     <CautionWrapper>
-      P2P Walet will automatically match your withdrawal target address to the correct network for
+      P2P Wallet will automatically match your withdrawal target address to the correct network for
       most withdrawals.
       <br />
       <br />

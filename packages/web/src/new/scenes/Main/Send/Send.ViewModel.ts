@@ -471,13 +471,15 @@ export class SendViewModel
     switch (network) {
       case Network.solana: {
         if (this._isRecipientBTCAddress()) {
-          this.recipient = null;
+          this.selectAddressViewModel.clearRecipient();
+          this.selectAddressViewModel.clearSearching();
         }
         break;
       }
       case Network.bitcoin: {
         if (!this._isRecipientBTCAddress()) {
-          this.recipient = null;
+          this.selectAddressViewModel.clearRecipient();
+          this.selectAddressViewModel.clearSearching();
         }
       }
     }
