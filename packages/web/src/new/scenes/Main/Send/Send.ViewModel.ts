@@ -94,8 +94,8 @@ export class SendViewModel
 
   constructor(
     private _pricesService: PricesService,
-    private _walletsRepository: WalletsRepository,
     private _sendService: SendService,
+    public walletsRepository: WalletsRepository,
     public chooseTokenAndAmountViewModel: ChooseTokenAndAmountViewModel,
     public choosePayingWalletViewModel: ChooseWalletViewModel,
     @inject(delay(() => SelectAddressViewModel))
@@ -232,7 +232,7 @@ export class SendViewModel
                   .gt(wallet.lamports ?? ZERO)
               ) {
                 runInAction(() => {
-                  this.payingWallet = this._walletsRepository.nativeWallet;
+                  this.payingWallet = this.walletsRepository.nativeWallet;
                 });
               } else {
                 runInAction(() => {
@@ -328,16 +328,16 @@ export class SendViewModel
   reload(): void {
     this.loadingState = LoadableState.loading;
 
-    this._walletsLoadPromise = when(() => this._walletsRepository.state === SDFetcherState.loaded);
+    this._walletsLoadPromise = when(() => this.walletsRepository.state === SDFetcherState.loaded);
 
     Promise.all([this._sendService.load(), this._walletsLoadPromise])
       .then(() => {
         runInAction(() => {
           this.loadingState = LoadableState.loaded;
           if (!this.wallet) {
-            this.wallet = this._walletsRepository.nativeWallet;
+            this.wallet = this.walletsRepository.nativeWallet;
           }
-          const payingWallet = this._walletsRepository
+          const payingWallet = this.walletsRepository
             .getWallets()
             .find((wallet) => wallet.mintAddress === Defaults.payingTokenMint);
           if (payingWallet) {
@@ -380,7 +380,7 @@ export class SendViewModel
           network: network,
           sender: wallet,
           receiver: receiver,
-          authority: this._walletsRepository.nativeWallet?.pubkey ?? null,
+          authority: this.walletsRepository.nativeWallet?.pubkey ?? null,
           amount: toLamport(amount, wallet.token.decimals),
           payingFeeWallet: this.payingWallet,
           feeInSOL: this.feeInfo.value?.feeAmountInSOL.total ?? ZERO,

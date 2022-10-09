@@ -6,6 +6,7 @@ const theme = {
       primary: '#FFFFFF',
       secondary: '#F6F6F8',
       tertiary: '#FAFBFC',
+      special: '#FAFAFC',
       activePrimary: '#EFF3FF',
       activeSecondary: '#FFFFFF',
       buttonPrimary: '#5887FF',

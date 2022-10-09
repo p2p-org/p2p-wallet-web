@@ -6,7 +6,7 @@ import { theme } from '@p2p-wallet-web/ui';
 import { observer } from 'mobx-react-lite';
 
 import type { FeeInfo, Network } from 'new/scenes/Main/Send';
-import type { Wallet } from 'new/sdk/SolanaSDK';
+import type { Token, Wallet } from 'new/sdk/SolanaSDK';
 import { convertToBalance } from 'new/sdk/SolanaSDK';
 import { Defaults } from 'new/services/Defaults';
 import { TokenAvatar } from 'new/ui/components/common/TokenAvatar';
@@ -69,19 +69,20 @@ const FeeValue = styled.div`
 
 type Props = {
   network: Network;
+  token?: Token;
   payingWallet: Wallet | null;
   feeInfo: FeeInfo | null;
 };
 
-export const NetworkView: FC<Props> = observer(({ network, payingWallet, feeInfo }) => {
+export const NetworkView: FC<Props> = observer(({ network, token, payingWallet, feeInfo }) => {
   return (
     <>
-      <TokenAvatar token={payingWallet?.token} size={44} />
+      <TokenAvatar token={token} size={44} />
       <Content>
         <InfoWrapper>
           <FirstLineWrapper>{capitalizeFirstLetter(network)} network</FirstLineWrapper>
           <SecondLineWrapper>
-            <FeeLabel>Transfer fee:</FeeLabel>
+            <FeeLabel>Fee:</FeeLabel>
             {feeValueEl({ feeInfo, wallet: payingWallet })}
           </SecondLineWrapper>
         </InfoWrapper>
