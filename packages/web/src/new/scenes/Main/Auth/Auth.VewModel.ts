@@ -1,6 +1,6 @@
 import { DERIVATION_PATH } from '@p2p-wallet-web/core';
 import * as bip39 from 'bip39';
-import { action, computed, makeObservable, observable, runInAction } from 'mobx';
+import { action, computed, makeObservable, observable, reaction, runInAction } from 'mobx';
 import { singleton } from 'tsyringe';
 
 import { isDev, localMnemonic } from 'config/constants';
@@ -18,7 +18,7 @@ const createList = [
 const restoreList = [WizardSteps.RESTORE_START, WizardSteps.RESTORE_PASSWORD];
 
 // @TODO all components in observer
-// @FIXME implement browser history with steps
+// @FIXME implement browser history with steps || move back to router
 // @TODO how does those methods work (override)?
 
 @singleton()
@@ -76,6 +76,13 @@ export class AuthVewModel extends ViewModel {
       this.authInfo.seed = seed;
       this.authInfo.mnemonic = mnemonic;
     });
+
+    this.addReaction(
+      reaction(
+        () => this.isRestore,
+        () => (this.authInfo.mnemonic = this._getMnemonic()),
+      ),
+    );
   }
 
   protected override setDefaults(): void {
