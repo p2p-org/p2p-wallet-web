@@ -129,25 +129,37 @@ export const NetworkSelect: FC<Props> = observer(({ viewModel }) => {
     >
       {cautionEl()}
 
-      {networks.map((network) => {
-        return (
-          <>
-            <SelectItem
-              isSelected={viewModel.network === network}
-              onItemClick={() => viewModel.selectNetwork(network)}
-            >
-              <NetworkView
-                network={network}
-                token={getTokenByNetwork(network)}
-                payingWallet={viewModel.payingWallet}
-                feeInfo={viewModel.feeInfo.value}
-              />
-            </SelectItem>
+      {viewModel.getSelectableNetworks.includes(Network.solana) ? (
+        <SelectItem
+          isSelected={viewModel.network === Network.solana}
+          onItemClick={() => viewModel.selectNetwork(Network.solana)}
+        >
+          <NetworkView
+            network={Network.solana}
+            token={getTokenByNetwork(Network.solana)}
+            payingWallet={viewModel.payingWallet}
+            feeInfo={viewModel.feeInfo.value}
+          />
+        </SelectItem>
+      ) : null}
 
-            {network === Network.solana ? notificationEl(usageStatus) : null}
-          </>
-        );
-      })}
+      {viewModel.getSelectableNetworks.includes(Network.solana)
+        ? notificationEl(usageStatus)
+        : null}
+
+      {viewModel.getSelectableNetworks.includes(Network.bitcoin) ? (
+        <SelectItem
+          isSelected={viewModel.network === Network.bitcoin}
+          onItemClick={() => viewModel.selectNetwork(Network.bitcoin)}
+        >
+          <NetworkView
+            network={Network.bitcoin}
+            token={getTokenByNetwork(Network.bitcoin)}
+            payingWallet={viewModel.payingWallet}
+            feeInfo={viewModel.feeInfo.value}
+          />
+        </SelectItem>
+      ) : null}
     </Select>
   );
 });
