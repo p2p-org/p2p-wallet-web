@@ -8,6 +8,7 @@ import { observer } from 'mobx-react-lite';
 
 import { Icon } from 'components/ui';
 import { TransactionStatusType } from 'new/app/models/PendingTransaction';
+import type { SendTransaction } from 'new/ui/modals/ProcessTransactionModal';
 
 import type { ProcessTransactionModalViewModel } from '../../ProcessTransactionModal.ViewModel';
 
@@ -157,7 +158,15 @@ export const ProgressView: FC<Props> = observer(({ viewModel /*label*/ }) => {
   useEffect(() => {
     let newProgress = INITIAL_PROGRESS;
 
-    if (!(isProcessing || isSending)) {
+    if (
+      !(
+        isProcessing ||
+        // start ProgressBar ticking on isSending when it's send RenBTC via Bitcoin Network transaction
+        (isSending &&
+          (viewModel.pendingTransaction?.rawTransaction as SendTransaction)
+            .isRenBTCViaBitcoinNetwork)
+      )
+    ) {
       return;
     }
 

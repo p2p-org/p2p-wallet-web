@@ -54,9 +54,11 @@ export class BurnAndReleasePersistentStore implements BurnAndReleasePersistentSt
         this._userDefaultKeyForSubmitedBurnTransactions,
       ) ?? []
     ).map((json) => BurnAndRelease.BurnDetails.fromJSON(json));
+
     currentValue = currentValue.filter(
       (detail) => detail.confirmedSignature !== details.confirmedSignature,
     );
+
     this._saveToUserDefault(currentValue, this._userDefaultKeyForSubmitedBurnTransactions);
   }
 

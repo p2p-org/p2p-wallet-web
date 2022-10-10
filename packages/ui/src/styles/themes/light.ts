@@ -6,7 +6,7 @@ const theme = {
       primary: '#FFFFFF',
       secondary: '#F6F6F8',
       tertiary: '#FAFBFC',
-      special: '#FAFAFC',
+      special: '#FAFAFC', // this color is from iOS design system
       activePrimary: '#EFF3FF',
       activeSecondary: '#FFFFFF',
       buttonPrimary: '#5887FF',

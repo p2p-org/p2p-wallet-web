@@ -40,8 +40,8 @@ export class SendRelayMethod {
 }
 
 export enum Network {
-  solana,
-  bitcoin,
+  solana = 'solana',
+  bitcoin = 'bitcoin',
 }
 
 export interface SendServiceType {

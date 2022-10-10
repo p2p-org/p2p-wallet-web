@@ -386,6 +386,7 @@ export class SendViewModel
           feeInSOL: this.feeInfo.value?.feeAmountInSOL.total ?? ZERO,
           feeInToken: this.feeInfo.value?.feeAmount ?? null,
           isSimulation: false,
+          isRenBTCViaBitcoinNetwork: network === Network.bitcoin && this._isRecipientBTCAddress(),
         }),
       },
     );

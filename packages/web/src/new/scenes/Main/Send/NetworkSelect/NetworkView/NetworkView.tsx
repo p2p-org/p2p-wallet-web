@@ -120,9 +120,9 @@ const feeValueEl = ({
   // total (in SOL)
   const totalFeeInSOL = convertToBalance(feeInfo?.feeAmount.transaction ?? ZERO, 9);
 
-  const fees = `${numberToString(totalFeeInSOL, { maximumFractionDigits: 9 })} ${
-    wallet?.token.symbol ?? ''
-  }`;
+  const fees = `${numberToString(totalFeeInSOL, {
+    maximumFractionDigits: wallet?.token.decimals || 9,
+  })} ${wallet?.token.symbol ?? ''}`;
 
   const otherFees =
     feeInfo?.feeAmount.others?.reduce((acc, otherFee) => {

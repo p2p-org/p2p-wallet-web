@@ -18,7 +18,7 @@ import { PricesService } from 'new/services/PriceAPIs/PricesService';
 import { WalletsRepository } from 'new/services/Repositories';
 import { AccountObservableService } from 'new/services/Socket';
 import { SolanaService } from 'new/services/SolanaService';
-import type { RawTransactionType } from 'new/ui/modals/ProcessTransactionModal';
+import type { RawTransactionType, SendTransaction } from 'new/ui/modals/ProcessTransactionModal';
 import * as ProcessTransaction from 'new/ui/modals/ProcessTransactionModal/ProcessTransaction.Models';
 import type { Emitter } from 'new/utils/libs/nanoEvent';
 import { createNanoEvent } from 'new/utils/libs/nanoEvent';
@@ -166,17 +166,36 @@ export class TransactionHandler implements TransactionHandlerType {
     processingTransaction: RawTransactionType;
   }): Promise<void> {
     try {
-      await processingTransaction.createRequest();
+      const transactionId = await processingTransaction.createRequest();
 
       // show notification
       this._notificationService.info('Transaction has been sent');
 
-      // update status
-      this._updateTransactionAtIndex(index, (currentValue) => {
-        const value = currentValue;
-        value.status = TransactionStatus.finalized();
-        return value;
-      });
+      // when sending renBTC via Bitcoin network transaction is already finished at this stage
+      if ((processingTransaction as SendTransaction).isRenBTCViaBitcoinNetwork) {
+        // update status
+        this._updateTransactionAtIndex(index, () => {
+          return new PendingTransaction({
+            transactionId,
+            sentAt: new Date(),
+            rawTransaction: processingTransaction,
+            status: TransactionStatus.finalized(),
+          });
+        });
+      } else {
+        // update status
+        this._updateTransactionAtIndex(index, () => {
+          return new PendingTransaction({
+            transactionId,
+            sentAt: new Date(),
+            rawTransaction: processingTransaction,
+            status: TransactionStatus.confirmed(0),
+          });
+        });
+
+        // observe confirmations
+        this._observe({ index, transactionId });
+      }
     } catch (error) {
       console.error(error);
       // update status
@@ -231,9 +250,7 @@ export class TransactionHandler implements TransactionHandlerType {
             throw ProcessTransaction.ErrorType.notEnoughNumberOfConfirmations();
           }
         } catch (error) {
-          if (
-            !(error instanceof ProcessTransaction.ErrorType.NotEnoughNumberOfConfirmationsError)
-          ) {
+          if (error instanceof ProcessTransaction.ErrorType.NotEnoughNumberOfConfirmationsError) {
             console.error(error);
             retry(error);
             return;
