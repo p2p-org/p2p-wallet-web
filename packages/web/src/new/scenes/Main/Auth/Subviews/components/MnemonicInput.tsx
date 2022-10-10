@@ -2,6 +2,7 @@ import type { FC } from 'react';
 import { useState } from 'react';
 
 import { styled } from '@linaria/react';
+import { observer } from 'mobx-react-lite';
 
 import { useViewModel } from 'new/core/viewmodels/useViewModel';
 
@@ -132,7 +133,7 @@ const CheckboxWrapper = styled.div`
   }
 `;
 
-export const Mnemonic: FC = () => {
+export const Mnemonic: FC = observer(() => {
   const [checked, setChecked] = useState(false);
   const viewModel = useViewModel(AuthVewModel);
 
@@ -166,4 +167,4 @@ export const Mnemonic: FC = () => {
       </Button>
     </Wrapper>
   );
-};
+});

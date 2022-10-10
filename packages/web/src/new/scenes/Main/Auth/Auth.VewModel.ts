@@ -3,6 +3,7 @@ import * as bip39 from 'bip39';
 import { action, computed, makeObservable, observable, runInAction } from 'mobx';
 import { singleton } from 'tsyringe';
 
+import { isDev, localMnemonic } from 'config/constants';
 import { ViewModel } from 'new/core/viewmodels/ViewModel';
 
 import type { AuthInfo, AuthState } from './typings';
@@ -15,6 +16,10 @@ const createList = [
   WizardSteps.CREATE_SET_PASSWORD,
 ];
 const restoreList = [WizardSteps.RESTORE_START];
+
+// @TODO all components in observer
+// @FIXME implement browser history with steps
+// @TODO how does those methods work?
 
 @singleton()
 export class AuthVewModel extends ViewModel {
@@ -29,7 +34,7 @@ export class AuthVewModel extends ViewModel {
     step: WizardSteps.CREATE_START,
     isLoading: false,
     authInfo: observable<AuthInfo>({
-      mnemonic: bip39.generateMnemonic(AuthVewModel._mnemonicStrength),
+      mnemonic: '',
       seed: '',
       derivationPath: DERIVATION_PATH.Bip44Change,
       password: '',
@@ -59,16 +64,17 @@ export class AuthVewModel extends ViewModel {
     });
   }
 
-  // @TODO how does those methods work?
   protected override afterReactionsRemoved() {
     // @TODO
   }
 
   protected override async onInitialize(): Promise<void> {
-    const seed = await mnemonicToSeed(this.authInfo.mnemonic);
+    const mnemonic = this._getMnemonic();
+    const seed = await mnemonicToSeed(mnemonic);
 
     runInAction(() => {
       this.authInfo.seed = seed;
+      this.authInfo.mnemonic = mnemonic;
     });
   }
 
@@ -168,5 +174,18 @@ export class AuthVewModel extends ViewModel {
     const list = this._getList();
 
     return list.indexOf(this.step);
+  }
+
+  private _getMnemonic(): string {
+    switch (true) {
+      case this.isCreate: {
+        return bip39.generateMnemonic(AuthVewModel._mnemonicStrength);
+      }
+      case this.isRestore && isDev: {
+        return localMnemonic as string;
+      }
+      default:
+        return '';
+    }
   }
 }
