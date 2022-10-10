@@ -9,7 +9,7 @@ import { ToastManager } from 'components/common/ToastManager';
 import { Switch } from 'components/ui';
 import { useViewModel } from 'new/core/viewmodels/useViewModel';
 
-import { AuthVewModel } from '../../Auth.VewModel';
+import { AuthViewModel } from '../../Auth.ViewModel';
 import { Button } from './Button';
 import { OffPasswordModal } from './Modal';
 
@@ -81,7 +81,7 @@ const SwitcherText = styled.span`
 
 // @FRIDAY proceed with restore wallet
 export const Final: FC = observer(() => {
-  const viewModel = useViewModel(AuthVewModel);
+  const viewModel = useViewModel(AuthViewModel);
 
   const [isSave, setIsSave] = useState(true);
   const [isShowModal, setIsShowModal] = useState(false);

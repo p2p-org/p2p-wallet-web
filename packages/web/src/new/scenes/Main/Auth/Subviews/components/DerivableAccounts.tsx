@@ -9,7 +9,7 @@ import { Button } from 'components/pages/auth/AuthSide/common/Button';
 import { Icon } from 'components/ui';
 import { Popover } from 'components/ui/Popover';
 import { useViewModel } from 'new/core/viewmodels/useViewModel';
-import { AuthVewModel } from 'new/scenes/Main/Auth/Auth.VewModel';
+import { AuthViewModel } from 'new/scenes/Main/Auth/Auth.ViewModel';
 
 import type { SelectorItemType } from './Selector';
 import { Selector } from './Selector';
@@ -91,7 +91,7 @@ const DERIVATION_PATHS_WITH_LABELS: SelectorItemType[] = [
 ];
 
 export const DerivableAccounts: FC = () => {
-  const viewModel = useViewModel(AuthVewModel);
+  const viewModel = useViewModel(AuthViewModel);
   const [derivationPathItem, setDerivationPathItem] = useState(DERIVATION_PATHS_WITH_LABELS[1]!);
   const derivableTokenAccounts = useDerivableTokenAccounts(
     viewModel.authInfo.seed,

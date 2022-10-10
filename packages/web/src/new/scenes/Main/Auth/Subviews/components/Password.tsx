@@ -9,7 +9,7 @@ import { ErrorHint } from 'components/common/ErrorHint';
 import { PasswordInput } from 'components/common/PasswordInput';
 import { useViewModel } from 'new/core/viewmodels/useViewModel';
 
-import { AuthVewModel } from '../../Auth.VewModel';
+import { AuthViewModel } from '../../Auth.ViewModel';
 import { validatePassword } from '../../utils';
 import { Button } from './Button';
 
@@ -111,7 +111,7 @@ const ButtonStyled = styled(Button)`
 `;
 
 export const Password: FC = observer(() => {
-  const viewModel = useViewModel(AuthVewModel);
+  const viewModel = useViewModel(AuthViewModel);
   const [passwordRepeat, setPasswordRepeat] = useState('');
   const [hasPasswordRepeatError, setHasPasswordRepeatError] = useState(false);
 

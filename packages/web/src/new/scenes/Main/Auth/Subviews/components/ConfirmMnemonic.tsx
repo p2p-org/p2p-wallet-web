@@ -8,7 +8,7 @@ import classNames from 'classnames';
 import { ErrorHint } from 'components/common/ErrorHint';
 import { useViewModel } from 'new/core/viewmodels/useViewModel';
 
-import { AuthVewModel } from '../../Auth.VewModel';
+import { AuthViewModel } from '../../Auth.ViewModel';
 import { Button } from './Button';
 
 const Wrapper = styled.div`
@@ -72,7 +72,7 @@ const MnemonicTextarea = styled.textarea`
 `;
 
 export const ConfirmMnemonic: FC = () => {
-  const viewModel = useViewModel(AuthVewModel);
+  const viewModel = useViewModel(AuthViewModel);
   const [userMnemonic, setUserMnemonic] = useState('');
   const [hasError, setHasError] = useState(false);
 

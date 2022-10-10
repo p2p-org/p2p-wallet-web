@@ -11,7 +11,7 @@ import throttle from 'lodash.throttle';
 import { ErrorHint } from 'components/common/ErrorHint';
 import { ToastManager } from 'components/common/ToastManager';
 import { useViewModel } from 'new/core/viewmodels/useViewModel';
-import { AuthVewModel } from 'new/scenes/Main/Auth/Auth.VewModel';
+import { AuthViewModel } from 'new/scenes/Main/Auth/Auth.ViewModel';
 
 import { Button } from './Button';
 import { MnemonicTextarea as MnemonicInput } from './MnemonicInput';
@@ -133,7 +133,7 @@ const MnemonicTextarea = styled(MnemonicInput)`
 const VALIDATE_MNEMONIC_THROTTLE_TIMEOUTE = 100;
 
 export const RestoreOptions: FC = () => {
-  const viewModel = useViewModel(AuthVewModel);
+  const viewModel = useViewModel(AuthViewModel);
   const [hasError, setHasError] = useState(false);
   const handleConnectByClick = (walletType: DefaultWalletType) => () => {
     viewModel.setIsLoading(true);

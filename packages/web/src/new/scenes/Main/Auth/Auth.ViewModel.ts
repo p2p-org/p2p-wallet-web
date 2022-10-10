@@ -22,7 +22,7 @@ const restoreList = [WizardSteps.RESTORE_START, WizardSteps.RESTORE_PASSWORD];
 // @TODO how does those methods work (override)?
 
 @singleton()
-export class AuthVewModel extends ViewModel {
+export class AuthViewModel extends ViewModel {
   step: WizardSteps;
   authInfo: AuthInfo;
   isLoading: boolean;
@@ -44,9 +44,9 @@ export class AuthVewModel extends ViewModel {
   constructor() {
     super();
 
-    this.step = AuthVewModel.defaultState.step;
-    this.authInfo = AuthVewModel.defaultState.authInfo;
-    this.isLoading = AuthVewModel.defaultState.isLoading;
+    this.step = AuthViewModel.defaultState.step;
+    this.authInfo = AuthViewModel.defaultState.authInfo;
+    this.isLoading = AuthViewModel.defaultState.isLoading;
 
     makeObservable(this, {
       step: observable,
@@ -86,9 +86,9 @@ export class AuthVewModel extends ViewModel {
   }
 
   protected override setDefaults(): void {
-    this.step = AuthVewModel.defaultState.step;
-    this.authInfo = AuthVewModel.defaultState.authInfo;
-    this.isLoading = AuthVewModel.defaultState.isLoading;
+    this.step = AuthViewModel.defaultState.step;
+    this.authInfo = AuthViewModel.defaultState.authInfo;
+    this.isLoading = AuthViewModel.defaultState.isLoading;
   }
 
   setCreateStart(): void {
@@ -156,7 +156,7 @@ export class AuthVewModel extends ViewModel {
     });
     const locked = await generateEncryptedTextAsync(plaintext, this.authInfo.password);
 
-    setStorageValue(AuthVewModel._storageKey, JSON.stringify(locked));
+    setStorageValue(AuthViewModel._storageKey, JSON.stringify(locked));
   }
 
   get isRestore(): boolean {
@@ -186,7 +186,7 @@ export class AuthVewModel extends ViewModel {
   private _getMnemonic(): string {
     switch (true) {
       case this.isCreate: {
-        return bip39.generateMnemonic(AuthVewModel._mnemonicStrength);
+        return bip39.generateMnemonic(AuthViewModel._mnemonicStrength);
       }
       case this.isRestore && isDev: {
         return localMnemonic as string;

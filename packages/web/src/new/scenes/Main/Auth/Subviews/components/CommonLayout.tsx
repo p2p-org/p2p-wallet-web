@@ -11,7 +11,7 @@ import { Back } from 'components/pages/auth/AuthSide/common/Back';
 import logo from 'components/pages/auth/logo.svg';
 import { useViewModel } from 'new/core/viewmodels/useViewModel';
 
-import { AuthVewModel } from '../../Auth.VewModel';
+import { AuthViewModel } from '../../Auth.ViewModel';
 
 const Wrapper = styled.div`
   display: flex;
@@ -161,7 +161,7 @@ const defaultProps = {
 
 export const CommonLayout: FC<Props> = observer((props) => {
   const isDesktop = useIsDesktop();
-  const viewModel = useViewModel(AuthVewModel);
+  const viewModel = useViewModel(AuthViewModel);
 
   const elBanner = isDesktop && (
     <Left>

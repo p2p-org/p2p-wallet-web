@@ -4,11 +4,11 @@ import { observer } from 'mobx-react-lite';
 
 import { useViewModel } from 'new/core/viewmodels/useViewModel';
 
-import { AuthVewModel } from './Auth.VewModel';
+import { AuthViewModel } from './Auth.ViewModel';
 import { Wizard } from './Subviews/Wizard';
 
 export const Auth: FC = observer(() => {
-  const viewModel = useViewModel(AuthVewModel);
+  const viewModel = useViewModel(AuthViewModel);
 
   return <Wizard step={viewModel.step} />;
 });
