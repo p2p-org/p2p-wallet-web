@@ -132,5 +132,5 @@ const feeValueEl = ({
       return acc;
     }, '') ?? null;
 
-  return <FeeValue>{fees + (otherFees ? `${separator}${otherFees}` : '')}</FeeValue>;
+  return <FeeValue>{fees + otherFees}</FeeValue>;
 };
