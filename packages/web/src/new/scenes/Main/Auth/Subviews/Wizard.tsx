@@ -1,13 +1,13 @@
 import type { FC } from 'react';
 
-import { CommonLayout } from 'new/scenes/Main/Auth/Subviews/components/CommonLayout';
-import { ConfirmMnemonic } from 'new/scenes/Main/Auth/Subviews/components/ConfirmMnemonic';
-import { Mnemonic } from 'new/scenes/Main/Auth/Subviews/components/MnemonicInput';
-import { Password } from 'new/scenes/Main/Auth/Subviews/components/Password';
-import type { ViewMap } from 'new/scenes/Main/Auth/typings';
-import { WizardSteps } from 'new/scenes/Main/Auth/typings';
-
-import { Final } from '../components/Final';
+import type { ViewMap } from '../typings';
+import { WizardSteps } from '../typings';
+import { CommonLayout } from './components/CommonLayout';
+import { ConfirmMnemonic } from './components/ConfirmMnemonic';
+import { Final } from './components/Final';
+import { Mnemonic } from './components/MnemonicInput';
+import { Password } from './components/Password';
+import { RestoreOptions } from './components/RestoreOptions';
 
 export interface Props {
   step: WizardSteps;
@@ -35,7 +35,11 @@ export const Wizard: FC<Props> = (props) => {
         <p>FINAL</p>
       </CommonLayout>
     ),
-    [WizardSteps.RESTORE_START]: <p>slkdf</p>,
+    [WizardSteps.RESTORE_START]: (
+      <CommonLayout>
+        <RestoreOptions />
+      </CommonLayout>
+    ),
     [WizardSteps.FINAL]: (
       <CommonLayout showNavigation={false}>
         <Final />

@@ -10,7 +10,8 @@ import app from 'components/pages/auth/app.png';
 import { Back } from 'components/pages/auth/AuthSide/common/Back';
 import logo from 'components/pages/auth/logo.svg';
 import { useViewModel } from 'new/core/viewmodels/useViewModel';
-import { AuthVewModel } from 'new/scenes/Main/Auth/Auth.VewModel';
+
+import { AuthVewModel } from '../../Auth.VewModel';
 
 const Wrapper = styled.div`
   display: flex;
@@ -142,6 +143,8 @@ const MenuContainer = styled.div`
 `;
 
 const ContentContainer = styled.div`
+  position: relative;
+
   display: flex;
   flex-direction: column;
 
@@ -190,7 +193,7 @@ export const CommonLayout: FC<Props> = observer((props) => {
   const elHead = props.showNavigation && (
     <WalletTitle>
       {viewModel.showBackButton && <BackStyled onClick={viewModel.previousStep} />}
-      New wallet
+      {viewModel.isCreate ? 'New wallet' : 'Log in to your wallet'}
     </WalletTitle>
   );
 

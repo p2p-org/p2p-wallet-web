@@ -7,8 +7,8 @@ import LogoImg from 'assets/images/big-logo.png';
 import { ToastManager } from 'components/common/ToastManager';
 import { Switch } from 'components/ui';
 import { useViewModel } from 'new/core/viewmodels/useViewModel';
-import { AuthVewModel } from 'new/scenes/Main/Auth/Auth.VewModel';
 
+import { AuthVewModel } from '../../Auth.VewModel';
 import { Button } from './Button';
 import { OffPasswordModal } from './Modal';
 

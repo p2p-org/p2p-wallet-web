@@ -4,9 +4,9 @@ import { action, computed, makeObservable, observable, runInAction } from 'mobx'
 import { singleton } from 'tsyringe';
 
 import { ViewModel } from 'new/core/viewmodels/ViewModel';
-import type { AuthInfo, AuthState } from 'new/scenes/Main/Auth/typings';
-import { WizardSteps } from 'new/scenes/Main/Auth/typings';
 
+import type { AuthInfo, AuthState } from './typings';
+import { WizardSteps } from './typings';
 import { generateEncryptedTextAsync, mnemonicToSeed, setStorageValue } from './utils';
 
 const createList = [
@@ -155,12 +155,14 @@ export class AuthVewModel extends ViewModel {
   }
 
   get showBackButton(): boolean {
-    return this.step !== WizardSteps.CREATE_START;
+    return this.step !== WizardSteps.CREATE_START && this.step !== WizardSteps.RESTORE_START;
   }
 
   private _getList(): Array<WizardSteps> {
     return this.isCreate ? createList : restoreList;
   }
+
+  // @TODO reset on flow change
 
   private _getCurrent(): number {
     const list = this._getList();

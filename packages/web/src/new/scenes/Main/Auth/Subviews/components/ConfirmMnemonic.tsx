@@ -7,8 +7,8 @@ import classNames from 'classnames';
 
 import { ErrorHint } from 'components/common/ErrorHint';
 import { useViewModel } from 'new/core/viewmodels/useViewModel';
-import { AuthVewModel } from 'new/scenes/Main/Auth/Auth.VewModel';
 
+import { AuthVewModel } from '../../Auth.VewModel';
 import { Button } from './Button';
 
 const Wrapper = styled.div`

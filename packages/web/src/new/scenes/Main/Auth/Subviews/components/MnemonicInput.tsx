@@ -4,8 +4,8 @@ import { useState } from 'react';
 import { styled } from '@linaria/react';
 
 import { useViewModel } from 'new/core/viewmodels/useViewModel';
-import { AuthVewModel } from 'new/scenes/Main/Auth/Auth.VewModel';
 
+import { AuthVewModel } from '../../Auth.VewModel';
 import { Button } from './Button';
 import { Checkbox } from './Checkbox';
 
@@ -83,7 +83,7 @@ const MnemonicWrapper = styled.div`
   }
 `;
 
-const MnemonicTextarea = styled.textarea`
+export const MnemonicTextarea = styled.textarea`
   position: relative;
 
   flex-shrink: 0;
@@ -105,6 +105,8 @@ const MnemonicTextarea = styled.textarea`
   border-radius: 12px;
   outline: 0;
   filter: drop-shadow(0 8px 20px rgba(0, 0, 0, 0.1));
+
+  resize: none;
 
   &::placeholder {
     color: #1616164c;
