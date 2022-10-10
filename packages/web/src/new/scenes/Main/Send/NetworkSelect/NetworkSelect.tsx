@@ -68,16 +68,18 @@ const notificationEl = (usageStatus: FeeRelayer.UsageStatus | null) => {
     return null;
   }
 
-  return (
-    <NotificationWrapper>
-      {usageStatus.currentUsage < usageStatus.maxUsage
-        ? `On the Solana network, the first ${usageStatus.maxUsage} transactions in a day are
+  let notification;
+
+  if (usageStatus.currentUsage < usageStatus.maxUsage) {
+    notification = `On the Solana network, the first ${usageStatus.maxUsage} transactions in a day are
         paid by P2P.org. Subsequent transactions will be charged based on the Solana blockchain gas
-        fee.`
-        : `Your ${usageStatus.maxUsage} free transactions have been used up. You will have to pay 
-        the network fee for subsequent transactions or wait until tomorrow when the counter resets.`}
-    </NotificationWrapper>
-  );
+        fee.`;
+  } else {
+    notification = `Your ${usageStatus.maxUsage} free transactions have been used up. You will have to pay 
+        the network fee for subsequent transactions or wait until tomorrow when the counter resets.`;
+  }
+
+  return <NotificationWrapper>{notification}</NotificationWrapper>;
 };
 
 type Props = {
@@ -92,12 +94,15 @@ export const NetworkSelect: FC<Props> = observer(({ viewModel }) => {
   }, []);
 
   const getTokenByNetwork = (network: Network): Token | undefined => {
-    const wallet =
-      network === Network.solana
-        ? viewModel.walletsRepository.nativeWallet
-        : viewModel.walletsRepository
-            .getWallets()
-            .find((wallet) => wallet.token.symbol === 'renBTC');
+    let wallet;
+
+    if (network === Network.solana) {
+      wallet = viewModel.walletsRepository.nativeWallet;
+    } else {
+      wallet = viewModel.walletsRepository
+        .getWallets()
+        .find((wallet) => wallet.token.symbol === 'renBTC');
+    }
 
     return wallet?.token;
   };

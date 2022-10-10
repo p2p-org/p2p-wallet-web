@@ -77,12 +77,12 @@ type Props = {
 
 export const NetworkView: FC<Props> = observer(({ network, token, payingWallet, feeInfo }) => {
   // FIXME: remove when Bitcoin fee calculation is known
-  const feeValueElement =
-    network === Network.bitcoin ? (
-      <FeeValue>0.0002 renBTC + 0.0002 SOL</FeeValue>
-    ) : (
-      feeValueEl({ feeInfo, wallet: payingWallet })
-    );
+  let feeValueElement;
+  if (network === Network.bitcoin) {
+    feeValueElement = <FeeValue>0.0002 renBTC + 0.0002 SOL</FeeValue>;
+  } else {
+    feeValueElement = feeValueEl({ feeInfo, wallet: payingWallet });
+  }
 
   return (
     <>
