@@ -81,7 +81,7 @@ export const NetworkView: FC<Props> = observer(({ network, token, payingWallet, 
   if (network === Network.bitcoin) {
     feeValueElement = <FeeValue>0.0002 renBTC + 0.0002 SOL</FeeValue>;
   } else {
-    feeValueElement = feeValueEl({ feeInfo, wallet: payingWallet });
+    feeValueElement = <FeeValue className="green">$0</FeeValue>;
   }
 
   return (

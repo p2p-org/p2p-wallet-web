@@ -79,7 +79,7 @@ const notificationEl = (usageStatus: FeeRelayer.UsageStatus | null) => {
         the network fee for subsequent transactions or wait until tomorrow when the counter resets.`;
   }
 
-  return <NotificationWrapper>{notification}</NotificationWrapper>;
+  return <NotificationWrapper key="notification">{notification}</NotificationWrapper>;
 };
 
 type Props = {
@@ -106,14 +106,6 @@ export const NetworkSelect: FC<Props> = observer(({ viewModel }) => {
 
     return wallet?.token;
   };
-
-  const networks = [];
-  if (viewModel.getSelectableNetworks.includes(Network.solana)) {
-    networks.push(Network.solana);
-  }
-  if (viewModel.getSelectableNetworks.includes(Network.bitcoin)) {
-    networks.push(Network.bitcoin);
-  }
 
   return (
     <Select
