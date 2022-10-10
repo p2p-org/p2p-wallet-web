@@ -10,7 +10,6 @@ import throttle from 'lodash.throttle';
 
 import { ErrorHint } from 'components/common/ErrorHint';
 import { ToastManager } from 'components/common/ToastManager';
-import { localMnemonic } from 'config/constants';
 import { useViewModel } from 'new/core/viewmodels/useViewModel';
 import { AuthVewModel } from 'new/scenes/Main/Auth/Auth.VewModel';
 
@@ -135,7 +134,6 @@ const VALIDATE_MNEMONIC_THROTTLE_TIMEOUTE = 100;
 
 export const RestoreOptions: FC = () => {
   const viewModel = useViewModel(AuthVewModel);
-  const [mnemonic, setMnemonic] = useState(localMnemonic || '');
   const [hasError, setHasError] = useState(false);
   const handleConnectByClick = (walletType: DefaultWalletType) => () => {
     viewModel.setIsLoading(true);
@@ -167,20 +165,20 @@ export const RestoreOptions: FC = () => {
     const valueTrimmed = value.trim();
 
     if (bip39.validateMnemonic(valueTrimmed)) {
-      setMnemonic(valueTrimmed);
+      viewModel.setMnemonic(valueTrimmed);
     } else {
-      setMnemonic(value);
+      viewModel.setMnemonic(value);
     }
     validateMnemonic(valueTrimmed);
   };
 
   const handleMnemonicBlur = (e: React.FocusEvent<HTMLTextAreaElement>) => {
     const value = e.target.value.trim();
-    setMnemonic(value);
+    viewModel.setMnemonic(value);
     validateMnemonic(value);
   };
 
-  const isDisabled = !mnemonic || hasError;
+  const isDisabled = !viewModel.authInfo.mnemonic || hasError;
 
   return (
     <Wrapper>
@@ -208,7 +206,7 @@ export const RestoreOptions: FC = () => {
         <SecurityKey>Enter security key</SecurityKey>
         <MnemonicTextarea
           placeholder="Seed phrase"
-          value={mnemonic}
+          value={viewModel.authInfo.mnemonic}
           onInput={handleMnemonicInput}
           onBlur={handleMnemonicBlur}
           className={classNames({ hasError })}

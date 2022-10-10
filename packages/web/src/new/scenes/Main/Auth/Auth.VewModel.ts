@@ -15,11 +15,11 @@ const createList = [
   WizardSteps.CREATE_CONFIRM_MNEMONIC,
   WizardSteps.CREATE_SET_PASSWORD,
 ];
-const restoreList = [WizardSteps.RESTORE_START];
+const restoreList = [WizardSteps.RESTORE_START, WizardSteps.RESTORE_PASSWORD];
 
 // @TODO all components in observer
 // @FIXME implement browser history with steps
-// @TODO how does those methods work?
+// @TODO how does those methods work (override)?
 
 @singleton()
 export class AuthVewModel extends ViewModel {

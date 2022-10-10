@@ -2,6 +2,7 @@ import type { FC } from 'react';
 import { useState } from 'react';
 
 import { styled } from '@linaria/react';
+import { observer } from 'mobx-react-lite';
 
 import LogoImg from 'assets/images/big-logo.png';
 import { ToastManager } from 'components/common/ToastManager';
@@ -79,7 +80,7 @@ const SwitcherText = styled.span`
 `;
 
 // @FRIDAY proceed with restore wallet
-export const Final: FC = () => {
+export const Final: FC = observer(() => {
   const viewModel = useViewModel(AuthVewModel);
 
   const [isSave, setIsSave] = useState(true);
@@ -132,4 +133,4 @@ export const Final: FC = () => {
       <Button onClick={handleFinishClick}>Finish setup</Button>
     </Wrapper>
   );
-};
+});

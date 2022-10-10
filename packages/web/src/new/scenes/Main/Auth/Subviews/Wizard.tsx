@@ -40,6 +40,11 @@ export const Wizard: FC<Props> = (props) => {
         <RestoreOptions />
       </CommonLayout>
     ),
+    [WizardSteps.RESTORE_PASSWORD]: (
+      <CommonLayout>
+        <Password />
+      </CommonLayout>
+    ),
     [WizardSteps.FINAL]: (
       <CommonLayout showNavigation={false}>
         <Final />
