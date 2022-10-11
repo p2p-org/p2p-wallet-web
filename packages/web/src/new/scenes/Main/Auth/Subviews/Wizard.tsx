@@ -1,9 +1,12 @@
 import type { FC } from 'react';
 
+import { observer } from 'mobx-react-lite';
+
 import type { ViewMap } from '../typings';
 import { WizardSteps } from '../typings';
 import { CommonLayout } from './components/CommonLayout';
 import { ConfirmMnemonic } from './components/ConfirmMnemonic';
+import { DerivableAccounts } from './components/DerivableAccounts';
 import { Final } from './components/Final';
 import { Mnemonic } from './components/MnemonicInput';
 import { Password } from './components/Password';
@@ -13,7 +16,7 @@ export interface Props {
   step: WizardSteps;
 }
 
-export const Wizard: FC<Props> = (props) => {
+export const Wizard: FC<Props> = observer((props) => {
   const VIEW_MAP: ViewMap = {
     [WizardSteps.CREATE_START]: (
       <CommonLayout>
@@ -45,6 +48,11 @@ export const Wizard: FC<Props> = (props) => {
         <Password />
       </CommonLayout>
     ),
+    [WizardSteps.RESTORE_ACCOUNTS]: (
+      <CommonLayout>
+        <DerivableAccounts />
+      </CommonLayout>
+    ),
     [WizardSteps.FINAL]: (
       <CommonLayout showNavigation={false}>
         <Final />
@@ -55,6 +63,6 @@ export const Wizard: FC<Props> = (props) => {
   const elView = VIEW_MAP[props.step];
 
   return elView;
-};
+});
 
 export default Wizard;

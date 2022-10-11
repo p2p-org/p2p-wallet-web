@@ -1,8 +1,9 @@
 import type { FC } from 'react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { styled } from '@linaria/react';
 import { DERIVATION_PATH, useDerivableTokenAccounts } from '@p2p-wallet-web/core';
+import { observer } from 'mobx-react-lite';
 
 import { TokenAccountRow } from 'components/common/TokenAccountRow';
 import { Button } from 'components/pages/auth/AuthSide/common/Button';
@@ -90,13 +91,17 @@ const DERIVATION_PATHS_WITH_LABELS: SelectorItemType[] = [
   },
 ];
 
-export const DerivableAccounts: FC = () => {
+export const DerivableAccounts: FC = observer(() => {
   const viewModel = useViewModel(AuthViewModel);
   const [derivationPathItem, setDerivationPathItem] = useState(DERIVATION_PATHS_WITH_LABELS[1]!);
   const derivableTokenAccounts = useDerivableTokenAccounts(
     viewModel.authInfo.seed,
     derivationPathItem.value,
   );
+
+  useEffect(() => {
+    void viewModel.getAccountBalances();
+  }, []);
 
   const handleDerivationPathChange = (item: SelectorItemType) => {
     setDerivationPathItem(item);
@@ -147,4 +152,4 @@ export const DerivableAccounts: FC = () => {
       <Button onClick={handleContinueClick}>Continue</Button>
     </Wrapper>
   );
-};
+});

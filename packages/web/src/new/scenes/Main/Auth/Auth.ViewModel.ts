@@ -1,21 +1,34 @@
-import { DERIVATION_PATH } from '@p2p-wallet-web/core';
+import type { AccountInfo } from '@solana/web3.js';
+import { Connection, PublicKey } from '@solana/web3.js';
 import * as bip39 from 'bip39';
 import { action, computed, makeObservable, observable, reaction, runInAction } from 'mobx';
 import { singleton } from 'tsyringe';
 
 import { isDev, localMnemonic } from 'config/constants';
 import { ViewModel } from 'new/core/viewmodels/ViewModel';
+import { Defaults } from 'new/services/Defaults';
 
 import type { AuthInfo, AuthState } from './typings';
 import { WizardSteps } from './typings';
-import { generateEncryptedTextAsync, mnemonicToSeed, setStorageValue } from './utils';
+import {
+  DERIVATION_PATH,
+  derivePublicKeyFromSeed,
+  generateEncryptedTextAsync,
+  loggable,
+  mnemonicToSeed,
+  setStorageValue,
+} from './utils';
 
 const createList = [
   WizardSteps.CREATE_START,
   WizardSteps.CREATE_CONFIRM_MNEMONIC,
   WizardSteps.CREATE_SET_PASSWORD,
 ];
-const restoreList = [WizardSteps.RESTORE_START, WizardSteps.RESTORE_PASSWORD];
+const restoreList = [
+  WizardSteps.RESTORE_START,
+  WizardSteps.RESTORE_PASSWORD,
+  WizardSteps.RESTORE_ACCOUNTS,
+];
 
 // @TODO all components in observer
 // @FIXME implement browser history with steps || move back to router
@@ -26,13 +39,19 @@ export class AuthViewModel extends ViewModel {
   step: WizardSteps;
   authInfo: AuthInfo;
   isLoading: boolean;
+  derivableAccounts: Array<AccountInfo<Buffer> | null>;
+
+  private _connection: Connection;
 
   private static _mnemonicStrength = 256;
+  private static _derivebleAccountsNumber = 5;
   private static _storageKey = 'encryptedSeedAndMnemonic';
 
   static defaultState: AuthState = {
-    step: WizardSteps.CREATE_START,
+    step: WizardSteps.RESTORE_START,
     isLoading: false,
+    derivableAccounts: [],
+    connection: new Connection(Defaults.apiEndpoint.getURL()),
     authInfo: observable<AuthInfo>({
       mnemonic: '',
       seed: '',
@@ -47,11 +66,14 @@ export class AuthViewModel extends ViewModel {
     this.step = AuthViewModel.defaultState.step;
     this.authInfo = AuthViewModel.defaultState.authInfo;
     this.isLoading = AuthViewModel.defaultState.isLoading;
+    this.derivableAccounts = AuthViewModel.defaultState.derivableAccounts;
+    this._connection = AuthViewModel.defaultState.connection;
 
     makeObservable(this, {
       step: observable,
       authInfo: observable,
       isLoading: observable,
+      derivableAccounts: observable,
       isRestore: computed,
       isCreate: computed,
       showBackButton: computed,
@@ -61,6 +83,7 @@ export class AuthViewModel extends ViewModel {
       nextStep: action.bound,
       setPassword: action.bound,
       setIsLoading: action.bound,
+      getAccountBalances: action.bound,
     });
   }
 
@@ -68,6 +91,7 @@ export class AuthViewModel extends ViewModel {
     // @TODO
   }
 
+  @loggable()
   protected override async onInitialize(): Promise<void> {
     const mnemonic = this._getMnemonic();
     const seed = await mnemonicToSeed(mnemonic);
@@ -80,7 +104,10 @@ export class AuthViewModel extends ViewModel {
     this.addReaction(
       reaction(
         () => this.isRestore,
-        () => (this.authInfo.mnemonic = this._getMnemonic()),
+        async () => {
+          this.authInfo.mnemonic = this._getMnemonic();
+          this.authInfo.seed = await mnemonicToSeed(this.authInfo.mnemonic);
+        },
       ),
     );
   }
@@ -88,7 +115,9 @@ export class AuthViewModel extends ViewModel {
   protected override setDefaults(): void {
     this.step = AuthViewModel.defaultState.step;
     this.authInfo = AuthViewModel.defaultState.authInfo;
+    this.derivableAccounts = AuthViewModel.defaultState.derivableAccounts;
     this.isLoading = AuthViewModel.defaultState.isLoading;
+    this._connection = AuthViewModel.defaultState.connection;
   }
 
   setCreateStart(): void {
@@ -157,6 +186,27 @@ export class AuthViewModel extends ViewModel {
     const locked = await generateEncryptedTextAsync(plaintext, this.authInfo.password);
 
     setStorageValue(AuthViewModel._storageKey, JSON.stringify(locked));
+  }
+
+  async getAccountBalances() {
+    const derivableTokenAccountPublicKeys = new Array(AuthViewModel._derivebleAccountsNumber)
+      .fill(null)
+      .map((_, idx) => {
+        const pubKey = derivePublicKeyFromSeed(
+          this.authInfo.seed,
+          idx,
+          this.authInfo.derivationPath,
+        );
+        return new PublicKey(pubKey);
+      });
+
+    const accounts = await this._connection.getMultipleAccountsInfo(
+      derivableTokenAccountPublicKeys,
+    );
+
+    runInAction(() => {
+      this.derivableAccounts = accounts;
+    });
   }
 
   get isRestore(): boolean {
