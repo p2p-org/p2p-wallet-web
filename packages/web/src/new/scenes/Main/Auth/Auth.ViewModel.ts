@@ -9,7 +9,7 @@ import { ViewModel } from 'new/core/viewmodels/ViewModel';
 import { Wallet } from 'new/sdk/SolanaSDK';
 import { Defaults } from 'new/services/Defaults';
 
-import type { AuthInfo, AuthState } from './typings';
+import type { AuthInfo, AuthState, DerivationPathOption } from './typings';
 import { WizardSteps } from './typings';
 import {
   DERIVATION_PATH,
@@ -40,7 +40,6 @@ export class AuthViewModel extends ViewModel {
   step: WizardSteps;
   authInfo: AuthInfo;
   isLoading: boolean;
-  wallets: Array<Wallet | null>;
 
   private _connection: Connection;
 
@@ -51,12 +50,14 @@ export class AuthViewModel extends ViewModel {
   static defaultState: AuthState = {
     step: WizardSteps.RESTORE_START,
     isLoading: false,
-    wallets: [],
     connection: new Connection(Defaults.apiEndpoint.getURL()),
     authInfo: observable<AuthInfo>({
       mnemonic: '',
       seed: '',
-      derivationPath: DERIVATION_PATH.Bip44Change,
+      derivationPath: {
+        label: `m/44'/501'/0'/0'`,
+        value: DERIVATION_PATH.Bip44Change,
+      },
       password: '',
     }),
   };
@@ -67,24 +68,23 @@ export class AuthViewModel extends ViewModel {
     this.step = AuthViewModel.defaultState.step;
     this.authInfo = AuthViewModel.defaultState.authInfo;
     this.isLoading = AuthViewModel.defaultState.isLoading;
-    this.wallets = AuthViewModel.defaultState.wallets;
     this._connection = AuthViewModel.defaultState.connection;
 
     makeObservable(this, {
       step: observable,
       authInfo: observable,
       isLoading: observable,
-      wallets: observable,
       isRestore: computed,
       isCreate: computed,
       showBackButton: computed,
+      wallets: computed,
       setCreateStart: action.bound,
       setRestoreStart: action.bound,
       previousStep: action.bound,
       nextStep: action.bound,
       setPassword: action.bound,
       setIsLoading: action.bound,
-      getWallets: action.bound,
+      setDerivationPath: action.bound,
     });
   }
 
@@ -116,7 +116,6 @@ export class AuthViewModel extends ViewModel {
   protected override setDefaults(): void {
     this.step = AuthViewModel.defaultState.step;
     this.authInfo = AuthViewModel.defaultState.authInfo;
-    this.wallets = AuthViewModel.defaultState.wallets;
     this.isLoading = AuthViewModel.defaultState.isLoading;
     this._connection = AuthViewModel.defaultState.connection;
   }
@@ -174,6 +173,10 @@ export class AuthViewModel extends ViewModel {
     this.authInfo.mnemonic = value;
   }
 
+  setDerivationPath(value: DerivationPathOption): void {
+    this.authInfo.derivationPath = value;
+  }
+
   setIsLoading(value: boolean): void {
     this.isLoading = value;
   }
@@ -189,36 +192,34 @@ export class AuthViewModel extends ViewModel {
     setStorageValue(AuthViewModel._storageKey, JSON.stringify(locked));
   }
 
-  async getWallets() {
+  get wallets(): Promise<Array<Wallet | null>> {
     const derivableTokenAccountPublicKeys = new Array(AuthViewModel._derivebleAccountsNumber)
       .fill(null)
       .map((_, idx) => {
         const pubKey = derivePublicKeyFromSeed(
           this.authInfo.seed,
           idx,
-          this.authInfo.derivationPath,
+          this.authInfo.derivationPath.value,
         );
         return new PublicKey(pubKey);
       });
 
-    const accounts = await this._connection.getMultipleAccountsInfo(
-      derivableTokenAccountPublicKeys,
-    );
+    const wallets = this._connection
+      .getMultipleAccountsInfo(derivableTokenAccountPublicKeys)
+      .then((accounts) => {
+        return accounts.map((acc) => {
+          if (acc) {
+            return Wallet.nativeSolana({
+              lamports: new u64(acc?.lamports),
+              pubkey: acc?.owner.toString(),
+            });
+          }
 
-    const wallets = accounts.map((acc) => {
-      if (acc) {
-        return Wallet.nativeSolana({
-          lamports: new u64(acc?.lamports),
-          pubkey: acc?.owner.toString(),
+          return null;
         });
-      }
+      });
 
-      return null;
-    });
-
-    runInAction(() => {
-      this.wallets = wallets;
-    });
+    return wallets;
   }
 
   get isRestore(): boolean {

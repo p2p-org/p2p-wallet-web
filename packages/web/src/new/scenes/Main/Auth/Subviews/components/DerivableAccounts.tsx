@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 import { styled } from '@linaria/react';
 import { DERIVATION_PATH } from '@p2p-wallet-web/core';
@@ -11,6 +11,7 @@ import { Icon } from 'components/ui';
 import { Popover } from 'components/ui/Popover';
 import { useViewModel } from 'new/core/viewmodels/useViewModel';
 import { AuthViewModel } from 'new/scenes/Main/Auth/Auth.ViewModel';
+import type { Wallet } from 'new/sdk/SolanaSDK';
 
 import type { SelectorItemType } from './Selector';
 import { Selector } from './Selector';
@@ -93,12 +94,11 @@ const DERIVATION_PATHS_WITH_LABELS: SelectorItemType[] = [
 
 export const DerivableAccounts: FC = observer(() => {
   const viewModel = useViewModel(AuthViewModel);
+  const [_, setWallets] = useState<Array<Wallet | null>>([]);
 
   useEffect(() => {
-    void viewModel.getWallets();
+    void viewModel.wallets.then(setWallets);
   }, []);
-
-  console.log(toJS(viewModel.derivableAccounts));
 
   return (
     <Wrapper>
