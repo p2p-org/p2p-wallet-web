@@ -4,6 +4,7 @@ import * as React from 'react';
 
 import { styled } from '@linaria/react';
 import classNames from 'classnames';
+import { observer } from 'mobx-react-lite';
 
 import { ErrorHint } from 'components/common/ErrorHint';
 import { useViewModel } from 'new/core/viewmodels/useViewModel';
@@ -71,7 +72,7 @@ const MnemonicTextarea = styled.textarea`
   }
 `;
 
-export const ConfirmMnemonic: FC = () => {
+export const ConfirmMnemonic: FC = observer(() => {
   const viewModel = useViewModel(AuthViewModel);
   const [userMnemonic, setUserMnemonic] = useState('');
   const [hasError, setHasError] = useState(false);
@@ -116,4 +117,4 @@ export const ConfirmMnemonic: FC = () => {
       </Button>
     </Wrapper>
   );
-};
+});

@@ -7,6 +7,7 @@ import { DefaultWalletType } from '@saberhq/use-solana';
 import * as bip39 from 'bip39';
 import classNames from 'classnames';
 import throttle from 'lodash.throttle';
+import { observer } from 'mobx-react-lite';
 
 import { ErrorHint } from 'components/common/ErrorHint';
 import { ToastManager } from 'components/common/ToastManager';
@@ -132,7 +133,7 @@ const MnemonicTextarea = styled(MnemonicInput)`
 
 const VALIDATE_MNEMONIC_THROTTLE_TIMEOUTE = 100;
 
-export const RestoreOptions: FC = () => {
+export const RestoreOptions: FC = observer(() => {
   const viewModel = useViewModel(AuthViewModel);
   const [hasError, setHasError] = useState(false);
   const handleConnectByClick = (walletType: DefaultWalletType) => () => {
@@ -218,4 +219,4 @@ export const RestoreOptions: FC = () => {
       </Button>
     </Wrapper>
   );
-};
+});

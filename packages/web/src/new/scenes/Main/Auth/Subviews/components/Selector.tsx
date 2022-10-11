@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { styled } from '@linaria/react';
 import type { DERIVATION_PATH, ValueOf } from '@p2p-wallet-web/core';
 import classNames from 'classnames';
+import { observer } from 'mobx-react-lite';
 
 import { Icon } from 'components/ui';
 
@@ -98,7 +99,7 @@ type Props = {
   className?: string;
 };
 
-export const Selector: FC<Props> = ({ value, items, onChange, className }) => {
+export const Selector: FC<Props> = observer(({ value, items, onChange, className }) => {
   const selectorRef = useRef<HTMLDivElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
@@ -175,4 +176,4 @@ export const Selector: FC<Props> = ({ value, items, onChange, className }) => {
       ) : undefined}
     </Wrapper>
   );
-};
+});
