@@ -1,4 +1,4 @@
-import type { AccountInfo } from '@solana/web3.js';
+import { u64 } from '@solana/spl-token';
 import { Connection, PublicKey } from '@solana/web3.js';
 import * as bip39 from 'bip39';
 import { action, computed, makeObservable, observable, reaction, runInAction } from 'mobx';
@@ -6,6 +6,7 @@ import { singleton } from 'tsyringe';
 
 import { isDev, localMnemonic } from 'config/constants';
 import { ViewModel } from 'new/core/viewmodels/ViewModel';
+import { Wallet } from 'new/sdk/SolanaSDK';
 import { Defaults } from 'new/services/Defaults';
 
 import type { AuthInfo, AuthState } from './typings';
@@ -39,7 +40,7 @@ export class AuthViewModel extends ViewModel {
   step: WizardSteps;
   authInfo: AuthInfo;
   isLoading: boolean;
-  derivableAccounts: Array<AccountInfo<Buffer> | null>;
+  wallets: Array<Wallet | null>;
 
   private _connection: Connection;
 
@@ -50,7 +51,7 @@ export class AuthViewModel extends ViewModel {
   static defaultState: AuthState = {
     step: WizardSteps.RESTORE_START,
     isLoading: false,
-    derivableAccounts: [],
+    wallets: [],
     connection: new Connection(Defaults.apiEndpoint.getURL()),
     authInfo: observable<AuthInfo>({
       mnemonic: '',
@@ -66,14 +67,14 @@ export class AuthViewModel extends ViewModel {
     this.step = AuthViewModel.defaultState.step;
     this.authInfo = AuthViewModel.defaultState.authInfo;
     this.isLoading = AuthViewModel.defaultState.isLoading;
-    this.derivableAccounts = AuthViewModel.defaultState.derivableAccounts;
+    this.wallets = AuthViewModel.defaultState.wallets;
     this._connection = AuthViewModel.defaultState.connection;
 
     makeObservable(this, {
       step: observable,
       authInfo: observable,
       isLoading: observable,
-      derivableAccounts: observable,
+      wallets: observable,
       isRestore: computed,
       isCreate: computed,
       showBackButton: computed,
@@ -83,7 +84,7 @@ export class AuthViewModel extends ViewModel {
       nextStep: action.bound,
       setPassword: action.bound,
       setIsLoading: action.bound,
-      getAccountBalances: action.bound,
+      getWallets: action.bound,
     });
   }
 
@@ -115,7 +116,7 @@ export class AuthViewModel extends ViewModel {
   protected override setDefaults(): void {
     this.step = AuthViewModel.defaultState.step;
     this.authInfo = AuthViewModel.defaultState.authInfo;
-    this.derivableAccounts = AuthViewModel.defaultState.derivableAccounts;
+    this.wallets = AuthViewModel.defaultState.wallets;
     this.isLoading = AuthViewModel.defaultState.isLoading;
     this._connection = AuthViewModel.defaultState.connection;
   }
@@ -188,7 +189,7 @@ export class AuthViewModel extends ViewModel {
     setStorageValue(AuthViewModel._storageKey, JSON.stringify(locked));
   }
 
-  async getAccountBalances() {
+  async getWallets() {
     const derivableTokenAccountPublicKeys = new Array(AuthViewModel._derivebleAccountsNumber)
       .fill(null)
       .map((_, idx) => {
@@ -204,8 +205,19 @@ export class AuthViewModel extends ViewModel {
       derivableTokenAccountPublicKeys,
     );
 
+    const wallets = accounts.map((acc) => {
+      if (acc) {
+        return Wallet.nativeSolana({
+          lamports: new u64(acc?.lamports),
+          pubkey: acc?.owner.toString(),
+        });
+      }
+
+      return null;
+    });
+
     runInAction(() => {
-      this.derivableAccounts = accounts;
+      this.wallets = wallets;
     });
   }
 
@@ -224,8 +236,6 @@ export class AuthViewModel extends ViewModel {
   private _getList(): Array<WizardSteps> {
     return this.isCreate ? createList : restoreList;
   }
-
-  // @TODO reset on flow change
 
   private _getCurrent(): number {
     const list = this._getList();

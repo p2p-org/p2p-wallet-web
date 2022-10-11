@@ -1,11 +1,11 @@
 import type { FC } from 'react';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 
 import { styled } from '@linaria/react';
-import { DERIVATION_PATH, useDerivableTokenAccounts } from '@p2p-wallet-web/core';
+import { DERIVATION_PATH } from '@p2p-wallet-web/core';
 import { observer } from 'mobx-react-lite';
 
-import { TokenAccountRow } from 'components/common/TokenAccountRow';
+// import { TokenAccountRow } from 'components/common/TokenAccountRow';
 import { Button } from 'components/pages/auth/AuthSide/common/Button';
 import { Icon } from 'components/ui';
 import { Popover } from 'components/ui/Popover';
@@ -71,10 +71,10 @@ const AccountsWrapper = styled.div`
   margin: 8px 0 22px;
 `;
 
-const TokenAccountRowStyled = styled(TokenAccountRow)`
-  padding-right: 0;
-  padding-left: 0;
-`;
+// const TokenAccountRowStyled = styled(TokenAccountRow)`
+//   padding-right: 0;
+//   padding-left: 0;
+// `;
 
 const DERIVATION_PATHS_WITH_LABELS: SelectorItemType[] = [
   {
@@ -93,23 +93,12 @@ const DERIVATION_PATHS_WITH_LABELS: SelectorItemType[] = [
 
 export const DerivableAccounts: FC = observer(() => {
   const viewModel = useViewModel(AuthViewModel);
-  const [derivationPathItem, setDerivationPathItem] = useState(DERIVATION_PATHS_WITH_LABELS[1]!);
-  const derivableTokenAccounts = useDerivableTokenAccounts(
-    viewModel.authInfo.seed,
-    derivationPathItem.value,
-  );
 
   useEffect(() => {
-    void viewModel.getAccountBalances();
+    void viewModel.getWallets();
   }, []);
 
-  const handleDerivationPathChange = (item: SelectorItemType) => {
-    setDerivationPathItem(item);
-  };
-
-  const handleContinueClick = () => {
-    // next(derivationPathItem.value);
-  };
+  console.log(toJS(viewModel.derivableAccounts));
 
   return (
     <Wrapper>
@@ -133,23 +122,23 @@ export const DerivableAccounts: FC = observer(() => {
         </Popover>
       </SelectDerivationPath>
       <Selector
-        value={derivationPathItem}
+        value={viewModel.authInfo.derivationPath}
         items={DERIVATION_PATHS_WITH_LABELS}
-        onChange={handleDerivationPathChange}
+        onChange={viewModel.setDerivationPath}
       />
 
       <Derivable>Derivable Accounts</Derivable>
       <AccountsWrapper>
-        {derivableTokenAccounts.map((tokenAccount) => (
-          <TokenAccountRowStyled
-            key={tokenAccount?.key?.toBase58()}
-            tokenAccount={tokenAccount}
-            showAddress
-          />
-        ))}
+        {/*{viewModel.derivableAccounts.map((tokenAccount) => (*/}
+        {/*  // <TokenAccountRowStyled*/}
+        {/*  //   key={tokenAccount?.key?.toBase58()}*/}
+        {/*  //   tokenAccount={tokenAccount}*/}
+        {/*  //   showAddress*/}
+        {/*  // />*/}
+        {/*))}*/}
       </AccountsWrapper>
 
-      <Button onClick={handleContinueClick}>Continue</Button>
+      <Button onClick={viewModel.nextStep}>Continue</Button>
     </Wrapper>
   );
 });

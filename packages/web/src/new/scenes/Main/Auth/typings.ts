@@ -1,6 +1,6 @@
-import type { ReactElement } from 'react';
+import type { ReactElement, ReactNode } from 'react';
 
-import type { AccountInfo, Connection } from '@solana/web3.js';
+import type { Connection } from '@solana/web3.js';
 
 export enum WizardSteps {
   CREATE_START = 'CREATE_START',
@@ -15,18 +15,20 @@ export enum WizardSteps {
 export type AuthInfo = {
   mnemonic: string;
   seed: string;
-  derivationPath: string;
+  derivationPath: DerivationPathOption;
   password: string;
 };
-
-export type DerivableAccounts = Array<AccountInfo<Buffer> | null>;
 
 export type AuthState = {
   step: WizardSteps;
   authInfo: AuthInfo;
   connection: Connection;
-  derivableAccounts: DerivableAccounts;
   isLoading: boolean;
+};
+
+export type DerivationPathOption = {
+  value: string;
+  label: ReactNode;
 };
 
 export type ViewMap = {
