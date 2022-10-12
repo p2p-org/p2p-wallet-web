@@ -1,9 +1,10 @@
 import { action, makeObservable, observable, when } from 'mobx';
 
-import { defaultFlags } from 'new/services/FeatureFlags/defaultFlags';
-import type { Features } from 'new/services/FeatureFlags/features';
-import type { FeatureFlagsProvider } from 'new/services/FeatureFlags/types';
 import { RemoteConfig } from 'new/services/RemoteConfig';
+
+import { defaultFlags } from '../defaultFlags';
+import type { Features } from '../features';
+import type { FeatureFlagsProvider } from '../types';
 
 class _RemoteFeatureFlagsProvider implements FeatureFlagsProvider {
   readonly isOn = true;

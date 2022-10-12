@@ -1,9 +1,10 @@
 import { action, makeObservable, observable } from 'mobx';
 
 import { makeLocalStorage } from 'new/services/common/makeLocalStorage';
-import { defaultFlags } from 'new/services/FeatureFlags/defaultFlags';
-import type { Features } from 'new/services/FeatureFlags/features';
-import type { FeatureFlagsProvider } from 'new/services/FeatureFlags/types';
+
+import { defaultFlags } from '../defaultFlags';
+import type { Features } from '../features';
+import type { FeatureFlagsProvider } from '../types';
 
 interface Storage {
   isManualFlagsOn: boolean;

@@ -1,9 +1,8 @@
-import { defaultFlags } from 'new/services/FeatureFlags/defaultFlags';
-import { RemoteFeatureFlagsProvider } from 'new/services/FeatureFlags/providers/RemoteFeatureFlagsProvider';
-import type { FeatureFlagsProvider } from 'new/services/FeatureFlags/types';
-
+import { defaultFlags } from './defaultFlags';
 import type { Features } from './features';
 import { DebugFeatureFlagsProvider } from './providers/DebugFeatureFlagsProvider';
+import { RemoteFeatureFlagsProvider } from './providers/RemoteFeatureFlagsProvider';
+import type { FeatureFlagsProvider } from './types';
 
 class _FeatureFlags {
   private _primaryProvider: FeatureFlagsProvider;

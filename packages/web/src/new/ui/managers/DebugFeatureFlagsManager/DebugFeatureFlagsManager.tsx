@@ -8,7 +8,8 @@ import { observer } from 'mobx-react-lite';
 
 import { useViewModel } from 'new/core/viewmodels/useViewModel';
 import { Features } from 'new/services/FeatureFlags/features';
-import { DebugFeatureFlagsManagerViewModel } from 'new/ui/managers/DebugFeatureFlagsManager/DebugFeatureFlagsManager.ViewModel';
+
+import { DebugFeatureFlagsManagerViewModel } from './DebugFeatureFlagsManager.ViewModel';
 
 const Wrapper = styled.div`
   position: fixed;
