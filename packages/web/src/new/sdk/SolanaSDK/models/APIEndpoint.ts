@@ -80,11 +80,29 @@ export class APIEndpoint {
         new APIEndpoint({ address: urlString, network: network as Network, additionalQuery }),
     );
 
+    let endpoints: APIEndpoint[];
     if (definedEndpoints.length) {
-      return definedEndpoints;
+      endpoints = definedEndpoints;
     } else {
-      return APIEndpoint._defaultEndpoints;
+      endpoints = APIEndpoint._defaultEndpoints;
     }
+
+    if (__DEVELOPMENT__ || process.env.REACT_APP_STAGING) {
+      endpoints.push(
+        new APIEndpoint({
+          address: clusterApiUrl('testnet'),
+          network: 'testnet',
+        }),
+      );
+      endpoints.push(
+        new APIEndpoint({
+          address: clusterApiUrl('devnet'),
+          network: 'devnet',
+        }),
+      );
+    }
+
+    return endpoints;
   }
 
   getURL(): string {
