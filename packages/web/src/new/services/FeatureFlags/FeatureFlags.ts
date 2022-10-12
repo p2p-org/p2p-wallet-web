@@ -1,3 +1,4 @@
+import { defaultFlags } from 'new/services/FeatureFlags/defaultFlags';
 import { RemoteFeatureFlagsProvider } from 'new/services/FeatureFlags/providers/RemoteFeatureFlagsProvider';
 import type { FeatureFlagsProvider } from 'new/services/FeatureFlags/types';
 
@@ -16,17 +17,25 @@ class _FeatureFlags {
   get isInitialized(): boolean {
     if (this._primaryProvider.isOn) {
       return this._primaryProvider.isInitialized;
-    } else {
+    }
+
+    if (this._secondaryProvider.isOn) {
       return this._secondaryProvider.isInitialized;
     }
+
+    return false;
   }
 
   isEnabled(feature: Features): boolean {
     if (this._primaryProvider.isOn) {
       return this._primaryProvider.isEnabled(feature);
-    } else {
+    }
+
+    if (this._secondaryProvider.isOn) {
       return this._secondaryProvider.isEnabled(feature);
     }
+
+    return defaultFlags[feature];
   }
 }
 
