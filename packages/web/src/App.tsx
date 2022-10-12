@@ -20,6 +20,7 @@ import { SettingsNetwork } from 'new/scenes/Main/SettingsNetwork';
 import { SwapPage } from 'new/scenes/Main/Swap';
 import { WalletDetail } from 'new/scenes/Main/WalletDetail';
 import { Root } from 'new/scenes/Root';
+import { DebugFeatureFlagsManager } from 'new/ui/managers/DebugFeatureFlagsManager';
 import { LocationManager } from 'new/ui/managers/LocationManager';
 import { NotificationManager } from 'new/ui/managers/NotificationManager';
 import { ModalManager } from 'new/ui/modals/ModalManager';
@@ -68,6 +69,9 @@ const App: React.FC = observer(() => {
               <FeaturesToggle />
               <ToastManager anchor="left" renderToast={(props) => <NotifyToast {...props} />} />
               <NotificationManager />
+              {__DEVELOPMENT__ || process.env.REACT_APP_STAGING ? (
+                <DebugFeatureFlagsManager />
+              ) : null}
             </Root>
           </Providers>
         </Router>

@@ -1,4 +1,4 @@
-import { Features } from 'new/services/FeatureFlags/features';
+import { Features } from './features';
 
 export type FeatureFlagsType = Record<Features, boolean>;
 
