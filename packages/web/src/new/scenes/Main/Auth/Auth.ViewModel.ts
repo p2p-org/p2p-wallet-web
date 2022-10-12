@@ -6,6 +6,7 @@ import { singleton } from 'tsyringe';
 
 import { isDev, localMnemonic } from 'config/constants';
 import { ViewModel } from 'new/core/viewmodels/ViewModel';
+import { WalletsListViewModel } from 'new/scenes/Main/Auth/Subviews/Wallets.ViewModel';
 import { Wallet } from 'new/sdk/SolanaSDK';
 import { Defaults } from 'new/services/Defaults';
 
@@ -15,7 +16,6 @@ import {
   DERIVATION_PATH,
   derivePublicKeyFromSeed,
   generateEncryptedTextAsync,
-  loggable,
   mnemonicToSeed,
   setStorageValue,
 } from './utils';
@@ -31,7 +31,6 @@ const restoreList = [
   WizardSteps.RESTORE_ACCOUNTS,
 ];
 
-// @TODO all components in observer
 // @FIXME implement browser history with steps || move back to router
 // @TODO how does those methods work (override)?
 
@@ -64,7 +63,7 @@ export class AuthViewModel extends ViewModel {
     }),
   };
 
-  constructor() {
+  constructor(public walletListsViewModel: WalletsListViewModel) {
     super();
 
     this.step = AuthViewModel.defaultState.step;
@@ -93,11 +92,9 @@ export class AuthViewModel extends ViewModel {
     });
   }
 
-  protected override afterReactionsRemoved() {
-    // @TODO
-  }
+  protected override afterReactionsRemoved() {}
 
-  @loggable()
+  // @loggable()
   protected override onInitialize(): void {}
 
   protected override setDefaults(): void {
@@ -182,6 +179,8 @@ export class AuthViewModel extends ViewModel {
   }
 
   get wallets(): Promise<Array<Wallet | null>> {
+    this.walletListsViewModel.reload();
+
     return this.seed.then((seed) => {
       const derivableTokenAccountPublicKeys = new Array(AuthViewModel._derivableAccountsNumber)
         .fill(null)
