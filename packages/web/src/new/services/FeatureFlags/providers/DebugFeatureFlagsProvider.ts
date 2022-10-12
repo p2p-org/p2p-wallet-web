@@ -6,6 +6,8 @@ import { defaultFlags } from '../defaultFlags';
 import type { Features } from '../features';
 import type { FeatureFlagsProvider } from '../types';
 
+const DEBUG_FEATURE_FLAGS_KEY = 'feature_flags_debug';
+
 interface Storage {
   isManualFlagsOn: boolean;
   featureFlags: Record<Features, boolean>;
@@ -25,7 +27,7 @@ class _DebugFeatureFlagsProvider implements FeatureFlagsProvider {
       setFeatureFlag: action,
     });
 
-    makeLocalStorage<Storage>(this, 'feature_flags');
+    makeLocalStorage<Storage>(this, DEBUG_FEATURE_FLAGS_KEY);
 
     this.isInitialized = true;
   }
