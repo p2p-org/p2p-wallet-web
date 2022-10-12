@@ -141,6 +141,11 @@ export const Mnemonic: FC = observer(() => {
     setChecked(nextChecked);
   };
 
+  const nextStep = () => {
+    viewModel.setMnemonic(viewModel.initialCreateMnemonic);
+    viewModel.nextStep();
+  };
+
   return (
     <Wrapper>
       <PleaseText>
@@ -153,7 +158,11 @@ export const Mnemonic: FC = observer(() => {
         or lost.
       </SecurityKeyHint>
       <MnemonicWrapper>
-        <MnemonicTextarea placeholder="Seed phrase" value={viewModel.authInfo.mnemonic} readOnly />
+        <MnemonicTextarea
+          placeholder="Seed phrase"
+          value={viewModel.initialCreateMnemonic}
+          readOnly
+        />
       </MnemonicWrapper>
       <CheckboxWrapper>
         <Checkbox
@@ -162,7 +171,7 @@ export const Mnemonic: FC = observer(() => {
           onChange={handleCheckChange}
         />
       </CheckboxWrapper>
-      <Button disabled={!checked} onClick={viewModel.nextStep}>
+      <Button disabled={!checked} onClick={nextStep}>
         Continue
       </Button>
     </Wrapper>

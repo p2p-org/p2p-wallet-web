@@ -79,7 +79,6 @@ const SwitcherText = styled.span`
   line-height: 18px;
 `;
 
-// @FRIDAY proceed with restore wallet
 export const Final: FC = observer(() => {
   const viewModel = useViewModel(AuthViewModel);
 

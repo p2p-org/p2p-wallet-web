@@ -1,7 +1,7 @@
 import { u64 } from '@solana/spl-token';
 import { Connection, PublicKey } from '@solana/web3.js';
 import * as bip39 from 'bip39';
-import { action, computed, makeObservable, observable, reaction, runInAction } from 'mobx';
+import { action, computed, makeObservable, observable } from 'mobx';
 import { singleton } from 'tsyringe';
 
 import { isDev, localMnemonic } from 'config/constants';
@@ -40,20 +40,22 @@ export class AuthViewModel extends ViewModel {
   step: WizardSteps;
   authInfo: AuthInfo;
   isLoading: boolean;
-
+  initialCreateMnemonic: string;
+  initialRestoreMnemonic: string;
   private _connection: Connection;
 
-  private static _mnemonicStrength = 256;
-  private static _derivebleAccountsNumber = 5;
+  private static _derivableAccountsNumber = 5;
   private static _storageKey = 'encryptedSeedAndMnemonic';
+  static _mnemonicStrength = 256;
 
   static defaultState: AuthState = {
     step: WizardSteps.RESTORE_START,
-    isLoading: false,
     connection: new Connection(Defaults.apiEndpoint.getURL()),
+    isLoading: false,
+    initialCreateMnemonic: bip39.generateMnemonic(AuthViewModel._mnemonicStrength),
+    initialRestoreMnemonic: isDev ? (localMnemonic as string) : '',
     authInfo: observable<AuthInfo>({
       mnemonic: '',
-      // seed: '',
       derivationPath: {
         label: `m/44'/501'/0'/0'`,
         value: DERIVATION_PATH.Bip44Change,
@@ -68,6 +70,8 @@ export class AuthViewModel extends ViewModel {
     this.step = AuthViewModel.defaultState.step;
     this.authInfo = AuthViewModel.defaultState.authInfo;
     this.isLoading = AuthViewModel.defaultState.isLoading;
+    this.initialCreateMnemonic = AuthViewModel.defaultState.initialCreateMnemonic;
+    this.initialRestoreMnemonic = AuthViewModel.defaultState.initialRestoreMnemonic;
     this._connection = AuthViewModel.defaultState.connection;
 
     makeObservable(this, {
@@ -94,30 +98,14 @@ export class AuthViewModel extends ViewModel {
   }
 
   @loggable()
-  protected override onInitialize(): void {
-    const mnemonic = this._getMnemonic();
-    // const seed = await mnemonicToSeed(mnemonic);
-
-    runInAction(() => {
-      // this.authInfo.seed = seed;
-      this.authInfo.mnemonic = mnemonic;
-    });
-
-    this.addReaction(
-      reaction(
-        () => this.isRestore,
-        () => {
-          this.authInfo.mnemonic = this._getMnemonic();
-          // this.authInfo.seed = await mnemonicToSeed(this.authInfo.mnemonic);
-        },
-      ),
-    );
-  }
+  protected override onInitialize(): void {}
 
   protected override setDefaults(): void {
     this.step = AuthViewModel.defaultState.step;
     this.authInfo = AuthViewModel.defaultState.authInfo;
     this.isLoading = AuthViewModel.defaultState.isLoading;
+    this.initialCreateMnemonic = AuthViewModel.defaultState.initialCreateMnemonic;
+    this.initialRestoreMnemonic = AuthViewModel.defaultState.initialRestoreMnemonic;
     this._connection = AuthViewModel.defaultState.connection;
   }
 
@@ -195,7 +183,7 @@ export class AuthViewModel extends ViewModel {
 
   get wallets(): Promise<Array<Wallet | null>> {
     return this.seed.then((seed) => {
-      const derivableTokenAccountPublicKeys = new Array(AuthViewModel._derivebleAccountsNumber)
+      const derivableTokenAccountPublicKeys = new Array(AuthViewModel._derivableAccountsNumber)
         .fill(null)
         .map((_, idx) => {
           const pubKey = derivePublicKeyFromSeed(seed, idx, this.authInfo.derivationPath.value);
@@ -243,18 +231,5 @@ export class AuthViewModel extends ViewModel {
     const list = this._getList();
 
     return list.indexOf(this.step);
-  }
-
-  private _getMnemonic(): string {
-    switch (true) {
-      case this.isCreate: {
-        return bip39.generateMnemonic(AuthViewModel._mnemonicStrength);
-      }
-      case this.isRestore && isDev: {
-        return localMnemonic as string;
-      }
-      default:
-        return '';
-    }
   }
 }

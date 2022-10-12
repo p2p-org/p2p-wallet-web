@@ -14,7 +14,6 @@ export enum WizardSteps {
 
 export type AuthInfo = {
   mnemonic: string;
-  // seed: string;
   derivationPath: DerivationPathOption;
   password: string;
 };
@@ -22,6 +21,8 @@ export type AuthInfo = {
 export type AuthState = {
   step: WizardSteps;
   authInfo: AuthInfo;
+  initialCreateMnemonic: string;
+  initialRestoreMnemonic: string;
   connection: Connection;
   isLoading: boolean;
 };

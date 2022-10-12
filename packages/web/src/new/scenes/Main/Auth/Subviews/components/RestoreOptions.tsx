@@ -135,6 +135,7 @@ const VALIDATE_MNEMONIC_THROTTLE_TIMEOUTE = 100;
 
 export const RestoreOptions: FC = observer(() => {
   const viewModel = useViewModel(AuthViewModel);
+  const [mnemonic, setMnemonic] = useState(viewModel.initialRestoreMnemonic);
   const [hasError, setHasError] = useState(false);
   const handleConnectByClick = (walletType: DefaultWalletType) => () => {
     viewModel.setIsLoading(true);
@@ -166,20 +167,25 @@ export const RestoreOptions: FC = observer(() => {
     const valueTrimmed = value.trim();
 
     if (bip39.validateMnemonic(valueTrimmed)) {
-      viewModel.setMnemonic(valueTrimmed);
+      setMnemonic(valueTrimmed);
     } else {
-      viewModel.setMnemonic(value);
+      setMnemonic(value);
     }
     validateMnemonic(valueTrimmed);
   };
 
   const handleMnemonicBlur = (e: React.FocusEvent<HTMLTextAreaElement>) => {
     const value = e.target.value.trim();
-    viewModel.setMnemonic(value);
+    setMnemonic(value);
     validateMnemonic(value);
   };
 
-  const isDisabled = !viewModel.authInfo.mnemonic || hasError;
+  const isDisabled = !mnemonic || hasError;
+
+  const goNext = () => {
+    viewModel.setMnemonic(mnemonic);
+    viewModel.nextStep();
+  };
 
   return (
     <Wrapper>
@@ -207,14 +213,14 @@ export const RestoreOptions: FC = observer(() => {
         <SecurityKey>Enter security key</SecurityKey>
         <MnemonicTextarea
           placeholder="Seed phrase"
-          value={viewModel.authInfo.mnemonic}
+          value={mnemonic}
           onInput={handleMnemonicInput}
           onBlur={handleMnemonicBlur}
           className={classNames({ hasError })}
         />
         {hasError ? <ErrorHint error="Incorrect seed phrase" /> : undefined}
       </SecurityWrapper>
-      <Button disabled={isDisabled} onClick={viewModel.nextStep}>
+      <Button disabled={isDisabled} onClick={goNext}>
         Continue
       </Button>
     </Wrapper>
