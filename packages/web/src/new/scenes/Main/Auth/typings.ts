@@ -1,7 +1,5 @@
 import type { ReactElement, ReactNode } from 'react';
 
-import type { Connection } from '@solana/web3.js';
-
 export enum WizardSteps {
   CREATE_START = 'CREATE_START',
   CREATE_CONFIRM_MNEMONIC = 'CREATE_CONFIRM_MNEMONIC',
@@ -23,13 +21,17 @@ export type AuthState = {
   authInfo: AuthInfo;
   initialCreateMnemonic: string;
   initialRestoreMnemonic: string;
-  connection: Connection;
   isLoading: boolean;
 };
 
 export type DerivationPathOption = {
   value: string;
   label: ReactNode;
+};
+
+export type GetWalletsConfig = {
+  seed: string;
+  derivationPathValue: string;
 };
 
 export type ViewMap = {

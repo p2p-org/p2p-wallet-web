@@ -1,5 +1,3 @@
-import { u64 } from '@solana/spl-token';
-import { Connection, PublicKey } from '@solana/web3.js';
 import * as bip39 from 'bip39';
 import { action, computed, makeObservable, observable } from 'mobx';
 import { singleton } from 'tsyringe';
@@ -7,14 +5,11 @@ import { singleton } from 'tsyringe';
 import { isDev, localMnemonic } from 'config/constants';
 import { ViewModel } from 'new/core/viewmodels/ViewModel';
 import { WalletsListViewModel } from 'new/scenes/Main/Auth/Subviews/Wallets.ViewModel';
-import { Wallet } from 'new/sdk/SolanaSDK';
-import { Defaults } from 'new/services/Defaults';
 
 import type { AuthInfo, AuthState, DerivationPathOption } from './typings';
 import { WizardSteps } from './typings';
 import {
   DERIVATION_PATH,
-  derivePublicKeyFromSeed,
   generateEncryptedTextAsync,
   mnemonicToSeed,
   setStorageValue,
@@ -41,15 +36,12 @@ export class AuthViewModel extends ViewModel {
   isLoading: boolean;
   initialCreateMnemonic: string;
   initialRestoreMnemonic: string;
-  private _connection: Connection;
 
-  private static _derivableAccountsNumber = 5;
   private static _storageKey = 'encryptedSeedAndMnemonic';
   static _mnemonicStrength = 256;
 
   static defaultState: AuthState = {
     step: WizardSteps.RESTORE_START,
-    connection: new Connection(Defaults.apiEndpoint.getURL()),
     isLoading: false,
     initialCreateMnemonic: bip39.generateMnemonic(AuthViewModel._mnemonicStrength),
     initialRestoreMnemonic: isDev ? (localMnemonic as string) : '',
@@ -71,7 +63,6 @@ export class AuthViewModel extends ViewModel {
     this.isLoading = AuthViewModel.defaultState.isLoading;
     this.initialCreateMnemonic = AuthViewModel.defaultState.initialCreateMnemonic;
     this.initialRestoreMnemonic = AuthViewModel.defaultState.initialRestoreMnemonic;
-    this._connection = AuthViewModel.defaultState.connection;
 
     makeObservable(this, {
       step: observable,
@@ -80,7 +71,6 @@ export class AuthViewModel extends ViewModel {
       isRestore: computed,
       isCreate: computed,
       showBackButton: computed,
-      wallets: computed,
       seed: computed,
       setCreateStart: action.bound,
       setRestoreStart: action.bound,
@@ -103,7 +93,6 @@ export class AuthViewModel extends ViewModel {
     this.isLoading = AuthViewModel.defaultState.isLoading;
     this.initialCreateMnemonic = AuthViewModel.defaultState.initialCreateMnemonic;
     this.initialRestoreMnemonic = AuthViewModel.defaultState.initialRestoreMnemonic;
-    this._connection = AuthViewModel.defaultState.connection;
   }
 
   setCreateStart(): void {
@@ -176,34 +165,6 @@ export class AuthViewModel extends ViewModel {
     const locked = await generateEncryptedTextAsync(plaintext, this.authInfo.password);
 
     setStorageValue(AuthViewModel._storageKey, JSON.stringify(locked));
-  }
-
-  get wallets(): Promise<Array<Wallet | null>> {
-    this.walletListsViewModel.reload();
-
-    return this.seed.then((seed) => {
-      const derivableTokenAccountPublicKeys = new Array(AuthViewModel._derivableAccountsNumber)
-        .fill(null)
-        .map((_, idx) => {
-          const pubKey = derivePublicKeyFromSeed(seed, idx, this.authInfo.derivationPath.value);
-          return new PublicKey(pubKey);
-        });
-
-      return this._connection
-        .getMultipleAccountsInfo(derivableTokenAccountPublicKeys)
-        .then((accounts) => {
-          return accounts.map((acc) => {
-            if (acc) {
-              return Wallet.nativeSolana({
-                lamports: new u64(acc?.lamports),
-                pubkey: acc?.owner.toString(),
-              });
-            }
-
-            return null;
-          });
-        });
-    });
   }
 
   get seed(): Promise<string> {
