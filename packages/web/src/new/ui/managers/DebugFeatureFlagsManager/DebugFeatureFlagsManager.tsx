@@ -14,7 +14,7 @@ import { DebugFeatureFlagsManagerViewModel } from './DebugFeatureFlagsManager.Vi
 const Wrapper = styled.div`
   position: fixed;
   bottom: 0;
-  left: 0;
+  left: 5px;
 
   z-index: 9999;
 
