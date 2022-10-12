@@ -37,12 +37,20 @@ const Row = styled.div`
   display: flex;
   justify-content: space-between;
 
-  height: 40px;
-  margin: 10px 15px;
+  padding: 15px 15px;
 
   cursor: pointer;
 
-  &.disabled {
+  &.delimited {
+    border-bottom: 1px solid ${theme.colors.stroke.primary};
+  }
+
+  & * {
+    cursor: pointer;
+  }
+
+  &.disabled,
+  &.disabled * {
     cursor: default;
   }
 
@@ -52,15 +60,8 @@ const Row = styled.div`
     font-size: 18px;
   }
 
-  & label,
-  & input {
-    cursor: pointer;
-  }
-
   &.disabled label {
     color: ${theme.colors.stroke.primary};
-
-    cursor: default;
   }
 
   & input {
@@ -69,11 +70,11 @@ const Row = styled.div`
     margin: auto 0;
   }
 
-  & label.italic {
+  &.italic label {
     font-style: italic;
   }
 
-  & label.bold {
+  &.bold label {
     font-weight: bold;
   }
 `;
@@ -92,8 +93,8 @@ const FlagRow = ({
   className?: string;
 }) => {
   return (
-    <Row onClick={onClick} className={classNames({ disabled })}>
-      <label className={className}>{label}</label>
+    <Row onClick={onClick} className={classNames({ disabled, [className]: true })}>
+      <label>{label}</label>
       <input id={label} type="checkbox" checked={checked} disabled={disabled} />
     </Row>
   );
@@ -133,10 +134,10 @@ export const DebugFeatureFlagsManager: FC = observer(() => {
   return (
     <Wrapper>
       <FlagRow
-        label={'Turn on manual flags'}
+        label={'Turn on Debug flags'}
         checked={viewModel.isOn}
         onClick={handleDebugFeatureFlagsOn}
-        className={'bold'}
+        className={'bold delimited'}
       />
       {Object.entries(Features).map(([key, value]) => (
         <FlagRow
