@@ -53,7 +53,7 @@ export class AuthViewModel extends ViewModel {
     connection: new Connection(Defaults.apiEndpoint.getURL()),
     authInfo: observable<AuthInfo>({
       mnemonic: '',
-      seed: '',
+      // seed: '',
       derivationPath: {
         label: `m/44'/501'/0'/0'`,
         value: DERIVATION_PATH.Bip44Change,
@@ -78,6 +78,7 @@ export class AuthViewModel extends ViewModel {
       isCreate: computed,
       showBackButton: computed,
       wallets: computed,
+      seed: computed,
       setCreateStart: action.bound,
       setRestoreStart: action.bound,
       previousStep: action.bound,
@@ -93,21 +94,21 @@ export class AuthViewModel extends ViewModel {
   }
 
   @loggable()
-  protected override async onInitialize(): Promise<void> {
+  protected override onInitialize(): void {
     const mnemonic = this._getMnemonic();
-    const seed = await mnemonicToSeed(mnemonic);
+    // const seed = await mnemonicToSeed(mnemonic);
 
     runInAction(() => {
-      this.authInfo.seed = seed;
+      // this.authInfo.seed = seed;
       this.authInfo.mnemonic = mnemonic;
     });
 
     this.addReaction(
       reaction(
         () => this.isRestore,
-        async () => {
+        () => {
           this.authInfo.mnemonic = this._getMnemonic();
-          this.authInfo.seed = await mnemonicToSeed(this.authInfo.mnemonic);
+          // this.authInfo.seed = await mnemonicToSeed(this.authInfo.mnemonic);
         },
       ),
     );
@@ -185,7 +186,7 @@ export class AuthViewModel extends ViewModel {
   async saveEncryptedMnemonicAndSeed() {
     const plaintext = JSON.stringify({
       mnemonic: this.authInfo.mnemonic,
-      seed: this.authInfo.seed,
+      seed: await this.seed,
     });
     const locked = await generateEncryptedTextAsync(plaintext, this.authInfo.password);
 
@@ -193,33 +194,33 @@ export class AuthViewModel extends ViewModel {
   }
 
   get wallets(): Promise<Array<Wallet | null>> {
-    const derivableTokenAccountPublicKeys = new Array(AuthViewModel._derivebleAccountsNumber)
-      .fill(null)
-      .map((_, idx) => {
-        const pubKey = derivePublicKeyFromSeed(
-          this.authInfo.seed,
-          idx,
-          this.authInfo.derivationPath.value,
-        );
-        return new PublicKey(pubKey);
-      });
-
-    const wallets = this._connection
-      .getMultipleAccountsInfo(derivableTokenAccountPublicKeys)
-      .then((accounts) => {
-        return accounts.map((acc) => {
-          if (acc) {
-            return Wallet.nativeSolana({
-              lamports: new u64(acc?.lamports),
-              pubkey: acc?.owner.toString(),
-            });
-          }
-
-          return null;
+    return this.seed.then((seed) => {
+      const derivableTokenAccountPublicKeys = new Array(AuthViewModel._derivebleAccountsNumber)
+        .fill(null)
+        .map((_, idx) => {
+          const pubKey = derivePublicKeyFromSeed(seed, idx, this.authInfo.derivationPath.value);
+          return new PublicKey(pubKey);
         });
-      });
 
-    return wallets;
+      return this._connection
+        .getMultipleAccountsInfo(derivableTokenAccountPublicKeys)
+        .then((accounts) => {
+          return accounts.map((acc) => {
+            if (acc) {
+              return Wallet.nativeSolana({
+                lamports: new u64(acc?.lamports),
+                pubkey: acc?.owner.toString(),
+              });
+            }
+
+            return null;
+          });
+        });
+    });
+  }
+
+  get seed(): Promise<string> {
+    return mnemonicToSeed(this.authInfo.mnemonic);
   }
 
   get isRestore(): boolean {
