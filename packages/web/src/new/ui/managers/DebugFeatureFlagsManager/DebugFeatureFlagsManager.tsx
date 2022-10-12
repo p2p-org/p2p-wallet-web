@@ -93,9 +93,7 @@ const FlagRow = ({
 }) => {
   return (
     <Row onClick={onClick} className={classNames({ disabled })}>
-      <label className={className} htmlFor={label}>
-        {label}
-      </label>
+      <label className={className}>{label}</label>
       <input id={label} type="checkbox" checked={checked} disabled={disabled} />
     </Row>
   );
