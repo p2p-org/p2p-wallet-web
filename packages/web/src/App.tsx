@@ -6,7 +6,6 @@ import dayjs from 'dayjs';
 import localizedFormat from 'dayjs/plugin/localizedFormat';
 import { observer } from 'mobx-react-lite';
 
-import { FeaturesToggle } from 'components/common/FeaturesToggle';
 import { Intercom } from 'components/common/Intercom';
 import { NotifyToast } from 'components/common/NotifyToast';
 import { ToastManager } from 'components/common/ToastManager';
@@ -66,7 +65,6 @@ const App: React.FC = observer(() => {
                 </Main>
               </Switch>
               <Intercom />
-              <FeaturesToggle />
               <ToastManager anchor="left" renderToast={(props) => <NotifyToast {...props} />} />
               <NotificationManager />
               {__DEVELOPMENT__ || process.env.REACT_APP_STAGING ? (
