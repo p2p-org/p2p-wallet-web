@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { styled } from '@linaria/react';
 import { theme } from '@p2p-wallet-web/ui';
@@ -101,8 +101,15 @@ const FlagRow = ({
 };
 
 export const DebugFeatureFlagsManager: FC = observer(() => {
+  const wrapperRef = useRef<HTMLDivElement>(null);
   const [isShown, setIsShown] = useState(false);
   const viewModel = useViewModel(DebugFeatureFlagsManagerViewModel);
+
+  const handleAwayClick = (e: MouseEvent) => {
+    if (!wrapperRef.current?.contains(e.target as HTMLDivElement)) {
+      setIsShown(false);
+    }
+  };
 
   const handleKeyUp = (e: KeyboardEvent) => {
     // Ctrl + I
@@ -112,9 +119,11 @@ export const DebugFeatureFlagsManager: FC = observer(() => {
   };
 
   useEffect(() => {
+    window.addEventListener('click', handleAwayClick);
     document.addEventListener('keyup', handleKeyUp);
 
     return () => {
+      window.removeEventListener('click', handleAwayClick);
       document.removeEventListener('keyup', handleKeyUp);
     };
   }, []);
@@ -132,7 +141,7 @@ export const DebugFeatureFlagsManager: FC = observer(() => {
   }
 
   return (
-    <Wrapper>
+    <Wrapper ref={wrapperRef}>
       <FlagRow
         label={'Turn on Debug flags'}
         checked={viewModel.isOn}
