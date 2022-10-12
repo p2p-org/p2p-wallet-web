@@ -6,7 +6,7 @@ import type { FeatureFlagsProvider } from 'new/services/FeatureFlags/types';
 import { RemoteConfig } from 'new/services/RemoteConfig';
 
 class _RemoteFeatureFlagsProvider implements FeatureFlagsProvider {
-  isOn = true;
+  readonly isOn = true;
   isInitialized = false;
   featureFlags = defaultFlags;
 

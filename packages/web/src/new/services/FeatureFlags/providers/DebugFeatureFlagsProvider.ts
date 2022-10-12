@@ -12,7 +12,7 @@ interface Storage {
 
 class _DebugFeatureFlagsProvider implements FeatureFlagsProvider {
   isOn = false;
-  isInitialized: boolean;
+  readonly isInitialized: boolean;
   featureFlags = defaultFlags;
 
   constructor() {
