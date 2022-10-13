@@ -1,10 +1,9 @@
+import type { u64 } from '@solana/spl-token';
 import {
   buildCancellablePromise,
   CancellablePromise,
   pseudoCancellable,
 } from 'real-cancellable-promise';
-
-import type { u64 } from '@solana/spl-token';
 
 import { LogEvent, Logger } from 'new/sdk/SolanaSDK';
 import { cancellablePromiseRetry } from 'new/utils/promise/cancellablePromiseRetry';
