@@ -84,10 +84,14 @@ export class AuthViewModel extends ViewModel {
     });
   }
 
-  protected override afterReactionsRemoved() {}
-
   // @loggable()
-  protected override onInitialize(): void {}
+  protected override onInitialize(): void {
+    this.walletListsViewModel.initialize();
+  }
+
+  protected override afterReactionsRemoved() {
+    this.walletListsViewModel.end();
+  }
 
   protected override setDefaults(): void {
     this.step = AuthViewModel.defaultState.step;

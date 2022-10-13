@@ -1,13 +1,15 @@
 import { u64 } from '@solana/spl-token';
 import { Connection, PublicKey } from '@solana/web3.js';
-import { flow } from 'mobx';
+import { flow, reaction } from 'mobx';
 import { injectable } from 'tsyringe';
 
 import { SDListViewModel } from 'new/core/viewmodels/SDListViewModel';
+import { SDFetcherState } from 'new/core/viewmodels/SDViewModel';
 import type { GetWalletsConfig } from 'new/scenes/Main/Auth/typings';
 import { derivePublicKeyFromSeed } from 'new/scenes/Main/Auth/utils';
 import { Wallet } from 'new/sdk/SolanaSDK';
 import { Defaults } from 'new/services/Defaults';
+import { PricesService } from 'new/services/PriceAPIs/PricesService';
 
 @injectable()
 export class WalletsListViewModel extends SDListViewModel<Wallet> {
@@ -15,7 +17,7 @@ export class WalletsListViewModel extends SDListViewModel<Wallet> {
   private _requestConfig: GetWalletsConfig | null = null;
   private static _derivableAccountsNumber = 5;
 
-  constructor() {
+  constructor(private _pricesService: PricesService) {
     super();
 
     this._connection = new Connection(Defaults.apiEndpoint.getURL());
@@ -23,9 +25,38 @@ export class WalletsListViewModel extends SDListViewModel<Wallet> {
 
   protected override setDefaults() {}
 
-  protected override onInitialize() {}
+  protected override onInitialize() {
+    // observe prices
+    this.addReaction(
+      reaction(
+        () => this._pricesService.currentPrices.state.type, // TODO: check
+        () => {
+          this._updatePrices();
+        },
+      ),
+    );
+  }
 
   protected override afterReactionsRemoved() {}
+
+  private _updatePrices(): void {
+    if (this.state !== SDFetcherState.loaded) {
+      return;
+    }
+
+    let wallets = this._mapPrices(this.data);
+    wallets = wallets.sort(Wallet.defaultSorter);
+    this.overrideData(wallets);
+  }
+
+  private _mapPrices(wallets: Wallet[]): Wallet[] {
+    const walletsNew = wallets;
+    for (const wallet of walletsNew) {
+      wallet.price = this._pricesService.currentPrice(wallet.token.symbol);
+    }
+
+    return walletsNew;
+  }
 
   // @FIXME flow annotation
   override createRequest = flow<Wallet[], []>(function* (
@@ -55,7 +86,17 @@ export class WalletsListViewModel extends SDListViewModel<Wallet> {
 
             return acc;
           })
-          .filter(Boolean);
+          .filter((w): w is Wallet => Boolean(w));
+      })
+      .then((wallets) => {
+        const newTokens = wallets
+          .map((wallet) => wallet.token)
+          .filter((token) => !this._pricesService.getWatchList().has(token));
+
+        this._pricesService.addToWatchList(newTokens);
+        this._pricesService.fetchPrices(newTokens);
+
+        return wallets;
       });
   });
 

@@ -5,7 +5,6 @@ import { styled } from '@linaria/react';
 import { DERIVATION_PATH } from '@p2p-wallet-web/core';
 import { observer } from 'mobx-react-lite';
 
-// import { TokenAccountRow } from 'components/common/TokenAccountRow';
 import { Button } from 'components/pages/auth/AuthSide/common/Button';
 import { Icon } from 'components/ui';
 import { Popover } from 'components/ui/Popover';
@@ -77,11 +76,6 @@ const AccountsWrapper = styled.div`
   margin: 8px 0 22px;
 `;
 
-// const TokenAccountRowStyled = styled(TokenAccountRow)`
-//   padding-right: 0;
-//   padding-left: 0;
-// `;
-
 const DERIVATION_PATHS_WITH_LABELS: SelectorItemType[] = [
   {
     label: `m/44'/501'/0'`,
@@ -108,14 +102,6 @@ export const DerivableAccounts: FC = observer(() => {
       });
     });
   }, []);
-
-  // const wl = viewModel.walletListsViewModel.data[0];
-  //
-  // console.log(wl?.amount);
-  // console.log(wl?.name);
-  // console.log(wl?.pubkey);
-  // console.log(wl?.token);
-  // console.log(wl?.userInfo);
 
   return (
     <Wrapper>

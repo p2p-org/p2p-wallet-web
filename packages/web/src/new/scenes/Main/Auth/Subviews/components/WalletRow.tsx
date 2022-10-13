@@ -5,6 +5,7 @@ import { styled } from '@linaria/react';
 import { Fiat } from 'new/app/models/Fiat';
 import type { Wallet } from 'new/sdk/SolanaSDK';
 import { TokenAvatar } from 'new/ui/components/common/TokenAvatar';
+import { numberToString } from 'new/utils/NumberExtensions';
 
 export const Wrapper = styled.div`
   padding: 10px 0;
@@ -65,11 +66,16 @@ export const WalletRow: FC<Props> = (props) => {
         <Info>
           <Top>
             <TokenSymbol>{props.wallet.token.symbol}</TokenSymbol>
-            <div>{Fiat.usd.symbol}</div>
+            <div>
+              {Fiat.usd.symbol}
+              {numberToString(props.wallet.amountInCurrentFiat, { maximumFractionDigits: 2 })}
+            </div>
           </Top>
           <Bottom>
             <div>{props.wallet.shortAddress}</div>
-            {/*<div>{props.tokenAccount.balance?.formatUnits()}</div>*/}
+            <div>
+              {props.wallet.amount} {props.wallet.token.symbol}
+            </div>
           </Bottom>
         </Info>
       </ItemWrapper>
