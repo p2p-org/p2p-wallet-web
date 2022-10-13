@@ -58,7 +58,6 @@ export class WalletsListViewModel extends SDListViewModel<Wallet> {
     return walletsNew;
   }
 
-  // @FIXME flow annotation
   override createRequest = flow<Wallet[], []>(function* (
     this: WalletsListViewModel,
   ): Generator<Promise<Array<Wallet | null>>> {
@@ -74,19 +73,19 @@ export class WalletsListViewModel extends SDListViewModel<Wallet> {
     return yield this._connection
       .getMultipleAccountsInfo(derivableTokenAccountPublicKeys)
       .then((accounts) => {
-        // @FIXME ad if correct
-        return accounts
-          .map((acc, idx) => {
-            if (acc) {
-              return Wallet.nativeSolana({
-                lamports: new u64(acc?.lamports),
-                pubkey: derivableTokenAccountPublicKeys[idx]?.toString(),
-              });
-            }
+        return accounts.map((acc, idx) => {
+          if (acc) {
+            return Wallet.nativeSolana({
+              lamports: new u64(acc?.lamports),
+              pubkey: derivableTokenAccountPublicKeys[idx]?.toString(),
+            });
+          }
 
-            return acc;
-          })
-          .filter((w): w is Wallet => Boolean(w));
+          return Wallet.nativeSolana({
+            lamports: new u64(0),
+            pubkey: derivableTokenAccountPublicKeys[idx]?.toString(),
+          });
+        });
       })
       .then((wallets) => {
         const newTokens = wallets
