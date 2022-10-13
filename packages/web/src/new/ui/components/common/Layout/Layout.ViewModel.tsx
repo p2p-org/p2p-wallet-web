@@ -2,11 +2,16 @@ import { singleton } from 'tsyringe';
 
 import { ViewModel } from 'new/core/viewmodels/ViewModel';
 import { ModalService, ModalType } from 'new/services/ModalService';
+import { NotificationService } from 'new/services/NotificationService';
 import { SolanaService } from 'new/services/SolanaService';
 
 @singleton()
 export class LayoutViewModel extends ViewModel {
-  constructor(private _modalService: ModalService, private _solanaService: SolanaService) {
+  constructor(
+    private _modalService: ModalService,
+    private _solanaService: SolanaService,
+    public notificationService: NotificationService,
+  ) {
     super();
   }
 
