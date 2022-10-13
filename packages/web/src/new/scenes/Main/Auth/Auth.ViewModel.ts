@@ -1,5 +1,5 @@
 import * as bip39 from 'bip39';
-import { action, computed, makeObservable, observable } from 'mobx';
+import { action, computed, makeObservable, observable, reaction, when } from 'mobx';
 import { singleton } from 'tsyringe';
 
 import { isDev, localMnemonic } from 'config/constants';
@@ -41,9 +41,7 @@ export class AuthViewModel extends ViewModel {
   static _mnemonicStrength = 256;
 
   static defaultState: AuthState = {
-    // step: WizardSteps.RESTORE_START,
-    // @FIXME
-    step: WizardSteps.RESTORE_ACCOUNTS,
+    step: WizardSteps.RESTORE_START,
     isLoading: false,
     initialCreateMnemonic: bip39.generateMnemonic(AuthViewModel._mnemonicStrength),
     initialRestoreMnemonic: isDev ? (localMnemonic as string) : '',
@@ -87,6 +85,19 @@ export class AuthViewModel extends ViewModel {
   // @loggable()
   protected override onInitialize(): void {
     this.walletListsViewModel.initialize();
+
+    this.addReaction(
+      reaction(
+        () => this.authInfo.derivationPath.value,
+        async () => this._fetchWallets(),
+      ),
+    );
+    this.addReaction(
+      when(
+        () => this.step === WizardSteps.RESTORE_ACCOUNTS,
+        async () => this._fetchWallets(),
+      ),
+    );
   }
 
   protected override afterReactionsRemoved() {
@@ -162,7 +173,6 @@ export class AuthViewModel extends ViewModel {
     this.isLoading = value;
   }
 
-  // @TODO do we need another sdk for this logic and utils?
   async saveEncryptedMnemonicAndSeed() {
     const plaintext = JSON.stringify({
       mnemonic: this.authInfo.mnemonic,
@@ -197,5 +207,12 @@ export class AuthViewModel extends ViewModel {
     const list = this._getList();
 
     return list.indexOf(this.step);
+  }
+
+  private async _fetchWallets() {
+    this.walletListsViewModel.fetchWallets({
+      seed: await this.seed,
+      derivationPathValue: this.authInfo.derivationPath.value,
+    });
   }
 }

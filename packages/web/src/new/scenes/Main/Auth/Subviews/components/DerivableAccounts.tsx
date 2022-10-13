@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-import { useEffect } from 'react';
 
 import { styled } from '@linaria/react';
 import { DERIVATION_PATH } from '@p2p-wallet-web/core';
@@ -93,17 +92,6 @@ const DERIVATION_PATHS_WITH_LABELS: SelectorItemType[] = [
 
 export const DerivableAccounts: FC = observer(() => {
   const viewModel = useViewModel(AuthViewModel);
-
-  useEffect(() => {
-    viewModel.seed
-      .then((seedString) => {
-        viewModel.walletListsViewModel.fetchWallets({
-          seed: seedString,
-          derivationPathValue: viewModel.authInfo.derivationPath.value,
-        });
-      })
-      .catch(console.error);
-  }, [viewModel.authInfo.derivationPath.value]);
 
   return (
     <Wrapper>
