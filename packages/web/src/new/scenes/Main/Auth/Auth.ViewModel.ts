@@ -41,12 +41,14 @@ export class AuthViewModel extends ViewModel {
   static _mnemonicStrength = 256;
 
   static defaultState: AuthState = {
-    step: WizardSteps.RESTORE_START,
+    // step: WizardSteps.RESTORE_START,
+    // @FIXME
+    step: WizardSteps.RESTORE_ACCOUNTS,
     isLoading: false,
     initialCreateMnemonic: bip39.generateMnemonic(AuthViewModel._mnemonicStrength),
     initialRestoreMnemonic: isDev ? (localMnemonic as string) : '',
     authInfo: observable<AuthInfo>({
-      mnemonic: '',
+      mnemonic: localMnemonic as string,
       derivationPath: {
         label: `m/44'/501'/0'/0'`,
         value: DERIVATION_PATH.Bip44Change,

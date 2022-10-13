@@ -11,12 +11,17 @@ import { Icon } from 'components/ui';
 import { Popover } from 'components/ui/Popover';
 import { useViewModel } from 'new/core/viewmodels/useViewModel';
 import { AuthViewModel } from 'new/scenes/Main/Auth/Auth.ViewModel';
+import { WalletPlaceholder } from 'new/scenes/Main/Auth/Subviews/components/WalletPlaceholder';
+import type { Wallet } from 'new/sdk/SolanaSDK';
+import { StaticSectionsCollectionView } from 'new/ui/components/common/StaticSectionsCollectionView';
 
 import type { SelectorItemType } from './Selector';
 import { Selector } from './Selector';
 
 const Wrapper = styled.div`
   position: relative;
+
+  margin-top: 32px;
 `;
 
 const SubTitle = styled.div`
@@ -132,6 +137,11 @@ export const DerivableAccounts: FC = observer(() => {
 
       <Derivable>Derivable Accounts</Derivable>
       <AccountsWrapper>
+        <StaticSectionsCollectionView<Wallet>
+          viewModel={viewModel.walletListsViewModel}
+          renderPlaceholder={(key) => <WalletPlaceholder key={key} />}
+          renderItem={() => <p>item</p>}
+        />
         {/*{viewModel.derivableAccounts.map((tokenAccount) => (*/}
         {/*  // <TokenAccountRowStyled*/}
         {/*  //   key={tokenAccount?.key?.toBase58()}*/}
