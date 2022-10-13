@@ -10,7 +10,7 @@ import { ErrorHint } from 'components/common/ErrorHint';
 import { useViewModel } from 'new/core/viewmodels/useViewModel';
 
 import { AuthViewModel } from '../../Auth.ViewModel';
-import { Button } from './Button';
+import { Button } from '../components/Button';
 
 const Wrapper = styled.div`
   display: flex;

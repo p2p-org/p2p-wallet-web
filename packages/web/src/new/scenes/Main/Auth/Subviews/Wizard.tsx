@@ -5,12 +5,12 @@ import { observer } from 'mobx-react-lite';
 import type { ViewMap } from '../typings';
 import { WizardSteps } from '../typings';
 import { CommonLayout } from './components/CommonLayout';
-import { ConfirmMnemonic } from './components/ConfirmMnemonic';
-import { DerivableAccounts } from './components/DerivableAccounts';
 import { Final } from './components/Final';
-import { Mnemonic } from './components/MnemonicInput';
 import { Password } from './components/Password';
-import { RestoreOptions } from './components/RestoreOptions';
+import { ConfirmMnemonic } from './Create/ConfirmMnemonic';
+import { Mnemonic } from './Create/MnemonicInput';
+import { DerivableAccounts } from './Restore/DerivableAccounts';
+import { RestoreOptions } from './Restore/RestoreOptions';
 
 export interface Props {
   step: WizardSteps;

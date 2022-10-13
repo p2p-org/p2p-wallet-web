@@ -7,8 +7,8 @@ import { observer } from 'mobx-react-lite';
 import { useViewModel } from 'new/core/viewmodels/useViewModel';
 
 import { AuthViewModel } from '../../Auth.ViewModel';
-import { Button } from './Button';
-import { Checkbox } from './Checkbox';
+import { Button } from '../components/Button';
+import { Checkbox } from '../components/Checkbox';
 
 const Wrapper = styled.div`
   display: flex;
@@ -42,7 +42,7 @@ const PleaseText = styled.span`
     width: 421px;
     height: 98px;
 
-    background: url('./assets/circle.svg') no-repeat 50%;
+    background: url('../components/assets/circle.svg') no-repeat 50%;
 
     content: '';
   }
@@ -78,7 +78,7 @@ const MnemonicWrapper = styled.div`
     width: 47px;
     height: 147px;
 
-    background: url('./assets/line-seed.svg') no-repeat 50%;
+    background: url('../components/assets/line-seed.svg') no-repeat 50%;
 
     content: '';
   }
@@ -127,7 +127,7 @@ const CheckboxWrapper = styled.div`
     width: 16px;
     height: 39px;
 
-    background: url('./assets/line-saved.svg') no-repeat 50%;
+    background: url('../components/assets/line-saved.svg') no-repeat 50%;
 
     content: '';
   }

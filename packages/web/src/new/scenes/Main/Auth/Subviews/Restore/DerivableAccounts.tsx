@@ -9,7 +9,7 @@ import { Icon } from 'components/ui';
 import { Popover } from 'components/ui/Popover';
 import { useViewModel } from 'new/core/viewmodels/useViewModel';
 import { AuthViewModel } from 'new/scenes/Main/Auth/Auth.ViewModel';
-import { WalletPlaceholder } from 'new/scenes/Main/Auth/Subviews/components/WalletPlaceholder';
+import { WalletPlaceholder } from 'new/scenes/Main/Auth/Subviews/Restore/WalletPlaceholder';
 import type { Wallet } from 'new/sdk/SolanaSDK';
 import { StaticSectionsCollectionView } from 'new/ui/components/common/StaticSectionsCollectionView';
 

@@ -14,8 +14,8 @@ import { ToastManager } from 'components/common/ToastManager';
 import { useViewModel } from 'new/core/viewmodels/useViewModel';
 import { AuthViewModel } from 'new/scenes/Main/Auth/Auth.ViewModel';
 
-import { Button } from './Button';
-import { MnemonicTextarea as MnemonicInput } from './MnemonicInput';
+import { Button } from '../components/Button';
+import { MnemonicTextarea as MnemonicInput } from '../Create/MnemonicInput';
 
 const Wrapper = styled.div`
   margin-top: 32px;
@@ -56,11 +56,11 @@ const WalletIcon = styled.div`
   margin-right: 16px;
 
   &.sollet {
-    background: url('./assets/sollet.svg') no-repeat 50%;
+    background: url('../components/assets/sollet.svg') no-repeat 50%;
   }
 
   &.phantom {
-    background: url('./assets/phantom.png') no-repeat 50%;
+    background: url('../components/assets/phantom.png') no-repeat 50%;
   }
 `;
 
@@ -69,7 +69,7 @@ const ArrowIcon = styled.div`
   width: 20px;
   height: 20px;
 
-  background: url('./assets/arrow-right.svg') no-repeat 100% 50%;
+  background: url('../components/assets/arrow-right.svg') no-repeat 100% 50%;
   opacity: 0.15;
 `;
 
