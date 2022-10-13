@@ -114,6 +114,10 @@ export class Wallet {
     return this.amount * this.priceInCurrentFiat;
   }
 
+  get shortAddress() {
+    return `${this.pubkey?.slice(0, 4)}…${this.pubkey?.slice(-4)}`;
+  }
+
   updateVisibility() {
     const userInfo = this.getParsedUserInfo();
     userInfo._isHidden = this.isHidden;

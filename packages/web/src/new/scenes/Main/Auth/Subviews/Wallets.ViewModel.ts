@@ -43,16 +43,19 @@ export class WalletsListViewModel extends SDListViewModel<Wallet> {
     return yield this._connection
       .getMultipleAccountsInfo(derivableTokenAccountPublicKeys)
       .then((accounts) => {
-        return accounts.map((acc) => {
-          if (acc) {
-            return Wallet.nativeSolana({
-              lamports: new u64(acc?.lamports),
-              pubkey: acc?.owner.toString(),
-            });
-          }
+        // @FIXME ad if correct
+        return accounts
+          .map((acc, idx) => {
+            if (acc) {
+              return Wallet.nativeSolana({
+                lamports: new u64(acc?.lamports),
+                pubkey: derivableTokenAccountPublicKeys[idx]?.toString(),
+              });
+            }
 
-          return acc;
-        });
+            return acc;
+          })
+          .filter(Boolean);
       });
   });
 

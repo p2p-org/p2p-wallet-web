@@ -17,6 +17,7 @@ import { StaticSectionsCollectionView } from 'new/ui/components/common/StaticSec
 
 import type { SelectorItemType } from './Selector';
 import { Selector } from './Selector';
+import { WalletRow } from './WalletRow';
 
 const Wrapper = styled.div`
   position: relative;
@@ -108,6 +109,14 @@ export const DerivableAccounts: FC = observer(() => {
     });
   }, []);
 
+  // const wl = viewModel.walletListsViewModel.data[0];
+  //
+  // console.log(wl?.amount);
+  // console.log(wl?.name);
+  // console.log(wl?.pubkey);
+  // console.log(wl?.token);
+  // console.log(wl?.userInfo);
+
   return (
     <Wrapper>
       <SelectDerivationPath>
@@ -140,15 +149,8 @@ export const DerivableAccounts: FC = observer(() => {
         <StaticSectionsCollectionView<Wallet>
           viewModel={viewModel.walletListsViewModel}
           renderPlaceholder={(key) => <WalletPlaceholder key={key} />}
-          renderItem={() => <p>item</p>}
+          renderItem={(wallet) => <WalletRow wallet={wallet} key={wallet.pubkey} />}
         />
-        {/*{viewModel.derivableAccounts.map((tokenAccount) => (*/}
-        {/*  // <TokenAccountRowStyled*/}
-        {/*  //   key={tokenAccount?.key?.toBase58()}*/}
-        {/*  //   tokenAccount={tokenAccount}*/}
-        {/*  //   showAddress*/}
-        {/*  // />*/}
-        {/*))}*/}
       </AccountsWrapper>
 
       <Button onClick={viewModel.nextStep}>Continue</Button>
