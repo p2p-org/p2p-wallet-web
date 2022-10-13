@@ -95,13 +95,15 @@ export const DerivableAccounts: FC = observer(() => {
   const viewModel = useViewModel(AuthViewModel);
 
   useEffect(() => {
-    viewModel.seed.then((seedString) => {
-      viewModel.walletListsViewModel.fetchWallets({
-        seed: seedString,
-        derivationPathValue: viewModel.authInfo.derivationPath.value,
-      });
-    });
-  }, []);
+    viewModel.seed
+      .then((seedString) => {
+        viewModel.walletListsViewModel.fetchWallets({
+          seed: seedString,
+          derivationPathValue: viewModel.authInfo.derivationPath.value,
+        });
+      })
+      .catch(console.error);
+  }, [viewModel.authInfo.derivationPath.value]);
 
   return (
     <Wrapper>
