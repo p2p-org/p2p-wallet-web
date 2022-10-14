@@ -43,7 +43,9 @@ export class RecipientsListViewModel extends SDListViewModel<Recipient> {
     this.addReaction(
       reaction(
         () => this._sendViewModel.network,
-        (network) => (this._preSelectedNetwork = network),
+        (network) => {
+          this._preSelectedNetwork = network;
+        },
       ),
     );
   }
