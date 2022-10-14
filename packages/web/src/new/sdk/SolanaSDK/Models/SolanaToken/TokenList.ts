@@ -1,6 +1,7 @@
 import type { Network } from '@saberhq/solana-contrib';
 import { chainIdToNetwork } from '@saberhq/token-utils';
 
+import type { Lamports } from 'new/sdk/SolanaSDK';
 import { SolanaSDKPublicKey } from 'new/sdk/SolanaSDK';
 
 export class TokenList {
@@ -26,6 +27,7 @@ export class Token {
   logoURI?: string | null;
   tags: string[];
   extensions?: TokenExtensions | null;
+  supply?: Lamports | null;
   private _isNative: boolean;
 
   constructor({
@@ -38,6 +40,7 @@ export class Token {
     tags = [],
     extensions,
     isNative = false,
+    supply,
   }: {
     chainId: number;
     address: string;
@@ -48,6 +51,7 @@ export class Token {
     tags?: string[];
     extensions?: TokenExtensions | null;
     isNative?: boolean;
+    supply?: Lamports;
   }) {
     this.chainId = chainId;
     this.address = address;
@@ -57,6 +61,7 @@ export class Token {
     this.logoURI = logoURI;
     this.tags = tags;
     this.extensions = extensions;
+    this.supply = supply;
     this._isNative = isNative;
 
     this.network = chainIdToNetwork(chainId);
@@ -70,10 +75,12 @@ export class Token {
     mint,
     decimals = 0,
     symbol = '',
+    supply,
   }: {
     mint?: string;
     decimals?: number;
     symbol?: string;
+    supply?: Lamports;
   }): Token {
     return new Token({
       chainId: 101,
@@ -84,6 +91,7 @@ export class Token {
       logoURI: null,
       tags: [],
       extensions: null,
+      supply,
     });
   }
 

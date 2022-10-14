@@ -6,7 +6,7 @@ import { convertToBalance } from 'new/sdk/SolanaSDK';
 import { Defaults } from 'new/services/Defaults';
 import type { CurrentPrice } from 'new/services/PriceAPIs/PricesService';
 
-import type { Lamports } from './SolanaSDKModels';
+import type { Lamports } from './Models';
 import { Token } from './SolanaToken';
 
 interface SolanaWalletUserInfo {
@@ -29,6 +29,7 @@ export class Wallet {
   lamports?: Lamports | null;
   token: Token;
   userInfo: object | null = null;
+  supply?: number | null;
 
   get isNativeSOL(): boolean {
     return this.token.isNativeSOL;
@@ -37,14 +38,17 @@ export class Wallet {
   constructor({
     pubkey = null,
     lamports = null,
+    supply = null,
     token,
   }: {
     pubkey?: string | null;
     lamports?: Lamports | null;
+    supply?: number | null;
     token: Token;
   }) {
     this.pubkey = pubkey;
     this.lamports = lamports;
+    this.supply = supply;
     this.token = token;
 
     makeAutoObservable(this);

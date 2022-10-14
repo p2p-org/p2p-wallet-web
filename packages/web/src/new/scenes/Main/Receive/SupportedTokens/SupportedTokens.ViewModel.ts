@@ -4,13 +4,13 @@ import { singleton } from 'tsyringe';
 import { SDListViewModel } from 'new/core/viewmodels/SDListViewModel';
 import type { Token } from 'new/sdk/SolanaSDK';
 import { excludingSpecialTokens } from 'new/sdk/SolanaSDK';
-import { SolanaService } from 'new/services/SolanaService';
+import { TokensRepository } from 'new/services/Repositories';
 
 @singleton()
 export class SupportedTokensViewModel extends SDListViewModel<Token> {
   keyword = '';
 
-  constructor(private _solanaSDK: SolanaService) {
+  constructor(private _tokensRepository: TokensRepository) {
     super();
 
     makeObservable(this, {
@@ -38,7 +38,7 @@ export class SupportedTokensViewModel extends SDListViewModel<Token> {
   ): Generator<Promise<Token[]>> {
     const existingSymbols = new Set<string>();
 
-    return yield this._solanaSDK
+    return yield this._tokensRepository
       .getTokensList()
       .then((tokens) => excludingSpecialTokens(tokens))
       .then((tokens) =>

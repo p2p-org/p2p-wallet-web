@@ -6,7 +6,7 @@ import { SDListViewModel } from 'new/core/viewmodels/SDListViewModel';
 import { SDFetcherState } from 'new/core/viewmodels/SDViewModel';
 import { excludingSpecialTokens, Wallet } from 'new/sdk/SolanaSDK';
 import { PricesService } from 'new/services/PriceAPIs/PricesService';
-import { WalletsRepository } from 'new/services/Repositories';
+import { TokensRepository, WalletsRepository } from 'new/services/Repositories';
 import { SolanaService } from 'new/services/SolanaService';
 
 @injectable()
@@ -20,7 +20,7 @@ export class ChooseWalletViewModel extends SDListViewModel<Wallet> {
 
   constructor(
     private _walletsRepository: WalletsRepository,
-    // private _tokensRepository: TokensRepository,
+    private _tokensRepository: TokensRepository,
     private _solanaSDK: SolanaService,
     private _pricesService: PricesService,
   ) {
@@ -109,7 +109,7 @@ export class ChooseWalletViewModel extends SDListViewModel<Wallet> {
     assert(this.showOtherWallets !== null, 'Set showOtherWallets');
 
     if (this.showOtherWallets) {
-      return yield this._solanaSDK
+      return yield this._tokensRepository
         .getTokensList()
         .then((tokens) => excludingSpecialTokens(tokens))
         .then((tokens) =>
