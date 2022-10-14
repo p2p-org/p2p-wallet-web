@@ -83,9 +83,6 @@ export class BuyViewModel extends ViewModel {
     this._addReactions();
 
     this._startUpdating();
-
-    // should be here in initialization (not in setDefaults) to get proper symbol from current url
-    runInAction(() => (this.crypto = new CryptoCurrency(this._getSymbolFromParams())));
   }
 
   protected override afterReactionsRemoved() {
@@ -100,6 +97,9 @@ export class BuyViewModel extends ViewModel {
           if (symbol) {
             this._setCryptoCurrency(this.cryptoCurrenciesForSelect[symbol]);
           }
+        },
+        {
+          fireImmediately: true,
         },
       ),
     );
