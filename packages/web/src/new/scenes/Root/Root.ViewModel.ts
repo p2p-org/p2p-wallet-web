@@ -6,7 +6,7 @@ import { PricesService } from 'new/services/PriceAPIs/PricesService';
 
 @singleton()
 export class RootViewModel extends ViewModel {
-  constructor(private _pricesService: PricesService, private _walletModel: WalletModel) {
+  constructor(private _pricesService: PricesService, public walletModel: WalletModel) {
     super();
   }
 

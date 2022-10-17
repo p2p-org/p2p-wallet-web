@@ -4,6 +4,7 @@ import { BaseMessageSignerWalletAdapter, WalletReadyState } from '@solana/wallet
 import type { PublicKey, Signer, Transaction } from '@solana/web3.js';
 import bs58 from 'bs58';
 import { pbkdf2 } from 'crypto';
+import { singleton } from 'tsyringe';
 import nacl from 'tweetnacl';
 
 import type { ConnectConfig, StorageInfo } from 'new/scenes/Main/Auth/typings';
@@ -15,6 +16,7 @@ export interface Wallet {
   publicKey: PublicKey;
 }
 
+@singleton()
 export class MnemonicAdapter extends BaseMessageSignerWalletAdapter {
   name = 'MnemonicWallet' as WalletName;
   icon = '';

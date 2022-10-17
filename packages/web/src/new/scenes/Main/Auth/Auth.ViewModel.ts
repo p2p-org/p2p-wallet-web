@@ -1,9 +1,11 @@
+import { PublicKey } from '@solana/web3.js';
 import * as bip39 from 'bip39';
 import { action, computed, makeObservable, observable, reaction, when } from 'mobx';
 import { singleton } from 'tsyringe';
 
 import { isDev, localMnemonic } from 'config/constants';
 import { ViewModel } from 'new/core/viewmodels/ViewModel';
+import { WalletModel } from 'new/models/WalletModel';
 import { WalletsListViewModel } from 'new/scenes/Main/Auth/Subviews/Wallets.ViewModel';
 
 import type { AuthInfo, AuthState, DerivationPathOption } from './typings';
@@ -50,7 +52,10 @@ export class AuthViewModel extends ViewModel {
     }),
   };
 
-  constructor(public walletListsViewModel: WalletsListViewModel) {
+  constructor(
+    public walletListsViewModel: WalletsListViewModel,
+    private _walletModel: WalletModel,
+  ) {
     super();
 
     this.step = AuthViewModel.defaultState.step;
@@ -164,8 +169,18 @@ export class AuthViewModel extends ViewModel {
       this.authInfo.derivationPath.value,
     );
 
-    // eslint-disable-next-line
-    console.log(keyPair);
+    const signer = {
+      publicKey: new PublicKey(keyPair.publicKey),
+      secretKey: keyPair.secretKey,
+    };
+
+    const storageInfo = {
+      mnemonic: this.authInfo.mnemonic,
+      password: this.authInfo.password,
+      seed,
+    };
+
+    await this._walletModel.connectAdaptor('MnemonicWallet', { signer, storageInfo });
   }
 
   setMnemonic(value: string): void {

@@ -11,6 +11,8 @@ import { PublicKey } from '@solana/web3.js';
 import { autorun, computed, makeObservable, observable, runInAction } from 'mobx';
 import { singleton } from 'tsyringe';
 
+import type { MnemonicAdapter } from 'new/scenes/Main/Auth/MnemonicAdapter';
+import type { ConnectConfig } from 'new/scenes/Main/Auth/typings';
 import { WalletAdaptorService } from 'new/services/WalletAdaptorService';
 
 import { Model } from '../../core/models/Model';
@@ -30,7 +32,6 @@ export class WalletModel extends Model {
     this.network = WalletAdapterNetwork.Mainnet;
     this.publicKey = '';
     this.connected = false;
-
     makeObservable(this, {
       name: observable,
       publicKey: observable,
@@ -69,23 +70,19 @@ export class WalletModel extends Model {
     super.onEnd();
   }
 
-  protected async setupAdaptors() {
+  protected setupAdaptors() {
     const { network } = this;
 
     const originalAdaptors = this.walletAdaptorService.getAdaptors(network);
 
-    const newAdaptors = await Promise.all(
-      originalAdaptors.map(async (value) => await this.setUpAdaptor(value)),
-    );
+    const newAdaptors = originalAdaptors.map((value) => this.setUpAdaptor(value));
 
     runInAction(() => {
       this.adaptors = newAdaptors;
     });
   }
 
-  protected async onConnect(adaptor: Adapter, publicKey: PublicKey) {
-    await adaptor.connect();
-
+  protected onConnect(adaptor: Adapter, publicKey: PublicKey) {
     runInAction(() => {
       this.selectedAdaptor = adaptor;
       this.connected = this.selectedAdaptor.connected;
@@ -94,9 +91,7 @@ export class WalletModel extends Model {
     });
   }
 
-  protected async onDisconnect(adaptor: Adapter) {
-    await adaptor.disconnect();
-
+  protected onDisconnect(adaptor: Adapter) {
     runInAction(() => {
       this.connected = adaptor.connected;
       this.name = '';
@@ -104,17 +99,29 @@ export class WalletModel extends Model {
     });
   }
 
-  protected async setUpAdaptor(adaptor: Adapter): Promise<Adapter> {
-    adaptor.on('connect', async (publicKey: PublicKey) => {
-      await this.onConnect(adaptor, publicKey);
+  setUpAdaptor(adaptor: Adapter | MnemonicAdapter): Adapter {
+    adaptor.on('connect', (publicKey: PublicKey) => {
+      this.onConnect(adaptor, publicKey);
     });
-    adaptor.on('disconnect', async () => {
-      await this.onDisconnect(adaptor);
+    adaptor.on('disconnect', () => {
+      this.onDisconnect(adaptor);
     });
     if (adaptor.connected && adaptor.publicKey) {
-      await this.onConnect(adaptor, adaptor.publicKey);
+      this.onConnect(adaptor, adaptor.publicKey);
     }
+
     return adaptor;
+  }
+
+  async connectAdaptor(adaptorName: string, config?: ConnectConfig) {
+    const adaptors = this.walletAdaptorService.getAdaptors(this.network);
+    const chosenAdaptor = adaptors.find((adaptor) => adaptor.name === adaptorName);
+
+    if (chosenAdaptor) {
+      this.setUpAdaptor(chosenAdaptor);
+
+      await chosenAdaptor.connect(config);
+    }
   }
 
   get pubKey(): PublicKey {
