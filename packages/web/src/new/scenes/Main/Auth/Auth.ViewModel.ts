@@ -11,6 +11,7 @@ import { WizardSteps } from './typings';
 import {
   DERIVATION_PATH,
   generateEncryptedTextAsync,
+  getKeyPairFromSeed,
   mnemonicToSeed,
   setStorageValue,
 } from './utils';
@@ -38,6 +39,7 @@ export class AuthViewModel extends ViewModel {
   initialRestoreMnemonic: string;
 
   private static _storageKey = 'encryptedSeedAndMnemonic';
+  private static _walletIndex = 0;
   static _mnemonicStrength = 256;
 
   static defaultState: AuthState = {
@@ -82,7 +84,6 @@ export class AuthViewModel extends ViewModel {
     });
   }
 
-  // @loggable()
   protected override onInitialize(): void {
     this.walletListsViewModel.initialize();
 
@@ -159,6 +160,17 @@ export class AuthViewModel extends ViewModel {
 
   setPassword(value: string): void {
     this.authInfo.password = value;
+  }
+
+  async finalize() {
+    await this.saveEncryptedMnemonicAndSeed();
+    const seed = await this.seed;
+
+    const keyPair = getKeyPairFromSeed(
+      seed,
+      AuthViewModel._walletIndex,
+      this.authInfo.derivationPath.value,
+    );
   }
 
   setMnemonic(value: string): void {

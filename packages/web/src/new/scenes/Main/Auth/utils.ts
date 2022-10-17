@@ -82,6 +82,14 @@ export const setStorageValue = <T>(key: string, data: T, { msTTL }: { msTTL?: nu
   return localStorage.setItem(key, JSON.stringify(expiringData));
 };
 
+export const deriveSecretKeyFromSeed = (
+  seed: string,
+  walletIndex: number,
+  derivationPath: ValueOf<typeof DERIVATION_PATH>,
+) => {
+  return getKeyPairFromSeed(seed, walletIndex, derivationPath).secretKey;
+};
+
 const deriveSeed = (
   seed: string,
   walletIndex: number,
@@ -103,7 +111,7 @@ const deriveSeed = (
   }
 };
 
-function getKeyPairFromSeed(
+export function getKeyPairFromSeed(
   seed: string,
   walletIndex: number,
   derivationPath: ValueOf<typeof DERIVATION_PATH>,

@@ -30,6 +30,7 @@ export class WalletModel extends Model {
     this.network = WalletAdapterNetwork.Mainnet;
     this.publicKey = '';
     this.connected = false;
+
     makeObservable(this, {
       name: observable,
       publicKey: observable,

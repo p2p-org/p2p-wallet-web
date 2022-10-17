@@ -100,12 +100,9 @@ export const Final: FC = observer(() => {
   };
 
   const handleFinishClick = () => {
-    // @TODO look at the original file
-    // there is privateKey and activate methods
-    // they should go into the mnemonic adapter
     viewModel.setIsLoading(true);
     try {
-      void viewModel.saveEncryptedMnemonicAndSeed();
+      void viewModel.finalize();
     } catch (error) {
       ToastManager.error((error as Error).message);
     } finally {
