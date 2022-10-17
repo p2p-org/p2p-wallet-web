@@ -1,6 +1,7 @@
 // @TODO might not need this decorator
 import type { Wallet } from '@project-serum/anchor';
-import { BaseMessageSignerWalletAdapter } from '@solana/wallet-adapter-base';
+import type { WalletName } from '@solana/wallet-adapter-base';
+import { BaseMessageSignerWalletAdapter, WalletReadyState } from '@solana/wallet-adapter-base';
 import type { PublicKey, Signer, Transaction } from '@solana/web3.js';
 
 export interface Wallet {
@@ -10,7 +11,12 @@ export interface Wallet {
 }
 
 export class MnemonicAdapter extends BaseMessageSignerWalletAdapter {
+  name = 'MnemonicWallet' as WalletName;
+  icon = '';
+  url = '';
   private _account: Signer | null = null;
+  private _connecting = false;
+  private _readyState = WalletReadyState.NotDetected;
   private static _noKeypairError = 'No keypair to sign transactions';
 
   constructor() {
@@ -37,14 +43,31 @@ export class MnemonicAdapter extends BaseMessageSignerWalletAdapter {
     return Promise.reject(MnemonicAdapter._noKeypairError);
   }
 
-  get pubKey() {
-    return this._account?.publicKey;
+  async signMessage(message: Uint8Array): Promise<Uint8Array> {
+    return Promise.resolve(message);
   }
 
-  set signer(signer: Signer) {
-    this._account = signer;
-    this.publicKey = signer.publicKey;
+  async disconnect(): Promise<void> {
+    return Promise.resolve();
   }
 
-  // add connect
+  get publicKey(): PublicKey | null {
+    return this._account?.publicKey || null;
+  }
+
+  get connecting(): boolean {
+    return this._connecting;
+  }
+
+  get readyState(): WalletReadyState {
+    return this._readyState;
+  }
+
+  override async connect(signer?: Signer): Promise<void> {
+    if (signer) {
+      this._account = signer;
+    }
+
+    return Promise.resolve();
+  }
 }
