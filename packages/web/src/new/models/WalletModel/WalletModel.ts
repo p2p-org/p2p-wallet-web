@@ -69,19 +69,23 @@ export class WalletModel extends Model {
     super.onEnd();
   }
 
-  protected setupAdaptors() {
+  protected async setupAdaptors() {
     const { network } = this;
 
     const originalAdaptors = this.walletAdaptorService.getAdaptors(network);
 
-    const newAdaptors = originalAdaptors.map((value) => this.setUpAdaptor(value));
+    const newAdaptors = await Promise.all(
+      originalAdaptors.map(async (value) => await this.setUpAdaptor(value)),
+    );
 
     runInAction(() => {
       this.adaptors = newAdaptors;
     });
   }
 
-  protected onConnect(adaptor: Adapter, publicKey: PublicKey) {
+  protected async onConnect(adaptor: Adapter, publicKey: PublicKey) {
+    await adaptor.connect();
+
     runInAction(() => {
       this.selectedAdaptor = adaptor;
       this.connected = this.selectedAdaptor.connected;
@@ -90,7 +94,9 @@ export class WalletModel extends Model {
     });
   }
 
-  protected onDisconnect(adaptor: Adapter) {
+  protected async onDisconnect(adaptor: Adapter) {
+    await adaptor.disconnect();
+
     runInAction(() => {
       this.connected = adaptor.connected;
       this.name = '';
@@ -98,15 +104,15 @@ export class WalletModel extends Model {
     });
   }
 
-  protected setUpAdaptor(adaptor: Adapter): Adapter {
-    adaptor.on('connect', (publicKey: PublicKey) => {
-      this.onConnect(adaptor, publicKey);
+  protected async setUpAdaptor(adaptor: Adapter): Promise<Adapter> {
+    adaptor.on('connect', async (publicKey: PublicKey) => {
+      await this.onConnect(adaptor, publicKey);
     });
-    adaptor.on('disconnect', () => {
-      this.onDisconnect(adaptor);
+    adaptor.on('disconnect', async () => {
+      await this.onDisconnect(adaptor);
     });
     if (adaptor.connected && adaptor.publicKey) {
-      this.onConnect(adaptor, adaptor.publicKey);
+      await this.onConnect(adaptor, adaptor.publicKey);
     }
     return adaptor;
   }

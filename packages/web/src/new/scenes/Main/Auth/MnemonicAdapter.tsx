@@ -6,6 +6,7 @@ import bs58 from 'bs58';
 import { pbkdf2 } from 'crypto';
 import nacl from 'tweetnacl';
 
+import type { ConnectConfig, StorageInfo } from 'new/scenes/Main/Auth/typings';
 import { setStorageValue } from 'new/scenes/Main/Auth/utils';
 
 export interface Wallet {
@@ -13,17 +14,6 @@ export interface Wallet {
   signAllTransactions(txs: Transaction[]): Promise<Transaction[]>;
   publicKey: PublicKey;
 }
-
-type ConnectConfig = {
-  signer: Signer;
-  storageInfo: StorageInfo;
-};
-
-type StorageInfo = {
-  mnemonic: string;
-  seed: string;
-  password: string;
-};
 
 export class MnemonicAdapter extends BaseMessageSignerWalletAdapter {
   name = 'MnemonicWallet' as WalletName;
