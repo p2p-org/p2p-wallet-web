@@ -1,8 +1,6 @@
 import type { ValueOf } from '@p2p-wallet-web/core/dist/esm';
 import * as bip32 from 'bip32';
 import * as bip39 from 'bip39';
-import bs58 from 'bs58';
-import { pbkdf2 } from 'crypto';
 import * as ed25519 from 'ed25519-hd-key';
 import nacl from 'tweetnacl';
 
@@ -43,39 +41,7 @@ export const mnemonicToSeed = async (mnemonic: string) => {
   return Buffer.from(seed).toString('hex');
 };
 
-async function deriveEncryptionKey(
-  password: string,
-  salt: Uint8Array,
-  iterations: number,
-  digest: string,
-) {
-  return new Promise<Buffer>((resolve, reject) =>
-    pbkdf2(password, salt, iterations, nacl.secretbox.keyLength, digest, (err, key) =>
-      err ? reject(err) : resolve(key),
-    ),
-  );
-}
-
 // @TODO where is this logic coming from?
-export const generateEncryptedTextAsync = async (plaintext: string, password: string) => {
-  const salt = nacl.randomBytes(16);
-  const kdf = 'pbkdf2';
-  const iterations = 100000;
-  const digest = 'sha256';
-
-  const nonce = nacl.randomBytes(nacl.secretbox.nonceLength);
-  const key = await deriveEncryptionKey(password, salt, iterations, digest);
-  const encrypted = nacl.secretbox(Buffer.from(plaintext), nonce, key);
-
-  return {
-    encrypted: bs58.encode(encrypted),
-    nonce: bs58.encode(nonce),
-    kdf,
-    salt: bs58.encode(salt),
-    iterations,
-    digest,
-  };
-};
 
 export const setStorageValue = <T>(key: string, data: T, { msTTL }: { msTTL?: number } = {}) => {
   const expiringData = createExpiringValue(data, msTTL);

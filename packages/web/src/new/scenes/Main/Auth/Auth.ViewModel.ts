@@ -8,13 +8,7 @@ import { WalletsListViewModel } from 'new/scenes/Main/Auth/Subviews/Wallets.View
 
 import type { AuthInfo, AuthState, DerivationPathOption } from './typings';
 import { WizardSteps } from './typings';
-import {
-  DERIVATION_PATH,
-  generateEncryptedTextAsync,
-  getKeyPairFromSeed,
-  mnemonicToSeed,
-  setStorageValue,
-} from './utils';
+import { DERIVATION_PATH, getKeyPairFromSeed, mnemonicToSeed } from './utils';
 
 const createList = [
   WizardSteps.CREATE_START,
@@ -38,7 +32,6 @@ export class AuthViewModel extends ViewModel {
   initialCreateMnemonic: string;
   initialRestoreMnemonic: string;
 
-  private static _storageKey = 'encryptedSeedAndMnemonic';
   private static _walletIndex = 0;
   static _mnemonicStrength = 256;
 
@@ -163,7 +156,6 @@ export class AuthViewModel extends ViewModel {
   }
 
   async finalize() {
-    await this.saveEncryptedMnemonicAndSeed();
     const seed = await this.seed;
 
     const keyPair = getKeyPairFromSeed(
@@ -171,6 +163,9 @@ export class AuthViewModel extends ViewModel {
       AuthViewModel._walletIndex,
       this.authInfo.derivationPath.value,
     );
+
+    // eslint-disable-next-line
+    console.log(keyPair);
   }
 
   setMnemonic(value: string): void {
@@ -183,16 +178,6 @@ export class AuthViewModel extends ViewModel {
 
   setIsLoading(value: boolean): void {
     this.isLoading = value;
-  }
-
-  async saveEncryptedMnemonicAndSeed() {
-    const plaintext = JSON.stringify({
-      mnemonic: this.authInfo.mnemonic,
-      seed: await this.seed,
-    });
-    const locked = await generateEncryptedTextAsync(plaintext, this.authInfo.password);
-
-    setStorageValue(AuthViewModel._storageKey, JSON.stringify(locked));
   }
 
   get seed(): Promise<string> {
