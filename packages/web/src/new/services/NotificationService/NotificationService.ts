@@ -1,11 +1,7 @@
 import { makeObservable, observable, runInAction } from 'mobx';
 import { singleton } from 'tsyringe';
 
-import type { TransferParams } from 'new/ui/components/common/NotifyToast/NotifyToast';
-import type {
-  RendererParams,
-  RendererType,
-} from 'new/ui/managers/NotificationManager/NotificationManager';
+import type { RendererType } from 'new/ui/managers/NotificationManager/NotificationManager';
 
 export type ToastType = 'info' | 'warn' | 'error' | 'component';
 
@@ -184,11 +180,7 @@ export class NotificationService {
     this._addToast({ type: 'error', header, text });
   }
 
-  show(params: RendererParams & TransferParams): void {
-    this._addToast(params);
-  }
-
-  component(renderer: RendererType): void {
+  show(renderer: RendererType): void {
     this._addToast({ type: 'component', renderer });
   }
 }

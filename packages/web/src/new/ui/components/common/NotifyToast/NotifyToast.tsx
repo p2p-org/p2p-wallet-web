@@ -147,6 +147,8 @@ const ButtonWrapper = styled.div`
 `;
 
 export type TransferParams = {
+  header?: string;
+  text?: string;
   status?:
     | 'processing'
     | 'success'
