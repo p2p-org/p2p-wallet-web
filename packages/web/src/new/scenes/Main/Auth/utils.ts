@@ -96,13 +96,3 @@ export const derivePublicKeyFromSeed = (
 ) => {
   return getKeyPairFromSeed(seed, walletIndex, derivationPath).publicKey;
 };
-
-/* eslint-disable */
-export function loggable() {
-  return function (_: any, propertyKey: string, __: PropertyDescriptor) {
-    console.log('**************************');
-    console.log(_.metadata);
-    console.log(propertyKey);
-  };
-}
-/* eslint-enable */

@@ -9,6 +9,7 @@ import nacl from 'tweetnacl';
 
 import type { ConnectConfig, StorageInfo } from 'new/scenes/Main/Auth/typings';
 import { setStorageValue } from 'new/scenes/Main/Auth/utils';
+import { notImplemented } from 'new/utils/decorators';
 
 export interface Wallet {
   signTransaction(tx: Transaction): Promise<Transaction>;
@@ -51,11 +52,14 @@ export class MnemonicAdapter extends BaseMessageSignerWalletAdapter {
     return Promise.reject(MnemonicAdapter._noKeypairError);
   }
 
+  @notImplemented()
   async signMessage(message: Uint8Array): Promise<Uint8Array> {
     return Promise.resolve(message);
   }
 
   async disconnect(): Promise<void> {
+    this._account = null;
+
     return Promise.resolve();
   }
 
@@ -71,7 +75,20 @@ export class MnemonicAdapter extends BaseMessageSignerWalletAdapter {
     return this._readyState;
   }
 
+  get wallet(): Wallet {
+    if (!this._account) {
+      throw new TypeError('No account exists for the wallet');
+    }
+
+    return {
+      publicKey: this.publicKey as PublicKey,
+      signTransaction: this.signTransaction.bind(this),
+      signAllTransactions: this.signAllTransactions.bind(this),
+    };
+  }
+
   async connect(config?: ConnectConfig): Promise<void> {
+    this._connecting = true;
     try {
       if (config?.signer) {
         this._account = config.signer;
@@ -83,6 +100,8 @@ export class MnemonicAdapter extends BaseMessageSignerWalletAdapter {
     } catch (error: any) {
       this.emit('error', error);
       throw error;
+    } finally {
+      this._connecting = false;
     }
   }
 

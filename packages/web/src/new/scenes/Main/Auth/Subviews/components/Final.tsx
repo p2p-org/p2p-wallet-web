@@ -8,6 +8,7 @@ import LogoImg from 'assets/images/big-logo.png';
 import { ToastManager } from 'components/common/ToastManager';
 import { Switch } from 'components/ui';
 import { useViewModel } from 'new/core/viewmodels/useViewModel';
+import { RootViewModel } from 'new/scenes/Root/Root.ViewModel';
 
 import { AuthViewModel } from '../../Auth.ViewModel';
 import { Button } from './Button';
@@ -81,6 +82,9 @@ const SwitcherText = styled.span`
 
 export const Final: FC = observer(() => {
   const viewModel = useViewModel(AuthViewModel);
+  // @TODO move this into AuthRequired routes and do redirects
+  // next, somehow pass adapter into the solana model
+  const rootViewModel = useViewModel(RootViewModel);
 
   const [isSave, setIsSave] = useState(true);
   const [isShowModal, setIsShowModal] = useState(false);
