@@ -1,5 +1,6 @@
 import type { FC } from 'react';
 import { useState } from 'react';
+import { Redirect } from 'react-router-dom';
 
 import { styled } from '@linaria/react';
 import { observer } from 'mobx-react-lite';
@@ -82,8 +83,6 @@ const SwitcherText = styled.span`
 
 export const Final: FC = observer(() => {
   const viewModel = useViewModel(AuthViewModel);
-  // @TODO move this into AuthRequired routes and do redirects
-  // next, somehow pass adapter into the solana model
   const rootViewModel = useViewModel(RootViewModel);
 
   const [isSave, setIsSave] = useState(true);
@@ -113,6 +112,10 @@ export const Final: FC = observer(() => {
       viewModel.setIsLoading(false);
     }
   };
+
+  if (rootViewModel.walletModel.connected) {
+    return <Redirect to={'/wallets'} />;
+  }
 
   return (
     <Wrapper>
