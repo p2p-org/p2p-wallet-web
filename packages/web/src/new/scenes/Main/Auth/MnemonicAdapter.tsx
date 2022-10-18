@@ -75,18 +75,6 @@ export class MnemonicAdapter extends BaseMessageSignerWalletAdapter {
     return this._readyState;
   }
 
-  get wallet(): Wallet {
-    if (!this._account) {
-      throw new TypeError('No account exists for the wallet');
-    }
-
-    return {
-      publicKey: this.publicKey as PublicKey,
-      signTransaction: this.signTransaction.bind(this),
-      signAllTransactions: this.signAllTransactions.bind(this),
-    };
-  }
-
   async connect(config?: ConnectConfig): Promise<void> {
     this._connecting = true;
     try {

@@ -1,17 +1,13 @@
 import '@abraham/reflection';
 
-import type {
-  Adapter,
-  MessageSignerWalletAdapter,
-  SignerWalletAdapter,
-} from '@solana/wallet-adapter-base';
+import type { Adapter, MessageSignerWalletAdapter } from '@solana/wallet-adapter-base';
 import { WalletAdapterNetwork } from '@solana/wallet-adapter-base';
 import type { Transaction } from '@solana/web3.js';
 import { PublicKey } from '@solana/web3.js';
 import { autorun, computed, makeObservable, observable, runInAction } from 'mobx';
 import { singleton } from 'tsyringe';
 
-import type { MnemonicAdapter } from 'new/scenes/Main/Auth/MnemonicAdapter';
+import type { MnemonicAdapter, Wallet } from 'new/scenes/Main/Auth/MnemonicAdapter';
 import type { ConnectConfig } from 'new/scenes/Main/Auth/typings';
 import { WalletAdaptorService } from 'new/services/WalletAdaptorService';
 
@@ -128,8 +124,8 @@ export class WalletModel extends Model {
     return new PublicKey(this.publicKey);
   }
 
-  get signer(): SignerWalletAdapter {
-    return this.selectedAdaptor as SignerWalletAdapter;
+  get signer(): Wallet {
+    return this.selectedAdaptor as Wallet;
   }
 
   get messageSigner(): MessageSignerWalletAdapter {
