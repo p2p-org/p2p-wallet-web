@@ -1,20 +1,26 @@
 import { action, makeObservable, observable } from 'mobx';
 
-import { SDViewModel } from './SDViewModel';
+import type { SDListViewModelType } from './SDListViewModel';
+import { SDStreamViewModel } from './SDStreamViewModel';
+import { SDFetcherState } from './SDViewModel';
 
-export interface SDListViewModelType {}
-
-export abstract class SDListViewModel<T> extends SDViewModel<T[]> implements SDListViewModelType {
+export abstract class SDStreamListViewModel<T>
+  extends SDStreamViewModel<T[]>
+  implements SDListViewModelType
+{
   // Properties
 
   isPaginationEnabled: boolean;
   customFilter?(item: T): boolean;
   customSorter?(a: T, b: T): number;
+  get isEmpty(): boolean {
+    return this._isLastPageLoaded && this.data.length === 0;
+  }
 
   // For pagination
-
   limit: number;
   offset: number;
+  private _cache: T[] = [];
   private _isLastPageLoaded = false;
 
   protected constructor({
@@ -44,35 +50,58 @@ export abstract class SDListViewModel<T> extends SDViewModel<T[]> implements SDL
 
   // Actions
 
-  override flush() {
+  override clear() {
     this.offset = 0;
     this._isLastPageLoaded = false;
-    super.flush();
+    super.clear();
   }
 
   // Asynchronous request handler
-  override shouldRequest(): boolean {
-    return super.shouldRequest() && !this._isLastPageLoaded;
+
+  override isFetchable(): boolean {
+    return super.isFetchable() && !this._isLastPageLoaded;
   }
 
   fetchNext() {
-    super.request();
+    super.fetch();
   }
 
-  override handleNewData(newItems: T[]) {
-    const _newData = this.join(newItems);
-
-    // resign state
-    if (!this.isPaginationEnabled || newItems.length < this.limit) {
-      this._isLastPageLoaded = true;
+  override fetch(force = false): void {
+    if (force) {
+      this.cancelRequest();
+    } else if (!this.isFetchable()) {
+      // there is an running operation
+      return;
     }
 
-    // map
-    const mappedData = this.map(_newData);
-    super.handleNewData(mappedData);
+    this.state = SDFetcherState.loading;
+    this._cache = [];
+    this.requestDisposable = this.next();
+    this.requestDisposable
+      .then((newData) => {
+        this.handleData(newData);
+      })
+      .catch((error) => {
+        this.handleError(error);
+      })
+      .finally(() => {
+        if (!this.isPaginationEnabled || this._cache.length < this.limit) {
+          this._isLastPageLoaded = true;
+        }
+        this.offset += this.limit;
+        this.state = SDFetcherState.loaded;
+      });
+  }
 
-    // get next offset
-    this.offset += this.limit;
+  override handleData(newItems: T[]) {
+    this._cache.push(...newItems);
+    const newData = this.join(newItems);
+
+    // map
+    const mappedData = this.map(newData);
+    super.handleData(mappedData);
+
+    this.state = SDFetcherState.loading;
   }
 
   join(newItems: T[]): T[] {
@@ -87,7 +116,7 @@ export abstract class SDListViewModel<T> extends SDViewModel<T[]> implements SDL
     const _newData = this.map(newData);
     // TODO: check equality!
     if (_newData !== this.data) {
-      super.handleNewData(_newData);
+      super.handleData(_newData);
     }
   }
 
@@ -100,6 +129,22 @@ export abstract class SDListViewModel<T> extends SDViewModel<T[]> implements SDL
       _newData = _newData.sort(this.customSorter);
     }
     return _newData;
+  }
+
+  setState(state: SDFetcherState, data?: T[]): void {
+    this.state = state;
+    if (data) {
+      this.overrideData(data);
+    }
+  }
+
+  // TODO: refreshUI?
+
+  getCurrentPage(): number | null {
+    if (!(this.isPaginationEnabled && this.limit === 0)) {
+      return null;
+    }
+    return this.offset / this.limit;
   }
 
   // Helper

@@ -16,6 +16,7 @@ function makeLocalStorage<T>(_this: { fromJSON(json: T): T }, name: string) {
     const json = JSON.parse(storedJson);
     set(_this, _this.fromJSON(json));
   }
+  // TODO: dispose
   autorun(() => {
     const value = toJS(_this);
     localStorage.setItem(name, JSON.stringify(value));
@@ -33,6 +34,7 @@ interface DefaultsKeys {
   hiddenWalletPubkey: string[];
   unhiddenWalletPubkey: string[];
   hideZeroBalances: boolean;
+  p2pFeePayerPubkeys: string[];
   prices: Record<string, CurrentPrice>;
   payingTokenMint: string;
 
@@ -50,6 +52,7 @@ class _Defaults implements DefaultsKeys {
   hiddenWalletPubkey: string[] = [];
   unhiddenWalletPubkey: string[] = [];
   hideZeroBalances = true;
+  p2pFeePayerPubkeys = [];
   prices: Record<string, CurrentPrice> = {};
   payingTokenMint: string = SolanaSDKPublicKey.wrappedSOLMint.toString();
 
@@ -67,6 +70,7 @@ class _Defaults implements DefaultsKeys {
       hiddenWalletPubkey: observable,
       unhiddenWalletPubkey: observable,
       hideZeroBalances: observable,
+      p2pFeePayerPubkeys: observable,
       prices: observable,
       payingTokenMint: observable,
 

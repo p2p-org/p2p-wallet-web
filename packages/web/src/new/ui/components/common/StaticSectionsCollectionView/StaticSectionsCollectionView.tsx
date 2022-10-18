@@ -4,13 +4,13 @@ import { observer } from 'mobx-react-lite';
 import { expr } from 'mobx-utils';
 import { nanoid } from 'nanoid';
 
-import type { ISDListViewModel } from 'new/core/viewmodels/SDListViewModel';
+import type { SDListViewModel } from 'new/core/viewmodels/SDListViewModel';
 import { SDFetcherState } from 'new/core/viewmodels/SDViewModel';
 
 import { SDCollectionViewItem } from './models/SDCollectionViewItem';
 
 interface Props<T> {
-  viewModel: Readonly<ISDListViewModel<T>>;
+  viewModel: Readonly<SDListViewModel<T>>;
   numberOfLoadingCells?: number;
   renderPlaceholder?: (key: string) => React.ReactNode;
   renderItem: (item: T, index: number) => React.ReactNode;

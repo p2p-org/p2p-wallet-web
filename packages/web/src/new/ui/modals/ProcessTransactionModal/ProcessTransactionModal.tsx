@@ -60,8 +60,7 @@ export const ProcessTransactionModal: FC<ProcessTransactionModalProps & ModalPro
     }
 
     useLayoutEffect(() => {
-      const disposer = viewModel.sendAndObserveTransaction();
-      return () => disposer();
+      return viewModel.sendAndObserveTransaction();
     }, []);
 
     const handleCloseClick = () => {

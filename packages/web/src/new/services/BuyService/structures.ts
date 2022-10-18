@@ -1,7 +1,6 @@
-import { USDC_MINT } from '@p2p-wallet-web/core';
-import { NATIVE_MINT } from '@solana/spl-token';
 import type { Cluster } from '@solana/web3.js';
 
+import { SolanaSDKPublicKey } from 'new/sdk/SolanaSDK';
 import { BASE_CURRENCY_SYMBOL } from 'new/services/BuyService/constants';
 import { Defaults } from 'new/services/Defaults';
 
@@ -104,15 +103,15 @@ export class CryptoCurrency {
 
   static Addresses = {
     'mainnet-beta': {
-      SOL: NATIVE_MINT.toBase58(),
-      USDC: USDC_MINT.toBase58(),
+      SOL: SolanaSDKPublicKey.wrappedSOLMint.toBase58(),
+      USDC: SolanaSDKPublicKey.usdcMint.toBase58(),
     },
     testnet: {
-      SOL: NATIVE_MINT.toBase58(),
+      SOL: SolanaSDKPublicKey.wrappedSOLMint.toBase58(),
       USDC: 'CpMah17kQEL2wqyMKt3mZBdTnZbkbfx4nqmQMFDP5vwp',
     },
     devnet: {
-      SOL: NATIVE_MINT.toBase58(),
+      SOL: SolanaSDKPublicKey.wrappedSOLMint.toBase58(),
       USDC: '4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU',
     },
   };

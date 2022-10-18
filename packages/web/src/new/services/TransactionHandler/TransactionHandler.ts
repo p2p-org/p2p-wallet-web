@@ -1,6 +1,7 @@
 import { ZERO } from '@orca-so/sdk';
 import { PublicKey } from '@solana/web3.js';
-import { action, computed, makeObservable, observable } from 'mobx';
+import type { IReactionDisposer } from 'mobx';
+import { action, computed, makeObservable, observable, ObservableMap, reaction } from "mobx";
 import promiseRetry from 'promise-retry';
 import { singleton } from 'tsyringe';
 
@@ -21,19 +22,26 @@ import type { RawTransactionType } from 'new/ui/modals/ProcessTransactionModal';
 import * as ProcessTransaction from 'new/ui/modals/ProcessTransactionModal/ProcessTransaction.Models';
 import type { Emitter } from 'new/utils/libs/nanoEvent';
 import { createNanoEvent } from 'new/utils/libs/nanoEvent';
+import { computedFn } from "mobx-utils";
 
 export type TransactionIndex = number;
 
 interface TransactionHandlerType {
   sendTransaction(processingTransaction: RawTransactionType): TransactionIndex;
-  observeTransaction(transactionIndex: TransactionIndex): PendingTransaction | null; // TODO: observable
+  observeTransaction(
+    transactionIndex: TransactionIndex,
+    cb: (tx: PendingTransaction | null) => void,
+  ): IReactionDisposer;
   readonly areSomeTransactionsInProgress: boolean;
 
-  observeProcessingTransactions(account: string): ParsedTransaction[]; // TODO: observable
-  observeProcessingTransactionsAll(): ParsedTransaction[]; // TODO: observable
+  observeProcessingTransactions(
+    account: string,
+    cb: (txs: ParsedTransaction[]) => void,
+  ): IReactionDisposer;
+  observeProcessingTransactionsAll(cb: (txs: ParsedTransaction[]) => void): IReactionDisposer;
 
-  getProccessingTransactions(account: string): ParsedTransaction[];
-  getProccessingTransactionAll(): ParsedTransaction[];
+  getProcessingTransactions(account: string): ParsedTransaction[];
+  getProcessingTransaction(): ParsedTransaction[];
 
   readonly onNewTransaction: Emitter<[{ trx: PendingTransaction; index: number }]>['on']; // TODO: observable
 }
@@ -61,8 +69,8 @@ export class TransactionHandler implements TransactionHandlerType {
 
       areSomeTransactionsInProgress: computed,
 
-      getProccessingTransactions: action,
-      getProcessingTransactionAll: action,
+      getProcessingTransactions: action,
+      getProcessingTransaction: action,
       sendAndObserve: action,
 
       _updateTransactionAtIndex: action,
@@ -93,18 +101,40 @@ export class TransactionHandler implements TransactionHandlerType {
     return txIndex;
   }
 
-  observeTransaction(transactionIndex: TransactionIndex): PendingTransaction | null {
-    return this.transactions[transactionIndex] ?? null;
+  observeTransaction(
+    transactionIndex: TransactionIndex,
+    cb: (tx: PendingTransaction | null) => void,
+  ): IReactionDisposer {
+    // return this.transactions[transactionIndex] ?? null;
+    return reaction(
+      () => this.transactions,
+      (transactions) => cb(transactions[transactionIndex] ?? null),
+    );
   }
 
   get areSomeTransactionsInProgress(): boolean {
     return this.transactions.some((tx) => tx.status.isProcessing);
   }
 
-  // observeProcessingTransactions(account: string): ParsedTransaction[] {}
-  // observeProcessingTransactionsAll(): ParsedTransaction[] {}
+  observeProcessingTransactions(
+    account: string,
+    cb: (txs: ParsedTransaction[]) => void,
+  ): IReactionDisposer {
+    return reaction(
+      () => this.transactions,
+      () => cb(this.getProcessingTransactions(account) ?? []),
+    );
+  }
 
-  getProccessingTransactions(account: string): ParsedTransaction[] {
+  observeProcessingTransactionsAll(cb: (txs: ParsedTransaction[]) => void): IReactionDisposer {
+    observable.array().
+    return reaction(
+      () => this.transactions,
+      () => cb(this.getProcessingTransaction() ?? []),
+    );
+  }
+
+  getProcessingTransactions(account: string): ParsedTransaction[] {
     return this.transactions
       .filter((pt) => {
         const transaction = pt.rawTransaction;
@@ -144,7 +174,7 @@ export class TransactionHandler implements TransactionHandlerType {
       .filter((tx): tx is ParsedTransaction => Boolean(tx));
   }
 
-  getProcessingTransactionAll(): ParsedTransaction[] {
+  getProcessingTransaction(): ParsedTransaction[] {
     return this.transactions
       .map((pt) => {
         return pt.parse({
