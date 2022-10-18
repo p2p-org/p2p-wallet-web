@@ -178,7 +178,8 @@ export class AuthViewModel extends ViewModel {
       seed,
     };
 
-    await this._walletModel.connectAdaptor('MnemonicWallet', { signer, storageInfo });
+    // @FIXME replace with sth static
+    await this._walletModel.connectAdaptor('MnemonicAdapter', { signer, storageInfo });
   }
 
   setMnemonic(value: string): void {

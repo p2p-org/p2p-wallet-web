@@ -20,7 +20,7 @@ export interface Wallet {
 
 @singleton()
 export class MnemonicAdapter extends BaseMessageSignerWalletAdapter {
-  name = 'MnemonicWallet' as WalletName;
+  name = 'MnemonicAdapter' as WalletName;
   icon = '';
   url = '';
   private _account: Signer | null = null;
@@ -95,6 +95,8 @@ export class MnemonicAdapter extends BaseMessageSignerWalletAdapter {
 
           return;
         }
+
+        // @TODO handle case when the key is not resolved
       }
       // eslint-disable-next-line
     } catch (error: any) {
@@ -116,7 +118,7 @@ export class MnemonicAdapter extends BaseMessageSignerWalletAdapter {
   }
 
   private static _saveCurrentSecretKey(secretKey: Uint8Array) {
-    setStorageValue(MnemonicAdapter._privateStorageKey, JSON.stringify(secretKey));
+    setStorageValue(MnemonicAdapter._privateStorageKey, secretKey);
   }
 
   private static async _deriveEncryptionKey(
@@ -153,9 +155,10 @@ export class MnemonicAdapter extends BaseMessageSignerWalletAdapter {
   }
 
   private static _restoreLocal(): Signer | null {
-    const secretKey = getStorageValue<Uint8Array>(MnemonicAdapter._privateStorageKey);
+    const secretKeyStored = getStorageValue<Uint8Array>(MnemonicAdapter._privateStorageKey);
 
-    if (secretKey) {
+    if (secretKeyStored) {
+      const secretKey = Uint8Array.from(Object.values(secretKeyStored));
       const keyPair = Keypair.fromSecretKey(secretKey);
 
       return {

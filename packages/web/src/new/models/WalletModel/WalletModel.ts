@@ -7,7 +7,8 @@ import { PublicKey } from '@solana/web3.js';
 import { autorun, computed, makeObservable, observable, runInAction } from 'mobx';
 import { singleton } from 'tsyringe';
 
-import type { MnemonicAdapter, Wallet } from 'new/scenes/Main/Auth/MnemonicAdapter';
+import type { Wallet } from 'new/scenes/Main/Auth/MnemonicAdapter';
+import { MnemonicAdapter } from 'new/scenes/Main/Auth/MnemonicAdapter';
 import type { ConnectConfig } from 'new/scenes/Main/Auth/typings';
 import { WalletAdaptorService } from 'new/services/WalletAdaptorService';
 
@@ -149,10 +150,11 @@ export class WalletModel extends Model {
     return this.selectedAdaptor as MessageSignerWalletAdapter;
   }
 
+  // @TODO next find out why localRestore does not lead to getting wallet object
   private async _restoreLocal() {
     const adaptors = this.walletAdaptorService.getAdaptors(this.network);
     const mnemonicAdapter = adaptors.find((adaptor) => {
-      return adaptor.name === 'MnemonicWallet';
+      return adaptor.name === MnemonicAdapter.name;
     }) as MnemonicAdapter;
 
     await mnemonicAdapter.connect();
