@@ -23,9 +23,6 @@ const restoreList = [
   WizardSteps.RESTORE_ACCOUNTS,
 ];
 
-// @FIXME implement browser history with steps || move back to router
-// @TODO how does those methods work (override)?
-
 @singleton()
 export class AuthViewModel extends ViewModel {
   step: WizardSteps;
@@ -163,6 +160,7 @@ export class AuthViewModel extends ViewModel {
   async finalize() {
     const seed = await this.seed;
 
+    // @TODO move to MnemonicAdapter
     const keyPair = getKeyPairFromSeed(
       seed,
       AuthViewModel._walletIndex,

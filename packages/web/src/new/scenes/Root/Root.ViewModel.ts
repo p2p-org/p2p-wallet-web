@@ -14,6 +14,7 @@ export class RootViewModel extends ViewModel {
 
   protected override onInitialize() {
     this._pricesService.startObserving();
+    this.walletModel.initialize();
   }
 
   protected override afterReactionsRemoved() {

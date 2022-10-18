@@ -1,8 +1,9 @@
-import type { ValueOf } from '@p2p-wallet-web/core/dist/esm';
 import * as bip32 from 'bip32';
 import * as bip39 from 'bip39';
 import * as ed25519 from 'ed25519-hd-key';
 import nacl from 'tweetnacl';
+
+import type { ExpiryDataType, ValueOf } from './typings';
 
 export const DERIVATION_PATH = {
   Deprecated: 'deprecated',
@@ -22,6 +23,18 @@ export const createExpiringValue = <T>(value: T, ms?: number) => {
     value,
     expiry: Number.MAX_SAFE_INTEGER,
   };
+};
+
+export const getExpiringValue = <T>(data: ExpiryDataType<T>) => {
+  if (!data) {
+    return null;
+  }
+
+  if (data.expiry < Date.now()) {
+    return null;
+  }
+
+  return data.value;
 };
 
 export function validatePassword(password: string) {
@@ -46,6 +59,22 @@ export const mnemonicToSeed = async (mnemonic: string) => {
 export const setStorageValue = <T>(key: string, data: T, { msTTL }: { msTTL?: number } = {}) => {
   const expiringData = createExpiringValue(data, msTTL);
   return localStorage.setItem(key, JSON.stringify(expiringData));
+};
+
+export const getStorageValue = <T>(key: string) => {
+  const strData = localStorage.getItem(key);
+  if (!strData) {
+    return null;
+  }
+
+  const value = getExpiringValue(JSON.parse(strData) as ExpiryDataType<T>);
+
+  if (!value) {
+    localStorage.removeItem(key);
+    return null;
+  }
+
+  return value;
 };
 
 export const deriveSecretKeyFromSeed = (

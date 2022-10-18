@@ -1,14 +1,15 @@
 // @TODO might not need this decorator
 import type { WalletName } from '@solana/wallet-adapter-base';
 import { BaseMessageSignerWalletAdapter, WalletReadyState } from '@solana/wallet-adapter-base';
-import type { PublicKey, Signer, Transaction } from '@solana/web3.js';
+import type { Signer, Transaction } from '@solana/web3.js';
+import { Keypair, PublicKey } from '@solana/web3.js';
 import bs58 from 'bs58';
 import { pbkdf2 } from 'crypto';
 import { singleton } from 'tsyringe';
 import nacl from 'tweetnacl';
 
 import type { ConnectConfig, StorageInfo } from 'new/scenes/Main/Auth/typings';
-import { setStorageValue } from 'new/scenes/Main/Auth/utils';
+import { getStorageValue, setStorageValue } from 'new/scenes/Main/Auth/utils';
 import { notImplemented } from 'new/utils/decorators';
 
 export interface Wallet {
@@ -26,7 +27,8 @@ export class MnemonicAdapter extends BaseMessageSignerWalletAdapter {
   private _connecting = false;
   private _readyState = WalletReadyState.NotDetected;
   private static _noKeypairError = 'No keypair to sign transactions';
-  private static _storageKey = 'encryptedSeedAndMnemonic';
+  private static _mnemonicStorageKey = 'encryptedSeedAndMnemonic';
+  private static _privateStorageKey = 'walletPrivateKey';
 
   constructor() {
     super();
@@ -82,7 +84,17 @@ export class MnemonicAdapter extends BaseMessageSignerWalletAdapter {
         this._account = config.signer;
         this.emit('connect', config.signer.publicKey);
 
+        MnemonicAdapter._saveCurrentSecretKey(config.signer.secretKey);
+
         await MnemonicAdapter._saveEncryptedMnemonicAndSeed(config.storageInfo);
+      } else {
+        const signer = MnemonicAdapter._restoreLocal();
+
+        if (signer) {
+          this._account = signer;
+
+          return;
+        }
       }
       // eslint-disable-next-line
     } catch (error: any) {
@@ -100,7 +112,11 @@ export class MnemonicAdapter extends BaseMessageSignerWalletAdapter {
     });
     const locked = await MnemonicAdapter._generateEncryptedTextAsync(plaintext, payload.password);
 
-    setStorageValue(MnemonicAdapter._storageKey, JSON.stringify(locked));
+    setStorageValue(MnemonicAdapter._mnemonicStorageKey, JSON.stringify(locked));
+  }
+
+  private static _saveCurrentSecretKey(secretKey: Uint8Array) {
+    setStorageValue(MnemonicAdapter._privateStorageKey, JSON.stringify(secretKey));
   }
 
   private static async _deriveEncryptionKey(
@@ -134,5 +150,20 @@ export class MnemonicAdapter extends BaseMessageSignerWalletAdapter {
       iterations,
       digest,
     };
+  }
+
+  private static _restoreLocal(): Signer | null {
+    const secretKey = getStorageValue<Uint8Array>(MnemonicAdapter._privateStorageKey);
+
+    if (secretKey) {
+      const keyPair = Keypair.fromSecretKey(secretKey);
+
+      return {
+        publicKey: new PublicKey(keyPair.publicKey),
+        secretKey: keyPair.secretKey,
+      };
+    }
+
+    return null;
   }
 }

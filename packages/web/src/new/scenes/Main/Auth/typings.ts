@@ -50,3 +50,10 @@ export type StorageInfo = {
   seed: string;
   password: string;
 };
+
+export type ExpiryDataType<T> = {
+  value: T;
+  expiry: number;
+};
+
+export type ValueOf<T> = T[keyof T];

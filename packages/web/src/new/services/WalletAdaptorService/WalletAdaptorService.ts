@@ -18,6 +18,7 @@ export interface IWalletAdaptorService {
 @singleton()
 export class WalletAdaptorService implements IWalletAdaptorService {
   constructor() {}
+
   getAdaptors(network: WalletAdapterNetwork): Array<Adapter | MnemonicAdapter> {
     return [
       new MnemonicAdapter(),
