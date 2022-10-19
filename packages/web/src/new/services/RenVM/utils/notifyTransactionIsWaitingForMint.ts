@@ -8,11 +8,6 @@ export const notifyTransactionIsWaitingForMint = (
   tx: ProcessingTx,
   notificationService: Readonly<NotificationService>,
 ): void => {
-  // show notification only when user is on page that differs from Receive
-  //if (location.pathname.includes('/receive')) {
-  //   return;
-  // }
-
   if (!tx) {
     return;
   }
@@ -33,20 +28,4 @@ export const notifyTransactionIsWaitingForMint = (
 
     return;
   }
-
-  // is confirming or confirmed
-  // const header = !tx.confirmedAt
-  //   ? 'Waiting for deposit confirmation...'
-  //   : 'The deposit has been confirmed!';
-  //
-  // const status = !tx.confirmedAt ? 'confirmingDeposit' : 'confirmedDeposit';
-  //
-  // const confirmationsAmount = tx.threeVoteAt ? 3 : tx.twoVoteAt ? 2 : tx.oneVoteAt ? 1 : 0;
-  //
-  // notificationService.show({
-  //   type: 'confirmingDeposit',
-  //   status,
-  //   header,
-  //   text: `${confirmationsAmount} / ${ProcessingTx.maxVote}`,
-  // });
 };
