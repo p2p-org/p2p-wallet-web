@@ -67,7 +67,7 @@ export abstract class SDStreamViewModel<T> extends ViewModel {
   }
 
   /// Fetch next item
-  next = flow<T, []>(function* (this: SDStreamViewModel<T>) {
+  next = flow<T, []>(function* (this: SDStreamViewModel<T>): Generator<Promise<T>> {
     // delay for simulating loading, MUST OVERRIDE
     return yield Promise.resolve<T>(this.data);
   });

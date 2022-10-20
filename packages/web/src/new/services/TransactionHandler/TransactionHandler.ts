@@ -1,7 +1,7 @@
 import { ZERO } from '@orca-so/sdk';
 import { PublicKey } from '@solana/web3.js';
 import type { IReactionDisposer } from 'mobx';
-import { action, computed, makeObservable, observable, ObservableMap, reaction } from "mobx";
+import { action, computed, makeObservable, observable, reaction } from 'mobx';
 import promiseRetry from 'promise-retry';
 import { singleton } from 'tsyringe';
 
@@ -22,11 +22,10 @@ import type { RawTransactionType } from 'new/ui/modals/ProcessTransactionModal';
 import * as ProcessTransaction from 'new/ui/modals/ProcessTransactionModal/ProcessTransaction.Models';
 import type { Emitter } from 'new/utils/libs/nanoEvent';
 import { createNanoEvent } from 'new/utils/libs/nanoEvent';
-import { computedFn } from "mobx-utils";
 
 export type TransactionIndex = number;
 
-interface TransactionHandlerType {
+export interface TransactionHandlerType {
   sendTransaction(processingTransaction: RawTransactionType): TransactionIndex;
   observeTransaction(
     transactionIndex: TransactionIndex,
@@ -127,7 +126,6 @@ export class TransactionHandler implements TransactionHandlerType {
   }
 
   observeProcessingTransactionsAll(cb: (txs: ParsedTransaction[]) => void): IReactionDisposer {
-    observable.array().
     return reaction(
       () => this.transactions,
       () => cb(this.getProcessingTransaction() ?? []),

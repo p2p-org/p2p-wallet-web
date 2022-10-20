@@ -27,7 +27,7 @@ interface HistoryTransactionParser {
   }): Promise<ParsedTransaction>;
 }
 
-type TransactionParser = HistoryTransactionParser;
+export type TransactionParser = HistoryTransactionParser;
 
 /// The default transaction parser.
 export class DefaultTransactionParser implements TransactionParser {

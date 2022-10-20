@@ -60,7 +60,7 @@ export abstract class SDViewModel<T> extends ViewModel {
   }
 
   // Asynchronous request handler
-  createRequest = flow<T, []>(function* (this: SDViewModel<T>) {
+  createRequest = flow<T, []>(function* (this: SDViewModel<T>): Generator<Promise<T>> {
     // delay for simulating loading, MUST OVERRIDE
     return yield Promise.resolve<T>(this.data);
   });
