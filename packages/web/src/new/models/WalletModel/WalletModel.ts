@@ -78,9 +78,11 @@ export class WalletModel extends Model {
     adaptor.on('connect', (publicKey: PublicKey) => {
       this.onConnect(adaptor, publicKey);
     });
+
     adaptor.on('disconnect', () => {
       this.onDisconnect(adaptor);
     });
+
     if (adaptor.connected && adaptor.publicKey) {
       this.onConnect(adaptor, adaptor.publicKey);
     }
@@ -158,9 +160,10 @@ export class WalletModel extends Model {
     const localSinger = MnemonicAdapter.getLocalSigner();
 
     if (localSinger) {
-      return await this.connectAdaptor(MnemonicAdapter.name, { signer: localSinger });
+      return await this.connectAdaptor(MnemonicAdapter.name, {
+        type: 'recur',
+        signer: localSinger,
+      });
     }
-
-    // @TODO handle this logic branch
   }
 }

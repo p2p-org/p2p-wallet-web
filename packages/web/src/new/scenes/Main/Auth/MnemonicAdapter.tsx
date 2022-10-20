@@ -9,7 +9,7 @@ import { singleton } from 'tsyringe';
 import nacl from 'tweetnacl';
 
 import type { ConnectConfig, StorageInfo } from 'new/scenes/Main/Auth/typings';
-import { getStorageValue, setStorageValue } from 'new/scenes/Main/Auth/utils';
+import { getKeyPairFromSeed, getStorageValue, setStorageValue } from 'new/scenes/Main/Auth/utils';
 import { notImplemented } from 'new/utils/decorators';
 
 export interface Wallet {
@@ -26,6 +26,10 @@ export class MnemonicAdapter extends BaseMessageSignerWalletAdapter {
   private _account: Signer | null = null;
   private _connecting = false;
   private _readyState = WalletReadyState.NotDetected;
+
+  static walletIndex = 0;
+  static mnemonicStrength = 256;
+
   private static _noKeypairError = 'No keypair to sign transactions';
   private static _mnemonicStorageKey = 'encryptedSeedAndMnemonic';
   private static _privateStorageKey = 'walletPrivateKey';
@@ -98,17 +102,33 @@ export class MnemonicAdapter extends BaseMessageSignerWalletAdapter {
 
   async connect(config?: ConnectConfig): Promise<void> {
     this._connecting = true;
+
     try {
-      if (config?.signer) {
-        this._account = config.signer;
-        this.emit('connect', config.signer.publicKey);
+      if (config?.type === 'sign') {
+        const keyPair = getKeyPairFromSeed(
+          config.storageInfo.seed,
+          MnemonicAdapter.walletIndex,
+          config.derivationPath,
+        );
 
-        MnemonicAdapter._saveCurrentSecretKey(config.signer.secretKey);
-      }
+        const signer = {
+          publicKey: new PublicKey(keyPair.publicKey),
+          secretKey: keyPair.secretKey,
+        };
 
-      if (config?.storageInfo) {
+        this._account = signer;
+        this.emit('connect', signer.publicKey);
+
+        MnemonicAdapter._saveCurrentSecretKey(signer.secretKey);
+
         await MnemonicAdapter._saveEncryptedMnemonicAndSeed(config.storageInfo);
       }
+
+      if (config?.type === 'recur') {
+        this._account = config.signer;
+        this.emit('connect', config.signer.publicKey);
+      }
+
       // eslint-disable-next-line
     } catch (error: any) {
       this.emit('error', error);

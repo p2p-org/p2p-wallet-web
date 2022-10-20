@@ -1,4 +1,3 @@
-import { PublicKey } from '@solana/web3.js';
 import * as bip39 from 'bip39';
 import { action, computed, makeObservable, observable, reaction, when } from 'mobx';
 import { singleton } from 'tsyringe';
@@ -6,11 +5,12 @@ import { singleton } from 'tsyringe';
 import { isDev, localMnemonic } from 'config/constants';
 import { ViewModel } from 'new/core/viewmodels/ViewModel';
 import { WalletModel } from 'new/models/WalletModel';
+import { MnemonicAdapter } from 'new/scenes/Main/Auth/MnemonicAdapter';
 import { WalletsListViewModel } from 'new/scenes/Main/Auth/Subviews/Wallets.ViewModel';
 
 import type { AuthInfo, AuthState, DerivationPathOption } from './typings';
 import { WizardSteps } from './typings';
-import { DERIVATION_PATH, getKeyPairFromSeed, mnemonicToSeed } from './utils';
+import { DERIVATION_PATH, mnemonicToSeed } from './utils';
 
 const createList = [
   WizardSteps.CREATE_START,
@@ -31,13 +31,10 @@ export class AuthViewModel extends ViewModel {
   initialCreateMnemonic: string;
   initialRestoreMnemonic: string;
 
-  private static _walletIndex = 0;
-  static _mnemonicStrength = 256;
-
   static defaultState: AuthState = {
     step: WizardSteps.RESTORE_START,
     isLoading: false,
-    initialCreateMnemonic: bip39.generateMnemonic(AuthViewModel._mnemonicStrength),
+    initialCreateMnemonic: bip39.generateMnemonic(MnemonicAdapter.mnemonicStrength),
     initialRestoreMnemonic: isDev ? (localMnemonic as string) : '',
     authInfo: observable<AuthInfo>({
       mnemonic: localMnemonic as string,
@@ -160,26 +157,17 @@ export class AuthViewModel extends ViewModel {
   async finalize() {
     const seed = await this.seed;
 
-    // @TODO move to MnemonicAdapter
-    const keyPair = getKeyPairFromSeed(
-      seed,
-      AuthViewModel._walletIndex,
-      this.authInfo.derivationPath.value,
-    );
-
-    const signer = {
-      publicKey: new PublicKey(keyPair.publicKey),
-      secretKey: keyPair.secretKey,
-    };
-
     const storageInfo = {
       mnemonic: this.authInfo.mnemonic,
       password: this.authInfo.password,
       seed,
     };
 
-    // @FIXME replace with sth static
-    await this._walletModel.connectAdaptor('MnemonicAdapter', { signer, storageInfo });
+    await this._walletModel.connectAdaptor('MnemonicAdapter', {
+      type: 'sign',
+      derivationPath: this.authInfo.derivationPath.value,
+      storageInfo,
+    });
   }
 
   setMnemonic(value: string): void {

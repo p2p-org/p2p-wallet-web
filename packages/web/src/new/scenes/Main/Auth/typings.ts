@@ -40,9 +40,17 @@ export type ViewMap = {
   [K in WizardSteps]: ReactElement;
 };
 
-export type ConnectConfig = {
+export type ConnectConfig = SignInConnectConfig | RecurringConnectConfig;
+
+type SignInConnectConfig = {
+  type: 'sign';
+  derivationPath: string;
+  storageInfo: StorageInfo;
+};
+
+type RecurringConnectConfig = {
+  type: 'recur';
   signer: Signer;
-  storageInfo?: StorageInfo;
 };
 
 export type StorageInfo = {
