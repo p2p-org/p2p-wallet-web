@@ -34,6 +34,22 @@ export class MnemonicAdapter extends BaseMessageSignerWalletAdapter {
     super();
   }
 
+  static getLocalSigner(): Signer | null {
+    const secretKeyStored = getStorageValue<Uint8Array>(MnemonicAdapter._privateStorageKey);
+
+    if (secretKeyStored) {
+      const secretKey = Uint8Array.from(Object.values(secretKeyStored));
+      const keyPair = Keypair.fromSecretKey(secretKey);
+
+      return {
+        publicKey: new PublicKey(keyPair.publicKey),
+        secretKey: keyPair.secretKey,
+      };
+    }
+
+    return null;
+  }
+
   async signTransaction(transaction: Transaction): Promise<Transaction> {
     if (this._account) {
       transaction.partialSign(this._account);
@@ -85,18 +101,10 @@ export class MnemonicAdapter extends BaseMessageSignerWalletAdapter {
         this.emit('connect', config.signer.publicKey);
 
         MnemonicAdapter._saveCurrentSecretKey(config.signer.secretKey);
+      }
 
+      if (config?.storageInfo) {
         await MnemonicAdapter._saveEncryptedMnemonicAndSeed(config.storageInfo);
-      } else {
-        const signer = MnemonicAdapter._restoreLocal();
-
-        if (signer) {
-          this._account = signer;
-
-          return;
-        }
-
-        // @TODO handle case when the key is not resolved
       }
       // eslint-disable-next-line
     } catch (error: any) {
@@ -152,21 +160,5 @@ export class MnemonicAdapter extends BaseMessageSignerWalletAdapter {
       iterations,
       digest,
     };
-  }
-
-  private static _restoreLocal(): Signer | null {
-    const secretKeyStored = getStorageValue<Uint8Array>(MnemonicAdapter._privateStorageKey);
-
-    if (secretKeyStored) {
-      const secretKey = Uint8Array.from(Object.values(secretKeyStored));
-      const keyPair = Keypair.fromSecretKey(secretKey);
-
-      return {
-        publicKey: new PublicKey(keyPair.publicKey),
-        secretKey: keyPair.secretKey,
-      };
-    }
-
-    return null;
   }
 }

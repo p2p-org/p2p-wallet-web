@@ -150,13 +150,13 @@ export class WalletModel extends Model {
     return this.selectedAdaptor as MessageSignerWalletAdapter;
   }
 
-  // @TODO next find out why localRestore does not lead to getting wallet object
   private async _restoreLocal() {
-    const adaptors = this.walletAdaptorService.getAdaptors(this.network);
-    const mnemonicAdapter = adaptors.find((adaptor) => {
-      return adaptor.name === MnemonicAdapter.name;
-    }) as MnemonicAdapter;
+    const localSinger = MnemonicAdapter.getLocalSigner();
 
-    await mnemonicAdapter.connect();
+    if (localSinger) {
+      return await this.connectAdaptor(MnemonicAdapter.name, { signer: localSinger });
+    }
+
+    // @TODO handle this logic line
   }
 }

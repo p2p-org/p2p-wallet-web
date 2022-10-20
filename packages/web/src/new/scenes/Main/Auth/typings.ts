@@ -42,7 +42,7 @@ export type ViewMap = {
 
 export type ConnectConfig = {
   signer: Signer;
-  storageInfo: StorageInfo;
+  storageInfo?: StorageInfo;
 };
 
 export type StorageInfo = {
