@@ -77,6 +77,9 @@ export class MnemonicAdapter extends BaseMessageSignerWalletAdapter {
 
   async disconnect(): Promise<void> {
     this._account = null;
+    this.emit('disconnect');
+
+    MnemonicAdapter._removeLocalAuthData();
 
     return Promise.resolve();
   }
@@ -160,5 +163,10 @@ export class MnemonicAdapter extends BaseMessageSignerWalletAdapter {
       iterations,
       digest,
     };
+  }
+
+  private static _removeLocalAuthData(): void {
+    localStorage.removeItem(MnemonicAdapter._privateStorageKey);
+    localStorage.removeItem(MnemonicAdapter._mnemonicStorageKey);
   }
 }

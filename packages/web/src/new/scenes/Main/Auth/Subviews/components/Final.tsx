@@ -100,13 +100,10 @@ export const Final: FC = observer(() => {
   };
 
   const handleFinishClick = () => {
-    viewModel.setIsLoading(true);
     try {
       void viewModel.finalize();
     } catch (error) {
       ToastManager.error((error as Error).message);
-    } finally {
-      viewModel.setIsLoading(false);
     }
   };
 

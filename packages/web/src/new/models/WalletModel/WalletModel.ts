@@ -59,6 +59,10 @@ export class WalletModel extends Model {
     return this.signer.signTransaction(transaction);
   }
 
+  async disconnect(): Promise<void> {
+    await this.selectedAdaptor?.disconnect();
+  }
+
   async connectAdaptor(adaptorName: string, config?: ConnectConfig) {
     const adaptors = this.walletAdaptorService.getAdaptors(this.network);
     const chosenAdaptor = adaptors.find((adaptor) => adaptor.name === adaptorName);
@@ -157,6 +161,6 @@ export class WalletModel extends Model {
       return await this.connectAdaptor(MnemonicAdapter.name, { signer: localSinger });
     }
 
-    // @TODO handle this logic line
+    // @TODO handle this logic branch
   }
 }

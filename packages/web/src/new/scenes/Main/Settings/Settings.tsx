@@ -2,7 +2,6 @@ import type { FC } from 'react';
 import { useHistory } from 'react-router';
 
 import { styled } from '@linaria/react';
-import { useWallet } from '@saberhq/use-solana';
 import classNames from 'classnames';
 import { observer } from 'mobx-react-lite';
 
@@ -12,6 +11,7 @@ import { useViewModel } from 'new/core/viewmodels/useViewModel';
 import AppStoreBadge from 'new/scenes/Main/Settings/images/app-store-badge.png';
 import GooglePlayBadge from 'new/scenes/Main/Settings/images/google-play-badge.png';
 import { SettingsViewModel } from 'new/scenes/Main/Settings/Settings.ViewModel';
+import { RootViewModel } from 'new/scenes/Root/Root.ViewModel';
 import { Defaults } from 'new/services/Defaults';
 import { Layout } from 'new/ui/components/common/Layout';
 import { UsernameAddressWidget } from 'new/ui/components/common/UsernameAddressWidget';
@@ -140,15 +140,15 @@ const Text = styled.div`
 
 export const Settings: FC = observer(() => {
   const viewModel = useViewModel(SettingsViewModel);
+  const rootViewModel = useViewModel(RootViewModel);
   const history = useHistory();
-  const { disconnect } = useWallet();
 
   const handleNetworkClick = () => {
     history.push('/settings/network');
   };
 
   const handleLogoutClick = () => {
-    void disconnect().then(() => history.go(0));
+    void rootViewModel.walletModel.disconnect();
   };
 
   return (
