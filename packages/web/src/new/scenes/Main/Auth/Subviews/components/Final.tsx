@@ -1,6 +1,5 @@
 import type { FC } from 'react';
 import { useState } from 'react';
-import { Redirect } from 'react-router-dom';
 
 import { styled } from '@linaria/react';
 import { observer } from 'mobx-react-lite';
@@ -9,7 +8,6 @@ import LogoImg from 'assets/images/big-logo.png';
 import { ToastManager } from 'components/common/ToastManager';
 import { Switch } from 'components/ui';
 import { useViewModel } from 'new/core/viewmodels/useViewModel';
-import { RootViewModel } from 'new/scenes/Root/Root.ViewModel';
 
 import { AuthViewModel } from '../../Auth.ViewModel';
 import { Button } from './Button';
@@ -83,7 +81,6 @@ const SwitcherText = styled.span`
 
 export const Final: FC = observer(() => {
   const viewModel = useViewModel(AuthViewModel);
-  const rootViewModel = useViewModel(RootViewModel);
 
   const [isSave, setIsSave] = useState(true);
   const [isShowModal, setIsShowModal] = useState(false);
@@ -112,10 +109,6 @@ export const Final: FC = observer(() => {
       viewModel.setIsLoading(false);
     }
   };
-
-  if (rootViewModel.walletModel.connected) {
-    return <Redirect to={'/wallets'} />;
-  }
 
   return (
     <Wrapper>

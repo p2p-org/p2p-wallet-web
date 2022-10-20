@@ -150,7 +150,7 @@ export class WalletModel extends Model {
     return this.selectedAdaptor as MessageSignerWalletAdapter;
   }
 
-  private async _restoreLocal() {
+  private async _restoreLocal(): Promise<void> {
     const localSinger = MnemonicAdapter.getLocalSigner();
 
     if (localSinger) {
