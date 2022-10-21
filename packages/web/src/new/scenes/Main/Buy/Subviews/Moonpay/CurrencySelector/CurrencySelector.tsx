@@ -56,9 +56,17 @@ export const CurrencySelect: FC<BuyViewModelProps> = observer(({ viewModel }) =>
 
   const handleItemClick = useCallback(
     (nextCurrency: CryptoCurrency) => () => {
+      //track event before coin changes
+      const fromCoin = viewModel.crypto.symbol;
+      const toCoin = nextCurrency.symbol;
+
+      if (fromCoin === toCoin) {
+        return;
+      }
+
       trackEvent1({
         name: 'Buy_Coin_Changed',
-        params: { From_Coin: viewModel.crypto.symbol, To_Coin: nextCurrency.symbol },
+        params: { From_Coin: fromCoin, To_Coin: toCoin },
       });
 
       history.push(`/buy/${nextCurrency.symbol}`);

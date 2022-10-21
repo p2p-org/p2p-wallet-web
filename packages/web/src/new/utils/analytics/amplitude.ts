@@ -17,4 +17,12 @@ export const trackEvent1 = (action: AmplitudeActions) => {
   } else {
     track(action.name);
   }
+
+  console.log(
+    `AMPLITUDE sent event:\n- name: '${action.name}'${
+      (action as ComplexActions).params
+        ? `\n- params: '${JSON.stringify((action as ComplexActions).params)}'`
+        : ''
+    }`,
+  );
 };
