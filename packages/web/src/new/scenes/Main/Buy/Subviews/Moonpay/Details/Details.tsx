@@ -3,7 +3,7 @@ import type { FC } from 'react';
 import { computed } from 'mobx';
 import { observer } from 'mobx-react-lite';
 
-import { trackEvent1 } from 'new/services/AnalyticsService';
+import { trackEvent1 } from 'new/services/analytics';
 import type { AccordionList } from 'new/ui/components/ui/AccordionDetails';
 import { AccordionDetails } from 'new/ui/components/ui/AccordionDetails';
 import { numberToFiatString } from 'new/utils/NumberExtensions';

@@ -1,4 +1,6 @@
 import type { FC } from 'react';
+import { useEffect } from 'react';
+import { useLocation } from 'react-router';
 
 import { styled } from '@linaria/react';
 import { observer } from 'mobx-react-lite';
@@ -6,6 +8,7 @@ import { observer } from 'mobx-react-lite';
 import { useViewModel } from 'new/core/viewmodels/useViewModel';
 import { BuyViewModel } from 'new/scenes/Main/Buy/Buy.ViewModel';
 import { MoonpayIframeWidget, MoonpayWidget } from 'new/scenes/Main/Buy/Subviews';
+import { trackEvent1 } from 'new/services/analytics';
 import { Layout } from 'new/ui/components/common/Layout';
 
 const Error = styled.div`
@@ -16,6 +19,15 @@ const Error = styled.div`
 
 export const Buy: FC = observer(() => {
   const viewModel = useViewModel(BuyViewModel);
+  const location = useLocation<{ fromPage?: string }>();
+
+  useEffect(() => {
+    if (!location.state.fromPage) {
+      return;
+    }
+
+    trackEvent1({ name: 'Buy_Screen_Opened', params: { Last_Screen: location.state.fromPage } });
+  }, []);
 
   const renderContent = () => {
     if (!viewModel.areMoonpayConstantsSet) {

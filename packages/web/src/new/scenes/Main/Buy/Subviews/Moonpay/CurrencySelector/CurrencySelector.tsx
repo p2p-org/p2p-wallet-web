@@ -9,7 +9,7 @@ import { observer } from 'mobx-react-lite';
 import { TokenAvatar } from 'components/common/TokenAvatar';
 import { Select, SelectItem } from 'components/ui';
 import type { BuyViewModelProps } from 'new/scenes/Main/Buy/Subviews/Moonpay/types';
-import { trackEvent1 } from 'new/services/AnalyticsService';
+import { trackEvent1 } from 'new/services/analytics';
 import type { CryptoCurrency } from 'new/services/BuyService/structures';
 
 const InfoWrapper = styled.div`

@@ -8,7 +8,7 @@ import { observer } from 'mobx-react-lite';
 import { useTrackEventOpen } from 'app/hooks/metrics';
 import type { BuyViewModelProps } from 'new/scenes/Main/Buy/Subviews/Moonpay/types';
 import { WidgetPageBuy } from 'new/scenes/Main/Buy/Subviews/Moonpay/WidgetPageBuy';
-import { trackEvent1 } from 'new/services/AnalyticsService';
+import { trackEvent1 } from 'new/services/analytics';
 import { MOONPAY_API_KEY, MOONPAY_SIGNER_URL } from 'new/services/BuyService/constants';
 import { buildParams } from 'new/services/BuyService/MoonpayProvider/utils';
 import type { MoonpayIframeParams } from 'new/services/BuyService/types';
