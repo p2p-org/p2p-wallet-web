@@ -1,25 +1,14 @@
-import { autorun, makeObservable, observable, set, toJS } from 'mobx';
+import { makeObservable, observable } from 'mobx';
 
 import { Fiat } from 'new/app/models/Fiat';
 import { APIEndpoint, SolanaSDKPublicKey } from 'new/sdk/SolanaSDK';
+import { makeLocalStorage } from 'new/services/common/makeLocalStorage';
 import type { CurrentPrice } from 'new/services/PriceAPIs/PricesService';
 
 export enum Appearance {
   system = 'system',
   light = 'light',
   dark = 'dark',
-}
-
-function makeLocalStorage<T>(_this: { fromJSON(json: T): T }, name: string) {
-  const storedJson = localStorage.getItem(name);
-  if (storedJson) {
-    const json = JSON.parse(storedJson);
-    set(_this, _this.fromJSON(json));
-  }
-  autorun(() => {
-    const value = toJS(_this);
-    localStorage.setItem(name, JSON.stringify(value));
-  });
 }
 
 interface DefaultsKeys {
@@ -72,6 +61,7 @@ class _Defaults implements DefaultsKeys {
 
       useFreeTransactions: observable,
     });
+
     makeLocalStorage(this, 'defaults');
   }
 
