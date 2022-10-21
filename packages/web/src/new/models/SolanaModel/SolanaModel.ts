@@ -35,13 +35,13 @@ export class SolanaModel extends Model {
   }
 
   protected setUpProvider() {
-    const conn = this.connection;
+    const connection = this.connection;
     const solana = this._walletModel.signer;
 
     if (!solana) {
       throw new Error('~~~ No Signer object was provided');
     }
-    this._provider = new Provider(conn, solana, Provider.defaultOptions());
+    this._provider = new Provider(connection, solana, Provider.defaultOptions());
   }
 
   get connection(): Connection {

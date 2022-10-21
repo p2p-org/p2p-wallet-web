@@ -35,8 +35,8 @@ export class WalletModel extends Model {
       network: observable,
       connected: observable,
       adaptors: observable,
-      selectedAdaptor: observable,
       pubKey: computed,
+      signer: computed,
     });
 
     this.onConnect = this.onConnect.bind(this);
