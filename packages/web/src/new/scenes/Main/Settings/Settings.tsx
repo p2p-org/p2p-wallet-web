@@ -138,6 +138,9 @@ const Text = styled.div`
 
 // const FIATS = [Fiat.usd, Fiat.eur, Fiat.rub];
 
+// @FRIDAY make sure hard reload
+// remove unnecessary disconnects
+// proceed with Phantom and Sollet
 export const Settings: FC = observer(() => {
   const viewModel = useViewModel(SettingsViewModel);
   const rootViewModel = useViewModel(RootViewModel);
@@ -149,6 +152,7 @@ export const Settings: FC = observer(() => {
 
   const handleLogoutClick = () => {
     void rootViewModel.walletModel.disconnect();
+    void rootViewModel.locationService.reload();
   };
 
   return (
