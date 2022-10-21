@@ -1,4 +1,3 @@
-import { ZERO } from '@orca-so/sdk';
 import type { Provider } from '@project-serum/anchor';
 import { networkToChainId } from '@saberhq/token-utils';
 import { Token as SPLToken, u64 } from '@solana/spl-token';
@@ -127,6 +126,8 @@ export class SolanaSDK {
   }
 
   // TODO: test it
+
+  // Wait until transaction is confirmed, return even when there is one or more confirmations and request timed out
   waitForConfirmation(signature: string): Promise<void> {
     let partiallyConfirmed = false;
     // Due to a bug (https://github.com/solana-labs/solana/issues/15461)
@@ -146,7 +147,9 @@ export class SolanaSDK {
             }
 
             const confirmed =
-              !status.value?.confirmations || status.value.confirmationStatus === 'finalized';
+              status.value?.confirmations === null ||
+              status.value?.confirmationStatus === 'finalized';
+
             if (confirmed) {
               return;
             }
@@ -156,9 +159,9 @@ export class SolanaSDK {
           .catch(retry);
       },
       {
-        retries: 10,
-        minTimeout: 1000,
-        maxTimeout: 60000,
+        retries: 30,
+        minTimeout: 1_000,
+        maxTimeout: 2_000,
         factor: 1,
       },
     ).catch((err) => {
@@ -237,7 +240,7 @@ export class SolanaSDK {
     feePayer,
     feeCalculator,
   }: {
-    owner: PublicKey;
+    owner?: PublicKey;
     instructions: TransactionInstruction[];
     signers?: Signer[];
     feePayer: PublicKey;
@@ -255,7 +258,9 @@ export class SolanaSDK {
       const lps = new u64(
         (await this.provider.connection.getRecentBlockhash()).feeCalculator.lamportsPerSignature,
       );
-      const minRentExemption = new u64(await this.getMinimumBalanceForRentExemption(165));
+      const minRentExemption = new u64(
+        await this.getMinimumBalanceForRentExemption(AccountInfo.span),
+      ); // 165
       const lamportsPerSignature = lps ?? new u64(5000);
       feeCalculatorNew = new DefaultFeeCalculator({
         lamportsPerSignature,
@@ -271,11 +276,14 @@ export class SolanaSDK {
     transaction.recentBlockhash = blockhash;
 
     // resign transaction
-    if (signers.length !== 0) {
-      transaction.sign(...signers);
+    if (signers.length > 0) {
+      transaction.partialSign(...signers);
     }
 
-    const signedTransaction = await this.provider.wallet.signTransaction(transaction);
+    let signedTransaction = transaction;
+    if (owner) {
+      signedTransaction = await this.provider.wallet.signTransaction(transaction);
+    }
 
     return new PreparedTransaction({
       owner,
@@ -298,12 +306,13 @@ export class SolanaSDK {
 
     try {
       const recentBlockhash = await this.getRecentBlockhash();
-      const serializedTransaction = this.signAndSerialize({
+      const serializedTransaction = await this.signAndSerialize({
         preparedTransaction,
         recentBlockhash,
       });
       return this.provider.connection.sendEncodedTransaction(serializedTransaction);
     } catch (error) {
+      console.error(error);
       if (numberOfTries <= maxAttemps) {
         let shouldRetry = false;
         if ((error as Error).message.includes('Blockhash not found')) {
@@ -319,16 +328,19 @@ export class SolanaSDK {
     }
   }
 
-  signAndSerialize({
+  async signAndSerialize({
     preparedTransaction,
     recentBlockhash,
   }: {
     preparedTransaction: PreparedTransaction;
     recentBlockhash: string;
-  }): string {
+  }): Promise<string> {
     const preparedTransactionNew = preparedTransaction;
     preparedTransactionNew.transaction.recentBlockhash = recentBlockhash;
     preparedTransactionNew.sign();
+    preparedTransactionNew.transaction = await this.provider.wallet.signTransaction(
+      preparedTransactionNew.transaction,
+    );
     return preparedTransactionNew.serialize();
   }
 
@@ -464,11 +476,11 @@ export class SolanaSDK {
       transaction.instructions = instructions;
       transaction.feePayer = _feePayer;
       transaction.recentBlockhash = _recentBlockhash;
-      transaction.sign(...signers);
+      transaction.partialSign(...signers);
       const signedTransaction = await this.provider.wallet.signTransaction(transaction);
       const serializedTransaction = signedTransaction.serialize().toString('base64');
 
-      const decodedTransaction = JSON.stringify(transaction);
+      const decodedTransaction = transaction;
       Logger.log(decodedTransaction, LogEvent.info);
       Logger.log(serializedTransaction, LogEvent.info);
 
@@ -689,12 +701,12 @@ export class SolanaSDK {
   }> {
     const feePayerNew = feePayer ?? account;
 
-    let minRentExemptionNew: Lamports;
-    if (minRentExemption) {
-      minRentExemptionNew = minRentExemption;
-    } else {
-      minRentExemptionNew = await this.getMinimumBalanceForRentExemption(AccountInfo.span);
-    }
+    // let minRentExemptionNew: Lamports;
+    // if (minRentExemption) {
+    //   minRentExemptionNew = minRentExemption;
+    // } else {
+    //   minRentExemptionNew = await this.getMinimumBalanceForRentExemption(AccountInfo.span);
+    // }
     const splDestination = await this.findSPLTokenDestinationAddress({
       mintAddress,
       destinationAddress,
@@ -713,7 +725,7 @@ export class SolanaSDK {
     const instructions: TransactionInstruction[] = [];
 
     // create associated token address
-    let accountsCreationFee: u64 = ZERO;
+    // let accountsCreationFee: u64 = ZERO;
     if (splDestination.isUnregisteredAsocciatedToken) {
       const mint = new PublicKey(mintAddress);
       const ownerNew = new PublicKey(destinationAddress);
@@ -728,7 +740,8 @@ export class SolanaSDK {
         feePayerNew,
       );
       instructions.push(createATokenInstruction);
-      accountsCreationFee = accountsCreationFee.sub(minRentExemptionNew);
+      // TODO: why not using?
+      // accountsCreationFee = accountsCreationFee.sub(minRentExemptionNew);
     }
 
     // send instruction

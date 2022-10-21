@@ -1,8 +1,8 @@
 import type { u64 } from '@solana/spl-token';
 import type { PublicKey } from '@solana/web3.js';
 
-import type { UsageStatus } from 'new/sdk/FeeRelayer';
-import type { RelayAccountStatus } from 'new/sdk/FeeRelayer/relay/helpers';
+import type { UsageStatus } from '../models';
+import type { RelayAccountStatus } from './helpers';
 
 export class FeeRelayerContext {
   minimumTokenAccountBalance: u64;
@@ -52,5 +52,17 @@ export class FeeRelayerContext {
       return false;
     }
     return true;
+  }
+
+  // for debug
+  toJSON() {
+    return {
+      minimumTokenAccountBalance: this.minimumTokenAccountBalance.toString(),
+      minimumRelayAccountBalance: this.minimumRelayAccountBalance.toString(),
+      feePayerAddress: this.feePayerAddress.toString(),
+      lamportsPerSignature: this.lamportsPerSignature.toString(),
+      relayAccountStatus: this.relayAccountStatus.toJSON(),
+      usageStatus: this.usageStatus.toJSON(),
+    };
   }
 }

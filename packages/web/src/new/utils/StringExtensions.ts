@@ -1,3 +1,5 @@
+import type { Network } from '@saberhq/solana-contrib';
+
 const nameServiceDomain = '.p2p.sol';
 
 export function truncatingMiddle(
@@ -25,3 +27,26 @@ export function withNameServiceDomain(text: string): string {
 
   return `${text}${nameServiceDomain}`;
 }
+
+// @web
+export const getExplorerUrl = (
+  type = 'tx',
+  address: string,
+  cluster: Network = 'mainnet-beta',
+): string => {
+  const baseUrlWithAddress = `https://explorer.solana.com/${type}/${address}`;
+  switch (cluster) {
+    case 'devnet':
+    case 'testnet':
+      return `${baseUrlWithAddress}?cluster=${cluster}`;
+    default:
+      return baseUrlWithAddress;
+  }
+};
+
+export const capitalizeFirstLetter = (str?: string): string | undefined => {
+  if (!str) {
+    return str;
+  }
+  return `${str[0]!.toUpperCase()}${str.slice(1)}`;
+};

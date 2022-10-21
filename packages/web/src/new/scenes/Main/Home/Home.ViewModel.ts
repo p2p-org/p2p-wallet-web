@@ -1,4 +1,3 @@
-import { ZERO } from '@orca-so/sdk';
 import { action, computed, makeObservable, observable, reaction } from 'mobx';
 import { singleton } from 'tsyringe';
 
@@ -74,15 +73,13 @@ export class HomeViewModel extends ViewModel {
     if (data?.length) {
       if (state === SDFetcherState.loading || state === SDFetcherState.initializing) {
         const amount =
-          data?.reduce((partialResult, wallet) => partialResult.add(wallet.amount.toU64()), ZERO) ??
-          ZERO;
+          data?.reduce((partialResult, wallet) => partialResult + wallet.amount, 0) ?? 0;
 
-        return amount.gt(ZERO);
+        return amount > 0;
       } else {
         const amount =
-          data?.reduce((partialResult, wallet) => partialResult.add(wallet.amount.toU64()), ZERO) ??
-          ZERO;
-        return amount.gt(ZERO);
+          data?.reduce((partialResult, wallet) => partialResult + wallet.amount, 0) ?? 0;
+        return amount > 0;
       }
     }
 

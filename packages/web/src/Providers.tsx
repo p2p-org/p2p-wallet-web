@@ -15,14 +15,12 @@ import assert from 'ts-invariant';
 
 import {
   BlockchainProvider,
-  FeatureFlagsProvider,
   ModalsProvider,
   NameServiceProvider,
   RatesProvider,
   SettingsProvider,
 } from 'app/contexts';
 import { ToastManager } from 'components/common/ToastManager';
-import { Providers as SwapProviders } from 'components/pages/swap/Providers';
 import { LockAndMintProvider } from 'utils/providers/LockAndMintProvider';
 
 const PUBLIC_KEY_LENGTH_FOR_TRIMMING = 20;
@@ -86,23 +84,19 @@ export const Providers: FC = ({ children }) => {
       autoBoot
       autoBootProps={{ hideDefaultLauncher: true }}
     >
-      <FeatureFlagsProvider>
-        <QueryClientProvider client={queryClient}>
-          <CoreProviders>
-            <ApiProviders>
-              <SettingsProvider>
-                <BlockchainProvider>
-                  <LockAndMintProvider>
-                    <SwapProviders>
-                      <ModalsProvider>{children}</ModalsProvider>
-                    </SwapProviders>
-                  </LockAndMintProvider>
-                </BlockchainProvider>
-              </SettingsProvider>
-            </ApiProviders>
-          </CoreProviders>
-        </QueryClientProvider>
-      </FeatureFlagsProvider>
+      <QueryClientProvider client={queryClient}>
+        <CoreProviders>
+          <ApiProviders>
+            <SettingsProvider>
+              <BlockchainProvider>
+                <LockAndMintProvider>
+                  <ModalsProvider>{children}</ModalsProvider>
+                </LockAndMintProvider>
+              </BlockchainProvider>
+            </SettingsProvider>
+          </ApiProviders>
+        </CoreProviders>
+      </QueryClientProvider>
     </IntercomProvider>
   );
 };

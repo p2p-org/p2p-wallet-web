@@ -1,11 +1,11 @@
 import type { PublicKey, Signer, Transaction } from '@solana/web3.js';
 import bs58 from 'bs58';
 
-import { LogEvent, Logger } from '../index';
+import { LogEvent, Logger, SolanaSDKError } from '../index';
 import type { FeeAmount } from './FeeAmount';
 
 export class PreparedTransaction {
-  owner: PublicKey;
+  owner?: PublicKey;
   transaction: Transaction;
   signers: Signer[];
   expectedFee: FeeAmount;
@@ -16,7 +16,7 @@ export class PreparedTransaction {
     signers,
     expectedFee,
   }: {
-    owner: PublicKey;
+    owner?: PublicKey;
     transaction: Transaction;
     signers: Signer[];
     expectedFee: FeeAmount;
@@ -28,7 +28,9 @@ export class PreparedTransaction {
   }
 
   sign() {
-    this.transaction.sign(...this.signers);
+    if (this.signers.length > 0) {
+      this.transaction.partialSign(...this.signers);
+    }
   }
 
   serialize(): string {
@@ -36,7 +38,7 @@ export class PreparedTransaction {
     const serializedTransaction = transaction.serialize().toString('base64');
 
     Logger.log(serializedTransaction, LogEvent.info);
-    const decodedTransaction = JSON.stringify(transaction);
+    const decodedTransaction = transaction;
     Logger.log(decodedTransaction, LogEvent.info);
 
     return serializedTransaction;
@@ -48,7 +50,8 @@ export class PreparedTransaction {
     )?.signature;
 
     if (!signature) {
-      throw new Error('Signature not found');
+      console.error(publicKey.toString());
+      throw SolanaSDKError.other('Signature not found');
     }
 
     return bs58.encode(signature);

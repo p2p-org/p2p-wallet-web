@@ -1,30 +1,40 @@
-import { action, makeObservable, observable, when } from 'mobx';
-
-import { defaultFlags } from 'new/services/FeatureFlags/defaultFlags';
-import type { Features } from 'new/services/FeatureFlags/features';
-import { RemoteConfig } from 'new/services/RemoteConfig';
+import { defaultFlags } from './defaultFlags';
+import type { Features } from './features';
+import { DebugFeatureFlagsProvider } from './providers/DebugFeatureFlagsProvider';
+import { RemoteFeatureFlagsProvider } from './providers/RemoteFeatureFlagsProvider';
+import type { FeatureFlagsProvider } from './types';
 
 class _FeatureFlags {
-  isInitialized = false;
-  featureFlags = defaultFlags;
+  private _primaryProvider: FeatureFlagsProvider;
+  private _secondaryProvider: FeatureFlagsProvider;
 
-  constructor() {
-    makeObservable(this, {
-      isInitialized: observable,
-      featureFlags: observable,
-    });
+  constructor(primaryProvider: FeatureFlagsProvider, secondaryProvider: FeatureFlagsProvider) {
+    this._primaryProvider = primaryProvider;
+    this._secondaryProvider = secondaryProvider;
+  }
 
-    when(
-      () => RemoteConfig.isActivated,
-      action(() => {
-        this.featureFlags = RemoteConfig.featureFlags;
-        this.isInitialized = true;
-      }),
-    );
+  get isInitialized(): boolean {
+    if (this._primaryProvider.isOn) {
+      return this._primaryProvider.isInitialized;
+    }
+
+    if (this._secondaryProvider.isOn) {
+      return this._secondaryProvider.isInitialized;
+    }
+
+    return false;
   }
 
   isEnabled(feature: Features): boolean {
-    return this.featureFlags[feature];
+    if (this._primaryProvider.isOn) {
+      return this._primaryProvider.isEnabled(feature);
+    }
+
+    if (this._secondaryProvider.isOn) {
+      return this._secondaryProvider.isEnabled(feature);
+    }
+
+    return defaultFlags[feature];
   }
 }
 
@@ -32,4 +42,7 @@ export const isEnabled = (feature: Features): boolean => {
   return FeatureFlags.isEnabled(feature);
 };
 
-export const FeatureFlags = new _FeatureFlags();
+export const FeatureFlags = new _FeatureFlags(
+  DebugFeatureFlagsProvider,
+  RemoteFeatureFlagsProvider,
+);

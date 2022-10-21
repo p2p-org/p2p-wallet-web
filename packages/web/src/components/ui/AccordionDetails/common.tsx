@@ -55,8 +55,16 @@ export const Text = styled.div`
     justify-content: flex-end;
   }
 
+  &.nowrap {
+    white-space: nowrap;
+  }
+
   &.right {
     text-align: right;
+  }
+
+  &.big {
+    font-weight: 700;
   }
 
   &.grid {

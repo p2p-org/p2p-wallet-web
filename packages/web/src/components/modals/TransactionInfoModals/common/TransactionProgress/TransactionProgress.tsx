@@ -7,8 +7,9 @@ import classNames from 'classnames';
 
 import { Icon } from 'components/ui';
 
-import { INITIAL_PROGRESS } from '../../TransactionStatusSendModal';
 import { StatusColors, TransactionLabel } from '../styled';
+
+const INITIAL_PROGRESS = 5;
 
 export const ProgressIcon = styled(Icon)`
   width: 24px;
@@ -105,6 +106,11 @@ export const BlockWrapper = styled(StatusColors)`
   border-radius: 40%;
 `;
 
+const UPPER_PROGRESS_BOUND = 95;
+const LOWER_PROGRESS_BOUND = 7;
+const FULL_PROGRESS = 100;
+const CHECK_PROGRESS_INTERVAL = 2500;
+
 export interface Props {
   isError: boolean;
   isProcessing: boolean;
@@ -112,11 +118,6 @@ export interface Props {
   isExecuting: boolean;
   label: string;
 }
-
-const UPPER_PROGRESS_BOUND = 95;
-const LOWER_PROGRESS_BOUND = 7;
-const FULL_PROGRESS = 100;
-const CHECK_PROGRESS_INTERVAL = 2500;
 
 export const TransactionProgress: FC<Props> = (props) => {
   const [progress, setProgress] = useState(INITIAL_PROGRESS);

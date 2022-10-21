@@ -58,14 +58,27 @@ const Input = styled.input`
   }
 `;
 
+function toFixed(amount: string, decimals?: number): string {
+  if (!decimals) {
+    return amount;
+  }
+
+  if (amount.includes('.') && amount.split('.')[1]!.length > decimals) {
+    return Number(amount).toFixed(decimals);
+  }
+
+  return amount;
+}
+
 const DECIMAL_ONLY = /^\d*(\.\d*)?$/;
 
 interface Props
   extends Omit<
     React.DetailedHTMLProps<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>,
-    'onChange' | 'prefix'
+    'prefix' | 'decimals' | 'onChange'
   > {
   prefix?: React.ReactNode;
+  decimals?: number;
   onChange?: (val: string) => void;
 }
 
@@ -73,6 +86,7 @@ export const InputAmount: FC<Props> = ({
   prefix,
   placeholder = '0',
   value = '',
+  decimals,
   onChange,
   ...props
 }) => {
@@ -84,6 +98,14 @@ export const InputAmount: FC<Props> = ({
     }
   }, [value]);
 
+  // react to decimals change and notify parent with fixed value
+  // useUpdateEffect(() => {
+  //   if (onChange) {
+  //     const _value = toFixed(String(value), decimals);
+  //     onChange(_value);
+  //   }
+  // }, [decimals]);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     let nextValue = e.target.value.replace(/^0(\d+)/, '$1');
 
@@ -91,9 +113,13 @@ export const InputAmount: FC<Props> = ({
       nextValue = '0.';
     }
 
+    nextValue = toFixed(nextValue, decimals);
+
     if ((!Number.isNaN(nextValue) && DECIMAL_ONLY.test(nextValue)) || nextValue === '') {
       setLocalValue(nextValue);
-      onChange?.(nextValue);
+      if (onChange) {
+        onChange(nextValue);
+      }
     }
   };
 

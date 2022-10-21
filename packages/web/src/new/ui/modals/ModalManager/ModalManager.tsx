@@ -18,11 +18,10 @@ import type { ModalPropsType } from './types';
 const Wrapper = styled.div`
   position: fixed;
   top: 0;
+  right: 0;
+  bottom: 0;
   left: 0;
   z-index: ${zIndexes.modal};
-
-  width: 100vw;
-  height: 100vh;
 
   background-color: rgba(0, 0, 0, 0.6);
 
@@ -70,27 +69,17 @@ const getPreset: GetPresetFn = (modal) => {
 
 const modalsMap = new Map<ModalType, LazyExoticComponent<ModalPropsType & any>>([
   [ModalType.SHOW_MODAL_ACTIONS_MOBILE, lazy(() => import('../ActionsMobileModal'))],
-  [
-    ModalType.SHOW_MODAL_RECEIVE_BITCOIN,
-    lazy(() => import('components/modals/ReceiveBitcoinModal')),
-  ],
+  [ModalType.SHOW_MODAL_RECEIVE_BITCOIN, lazy(() => import('../ReceiveBitcoinModal'))],
   [
     ModalType.SHOW_MODAL_TRANSACTION_CONFIRM,
     lazy(() => import('components/modals/TransactionConfirmModal')),
   ],
   [ModalType.SHOW_MODAL_CONFIRM_SEND, lazy(() => import('../confirmModals/ConfirmSendModal'))],
+  [ModalType.SHOW_MODAL_CONFIRM_SWAP, lazy(() => import('../confirmModals/ConfirmSwapModal'))],
   [ModalType.SHOW_MODAL_PROCESS_TRANSACTION, lazy(() => import('../ProcessTransactionModal'))],
   [
     ModalType.SHOW_MODAL_TRANSACTION_DETAILS,
     lazy(() => import('components/modals/TransactionInfoModals/TransactionDetailsModal')),
-  ],
-  [
-    ModalType.SHOW_MODAL_TRANSACTION_STATUS_SEND,
-    lazy(() => import('components/modals/TransactionInfoModals/TransactionStatusSendModal')),
-  ],
-  [
-    ModalType.SHOW_MODAL_TRANSACTION_STATUS_SWAP,
-    lazy(() => import('components/modals/TransactionInfoModals/TransactionStatusSwapModal')),
   ],
   [
     ModalType.SHOW_MODAL_CLOSE_TOKEN_ACCOUNT,
@@ -104,10 +93,7 @@ const modalsMap = new Map<ModalType, LazyExoticComponent<ModalPropsType & any>>(
     ModalType.SHOW_MODAL_CHOOSE_BUY_TOKEN_MOBILE,
     lazy(() => import('../ChooseBuyTokenMobileModal')),
   ],
-  [
-    ModalType.SHOW_MODAL_SELECT_LIST_MOBILE,
-    lazy(() => import('components/modals/SelectListMobileModal')),
-  ],
+  [ModalType.SHOW_MODAL_SELECT_LIST_MOBILE, lazy(() => import('../SelectListMobileModal'))],
   [ModalType.SHOW_MODAL_ERROR, lazy(() => import('components/modals/ErrorModal'))],
 ]);
 
@@ -141,7 +127,7 @@ export const ModalManager: FC = observer(() => {
               <ModalComponent
                 {...modal.props}
                 key={modal.modalId}
-                close={(result?: any) => vm.closeModal(modal.modalId, result)}
+                close={(result?: unknown) => vm.closeModal(modal.modalId, result)}
               />
             </ModalWrapper>
           </ModalContainer>

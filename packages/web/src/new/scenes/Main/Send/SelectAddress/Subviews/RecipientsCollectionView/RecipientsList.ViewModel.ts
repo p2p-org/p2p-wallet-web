@@ -1,9 +1,9 @@
-import { flow } from 'mobx';
-import { injectable } from 'tsyringe';
+import { flow, reaction } from 'mobx';
+import { delay, inject, injectable } from 'tsyringe';
 
 import { SDListViewModel } from 'new/core/viewmodels/SDListViewModel';
 import type { Recipient } from 'new/scenes/Main/Send';
-import { Network } from 'new/scenes/Main/Send';
+import { Network, SendViewModel } from 'new/scenes/Main/Send';
 import { NameService } from 'new/services/NameService';
 import { SendService } from 'new/services/SendService';
 import { bitcoinAddress, matches } from 'new/utils/RegularExpression';
@@ -24,11 +24,31 @@ export class RecipientsListViewModel extends SDListViewModel<Recipient> {
     return matches(this.searchString, [bitcoinAddress(this._solanaAPIClient.isTestNet())]);
   }
 
-  constructor(private _nameService: NameService, private _solanaAPIClient: SendService) {
+  constructor(
+    private _nameService: NameService,
+    private _solanaAPIClient: SendService,
+    @inject(delay(() => SendViewModel))
+    private _sendViewModel: Readonly<SendViewModel>,
+  ) {
     super();
+
+    this._preSelectedNetwork = this._sendViewModel.network;
   }
 
-  protected override onInitialize() {}
+  protected override setDefaults() {
+    this._preSelectedNetwork = this._sendViewModel.network;
+  }
+
+  protected override onInitialize() {
+    this.addReaction(
+      reaction(
+        () => this._sendViewModel.network,
+        (network) => {
+          this._preSelectedNetwork = network;
+        },
+      ),
+    );
+  }
 
   protected override afterReactionsRemoved() {}
 

@@ -94,7 +94,7 @@ export type OrcaSwapType = {
     feePayer,
     slippage,
   }: {
-    owner: Signer;
+    owner: PublicKey;
     fromWalletPubkey: string;
     toWalletPubkey?: string;
     bestPoolsPair: PoolsPair;
@@ -111,7 +111,7 @@ export type OrcaSwapType = {
     slippage,
     isSimulation,
   }: {
-    owner: Signer;
+    owner: PublicKey;
     fromWalletPubkey: string;
     toWalletPubkey?: string;
     bestPoolsPair: PoolsPair;
@@ -123,8 +123,8 @@ export type OrcaSwapType = {
 
 export class OrcaSwap implements OrcaSwapType {
   // Properties
-  protected _apiClient: APIClient;
-  protected _solanaClient: OrcaSwapSolanaClient;
+  protected _apiClient: APIClient; // TODO: make OrcaSwapAPIClient
+  protected _solanaClient: OrcaSwapSolanaClient; // TODO: make SolanaAPIClient
 
   private _info: SwapInfo | null = null;
   private _balancesCache: BalancesCache = new BalancesCache();
@@ -157,7 +157,7 @@ export class OrcaSwap implements OrcaSwapType {
 
     // find all available routes
     const routes = _findAllAvailableRoutes(tokens, pools);
-    const tokenNames = [...tokens].reduce((result, token) => {
+    const tokenNames = Array.from(tokens).reduce((result, token) => {
       result.set(token[1].mint, token[0]);
       return result;
     }, new Map<string, string>());
@@ -237,7 +237,6 @@ export class OrcaSwap implements OrcaSwapType {
     if (!fromTokenName || !toTokenName || !currentRoutes) {
       return [];
     }
-
     const poolsPairs: PoolsPair[] = [];
     const group = await Promise.all(
       currentRoutes.map((route) => {
@@ -285,7 +284,7 @@ export class OrcaSwap implements OrcaSwapType {
         continue;
       }
 
-      if (estimatedAmount > bestEstimatedAmount) {
+      if (estimatedAmount.gt(bestEstimatedAmount)) {
         bestEstimatedAmount = estimatedAmount;
         bestPools = pair;
       }
@@ -330,8 +329,8 @@ export class OrcaSwap implements OrcaSwapType {
     inputAmount,
     slippage,
   }: {
-    bestPoolsPair?: PoolsPair;
-    inputAmount?: number;
+    bestPoolsPair?: PoolsPair | null;
+    inputAmount?: number | null;
     slippage: number;
   }): u64[] {
     if (!bestPoolsPair) {
@@ -444,7 +443,7 @@ export class OrcaSwap implements OrcaSwapType {
     feePayer,
     slippage,
   }: {
-    owner: Signer;
+    owner: PublicKey;
     fromWalletPubkey: string;
     toWalletPubkey?: string;
     bestPoolsPair: PoolsPair;
@@ -543,7 +542,7 @@ export class OrcaSwap implements OrcaSwapType {
     slippage,
     isSimulation,
   }: {
-    owner: Signer;
+    owner: PublicKey;
     fromWalletPubkey: string;
     toWalletPubkey?: string;
     bestPoolsPair: PoolsPair;
@@ -567,7 +566,7 @@ export class OrcaSwap implements OrcaSwapType {
 
       let request = this.prepareAndSend({
         swapTransaction: swapTransactions[0]!,
-        feePayer: owner.publicKey,
+        feePayer: owner,
         isSimulation: swapTransactions.length === 2 ? false : isSimulation, // the first transaction in transitive swap must be non-simulation
       });
 
@@ -581,7 +580,7 @@ export class OrcaSwap implements OrcaSwapType {
               (_retry) => {
                 return this.prepareAndSend({
                   swapTransaction: swapTransactions[1]!,
-                  feePayer: owner.publicKey,
+                  feePayer: owner,
                   isSimulation,
                 }).catch((error: Error) => {
                   if (error) {
@@ -648,7 +647,7 @@ export class OrcaSwap implements OrcaSwapType {
     }
 
     // if toToken isn't selected
-    if (!toTokenName === null) {
+    if (!toTokenName) {
       // get all routes that have token A
       return pickBy((_, key) => key.split('/').includes(fromTokenName), info.routes);
     }
@@ -669,7 +668,7 @@ export class OrcaSwap implements OrcaSwapType {
     slippage,
     minRentExemption,
   }: {
-    owner: Signer;
+    owner: PublicKey;
     pool: Pool;
     fromTokenPubkey: string;
     toTokenPubkey?: string;
@@ -697,10 +696,11 @@ export class OrcaSwap implements OrcaSwapType {
     }).then(([accountInstructions, accountCreationFee]) => {
       return [
         new PreparedSwapTransaction({
+          owner, // instead of owner in signers
           instructions: accountInstructions.instructions.concat(
             accountInstructions.cleanupInstructions,
           ),
-          signers: [owner].concat(accountInstructions.signers),
+          signers: accountInstructions.signers,
           accountCreationFee,
         }),
         !toTokenPubkey ? accountInstructions.account.toString() : null,
@@ -722,7 +722,7 @@ export class OrcaSwap implements OrcaSwapType {
     slippage,
     minRentExemption,
   }: {
-    owner: Signer;
+    owner: PublicKey;
     pool0: Pool;
     pool1: Pool;
     fromTokenPubkey: string;
@@ -766,8 +766,9 @@ export class OrcaSwap implements OrcaSwapType {
 
       return [
         new PreparedSwapTransaction({
+          owner, // instead of owner in signers
           instructions,
-          signers: [owner].concat(additionalSigners).concat(accountInstructions.signers),
+          signers: additionalSigners.concat(accountInstructions.signers),
           accountCreationFee,
         }),
         isDestinationNew ? accountInstructions.account.toString() : null,
@@ -783,7 +784,7 @@ export class OrcaSwap implements OrcaSwapType {
     feePayer,
     minRentExemption,
   }: {
-    owner: Signer;
+    owner: PublicKey;
     pool0: Pool;
     pool1: Pool;
     // toWalletPubkey?: string;
@@ -807,16 +808,16 @@ export class OrcaSwap implements OrcaSwapType {
     if (intermediaryTokenMint.equals(SolanaSDKPublicKey.wrappedSOLMint)) {
       requestCreatingIntermediaryToken =
         this._solanaClient.prepareCreatingWSOLAccountAndCloseWhenDone(
-          owner.publicKey,
+          owner,
           ZERO,
-          feePayer ?? owner.publicKey,
+          feePayer ?? owner,
         );
     } else {
       requestCreatingIntermediaryToken =
         this._solanaClient.prepareForCreatingAssociatedTokenAccount(
-          owner.publicKey,
+          owner,
           intermediaryTokenMint,
-          feePayer ?? owner.publicKey,
+          feePayer ?? owner,
           true,
         );
     }
@@ -824,9 +825,9 @@ export class OrcaSwap implements OrcaSwapType {
     return Promise.all([
       requestCreatingIntermediaryToken,
       this._solanaClient.prepareForCreatingAssociatedTokenAccount(
-        owner.publicKey,
+        owner,
         destinationMint,
-        feePayer ?? owner.publicKey,
+        feePayer ?? owner,
         false,
       ),
     ]).then(([initAccountInstructions, destAccountInstructions]) => {
@@ -870,8 +871,8 @@ export class OrcaSwap implements OrcaSwapType {
           destAccountInstructions.account,
           wsolAccountInstructions,
           new PreparedSwapTransaction({
+            owner, // instead of owner in signers
             instructions,
-            signers: [owner],
             accountCreationFee,
           }),
         ];
@@ -994,7 +995,7 @@ export class OrcaSwap implements OrcaSwapType {
 }
 
 function _findAllAvailableRoutes(tokens: Map<string, TokenValue>, pools: Pools): Routes {
-  const filteredTokens = [...tokens]
+  const filteredTokens = Array.from(tokens)
     .filter(([, token]) => token.poolToken !== true)
     .map(([tokenName]) => tokenName);
 
@@ -1063,7 +1064,7 @@ function _getRoutes(tokenA: string, tokenB: string, pools: Pools): Route[] {
 
   // Find all pools that contain the same tokens.
   // Checking tokenAName and tokenBName will find Stable pools.
-  [...pools].forEach(([poolId, poolConfig]) => {
+  pools.forEach((poolConfig, poolId) => {
     if (
       (poolConfig.tokenAName.toString() === tokenA &&
         poolConfig.tokenBName.toString() === tokenB) ||
@@ -1074,7 +1075,7 @@ function _getRoutes(tokenA: string, tokenB: string, pools: Pools): Route[] {
   });
 
   // Find all pools that contain the first token but not the second
-  const firstLegPools = [...pools]
+  const firstLegPools = Array.from(pools)
     .filter(
       ([, poolConfig]) =>
         (poolConfig.tokenAName.toString() === tokenA &&
@@ -1082,7 +1083,7 @@ function _getRoutes(tokenA: string, tokenB: string, pools: Pools): Route[] {
         (poolConfig.tokenBName.toString() === tokenA &&
           poolConfig.tokenAName.toString() !== tokenB),
     )
-    .map<[string, string]>(([poolId, poolConfig]) => [
+    .map(([poolId, poolConfig]) => [
       poolId,
       poolConfig.tokenBName.toString() === tokenA
         ? poolConfig.tokenAName.toString()
@@ -1091,14 +1092,14 @@ function _getRoutes(tokenA: string, tokenB: string, pools: Pools): Route[] {
 
   // Find all routes that can include firstLegPool and a second pool.
   firstLegPools.forEach(([firstLegPoolId, intermediateTokenName]) => {
-    [...pools].forEach(([secondLegPoolId, poolConfig]) => {
+    pools.forEach((poolConfig, secondLegPoolId) => {
       if (
         (poolConfig.tokenAName.toString() === intermediateTokenName &&
           poolConfig.tokenBName.toString() === tokenB) ||
         (poolConfig.tokenBName.toString() === intermediateTokenName &&
           poolConfig.tokenAName.toString() === tokenB)
       ) {
-        routes.push([firstLegPoolId, secondLegPoolId]);
+        routes.push([firstLegPoolId!, secondLegPoolId]);
       }
     });
   });

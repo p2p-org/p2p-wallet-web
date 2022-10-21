@@ -6,25 +6,26 @@ import dayjs from 'dayjs';
 import localizedFormat from 'dayjs/plugin/localizedFormat';
 import { observer } from 'mobx-react-lite';
 
-import { FeaturesToggle } from 'components/common/FeaturesToggle';
 import { Intercom } from 'components/common/Intercom';
 import { NotifyToast } from 'components/common/NotifyToast';
 import { ToastManager } from 'components/common/ToastManager';
 import { Main } from 'new/scenes/Main';
 import { Buy } from 'new/scenes/Main/Buy';
 import { Home } from 'new/scenes/Main/Home';
+import { Receive } from 'new/scenes/Main/Receive';
 import { Send } from 'new/scenes/Main/Send';
 import { Settings } from 'new/scenes/Main/Settings';
 import { SettingsNetwork } from 'new/scenes/Main/SettingsNetwork';
+import { SwapPage } from 'new/scenes/Main/Swap';
+import { WalletDetail } from 'new/scenes/Main/WalletDetail';
 import { Root } from 'new/scenes/Root';
+import { DebugFeatureFlagsManager } from 'new/ui/managers/DebugFeatureFlagsManager';
 import { LocationManager } from 'new/ui/managers/LocationManager';
 import { NotificationManager } from 'new/ui/managers/NotificationManager';
 import { ModalManager } from 'new/ui/modals/ModalManager';
 import { Auth } from 'pages/Auth';
 import { Landing } from 'pages/Landing';
-import { Receive } from 'pages/Receive';
-import { Swap } from 'pages/Swap';
-import { Wallet } from 'pages/Wallet';
+import { Wallet as WalletOld } from 'pages/Wallet';
 import { WalletSettings } from 'pages/WalletSettings';
 import { AuthRequiredRoute } from 'utils/routes/UserRequiredRoute';
 
@@ -51,21 +52,24 @@ const App: React.FC = observer(() => {
                     path="/wallet/:publicKey/settings"
                     component={WalletSettings}
                   />
-                  <AuthRequiredRoute path="/wallet/:publicKey" exact component={Wallet} />
+                  <AuthRequiredRoute path="/walletold/:publicKey" exact component={WalletOld} />
+                  <AuthRequiredRoute path="/wallet/:publicKey" exact component={WalletDetail} />
                   <AuthRequiredRoute path="/buy/:symbol?" component={Buy} />
                   <AuthRequiredRoute path="/receive/(tokens)?" component={Receive} />
                   <AuthRequiredRoute path="/send/:publicKey/:status(result)" component={Send} />
                   <AuthRequiredRoute path="/send/:publicKey?" component={Send} />
-                  <AuthRequiredRoute path="/swap/(settings)?/:symbol?" component={Swap} />
+                  <AuthRequiredRoute path="/swap/(settings)?/:symbol?" component={SwapPage} />
                   <AuthRequiredRoute path="/settings/network" component={SettingsNetwork} />
-                  <AuthRequiredRoute path="/settings" component={Settings} />
+                  <AuthRequiredRoute path="/settings" component={Settings} exact />
+                  <ModalManager />
                 </Main>
               </Switch>
               <Intercom />
-              <FeaturesToggle />
               <ToastManager anchor="left" renderToast={(props) => <NotifyToast {...props} />} />
-              <ModalManager />
               <NotificationManager />
+              {__DEVELOPMENT__ || process.env.REACT_APP_STAGING ? (
+                <DebugFeatureFlagsManager />
+              ) : null}
             </Root>
           </Providers>
         </Router>

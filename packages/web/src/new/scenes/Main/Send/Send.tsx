@@ -5,12 +5,14 @@ import { observer } from 'mobx-react-lite';
 
 import { WidgetPageWithBottom } from 'components/common/WidgetPageWithBottom';
 import { useViewModel } from 'new/core/viewmodels/useViewModel';
-import { ActionButton } from 'new/scenes/Main/Send/ActionButton';
-import { ChooseTokenAndAmount } from 'new/scenes/Main/Send/ChooseTokenAndAmount';
-import { FeesView } from 'new/scenes/Main/Send/FeesView';
-import { SelectAddress } from 'new/scenes/Main/Send/SelectAddress';
-import { SendViewModel } from 'new/scenes/Main/Send/Send.ViewModel';
+import { NetworkSelect } from 'new/scenes/Main/Send/NetworkSelect';
 import { Layout } from 'new/ui/components/common/Layout';
+
+import { ActionButton } from './ActionButton';
+import { ChooseTokenAndAmount } from './ChooseTokenAndAmount';
+import { FeesView } from './FeesView';
+import { SelectAddress } from './SelectAddress';
+import { SendViewModel } from './Send.ViewModel';
 
 const Wrapper = styled.div`
   display: grid;
@@ -26,6 +28,9 @@ export const Send: FC = observer(() => {
         <Wrapper>
           <ChooseTokenAndAmount viewModel={viewModel} />
           <SelectAddress viewModel={viewModel} />
+          {viewModel.getSelectedWallet?.token.isRenBTC ? (
+            <NetworkSelect viewModel={viewModel} />
+          ) : null}
           <FeesView viewModel={viewModel} />
         </Wrapper>
       </WidgetPageWithBottom>

@@ -45,7 +45,7 @@ const DropDownListContainer = styled.div`
   top: 100%;
   right: 0;
   left: 0;
-  z-index: 1;
+  z-index: 2;
 
   margin-top: 8px;
   padding: 8px 8px 0;
@@ -70,19 +70,34 @@ interface Props {
   viewModel: Readonly<ChooseWalletViewModel>;
   selector: React.ReactNode;
   selectedWallet: Wallet | null;
+  customFilter?: (wallet: Wallet) => boolean;
+  staticWallets: Wallet[] | null;
   showOtherWallets: boolean;
   onWalletChange: (wallet: Wallet) => void;
+  className?: string;
 }
 
 export const ChooseWallet: FC<Props> = observer(
-  ({ viewModel, selector, selectedWallet, showOtherWallets, onWalletChange }) => {
+  ({
+    viewModel,
+    selector,
+    selectedWallet,
+    customFilter,
+    staticWallets = null,
+    showOtherWallets,
+    onWalletChange,
+    className,
+  }) => {
     const selectorRef = useRef<HTMLDivElement>(null);
     const dropdownRef = useRef<HTMLDivElement>(null);
 
     useLayoutEffect(() => {
       viewModel.selectWallet(selectedWallet);
+      viewModel.setCustomFilter(customFilter);
+      viewModel.setStaticWallets(staticWallets);
       viewModel.setShowOtherWallets(showOtherWallets);
-    }, [selectedWallet, showOtherWallets, viewModel]);
+      viewModel.reload();
+    }, [customFilter, selectedWallet, showOtherWallets, viewModel]);
 
     const handleAwayClick = useCallback(
       (e: MouseEvent) => {
@@ -116,7 +131,7 @@ export const ChooseWallet: FC<Props> = observer(
         <SelectorWrapper
           ref={selectorRef}
           onClick={handleSelectorClick}
-          className={classNames({ isOpen: viewModel.isOpen })}
+          className={classNames(className, { isOpen: viewModel.isOpen })}
         >
           {selector}
           <ChevronWrapper>

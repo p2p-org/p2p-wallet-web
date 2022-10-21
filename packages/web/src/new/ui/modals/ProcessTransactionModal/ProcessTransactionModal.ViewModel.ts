@@ -1,10 +1,12 @@
-import { action, makeObservable, observable } from 'mobx';
+import type { IReactionDisposer } from 'mobx';
+import { action, computed, makeObservable, observable, reaction } from 'mobx';
 import assert from 'ts-invariant';
 import { injectable } from 'tsyringe';
 
 import { PendingTransaction, TransactionStatus } from 'new/app/models/PendingTransaction';
 import { ViewModel } from 'new/core/viewmodels/ViewModel';
 import { SolanaSDKError } from 'new/sdk/SolanaSDK';
+import type { TransactionIndex } from 'new/services/TransactionHandler';
 import { TransactionHandler } from 'new/services/TransactionHandler';
 
 import type { RawTransactionType } from './ProcessTransaction.Models';
@@ -21,7 +23,7 @@ export class ProcessTransactionModalViewModel
 {
   rawTransaction: RawTransactionType | null;
   pendingTransaction: PendingTransaction | null;
-  observingTransactionIndex: number | null;
+  observingTransactionIndex: TransactionIndex | null;
 
   constructor(private _transactionHandler: TransactionHandler) {
     super();
@@ -36,7 +38,22 @@ export class ProcessTransactionModalViewModel
       observingTransactionIndex: observable,
 
       setTransaction: action,
+
+      isSwapping: computed,
+      transactionID: computed,
+      getMainDescription: computed,
+
       sendAndObserveTransaction: action,
+    });
+  }
+
+  setTransaction(processingTransaction: RawTransactionType) {
+    this.rawTransaction = processingTransaction;
+    this.pendingTransaction = new PendingTransaction({
+      transactionId: null,
+      sentAt: new Date(),
+      rawTransaction: processingTransaction,
+      status: TransactionStatus.sending(),
     });
   }
 
@@ -50,16 +67,6 @@ export class ProcessTransactionModalViewModel
 
   protected override afterReactionsRemoved() {}
 
-  setTransaction(processingTransaction: RawTransactionType) {
-    this.rawTransaction = processingTransaction;
-    this.pendingTransaction = new PendingTransaction({
-      transactionId: null,
-      sentAt: new Date(),
-      rawTransaction: processingTransaction,
-      status: TransactionStatus.sending(),
-    });
-  }
-
   get isSwapping(): boolean {
     assert(this.rawTransaction, 'rawTransaction is not set');
     return this.rawTransaction.isSwap;
@@ -70,14 +77,14 @@ export class ProcessTransactionModalViewModel
     return this.pendingTransaction.transactionId;
   }
 
-  getMainDescription(): string {
+  get getMainDescription(): string {
     assert(this.rawTransaction, 'rawTransaction is not set');
     return this.rawTransaction.mainDescription;
   }
 
   // Actions
 
-  sendAndObserveTransaction(): void {
+  sendAndObserveTransaction(): IReactionDisposer {
     assert(this.rawTransaction, 'rawTransaction is not set');
     // send transaction and get observation index
     const index = this._transactionHandler.sendTransaction(this.rawTransaction);
@@ -92,8 +99,12 @@ export class ProcessTransactionModalViewModel
     });
 
     // observe transaction based on transaction index
-    // TODO: it should wait
-    this.pendingTransaction =
-      this._transactionHandler.observeTransaction(index) ?? unknownErrorInfo;
+    return reaction(
+      () => this._transactionHandler.transactions,
+      () => {
+        this.pendingTransaction =
+          this._transactionHandler.observeTransaction(index) || unknownErrorInfo;
+      },
+    );
   }
 }

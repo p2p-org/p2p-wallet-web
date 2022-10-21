@@ -1,6 +1,8 @@
 import type { Token } from 'new/sdk/SolanaSDK';
 import { Defaults } from 'new/services/Defaults';
 
+export const maxSlippage = 0.5;
+
 export function numberToString(
   value: number,
   {
@@ -9,30 +11,47 @@ export function numberToString(
     autoSetMaximumFractionDigits = false,
   }: {
     maximumFractionDigits?: number;
-    groupingSeparator?: string;
+    groupingSeparator?: string | null;
     autoSetMaximumFractionDigits?: boolean;
   },
 ): string {
-  let _maximumFractionDigits = maximumFractionDigits;
+  const options: Intl.NumberFormatOptions = {};
+  options.maximumFractionDigits = maximumFractionDigits;
   if (autoSetMaximumFractionDigits) {
     if (value > 1000) {
-      _maximumFractionDigits = 2;
+      options.maximumFractionDigits = 2;
     } else if (value > 100) {
-      _maximumFractionDigits = 4;
+      options.maximumFractionDigits = 4;
     } else {
-      _maximumFractionDigits = 9;
+      options.maximumFractionDigits = 9;
     }
   }
 
-  return value
-    .toLocaleString('en-US', { maximumFractionDigits: _maximumFractionDigits })
-    .replace(/,/g, groupingSeparator);
+  let _value = value.toLocaleString('en-US', options);
+  if (typeof groupingSeparator === 'string') {
+    _value = _value.replace(/,/g, groupingSeparator);
+  }
+
+  return _value;
 }
 
-export const numberToFiatString = (value: number) => {
-  return Defaults.fiat.symbol + numberToString(value, { maximumFractionDigits: 2 });
+// TODO: rename
+export const numberToFiatString = (value: number, maximumFractionDigits = 2) => {
+  return `${Defaults.fiat.symbol} ${numberToString(value, { maximumFractionDigits })}`;
 };
 
+// TODO: rename
 export const numberToTokenString = (value: number, token: Token) => {
-  return numberToString(value, { maximumFractionDigits: token.decimals || 9 }) + ' ' + token.symbol;
+  return `${numberToString(value, { maximumFractionDigits: token.decimals ?? 9 })} ${token.symbol}`;
 };
+
+export function rounded(value: number, decimals?: number): number {
+  if (!decimals) {
+    return value;
+  }
+  const realAmount = numberToString(value, {
+    maximumFractionDigits: decimals,
+    groupingSeparator: '',
+  });
+  return Number(realAmount);
+}

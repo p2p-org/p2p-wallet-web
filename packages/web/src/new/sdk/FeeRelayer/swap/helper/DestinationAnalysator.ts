@@ -1,8 +1,9 @@
 import type { PublicKey } from '@solana/web3.js';
 
-import { TokenAccount } from 'new/sdk/FeeRelayer';
-import type { FeeRelayerRelaySolanaClient } from 'new/sdk/FeeRelayer/relay';
 import { AccountInfo, SolanaSDKPublicKey } from 'new/sdk/SolanaSDK';
+
+import { TokenAccount } from '../../models/TokenAccount';
+import type { FeeRelayerRelaySolanaClient } from '../../relay';
 
 export class DestinationAnalysator {
   static async analyseDestination({
@@ -53,6 +54,7 @@ export class DestinationAnalysator {
         const needsCreateDestinationTokenAccount = !info?.owner.equals(
           SolanaSDKPublicKey.tokenProgramId,
         );
+
         return {
           destination: new TokenAccount({
             address: userAccount,

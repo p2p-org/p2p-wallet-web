@@ -1,10 +1,11 @@
 import { PublicKey } from '@solana/web3.js';
 
-import { TokenAccount } from 'new/sdk/FeeRelayer';
-import type { FeeRelayerRelaySolanaClient } from 'new/sdk/FeeRelayer/relay';
-import { RelayProgram } from 'new/sdk/FeeRelayer/relayProgram';
 import type * as OrcaSwap from 'new/sdk/OrcaSwap';
 import * as SolanaSDK from 'new/sdk/SolanaSDK';
+
+import { TokenAccount } from '../../models';
+import type { FeeRelayerRelaySolanaClient } from '../../relay';
+import { RelayProgram } from '../../relayProgram';
 
 export class TransitTokenAccountAnalysator {
   static getTransitToken({

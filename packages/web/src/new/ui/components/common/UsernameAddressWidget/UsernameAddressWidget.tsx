@@ -4,12 +4,12 @@ import { styled } from '@linaria/react';
 import { borders, shadows, theme, up, useIsMobile, useIsTablet } from '@p2p-wallet-web/ui';
 import QRCode from 'qrcode.react';
 
-import { ToastManager } from 'components/common/ToastManager';
+import { useViewModel } from 'new/core/viewmodels/useViewModel';
 import Logo from 'new/ui/assets/images/logo.png';
 import { AddressText } from 'new/ui/components/common/AddressText';
+import { UserNamedAddressWidgetViewModel } from 'new/ui/components/common/UsernameAddressWidget/UserNamedAddressWidget.ViewModel';
 import { Button } from 'new/ui/components/ui/Button';
-import { setToClipboard } from 'new/utils/Clipboard';
-import { browserName, BrowserNames } from 'new/utils/UserAgent';
+import { isImageCopyAvailable } from 'new/utils/Clipboard';
 
 const Wrapper = styled.div`
   display: grid;
@@ -78,15 +78,6 @@ const ButtonsWrapper = styled.div`
   }
 `;
 
-const copy = (value: string, text: string) => {
-  try {
-    void navigator.clipboard.writeText(value);
-    ToastManager.info(`${text} copied!`);
-  } catch (error) {
-    console.error(error);
-  }
-};
-
 const QR_CODE_SIZE_MOBILE = 237;
 const QR_CODE_SIZE = 122;
 
@@ -96,22 +87,17 @@ type Props = {
 };
 
 export const UsernameAddressWidget: FC<Props> = ({ address, username }) => {
+  const viewModel = useViewModel(UserNamedAddressWidgetViewModel);
   const isMobile = useIsMobile();
   const isTablet = useIsTablet();
-  const qrCopyEnabled = browserName !== BrowserNames.FIREFOX;
 
   const handleImageCopyClick = () => {
-    const showNotification = () => {
-      ToastManager.info('QR code Copied!');
-      // trackEvent('Receive_QR_Saved');
-    };
-
     const qrElement = document.querySelector<HTMLCanvasElement>('#qrcode');
     if (!qrElement) {
       return;
     }
 
-    void setToClipboard(qrElement, showNotification);
+    viewModel.copyQRCode(qrElement);
   };
 
   return (
@@ -137,15 +123,20 @@ export const UsernameAddressWidget: FC<Props> = ({ address, username }) => {
             small={!isMobile}
             medium={isMobile}
             hollow
-            onClick={() => copy(username, 'Username')}
+            onClick={() => viewModel.copyString(username, 'Username')}
           >
             Copy username
           </Button>
         ) : undefined}
-        <Button small={!isMobile} medium={isMobile} hollow onClick={() => copy(address, 'Address')}>
+        <Button
+          small={!isMobile}
+          medium={isMobile}
+          hollow
+          onClick={() => viewModel.copyString(address, 'Address')}
+        >
           Copy address
         </Button>
-        {qrCopyEnabled ? (
+        {isImageCopyAvailable ? (
           <Button small={!isMobile} medium={isMobile} hollow onClick={handleImageCopyClick}>
             Copy QR code
           </Button>

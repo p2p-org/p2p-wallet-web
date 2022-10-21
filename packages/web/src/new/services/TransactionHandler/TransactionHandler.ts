@@ -1,43 +1,46 @@
 import { ZERO } from '@orca-so/sdk';
 import { PublicKey } from '@solana/web3.js';
+import { action, computed, makeObservable, observable } from 'mobx';
 import promiseRetry from 'promise-retry';
-import { injectable } from 'tsyringe';
+import { singleton } from 'tsyringe';
 
 import { FeeTypeEnum } from 'new/app/models/PayingFee';
 import { PendingTransaction, TransactionStatus } from 'new/app/models/PendingTransaction';
-import type * as SolanaSDK from 'new/sdk/SolanaSDK';
 import {
   getAssociatedTokenAddressSync,
   SolanaSDKError,
   SolanaSDKPublicKey,
   toLamport,
 } from 'new/sdk/SolanaSDK';
+import type { ParsedTransaction } from 'new/sdk/TransactionParser';
+import { NotificationService } from 'new/services/NotificationService';
 import { PricesService } from 'new/services/PriceAPIs/PricesService';
 import { WalletsRepository } from 'new/services/Repositories';
 import { AccountObservableService } from 'new/services/Socket';
 import { SolanaService } from 'new/services/SolanaService';
-import type { RawTransactionType } from 'new/ui/modals/ProcessTransactionModal';
+import type { RawTransactionType, SendTransaction } from 'new/ui/modals/ProcessTransactionModal';
 import * as ProcessTransaction from 'new/ui/modals/ProcessTransactionModal/ProcessTransaction.Models';
 import type { Emitter } from 'new/utils/libs/nanoEvent';
 import { createNanoEvent } from 'new/utils/libs/nanoEvent';
 
-type TransactionIndex = number;
+export type TransactionIndex = number;
 
 interface TransactionHandlerType {
   sendTransaction(processingTransaction: RawTransactionType): TransactionIndex;
   observeTransaction(transactionIndex: TransactionIndex): PendingTransaction | null; // TODO: observable
-  areSomeTransactionsInProgress(): boolean;
+  readonly areSomeTransactionsInProgress: boolean;
 
-  observeProcessingTransactions(account: string): SolanaSDK.ParsedTransaction[]; // TODO: observable
-  observeProcessingTransactionsAll(): SolanaSDK.ParsedTransaction[]; // TODO: observable
+  observeProcessingTransactions(account: string): ParsedTransaction[]; // TODO: observable
+  observeProcessingTransactionsAll(): ParsedTransaction[]; // TODO: observable
 
-  getProccessingTransactions(account: string): SolanaSDK.ParsedTransaction[];
-  getProccessingTransactionAll(): SolanaSDK.ParsedTransaction[];
+  getProccessingTransactions(account: string): ParsedTransaction[];
+  getProccessingTransactionAll(): ParsedTransaction[];
 
   readonly onNewTransaction: Emitter<[{ trx: PendingTransaction; index: number }]>['on']; // TODO: observable
 }
 
-@injectable()
+// @web: it must be same instance during all resolves
+@singleton()
 export class TransactionHandler implements TransactionHandlerType {
   transactions: PendingTransaction[] = [];
   private _onNewTransactionEmitter =
@@ -50,7 +53,23 @@ export class TransactionHandler implements TransactionHandlerType {
     private _walletsRepository: WalletsRepository,
     private _pricesService: PricesService,
     private _socket: AccountObservableService,
-  ) {}
+    private _notificationService: NotificationService,
+  ) {
+    makeObservable(this, {
+      transactions: observable,
+
+      sendTransaction: action,
+      observeTransaction: action,
+
+      areSomeTransactionsInProgress: computed,
+
+      getProccessingTransactions: action,
+      getProcessingTransactionAll: action,
+      sendAndObserve: action,
+
+      _updateTransactionAtIndex: action,
+    });
+  }
 
   sendTransaction(processingTransaction: RawTransactionType): TransactionIndex {
     // get index to return
@@ -64,14 +83,14 @@ export class TransactionHandler implements TransactionHandlerType {
       status: TransactionStatus.sending(),
     });
 
-    const value = this.transactions;
+    const value = [...this.transactions];
     value.push(trx);
 
     this.transactions = value;
     this._onNewTransactionEmitter.emit({ trx, index: txIndex });
 
     // process
-    this.sendAndObserve({ index: txIndex, processingTransaction });
+    void this.sendAndObserve({ index: txIndex, processingTransaction });
 
     return txIndex;
   }
@@ -80,14 +99,14 @@ export class TransactionHandler implements TransactionHandlerType {
     return this.transactions[transactionIndex] ?? null;
   }
 
-  areSomeTransactionsInProgress(): boolean {
+  get areSomeTransactionsInProgress(): boolean {
     return this.transactions.some((tx) => tx.status.isProcessing);
   }
 
-  // observeProcessingTransactions(account: string): SolanaSDK.ParsedTransaction[] {}
-  // observeProcessingTransactionsAll(): SolanaSDK.ParsedTransaction[] {}
+  // observeProcessingTransactions(account: string): ParsedTransaction[] {}
+  // observeProcessingTransactionsAll(): ParsedTransaction[] {}
 
-  getProccessingTransactions(account: string): SolanaSDK.ParsedTransaction[] {
+  getProccessingTransactions(account: string): ParsedTransaction[] {
     return this.transactions
       .filter((pt) => {
         const transaction = pt.rawTransaction;
@@ -124,10 +143,10 @@ export class TransactionHandler implements TransactionHandlerType {
           authority: this._walletsRepository.nativeWallet?.pubkey,
         });
       })
-      .filter((tx): tx is SolanaSDK.ParsedTransaction => Boolean(tx));
+      .filter((tx): tx is ParsedTransaction => Boolean(tx));
   }
 
-  getProcessingTransactionAll(): SolanaSDK.ParsedTransaction[] {
+  getProcessingTransactionAll(): ParsedTransaction[] {
     return this.transactions
       .map((pt) => {
         return pt.parse({
@@ -135,7 +154,7 @@ export class TransactionHandler implements TransactionHandlerType {
           authority: this._walletsRepository.nativeWallet?.pubkey,
         });
       })
-      .filter((tx): tx is SolanaSDK.ParsedTransaction => Boolean(tx));
+      .filter((tx): tx is ParsedTransaction => Boolean(tx));
   }
 
   // Send and observe transaction
@@ -150,24 +169,37 @@ export class TransactionHandler implements TransactionHandlerType {
       const transactionId = await processingTransaction.createRequest();
 
       // show notification
-      // this._notificationsService.showInAppNotification(done(transactionHasBeenSent))
+      this._notificationService.info('Transaction has been sent');
 
-      // update status
-      this._updateTransactionAtIndex(index, () => {
-        return new PendingTransaction({
-          transactionId,
-          sentAt: new Date(),
-          rawTransaction: processingTransaction,
-          status: TransactionStatus.confirmed(0),
+      // when sending renBTC via Bitcoin network transaction is already finished at this stage
+      if ((processingTransaction as SendTransaction).isRenBTCViaBitcoinNetwork) {
+        // update status
+        this._updateTransactionAtIndex(index, () => {
+          return new PendingTransaction({
+            transactionId,
+            sentAt: new Date(),
+            rawTransaction: processingTransaction,
+            status: TransactionStatus.finalized(),
+          });
         });
-      });
+      } else {
+        // update status
+        this._updateTransactionAtIndex(index, () => {
+          return new PendingTransaction({
+            transactionId,
+            sentAt: new Date(),
+            rawTransaction: processingTransaction,
+            status: TransactionStatus.confirmed(0),
+          });
+        });
 
-      // observe confirmations
-      this.observe({ index, transactionId });
+        // observe confirmations
+        this._observe({ index, transactionId });
+      }
     } catch (error) {
       console.error(error);
       // update status
-      // TODO: notification this._notificationsService.showInAppNotification(error(error));
+      this._notificationService.error((error as Error).message);
 
       // mark transaction as failured
       this._updateTransactionAtIndex(index, (currentValue) => {
@@ -179,10 +211,19 @@ export class TransactionHandler implements TransactionHandlerType {
   }
 
   // Observe confirmation statuses of given transaction
-  observe({ index, transactionId }: { index: TransactionIndex; transactionId: string }): void {
-    promiseRetry(
-      (_retry) =>
-        this._apiClient.provider.connection.getSignatureStatus(transactionId).then((result) => {
+  private _observe({
+    index,
+    transactionId,
+  }: {
+    index: TransactionIndex;
+    transactionId: string;
+  }): void {
+    void promiseRetry(
+      async (retry) => {
+        try {
+          const result = await this._apiClient.provider.connection.getSignatureStatus(
+            transactionId,
+          );
           const status = result.value;
           if (!status) {
             throw SolanaSDKError.other('Invalid status');
@@ -206,24 +247,37 @@ export class TransactionHandler implements TransactionHandlerType {
           if (confirmed) {
             return null;
           } else {
-            throw ProcessTransaction.ErrorType.notEnoughNumberOfConfirmations;
+            throw ProcessTransaction.ErrorType.notEnoughNumberOfConfirmations();
           }
-        }),
+        } catch (error) {
+          if (error instanceof ProcessTransaction.ErrorType.NotEnoughNumberOfConfirmationsError) {
+            console.error(error);
+            retry(error);
+            return;
+          }
+
+          this._updateTransactionAtIndex(index, (currentValue) => {
+            const value = currentValue;
+            value.status = TransactionStatus.finalized();
+            return value;
+          });
+        }
+      },
       {
-        retries: 10,
-        minTimeout: 1000,
-        maxTimeout: 60000,
+        retries: 30,
+        minTimeout: 1_000,
+        maxTimeout: 2_000,
         factor: 1,
       },
     );
   }
 
   // Update transaction
-  private _updateTransactionAtIndex(
+  _updateTransactionAtIndex(
     index: TransactionIndex,
     update: (tx: PendingTransaction) => PendingTransaction,
   ): boolean {
-    const value = this.transactions;
+    const value = [...this.transactions];
 
     const currentValue = value[index];
     if (currentValue) {
@@ -321,7 +375,7 @@ export class TransactionHandler implements TransactionHandlerType {
 
           // update native wallet
           const index = wallets.findIndex((wallet) => wallet.isNativeSOL);
-          if (index) {
+          if (index !== -1) {
             wallets[index]!.increaseBalance(reimbursedAmount);
           }
 
@@ -340,7 +394,7 @@ export class TransactionHandler implements TransactionHandlerType {
                 wallet.pubkey ===
                 (rawTransaction as ProcessTransaction.SwapTransaction).sourceWallet.pubkey,
             );
-            if (index) {
+            if (index !== -1) {
               wallets[index]!.decreaseBalance(
                 toLamport(
                   (rawTransaction as ProcessTransaction.SwapTransaction).amount,
@@ -357,7 +411,7 @@ export class TransactionHandler implements TransactionHandlerType {
               wallet.pubkey ===
               (rawTransaction as ProcessTransaction.SwapTransaction).destinationWallet.pubkey,
           );
-          if (index) {
+          if (index !== -1) {
             // update only if socket is not connected
             if (!this._socket.isConnected) {
               wallets[index]!.increaseBalance(
@@ -412,7 +466,7 @@ export class TransactionHandler implements TransactionHandlerType {
                   const index = wallets.findIndex(
                     (wallet) => wallet.mintAddress === fee.token.address,
                   );
-                  if (index) {
+                  if (index !== -1) {
                     wallets[index]!.decreaseBalance(fee.lamports);
                   }
                   break;

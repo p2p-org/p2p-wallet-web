@@ -1,7 +1,8 @@
-import { autorun, makeObservable, observable, set, toJS } from 'mobx';
+import { makeObservable, observable } from 'mobx';
 
 import { Fiat } from 'new/app/models/Fiat';
 import { APIEndpoint, SolanaSDKPublicKey } from 'new/sdk/SolanaSDK';
+import { makeLocalStorage } from 'new/services/common/makeLocalStorage';
 import type { CurrentPrice } from 'new/services/PriceAPIs/PricesService';
 
 export enum Appearance {
@@ -10,49 +11,37 @@ export enum Appearance {
   dark = 'dark',
 }
 
-function makeLocalStorage<T>(_this: { fromJSON(json: T): T }, name: string) {
-  const storedJson = localStorage.getItem(name);
-  if (storedJson) {
-    const json = JSON.parse(storedJson);
-    set(_this, _this.fromJSON(json));
-  }
-  autorun(() => {
-    const value = toJS(_this);
-    localStorage.setItem(name, JSON.stringify(value));
-  });
-}
-
 interface DefaultsKeys {
   apiEndpoint: APIEndpoint;
 
-  walletName: { [pubkey in string]: string };
+  walletName: Record<string, string>;
 
+  appearance: Appearance;
+  slippage: number;
+  fiat: Fiat;
   hiddenWalletPubkey: string[];
   unhiddenWalletPubkey: string[];
   hideZeroBalances: boolean;
-
-  fiat: Fiat;
-  prices: { [key in string]: CurrentPrice };
+  prices: Record<string, CurrentPrice>;
   payingTokenMint: string;
 
-  appearance: Appearance;
   useFreeTransactions: boolean;
 }
 
 class _Defaults implements DefaultsKeys {
   apiEndpoint: APIEndpoint = APIEndpoint.definedEndpoints[0]!;
 
-  walletName: { [pubkey in string]: string } = {};
+  walletName: Record<string, string> = {};
 
+  appearance: Appearance = Appearance.system;
+  slippage = 0.01;
+  fiat: Fiat = Fiat.usd;
   hiddenWalletPubkey: string[] = [];
   unhiddenWalletPubkey: string[] = [];
   hideZeroBalances = true;
-
-  fiat: Fiat = Fiat.usd;
-  prices: { [key in string]: CurrentPrice } = {};
+  prices: Record<string, CurrentPrice> = {};
   payingTokenMint: string = SolanaSDKPublicKey.wrappedSOLMint.toString();
 
-  appearance: Appearance = Appearance.system;
   useFreeTransactions = false;
 
   constructor() {
@@ -61,17 +50,18 @@ class _Defaults implements DefaultsKeys {
 
       walletName: observable,
 
+      appearance: observable,
+      slippage: observable,
+      fiat: observable,
       hiddenWalletPubkey: observable,
       unhiddenWalletPubkey: observable,
       hideZeroBalances: observable,
-
-      fiat: observable,
       prices: observable,
       payingTokenMint: observable,
 
-      appearance: observable,
       useFreeTransactions: observable,
     });
+
     makeLocalStorage(this, 'defaults');
   }
 

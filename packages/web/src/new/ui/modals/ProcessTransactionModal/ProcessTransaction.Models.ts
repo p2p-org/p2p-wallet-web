@@ -22,6 +22,7 @@ export interface RawTransactionType {
   // extensions
 
   readonly isSwap: boolean;
+  readonly payingWallet: Wallet | null;
 }
 
 class RawTransactionBase {
@@ -30,19 +31,30 @@ class RawTransactionBase {
   }
 
   get payingWallet(): Wallet | null {
-    switch (true) {
-      case this instanceof SwapTransaction:
+    switch (this.constructor) {
+      case SwapTransaction:
         return (this as unknown as SwapTransaction)._payingWallet;
-      case this instanceof SendTransaction:
+      case SendTransaction:
         return (this as unknown as SendTransaction).payingFeeWallet;
       default:
         return null;
     }
   }
+
+  set payingWallet(wallet: Wallet | null) {
+    switch (this.constructor) {
+      case SwapTransaction:
+        (this as unknown as SwapTransaction)._payingWallet = wallet;
+        break;
+      case SendTransaction:
+        (this as unknown as SendTransaction).payingFeeWallet = wallet;
+        break;
+    }
+  }
 }
 
 type MetaInfo = {
-  swapMax: boolean;
+  swapMAX: boolean;
   swapUSD: number;
 };
 
@@ -100,11 +112,14 @@ export class SwapTransaction extends RawTransactionBase implements RawTransactio
   }
 
   get mainDescription(): string {
+    // @ios: was on ios
     return `${numberToString(this.amount, { maximumFractionDigits: 9 })} ${
       this.sourceWallet.token.symbol
     } -> ${numberToString(this.amount, { maximumFractionDigits: 9 })} ${
       this.destinationWallet.token.symbol
     }`;
+    // @web: tried on web with web design
+    // return `${this.sourceWallet.token.symbol} -> ${this.destinationWallet.token.symbol}`;
   }
 
   createRequest(): Promise<string> {
@@ -203,6 +218,7 @@ export class SendTransaction extends RawTransactionBase implements RawTransactio
   feeInSOL: u64;
   feeInToken: SolanaSDK.FeeAmount | null;
   isSimulation: boolean;
+  isRenBTCViaBitcoinNetwork: boolean;
 
   constructor({
     sendService,
@@ -215,6 +231,7 @@ export class SendTransaction extends RawTransactionBase implements RawTransactio
     feeInSOL,
     feeInToken,
     isSimulation,
+    isRenBTCViaBitcoinNetwork,
   }: {
     sendService: SendServiceType;
     network: Send.Network;
@@ -226,6 +243,7 @@ export class SendTransaction extends RawTransactionBase implements RawTransactio
     feeInSOL: u64;
     feeInToken: SolanaSDK.FeeAmount | null;
     isSimulation: boolean;
+    isRenBTCViaBitcoinNetwork: boolean;
   }) {
     super();
 
@@ -239,6 +257,7 @@ export class SendTransaction extends RawTransactionBase implements RawTransactio
     this.feeInSOL = feeInSOL;
     this.feeInToken = feeInToken;
     this.isSimulation = isSimulation;
+    this.isRenBTCViaBitcoinNetwork = isRenBTCViaBitcoinNetwork;
   }
 
   get mainDescription(): string {
@@ -272,6 +291,14 @@ export class SendTransaction extends RawTransactionBase implements RawTransactio
   }
 }
 
-export enum ErrorType {
-  notEnoughNumberOfConfirmations,
+// Transaction status
+
+class NotEnoughNumberOfConfirmationsError extends Error {}
+
+export class ErrorType {
+  static NotEnoughNumberOfConfirmationsError = NotEnoughNumberOfConfirmationsError;
+
+  static notEnoughNumberOfConfirmations(): NotEnoughNumberOfConfirmationsError {
+    return new NotEnoughNumberOfConfirmationsError('notEnoughNumberOfConfirmations');
+  }
 }

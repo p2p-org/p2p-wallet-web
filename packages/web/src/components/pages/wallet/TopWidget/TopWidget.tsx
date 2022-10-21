@@ -16,7 +16,7 @@ import classNames from 'classnames';
 import throttle from 'lodash.throttle';
 
 import { useMarketData, useRates } from 'app/contexts';
-import { useConfig } from 'app/contexts/solana/swap';
+// import { useConfig } from 'app/contexts/solana/swap';
 import { AmountUSD } from 'components/common/AmountUSD';
 import { COLUMN_RIGHT_WIDTH } from 'components/common/Layout/constants';
 import { ToastManager } from 'components/common/ToastManager';
@@ -182,7 +182,7 @@ type Props = {
 
 const TopWidgetOrigin: FunctionComponent<Props> = ({ publicKey }) => {
   const location = useLocation();
-  const { tokenConfigs } = useConfig();
+  // const { tokenConfigs } = useConfig();
   const widgetRef = useRef<HTMLDivElement>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isShowFixed, setIsShowFixed] = useState(false);
@@ -276,7 +276,8 @@ const TopWidgetOrigin: FunctionComponent<Props> = ({ publicKey }) => {
             <PlusIcon name="top" />
           </ButtonStyled>
         </Link>
-        {tokenAccount?.balance?.token.symbol && tokenConfigs[tokenAccount?.balance.token.symbol] ? (
+        {tokenAccount?.balance?.token
+          .symbol /* && tokenConfigs[tokenAccount?.balance.token.symbol] */ ? (
           <Link
             to={{
               pathname: `/swap/${tokenAccount.balance.token.symbol}`,
