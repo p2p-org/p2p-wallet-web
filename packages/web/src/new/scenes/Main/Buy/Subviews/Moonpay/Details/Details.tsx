@@ -3,14 +3,16 @@ import type { FC } from 'react';
 import { computed } from 'mobx';
 import { observer } from 'mobx-react-lite';
 
-import type { Accordion } from 'components/ui/AccordionDetails';
-import { AccordionDetails } from 'components/ui/AccordionDetails';
-import type { BuyViewModelProps } from 'new/scenes/Main/Buy/Subviews/Moonpay/types';
+import { trackEvent1 } from 'new/services/AnalyticsService';
+import type { AccordionList } from 'new/ui/components/ui/AccordionDetails';
+import { AccordionDetails } from 'new/ui/components/ui/AccordionDetails';
 import { numberToFiatString } from 'new/utils/NumberExtensions';
 
+import type { BuyViewModelProps } from '../types';
+
 export const Details: FC<BuyViewModelProps> = observer(({ viewModel }) => {
-  const accordion = computed(() => {
-    const lists: Accordion = [
+  const accordion = computed<AccordionList>(() => {
+    const lists: AccordionList = [
       {
         id: 1,
         rows: [
@@ -67,6 +69,9 @@ export const Details: FC<BuyViewModelProps> = observer(({ viewModel }) => {
       titleBottomName="Total amount spent"
       titleBottomValue={numberToFiatString(viewModel.output.total)}
       accordion={accordion}
+      onToggle={(isOpen) => {
+        trackEvent1({ name: 'Buy_Total_Showed', params: { Showed: isOpen } });
+      }}
     />
   );
 });
