@@ -41,7 +41,14 @@ export class SolanaModel extends Model {
     if (!solana) {
       throw new Error('~~~ No Signer object was provided');
     }
-    this._provider = new Provider(connection, solana, Provider.defaultOptions());
+
+    if (!connection) {
+      throw new Error('~~~ No Connection');
+    }
+
+    if (!this._provider) {
+      this._provider = new Provider(connection, solana, Provider.defaultOptions());
+    }
   }
 
   get connection(): Connection {

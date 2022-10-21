@@ -23,6 +23,8 @@ export class WalletModel extends Model {
   connected: boolean;
   selectedAdaptor: Adapter | null = null;
 
+  private _adaptors: Array<Adapter | MnemonicAdapter> | null = null;
+
   constructor(protected walletAdaptorService: WalletAdaptorService) {
     super();
     this.name = '';
@@ -34,6 +36,7 @@ export class WalletModel extends Model {
       publicKey: observable,
       network: observable,
       connected: observable,
+      selectedAdaptor: observable,
       adaptors: observable,
       pubKey: computed,
       signer: computed,
@@ -64,8 +67,13 @@ export class WalletModel extends Model {
   }
 
   async connectAdaptor(adaptorName: string, config?: ConnectConfig) {
-    const adaptors = this.walletAdaptorService.getAdaptors(this.network);
-    const chosenAdaptor = adaptors.find((adaptor) => adaptor.name === adaptorName);
+    // @TODO can be a problem again. This is due to if network changes, the new adapter instances
+    // getting created when network changes
+    if (!this._adaptors) {
+      this._adaptors = this.walletAdaptorService.getAdaptors(this.network);
+    }
+
+    const chosenAdaptor = this._adaptors.find((adaptor) => adaptor.name === adaptorName);
 
     if (chosenAdaptor) {
       this.setUpAdaptor(chosenAdaptor);
