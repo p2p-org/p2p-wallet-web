@@ -1,4 +1,5 @@
 import type { FC } from 'react';
+import { useEffect } from 'react';
 
 import { styled } from '@linaria/react';
 import { computed } from 'mobx';
@@ -7,6 +8,7 @@ import { observer } from 'mobx-react-lite';
 import { useTrackEventOpen } from 'app/hooks/metrics';
 import type { BuyViewModelProps } from 'new/scenes/Main/Buy/Subviews/Moonpay/types';
 import { WidgetPageBuy } from 'new/scenes/Main/Buy/Subviews/Moonpay/WidgetPageBuy';
+import { trackEvent1 } from 'new/services/AnalyticsService';
 import { MOONPAY_API_KEY, MOONPAY_SIGNER_URL } from 'new/services/BuyService/constants';
 import { buildParams } from 'new/services/BuyService/MoonpayProvider/utils';
 import type { MoonpayIframeParams } from 'new/services/BuyService/types';
@@ -25,6 +27,13 @@ const baseParams: MoonpayIframeParams = {
 
 export const MoonpayIframeWidget: FC<BuyViewModelProps> = observer(({ viewModel }) => {
   useTrackEventOpen('Buy_Provider_Step_Viewed');
+
+  useEffect(() => {
+    trackEvent1({ name: 'Moonpay_Window' });
+    return () => {
+      trackEvent1({ name: 'Moonpay_Window_Closed' });
+    };
+  }, []);
 
   const urlWithParams = computed(
     () =>

@@ -7,4 +7,6 @@ export type BuyAmplitudeActions =
   | {
       name: 'Buy_Button_Pressed';
       params: { Sum_Currency: number; Sum_Coin: number; Currency: string; Coin: string };
-    };
+    }
+  | { name: 'Moonpay_Window' }
+  | { name: 'Moonpay_Window_Closed' };
