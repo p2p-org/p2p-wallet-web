@@ -5,6 +5,7 @@ import { delay, inject, Lifecycle, scoped } from 'tsyringe';
 import { LoadableRelay, LoadableState } from 'new/app/models/LoadableRelay';
 import { SDFetcherState } from 'new/core/viewmodels/SDViewModel';
 import { ViewModel } from 'new/core/viewmodels/ViewModel';
+import type { NetworkSelectViewModelType } from 'new/scenes/Main/Send/NetworkSelect/NetworkSelect.ViewModel';
 import type { SelectAddressError } from 'new/scenes/Main/Send/SelectAddress/SelectAddress.ViewModel';
 import { SelectAddressViewModel } from 'new/scenes/Main/Send/SelectAddress/SelectAddress.ViewModel';
 import type * as FeeRelayer from 'new/sdk/FeeRelayer';
@@ -34,8 +35,8 @@ export type Recipient = {
 };
 
 export enum Network {
-  solana,
-  bitcoin,
+  solana = 'solana',
+  bitcoin = 'bitcoin',
 }
 
 export type FeeInfo = {
@@ -71,7 +72,10 @@ export interface SendViewModelType {
 }
 
 @scoped(Lifecycle.ResolutionScoped)
-export class SendViewModel extends ViewModel implements SendViewModelType {
+export class SendViewModel
+  extends ViewModel
+  implements SendViewModelType, NetworkSelectViewModelType
+{
   // Subject
 
   wallet: Wallet | null;
@@ -90,8 +94,8 @@ export class SendViewModel extends ViewModel implements SendViewModelType {
 
   constructor(
     private _pricesService: PricesService,
-    private _walletsRepository: WalletsRepository,
     private _sendService: SendService,
+    public walletsRepository: WalletsRepository,
     public chooseTokenAndAmountViewModel: ChooseTokenAndAmountViewModel,
     public choosePayingWalletViewModel: ChooseWalletViewModel,
     @inject(delay(() => SelectAddressViewModel))
@@ -133,6 +137,8 @@ export class SendViewModel extends ViewModel implements SendViewModelType {
       getSelectedWallet: computed,
 
       getFeeInCurrentFiat: computed,
+
+      getSelectableNetworks: computed,
 
       chooseWallet: action,
       enterAmount: action,
@@ -226,7 +232,7 @@ export class SendViewModel extends ViewModel implements SendViewModelType {
                   .gt(wallet.lamports ?? ZERO)
               ) {
                 runInAction(() => {
-                  this.payingWallet = this._walletsRepository.nativeWallet;
+                  this.payingWallet = this.walletsRepository.nativeWallet;
                 });
               } else {
                 runInAction(() => {
@@ -322,16 +328,16 @@ export class SendViewModel extends ViewModel implements SendViewModelType {
   reload(): void {
     this.loadingState = LoadableState.loading;
 
-    this._walletsLoadPromise = when(() => this._walletsRepository.state === SDFetcherState.loaded);
+    this._walletsLoadPromise = when(() => this.walletsRepository.state === SDFetcherState.loaded);
 
     Promise.all([this._sendService.load(), this._walletsLoadPromise])
       .then(() => {
         runInAction(() => {
           this.loadingState = LoadableState.loaded;
           if (!this.wallet) {
-            this.wallet = this._walletsRepository.nativeWallet;
+            this.wallet = this.walletsRepository.nativeWallet;
           }
-          const payingWallet = this._walletsRepository
+          const payingWallet = this.walletsRepository
             .getWallets()
             .find((wallet) => wallet.mintAddress === Defaults.payingTokenMint);
           if (payingWallet) {
@@ -374,12 +380,13 @@ export class SendViewModel extends ViewModel implements SendViewModelType {
           network: network,
           sender: wallet,
           receiver: receiver,
-          authority: this._walletsRepository.nativeWallet?.pubkey ?? null,
+          authority: this.walletsRepository.nativeWallet?.pubkey ?? null,
           amount: toLamport(amount, wallet.token.decimals),
           payingFeeWallet: this.payingWallet,
           feeInSOL: this.feeInfo.value?.feeAmountInSOL.total ?? ZERO,
           feeInToken: this.feeInfo.value?.feeAmount ?? null,
           isSimulation: false,
+          isRenBTCViaBitcoinNetwork: network === Network.bitcoin && this._isRecipientBTCAddress(),
         }),
       },
     );
@@ -411,6 +418,15 @@ export class SendViewModel extends ViewModel implements SendViewModelType {
       fee = feeInSol * this.getPrice('SOL');
     }
     return `~${Defaults.fiat.symbol}${numberToString(fee, { maximumFractionDigits: 2 })}`;
+  }
+
+  get getSelectableNetworks(): Network[] {
+    const networks: Network[] = [Network.solana];
+
+    if (this.getSelectedWallet?.token.isRenBTC) {
+      networks.push(Network.bitcoin);
+    }
+    return networks;
   }
 
   getFreeTransactionFeeLimit(): Promise<FeeRelayer.UsageStatus> {
@@ -456,13 +472,15 @@ export class SendViewModel extends ViewModel implements SendViewModelType {
     switch (network) {
       case Network.solana: {
         if (this._isRecipientBTCAddress()) {
-          this.recipient = null;
+          this.selectAddressViewModel.clearRecipient();
+          this.selectAddressViewModel.clearSearching();
         }
         break;
       }
       case Network.bitcoin: {
         if (!this._isRecipientBTCAddress()) {
-          this.recipient = null;
+          this.selectAddressViewModel.clearRecipient();
+          this.selectAddressViewModel.clearSearching();
         }
       }
     }

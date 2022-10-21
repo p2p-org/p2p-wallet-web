@@ -324,7 +324,10 @@ export class SolanaChain extends RenVMChainType {
     }
 
     const nonce = gatewayState.burnCount.addn(1);
-    const burnLogAccountId = PublicKey.findProgramAddressSync([nonce.toBuffer()], program)[0];
+    const burnLogAccountId = PublicKey.findProgramAddressSync(
+      [nonce.toArrayLike(Buffer, 'le', 8)],
+      program,
+    )[0];
 
     // @ts-ignore
     const burnCheckedInstruction = Token.createBurnCheckedInstruction(

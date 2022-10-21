@@ -23,16 +23,11 @@ const Value = styled.div`
 `;
 
 const CheckIcon = styled(Icon)`
-  width: 16px;
-  height: 16px;
+  width: 24px;
+  height: 24px;
   margin-left: 4px;
 
   color: transparent;
-
-  ${up.tablet} {
-    width: 24px;
-    height: 24px;
-  }
 `;
 
 const Wrapper = styled.div`
