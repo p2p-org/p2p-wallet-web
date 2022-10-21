@@ -1,7 +1,7 @@
 import { init, track } from '@amplitude/analytics-browser';
 import assert from 'ts-invariant';
 
-import type { AmplitudeActions, ComplexActions } from 'new/services/analytics/types';
+import type { AmplitudeActions, ComplexActions } from 'new/utils/analytics/types';
 
 export const initAmplitude = () => {
   assert(

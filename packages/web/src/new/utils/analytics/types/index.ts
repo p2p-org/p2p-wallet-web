@@ -1,4 +1,4 @@
-import type { BuyComplexActions, BuySimpleActions } from 'new/services/analytics/types/Buy';
+import type { BuyComplexActions, BuySimpleActions } from 'new/utils/analytics/types/Buy';
 
 type SimpleActions = BuySimpleActions;
 

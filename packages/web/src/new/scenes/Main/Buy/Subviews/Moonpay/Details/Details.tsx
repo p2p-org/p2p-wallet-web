@@ -3,9 +3,9 @@ import type { FC } from 'react';
 import { computed } from 'mobx';
 import { observer } from 'mobx-react-lite';
 
-import { trackEvent1 } from 'new/services/analytics';
 import type { AccordionList } from 'new/ui/components/ui/AccordionDetails';
 import { AccordionDetails } from 'new/ui/components/ui/AccordionDetails';
+import { trackEvent1 } from 'new/utils/analytics';
 import { numberToFiatString } from 'new/utils/NumberExtensions';
 
 import type { BuyViewModelProps } from '../types';

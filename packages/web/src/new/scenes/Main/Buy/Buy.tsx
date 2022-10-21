@@ -8,8 +8,8 @@ import { observer } from 'mobx-react-lite';
 import { useViewModel } from 'new/core/viewmodels/useViewModel';
 import { BuyViewModel } from 'new/scenes/Main/Buy/Buy.ViewModel';
 import { MoonpayIframeWidget, MoonpayWidget } from 'new/scenes/Main/Buy/Subviews';
-import { trackEvent1 } from 'new/services/analytics';
 import { Layout } from 'new/ui/components/common/Layout';
+import { trackEvent1 } from 'new/utils/analytics';
 
 const Error = styled.div`
   align-self: center;

@@ -17,7 +17,7 @@ import {
   SENTRY_RELEASE,
   SENTRY_TRACES_SAMPLE_RATE,
 } from 'new/constants';
-import { initAmplitude } from 'utils/analytics';
+import { initAmplitude } from 'new/utils/analytics';
 
 initAmplitude();
 

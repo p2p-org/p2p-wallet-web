@@ -1,4 +1,4 @@
-import type { MapActionWithNoParams } from 'new/services/analytics/types/common';
+import type { MapActionWithNoParams } from 'new/utils/analytics/types/common';
 
 export type BuyComplexActions =
   | {
