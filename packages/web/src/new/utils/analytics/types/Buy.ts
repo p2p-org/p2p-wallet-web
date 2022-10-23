@@ -10,7 +10,7 @@ export type BuyComplexActions =
       name: 'Buy_Button_Pressed';
       params: { Sum_Currency: number; Sum_Coin: number; Currency: string; Coin: string };
     }
-  | { name: 'Buy_Screen_Opened'; params: { Last_Screen: string } };
+  | { name: 'Buy_Screen_Opened'; params: { Last_Screen: string | null } };
 
 type BuyActions = 'Moonpay_Window' | 'Moonpay_Window_Closed';
 

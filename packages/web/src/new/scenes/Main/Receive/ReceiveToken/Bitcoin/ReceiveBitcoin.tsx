@@ -24,7 +24,12 @@ export const ReceiveBitcoin: FC = observer(() => {
   return (
     <>
       <Content className="noTopPadding">
-        {viewModel.address ? <UsernameAddressWidget address={viewModel.address} /> : null}
+        {viewModel.address ? (
+          <UsernameAddressWidget
+            address={viewModel.address}
+            copyAddressTrackEventName="Receive_Address_Copied"
+          />
+        ) : null}
         <Hint viewModel={viewModel} />
         {showReceivingStatuses ? <RenBTCReceivingStatuses /> : null}
       </Content>

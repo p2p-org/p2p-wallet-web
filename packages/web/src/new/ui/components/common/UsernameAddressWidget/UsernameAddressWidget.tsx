@@ -9,6 +9,7 @@ import Logo from 'new/ui/assets/images/logo.png';
 import { AddressText } from 'new/ui/components/common/AddressText';
 import { UserNamedAddressWidgetViewModel } from 'new/ui/components/common/UsernameAddressWidget/UserNamedAddressWidget.ViewModel';
 import { Button } from 'new/ui/components/ui/Button';
+import { trackEvent1 } from 'new/utils/analytics';
 import { isImageCopyAvailable } from 'new/utils/Clipboard';
 
 const Wrapper = styled.div`
@@ -84,9 +85,10 @@ const QR_CODE_SIZE = 122;
 type Props = {
   address: string;
   username?: string;
+  trackCopyAddressEvent?: boolean;
 };
 
-export const UsernameAddressWidget: FC<Props> = ({ address, username }) => {
+export const UsernameAddressWidget: FC<Props> = ({ address, username, trackCopyAddressEvent }) => {
   const viewModel = useViewModel(UserNamedAddressWidgetViewModel);
   const isMobile = useIsMobile();
   const isTablet = useIsTablet();
@@ -132,7 +134,14 @@ export const UsernameAddressWidget: FC<Props> = ({ address, username }) => {
           small={!isMobile}
           medium={isMobile}
           hollow
-          onClick={() => viewModel.copyString(address, 'Address')}
+          onClick={() => {
+            viewModel.copyString(address, 'Address');
+
+            // track event
+            if (trackCopyAddressEvent) {
+              trackEvent1({ name: 'Receive_Address_Copied' });
+            }
+          }}
         >
           Copy address
         </Button>

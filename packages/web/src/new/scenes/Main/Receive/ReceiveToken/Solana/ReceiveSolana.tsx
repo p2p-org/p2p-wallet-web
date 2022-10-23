@@ -21,6 +21,7 @@ export const ReceiveSolana: FC = () => {
         <UsernameAddressWidget
           address={viewModel.pubkeyBase58}
           username={viewModel.username && withNameServiceDomain(viewModel.username)}
+          copyAddressTrackEventName="Receive_Address_Copied"
         />
       </Content>
       <BottomWrapper>

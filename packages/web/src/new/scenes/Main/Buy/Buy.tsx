@@ -26,7 +26,9 @@ export const Buy: FC = observer(() => {
       return;
     }
 
-    trackEvent1({ name: 'Buy_Screen_Opened', params: { Last_Screen: location.state.fromPage } });
+    if (location.pathname !== location.state.fromPage) {
+      trackEvent1({ name: 'Buy_Screen_Opened', params: { Last_Screen: location.state.fromPage } });
+    }
   }, []);
 
   const renderContent = () => {

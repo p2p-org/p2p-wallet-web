@@ -1,7 +1,8 @@
-import type { BuyComplexActions, BuySimpleActions } from 'new/utils/analytics/types/Buy';
+import type { BuyComplexActions, BuySimpleActions } from './Buy';
+import type { ReceiveComplexActions, ReceiveSimpleActions } from './Receive';
 
-type SimpleActions = BuySimpleActions;
+type SimpleActions = BuySimpleActions | ReceiveSimpleActions;
 
-export type ComplexActions = BuyComplexActions;
+export type ComplexActions = BuyComplexActions | ReceiveComplexActions;
 
 export type AmplitudeActions = SimpleActions | ComplexActions;
