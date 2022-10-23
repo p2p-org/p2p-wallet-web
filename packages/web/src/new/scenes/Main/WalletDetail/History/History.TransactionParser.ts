@@ -1,6 +1,6 @@
 import type { ConfirmedSignatureInfo } from '@solana/web3.js';
 
-import type { TransactionInfo } from 'new/sdk/SolanaSDK';
+import type { SolanaSDK, TransactionInfo } from 'new/sdk/SolanaSDK';
 import { SolanaSDKError } from 'new/sdk/SolanaSDK';
 import type { TransactionParserService } from 'new/sdk/TransactionParser';
 import { ParsedTransaction, Status, TransactionParserServiceImpl } from 'new/sdk/TransactionParser';
@@ -34,10 +34,16 @@ export class DefaultTransactionParser implements TransactionParser {
   private _p2pFeePayers: string[];
   private _parser: TransactionParserService;
 
-  constructor({ p2pFeePayers }: { p2pFeePayers: string[] }) {
+  constructor({
+    p2pFeePayers,
+    solanaAPIClient,
+  }: {
+    p2pFeePayers: string[];
+    solanaAPIClient: SolanaSDK;
+  }) {
     this._p2pFeePayers = p2pFeePayers;
     this._parser = TransactionParserServiceImpl.default({
-      apiClient: resolve,
+      apiClient: solanaAPIClient,
     });
   }
 
@@ -48,7 +54,7 @@ export class DefaultTransactionParser implements TransactionParser {
     symbol,
   }: {
     signatureInfo: ConfirmedSignatureInfo;
-    transactionInfo?: TransactionInfo;
+    transactionInfo?: TransactionInfo | null;
     account?: string;
     symbol?: string;
   }): Promise<ParsedTransaction> {
@@ -66,7 +72,7 @@ export class DefaultTransactionParser implements TransactionParser {
         },
       });
 
-      const time = transactionInfo.blockTime ? new Date(transactionInfo.blockTime) : null;
+      const time = transactionInfo.blockTime ? new Date(transactionInfo.blockTime * 1000) : null;
 
       return new ParsedTransaction({
         status: parsedTrx.status,
@@ -78,7 +84,7 @@ export class DefaultTransactionParser implements TransactionParser {
         blockhash: parsedTrx.blockhash,
       });
     } catch {
-      const blockTime = signatureInfo.blockTime ? new Date(signatureInfo.blockTime) : null;
+      const blockTime = signatureInfo.blockTime ? new Date(signatureInfo.blockTime * 1000) : null;
       return new ParsedTransaction({
         status: Status.confirmed(),
         signature: signatureInfo.signature,

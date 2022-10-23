@@ -79,10 +79,11 @@ export class AccountStreamSource extends HistoryStreamSource {
     let transactionTime = new Date();
     const time = signatureInfo.blockTime;
     if (time) {
-      transactionTime = new Date(time);
+      transactionTime = new Date(time * 1000);
     }
 
     // Check transaction timestamp
+    console.log(1111111, transactionTime, configuration.timestampEnd);
     if (transactionTime >= configuration.timestampEnd) {
       this._buffer.splice(0);
       return { signatureInfo, account: this._account, symbol: this._symbol };

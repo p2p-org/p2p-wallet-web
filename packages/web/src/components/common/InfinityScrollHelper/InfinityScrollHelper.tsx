@@ -36,7 +36,7 @@ export class InfinityScrollHelper extends Component<Props> {
     }
   }, 500);
 
-  componentDidMount() {
+  override componentDidMount() {
     window.addEventListener('scroll', this.checkLoadMore);
     window.addEventListener('resize', this.checkLoadMore);
 
@@ -45,11 +45,11 @@ export class InfinityScrollHelper extends Component<Props> {
     }, 0);
   }
 
-  componentDidUpdate() {
+  override componentDidUpdate() {
     void this.checkLoadMore();
   }
 
-  componentWillUnmount() {
+  override componentWillUnmount() {
     clearTimeout(this.delayedCheck);
     this.checkLoadMore.cancel();
 
@@ -57,7 +57,7 @@ export class InfinityScrollHelper extends Component<Props> {
     window.removeEventListener('resize', this.checkLoadMore);
   }
 
-  render() {
+  override render() {
     return <Wrapper {...omit(['onNeedLoadMore', 'disabled'], this.props)} ref={this.wrapperRef} />;
   }
 }

@@ -1,14 +1,15 @@
-import { injectable } from 'tsyringe';
-
 import type { ParsedTransaction } from 'new/sdk/TransactionParser';
 import type { PricesServiceType } from 'new/services/PriceAPIs/PricesService';
 
 import type { HistoryOutput } from './History.OutputStream';
 
 /// Update apply exchange rate to transaction to show price information
-@injectable()
 export class PriceUpdatingOutput implements HistoryOutput {
   private _pricesService: PricesServiceType;
+
+  constructor({ pricesService }: { pricesService: PricesServiceType }) {
+    this._pricesService = pricesService;
+  }
 
   process(newData: ParsedTransaction[]): ParsedTransaction[] {
     const transactions = [...newData];

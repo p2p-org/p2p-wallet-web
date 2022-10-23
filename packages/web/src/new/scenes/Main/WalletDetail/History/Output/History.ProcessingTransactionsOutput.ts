@@ -13,8 +13,15 @@ export class ProcessingTransactionsOutput implements HistoryOutput {
 
   private _repository: TransactionHandlerType;
 
-  constructor(accountFilter?: string) {
+  constructor({
+    accountFilter,
+    transactionHandler,
+  }: {
+    accountFilter?: string;
+    transactionHandler: TransactionHandlerType;
+  }) {
     this.accountFilter = accountFilter;
+    this._repository = transactionHandler;
   }
 
   process(newData: ParsedTransaction[]): ParsedTransaction[] {

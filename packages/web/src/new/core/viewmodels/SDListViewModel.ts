@@ -1,10 +1,27 @@
 import { action, makeObservable, observable } from 'mobx';
 
+import type { SDFetcherState } from './SDViewModel';
 import { SDViewModel } from './SDViewModel';
 
-export interface SDListViewModelType {}
+export interface SDListViewModelType<T> {
+  readonly state: SDFetcherState;
+  readonly isPaginationEnabled: boolean;
 
-export abstract class SDListViewModel<T> extends SDViewModel<T[]> implements SDListViewModelType {
+  reload(): void;
+  fetchNext(): void;
+
+  getCurrentPage(): number | null;
+
+  data: T[];
+
+  // own
+  readonly isFetchable: boolean;
+}
+
+export abstract class SDListViewModel<T>
+  extends SDViewModel<T[]>
+  implements SDListViewModelType<T>
+{
   // Properties
 
   isPaginationEnabled: boolean;
@@ -44,22 +61,22 @@ export abstract class SDListViewModel<T> extends SDViewModel<T[]> implements SDL
 
   // Actions
 
-  override flush() {
+  override flush(): void {
     this.offset = 0;
     this._isLastPageLoaded = false;
     super.flush();
   }
 
   // Asynchronous request handler
-  override shouldRequest(): boolean {
-    return super.shouldRequest() && !this._isLastPageLoaded;
+  override isFetchable(): boolean {
+    return super.isFetchable() && !this._isLastPageLoaded;
   }
 
-  fetchNext() {
+  fetchNext(): void {
     super.request();
   }
 
-  override handleNewData(newItems: T[]) {
+  override handleNewData(newItems: T[]): void {
     const _newData = this.join(newItems);
 
     // resign state
@@ -83,7 +100,7 @@ export abstract class SDListViewModel<T> extends SDViewModel<T[]> implements SDL
     return this.data.concat(newItems.filter((item) => !this.data.includes(item)));
   }
 
-  overrideData(newData: T[]) {
+  overrideData(newData: T[]): void {
     const _newData = this.map(newData);
     // TODO: check equality!
     if (_newData !== this.data) {
@@ -100,6 +117,13 @@ export abstract class SDListViewModel<T> extends SDViewModel<T[]> implements SDL
       _newData = _newData.sort(this.customSorter);
     }
     return _newData;
+  }
+
+  getCurrentPage(): number | null {
+    if (!this.isPaginationEnabled || this.limit === 0) {
+      return null;
+    }
+    return this.offset / this.limit;
   }
 
   // Helper

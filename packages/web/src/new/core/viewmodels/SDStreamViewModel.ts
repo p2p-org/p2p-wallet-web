@@ -10,7 +10,7 @@ export abstract class SDStreamViewModel<T> extends ViewModel {
   readonly initialData: T;
 
   /// Current request
-  requestDisposable?: CancellablePromise<T>;
+  task?: CancellablePromise<T>;
 
   /// Current data
   data: T;
@@ -36,8 +36,8 @@ export abstract class SDStreamViewModel<T> extends ViewModel {
       clear: action,
       reload: action,
       cancelRequest: action,
-      // createRequest: flow,
-      isFetchable: action,
+      // next: flow,
+      isFetchable: computed,
       fetch: action,
       handleData: action,
       handleError: action,
@@ -58,11 +58,11 @@ export abstract class SDStreamViewModel<T> extends ViewModel {
   }
 
   cancelRequest(): void {
-    this.requestDisposable?.cancel();
+    this.task?.cancel();
   }
 
   // Asynchronous request handler
-  isFetchable(): boolean {
+  get isFetchable(): boolean {
     return this.state !== SDFetcherState.loading;
   }
 
@@ -76,14 +76,14 @@ export abstract class SDStreamViewModel<T> extends ViewModel {
     if (force) {
       // cancel previous request
       this.cancelRequest();
-    } else if (!this.isFetchable()) {
+    } else if (!this.isFetchable) {
       // there is an running operation
       return;
     }
 
     this.state = SDFetcherState.loading;
-    this.requestDisposable = this.next();
-    this.requestDisposable
+    this.task = this.next();
+    this.task
       .then((newData) => {
         this.handleData(newData);
       })
@@ -97,12 +97,14 @@ export abstract class SDStreamViewModel<T> extends ViewModel {
 
   /// processes incoming data
   handleData(newData: T): void {
+    console.log(888, newData);
     this.data = newData;
     this.error = null;
   }
 
   /// handles occurred error
   handleError(error: Error): void {
+    console.error(error);
     this.error = error;
     this.state = SDFetcherState.error;
   }

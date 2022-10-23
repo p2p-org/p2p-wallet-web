@@ -6,11 +6,11 @@ import { observer } from 'mobx-react-lite';
 import { expr } from 'mobx-utils';
 
 import { QRAddressWidget } from 'components/common/QRAddressWidget';
-import { TransactionsWidget } from 'components/pages/wallet';
 import { useViewModel } from 'new/core/viewmodels/useViewModel';
 import { Layout } from 'new/ui/components/common/Layout';
 import { shortAddress } from 'utils/tokens';
 
+import { History } from './History';
 import { TopWidget } from './TopWidget';
 import { WalletDetailViewModel } from './WalletDetail.ViewModel';
 
@@ -47,7 +47,8 @@ export const WalletDetail: FC = observer(() => {
       {/* TODO: temp */}
       <QRAddressWidget publicKey={publicKey} />
       {/* TODO: temp */}
-      <TransactionsWidget publicKey={publicKey} />
+      {/*<TransactionsWidget publicKey={publicKey} />*/}
+      <History />
     </Layout>
   );
 });

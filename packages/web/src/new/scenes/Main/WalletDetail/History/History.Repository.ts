@@ -32,6 +32,10 @@ export interface HistoryTransactionRepository {
 export class SolanaTransactionRepository implements HistoryTransactionRepository {
   private _solanaAPIClient: SolanaSDK;
 
+  constructor({ solanaAPIClient }: { solanaAPIClient: SolanaSDK }) {
+    this._solanaAPIClient = solanaAPIClient;
+  }
+
   getSignatures({
     address,
     limit,

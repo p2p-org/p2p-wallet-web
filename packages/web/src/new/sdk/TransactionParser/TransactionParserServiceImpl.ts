@@ -31,7 +31,7 @@ export class TransactionParserServiceImpl implements TransactionParserService {
     this.feeParserStrategy = feeParserStrategy;
   }
 
-  static default(apiClient: SolanaSDK): TransactionParserServiceImpl {
+  static default({ apiClient }: { apiClient: SolanaSDK }): TransactionParserServiceImpl {
     const tokensRepository = new TokensRepository({ endpoint: apiClient.endpoint });
 
     return new TransactionParserServiceImpl({
@@ -72,7 +72,7 @@ export class TransactionParserServiceImpl implements TransactionParserService {
       signature: transactionInfo.transaction.signatures[0], // TODO
       info,
       slot: transactionInfo.slot,
-      blockTime: transactionInfo.blockTime ? new Date(transactionInfo.blockTime) : null,
+      blockTime: transactionInfo.blockTime ? new Date(transactionInfo.blockTime * 1000) : null,
       fee,
       blockhash: transactionInfo.transaction.message.recentBlockhash,
     });

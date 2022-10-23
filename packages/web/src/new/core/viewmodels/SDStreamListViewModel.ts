@@ -6,7 +6,7 @@ import { SDFetcherState } from './SDViewModel';
 
 export abstract class SDStreamListViewModel<T>
   extends SDStreamViewModel<T[]>
-  implements SDListViewModelType
+  implements SDListViewModelType<T>
 {
   // Properties
 
@@ -50,7 +50,7 @@ export abstract class SDStreamListViewModel<T>
 
   // Actions
 
-  override clear() {
+  override clear(): void {
     this.offset = 0;
     this._isLastPageLoaded = false;
     super.clear();
@@ -58,42 +58,57 @@ export abstract class SDStreamListViewModel<T>
 
   // Asynchronous request handler
 
-  override isFetchable(): boolean {
-    return super.isFetchable() && !this._isLastPageLoaded;
+  override get isFetchable(): boolean {
+    console.log(
+      '99119 isFetchable',
+      super.isFetchable && !this._isLastPageLoaded,
+      super.isFetchable,
+      !this._isLastPageLoaded,
+    );
+    debugger;
+    return super.isFetchable && !this._isLastPageLoaded;
   }
 
-  fetchNext() {
+  fetchNext(): void {
+    console.log('99119 fetchNext');
     super.fetch();
   }
 
   override fetch(force = false): void {
     if (force) {
       this.cancelRequest();
-    } else if (!this.isFetchable()) {
+    } else if (!this.isFetchable) {
       // there is an running operation
       return;
     }
 
     this.state = SDFetcherState.loading;
     this._cache = [];
-    this.requestDisposable = this.next();
-    this.requestDisposable
+
+    this.task = this.next();
+    console.log(99119, this._cache);
+    this.task
       .then((newData) => {
+        console.log(886, newData);
         this.handleData(newData);
       })
       .catch((error) => {
         this.handleError(error);
       })
       .finally(() => {
+        console.log(9911919191991, this._cache);
         if (!this.isPaginationEnabled || this._cache.length < this.limit) {
           this._isLastPageLoaded = true;
         }
         this.offset += this.limit;
         this.state = SDFetcherState.loaded;
+
+        this.requestDisposable = undefined;
       });
   }
 
-  override handleData(newItems: T[]) {
+  override handleData(newItems: T[]): void {
+    console.log(887, newItems);
     this._cache.push(...newItems);
     const newData = this.join(newItems);
 

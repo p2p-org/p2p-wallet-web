@@ -1,12 +1,14 @@
-import { flow, when } from 'mobx';
+import { flow, makeObservable, when } from 'mobx';
 import { singleton } from 'tsyringe';
 
 import { SDFetcherState, SDStreamListViewModel } from 'new/core/viewmodels';
 import type { ParsedTransaction } from 'new/sdk/TransactionParser';
 import { Defaults } from 'new/services/Defaults';
-import DependencyService from 'new/services/injection/DependencyService';
 import { NotificationService } from 'new/services/NotificationService';
+import { PricesService } from 'new/services/PriceAPIs/PricesService';
 import { WalletsRepository } from 'new/services/Repositories';
+import { SolanaService } from 'new/services/SolanaService';
+import { TransactionHandler } from 'new/services/TransactionHandler';
 
 import { SolanaTransactionRepository } from './History.Repository';
 import { DefaultTransactionParser } from './History.TransactionParser';
@@ -30,8 +32,13 @@ export enum State {
 
 @singleton()
 export class HistoryViewModel extends SDStreamListViewModel<ParsedTransaction> {
-  transactionRepository = new SolanaTransactionRepository();
-  transactionParser = new DefaultTransactionParser({ p2pFeePayers: Defaults.p2pFeePayerPubkeys });
+  transactionRepository = new SolanaTransactionRepository({
+    solanaAPIClient: this._solanaAPIClient,
+  });
+  transactionParser = new DefaultTransactionParser({
+    p2pFeePayers: Defaults.p2pFeePayerPubkeys,
+    solanaAPIClient: this._solanaAPIClient,
+  });
 
   // Properties
 
@@ -40,8 +47,8 @@ export class HistoryViewModel extends SDStreamListViewModel<ParsedTransaction> {
 
   /// Refresh handling
   private _refreshTriggers: HistoryRefreshTrigger[] = [
-    DependencyService.resolve(PriceRefreshTrigger),
-    DependencyService.resolve(ProcessingTransactionRefreshTrigger),
+    new PriceRefreshTrigger({ pricesService: this._pricesService }),
+    new ProcessingTransactionRefreshTrigger({ transactionHandler: this._transactionHandler }),
   ];
 
   /// A list of source, where data can be fetched
@@ -54,7 +61,7 @@ export class HistoryViewModel extends SDStreamListViewModel<ParsedTransaction> {
   get stateDriver(): State {
     const change = this.dataObservable; // TODO: check, should be "withPrevious"
     const state = this.stateObservable;
-    const error = this.error;
+    const error = this._errorRelay;
     if (error) {
       return State.error;
     }
@@ -68,19 +75,31 @@ export class HistoryViewModel extends SDStreamListViewModel<ParsedTransaction> {
 
   // TODO: tryAgain
   // TODO: refreshPage
-  private _error = false;
+  private _errorRelay = false;
 
   constructor(
     private _walletsRepository: WalletsRepository,
     private _notificationService: NotificationService, // accountSymbol?: AccountSymbol
+    // @web: for dependencies
+    private _solanaAPIClient: SolanaService,
+    private _transactionHandler: TransactionHandler,
+    private _pricesService: PricesService,
   ) {
     super({ isPaginationEnabled: true, limit: 10 });
+
+    const accountSymbol = {
+      account: '3RkWk4dDzVQtZiXpaeaS3DiXdVfcBEisWH9Znp5hJtwa',
+      symbol: 'SOL',
+    };
 
     this.accountSymbol = accountSymbol;
 
     this._outputs = [
-      new ProcessingTransactionsOutput(accountSymbol?.account),
-      new PriceUpdatingOutput(),
+      new ProcessingTransactionsOutput({
+        accountFilter: accountSymbol?.account,
+        transactionHandler: this._transactionHandler,
+      }),
+      new PriceUpdatingOutput({ pricesService: this._pricesService }),
     ];
 
     // Register all refresh triggers
@@ -93,11 +112,19 @@ export class HistoryViewModel extends SDStreamListViewModel<ParsedTransaction> {
 
     // TODO: tryAgain
     // TODO: refreshPage
+
+    makeObservable(this, {
+      next: flow,
+    });
+  }
+
+  protected override setDefaults() {
+    // TODO:
   }
 
   tryAgain(): void {
     this.reload();
-    this._error = false;
+    this._errorRelay = false;
   }
 
   refreshPage(): void {
@@ -119,9 +146,12 @@ export class HistoryViewModel extends SDStreamListViewModel<ParsedTransaction> {
   protected override afterReactionsRemoved() {}
 
   private _buildSource(): void {
-    const cachedTransactionRepository = new SolanaTransactionRepository();
+    const cachedTransactionRepository = new SolanaTransactionRepository({
+      solanaAPIClient: this._solanaAPIClient,
+    });
     const cachedTransactionParser = new DefaultTransactionParser({
       p2pFeePayers: Defaults.p2pFeePayerPubkeys,
+      solanaAPIClient: this._solanaAPIClient,
     });
 
     const accountSymbol = this.accountSymbol;
@@ -157,9 +187,9 @@ export class HistoryViewModel extends SDStreamListViewModel<ParsedTransaction> {
     super.clear();
   }
 
-  override next = flow<ParsedTransaction[], []>(function* (
+  private _next = flow<Result[], []>(async function* (
     this: HistoryViewModel,
-  ): Generator<Promise<ParsedTransaction[]>> {
+  ): AsyncGenerator<Result[]> {
     const results: Result[] = [];
     try {
       while (true) {
@@ -170,9 +200,9 @@ export class HistoryViewModel extends SDStreamListViewModel<ParsedTransaction> {
         }
 
         // Fetch next 1 days
-        const timeEndFilter = new Date(rawTime - 60 * 60 * 24); // TODO: check
+        const timeEndFilter = new Date(rawTime * 1000 - 60 * 60 * 24 * 1000); // TODO: check
 
-        const result: Result | null = null;
+        let result: Result | null = null;
         while ((result = await this._source.next({ timestampEnd: timeEndFilter }))) {
           const { signatureInfo } = result;
 
@@ -195,8 +225,42 @@ export class HistoryViewModel extends SDStreamListViewModel<ParsedTransaction> {
       yield results;
       throw error;
     }
+  });
 
-    // TODO:
+  override next = flow<ParsedTransaction[], []>(function* (
+    this: HistoryViewModel,
+  ): Generator<Promise<ParsedTransaction[]>> {
+    try {
+      return yield this._next().then(async (signatures: Result[]) => {
+        // @web:
+        const parsedTransactions: ParsedTransaction[] = [];
+        if (signatures.length === 0) {
+          return parsedTransactions;
+        }
+
+        const transactions = await this.transactionRepository.getTransactions(
+          signatures.map((s) => s.signatureInfo.signature),
+        );
+
+        for (const [i, trxInfo] of transactions.entries()) {
+          const { signatureInfo, account, symbol } = signatures[i]!;
+          parsedTransactions.push(
+            await this.transactionParser.parse({
+              signatureInfo,
+              transactionInfo: trxInfo,
+              account,
+              symbol,
+            }),
+          );
+        }
+        return parsedTransactions;
+      });
+    } catch (error) {
+      // TODO: check it works
+      console.error(error);
+      this._errorRelay = true;
+      this._notificationService.error((error as Error).message);
+    }
   });
 
   override join(newItems: ParsedTransaction[]): ParsedTransaction[] {
