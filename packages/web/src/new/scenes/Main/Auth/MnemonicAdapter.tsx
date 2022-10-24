@@ -52,7 +52,7 @@ export class MnemonicAdapter extends BaseMessageSignerWalletAdapter {
     return null;
   }
 
-  async signTransaction(transaction: Transaction): Promise<Transaction> {
+  signTransaction(transaction: Transaction): Promise<Transaction> {
     if (this._account) {
       transaction.partialSign(this._account);
 
@@ -62,7 +62,7 @@ export class MnemonicAdapter extends BaseMessageSignerWalletAdapter {
     return Promise.reject(MnemonicAdapter._noKeypairError);
   }
 
-  async signAllTransactions(transactions: Transaction[]): Promise<Transaction[]> {
+  signAllTransactions(transactions: Transaction[]): Promise<Transaction[]> {
     if (this._account) {
       transactions.forEach((trx) => trx.partialSign(this._account as Signer));
 
