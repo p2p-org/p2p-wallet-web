@@ -136,7 +136,7 @@ export const UsernameAddressWidget: FC<Props> = ({ address, username, onAddressC
           onClick={() => {
             viewModel.copyString(address, 'Address');
 
-            if (typeof onAddressCopied === 'function') {
+            if (onAddressCopied) {
               onAddressCopied();
             }
           }}
