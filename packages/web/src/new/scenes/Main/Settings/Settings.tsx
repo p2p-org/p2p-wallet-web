@@ -11,7 +11,6 @@ import { useViewModel } from 'new/core/viewmodels/useViewModel';
 import AppStoreBadge from 'new/scenes/Main/Settings/images/app-store-badge.png';
 import GooglePlayBadge from 'new/scenes/Main/Settings/images/google-play-badge.png';
 import { SettingsViewModel } from 'new/scenes/Main/Settings/Settings.ViewModel';
-import { RootViewModel } from 'new/scenes/Root/Root.ViewModel';
 import { Defaults } from 'new/services/Defaults';
 import { Layout } from 'new/ui/components/common/Layout';
 import { UsernameAddressWidget } from 'new/ui/components/common/UsernameAddressWidget';
@@ -138,12 +137,8 @@ const Text = styled.div`
 
 // const FIATS = [Fiat.usd, Fiat.eur, Fiat.rub];
 
-// @FRIDAY make sure hard reload
-// remove unnecessary disconnects
-// proceed with Phantom and Sollet
 export const Settings: FC = observer(() => {
   const viewModel = useViewModel(SettingsViewModel);
-  const rootViewModel = useViewModel(RootViewModel);
   const history = useHistory();
 
   const handleNetworkClick = () => {
@@ -151,8 +146,8 @@ export const Settings: FC = observer(() => {
   };
 
   const handleLogoutClick = () => {
-    void rootViewModel.walletModel.disconnect();
-    void rootViewModel.locationService.reload();
+    void viewModel.walletModel.disconnect();
+    void viewModel.locationService.reload();
   };
 
   return (
