@@ -3,7 +3,6 @@ import '@abraham/reflection';
 import type { Adapter, WalletAdapterNetwork } from '@solana/wallet-adapter-base';
 import {
   PhantomWalletAdapter,
-  SolflareWalletAdapter,
   SolletExtensionWalletAdapter,
   SolletWalletAdapter,
 } from '@solana/wallet-adapter-wallets';
@@ -23,7 +22,6 @@ export class WalletAdaptorService implements IWalletAdaptorService {
     return [
       new MnemonicAdapter(),
       new PhantomWalletAdapter(),
-      new SolflareWalletAdapter(),
       new SolletWalletAdapter({ network }),
       new SolletExtensionWalletAdapter({ network }),
     ];

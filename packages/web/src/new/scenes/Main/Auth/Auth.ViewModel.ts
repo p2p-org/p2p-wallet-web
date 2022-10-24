@@ -170,6 +170,10 @@ export class AuthViewModel extends ViewModel {
     });
   }
 
+  async connectExtension(adaptorName: string) {
+    await this._walletModel.connectAdaptor(adaptorName);
+  }
+
   setMnemonic(value: string): void {
     this.authInfo.mnemonic = value;
   }

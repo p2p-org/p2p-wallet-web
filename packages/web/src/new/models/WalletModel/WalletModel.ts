@@ -31,6 +31,7 @@ export class WalletModel extends Model {
     this.network = WalletAdapterNetwork.Mainnet;
     this.publicKey = '';
     this.connected = false;
+
     makeObservable(this, {
       name: observable,
       publicKey: observable,
@@ -67,13 +68,10 @@ export class WalletModel extends Model {
   }
 
   async connectAdaptor(adaptorName: string, config?: ConnectConfig) {
-    // @TODO can be a problem again. This is due to if network changes, the new adapter instances
-    // getting created when network changes
-    if (!this._adaptors) {
-      this._adaptors = this.walletAdaptorService.getAdaptors(this.network);
-    }
+    this.setupAdaptors();
+    const adaptors = this._getAdaptors();
 
-    const chosenAdaptor = this._adaptors.find((adaptor) => adaptor.name === adaptorName);
+    const chosenAdaptor = adaptors.find((adaptor) => adaptor.name === adaptorName);
 
     if (chosenAdaptor) {
       this.setUpAdaptor(chosenAdaptor);
@@ -124,9 +122,7 @@ export class WalletModel extends Model {
   }
 
   protected setupAdaptors() {
-    const { network } = this;
-
-    const originalAdaptors = this.walletAdaptorService.getAdaptors(network);
+    const originalAdaptors = this._getAdaptors();
 
     const newAdaptors = originalAdaptors.map((value) => this.setUpAdaptor(value));
 
@@ -162,6 +158,14 @@ export class WalletModel extends Model {
 
   get messageSigner(): MessageSignerWalletAdapter {
     return this.selectedAdaptor as MessageSignerWalletAdapter;
+  }
+
+  private _getAdaptors() {
+    if (!this._adaptors) {
+      this._adaptors = this.walletAdaptorService.getAdaptors(this.network);
+    }
+
+    return this._adaptors;
   }
 
   private async _restoreLocal(): Promise<void> {
