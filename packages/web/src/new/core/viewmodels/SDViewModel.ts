@@ -36,7 +36,7 @@ export abstract class SDViewModel<T> extends ViewModel {
       reload: action,
       cancelRequest: action,
       // createRequest: flow,
-      isFetchable: action,
+      isFetchable: computed,
       request: action,
       handleNewData: action,
       handleError: action,
@@ -65,14 +65,14 @@ export abstract class SDViewModel<T> extends ViewModel {
     return yield Promise.resolve<T>(this.data);
   });
 
-  isFetchable(): boolean {
+  get isFetchable(): boolean {
     return this.state !== SDFetcherState.loading;
   }
 
   request(reload = false): void {
     if (reload) {
       this.cancelRequest();
-    } else if (!this.isFetchable()) {
+    } else if (!this.isFetchable) {
       // there is an running operation
       return;
     }

@@ -60,7 +60,7 @@ export class DefaultTransactionParser implements TransactionParser {
   }): Promise<ParsedTransaction> {
     try {
       if (!transactionInfo) {
-        throw SolanaSDKError.other('TransactionInfo is nil');
+        throw SolanaSDKError.other('TransactionInfo is null');
       }
 
       const parsedTrx = await this._parser.parse({
@@ -83,7 +83,8 @@ export class DefaultTransactionParser implements TransactionParser {
         fee: parsedTrx.fee,
         blockhash: parsedTrx.blockhash,
       });
-    } catch {
+    } catch (error) {
+      console.error(error);
       const blockTime = signatureInfo.blockTime ? new Date(signatureInfo.blockTime * 1000) : null;
       return new ParsedTransaction({
         status: Status.confirmed(),

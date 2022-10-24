@@ -20,13 +20,12 @@ export abstract class SDStreamViewModel<T> extends ViewModel {
 
   // Subject
 
-  state: SDFetcherState;
+  state: SDFetcherState = SDFetcherState.initializing;
 
   constructor({ initialData }: { initialData: T }) {
     super();
     this.initialData = initialData;
     this.data = initialData;
-    this.state = SDFetcherState.initializing;
 
     makeObservable(this, {
       data: observable,
@@ -69,7 +68,7 @@ export abstract class SDStreamViewModel<T> extends ViewModel {
   /// Fetch next item
   next = flow<T, []>(function* (this: SDStreamViewModel<T>): Generator<Promise<T>> {
     // delay for simulating loading, MUST OVERRIDE
-    return yield Promise.resolve<T>(this.data);
+    return yield Promise.reject<T>(new Error());
   });
 
   fetch(force = false): void {
@@ -97,7 +96,6 @@ export abstract class SDStreamViewModel<T> extends ViewModel {
 
   /// processes incoming data
   handleData(newData: T): void {
-    console.log(888, newData);
     this.data = newData;
     this.error = null;
   }

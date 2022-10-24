@@ -34,7 +34,7 @@ export class MultipleStreamSource extends HistoryStreamSource {
     }, null);
   }
 
-  async next(configuration: FetchingConfiguration): Promise<Result | null> {
+  async *next(configuration: FetchingConfiguration): AsyncGenerator<Result> {
     if (this._buffer.length === 0) {
       await this._fillBuffer(configuration);
     }
@@ -44,7 +44,7 @@ export class MultipleStreamSource extends HistoryStreamSource {
       return null;
     }
     this._buffer.splice(0);
-    return item;
+    yield item;
   }
 
   /// A method that fills a buffer

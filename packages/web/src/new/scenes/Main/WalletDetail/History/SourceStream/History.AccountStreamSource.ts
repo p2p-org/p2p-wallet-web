@@ -63,7 +63,7 @@ export class AccountStreamSource extends HistoryStreamSource {
     return { signatureInfo, account: this._account, symbol: this._symbol };
   }
 
-  async next(configuration: FetchingConfiguration): Promise<Result | null> {
+  async *next(configuration: FetchingConfiguration): AsyncGenerator<Result> {
     // Fetch transaction signatures
     if (this._buffer.length === 0) {
       await this._fillBuffer();
@@ -72,7 +72,7 @@ export class AccountStreamSource extends HistoryStreamSource {
     // Fetch transaction and parse it
     const signatureInfo = this._buffer[0];
     if (!signatureInfo) {
-      return null;
+      return;
     }
 
     // Setup transaction timestamp
@@ -83,13 +83,12 @@ export class AccountStreamSource extends HistoryStreamSource {
     }
 
     // Check transaction timestamp
-    console.log(1111111, transactionTime, configuration.timestampEnd);
     if (transactionTime >= configuration.timestampEnd) {
-      this._buffer.splice(0);
-      return { signatureInfo, account: this._account, symbol: this._symbol };
+      this._buffer.splice(0, 1);
+      yield { signatureInfo, account: this._account, symbol: this._symbol };
+    } else {
+      return;
     }
-
-    return null;
   }
 
   /// This method fills buffer of transaction.

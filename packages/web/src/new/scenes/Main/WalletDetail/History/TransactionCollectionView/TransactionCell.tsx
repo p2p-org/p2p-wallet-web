@@ -1,13 +1,13 @@
 import type { FC } from 'react';
-import * as React from 'react';
 import Skeleton from 'react-loading-skeleton';
 import { Link } from 'react-router-dom';
 
 import { styled } from '@linaria/react';
+import classNames from 'classnames';
+import { observer } from 'mobx-react-lite';
 import { expr } from 'mobx-utils';
 import { rgba } from 'polished';
 
-import { BaseWrapper } from 'components/pages/wallet/TransactionsWidget/TransactionRow/common/styled';
 import { Icon } from 'components/ui';
 import type { ParsedTransaction } from 'new/sdk/TransactionParser';
 import {
@@ -25,6 +25,9 @@ import {
   parsedTransactionLabel,
 } from 'new/utils/SolanaSDK.ParsedTransactionExtensions';
 import { truncatingMiddle } from 'new/utils/StringExtensions';
+
+import type { ImageViewType } from './TransactionImageView';
+import { TransactionImageView } from './TransactionImageView';
 
 const Wrapper = styled.div`
   position: relative;
@@ -45,26 +48,6 @@ const Wrapper = styled.div`
   }
 `;
 
-const TransactionIconWrapper = styled(BaseWrapper)`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  background: #f6f6f8;
-  border-radius: 12px;
-`;
-
-const TransactionIcon = styled(Icon)`
-  width: 25px;
-  height: 25px;
-
-  color: #a3a5ba;
-`;
-
-const Content = styled.div`
-  flex: 1;
-`;
-
 const TopStack = styled.div`
   display: flex;
   justify-content: space-between;
@@ -82,10 +65,8 @@ const TransactionTypeLabel = styled.div`
 const AmountInFiatLabel = styled.div`
   display: flex;
   align-items: center;
-`;
 
-const Amount = styled.div`
-  &.isReceiver {
+  &.green {
     color: #2db533;
   }
 `;
@@ -112,26 +93,7 @@ const WarningIcon = styled(Icon)`
 //   color: #ffa631;
 // `;
 
-const Main = styled.div`
-  display: flex;
-  align-items: center;
-  padding: 10px;
-
-  cursor: pointer;
-
-  &:hover {
-    background: #f6f6f8;
-    border-radius: 12px;
-
-    ${TransactionIconWrapper} {
-      background: #fff;
-    }
-
-    ${TransactionTypeLabel} {
-      color: #5887ff;
-    }
-  }
-`;
+const TransactionImageViewStyled = styled(TransactionImageView)``;
 
 const BottomStack = styled.div`
   display: flex;
@@ -149,18 +111,42 @@ const LinkStyled = styled(Link)`
   text-decoration: none;
 `;
 
+const Main = styled.div`
+  display: grid;
+  grid-auto-flow: column;
+  grid-gap: 12px;
+  grid-template-columns: min-content 1fr;
+  align-items: center;
+  padding: 10px;
+
+  cursor: pointer;
+
+  &:hover {
+    background: #f6f6f8;
+    border-radius: 12px;
+
+    ${TransactionImageViewStyled} {
+      background: #fff;
+    }
+
+    ${TransactionTypeLabel} {
+      color: #5887ff;
+    }
+  }
+`;
+
 interface Props {
-  transaction: ParsedTransaction;
-  isPlaceholder: boolean;
+  transaction?: ParsedTransaction;
+  isPlaceholder?: boolean;
 }
 
-export const TransactionCell: FC<Props> = ({ transaction, isPlaceholder }) => {
-  if (isPlaceholder) {
+export const TransactionCell: FC<Props> = observer(({ transaction, isPlaceholder = false }) => {
+  if (isPlaceholder || !transaction) {
     return (
       <Wrapper>
         <Main onClick={() => {}}>
           <Skeleton width={48} height={48} borderRadius={12} />
-          <Content>
+          <div>
             <TopStack>
               <TransactionTypeLabel>
                 <Skeleton width={50} height={16} />
@@ -170,12 +156,14 @@ export const TransactionCell: FC<Props> = ({ transaction, isPlaceholder }) => {
               </AmountInFiatLabel>
             </TopStack>
             <BottomStack>
-              <div />
+              <div>
+                <Skeleton width={70} height={16} />
+              </div>
               <div>
                 <Skeleton width={70} height={16} />
               </div>
             </BottomStack>
-          </Content>
+          </div>
         </Main>
       </Wrapper>
     );
@@ -187,6 +175,7 @@ export const TransactionCell: FC<Props> = ({ transaction, isPlaceholder }) => {
     imageView,
     statusImage,
     amountInFiatLabel,
+    amountInFiatLabelTextColor,
     amountInTokenLabel,
   } = expr(() => {
     // clear
@@ -199,14 +188,14 @@ export const TransactionCell: FC<Props> = ({ transaction, isPlaceholder }) => {
     let isUndefinedTransaction = false;
     switch (transaction.info?.constructor) {
       case CreateAccountInfo: {
-        const newWallet = (transaction as CreateAccountInfo).newWallet;
+        const newWallet = (transaction.info as CreateAccountInfo).newWallet;
         if (newWallet) {
           descriptionLabel = `${newWallet.token.symbol} Created`;
         }
         break;
       }
       case CloseAccountInfo: {
-        const closedWallet = (transaction as CloseAccountInfo).closedWallet;
+        const closedWallet = (transaction.info as CloseAccountInfo).closedWallet;
         if (closedWallet) {
           descriptionLabel = `${closedWallet.token.symbol} Closed`;
         }
@@ -226,9 +215,7 @@ export const TransactionCell: FC<Props> = ({ transaction, isPlaceholder }) => {
           case TransferType.receive: {
             const source = (transaction.info as TransferInfo).source;
             if (source) {
-              descriptionLabel = `From token ${
-                source.pubkey ? truncatingMiddle(source.pubkey) : ''
-              }`;
+              descriptionLabel = `From ${source.pubkey ? truncatingMiddle(source.pubkey) : ''}`;
             }
             break;
           }
@@ -255,7 +242,7 @@ export const TransactionCell: FC<Props> = ({ transaction, isPlaceholder }) => {
     }
 
     // set up icon
-    let imageView = null;
+    let imageView: ImageViewType = null;
     switch (transaction.info?.constructor) {
       case SwapInfo: {
         imageView = {
@@ -286,7 +273,7 @@ export const TransactionCell: FC<Props> = ({ transaction, isPlaceholder }) => {
 
     // amount in fiat
     let amountInFiatLabel = null;
-    // amountInFiatLabel text black
+    let amountInFiatLabelTextColor = undefined;
     const amountInFiat = transaction.amountInFiat;
     if (amountInFiat) {
       let amountText = `${Defaults.fiat.symbol}${numberToString(amountInFiat, {
@@ -298,12 +285,11 @@ export const TransactionCell: FC<Props> = ({ transaction, isPlaceholder }) => {
         amountText = `- ${amountText}`;
       } else if (transaction.amount > 0) {
         amountText = `+ ${amountText}`;
-        // textColor = attention gree
+        amountInFiatLabelTextColor = 'green';
       } else {
         amountText = '';
       }
       amountInFiatLabel = amountText;
-      // amountInFiatLabel.textColor = textColor
     }
 
     // amount
@@ -313,7 +299,12 @@ export const TransactionCell: FC<Props> = ({ transaction, isPlaceholder }) => {
         amountInTokenLabel = `${numberToString(transaction.amount, {
           maximumFractionDigits: 9,
           showPlus: true,
-        })}`;
+        })} ${transaction.symbol}`;
+      }
+    } else {
+      const blockhash = transaction.blockhash;
+      if (blockhash) {
+        amountInTokenLabel = `#${truncatingMiddle(blockhash)}`;
       }
     }
 
@@ -323,6 +314,7 @@ export const TransactionCell: FC<Props> = ({ transaction, isPlaceholder }) => {
       imageView,
       statusImage,
       amountInFiatLabel,
+      amountInFiatLabelTextColor,
       amountInTokenLabel,
     };
   });
@@ -330,17 +322,20 @@ export const TransactionCell: FC<Props> = ({ transaction, isPlaceholder }) => {
   return (
     <Wrapper>
       <Main onClick={() => {}}>
-        <Content>
+        <TransactionImageViewStyled imageView={imageView} statusView={null} />
+        <div>
           <TopStack>
             <TransactionTypeLabel>{transactionTypeLabel}</TransactionTypeLabel>
-            <AmountInFiatLabel>{amountInFiatLabel}</AmountInFiatLabel>
+            <AmountInFiatLabel className={classNames(amountInFiatLabelTextColor)}>
+              {amountInFiatLabel}
+            </AmountInFiatLabel>
           </TopStack>
           <BottomStack>
             <div>{descriptionLabel}</div>
             <div>{amountInTokenLabel}</div>
           </BottomStack>
-        </Content>
+        </div>
       </Main>
     </Wrapper>
   );
-};
+});

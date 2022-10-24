@@ -2,7 +2,6 @@ import { u64 } from '@solana/spl-token';
 import { PublicKey } from '@solana/web3.js';
 
 import type {
-  AccountInfo,
   InnerInstruction,
   SolanaSDK,
   SolanaTokensRepository,
@@ -10,6 +9,7 @@ import type {
   TransactionInfo,
 } from 'new/sdk/SolanaSDK';
 import {
+  AccountInfo,
   convertToBalance,
   instructionsData,
   SolanaSDKPublicKey,
@@ -104,17 +104,22 @@ export class OrcaSwapParseStrategy implements TransactionParseStrategy {
 
     // Get accounts info
     const [sourceAccount, destinationAccount] = await Promise.all([
-      this._apiClient.getAccountInfo<AccountInfo>(sourceInfo.source, sourceInfo.destination),
-      this._apiClient.getAccountInfo<AccountInfo>(
-        destinationInfo.source,
-        destinationInfo.destination,
-      ),
+      this._apiClient.getAccountInfoOr<AccountInfo | null>({
+        account: sourceInfo.source,
+        anotherAccount: sourceInfo.destination,
+        decodedTo: AccountInfo,
+      }),
+      this._apiClient.getAccountInfoOr<AccountInfo | null>({
+        account: destinationInfo.source,
+        anotherAccount: destinationInfo.destination,
+        decodedTo: AccountInfo,
+      }),
     ]);
 
     // Get tokens info
     const [sourceToken, destinationToken]: [Token, Token] = await Promise.all([
-      this._tokensRepository.getTokenWithMint(sourceAccount.data.mint.toString()),
-      this._tokensRepository.getTokenWithMint(destinationAccount.data.mint.toString()),
+      this._tokensRepository.getTokenWithMint(sourceAccount?.data?.mint.toString()),
+      this._tokensRepository.getTokenWithMint(destinationAccount?.data?.mint.toString()),
     ]);
 
     const pubkey = trySafe(
@@ -123,13 +128,13 @@ export class OrcaSwapParseStrategy implements TransactionParseStrategy {
     );
     const sourceWallet = new Wallet({
       pubkey,
-      lamports: sourceAccount.lamports ? new u64(sourceAccount.lamports) : null,
+      lamports: sourceInfo.lamports ? new u64(sourceInfo.lamports) : null,
       token: sourceToken,
     });
 
     const destinationWallet = new Wallet({
       pubkey,
-      lamports: destinationAccount.lamports ? new u64(destinationAccount.lamports) : null,
+      lamports: sourceInfo.lamports ? new u64(sourceInfo.lamports) : null,
       token: destinationToken,
     });
 

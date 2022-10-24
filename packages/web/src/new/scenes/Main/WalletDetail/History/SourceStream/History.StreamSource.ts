@@ -12,7 +12,7 @@ export abstract class HistoryStreamSource {
   ///
   /// - Parameter configuration: the fetching configuration that contains things like filtering
   /// - Returns: A stream of parsed transactions and the error that can be occurred.
-  abstract next(configuration: FetchingConfiguration): Promise<Result | null>;
+  abstract next(configuration: FetchingConfiguration): AsyncGenerator<Result>;
 
   /// Fetches next sequence of transactions signatures that satisfies the configuration.
   ///
@@ -21,10 +21,15 @@ export abstract class HistoryStreamSource {
   async nextItems(configuration: FetchingConfiguration): Promise<Result[]> {
     const sequence: Result[] = [];
 
-    let item: Result | null = null;
-    while ((item = await this.next(configuration))) {
-      sequence.push(item);
+    const items = this.next(configuration);
+    let item: IteratorResult<Result> | null = null;
+    while (!(item = await items.next()).done) {
+      sequence.push(item.value);
     }
+    //
+    // for await (const item of items) {
+    //   sequence.push(item);
+    // }
 
     return sequence;
   }

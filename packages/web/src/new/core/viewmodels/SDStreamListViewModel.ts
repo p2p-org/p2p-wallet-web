@@ -30,6 +30,7 @@ export abstract class SDStreamListViewModel<T>
     offset = 0,
   }: { initialData?: T[]; isPaginationEnabled?: boolean; limit?: number; offset?: number } = {}) {
     super({ initialData });
+
     this.isPaginationEnabled = isPaginationEnabled;
     this.limit = limit;
     this.offset = offset;
@@ -59,19 +60,12 @@ export abstract class SDStreamListViewModel<T>
   // Asynchronous request handler
 
   override get isFetchable(): boolean {
-    console.log(
-      '99119 isFetchable',
-      super.isFetchable && !this._isLastPageLoaded,
-      super.isFetchable,
-      !this._isLastPageLoaded,
-    );
-    debugger;
+    // @ts-ignore
     return super.isFetchable && !this._isLastPageLoaded;
   }
 
   fetchNext(): void {
-    console.log('99119 fetchNext');
-    super.fetch();
+    this.fetch();
   }
 
   override fetch(force = false): void {
@@ -86,29 +80,44 @@ export abstract class SDStreamListViewModel<T>
     this._cache = [];
 
     this.task = this.next();
-    console.log(99119, this._cache);
     this.task
       .then((newData) => {
-        console.log(886, newData);
         this.handleData(newData);
-      })
-      .catch((error) => {
-        this.handleError(error);
-      })
-      .finally(() => {
-        console.log(9911919191991, this._cache);
         if (!this.isPaginationEnabled || this._cache.length < this.limit) {
           this._isLastPageLoaded = true;
         }
         this.offset += this.limit;
         this.state = SDFetcherState.loaded;
-
-        this.requestDisposable = undefined;
+      })
+      .catch((error) => {
+        this.handleError(error);
       });
+
+    // this.task = flow<T, []>(function* (
+    //   this: SDStreamListViewModel<T>,
+    // ): Generator<Promise<T[]>> {
+    //   try {
+    //     // TODO: check cancellation
+    //     const stream = await this.next();
+    //     for (const newData of stream) {
+    //       // TODO: check cancellation
+    //       this.handleData(newData);
+    //     }
+    //     if (!this.isPaginationEnabled || this._cache.length < this.limit) {
+    //       this._isLastPageLoaded = true;
+    //     }
+    //     this.offset += this.limit;
+    //     this.state = SDFetcherState.loaded;
+    //   } catch (error) {
+    //     if (errorr instanceof Cancellation) {
+    //       return;
+    //     }
+    //     this.handleError(error);
+    //   }
+    // };
   }
 
   override handleData(newItems: T[]): void {
-    console.log(887, newItems);
     this._cache.push(...newItems);
     const newData = this.join(newItems);
 
@@ -136,7 +145,7 @@ export abstract class SDStreamListViewModel<T>
   }
 
   map(newData: T[]): T[] {
-    let _newData = newData;
+    let _newData = newData; // TODO: check new reference need
     if (this.customFilter) {
       _newData = _newData.filter(this.customFilter);
     }
@@ -151,6 +160,11 @@ export abstract class SDStreamListViewModel<T>
     if (data) {
       this.overrideData(data);
     }
+  }
+
+  refreshUI(): void {
+    this.overrideData(this.data);
+    // TODO: override state
   }
 
   // TODO: refreshUI?

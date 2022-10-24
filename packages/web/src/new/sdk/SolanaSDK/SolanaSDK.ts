@@ -83,6 +83,41 @@ export class SolanaSDK {
     });
   }
 
+  async getAccountInfoOr<T>({
+    account,
+    anotherAccount,
+    decodedTo,
+  }: {
+    account?: string;
+    anotherAccount?: string;
+    decodedTo: { decode(data: Buffer): T };
+  }): Promise<BufferInfo<T> | null> {
+    if (!account) {
+      return null;
+    }
+
+    let accountInfo = null;
+    try {
+      accountInfo = await this.getAccountInfo({
+        account,
+        decodedTo,
+      });
+    } catch {
+      // ignore
+    }
+
+    if (accountInfo) {
+      return accountInfo;
+    } else if (anotherAccount) {
+      return this.getAccountInfo({
+        account: anotherAccount,
+        decodedTo,
+      });
+    } else {
+      throw SolanaSDKError.couldNotRetrieveAccountInfo();
+    }
+  }
+
   async getMinimumBalanceForRentExemption(span: number): Promise<Lamports> {
     return new u64(await this.provider.connection.getMinimumBalanceForRentExemption(span));
   }

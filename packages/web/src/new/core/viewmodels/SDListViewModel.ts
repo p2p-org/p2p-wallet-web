@@ -68,8 +68,9 @@ export abstract class SDListViewModel<T>
   }
 
   // Asynchronous request handler
-  override isFetchable(): boolean {
-    return super.isFetchable() && !this._isLastPageLoaded;
+  override get isFetchable(): boolean {
+    // @ts-ignore
+    return super.isFetchable && !this._isLastPageLoaded;
   }
 
   fetchNext(): void {

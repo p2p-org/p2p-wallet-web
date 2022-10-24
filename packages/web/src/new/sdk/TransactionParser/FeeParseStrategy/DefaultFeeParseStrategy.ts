@@ -126,10 +126,12 @@ export class DefaultFeeParseStrategy implements FeeParseStrategy {
     }
 
     // Load from network
-    const fee = await this.apiClient.getFees();
+    const fee = await this.apiClient.provider.connection.getRecentBlockhash(); // @ios: was getFees()
 
     // Default value in case network in not available
-    lamportsPerSignature = fee.feeCalculator?.lamportsPerSignature ?? 5000;
+    lamportsPerSignature = fee.feeCalculator?.lamportsPerSignature
+      ? new u64(fee.feeCalculator.lamportsPerSignature)
+      : new u64(5000);
 
     // Store in cache
     this.cache.insert(lamportsPerSignature, kLamportsPerSignature);

@@ -164,9 +164,13 @@ export class TransferParseStrategy implements TransactionParseStrategy {
       });
     } else {
       // Mint not found
-      const accountInfo = await this._apiClient.getAccountInfo(sourcePubkey, destinationPubkey);
+      const accountInfo = await this._apiClient.getAccountInfoOr<AccountInfo | null>({
+        account: sourcePubkey,
+        anotherAccount: destinationPubkey,
+        decodedTo: AccountInfo,
+      });
       const token = await this._tokensRepository.getTokenWithMint(
-        accountInfo?.data.mint.toString(),
+        accountInfo?.data?.mint.toString(),
       );
       const source = new Wallet({ pubkey: sourcePubkey, lamports: null, token: token });
       const destination = new Wallet({ pubkey: destinationPubkey, lamports: null, token: token });

@@ -57,7 +57,11 @@ export class SolanaTransactionRepository implements HistoryTransactionRepository
     ) as Promise<TransactionInfo | null>;
   }
 
-  getTransactions(signatures: string[]): Promise<(TransactionInfo | null)[]> {
+  async getTransactions(signatures: string[]): Promise<(TransactionInfo | null)[]> {
+    if (signatures.length === 0) {
+      return [];
+    }
+
     return this._solanaAPIClient.provider.connection.getParsedTransactions(signatures) as Promise<
       (TransactionInfo | null)[]
     >;

@@ -9,6 +9,7 @@ import { StaticSectionsCollectionView } from 'new/ui/components/common/StaticSec
 
 import { ErrorView } from './History.ErrorView';
 import { HistoryViewModel, State } from './History.ViewModel';
+import { TransactionCell } from './TransactionCollectionView/TransactionCell';
 
 export const History: FC = observer(() => {
   const viewModel = useViewModel(HistoryViewModel);
@@ -18,14 +19,9 @@ export const History: FC = observer(() => {
       return (
         <StaticSectionsCollectionView<ParsedTransaction>
           viewModel={viewModel}
-          renderPlaceholder={(key) => {
-            // console.log('renderPlaceholder', key);
-            return <div key={key}>{key}</div>;
-          }}
-          renderItem={(item) => {
-            // console.log('renderItem', item);
-            return <div key={item.signature}>{item.signature}</div>;
-          }}
+          numberOfLoadingCells={7}
+          renderPlaceholder={(key) => <TransactionCell key={key} isPlaceholder />}
+          renderItem={(item) => <TransactionCell key={item.signature} transaction={item} />}
         />
       );
     case State.empty:

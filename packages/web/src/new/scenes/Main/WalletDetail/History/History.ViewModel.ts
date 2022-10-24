@@ -196,15 +196,16 @@ export class HistoryViewModel extends SDStreamListViewModel<ParsedTransaction> {
         const firstTrx = await this._source.currentItem();
         const rawTime = firstTrx?.signatureInfo.blockTime;
         if (!firstTrx || !rawTime) {
-          return yield results;
+          return results;
         }
 
         // Fetch next 1 days
         const timeEndFilter = new Date(rawTime * 1000 - 60 * 60 * 24 * 1000); // TODO: check
 
-        let result: Result | null = null;
-        while ((result = await this._source.next({ timestampEnd: timeEndFilter }))) {
-          const { signatureInfo } = result;
+        const items = this._source.next({ timestampEnd: timeEndFilter });
+        let result: IteratorResult<Result> | null = null;
+        while (!(result = await items.next()).done) {
+          const { signatureInfo } = result.value;
 
           // Skip duplicated transaction
           if (this.data.some((tx) => tx.signature === signatureInfo.signature)) {
@@ -214,14 +215,15 @@ export class HistoryViewModel extends SDStreamListViewModel<ParsedTransaction> {
             continue;
           }
 
-          results.push(result);
+          results.push(result.value);
 
           if (results.length > 15) {
-            return yield results;
+            return results;
           }
         }
       }
     } catch (error) {
+      console.error(error);
       yield results;
       throw error;
     }
@@ -232,18 +234,24 @@ export class HistoryViewModel extends SDStreamListViewModel<ParsedTransaction> {
   ): Generator<Promise<ParsedTransaction[]>> {
     try {
       return yield this._next().then(async (signatures: Result[]) => {
-        // @web:
-        const parsedTransactions: ParsedTransaction[] = [];
-        if (signatures.length === 0) {
-          return parsedTransactions;
-        }
-
         const transactions = await this.transactionRepository.getTransactions(
           signatures.map((s) => s.signatureInfo.signature),
         );
+        const parsedTransactions: ParsedTransaction[] = [];
 
-        for (const [i, trxInfo] of transactions.entries()) {
-          const { signatureInfo, account, symbol } = signatures[i]!;
+        // TODO: maybe parallel
+        for (const trxInfo of transactions) {
+          if (!trxInfo) {
+            continue;
+          }
+          const signature = signatures.find(
+            (res) => res.signatureInfo.signature === trxInfo.transaction.signatures[0],
+          );
+          if (!signature) {
+            continue;
+          }
+          const { signatureInfo, account, symbol } = signature;
+
           parsedTransactions.push(
             await this.transactionParser.parse({
               signatureInfo,
@@ -253,6 +261,7 @@ export class HistoryViewModel extends SDStreamListViewModel<ParsedTransaction> {
             }),
           );
         }
+
         return parsedTransactions;
       });
     } catch (error) {
