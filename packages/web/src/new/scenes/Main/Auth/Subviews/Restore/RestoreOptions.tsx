@@ -195,7 +195,6 @@ export const RestoreOptions: FC = observer(() => {
           Sollet.io
           <ArrowIcon />
         </SocialButton>
-        {/*<SocialButton onClick={handleConnectByClick(DefaultWalletType.SolletExtension)}>*/}
         <SocialButton onClick={handleConnectByClick(SolletExtensionWalletName)}>
           <WalletIcon className="sollet" />
           Sollet Extension

@@ -5,7 +5,7 @@ import { singleton } from 'tsyringe';
 import { isDev, localMnemonic } from 'config/constants';
 import { ViewModel } from 'new/core/viewmodels/ViewModel';
 import { WalletModel } from 'new/models/WalletModel';
-import { MnemonicAdapter } from 'new/scenes/Main/Auth/MnemonicAdapter';
+import { MnemonicAdapter, MnemonicAdapterName } from 'new/scenes/Main/Auth/MnemonicAdapter';
 import { WalletsListViewModel } from 'new/scenes/Main/Auth/Subviews/Wallets.ViewModel';
 
 import type { AuthInfo, AuthState, DerivationPathOption } from './typings';
@@ -163,7 +163,7 @@ export class AuthViewModel extends ViewModel {
       seed,
     };
 
-    await this._walletModel.connectAdaptor('MnemonicAdapter', {
+    await this._walletModel.connectAdaptor(MnemonicAdapterName, {
       type: 'sign',
       derivationPath: this.authInfo.derivationPath.value,
       storageInfo,

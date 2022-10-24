@@ -8,7 +8,7 @@ import { autorun, computed, makeObservable, observable, runInAction } from 'mobx
 import { singleton } from 'tsyringe';
 
 import type { Wallet } from 'new/scenes/Main/Auth/MnemonicAdapter';
-import { MnemonicAdapter } from 'new/scenes/Main/Auth/MnemonicAdapter';
+import { MnemonicAdapter, MnemonicAdapterName } from 'new/scenes/Main/Auth/MnemonicAdapter';
 import type { ConnectConfig } from 'new/scenes/Main/Auth/typings';
 import { WalletAdaptorService } from 'new/services/WalletAdaptorService';
 
@@ -74,8 +74,6 @@ export class WalletModel extends Model {
     const chosenAdaptor = adaptors.find((adaptor) => adaptor.name === adaptorName);
 
     if (chosenAdaptor) {
-      this.setUpAdaptor(chosenAdaptor);
-
       await chosenAdaptor.connect(config);
     }
   }
@@ -172,7 +170,7 @@ export class WalletModel extends Model {
     const localSinger = MnemonicAdapter.getLocalSigner();
 
     if (localSinger) {
-      return await this.connectAdaptor(MnemonicAdapter.name, {
+      return await this.connectAdaptor(MnemonicAdapterName, {
         type: 'recur',
         signer: localSinger,
       });
