@@ -1,7 +1,7 @@
 import { init, track } from '@amplitude/analytics-browser';
 import assert from 'ts-invariant';
 
-import type { AmplitudeActions, ComplexActions } from 'new/utils/analytics/types';
+import type { AmplitudeActions } from './types';
 
 // init amplitude
 assert(
@@ -12,13 +12,11 @@ init(process.env.REACT_APP_AMPLITUDE_API_KEY);
 
 // track event
 export const trackEvent1 = (action: AmplitudeActions) => {
-  track(action.name, action.params);
+  track(action.name, (action as { params: Record<string, unknown> }).params);
 
   console.log(
     `AMPLITUDE sent event:\n- name: '${action.name}'${
-      (action as ComplexActions).params
-        ? `\n- params: '${JSON.stringify((action as ComplexActions).params)}'`
-        : ''
+      action.params ? `\n- params: '${JSON.stringify(action.params)}'` : ''
     }`,
   );
 };

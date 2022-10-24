@@ -7,6 +7,7 @@ import {
   ShareIcon,
 } from 'components/pages/receive/ReceiveWidget/common/styled';
 import { useViewModel } from 'new/core/viewmodels/useViewModel';
+import { trackEvent1 } from 'new/sdk/Analytics';
 import { UsernameAddressWidget } from 'new/ui/components/common/UsernameAddressWidget';
 import { withNameServiceDomain } from 'new/utils/StringExtensions';
 
@@ -21,7 +22,9 @@ export const ReceiveSolana: FC = () => {
         <UsernameAddressWidget
           address={viewModel.pubkeyBase58}
           username={viewModel.username && withNameServiceDomain(viewModel.username)}
-          copyAddressTrackEventName="Receive_Address_Copied"
+          onAddressCopied={() => {
+            trackEvent1({ name: 'Receive_Address_Copied' });
+          }}
         />
       </Content>
       <BottomWrapper>

@@ -4,6 +4,7 @@ import classNames from 'classnames';
 import { observer } from 'mobx-react-lite';
 
 import { useViewModel } from 'new/core/viewmodels/useViewModel';
+import { trackEvent1 } from 'new/sdk/Analytics';
 import { LoaderBlock } from 'new/ui/components/common/LoaderBlock';
 import { UsernameAddressWidget } from 'new/ui/components/common/UsernameAddressWidget';
 
@@ -27,7 +28,9 @@ export const ReceiveBitcoin: FC = observer(() => {
         {viewModel.address ? (
           <UsernameAddressWidget
             address={viewModel.address}
-            copyAddressTrackEventName="Receive_Address_Copied"
+            onAddressCopied={() => {
+              trackEvent1({ name: 'Receive_Address_Copied' });
+            }}
           />
         ) : null}
         <Hint viewModel={viewModel} />

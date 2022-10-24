@@ -17,9 +17,6 @@ import {
   SENTRY_RELEASE,
   SENTRY_TRACES_SAMPLE_RATE,
 } from 'new/constants';
-import { initAmplitude } from 'new/utils/analytics';
-
-initAmplitude();
 
 export const global = globalCss;
 

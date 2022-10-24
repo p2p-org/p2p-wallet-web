@@ -1,6 +1,6 @@
-import type { MapActionWithNoParams } from 'new/utils/analytics/types/common';
+import type { MapActionWithNoParams } from '../common';
 
-export type BuyComplexActions =
+type BuyComplexActions =
   | {
       name: 'Buy_Coin_Changed';
       params: { From_Coin: string; To_Coin: string };
@@ -12,6 +12,8 @@ export type BuyComplexActions =
     }
   | { name: 'Buy_Screen_Opened'; params: { Last_Screen: string | null } };
 
-type BuyActions = 'Moonpay_Window' | 'Moonpay_Window_Closed';
+type BuySimpleActionNames = 'Moonpay_Window' | 'Moonpay_Window_Closed';
 
-export type BuySimpleActions = MapActionWithNoParams<BuyActions>;
+type BuySimpleActions = MapActionWithNoParams<BuySimpleActionNames>;
+
+export type BuyActions = BuySimpleActions | BuyComplexActions;

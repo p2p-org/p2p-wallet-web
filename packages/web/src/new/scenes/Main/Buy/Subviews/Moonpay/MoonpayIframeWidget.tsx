@@ -7,10 +7,10 @@ import { expr } from 'mobx-utils';
 
 import type { BuyViewModelProps } from 'new/scenes/Main/Buy/Subviews/Moonpay/types';
 import { WidgetPageBuy } from 'new/scenes/Main/Buy/Subviews/Moonpay/WidgetPageBuy';
+import { trackEvent1 } from 'new/sdk/Analytics';
 import { MOONPAY_API_KEY, MOONPAY_SIGNER_URL } from 'new/services/BuyService/constants';
 import { buildParams } from 'new/services/BuyService/MoonpayProvider/utils';
 import type { MoonpayIframeParams } from 'new/services/BuyService/types';
-import { trackEvent1 } from 'new/utils/analytics';
 
 const Wrapper = styled.div`
   height: 640px;
