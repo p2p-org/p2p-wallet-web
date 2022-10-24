@@ -17,3 +17,5 @@ type BuySimpleActionNames = 'Moonpay_Window' | 'Moonpay_Window_Closed';
 type BuySimpleActions = MapActionWithNoParams<BuySimpleActionNames>;
 
 export type BuyActions = BuySimpleActions | BuyComplexActions;
+
+// FIXME: just for Github preview creation
