@@ -12,11 +12,7 @@ init(process.env.REACT_APP_AMPLITUDE_API_KEY);
 
 // track event
 export const trackEvent1 = (action: AmplitudeActions) => {
-  if ((action as ComplexActions).params) {
-    track(action.name, (action as ComplexActions).params);
-  } else {
-    track(action.name);
-  }
+  track(action.name, action.params);
 
   console.log(
     `AMPLITUDE sent event:\n- name: '${action.name}'${
