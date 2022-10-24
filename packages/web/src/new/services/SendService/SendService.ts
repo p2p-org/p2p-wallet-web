@@ -12,6 +12,7 @@ import * as SolanaSDK from 'new/sdk/SolanaSDK';
 import { SolanaSDKPublicKey, toLamport } from 'new/sdk/SolanaSDK';
 import { OrcaSwapService } from 'new/services/OrcaSwapService';
 import { RelayService } from 'new/services/RelayService';
+import { BurnAndReleaseService } from 'new/services/RenVM';
 import { WalletsRepository } from 'new/services/Repositories';
 import { SendServiceError } from 'new/services/SendService/SendServiceError';
 import { SendServiceRelayMethod } from 'new/services/SendService/SendServiceRelayMethod';
@@ -39,8 +40,8 @@ export class SendRelayMethod {
 }
 
 export enum Network {
-  solana,
-  bitcoin,
+  solana = 'solana',
+  bitcoin = 'bitcoin',
 }
 
 export interface SendServiceType {
@@ -92,7 +93,6 @@ export interface SendServiceType {
 export class SendService implements SendServiceType {
   relayMethod: SendRelayMethod;
 
-  // private _renVMBurnAndReleaseService: RenVMBurnAndReleaseServiceType;
   private _contextManager: FeeRelayerContextManager;
 
   private _sendServiceRelayMethod: SendServiceRelayMethod;
@@ -100,7 +100,7 @@ export class SendService implements SendServiceType {
   constructor(
     private _solanaAPIClient: SolanaService,
     private _orcaSwap: OrcaSwapService,
-    // renVMBurnAndReleaseService: RenVMBurnAndReleaseServiceType,
+    private _renVMBurnAndReleaseService: BurnAndReleaseService,
     private _feeRelayer: RelayService,
     private _feeRelayerRelaySolanaClient: FeeRelayerRelaySolanaClient,
     private _walletsRepository: WalletsRepository,
@@ -108,7 +108,6 @@ export class SendService implements SendServiceType {
     this.relayMethod = SendRelayMethod.default;
 
     const feeRelayerAPIClient = new FeeRelayerAPIClient();
-    // this._renVMBurnAndReleaseService = renVMBurnAndReleaseService;
     this._contextManager = new FeeRelayerContextManager({
       owner: this._solanaAPIClient.provider.wallet.publicKey,
       solanaAPIClient: this._feeRelayerRelaySolanaClient,
@@ -287,7 +286,7 @@ export class SendService implements SendServiceType {
       case Network.bitcoin: {
         request = this._renVMBurnAndReleaseService.burnAndRelease({
           recipient: receiver,
-          amount,
+          amount: amountNew,
         });
         break;
       }
