@@ -8,8 +8,8 @@ import { WalletsRepository } from 'new/services/Repositories';
 @singleton()
 export class MainViewModel extends ViewModel {
   constructor(
-    private _solanaModel: SolanaModel,
     public walletsRepository: WalletsRepository,
+    private _solanaModel: SolanaModel,
     private _burnAndRelease: BurnAndReleaseService,
     private _lockAndMint: LockAndMintService,
   ) {

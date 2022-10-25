@@ -17,7 +17,7 @@ import { useViewModel } from 'new/core/viewmodels/useViewModel';
 import type { ModalPropsType } from 'new/ui/modals/ModalManager';
 import { TransactionID } from 'new/ui/modals/ProcessTransactionModal/Status/TransactionID';
 
-import type { RawTransactionType } from './ProcessTransaction.Models';
+import type { RawTransactionType, SendTransaction } from './ProcessTransaction.Models';
 import { ProcessTransactionModalViewModel } from './ProcessTransactionModal.ViewModel';
 import { HeaderLabel } from './Status/HeaderLabel';
 import { ProgressView } from './Status/ProgressView';
@@ -68,6 +68,10 @@ export const ProcessTransactionModal: FC<ProcessTransactionModalProps & ModalPro
       close(false);
     };
 
+    const showExplorerLink =
+      viewModel.transactionID &&
+      !(viewModel.rawTransaction as SendTransaction).isRenBTCViaBitcoinNetwork;
+
     return (
       <WrapperModal close={handleCloseClick}>
         <PaddedHeader>
@@ -86,7 +90,7 @@ export const ProcessTransactionModal: FC<ProcessTransactionModalProps & ModalPro
         {/*    <TransactionDetail observingTransactionIndex={viewModel.observingTransactionIndex} />*/}
         {/*  ) : null}*/}
         {/*</Section>*/}
-        {viewModel.transactionID ? (
+        {showExplorerLink ? (
           <Section>
             <TransactionID transactionID={viewModel.transactionID} />
           </Section>

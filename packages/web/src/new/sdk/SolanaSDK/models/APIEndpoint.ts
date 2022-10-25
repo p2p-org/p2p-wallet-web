@@ -1,6 +1,8 @@
 import type { Network } from '@saberhq/solana-contrib';
 import { clusterApiUrl } from '@solana/web3.js';
 
+import { isEnabled } from 'new/services/FeatureFlags';
+import { Features } from 'new/services/FeatureFlags/features';
 import { RemoteConfig } from 'new/services/RemoteConfig';
 
 enum APIKeysNames {
@@ -80,11 +82,29 @@ export class APIEndpoint {
         new APIEndpoint({ address: urlString, network: network as Network, additionalQuery }),
     );
 
+    let endpoints: APIEndpoint[];
     if (definedEndpoints.length) {
-      return definedEndpoints;
+      endpoints = definedEndpoints;
     } else {
-      return APIEndpoint._defaultEndpoints;
+      endpoints = APIEndpoint._defaultEndpoints;
     }
+
+    if (isEnabled(Features.ShowDevnet)) {
+      endpoints.push(
+        new APIEndpoint({
+          address: clusterApiUrl('testnet'),
+          network: 'testnet',
+        }),
+      );
+      endpoints.push(
+        new APIEndpoint({
+          address: clusterApiUrl('devnet'),
+          network: 'devnet',
+        }),
+      );
+    }
+
+    return endpoints;
   }
 
   getURL(): string {

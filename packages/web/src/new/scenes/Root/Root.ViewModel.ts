@@ -1,11 +1,12 @@
 import { singleton } from 'tsyringe';
 
 import { ViewModel } from 'new/core/viewmodels/ViewModel';
+import { WalletModel } from 'new/models/WalletModel';
 import { PricesService } from 'new/services/PriceAPIs/PricesService';
 
 @singleton()
 export class RootViewModel extends ViewModel {
-  constructor(private _pricesService: PricesService) {
+  constructor(private _pricesService: PricesService, public walletModel: WalletModel) {
     super();
   }
 
@@ -13,6 +14,7 @@ export class RootViewModel extends ViewModel {
 
   protected override onInitialize() {
     this._pricesService.startObserving();
+    this.walletModel.initialize();
   }
 
   protected override afterReactionsRemoved() {

@@ -2,7 +2,8 @@ import type { FunctionComponent } from 'react';
 import type { RouteProps } from 'react-router';
 import { Redirect, Route, useLocation } from 'react-router-dom';
 
-import { useWallet } from '@p2p-wallet-web/core';
+import { useViewModel } from 'new/core/viewmodels/useViewModel';
+import { RootViewModel } from 'new/scenes/Root/Root.ViewModel';
 
 export const ProtectedRoute: FunctionComponent<
   {
@@ -29,6 +30,9 @@ export const ProtectedRoute: FunctionComponent<
 
 // ProtectedRoute is used to create specific types.ts of protected routes like this...
 export const AuthRequiredRoute: FunctionComponent<RouteProps> = ({ ...props }) => {
-  const { connected } = useWallet();
-  return <ProtectedRoute allow={connected} redirect="/login" {...props} />;
+  const rootViewModel = useViewModel(RootViewModel);
+
+  return (
+    <ProtectedRoute allow={rootViewModel.walletModel.connected} redirect="/login" {...props} />
+  );
 };

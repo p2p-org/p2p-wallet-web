@@ -4,16 +4,13 @@ import { singleton } from 'tsyringe';
 
 import { isDev, localMnemonic } from 'config/constants';
 import { ViewModel } from 'new/core/viewmodels/ViewModel';
+import { WalletModel } from 'new/models/WalletModel';
+import { MnemonicAdapter } from 'new/scenes/Main/Auth/MnemonicAdapter';
 import { WalletsListViewModel } from 'new/scenes/Main/Auth/Subviews/Wallets.ViewModel';
 
 import type { AuthInfo, AuthState, DerivationPathOption } from './typings';
 import { WizardSteps } from './typings';
-import {
-  DERIVATION_PATH,
-  generateEncryptedTextAsync,
-  mnemonicToSeed,
-  setStorageValue,
-} from './utils';
+import { DERIVATION_PATH, mnemonicToSeed } from './utils';
 
 const createList = [
   WizardSteps.CREATE_START,
@@ -26,9 +23,6 @@ const restoreList = [
   WizardSteps.RESTORE_ACCOUNTS,
 ];
 
-// @FIXME implement browser history with steps || move back to router
-// @TODO how does those methods work (override)?
-
 @singleton()
 export class AuthViewModel extends ViewModel {
   step: WizardSteps;
@@ -37,13 +31,10 @@ export class AuthViewModel extends ViewModel {
   initialCreateMnemonic: string;
   initialRestoreMnemonic: string;
 
-  private static _storageKey = 'encryptedSeedAndMnemonic';
-  static _mnemonicStrength = 256;
-
   static defaultState: AuthState = {
     step: WizardSteps.RESTORE_START,
     isLoading: false,
-    initialCreateMnemonic: bip39.generateMnemonic(AuthViewModel._mnemonicStrength),
+    initialCreateMnemonic: bip39.generateMnemonic(MnemonicAdapter.mnemonicStrength),
     initialRestoreMnemonic: isDev ? (localMnemonic as string) : '',
     authInfo: observable<AuthInfo>({
       mnemonic: localMnemonic as string,
@@ -55,7 +46,10 @@ export class AuthViewModel extends ViewModel {
     }),
   };
 
-  constructor(public walletListsViewModel: WalletsListViewModel) {
+  constructor(
+    public walletListsViewModel: WalletsListViewModel,
+    private _walletModel: WalletModel,
+  ) {
     super();
 
     this.step = AuthViewModel.defaultState.step;
@@ -82,7 +76,6 @@ export class AuthViewModel extends ViewModel {
     });
   }
 
-  // @loggable()
   protected override onInitialize(): void {
     this.walletListsViewModel.initialize();
 
@@ -161,6 +154,22 @@ export class AuthViewModel extends ViewModel {
     this.authInfo.password = value;
   }
 
+  async finalize() {
+    const seed = await this.seed;
+
+    const storageInfo = {
+      mnemonic: this.authInfo.mnemonic,
+      password: this.authInfo.password,
+      seed,
+    };
+
+    await this._walletModel.connectAdaptor('MnemonicAdapter', {
+      type: 'sign',
+      derivationPath: this.authInfo.derivationPath.value,
+      storageInfo,
+    });
+  }
+
   setMnemonic(value: string): void {
     this.authInfo.mnemonic = value;
   }
@@ -171,16 +180,6 @@ export class AuthViewModel extends ViewModel {
 
   setIsLoading(value: boolean): void {
     this.isLoading = value;
-  }
-
-  async saveEncryptedMnemonicAndSeed() {
-    const plaintext = JSON.stringify({
-      mnemonic: this.authInfo.mnemonic,
-      seed: await this.seed,
-    });
-    const locked = await generateEncryptedTextAsync(plaintext, this.authInfo.password);
-
-    setStorageValue(AuthViewModel._storageKey, JSON.stringify(locked));
   }
 
   get seed(): Promise<string> {

@@ -3,8 +3,10 @@ import { singleton } from 'tsyringe';
 
 import { Fiat } from 'new/app/models/Fiat';
 import { ViewModel } from 'new/core/viewmodels/ViewModel';
+import { WalletModel } from 'new/models/WalletModel';
 import type { Appearance } from 'new/services/Defaults';
 import { Defaults } from 'new/services/Defaults';
+import { LocationService } from 'new/services/LocationService';
 import { NameService } from 'new/services/NameService';
 import { PricesService } from 'new/services/PriceAPIs/PricesService';
 import { SolanaService } from 'new/services/SolanaService';
@@ -17,6 +19,8 @@ export class SettingsViewModel extends ViewModel {
     private _pricesService: PricesService,
     private _solanaService: SolanaService,
     private _nameService: NameService,
+    public walletModel: WalletModel,
+    public locationService: LocationService,
   ) {
     super();
 
@@ -36,6 +40,8 @@ export class SettingsViewModel extends ViewModel {
     void this._nameService
       .getName(this._solanaService.provider.wallet.publicKey.toBase58())
       .then(action((name) => name && (this.username = name)));
+
+    this.walletModel.initialize();
   }
 
   protected override afterReactionsRemoved() {}

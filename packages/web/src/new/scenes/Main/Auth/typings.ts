@@ -1,5 +1,7 @@
 import type { ReactElement, ReactNode } from 'react';
 
+import type { Signer } from '@solana/web3.js';
+
 export enum WizardSteps {
   CREATE_START = 'CREATE_START',
   CREATE_CONFIRM_MNEMONIC = 'CREATE_CONFIRM_MNEMONIC',
@@ -37,3 +39,29 @@ export type GetWalletsConfig = {
 export type ViewMap = {
   [K in WizardSteps]: ReactElement;
 };
+
+export type ConnectConfig = SignInConnectConfig | RecurringConnectConfig;
+
+type SignInConnectConfig = {
+  type: 'sign';
+  derivationPath: string;
+  storageInfo: StorageInfo;
+};
+
+type RecurringConnectConfig = {
+  type: 'recur';
+  signer: Signer;
+};
+
+export type StorageInfo = {
+  mnemonic: string;
+  seed: string;
+  password: string;
+};
+
+export type ExpiryDataType<T> = {
+  value: T;
+  expiry: number;
+};
+
+export type ValueOf<T> = T[keyof T];
