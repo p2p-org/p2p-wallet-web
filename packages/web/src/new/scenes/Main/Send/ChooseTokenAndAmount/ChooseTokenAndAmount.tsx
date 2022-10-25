@@ -162,6 +162,7 @@ export const ChooseTokenAndAmount: FC<Props> = observer(({ viewModel }) => {
       groupingSeparator: '',
     });
     viewModel.enterAmount(Number(string));
+    viewModel.setMaxWasClicked();
   };
 
   const handleWalletChange = (wallet: Wallet) => {

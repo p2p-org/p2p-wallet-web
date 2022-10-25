@@ -6,6 +6,7 @@ import { Network, SendViewModel } from 'new/scenes/Main/Send';
 import type { Wallet } from 'new/sdk/SolanaSDK';
 import { LogEvent, Logger } from 'new/sdk/SolanaSDK';
 import { ChooseWalletViewModel } from 'new/ui/components/common/ChooseWallet/ChooseWallet.ViewModel';
+import { rounded } from 'new/utils/NumberExtensions';
 
 export enum CurrencyMode {
   token = 'token',
@@ -160,7 +161,7 @@ export class ChooseTokenAndAmountViewModel
 
     // convert to fiat in fiat mode
     if (this.currencyMode === CurrencyMode.fiat) {
-      availableAmount = availableAmount * wallet.priceInCurrentFiat;
+      availableAmount = rounded(availableAmount * wallet.priceInCurrentFiat, 2);
     }
 
     Logger.log(`availableAmount ${availableAmount}`, LogEvent.debug);
