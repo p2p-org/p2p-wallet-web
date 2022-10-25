@@ -28,7 +28,7 @@ type SwapComplexActions =
       };
     };
 
-type SwapSimpleActionNames = null;
+type SwapSimpleActionNames = 'Swap_Review_Button';
 
 type SwapSimpleActions = MapActionWithNoParams<SwapSimpleActionNames>;
 
