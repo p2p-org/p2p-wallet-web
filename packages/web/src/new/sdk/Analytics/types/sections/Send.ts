@@ -19,7 +19,9 @@ type SendComplexActions =
       };
     };
 
-type SendSimpleActionNames = 'Send_Filling_Address' | 'Send_Review_Screen' | 'Send_Approved_Screen';
+type SendSimpleActionNames =
+  | 'Send_Filling_Address' /*| 'Send_Review_Screen'*/
+  | 'Send_Approved_Screen';
 
 type SendSimpleActions = MapActionWithNoParams<SendSimpleActionNames>;
 
