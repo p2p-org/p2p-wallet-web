@@ -12,10 +12,11 @@ type BuyComplexActions =
     }
   | { name: 'Buy_Screen_Opened'; params: { Last_Screen: string | null } };
 
-type BuySimpleActionNames = 'Moonpay_Window' | 'Moonpay_Window_Closed';
+type BuySimpleActionNames =
+  | 'Moonpay_Window'
+  | 'Moonpay_Window_Closed'
+  | 'Buy_Unsupported_Region_Showed';
 
 type BuySimpleActions = MapActionWithNoParams<BuySimpleActionNames>;
 
 export type BuyActions = BuySimpleActions | BuyComplexActions;
-
-// FIXME: just for Github preview creation
