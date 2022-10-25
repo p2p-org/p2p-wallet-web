@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { styled } from '@linaria/react';
 import {
@@ -14,6 +14,7 @@ import { observer } from 'mobx-react-lite';
 import { Button, Icon } from 'components/ui';
 import { Modal } from 'components/ui/Modal';
 import type { SendViewModel } from 'new/scenes/Main/Send';
+import { trackEvent1 } from 'new/sdk/Analytics';
 import { ButtonCancel } from 'new/ui/components/common/ButtonCancel';
 import { ErrorHint } from 'new/ui/components/common/ErrorHint';
 import { PasswordInput } from 'new/ui/components/common/PasswordInput';
@@ -78,6 +79,10 @@ export const ConfirmSendModal: FC<ConfirmSendModalProps & ModalPropsType> = obse
 
     const [password, setPassword] = useState('');
     const [hasError, setHasError] = useState(false);
+
+    useEffect(() => {
+      trackEvent1({ name: 'Send_Approved_Screen' });
+    }, []);
 
     const handleCloseClick = () => {
       close(false);
