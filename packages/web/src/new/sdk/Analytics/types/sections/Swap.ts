@@ -16,6 +16,16 @@ type SwapComplexActions =
       params: {
         Token_B_Name: string;
       };
+    }
+  | {
+      name: 'Swap_Approve_Button';
+      params: {
+        Token_A: string;
+        Token_B: string;
+        Swap_Sum: number;
+        Swap_MAX: boolean;
+        Swap_USD: number;
+      };
     };
 
 type SwapSimpleActionNames = null;
