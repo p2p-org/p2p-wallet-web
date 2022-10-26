@@ -45,7 +45,7 @@ const App: React.FC = observer(() => {
               <LocationManager />
               <Switch>
                 <Route path="/" exact component={Landing} />
-                <Route path="/trial" exact component={AuthTrial} />
+                <Route path="/onboard" exact component={AuthTrial} />
                 <Route path="/:type(create|restore)" exact component={AuthTrial} />
                 {/*<Route path="/:type(signup|login)" exact component={Auth} />*/}
                 <Main>

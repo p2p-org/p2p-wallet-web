@@ -15,10 +15,10 @@ interface Props {
 export const Root: FC<Props> = observer(({ children }) => {
   const rootViewModel = useViewModel(RootViewModel);
   const location = useLocation();
-  const isAuth = location.pathname === '/' || location.pathname === '/trial';
+  const isAuth = location.pathname === '/' || location.pathname === '/onboard';
 
   if (!rootViewModel.walletModel.connected && !isAuth) {
-    return <Redirect to={'/trial'} />;
+    return <Redirect to={'/onboard'} />;
   }
 
   if (rootViewModel.walletModel.connected && isAuth) {

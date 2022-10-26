@@ -111,11 +111,11 @@ export const Drawer: FC<Props> = ({ isOpen, onDrawerClose }) => {
           {/* <MenuLink href="/#">About</MenuLink> */}
           {/* <MenuLink href="/#">Recent Updates</MenuLink> */}
           {/* <MenuLink href="/#">FAQ</MenuLink> */}
-          <MenuLink to="/login" onClick={() => trackEvent('landing_i_have_wallet_click')}>
+          <MenuLink to="/onboard" onClick={() => trackEvent('landing_i_have_wallet_click')}>
             I have a wallet
           </MenuLink>
           <MenuLink
-            to="/signup"
+            to="/onboard"
             onClick={() => trackEvent('landing_create_wallet_click')}
             className="green"
           >
