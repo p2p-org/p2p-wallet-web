@@ -23,7 +23,6 @@ export type AuthState = {
   authInfo: AuthInfo;
   initialCreateMnemonic: string;
   initialRestoreMnemonic: string;
-  isLoading: boolean;
 };
 
 export type DerivationPathOption = {

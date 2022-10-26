@@ -22,6 +22,7 @@ export class WalletModel extends Model {
   adaptors: Adapter[] = [];
   network: WalletAdapterNetwork;
   connected: boolean;
+  connecting: boolean;
   selectedAdaptor: Adapter | null = null;
 
   private _adaptors: Array<Adapter | MnemonicAdapter> | null = null;
@@ -34,12 +35,14 @@ export class WalletModel extends Model {
     this.network = WalletAdapterNetwork.Mainnet;
     this.publicKey = '';
     this.connected = false;
+    this.connecting = false;
 
     makeObservable(this, {
       name: observable,
       publicKey: observable,
       network: observable,
       connected: observable,
+      connecting: observable,
       selectedAdaptor: observable,
       adaptors: observable,
       pubKey: computed,
@@ -79,10 +82,12 @@ export class WalletModel extends Model {
     const chosenAdaptor = adaptors.find((adaptor) => adaptor.name === adaptorName);
 
     if (chosenAdaptor) {
+      this.connecting = true;
       await chosenAdaptor.connect(config);
     }
 
     this._saveAdaptorName(adaptorName);
+    this.connecting = false;
   }
 
   protected _saveAdaptorName(adaptorName: string): void {

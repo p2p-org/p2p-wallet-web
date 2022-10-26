@@ -140,13 +140,10 @@ export const RestoreOptions: FC = observer(() => {
   const [mnemonic, setMnemonic] = useState(viewModel.initialRestoreMnemonic);
   const [hasError, setHasError] = useState(false);
   const handleConnectByClick = (extensionName: WalletName) => () => {
-    viewModel.setIsLoading(true);
     try {
-      void viewModel.connectExtension(extensionName);
+      void viewModel.connectExtension(extensionName).finally(() => {});
     } catch (error) {
       ToastManager.error((error as Error).message);
-    } finally {
-      viewModel.setIsLoading(false);
     }
   };
 

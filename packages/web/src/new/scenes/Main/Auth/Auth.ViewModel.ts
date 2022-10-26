@@ -27,13 +27,11 @@ const restoreList = [
 export class AuthViewModel extends ViewModel {
   step: WizardSteps;
   authInfo: AuthInfo;
-  isLoading: boolean;
   initialCreateMnemonic: string;
   initialRestoreMnemonic: string;
 
   static defaultState: AuthState = {
     step: WizardSteps.RESTORE_START,
-    isLoading: false,
     initialCreateMnemonic: bip39.generateMnemonic(MnemonicAdapter.mnemonicStrength),
     initialRestoreMnemonic: isDev ? (localMnemonic as string) : '',
     authInfo: observable<AuthInfo>({
@@ -54,24 +52,22 @@ export class AuthViewModel extends ViewModel {
 
     this.step = AuthViewModel.defaultState.step;
     this.authInfo = AuthViewModel.defaultState.authInfo;
-    this.isLoading = AuthViewModel.defaultState.isLoading;
     this.initialCreateMnemonic = AuthViewModel.defaultState.initialCreateMnemonic;
     this.initialRestoreMnemonic = AuthViewModel.defaultState.initialRestoreMnemonic;
 
     makeObservable(this, {
       step: observable,
       authInfo: observable,
-      isLoading: observable,
       isRestore: computed,
       isCreate: computed,
       showBackButton: computed,
       seed: computed,
+      connecting: computed,
       setCreateStart: action.bound,
       setRestoreStart: action.bound,
       previousStep: action.bound,
       nextStep: action.bound,
       setPassword: action.bound,
-      setIsLoading: action.bound,
       setDerivationPath: action.bound,
     });
   }
@@ -100,7 +96,6 @@ export class AuthViewModel extends ViewModel {
   protected override setDefaults(): void {
     this.step = AuthViewModel.defaultState.step;
     this.authInfo = AuthViewModel.defaultState.authInfo;
-    this.isLoading = AuthViewModel.defaultState.isLoading;
     this.initialCreateMnemonic = AuthViewModel.defaultState.initialCreateMnemonic;
     this.initialRestoreMnemonic = AuthViewModel.defaultState.initialRestoreMnemonic;
   }
@@ -182,10 +177,6 @@ export class AuthViewModel extends ViewModel {
     this.authInfo.derivationPath = value;
   }
 
-  setIsLoading(value: boolean): void {
-    this.isLoading = value;
-  }
-
   get seed(): Promise<string> {
     return mnemonicToSeed(this.authInfo.mnemonic);
   }
@@ -200,6 +191,10 @@ export class AuthViewModel extends ViewModel {
 
   get showBackButton(): boolean {
     return this.step !== WizardSteps.CREATE_START && this.step !== WizardSteps.RESTORE_START;
+  }
+
+  get connecting(): boolean {
+    return this._walletModel.connecting;
   }
 
   private _getList(): Array<WizardSteps> {
