@@ -1,4 +1,3 @@
-// @TODO might not need this decorator
 import type { WalletName } from '@solana/wallet-adapter-base';
 import { BaseMessageSignerWalletAdapter, WalletReadyState } from '@solana/wallet-adapter-base';
 import type { Signer, Transaction } from '@solana/web3.js';
@@ -17,8 +16,10 @@ export interface Wallet {
   publicKey: PublicKey;
 }
 
+export const MnemonicAdapterName = 'MnemonicAdapter' as WalletName;
+
 export class MnemonicAdapter extends BaseMessageSignerWalletAdapter {
-  name = 'MnemonicAdapter' as WalletName;
+  name = MnemonicAdapterName;
   icon = '';
   url = '';
   private _account: Signer | null = null;

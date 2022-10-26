@@ -3,7 +3,9 @@ import { useState } from 'react';
 import * as React from 'react';
 
 import { styled } from '@linaria/react';
-import { DefaultWalletType } from '@saberhq/use-solana';
+import type { WalletName } from '@solana/wallet-adapter-base';
+import { PhantomWalletName } from '@solana/wallet-adapter-phantom';
+import { SolletExtensionWalletName, SolletWalletName } from '@solana/wallet-adapter-sollet';
 import * as bip39 from 'bip39';
 import classNames from 'classnames';
 import throttle from 'lodash.throttle';
@@ -137,12 +139,10 @@ export const RestoreOptions: FC = observer(() => {
   const viewModel = useViewModel(AuthViewModel);
   const [mnemonic, setMnemonic] = useState(viewModel.initialRestoreMnemonic);
   const [hasError, setHasError] = useState(false);
-  const handleConnectByClick = (walletType: DefaultWalletType) => () => {
+  const handleConnectByClick = (walletType: WalletName) => () => {
     viewModel.setIsLoading(true);
     try {
-      // await activate(walletType);
-      // eslint-disable-next-line
-      console.info(walletType);
+      void viewModel.connectExtension(walletType);
     } catch (error) {
       ToastManager.error((error as Error).message);
     } finally {
@@ -190,17 +190,17 @@ export const RestoreOptions: FC = observer(() => {
   return (
     <Wrapper>
       <ButtonsWrapper>
-        <SocialButton onClick={handleConnectByClick(DefaultWalletType.Sollet)}>
+        <SocialButton onClick={handleConnectByClick(SolletWalletName)}>
           <WalletIcon className="sollet" />
           Sollet.io
           <ArrowIcon />
         </SocialButton>
-        <SocialButton onClick={handleConnectByClick(DefaultWalletType.SolletExtension)}>
+        <SocialButton onClick={handleConnectByClick(SolletExtensionWalletName)}>
           <WalletIcon className="sollet" />
           Sollet Extension
           <ArrowIcon />
         </SocialButton>
-        <SocialButton onClick={handleConnectByClick(DefaultWalletType.Phantom)}>
+        <SocialButton onClick={handleConnectByClick(PhantomWalletName)}>
           <WalletIcon className="phantom" />
           Phantom
           <ArrowIcon />
