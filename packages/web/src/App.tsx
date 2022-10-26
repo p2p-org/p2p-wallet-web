@@ -46,8 +46,6 @@ const App: React.FC = observer(() => {
               <Switch>
                 <Route path="/" exact component={Landing} />
                 <Route path="/onboard" exact component={AuthTrial} />
-                <Route path="/:type(create|restore)" exact component={AuthTrial} />
-                {/*<Route path="/:type(signup|login)" exact component={Auth} />*/}
                 <Main>
                   <AuthRequiredRoute path="/wallets" component={Home} />
                   <AuthRequiredRoute

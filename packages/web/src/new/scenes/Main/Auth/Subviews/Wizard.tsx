@@ -1,6 +1,11 @@
 import type { FC } from 'react';
+import { useHistory } from 'react-router';
+import { useLocation } from 'react-router-dom';
 
 import { observer } from 'mobx-react-lite';
+
+import { useViewModel } from 'new/core/viewmodels/useViewModel';
+import { AuthViewModel } from 'new/scenes/Main/Auth/Auth.ViewModel';
 
 import type { ViewMap } from '../typings';
 import { WizardSteps } from '../typings';
@@ -17,6 +22,21 @@ export interface Props {
 }
 
 export const Wizard: FC<Props> = observer((props) => {
+  const location = useLocation();
+  const history = useHistory();
+  const viewModel = useViewModel(AuthViewModel);
+
+  // @FIXME remove and replace with react-router
+  if (location.search === '?restore') {
+    viewModel.setRestoreStart();
+    history.replace({});
+  }
+
+  if (location.search === '?create') {
+    viewModel.setCreateStart();
+    history.replace({});
+  }
+
   const VIEW_MAP: ViewMap = {
     [WizardSteps.CREATE_START]: (
       <CommonLayout>
