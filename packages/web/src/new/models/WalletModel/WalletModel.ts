@@ -1,7 +1,8 @@
 import '@abraham/reflection';
 
-import type { Adapter, MessageSignerWalletAdapter } from '@solana/wallet-adapter-base';
+import type { Adapter, MessageSignerWalletAdapter, WalletName } from '@solana/wallet-adapter-base';
 import { WalletAdapterNetwork } from '@solana/wallet-adapter-base';
+import { PhantomWalletName } from '@solana/wallet-adapter-phantom';
 import type { Transaction } from '@solana/web3.js';
 import { PublicKey } from '@solana/web3.js';
 import { autorun, computed, makeObservable, observable, runInAction } from 'mobx';
@@ -24,6 +25,8 @@ export class WalletModel extends Model {
   selectedAdaptor: Adapter | null = null;
 
   private _adaptors: Array<Adapter | MnemonicAdapter> | null = null;
+  private static _previousAdaptorKey = 'previousAdaptor';
+  private static _reloadableAdaptors = [PhantomWalletName];
 
   constructor(protected walletAdaptorService: WalletAdaptorService) {
     super();
@@ -64,17 +67,27 @@ export class WalletModel extends Model {
   }
 
   async disconnect(): Promise<void> {
+    localStorage.removeItem(WalletModel._previousAdaptorKey);
+
     await this.selectedAdaptor?.disconnect();
   }
 
-  async connectAdaptor(adaptorName: string, config?: ConnectConfig) {
+  async connectAdaptor(adaptorName: string, config?: ConnectConfig): Promise<void> {
     this.setupAdaptors();
-    const adaptors = this._getAdaptors();
 
+    const adaptors = this._getAdaptors();
     const chosenAdaptor = adaptors.find((adaptor) => adaptor.name === adaptorName);
 
     if (chosenAdaptor) {
       await chosenAdaptor.connect(config);
+    }
+
+    this._saveAdaptorName(adaptorName);
+  }
+
+  protected _saveAdaptorName(adaptorName: string): void {
+    if (adaptorName !== MnemonicAdapterName) {
+      localStorage.setItem(WalletModel._previousAdaptorKey, adaptorName);
     }
   }
 
@@ -174,6 +187,14 @@ export class WalletModel extends Model {
         type: 'recur',
         signer: localSinger,
       });
+    }
+
+    const localAdaptor = localStorage.getItem(WalletModel._previousAdaptorKey);
+    const shouldAutoConnect =
+      localAdaptor && WalletModel._reloadableAdaptors.includes(localAdaptor as WalletName);
+
+    if (shouldAutoConnect) {
+      await this.connectAdaptor(localAdaptor);
     }
   }
 }
