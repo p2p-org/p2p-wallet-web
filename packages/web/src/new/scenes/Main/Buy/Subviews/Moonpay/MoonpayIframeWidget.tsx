@@ -36,7 +36,7 @@ const moonpayIframeParams: MoonpayIframeParams = {
 export const MoonpayIframeWidget: FC<BuyViewModelProps> = observer(({ viewModel }) => {
   useEffect(() => {
     // track iFrame shown event
-    trackEvent1({ name: 'Moonpay_Window' });
+    trackEvent1({ name: 'Moonpay_Window_Opened' });
 
     // track unsupported region
     const cancellableIpAddressRequest = cancellableAxios<MoonpayIpAddressResponse>({
@@ -44,14 +44,11 @@ export const MoonpayIframeWidget: FC<BuyViewModelProps> = observer(({ viewModel 
       params: baseParams,
     }).then((response) => {
       if (!response.data.isBuyAllowed) {
-        trackEvent1({ name: 'Buy_Unsupported_Region_Showed' });
+        trackEvent1({ name: 'Unsupported_Region_Showed' });
       }
     });
 
     return () => {
-      // track iFrame closed event
-      trackEvent1({ name: 'Moonpay_Window_Closed' });
-
       // cancel IP address request
       cancellableIpAddressRequest.cancel('Moonpay window is closed');
     };

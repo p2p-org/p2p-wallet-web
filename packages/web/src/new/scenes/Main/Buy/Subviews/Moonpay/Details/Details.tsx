@@ -3,7 +3,6 @@ import type { FC } from 'react';
 import { computed } from 'mobx';
 import { observer } from 'mobx-react-lite';
 
-import { trackEvent1 } from 'new/sdk/Analytics';
 import type { AccordionList } from 'new/ui/components/ui/AccordionDetails';
 import { AccordionDetails } from 'new/ui/components/ui/AccordionDetails';
 import { numberToFiatString } from 'new/utils/NumberExtensions';
@@ -69,9 +68,6 @@ export const Details: FC<BuyViewModelProps> = observer(({ viewModel }) => {
       titleBottomName="Total amount spent"
       titleBottomValue={numberToFiatString(viewModel.output.total)}
       accordion={accordion}
-      onToggle={(isOpen) => {
-        trackEvent1({ name: 'Buy_Total_Showed', params: { Showed: isOpen } });
-      }}
     />
   );
 });
