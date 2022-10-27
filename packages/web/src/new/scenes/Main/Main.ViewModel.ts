@@ -26,8 +26,12 @@ export class MainViewModel extends ViewModel {
 
   protected override onInitialize() {
     this._pricesService.startObserving();
+
     this._solanaModel.initialize();
+
     this.walletsRepository.initialize();
+    this.walletsRepository.reload();
+
     this._burnAndRelease.resume();
     void this._lockAndMint.resume();
 
