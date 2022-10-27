@@ -44,7 +44,7 @@ export const MoonpayIframeWidget: FC<BuyViewModelProps> = observer(({ viewModel 
       params: baseParams,
     }).then((response) => {
       if (!response.data.isBuyAllowed) {
-        trackEvent1({ name: 'Unsupported_Region_Showed' });
+        trackEvent1({ name: 'Moonpay_Unsupported_Region_Showed' });
       }
     });
 

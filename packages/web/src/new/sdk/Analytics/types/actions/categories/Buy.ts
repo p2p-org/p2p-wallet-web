@@ -11,7 +11,7 @@ type BuyComplexActions =
     }
   | { name: 'Buy_Screen_Opened'; params: { Last_Screen: string | null } };
 
-type BuySimpleActionNames = 'Moonpay_Window_Opened' | 'Unsupported_Region_Showed';
+type BuySimpleActionNames = 'Moonpay_Window_Opened' | 'Moonpay_Unsupported_Region_Showed';
 
 type BuySimpleActions = MapActionWithNoParams<BuySimpleActionNames>;
 
