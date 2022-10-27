@@ -18,8 +18,14 @@ export const trackEvent1 = (action: AmplitudeActions) => {
     // eslint-disable-next-line no-console
     console.log(
       `AMPLITUDE sent event:
-      - name: '${action.name}'
-      ${action.params ? `- params: '${JSON.stringify(action.params)}'` : ''}`,
+   - name: '${action.name}'
+${
+  action.params
+    ? `   - params:\n${Object.entries(action.params)
+        .map(([key, value]) => `       - ${key}: ${value}`)
+        .join('\n')}`
+    : ''
+}`,
     );
   }
 };
@@ -34,8 +40,8 @@ export const setUserProperty = (property: UserProperties) => {
   if (__DEVELOPMENT__) {
     // eslint-disable-next-line no-console
     console.log(`AMPLITUDE set User Property:
-    - name: '${property.name}'
-    - value: '${property.value}'
+     - name: ${property.name}
+     - value: ${property.value}
     `);
   }
 };
