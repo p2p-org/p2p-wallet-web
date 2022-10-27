@@ -1,6 +1,6 @@
 import type { MapActionWithNoParams } from '../common';
 
-type HomeComplexActions = null;
+type HomeComplexActions = never;
 
 type HomeSimpleActionNames = 'Wallets_Buy_Button' | 'Wallets_Receive_Button';
 

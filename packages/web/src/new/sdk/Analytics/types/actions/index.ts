@@ -1,7 +1,15 @@
+import type {
+  BuyActions,
+  GeneralActions,
+  HomeActions,
+  ReceiveActions,
+  SendActions,
+  SwapActions,
+} from './categories';
 import type { WithLastScreenActionNames } from './common';
-import type { BuyActions, HomeActions, ReceiveActions, SendActions, SwapActions } from './pages';
 
 export type AmplitudeActions =
+  | GeneralActions
   | HomeActions
   | BuyActions
   | ReceiveActions
