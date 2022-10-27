@@ -6,6 +6,7 @@ import { theme, up, useIsMobile } from '@p2p-wallet-web/ui';
 
 import { NavButton, NavButtonIcon, NavButtons } from 'components/common/NavButtons';
 import type { HomeViewModel } from 'new/scenes/Main/Home';
+import { trackEvent1 } from 'new/sdk/Analytics';
 import { Card } from 'new/ui/components/ui/Card';
 
 import rocketImg from './rocket.png';
@@ -74,14 +75,22 @@ export const EmptyWalletView: FC<Props> = ({ viewModel }) => {
   const isMobile = useIsMobile();
 
   const handleBuyButtonClick = () => {
+    trackEvent1({ name: 'Wallets_Buy_Button' });
+
     if (isMobile) {
       viewModel.openChooseBuyTokenMobileModal();
     } else {
-      handleButtonClick('/buy')();
+      goToRoute('/buy')();
     }
   };
 
-  const handleButtonClick = (route: string) => () => {
+  const handleReceiveButtonClick = () => {
+    trackEvent1({ name: 'Wallets_Receive_Button' });
+
+    goToRoute('/receive')();
+  };
+
+  const goToRoute = (route: string) => () => {
     history.push(route, { fromPage: location.pathname });
   };
 
@@ -97,7 +106,7 @@ export const EmptyWalletView: FC<Props> = ({ viewModel }) => {
           <NavButtonStyled onClick={handleBuyButtonClick}>
             <NavButtonIcon name="plus" /> Buy
           </NavButtonStyled>
-          <NavButtonStyled onClick={handleButtonClick('/receive')}>
+          <NavButtonStyled onClick={handleReceiveButtonClick}>
             <NavButtonIcon name="bottom" /> Receive
           </NavButtonStyled>
         </NavButtonsStyled>

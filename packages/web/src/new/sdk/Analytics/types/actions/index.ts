@@ -1,6 +1,11 @@
 import type { WithLastScreenActionNames } from './common';
-import type { BuyActions, ReceiveActions, SendActions, SwapActions } from './pages';
+import type { BuyActions, HomeActions, ReceiveActions, SendActions, SwapActions } from './pages';
 
-export type AmplitudeActions = BuyActions | ReceiveActions | SendActions | SwapActions;
+export type AmplitudeActions =
+  | HomeActions
+  | BuyActions
+  | ReceiveActions
+  | SendActions
+  | SwapActions;
 
 export type OpenPageActionNames = WithLastScreenActionNames<AmplitudeActions>;
