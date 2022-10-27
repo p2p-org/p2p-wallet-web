@@ -6,6 +6,7 @@ import { theme } from '@p2p-wallet-web/ui';
 import { observer } from 'mobx-react-lite';
 
 import { useViewModel } from 'new/core/viewmodels/useViewModel';
+import { trackEvent1 } from 'new/sdk/Analytics';
 import { Layout } from 'new/ui/components/common/Layout';
 import { WidgetPage } from 'new/ui/components/common/WidgetPage';
 
@@ -44,7 +45,12 @@ export const ReceiveToken: FC = observer(() => {
         <Content>
           <NetworkSelect viewModel={viewModel} />{' '}
           {isTokenListAvailable ? (
-            <WhatTokensCanIReceiveLink to="/receive/tokens">
+            <WhatTokensCanIReceiveLink
+              to="/receive/tokens"
+              onClick={() => {
+                trackEvent1({ name: 'Receive_Token_Info' });
+              }}
+            >
               What tokens can I receive?
             </WhatTokensCanIReceiveLink>
           ) : null}

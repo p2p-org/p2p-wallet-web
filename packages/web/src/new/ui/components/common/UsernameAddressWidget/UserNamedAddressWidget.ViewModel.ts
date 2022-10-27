@@ -16,18 +16,30 @@ export class UserNamedAddressWidgetViewModel extends ViewModel {
 
   protected override afterReactionsRemoved() {}
 
-  copyString(value: string, text: string): void {
+  copyString(name: string, value: string, onSuccess?: () => void): void {
     void copyStringToClipboard(
       value,
-      () => this._notificationService.info(`${text} copied!`),
+      () => {
+        this._notificationService.info(`${name} copied!`);
+
+        if (onSuccess) {
+          onSuccess();
+        }
+      },
       (error: Error) => console.error(error),
     );
   }
 
-  copyQRCode(qrElement: HTMLCanvasElement): void {
+  copyQRCode(qrElement: HTMLCanvasElement, onSuccess?: () => void): void {
     void copyImageToClipboard(
       qrElement,
-      () => this._notificationService.info('QR code Copied!'),
+      () => {
+        this._notificationService.info('QR code Copied!');
+
+        if (onSuccess) {
+          onSuccess();
+        }
+      },
       (err: Error) => this._notificationService.error(err.message),
     );
   }

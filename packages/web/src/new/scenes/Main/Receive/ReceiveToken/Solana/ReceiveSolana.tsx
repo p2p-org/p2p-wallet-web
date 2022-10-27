@@ -25,6 +25,9 @@ export const ReceiveSolana: FC = () => {
           onAddressCopied={() => {
             trackEvent1({ name: 'Receive_Address_Copied' });
           }}
+          onQRCodeCopied={() => {
+            trackEvent1({ name: 'Receive_QR_Copied' });
+          }}
         />
       </Content>
       <BottomWrapper>
@@ -33,6 +36,9 @@ export const ReceiveSolana: FC = () => {
           target="_blank"
           rel="noopener noreferrer noindex"
           className="button"
+          onClick={() => {
+            trackEvent1({ name: 'Receive_Solana_Explorer' });
+          }}
         >
           <ShareIcon name="external" />
           View in Solana explorer

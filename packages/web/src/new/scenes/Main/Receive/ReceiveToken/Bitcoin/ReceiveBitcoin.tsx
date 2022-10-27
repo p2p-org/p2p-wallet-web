@@ -31,6 +31,9 @@ export const ReceiveBitcoin: FC = observer(() => {
             onAddressCopied={() => {
               trackEvent1({ name: 'Receive_Address_Copied' });
             }}
+            onQRCodeCopied={() => {
+              trackEvent1({ name: 'Receive_QR_Copied' });
+            }}
           />
         ) : null}
         <Hint viewModel={viewModel} />
@@ -42,6 +45,9 @@ export const ReceiveBitcoin: FC = observer(() => {
           target="_blank"
           rel="noopener noreferrer noindex"
           className={classNames({ button: true, disabled: !viewModel.address })}
+          onClick={() => {
+            trackEvent1({ name: 'Receive_Bitcoin_Explorer' });
+          }}
         >
           <ShareIcon name="external" />
           View in Bitcoin explorer

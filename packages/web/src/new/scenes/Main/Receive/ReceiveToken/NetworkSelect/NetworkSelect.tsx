@@ -4,6 +4,7 @@ import { styled } from '@linaria/react';
 import { theme, useIsMobile } from '@p2p-wallet-web/ui';
 import { observer } from 'mobx-react-lite';
 
+import { trackEvent1 } from 'new/sdk/Analytics';
 import type { Token } from 'new/sdk/SolanaSDK';
 import { Select, SelectItem } from 'new/ui/components/common/Select';
 import { TokenAvatar } from 'new/ui/components/common/TokenAvatar';
@@ -68,6 +69,9 @@ export const NetworkSelect: FC<Props> = observer(({ viewModel }) => {
     if (newTokenType.isSolana()) {
       viewModel.switchTokenType(newTokenType);
     } else {
+      // track event - user clicked Bitcoin Network in selector
+      trackEvent1({ name: 'Receive_Bitcoin_Network' });
+
       if (viewModel.isRenBtcCreated()) {
         viewModel.switchTokenType(newTokenType);
       } else {

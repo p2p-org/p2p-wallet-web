@@ -84,10 +84,18 @@ const QR_CODE_SIZE = 122;
 type Props = {
   address: string;
   username?: string;
+  onUsernameCopied?: () => void;
   onAddressCopied?: () => void;
+  onQRCodeCopied?: () => void;
 };
 
-export const UsernameAddressWidget: FC<Props> = ({ address, username, onAddressCopied }) => {
+export const UsernameAddressWidget: FC<Props> = ({
+  address,
+  username,
+  onUsernameCopied,
+  onAddressCopied,
+  onQRCodeCopied,
+}) => {
   const viewModel = useViewModel(UserNamedAddressWidgetViewModel);
   const isMobile = useIsMobile();
   const isTablet = useIsTablet();
@@ -98,7 +106,7 @@ export const UsernameAddressWidget: FC<Props> = ({ address, username, onAddressC
       return;
     }
 
-    viewModel.copyQRCode(qrElement);
+    viewModel.copyQRCode(qrElement, onQRCodeCopied);
   };
 
   return (
@@ -124,7 +132,7 @@ export const UsernameAddressWidget: FC<Props> = ({ address, username, onAddressC
             small={!isMobile}
             medium={isMobile}
             hollow
-            onClick={() => viewModel.copyString(username, 'Username')}
+            onClick={() => viewModel.copyString('Username', username, onUsernameCopied)}
           >
             Copy username
           </Button>
@@ -134,11 +142,7 @@ export const UsernameAddressWidget: FC<Props> = ({ address, username, onAddressC
           medium={isMobile}
           hollow
           onClick={() => {
-            viewModel.copyString(address, 'Address');
-
-            if (onAddressCopied) {
-              onAddressCopied();
-            }
+            viewModel.copyString('Address', address, onAddressCopied);
           }}
         >
           Copy address
