@@ -1,14 +1,13 @@
-import { action, computed, makeObservable, observable, reaction, when } from 'mobx';
+import { action, computed, makeObservable, observable, reaction } from 'mobx';
 import { singleton } from 'tsyringe';
 
 import { SDFetcherState } from 'new/core/viewmodels/SDViewModel';
 import { ViewModel } from 'new/core/viewmodels/ViewModel';
-import { setUserProperty } from 'new/sdk/Analytics';
 import { Defaults } from 'new/services/Defaults';
 import { ModalService, ModalType } from 'new/services/ModalService';
 import { NameService } from 'new/services/NameService';
 import { WalletsRepository } from 'new/services/Repositories';
-import { numberToString, rounded } from 'new/utils/NumberExtensions';
+import { numberToString } from 'new/utils/NumberExtensions';
 
 @singleton()
 export class HomeViewModel extends ViewModel {
@@ -30,22 +29,6 @@ export class HomeViewModel extends ViewModel {
       isBalanceLoading: computed,
       changeUsername: action,
     });
-
-    // set Amplitude UserProperties only once - when balance is known
-    when(
-      () => this.walletsRepository.state === SDFetcherState.loaded,
-      () => {
-        const fiatAmount = this.walletsRepository.data.reduce((acc, wallet) => {
-          return acc + wallet.amountInCurrentFiat;
-        }, 0);
-
-        setUserProperty({ name: 'User_Has_Positive_Balance', value: fiatAmount > 0 });
-
-        if (fiatAmount) {
-          setUserProperty({ name: 'User_Aggregate_Balance', value: rounded(fiatAmount, 2) });
-        }
-      },
-    );
   }
 
   protected override setDefaults() {
