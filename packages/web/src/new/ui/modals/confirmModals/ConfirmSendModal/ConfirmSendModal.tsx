@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 import { styled } from '@linaria/react';
 import { ZERO } from '@orca-so/sdk';
@@ -81,10 +81,6 @@ export const ConfirmSendModal: FC<ConfirmSendModalProps & ModalPropsType> = obse
 
     const [password, setPassword] = useState('');
     const [hasError, setHasError] = useState(false);
-
-    useEffect(() => {
-      trackEvent1({ name: 'Send_Approved_Screen' });
-    }, []);
 
     const handleCloseClick = () => {
       close(false);

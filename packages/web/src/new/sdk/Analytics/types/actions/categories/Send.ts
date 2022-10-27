@@ -6,6 +6,12 @@ type SendComplexActions =
       params: { Last_Screen: string | null };
     }
   | {
+      name: 'Send_USD_Button';
+      params: {
+        Mode: string;
+      };
+    }
+  | {
       name: 'Send_Confirm_Button_Pressed';
       params: {
         Send_Network: string;
@@ -19,9 +25,7 @@ type SendComplexActions =
       };
     };
 
-type SendSimpleActionNames =
-  | 'Send_Filling_Address' /*| 'Send_Review_Screen'*/
-  | 'Send_Approved_Screen';
+type SendSimpleActionNames = never;
 
 type SendSimpleActions = MapActionWithNoParams<SendSimpleActionNames>;
 

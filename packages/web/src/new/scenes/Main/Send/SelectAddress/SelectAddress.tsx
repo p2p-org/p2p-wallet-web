@@ -10,7 +10,6 @@ import type { Recipient, SendViewModel } from 'new/scenes/Main/Send';
 import { AttentionView } from 'new/scenes/Main/Send/SelectAddress/AttentionView';
 import { ErrorView } from 'new/scenes/Main/Send/SelectAddress/ErrorView';
 import { InputState } from 'new/scenes/Main/Send/SelectAddress/SelectAddress.ViewModel';
-import { trackEvent1 } from 'new/sdk/Analytics';
 
 import { AddressInputView } from './AddressInputView';
 import { RecipientView } from './RecipientView';
@@ -77,8 +76,6 @@ export const SelectAddress: FC<Props> = observer(({ viewModel }) => {
 
   const handleRecipientClick = (recipient: Recipient) => {
     vm.selectRecipient(recipient);
-
-    trackEvent1({ name: 'Send_Filling_Address' });
   };
 
   const handleClearClick = () => {
