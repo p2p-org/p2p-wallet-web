@@ -249,7 +249,7 @@ const config: ConfigFn = (env, argv) => {
       historyApiFallback: true,
       compress: true,
       port: DEV_PORT,
-      hot: false,
+      hot: true,
       open: true,
     },
 
