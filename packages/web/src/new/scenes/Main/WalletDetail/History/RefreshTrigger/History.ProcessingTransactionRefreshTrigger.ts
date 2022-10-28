@@ -1,3 +1,5 @@
+import type { IReactionDisposer } from 'mobx';
+
 import type { TransactionHandler } from 'new/services/TransactionHandler';
 
 import type { HistoryRefreshTrigger } from './History.RefreshTrigger';
@@ -12,7 +14,7 @@ export class ProcessingTransactionRefreshTrigger implements HistoryRefreshTrigge
     this._repository = transactionHandler;
   }
 
-  register(): Promise<void> {
-    return this._repository.observeProcessingTransactions();
+  register(cb: () => void): IReactionDisposer {
+    return this._repository.observeProcessingTransactionsAll(cb);
   }
 }

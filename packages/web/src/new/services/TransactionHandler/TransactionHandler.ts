@@ -120,15 +120,15 @@ export class TransactionHandler implements TransactionHandlerType {
     cb: (txs: ParsedTransaction[]) => void,
   ): IReactionDisposer {
     return reaction(
-      () => this.transactions,
-      () => cb(this.getProcessingTransactions(account) ?? []),
+      () => this.transactions && this.getProcessingTransactions(account),
+      (txs) => cb(txs),
     );
   }
 
   observeProcessingTransactionsAll(cb: (txs: ParsedTransaction[]) => void): IReactionDisposer {
     return reaction(
-      () => this.transactions,
-      () => cb(this.getProcessingTransaction() ?? []),
+      () => this.transactions && this.getProcessingTransaction(),
+      (txs) => cb(txs),
     );
   }
 

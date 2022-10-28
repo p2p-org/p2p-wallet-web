@@ -57,7 +57,7 @@ export class HistoryViewModel extends SDStreamListViewModel<ParsedTransaction> {
 
   /// A list of output objects, that builds, forms, maps, filters and updates a final list.
   /// This list will be delivered to UI layer.
-  private _outputs: HistoryOutput[];
+  private _outputs: HistoryOutput[] = [];
 
   get stateDriver(): State {
     const change = this.dataObservable; // TODO: check, should be "withPrevious"
@@ -133,7 +133,11 @@ export class HistoryViewModel extends SDStreamListViewModel<ParsedTransaction> {
 
     // Register all refresh triggers
     for (const trigger of this._refreshTriggers) {
-      this.addReaction(trigger.register(() => this.refreshUI()));
+      this.addReaction(
+        trigger.register(() => {
+          this.refreshUI();
+        }),
+      );
     }
 
     // Build source
@@ -142,18 +146,6 @@ export class HistoryViewModel extends SDStreamListViewModel<ParsedTransaction> {
     this._bind();
 
     this.initialize();
-  }
-
-  private _bind(): void {
-    // Start loading when wallets are ready.
-    this.addReaction(
-      when(
-        () => (this._walletsRepository.dataObservable?.length ?? 0) > 0,
-        () => {
-          this.reload();
-        },
-      ),
-    );
   }
 
   private _buildSource(): void {
@@ -189,6 +181,18 @@ export class HistoryViewModel extends SDStreamListViewModel<ParsedTransaction> {
 
       this._source = new MultipleStreamSource({ sources: accountStreamSources });
     }
+  }
+
+  private _bind(): void {
+    // Start loading when wallets are ready.
+    this.addReaction(
+      when(
+        () => (this._walletsRepository.dataObservable?.length ?? 0) > 0,
+        () => {
+          this.reload();
+        },
+      ),
+    );
   }
 
   override clear() {

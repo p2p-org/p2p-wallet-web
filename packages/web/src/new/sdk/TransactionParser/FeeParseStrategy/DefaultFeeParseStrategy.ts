@@ -2,7 +2,6 @@ import { ZERO } from '@orca-so/sdk';
 import { u64 } from '@solana/spl-token';
 
 import { Cache } from 'new/sdk/Cache';
-import { RelayProgram } from 'new/sdk/FeeRelayer';
 import type { Lamports, SolanaSDK, TransactionInfo } from 'new/sdk/SolanaSDK';
 import { FeeAmount, SolanaSDKPublicKey } from 'new/sdk/SolanaSDK';
 
@@ -70,22 +69,28 @@ export class DefaultFeeParseStrategy implements FeeParseStrategy {
     // check last compensation transaction
     const firstPubkey = confirmedTransaction.message.accountKeys[0]?.pubkey.toString();
     if (firstPubkey && feePayers.some((pubkey) => pubkey === firstPubkey)) {
-      let lastTransaction, innerInstruction, innerInstructionAmount;
-      if (
-        (lastTransaction = confirmedTransaction.message.instructions.at(-1)) &&
-        lastTransaction.programId.toString() ===
-          RelayProgram.id(this.apiClient.endpoint.network).toString() &&
-        (innerInstruction = transactionInfo.meta?.innerInstructions?.find(
-          (innerInst) => innerInst.index === confirmedTransaction.message.instructions.length - 1,
-        )) &&
-        (innerInstructionAmount = innerInstruction.instructions[0]?.parsed?.info.lamports) &&
-        new u64(innerInstructionAmount).gt(accountCreationFee)
-      ) {
-        // do nothing
-      } else {
-        // mark transaction as paid by P2p org
-        transactionFee = ZERO;
-      }
+      // TODO: - Fix later
+      transactionFee = ZERO;
+      // let lastTransaction, innerInstruction, innerInstructionAmount;
+      // if (
+      //   // check last "returning instruction"
+      //   (lastTransaction = confirmedTransaction.message.instructions.at(-1)) &&
+      //   // returning transaction must have RelayProgram id
+      //   lastTransaction.programId.toString() ===
+      //     RelayProgram.id(this.apiClient.endpoint.network).toString() &&
+      //   // get inner transaction to get amount that have been returned
+      //   (innerInstruction = transactionInfo.meta?.innerInstructions?.find(
+      //     (innerInst) => innerInst.index === confirmedTransaction.message.instructions.length - 1,
+      //   )) &&
+      //   (innerInstructionAmount = innerInstruction.instructions[0]?.parsed?.info.lamports) &&
+      //   // got the amount, check if user had to pay the transaction fee (not account creation fee)
+      //   new u64(innerInstructionAmount).gt(accountCreationFee.add(depositFee))
+      // ) {
+      //   // do nothing
+      // } else {
+      //   // mark transaction as paid by P2p org
+      //   transactionFee = ZERO;
+      // }
     }
 
     return new FeeAmount({
