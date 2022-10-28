@@ -218,6 +218,7 @@ export class SendTransaction extends RawTransactionBase implements RawTransactio
   feeInSOL: u64;
   feeInToken: SolanaSDK.FeeAmount | null;
   isSimulation: boolean;
+  isRenBTCViaBitcoinNetwork: boolean;
 
   constructor({
     sendService,
@@ -230,6 +231,7 @@ export class SendTransaction extends RawTransactionBase implements RawTransactio
     feeInSOL,
     feeInToken,
     isSimulation,
+    isRenBTCViaBitcoinNetwork,
   }: {
     sendService: SendServiceType;
     network: Send.Network;
@@ -241,6 +243,7 @@ export class SendTransaction extends RawTransactionBase implements RawTransactio
     feeInSOL: u64;
     feeInToken: SolanaSDK.FeeAmount | null;
     isSimulation: boolean;
+    isRenBTCViaBitcoinNetwork: boolean;
   }) {
     super();
 
@@ -254,6 +257,7 @@ export class SendTransaction extends RawTransactionBase implements RawTransactio
     this.feeInSOL = feeInSOL;
     this.feeInToken = feeInToken;
     this.isSimulation = isSimulation;
+    this.isRenBTCViaBitcoinNetwork = isRenBTCViaBitcoinNetwork;
   }
 
   get mainDescription(): string {

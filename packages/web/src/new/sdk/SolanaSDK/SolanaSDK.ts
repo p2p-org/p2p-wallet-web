@@ -165,6 +165,8 @@ export class SolanaSDK {
   }
 
   // TODO: test it
+
+  // Wait until transaction is confirmed, return even when there is one or more confirmations and request timed out
   waitForConfirmation(signature: string): Promise<void> {
     let partiallyConfirmed = false;
     // Due to a bug (https://github.com/solana-labs/solana/issues/15461)
@@ -184,7 +186,9 @@ export class SolanaSDK {
             }
 
             const confirmed =
-              !status.value?.confirmations || status.value.confirmationStatus === 'finalized';
+              status.value?.confirmations === null ||
+              status.value?.confirmationStatus === 'finalized';
+
             if (confirmed) {
               return;
             }
@@ -194,9 +198,9 @@ export class SolanaSDK {
           .catch(retry);
       },
       {
-        retries: 10,
-        minTimeout: 1000,
-        maxTimeout: 60000,
+        retries: 30,
+        minTimeout: 1_000,
+        maxTimeout: 2_000,
         factor: 1,
       },
     ).catch((err) => {

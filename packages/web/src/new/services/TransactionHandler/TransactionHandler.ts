@@ -14,11 +14,12 @@ import {
   toLamport,
 } from 'new/sdk/SolanaSDK';
 import type { ParsedTransaction } from 'new/sdk/TransactionParser';
+import { NotificationService } from 'new/services/NotificationService';
 import { PricesService } from 'new/services/PriceAPIs/PricesService';
 import { WalletsRepository } from 'new/services/Repositories';
 import { AccountObservableService } from 'new/services/Socket';
 import { SolanaService } from 'new/services/SolanaService';
-import type { RawTransactionType } from 'new/ui/modals/ProcessTransactionModal';
+import type { RawTransactionType, SendTransaction } from 'new/ui/modals/ProcessTransactionModal';
 import * as ProcessTransaction from 'new/ui/modals/ProcessTransactionModal/ProcessTransaction.Models';
 import type { Emitter } from 'new/utils/libs/nanoEvent';
 import { createNanoEvent } from 'new/utils/libs/nanoEvent';
@@ -59,6 +60,7 @@ export class TransactionHandler implements TransactionHandlerType {
     private _walletsRepository: WalletsRepository,
     private _pricesService: PricesService,
     private _socket: AccountObservableService,
+    private _notificationService: NotificationService,
   ) {
     makeObservable(this, {
       transactions: observable,
@@ -195,24 +197,37 @@ export class TransactionHandler implements TransactionHandlerType {
       const transactionId = await processingTransaction.createRequest();
 
       // show notification
-      // this._notificationsService.showInAppNotification(done(transactionHasBeenSent))
+      this._notificationService.info('Transaction has been sent');
 
-      // update status
-      this._updateTransactionAtIndex(index, () => {
-        return new PendingTransaction({
-          transactionId,
-          sentAt: new Date(),
-          rawTransaction: processingTransaction,
-          status: TransactionStatus.confirmed(0),
+      // when sending renBTC via Bitcoin network transaction is already finished at this stage
+      if ((processingTransaction as SendTransaction).isRenBTCViaBitcoinNetwork) {
+        // update status
+        this._updateTransactionAtIndex(index, () => {
+          return new PendingTransaction({
+            transactionId,
+            sentAt: new Date(),
+            rawTransaction: processingTransaction,
+            status: TransactionStatus.finalized(),
+          });
         });
-      });
+      } else {
+        // update status
+        this._updateTransactionAtIndex(index, () => {
+          return new PendingTransaction({
+            transactionId,
+            sentAt: new Date(),
+            rawTransaction: processingTransaction,
+            status: TransactionStatus.confirmed(0),
+          });
+        });
 
-      // observe confirmations
-      this._observe({ index, transactionId });
+        // observe confirmations
+        this._observe({ index, transactionId });
+      }
     } catch (error) {
       console.error(error);
       // update status
-      // TODO: notification this._notificationsService.showInAppNotification(error(error));
+      this._notificationService.error((error as Error).message);
 
       // mark transaction as failured
       this._updateTransactionAtIndex(index, (currentValue) => {
@@ -263,9 +278,7 @@ export class TransactionHandler implements TransactionHandlerType {
             throw ProcessTransaction.ErrorType.notEnoughNumberOfConfirmations();
           }
         } catch (error) {
-          if (
-            !(error instanceof ProcessTransaction.ErrorType.NotEnoughNumberOfConfirmationsError)
-          ) {
+          if (error instanceof ProcessTransaction.ErrorType.NotEnoughNumberOfConfirmationsError) {
             console.error(error);
             retry(error);
             return;
@@ -279,9 +292,9 @@ export class TransactionHandler implements TransactionHandlerType {
         }
       },
       {
-        retries: 10,
-        minTimeout: 1000,
-        maxTimeout: 60000,
+        retries: 30,
+        minTimeout: 1_000,
+        maxTimeout: 2_000,
         factor: 1,
       },
     );

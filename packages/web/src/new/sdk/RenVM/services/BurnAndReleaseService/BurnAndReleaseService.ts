@@ -108,6 +108,7 @@ export class BurnAndReleaseServiceImpl implements BurnAndReleaseService {
   async burnAndRelease({ recipient, amount }: { recipient: string; amount: u64 }): Promise<string> {
     const account = await this._chainProvider.getAccount();
     const burnAndRelease = await this._getBurnAndRelease();
+
     const burnDetails = await burnAndRelease.submitBurnTransaction({
       account,
       amount: amount.toString(),
@@ -120,6 +121,7 @@ export class BurnAndReleaseServiceImpl implements BurnAndReleaseService {
     if (chain) {
       await chain.waitForConfirmation(burnDetails.confirmedSignature);
     }
+
     const signature = await this._release(burnDetails);
 
     this._persistentStore.markAsReleased(burnDetails);
@@ -169,7 +171,7 @@ export class BurnAndReleaseServiceImpl implements BurnAndReleaseService {
         return burnAndRelease.release({ state, details }).catch(retry);
       },
       {
-        retries: Number.MAX_SAFE_INTEGER,
+        forever: true,
         maxTimeout: 3_000,
       },
     );
