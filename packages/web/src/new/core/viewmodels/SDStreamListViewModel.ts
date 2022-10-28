@@ -167,8 +167,6 @@ export abstract class SDStreamListViewModel<T>
     // TODO: override state
   }
 
-  // TODO: refreshUI?
-
   getCurrentPage(): number | null {
     if (!(this.isPaginationEnabled && this.limit === 0)) {
       return null;

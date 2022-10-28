@@ -43,8 +43,6 @@ export const WalletDetail: FC = observer(() => {
       <TopWidget viewModel={viewModel} />
       {/* TODO: temp */}
       <QRAddressWidget publicKey={publicKey} />
-      {/* TODO: temp */}
-      {/*<TransactionsWidget publicKey={publicKey} />*/}
       <History wallet={viewModel.wallet} />
     </Layout>
   );

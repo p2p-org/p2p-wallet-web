@@ -79,7 +79,7 @@ export class SolanaAPIClient {
     return result;
   }
 
-  // TODO: !!!
+  // TODO: new implementation
   async checkIfAssociatedTokenAccountExists(owner: PublicKey, mint: string): Promise<boolean> {
     const mintAddress = new PublicKey(mint);
 
