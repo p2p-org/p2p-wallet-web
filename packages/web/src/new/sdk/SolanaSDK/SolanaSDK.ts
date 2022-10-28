@@ -983,7 +983,7 @@ export class SolanaSDK {
         knownWallets.push(
           new Wallet({
             pubkey: pubkey.toString(),
-            lamports: accountInfo.amount,
+            lamports: accountInfo.lamports,
             token,
           }),
         );
@@ -1006,7 +1006,7 @@ export class SolanaSDK {
       wallets.push(
         new Wallet({
           pubkey: unknownAccounts[index]![0],
-          lamports: unknownAccounts[index]![1].amount,
+          lamports: unknownAccounts[index]![1].lamports,
           token: Token.unsupported({
             mint: unknownAccounts[index]![1].mint.toString(),
             decimals: item?.decimals,

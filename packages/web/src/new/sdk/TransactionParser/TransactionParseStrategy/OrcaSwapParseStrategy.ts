@@ -122,19 +122,24 @@ export class OrcaSwapParseStrategy implements TransactionParseStrategy {
       this._tokensRepository.getTokenWithMint(destinationAccount?.data?.mint.toString()),
     ]);
 
-    const pubkey = trySafe(
-      () => (sourceInfo.source ? new PublicKey(sourceInfo.source).toString() : null),
-      null,
-    );
     const sourceWallet = new Wallet({
-      pubkey,
-      lamports: sourceInfo.lamports ? new u64(sourceInfo.lamports) : null,
+      pubkey: trySafe(
+        () => (sourceInfo.source ? new PublicKey(sourceInfo.source).toString() : null),
+        null,
+      ),
+      lamports: sourceAccount?.data?.lamports,
       token: sourceToken,
     });
 
     const destinationWallet = new Wallet({
-      pubkey,
-      lamports: sourceInfo.lamports ? new u64(sourceInfo.lamports) : null,
+      pubkey: trySafe(
+        () =>
+          destinationInfo.destination
+            ? new PublicKey(destinationInfo.destination).toString()
+            : null,
+        null,
+      ),
+      lamports: destinationAccount?.data?.lamports,
       token: destinationToken,
     });
 

@@ -8,7 +8,6 @@ import { observer } from 'mobx-react-lite';
 import { expr } from 'mobx-utils';
 import { rgba } from 'polished';
 
-import { Icon } from 'components/ui';
 import type { ParsedTransaction } from 'new/sdk/TransactionParser';
 import {
   CloseAccountInfo,
@@ -69,20 +68,6 @@ const AmountInFiatLabel = styled.div`
   &.green {
     color: #2db533;
   }
-`;
-
-const StatusWrapper = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-`;
-
-const WarningIcon = styled(Icon)`
-  width: 16px;
-  height: 16px;
-  margin-left: 9px;
-
-  color: #f43d3d;
 `;
 
 // const ClockIcon = styled(Icon)`
@@ -262,10 +247,10 @@ export const TransactionCell: FC<Props> = observer(({ transaction, isPlaceholder
     switch (transaction.status.type) {
       case StatusType.requesting:
       case StatusType.processing:
-        statusImage = ''; // TODO:
+        statusImage = 'clock'; // @ios: transactionIndicatorPending
         break;
       case StatusType.error:
-        statusImage = ''; // TODO:
+        statusImage = 'warning'; // @ios: transactionIndicatorError
         break;
       default:
         break;
@@ -280,7 +265,6 @@ export const TransactionCell: FC<Props> = observer(({ transaction, isPlaceholder
         maximumFractionDigits: 2,
         showMinus: false,
       })}`;
-      // textColor = textBlack
       if (transaction.amount < 0) {
         amountText = `- ${amountText}`;
       } else if (transaction.amount > 0) {
@@ -322,7 +306,7 @@ export const TransactionCell: FC<Props> = observer(({ transaction, isPlaceholder
   return (
     <Wrapper>
       <Main onClick={() => {}}>
-        <TransactionImageViewStyled imageView={imageView} statusView={null} />
+        <TransactionImageViewStyled imageView={imageView} statusImage={statusImage} />
         <div>
           <TopStack>
             <TransactionTypeLabel>{transactionTypeLabel}</TransactionTypeLabel>

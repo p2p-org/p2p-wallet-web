@@ -37,8 +37,6 @@ export const StaticSectionsCollectionView = observer(
         expr(() => {
           let _items = viewModel.data;
 
-          console.log(777, _items);
-
           if (customFilter) {
             _items = _items.filter(customFilter);
           }

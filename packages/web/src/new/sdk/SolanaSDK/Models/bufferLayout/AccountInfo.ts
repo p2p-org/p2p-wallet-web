@@ -5,7 +5,7 @@ import { PublicKey } from '@solana/web3.js';
 export class AccountInfo {
   mint: PublicKey;
   owner: PublicKey;
-  amount: u64;
+  lamports: u64;
   delegateOption: number;
   delegate: PublicKey | null;
   state: number;
@@ -28,7 +28,7 @@ export class AccountInfo {
     const accountInfo = AccountLayout.decode(data);
     this.mint = new PublicKey(accountInfo.mint);
     this.owner = new PublicKey(accountInfo.owner);
-    this.amount = u64.fromBuffer(accountInfo.amount);
+    this.lamports = u64.fromBuffer(accountInfo.amount);
     this.delegateOption = accountInfo.delegateOption;
     this.delegate = new PublicKey(accountInfo.delegate);
     this.state = accountInfo.state;

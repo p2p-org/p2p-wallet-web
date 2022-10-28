@@ -8,6 +8,7 @@ interface Props {
   onClick: () => void;
 }
 
+// TDOO: error
 export const ErrorView: FC<Props> = ({ onClick }) => {
   return <Wrapper onClick={onClick}>ErrorView</Wrapper>;
 };

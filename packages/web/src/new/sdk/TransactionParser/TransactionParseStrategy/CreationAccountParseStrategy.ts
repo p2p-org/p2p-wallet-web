@@ -21,12 +21,20 @@ export class CreationAccountParseStrategy implements TransactionParseStrategy {
     const instructions = transactionInfo.transaction.message.instructions;
     switch (instructions.length) {
       case 1:
-        return instructions[0]!.program === 'spl-associated-token-account';
-      case 2:
         return (
+          instructions[0]!.program === 'spl-associated-token-account' ||
+          instructions[0]!.parsed?.type === 'create'
+        );
+      case 2:
+        if (instructions[0]!.parsed?.type === 'create') {
+          return true;
+        } else if (
           instructions[0]!.parsed?.type === 'createAccount' &&
           instructions.at(-1)!.parsed?.type === 'initializeAccount'
-        );
+        ) {
+          return true;
+        }
+        return false;
       default:
         return false;
     }

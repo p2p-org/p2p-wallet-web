@@ -47,7 +47,7 @@ export class Status {
 
   // The transaction has been done processed but finished with error.
   static error(error?: string | null): Status {
-    return new Status({ type: StatusType.processing, error });
+    return new Status({ type: StatusType.error, error });
   }
 
   // Convert the status as error.

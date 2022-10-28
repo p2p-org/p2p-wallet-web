@@ -1,7 +1,8 @@
-import { flow, makeObservable, when } from 'mobx';
+import { action, flow, makeObservable, when } from 'mobx';
 import { singleton } from 'tsyringe';
 
 import { SDFetcherState, SDStreamListViewModel } from 'new/core/viewmodels';
+import type { Wallet } from 'new/sdk/SolanaSDK';
 import type { ParsedTransaction } from 'new/sdk/TransactionParser';
 import { Defaults } from 'new/services/Defaults';
 import { NotificationService } from 'new/services/NotificationService';
@@ -87,16 +88,44 @@ export class HistoryViewModel extends SDStreamListViewModel<ParsedTransaction> {
   ) {
     super({ isPaginationEnabled: true, limit: 10 });
 
-    const accountSymbol = {
-      account: '3RkWk4dDzVQtZiXpaeaS3DiXdVfcBEisWH9Znp5hJtwa',
-      symbol: 'SOL',
-    };
+    // TODO: tryAgain
+    // TODO: refreshPage
 
-    this.accountSymbol = accountSymbol;
+    makeObservable(this, {
+      setAccountSymbol: action,
+      next: flow,
+    });
+  }
+
+  protected override setDefaults(): void {
+    // TODO:
+  }
+
+  tryAgain(): void {
+    this.reload();
+    this._errorRelay = false;
+  }
+
+  refreshPage(): void {
+    this.reload();
+  }
+
+  protected override onInitialize(): void {}
+
+  protected override afterReactionsRemoved(): void {}
+
+  // we need to
+  setAccountSymbol(wallet: Wallet): void {
+    this.end();
+
+    this.accountSymbol = {
+      account: wallet.pubkey!,
+      symbol: wallet.token.symbol,
+    };
 
     this._outputs = [
       new ProcessingTransactionsOutput({
-        accountFilter: accountSymbol?.account,
+        accountFilter: this.accountSymbol?.account,
         transactionHandler: this._transactionHandler,
       }),
       new PriceUpdatingOutput({ pricesService: this._pricesService }),
@@ -110,28 +139,12 @@ export class HistoryViewModel extends SDStreamListViewModel<ParsedTransaction> {
     // Build source
     this._buildSource();
 
-    // TODO: tryAgain
-    // TODO: refreshPage
+    this._bind();
 
-    makeObservable(this, {
-      next: flow,
-    });
+    this.initialize();
   }
 
-  protected override setDefaults() {
-    // TODO:
-  }
-
-  tryAgain(): void {
-    this.reload();
-    this._errorRelay = false;
-  }
-
-  refreshPage(): void {
-    this.reload();
-  }
-
-  protected override onInitialize() {
+  private _bind(): void {
     // Start loading when wallets are ready.
     this.addReaction(
       when(
@@ -142,8 +155,6 @@ export class HistoryViewModel extends SDStreamListViewModel<ParsedTransaction> {
       ),
     );
   }
-
-  protected override afterReactionsRemoved() {}
 
   private _buildSource(): void {
     const cachedTransactionRepository = new SolanaTransactionRepository({
