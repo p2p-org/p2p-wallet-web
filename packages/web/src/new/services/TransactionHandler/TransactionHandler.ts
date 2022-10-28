@@ -106,7 +106,6 @@ export class TransactionHandler implements TransactionHandlerType {
     transactionIndex: TransactionIndex,
     cb: (tx: PendingTransaction | null) => void,
   ): IReactionDisposer {
-    // return this.transactions[transactionIndex] ?? null;
     return reaction(
       () => this.transactions,
       (transactions) => cb(transactions[transactionIndex] ?? null),
