@@ -52,17 +52,6 @@ export const deriveSecretKeyFromSeed = (
   return getKeyPairFromSeed(seed, walletIndex, derivationPath).secretKey;
 };
 
-// export const generateMnemonicAndSeedAsync = async (): Promise<SeedAndMnemonic> => {
-//   const bip39 = await import('bip39');
-//   const mnemonic = bip39.generateMnemonic(256);
-//   const seed = await bip39.mnemonicToSeed(mnemonic);
-//   return {
-//     mnemonic,
-//     seed: Buffer.from(seed).toString('hex'),
-//   };
-// };
-
-// @FIXME possibly remove this file
 export const mnemonicToSeed = async (mnemonic: string) => {
   const bip39 = await import('bip39');
   if (!bip39.validateMnemonic(mnemonic)) {

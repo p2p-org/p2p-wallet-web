@@ -53,11 +53,6 @@ export const Wizard: FC<Props> = observer((props) => {
         <Password />
       </CommonLayout>
     ),
-    [WizardSteps.FINAL]: (
-      <CommonLayout>
-        <p>FINAL</p>
-      </CommonLayout>
-    ),
     [WizardSteps.RESTORE_START]: (
       <CommonLayout>
         <RestoreOptions />
