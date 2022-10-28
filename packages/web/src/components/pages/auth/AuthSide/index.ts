@@ -1,1 +1,0 @@
-export { AuthSide } from './AuthSide';

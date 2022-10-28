@@ -54,8 +54,6 @@ export const mnemonicToSeed = async (mnemonic: string) => {
   return Buffer.from(seed).toString('hex');
 };
 
-// @TODO where is this logic coming from?
-
 export const setStorageValue = <T>(key: string, data: T, { msTTL }: { msTTL?: number } = {}) => {
   const expiringData = createExpiringValue(data, msTTL);
   return localStorage.setItem(key, JSON.stringify(expiringData));

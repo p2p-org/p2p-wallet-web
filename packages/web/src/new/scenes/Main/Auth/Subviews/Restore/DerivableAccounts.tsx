@@ -4,7 +4,6 @@ import { styled } from '@linaria/react';
 import { DERIVATION_PATH } from '@p2p-wallet-web/core';
 import { observer } from 'mobx-react-lite';
 
-import { Button } from 'components/pages/auth/AuthSide/common/Button';
 import { Icon } from 'components/ui';
 import { Popover } from 'components/ui/Popover';
 import { useViewModel } from 'new/core/viewmodels/useViewModel';
@@ -13,6 +12,7 @@ import { WalletPlaceholder } from 'new/scenes/Main/Auth/Subviews/Restore/WalletP
 import type { Wallet } from 'new/sdk/SolanaSDK';
 import { StaticSectionsCollectionView } from 'new/ui/components/common/StaticSectionsCollectionView';
 
+import { Button } from '../components/Button';
 import type { SelectorItemType } from './Selector';
 import { Selector } from './Selector';
 import { WalletRow } from './WalletRow';

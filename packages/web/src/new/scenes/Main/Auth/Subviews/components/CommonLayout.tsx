@@ -6,12 +6,12 @@ import classNames from 'classnames';
 import { observer } from 'mobx-react-lite';
 
 import { LoaderWide } from 'components/common/LoaderWide';
-import app from 'components/pages/auth/app.png';
-import { Back } from 'components/pages/auth/AuthSide/common/Back';
-import logo from 'components/pages/auth/logo.svg';
 import { useViewModel } from 'new/core/viewmodels/useViewModel';
 
 import { AuthViewModel } from '../../Auth.ViewModel';
+import app from './assets/app.png';
+import logo from './assets/logo.svg';
+import { Back } from './Back';
 
 const Wrapper = styled.div`
   display: flex;

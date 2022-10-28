@@ -13,7 +13,7 @@ import { AuthViewModel } from '../../Auth.ViewModel';
 import { validatePassword } from '../../utils';
 import { Button } from './Button';
 
-// @FIXME rewrite all hex colors to palette
+// @TODO rewrite all hex colors to palette
 const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
