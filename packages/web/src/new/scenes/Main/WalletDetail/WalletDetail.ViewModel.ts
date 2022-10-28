@@ -3,7 +3,6 @@ import { singleton } from 'tsyringe';
 
 import { ViewModel } from 'new/core/viewmodels/ViewModel';
 import type { Wallet } from 'new/sdk/SolanaSDK';
-import type { ParsedTransaction } from 'new/sdk/TransactionParser';
 import { LocationService } from 'new/services/LocationService';
 import { WalletsRepository } from 'new/services/Repositories';
 
@@ -202,7 +201,7 @@ export class WalletDetailViewModel extends ViewModel {
     }
   }
 
-  showTransaction(transaction: ParsedTransaction): void {
-    // TODO: open modal with transaction
-  }
+  // showTransaction(transaction: ParsedTransaction): void {
+  //   // TODO: open modal with transaction
+  // }
 }

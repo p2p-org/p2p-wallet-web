@@ -1,6 +1,5 @@
 import type * as Compensation from '../compensation';
 import type * as Relay from '../relay';
-import type * as Reward from '../reward';
 
 export class FeeRelayerRequestType {
   // Properties
@@ -19,14 +18,14 @@ export class FeeRelayerRequestType {
 
   // Builders
 
-  static rewardTransferSOL(params: Reward.TransferSolParams): FeeRelayerRequestType {
+  static rewardTransferSOL(params: Relay.TransferSolParams): FeeRelayerRequestType {
     return new FeeRelayerRequestType({
       path: '/transfer_sol',
       params,
     });
   }
 
-  static rewardTransferSPLToken(params: Reward.TransferSPLTokenParams): FeeRelayerRequestType {
+  static rewardTransferSPLToken(params: Relay.TransferSPLTokenParams): FeeRelayerRequestType {
     return new FeeRelayerRequestType({
       path: '/transfer_spl_token',
       params,

@@ -38,7 +38,7 @@ export class TransactionParserServiceImpl implements TransactionParserService {
     return new TransactionParserServiceImpl({
       strategies: [
         new OrcaSwapParseStrategy({ apiClient, tokensRepository }),
-        new P2POrcaSwapWrapperParseStrategy({ apiClient, tokensRepository }),
+        new P2POrcaSwapWrapperParseStrategy({ tokensRepository }),
         new SerumSwapParseStrategy({ tokensRepository }),
         new CreationAccountParseStrategy({ tokensRepository }),
         new CloseAccountParseStrategy({ tokensRepository }),

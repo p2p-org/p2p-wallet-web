@@ -13,6 +13,7 @@ export enum StatusType {
 // The enum of possible status of transaction in blockchain
 export class Status {
   type: StatusType;
+  // @ts-ignore
   private _percent?: number | null;
   private _error?: string | null;
 

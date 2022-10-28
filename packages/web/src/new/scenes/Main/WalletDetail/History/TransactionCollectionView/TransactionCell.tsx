@@ -1,6 +1,5 @@
 import type { FC } from 'react';
 import Skeleton from 'react-loading-skeleton';
-import { Link } from 'react-router-dom';
 
 import { styled } from '@linaria/react';
 import classNames from 'classnames';
@@ -89,11 +88,6 @@ const BottomStack = styled.div`
   font-weight: 600;
   font-size: 14px;
   line-height: 16px;
-`;
-
-const LinkStyled = styled(Link)`
-  color: #a3a5ba;
-  text-decoration: none;
 `;
 
 const Main = styled.div`

@@ -7,7 +7,6 @@ import { SDFetcherState } from 'new/core/viewmodels/SDViewModel';
 import { excludingSpecialTokens, Wallet } from 'new/sdk/SolanaSDK';
 import { PricesService } from 'new/services/PriceAPIs/PricesService';
 import { TokensRepository, WalletsRepository } from 'new/services/Repositories';
-import { SolanaService } from 'new/services/SolanaService';
 
 @injectable()
 export class ChooseWalletViewModel extends SDListViewModel<Wallet> {
@@ -21,7 +20,6 @@ export class ChooseWalletViewModel extends SDListViewModel<Wallet> {
   constructor(
     private _walletsRepository: WalletsRepository,
     private _tokensRepository: TokensRepository,
-    private _solanaSDK: SolanaService,
     private _pricesService: PricesService,
   ) {
     super();

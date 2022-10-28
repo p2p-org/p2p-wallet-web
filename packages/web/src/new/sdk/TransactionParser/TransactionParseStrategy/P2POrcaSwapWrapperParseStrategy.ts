@@ -2,12 +2,7 @@ import { u64 } from '@solana/spl-token';
 import { PublicKey } from '@solana/web3.js';
 import base58 from 'bs58';
 
-import type {
-  Lamports,
-  SolanaSDK,
-  SolanaTokensRepository,
-  TransactionInfo,
-} from 'new/sdk/SolanaSDK';
+import type { Lamports, SolanaTokensRepository, TransactionInfo } from 'new/sdk/SolanaSDK';
 import { convertToBalance, SolanaSDKPublicKey, Token, trySafe, Wallet } from 'new/sdk/SolanaSDK';
 import type { Configuration, ParsedTransactionInfoType } from 'new/sdk/TransactionParser';
 import { SwapInfo } from 'new/sdk/TransactionParser';
@@ -18,17 +13,9 @@ export class P2POrcaSwapWrapperParseStrategy implements TransactionParseStrategy
   /// The list of orca program signatures that will be parsed by this strategy
   private _orcaProgramSignatures = ['12YKFL4mnZz6CBEGePrf293mEzueQM3h8VLPUJsKpGs9'];
 
-  private _apiClient: SolanaSDK;
   private _tokensRepository: SolanaTokensRepository;
 
-  constructor({
-    apiClient,
-    tokensRepository,
-  }: {
-    apiClient: SolanaSDK;
-    tokensRepository: SolanaTokensRepository;
-  }) {
-    this._apiClient = apiClient;
+  constructor({ tokensRepository }: { tokensRepository: SolanaTokensRepository }) {
     this._tokensRepository = tokensRepository;
   }
 
