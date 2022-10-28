@@ -5,9 +5,9 @@ import { observer } from 'mobx-react-lite';
 import { expr } from 'mobx-utils';
 import { nanoid } from 'nanoid';
 
-import { InfinityScrollHelper } from 'components/common/InfinityScrollHelper';
 import type { SDListViewModelType } from 'new/core/viewmodels/SDListViewModel';
 import { SDFetcherState } from 'new/core/viewmodels/SDViewModel';
+import { InfinityScrollHelper } from 'new/ui/components/common/InfinityScrollHelper';
 
 import { SDCollectionViewItem } from '../StaticSectionsCollectionView/models/SDCollectionViewItem';
 

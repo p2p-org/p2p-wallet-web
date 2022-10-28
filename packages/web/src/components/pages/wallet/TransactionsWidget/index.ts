@@ -1,1 +1,0 @@
-export { TransactionsWidget } from './TransactionsWidget';

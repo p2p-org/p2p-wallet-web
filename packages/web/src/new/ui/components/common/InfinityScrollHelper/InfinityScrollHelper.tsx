@@ -2,7 +2,7 @@ import { Component, createRef } from 'react';
 
 import { styled } from '@linaria/react';
 import throttle from 'lodash.throttle';
-import omit from 'ramda/src/omit';
+import { omit } from 'ramda';
 
 const Wrapper = styled.div``;
 
