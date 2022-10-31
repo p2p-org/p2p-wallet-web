@@ -1,5 +1,6 @@
 import type {
   BuyActions,
+  ErrorActions,
   GeneralActions,
   HomeActions,
   ReceiveActions,
@@ -14,6 +15,7 @@ export type AmplitudeActions =
   | BuyActions
   | ReceiveActions
   | SendActions
-  | SwapActions;
+  | SwapActions
+  | ErrorActions;
 
 export type OpenPageActionNames = WithLastScreenActionNames<AmplitudeActions>;
