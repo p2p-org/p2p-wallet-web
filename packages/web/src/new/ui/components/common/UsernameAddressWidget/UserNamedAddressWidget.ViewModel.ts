@@ -26,7 +26,7 @@ export class UserNamedAddressWidgetViewModel extends ViewModel {
           onSuccess();
         }
       },
-      (error: Error) => console.error(error),
+      (_: Error) => this._notificationService.error(`Can't copy ${value} to clipboard`),
     );
   }
 
@@ -34,13 +34,13 @@ export class UserNamedAddressWidgetViewModel extends ViewModel {
     void copyImageToClipboard(
       qrElement,
       () => {
-        this._notificationService.info('QR code Copied!');
+        this._notificationService.info('QR Code copied!');
 
         if (onSuccess) {
           onSuccess();
         }
       },
-      (err: Error) => this._notificationService.error(err.message),
+      (_: Error) => this._notificationService.error(`Can't copy QR Code to clipboard`),
     );
   }
 }

@@ -5,12 +5,15 @@ import { singleton } from 'tsyringe';
 
 import { SDListViewModel } from 'new/core/viewmodels/SDListViewModel';
 import { SDFetcherState } from 'new/core/viewmodels/SDViewModel';
-import { LogEvent, Logger, Wallet } from 'new/sdk/SolanaSDK';
+import { convertToBalance, LogEvent, Logger, Wallet } from 'new/sdk/SolanaSDK';
 import { Defaults } from 'new/services/Defaults';
+import { NotificationService } from 'new/services/NotificationService';
 import { PricesService } from 'new/services/PriceAPIs/PricesService';
 import type { AccountsObservableEvent } from 'new/services/Socket';
 import { AccountObservableService } from 'new/services/Socket';
 import { SolanaService } from 'new/services/SolanaService';
+import { getTransferNotificationRenderer } from 'new/ui/notifications/transferNotificationRenderer';
+import { numberToString } from 'new/utils/NumberExtensions';
 
 @singleton()
 export class WalletsRepository extends SDListViewModel<Wallet> {
@@ -38,6 +41,7 @@ export class WalletsRepository extends SDListViewModel<Wallet> {
     private _solanaService: SolanaService,
     private _pricesService: PricesService,
     private _socket: AccountObservableService,
+    private _notificationService: NotificationService,
   ) {
     super();
     makeObservable(this, {
@@ -289,37 +293,60 @@ export class WalletsRepository extends SDListViewModel<Wallet> {
 
   private _handleAccountNotification(notification: AccountsObservableEvent): void {
     // notify changes
-    const oldLamportsValue = this.data.find(
-      (wallet) => wallet.pubkey === notification.pubkey,
-    )?.lamports;
+    const wallet = this.data.find((wallet) => wallet.pubkey === notification.pubkey);
+    const oldLamportsValue = wallet?.lamports;
     const newLamportsValue = notification.lamports;
 
     if (oldLamportsValue) {
-      let wlNoti;
       if (oldLamportsValue.gt(newLamportsValue)) {
         // sent
+        const lamports = oldLamportsValue.sub(newLamportsValue);
+
+        const text = numberToString(convertToBalance(lamports, wallet.token.decimals), {
+          maximumFractionDigits: wallet.token.decimals,
+        });
+
+        this._notificationService.show(
+          getTransferNotificationRenderer({
+            header: 'Sent',
+            text: `- ${text} ${wallet.token.symbol}`,
+            token: wallet.token,
+          }),
+        );
+
         // TODO: WLNotification
         Logger.log(
           {
             account: notification.pubkey,
-            lamports: oldLamportsValue.sub(newLamportsValue),
+            lamports,
           },
           LogEvent.info,
         );
       } else if (oldLamportsValue.lt(newLamportsValue)) {
         // received
+
+        const lamports = newLamportsValue.sub(oldLamportsValue);
+
+        const text = numberToString(convertToBalance(lamports, wallet.token.decimals), {
+          maximumFractionDigits: wallet.token.decimals,
+        });
+
+        this._notificationService.show(
+          getTransferNotificationRenderer({
+            header: 'Received',
+            text: `+ ${text} ${wallet.token.symbol}`,
+            token: wallet.token,
+          }),
+        );
+
         // TODO: WLNotification
         Logger.log(
           {
             account: notification.pubkey,
-            lamports: newLamportsValue.sub(oldLamportsValue),
+            lamports,
           },
           LogEvent.info,
         );
-      }
-
-      if (wlNoti) {
-        // TODO: noti
       }
     }
 
