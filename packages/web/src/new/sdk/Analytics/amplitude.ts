@@ -1,6 +1,9 @@
 import { Identify, identify, init, track } from '@amplitude/analytics-browser';
 import assert from 'ts-invariant';
 
+import { isEnabled } from 'new/services/FeatureFlags';
+import { Features } from 'new/services/FeatureFlags/features';
+
 import type { AmplitudeActions, UserProperties } from './types';
 
 // init amplitude
@@ -17,15 +20,16 @@ init(process.env.REACT_APP_AMPLITUDE_API_KEY);
 export const trackEvent1 = (action: AmplitudeActions) => {
   track(action.name, (action as { params: Record<string, unknown> }).params);
 
-  //FIXME: comment in last commit
-  if (__DEVELOPMENT__) {
+  if (__DEVELOPMENT__ && isEnabled(Features.LogAmplitudeEvents)) {
     // eslint-disable-next-line no-console
     console.log(
       `AMPLITUDE sent event:
    - name: '${action.name}'
 ${
+  // @ts-ignore
   action.params
-    ? `   - params:\n${Object.entries(action.params)
+    ? // @ts-ignore
+      `   - params:\n${Object.entries(action.params)
         .map(([key, value]) => `       - ${key}: ${value}`)
         .join('\n')}`
     : ''
@@ -41,8 +45,7 @@ export const setUserProperty = (property: UserProperties) => {
 
   identify(identifyObj);
 
-  //FIXME: comment in last commit
-  if (__DEVELOPMENT__) {
+  if (__DEVELOPMENT__ && isEnabled(Features.LogAmplitudeEvents)) {
     // eslint-disable-next-line no-console
     console.log(`AMPLITUDE set User Property:
      - name: ${property.name}
