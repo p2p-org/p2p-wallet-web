@@ -7,7 +7,14 @@ import { pbkdf2 } from 'crypto';
 import nacl from 'tweetnacl';
 
 import type { ConnectConfig, StorageInfo } from 'new/scenes/Main/Auth/typings';
-import { getKeyPairFromSeed, getStorageValue, setStorageValue } from 'new/scenes/Main/Auth/utils';
+import type { KeyPairDbApi } from 'new/scenes/Main/Auth/utils';
+import {
+  getDB,
+  getKeyPairFromSeed,
+  KEYPAIR_KEY,
+  setStorageValue,
+  STORE_NAME,
+} from 'new/scenes/Main/Auth/utils';
 import { notImplemented } from 'new/utils/decorators';
 
 export interface Wallet {
@@ -25,6 +32,10 @@ export class MnemonicAdapter extends BaseMessageSignerWalletAdapter {
   private _account: Signer | null = null;
   private _connecting = false;
   private _readyState = WalletReadyState.NotDetected;
+  private _keypairDB: KeyPairDbApi;
+  private _rsaKeypair: CryptoKeyPair;
+  private _textEncoder: TextEncoder;
+  private _extractableKeys = false;
 
   static walletIndex = 0;
   static mnemonicStrength = 256;
@@ -35,10 +46,14 @@ export class MnemonicAdapter extends BaseMessageSignerWalletAdapter {
 
   constructor() {
     super();
+
+    this._textEncoder = new TextEncoder();
+
+    void this._initStorage();
   }
 
   static getLocalSigner(): Signer | null {
-    const secretKeyStored = getStorageValue<Uint8Array>(MnemonicAdapter._privateStorageKey);
+    const secretKeyStored = localStorage.getItem(MnemonicAdapter._privateStorageKey);
 
     if (secretKeyStored) {
       const secretKey = Uint8Array.from(Object.values(secretKeyStored));
@@ -118,7 +133,7 @@ export class MnemonicAdapter extends BaseMessageSignerWalletAdapter {
         this._account = signer;
         this.emit('connect', signer.publicKey);
 
-        MnemonicAdapter._saveCurrentSecretKey(signer.secretKey);
+        await this._saveCurrentSecretKey(signer.secretKey);
 
         await MnemonicAdapter._saveEncryptedMnemonicAndSeed(config.storageInfo);
       }
@@ -147,8 +162,23 @@ export class MnemonicAdapter extends BaseMessageSignerWalletAdapter {
     setStorageValue(MnemonicAdapter._mnemonicStorageKey, JSON.stringify(locked));
   }
 
-  private static _saveCurrentSecretKey(secretKey: Uint8Array) {
-    setStorageValue(MnemonicAdapter._privateStorageKey, secretKey);
+  private async _saveCurrentSecretKey(secretKey: Uint8Array) {
+    // setStorageValue(MnemonicAdapter._privateStorageKey, secretKey);
+    const encoded = this._textEncoder.encode(secretKey.toString());
+
+    const ciphertext = await window.crypto.subtle.encrypt(
+      {
+        name: 'RSA-OAEP',
+      },
+      this._rsaKeypair.publicKey as CryptoKey,
+      encoded,
+    );
+
+    if (ciphertext) {
+      const cipherString = Buffer.from(ciphertext).toString('hex');
+
+      localStorage.setItem(MnemonicAdapter._privateStorageKey, cipherString);
+    }
   }
 
   private static async _deriveEncryptionKey(
@@ -187,5 +217,30 @@ export class MnemonicAdapter extends BaseMessageSignerWalletAdapter {
   private static _removeLocalAuthData(): void {
     localStorage.removeItem(MnemonicAdapter._privateStorageKey);
     localStorage.removeItem(MnemonicAdapter._mnemonicStorageKey);
+  }
+
+  private async _initStorage(): Promise<void> {
+    this._keypairDB = await getDB();
+
+    const keypair = await this._keypairDB.get(STORE_NAME, KEYPAIR_KEY);
+
+    if (keypair) {
+      this._rsaKeypair = keypair;
+      return;
+    }
+
+    this._rsaKeypair = await window.crypto.subtle.generateKey(
+      {
+        name: 'RSA-OAEP',
+        modulusLength: 4096,
+        // @FIXME
+        publicExponent: new Uint8Array([1, 0, 1]),
+        hash: 'SHA-256',
+      },
+      this._extractableKeys,
+      ['encrypt', 'decrypt'],
+    );
+
+    await this._keypairDB.put(STORE_NAME, this._rsaKeypair, KEYPAIR_KEY);
   }
 }

@@ -1,6 +1,9 @@
 import * as bip32 from 'bip32';
 import * as bip39 from 'bip39';
 import * as ed25519 from 'ed25519-hd-key';
+import type { DBSchema } from 'idb';
+import { openDB } from 'idb';
+import type { IDBPDatabase } from 'idb/build/entry';
 import nacl from 'tweetnacl';
 
 import type { ExpiryDataType, ValueOf } from './typings';
@@ -123,3 +126,24 @@ export const derivePublicKeyFromSeed = (
 ) => {
   return getKeyPairFromSeed(seed, walletIndex, derivationPath).publicKey;
 };
+
+interface KeypairDB extends DBSchema {
+  cryptoPair: {
+    key: string;
+    value: CryptoKeyPair;
+  };
+}
+
+const DB_NAME = 'keys';
+export const STORE_NAME = 'cryptoPair';
+export const KEYPAIR_KEY = 'keypair';
+const INIT_VERSION = 1;
+
+export const getDB = async (): Promise<KeyPairDbApi> =>
+  await openDB<KeypairDB>(DB_NAME, INIT_VERSION, {
+    upgrade(db) {
+      db.createObjectStore(STORE_NAME);
+    },
+  });
+
+export type KeyPairDbApi = IDBPDatabase<KeypairDB>;
