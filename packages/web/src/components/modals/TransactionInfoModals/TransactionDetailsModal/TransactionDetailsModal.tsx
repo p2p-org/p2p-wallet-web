@@ -17,7 +17,6 @@ import type { TransactionSignature } from '@solana/web3.js';
 import classNames from 'classnames';
 import dayjs from 'dayjs';
 
-import { AmountUSD } from 'components/common/AmountUSD';
 import { TokenAvatar } from 'components/common/TokenAvatar';
 import { trackEvent } from 'utils/analytics';
 import { getExplorerUrl } from 'utils/connection';

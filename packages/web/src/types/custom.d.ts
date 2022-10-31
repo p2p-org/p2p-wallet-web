@@ -17,3 +17,6 @@ declare module '*.svg' {
   const content: any;
   export default content;
 }
+
+// search in webpack config
+declare const __DEVELOPMENT__: boolean;

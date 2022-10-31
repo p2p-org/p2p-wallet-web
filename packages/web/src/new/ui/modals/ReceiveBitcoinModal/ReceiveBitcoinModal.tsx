@@ -5,7 +5,7 @@ import { observer } from 'mobx-react-lite';
 
 import { useViewModel } from 'new/core/viewmodels/useViewModel';
 import { Loader } from 'new/ui/components/common/Loader';
-import type { ModalPropsType } from 'new/ui/modals/ModalManager';
+import type { ModalPropsType } from 'new/ui/managers/ModalManager';
 
 import { LoaderWrapper, WrapperModal } from './common/styled';
 import { Create } from './Create';

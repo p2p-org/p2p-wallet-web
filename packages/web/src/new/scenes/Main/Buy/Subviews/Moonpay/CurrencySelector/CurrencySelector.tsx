@@ -7,9 +7,9 @@ import { theme } from '@p2p-wallet-web/ui';
 import { observer } from 'mobx-react-lite';
 
 import { TokenAvatar } from 'components/common/TokenAvatar';
-import { Select, SelectItem } from 'components/ui';
 import type { BuyViewModelProps } from 'new/scenes/Main/Buy/Subviews/Moonpay/types';
 import type { CryptoCurrency } from 'new/services/BuyService/structures';
+import { Select, SelectItem } from 'new/ui/components/common/Select';
 
 const InfoWrapper = styled.div`
   margin-left: 12px;

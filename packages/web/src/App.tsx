@@ -1,3 +1,5 @@
+import 'new/services/Defaults';
+
 import * as React from 'react';
 import { BrowserRouter, HashRouter, Route, Switch } from 'react-router-dom';
 
@@ -9,20 +11,24 @@ import { observer } from 'mobx-react-lite';
 import { Intercom } from 'components/common/Intercom';
 import { NotifyToast } from 'components/common/NotifyToast';
 import { ToastManager } from 'components/common/ToastManager';
-import { Main } from 'new/scenes/Main';
-import { Buy } from 'new/scenes/Main/Buy';
-import { Home } from 'new/scenes/Main/Home';
-import { Receive } from 'new/scenes/Main/Receive';
-import { Send } from 'new/scenes/Main/Send';
-import { Settings } from 'new/scenes/Main/Settings';
-import { SettingsNetwork } from 'new/scenes/Main/SettingsNetwork';
-import { SwapPage } from 'new/scenes/Main/Swap';
-import { WalletDetail } from 'new/scenes/Main/WalletDetail';
+import {
+  Buy,
+  Home,
+  Main,
+  Receive,
+  Send,
+  Settings,
+  SettingsNetwork,
+  SwapPage,
+  WalletDetail,
+} from 'new/scenes/Main';
 import { Root } from 'new/scenes/Root';
-import { DebugFeatureFlagsManager } from 'new/ui/managers/DebugFeatureFlagsManager';
-import { LocationManager } from 'new/ui/managers/LocationManager';
-import { NotificationManager } from 'new/ui/managers/NotificationManager';
-import { ModalManager } from 'new/ui/modals/ModalManager';
+import {
+  DebugFeatureFlagsManager,
+  LocationManager,
+  ModalManager,
+  NotificationManager,
+} from 'new/ui/managers';
 import { Auth } from 'pages/Auth';
 import { Landing } from 'pages/Landing';
 import { AuthRequiredRoute } from 'utils/routes/UserRequiredRoute';

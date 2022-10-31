@@ -13,15 +13,7 @@ import {
 import { SailProvider } from '@p2p-wallet-web/sail';
 import assert from 'ts-invariant';
 
-import {
-  BlockchainProvider,
-  ModalsProvider,
-  NameServiceProvider,
-  RatesProvider,
-  SettingsProvider,
-} from 'app/contexts';
 import { ToastManager } from 'components/common/ToastManager';
-import { LockAndMintProvider } from 'utils/providers/LockAndMintProvider';
 
 const PUBLIC_KEY_LENGTH_FOR_TRIMMING = 20;
 
@@ -62,14 +54,6 @@ const CoreProviders: FC = ({ children }) => {
   );
 };
 
-const ApiProviders: FC = ({ children }) => {
-  return (
-    <RatesProvider>
-      <NameServiceProvider>{children}</NameServiceProvider>
-    </RatesProvider>
-  );
-};
-
 const queryClient = new QueryClient();
 
 export const Providers: FC = ({ children }) => {
@@ -85,17 +69,7 @@ export const Providers: FC = ({ children }) => {
       autoBootProps={{ hideDefaultLauncher: true }}
     >
       <QueryClientProvider client={queryClient}>
-        <CoreProviders>
-          <ApiProviders>
-            <SettingsProvider>
-              <BlockchainProvider>
-                <LockAndMintProvider>
-                  <ModalsProvider>{children}</ModalsProvider>
-                </LockAndMintProvider>
-              </BlockchainProvider>
-            </SettingsProvider>
-          </ApiProviders>
-        </CoreProviders>
+        <CoreProviders>{children}</CoreProviders>
       </QueryClientProvider>
     </IntercomProvider>
   );

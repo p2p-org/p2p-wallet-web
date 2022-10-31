@@ -19,7 +19,7 @@ import { ErrorHint } from 'new/ui/components/common/ErrorHint';
 import { PasswordInput } from 'new/ui/components/common/PasswordInput';
 import { numberToString } from 'new/utils/NumberExtensions';
 
-import type { ModalPropsType } from '../../ModalManager';
+import type { ModalPropsType } from '../../../managers/ModalManager';
 import { ArrowDown } from '../common/ArrowDown';
 import { Section } from '../common/styled';
 import { AmountSummaryView } from './AmountSummaryView';

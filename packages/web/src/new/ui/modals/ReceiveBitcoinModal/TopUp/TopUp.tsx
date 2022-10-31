@@ -3,7 +3,7 @@ import { useHistory } from 'react-router';
 
 import { ButtonCancel } from 'new/ui/components/common/ButtonCancel';
 import { Button } from 'new/ui/components/ui/Button';
-import type { ModalPropsType } from 'new/ui/modals/ModalManager';
+import type { ModalPropsType } from 'new/ui/managers/ModalManager';
 
 import { List, Row, Section, WrapperModal } from '../common/styled';
 

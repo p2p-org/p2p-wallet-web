@@ -5,7 +5,6 @@ import { styled } from '@linaria/react';
 import { mnemonicToSeed } from '@p2p-wallet-web/core';
 
 import { Back } from 'components/pages/auth/AuthSide/common/Back';
-import { DerivableAccounts } from 'components/pages/auth/AuthSide/Login/DerivableAccounts';
 
 import { Password } from '../common/Password';
 import type { DataType } from '../types';

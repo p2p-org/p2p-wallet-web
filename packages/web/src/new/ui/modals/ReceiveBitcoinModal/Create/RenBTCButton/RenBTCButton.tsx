@@ -5,7 +5,7 @@ import { expr } from 'mobx-utils';
 
 import { Button } from 'components/ui';
 import { Loader } from 'new/ui/components/common/Loader';
-import type { ModalPropsType } from 'new/ui/modals/ModalManager';
+import type { ModalPropsType } from 'new/ui/managers/ModalManager';
 import type { ReceiveBitcoinModalViewModel } from 'new/ui/modals/ReceiveBitcoinModal/ReceiveBitcoinModal.ViewModel';
 import { numberToString } from 'new/utils/NumberExtensions';
 

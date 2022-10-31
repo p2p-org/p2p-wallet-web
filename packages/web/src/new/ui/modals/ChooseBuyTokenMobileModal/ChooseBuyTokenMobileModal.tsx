@@ -5,10 +5,10 @@ import { observer } from 'mobx-react-lite';
 
 import { useViewModel } from 'new/core/viewmodels/useViewModel';
 import { CryptoCurrency } from 'new/services/BuyService/structures';
+import type { ModalPropsType } from 'new/ui/managers/ModalManager';
 import { ActionRow } from 'new/ui/modals/ChooseBuyTokenMobileModal/ActionRow';
 import { ChooseBuyTokenMobileModalViewModel } from 'new/ui/modals/ChooseBuyTokenMobileModal/ChooseBuyTokenMobileModal.ViewModel';
 import { Modal } from 'new/ui/modals/Modal';
-import type { ModalPropsType } from 'new/ui/modals/ModalManager';
 
 export const ChooseBuyTokenMobileModal: FC<ModalPropsType> = observer(({ close }) => {
   const history = useHistory();

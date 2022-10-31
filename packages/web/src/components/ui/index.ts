@@ -3,7 +3,6 @@ export * from './Icon'; // Must be first if we want to use it in below component
 export * from './Button';
 export * from './Input';
 export * from './Avatar';
-export * from './Select';
 export * from './Switch';
 export * from './RadioButton';
 export * from './Menu';

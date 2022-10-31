@@ -7,7 +7,7 @@ import { observer } from 'mobx-react-lite';
 import { ButtonCancel } from 'components/common/ButtonCancel';
 import type { Wallet } from 'new/sdk/SolanaSDK';
 import { ChooseWallet } from 'new/ui/components/common/ChooseWallet';
-import type { ModalPropsType } from 'new/ui/modals/ModalManager';
+import type { ModalPropsType } from 'new/ui/managers/ModalManager';
 
 import { List, Row, Section, WrapperModal } from '../common/styled';
 import type { ReceiveBitcoinModalViewModel } from '../ReceiveBitcoinModal.ViewModel';

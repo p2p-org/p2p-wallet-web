@@ -4,9 +4,9 @@ import { useHistory, useLocation } from 'react-router';
 import { styled } from '@linaria/react';
 
 import type { LayoutViewModel } from 'new/ui/components/common/Layout/Layout.ViewModel';
+import type { ModalPropsType } from 'new/ui/managers/ModalManager';
 import { ActionButton } from 'new/ui/modals/ActionsMobileModal/ActionButton';
 import { Modal } from 'new/ui/modals/Modal';
-import type { ModalPropsType } from 'new/ui/modals/ModalManager';
 
 const Content = styled.div`
   display: grid;
