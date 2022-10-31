@@ -15,7 +15,6 @@ import assert from 'ts-invariant';
 
 import {
   BlockchainProvider,
-  FeatureFlagsProvider,
   ModalsProvider,
   NameServiceProvider,
   RatesProvider,
@@ -85,21 +84,19 @@ export const Providers: FC = ({ children }) => {
       autoBoot
       autoBootProps={{ hideDefaultLauncher: true }}
     >
-      <FeatureFlagsProvider>
-        <QueryClientProvider client={queryClient}>
-          <CoreProviders>
-            <ApiProviders>
-              <SettingsProvider>
-                <BlockchainProvider>
-                  <LockAndMintProvider>
-                    <ModalsProvider>{children}</ModalsProvider>
-                  </LockAndMintProvider>
-                </BlockchainProvider>
-              </SettingsProvider>
-            </ApiProviders>
-          </CoreProviders>
-        </QueryClientProvider>
-      </FeatureFlagsProvider>
+      <QueryClientProvider client={queryClient}>
+        <CoreProviders>
+          <ApiProviders>
+            <SettingsProvider>
+              <BlockchainProvider>
+                <LockAndMintProvider>
+                  <ModalsProvider>{children}</ModalsProvider>
+                </LockAndMintProvider>
+              </BlockchainProvider>
+            </SettingsProvider>
+          </ApiProviders>
+        </CoreProviders>
+      </QueryClientProvider>
     </IntercomProvider>
   );
 };

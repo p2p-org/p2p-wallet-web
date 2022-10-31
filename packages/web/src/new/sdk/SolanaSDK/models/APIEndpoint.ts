@@ -1,6 +1,8 @@
 import type { Network } from '@saberhq/solana-contrib';
 import { clusterApiUrl } from '@solana/web3.js';
 
+import { isEnabled } from 'new/services/FeatureFlags';
+import { Features } from 'new/services/FeatureFlags/features';
 import { RemoteConfig } from 'new/services/RemoteConfig';
 
 enum APIKeysNames {
@@ -87,7 +89,7 @@ export class APIEndpoint {
       endpoints = APIEndpoint._defaultEndpoints;
     }
 
-    if (__DEVELOPMENT__ || process.env.REACT_APP_STAGING) {
+    if (isEnabled(Features.ShowDevnet)) {
       endpoints.push(
         new APIEndpoint({
           address: clusterApiUrl('testnet'),
