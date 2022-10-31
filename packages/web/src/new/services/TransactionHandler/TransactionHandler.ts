@@ -197,7 +197,6 @@ export class TransactionHandler implements TransactionHandlerType {
         this._observe({ index, transactionId });
       }
     } catch (error) {
-      console.error(error);
       // update status
       this._notificationService.error((error as Error).message);
 

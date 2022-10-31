@@ -65,7 +65,7 @@ const ColumnRight = styled.div`
 `;
 
 type Props = {
-  viewModel: LayoutViewModel;
+  viewModel: Readonly<LayoutViewModel>;
   breadcrumb?: BreadcrumbType;
   children: React.ReactNode;
 };
@@ -82,7 +82,7 @@ export const DesktopLayoutOrigin: FC<Props> = observer(({ viewModel, breadcrumb,
           {viewModel.walletConnected ? (
             <Content>
               <ColumnsWrapper className={classNames({ isTablet, isDesktop })}>
-                <ColumnLeft />
+                <ColumnLeft viewModel={viewModel} />
                 <ColumnRightWrapper>
                   <ColumnRight>{children}</ColumnRight>
                 </ColumnRightWrapper>
