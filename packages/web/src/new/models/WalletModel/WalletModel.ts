@@ -5,7 +5,7 @@ import { WalletAdapterNetwork } from '@solana/wallet-adapter-base';
 import { PhantomWalletName } from '@solana/wallet-adapter-phantom';
 import type { Transaction } from '@solana/web3.js';
 import { PublicKey } from '@solana/web3.js';
-import { autorun, computed, makeObservable, observable, runInAction } from 'mobx';
+import { action, autorun, computed, makeObservable, observable, runInAction } from 'mobx';
 import { singleton } from 'tsyringe';
 
 import type { Wallet } from 'new/scenes/Main/Auth/MnemonicAdapter';
@@ -40,7 +40,9 @@ export class WalletModel extends Model {
     this.connected = false;
     this.connecting = false;
 
-    makeObservable(this, {
+    makeObservable<WalletModel, '_restoreLocal'>(this, {
+      _restoreLocal: action,
+      connectAdaptor: action,
       name: observable,
       publicKey: observable,
       network: observable,
@@ -79,18 +81,23 @@ export class WalletModel extends Model {
   }
 
   async connectAdaptor(adaptorName: string, config?: ConnectConfig): Promise<void> {
-    this.setupAdaptors();
+    try {
+      this.setupAdaptors();
 
-    const adaptors = this._getAdaptors();
-    const chosenAdaptor = adaptors.find((adaptor) => adaptor.name === adaptorName);
+      const adaptors = this._getAdaptors();
+      const chosenAdaptor = adaptors.find((adaptor) => adaptor.name === adaptorName);
 
-    if (chosenAdaptor) {
-      this.connecting = true;
-      await chosenAdaptor.connect(config);
+      if (chosenAdaptor) {
+        this.connecting = true;
+        await chosenAdaptor.connect(config);
+      }
+
+      this._saveAdaptorName(adaptorName);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      this.connecting = false;
     }
-
-    this._saveAdaptorName(adaptorName);
-    this.connecting = false;
   }
 
   protected _saveAdaptorName(adaptorName: string): void {
@@ -205,7 +212,7 @@ export class WalletModel extends Model {
 
     if (shouldAutoConnect) {
       await this.connectAdaptor(localAdaptor);
-      this.connecting = false;
     }
+    this.connecting = false;
   }
 }
