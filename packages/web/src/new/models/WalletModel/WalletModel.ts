@@ -188,9 +188,11 @@ export class WalletModel extends Model {
   }
 
   private async _restoreLocal(): Promise<void> {
+    this.connecting = true;
     const localSinger = await this._mnemonicAdapter.getLocalSigner();
 
     if (localSinger) {
+      this.connecting = false;
       return await this.connectAdaptor(MnemonicAdapterName, {
         type: 'recur',
         signer: localSinger,
@@ -203,6 +205,7 @@ export class WalletModel extends Model {
 
     if (shouldAutoConnect) {
       await this.connectAdaptor(localAdaptor);
+      this.connecting = false;
     }
   }
 }

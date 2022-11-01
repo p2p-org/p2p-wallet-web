@@ -114,17 +114,15 @@ export class MnemonicAdapter extends BaseMessageSignerWalletAdapter {
     return this._account?.publicKey || null;
   }
 
-  get connecting(): boolean {
-    return this._connecting;
-  }
-
   get readyState(): WalletReadyState {
     return this._readyState;
   }
 
-  async connect(config?: ConnectConfig): Promise<void> {
-    this._connecting = true;
+  get connecting(): boolean {
+    return this._connecting;
+  }
 
+  async connect(config?: ConnectConfig): Promise<void> {
     try {
       if (config?.type === 'sign') {
         const keyPair = getKeyPairFromSeed(
@@ -155,8 +153,6 @@ export class MnemonicAdapter extends BaseMessageSignerWalletAdapter {
     } catch (error: any) {
       this.emit('error', error);
       throw error;
-    } finally {
-      this._connecting = false;
     }
   }
 
