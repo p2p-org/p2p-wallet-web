@@ -7,7 +7,7 @@ import { pbkdf2 } from 'crypto';
 import nacl from 'tweetnacl';
 
 import type { ConnectConfig, StorageInfo } from 'new/scenes/Main/Auth/typings';
-import type { KeyPairDbApi } from 'new/scenes/Main/Auth/utils';
+import type { KeyPairDbInstance } from 'new/scenes/Main/Auth/utils';
 import {
   getDB,
   getKeyPairFromSeed,
@@ -32,8 +32,7 @@ export class MnemonicAdapter extends BaseMessageSignerWalletAdapter {
   private _account: Signer | null = null;
   private _connecting = false;
   private _readyState = WalletReadyState.NotDetected;
-  private _keypairDB: KeyPairDbApi | undefined;
-  private _textEncoder: TextEncoder;
+  private _keypairDB: KeyPairDbInstance | undefined;
   private _extractableKeys = false;
   private _encryptAlgo = 'RSA-OAEP';
 
@@ -46,8 +45,6 @@ export class MnemonicAdapter extends BaseMessageSignerWalletAdapter {
 
   constructor() {
     super();
-
-    this._textEncoder = new TextEncoder();
   }
 
   async getLocalSigner(): Promise<Signer | null> {
@@ -108,7 +105,7 @@ export class MnemonicAdapter extends BaseMessageSignerWalletAdapter {
     this._account = null;
     this.emit('disconnect');
 
-    MnemonicAdapter._removeLocalAuthData();
+    await this._removeLocalAuthData();
 
     return Promise.resolve();
   }
@@ -222,10 +219,13 @@ export class MnemonicAdapter extends BaseMessageSignerWalletAdapter {
     };
   }
 
-  private static _removeLocalAuthData(): void {
-    // @TODO remove keypair
+  private async _removeLocalAuthData(): Promise<void> {
     localStorage.removeItem(MnemonicAdapter._privateStorageKey);
     localStorage.removeItem(MnemonicAdapter._mnemonicStorageKey);
+
+    const db = await this._getDB();
+
+    await db.delete(STORE_NAME, KEYPAIR_KEY);
   }
 
   private async _getKeyPair(): Promise<CryptoKeyPair> {
@@ -252,5 +252,13 @@ export class MnemonicAdapter extends BaseMessageSignerWalletAdapter {
     await this._keypairDB.put(STORE_NAME, keypair, KEYPAIR_KEY);
 
     return keypair;
+  }
+
+  private async _getDB(): Promise<KeyPairDbInstance> {
+    if (this._keypairDB) {
+      return this._keypairDB;
+    }
+
+    return await getDB();
   }
 }

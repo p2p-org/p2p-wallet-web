@@ -139,11 +139,11 @@ export const STORE_NAME = 'cryptoPair';
 export const KEYPAIR_KEY = 'keypair';
 const INIT_VERSION = 1;
 
-export const getDB = async (): Promise<KeyPairDbApi> =>
+export const getDB = async (): Promise<KeyPairDbInstance> =>
   await openDB<KeypairDB>(DB_NAME, INIT_VERSION, {
     upgrade(db) {
       db.createObjectStore(STORE_NAME);
     },
   });
 
-export type KeyPairDbApi = IDBPDatabase<KeypairDB>;
+export type KeyPairDbInstance = IDBPDatabase<KeypairDB>;

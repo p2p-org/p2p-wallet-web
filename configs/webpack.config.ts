@@ -249,6 +249,7 @@ const config: ConfigFn = (env, argv) => {
       historyApiFallback: true,
       compress: true,
       port: DEV_PORT,
+      // @FIXME
       hot: false,
       open: true,
     },
