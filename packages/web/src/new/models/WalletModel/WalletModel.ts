@@ -29,7 +29,10 @@ export class WalletModel extends Model {
   private static _previousAdaptorKey = 'previousAdaptor';
   private static _reloadableAdaptors = [PhantomWalletName];
 
-  constructor(protected walletAdaptorService: WalletAdaptorService) {
+  constructor(
+    protected walletAdaptorService: WalletAdaptorService,
+    private _mnemonicAdapter: MnemonicAdapter,
+  ) {
     super();
     this.name = '';
     this.network = WalletAdapterNetwork.Mainnet;
@@ -185,7 +188,7 @@ export class WalletModel extends Model {
   }
 
   private async _restoreLocal(): Promise<void> {
-    const localSinger = MnemonicAdapter.getLocalSigner();
+    const localSinger = await this._mnemonicAdapter.getLocalSigner();
 
     if (localSinger) {
       return await this.connectAdaptor(MnemonicAdapterName, {

@@ -1,7 +1,7 @@
 import type { WalletName } from '@solana/wallet-adapter-base';
 import { BaseMessageSignerWalletAdapter, WalletReadyState } from '@solana/wallet-adapter-base';
 import type { Signer, Transaction } from '@solana/web3.js';
-import { Keypair, PublicKey } from '@solana/web3.js';
+import { Keypair as SolanaKeypair, PublicKey } from '@solana/web3.js';
 import bs58 from 'bs58';
 import { pbkdf2 } from 'crypto';
 import nacl from 'tweetnacl';
@@ -32,10 +32,10 @@ export class MnemonicAdapter extends BaseMessageSignerWalletAdapter {
   private _account: Signer | null = null;
   private _connecting = false;
   private _readyState = WalletReadyState.NotDetected;
-  private _keypairDB: KeyPairDbApi;
-  private _rsaKeypair: CryptoKeyPair;
+  private _keypairDB: KeyPairDbApi | undefined;
   private _textEncoder: TextEncoder;
   private _extractableKeys = false;
+  private _encryptAlgo = 'RSA-OAEP';
 
   static walletIndex = 0;
   static mnemonicStrength = 256;
@@ -48,24 +48,35 @@ export class MnemonicAdapter extends BaseMessageSignerWalletAdapter {
     super();
 
     this._textEncoder = new TextEncoder();
-
-    void this._initStorage();
   }
 
-  static getLocalSigner(): Signer | null {
-    const secretKeyStored = localStorage.getItem(MnemonicAdapter._privateStorageKey);
+  async getLocalSigner(): Promise<Signer | null> {
+    const rsaKeypair = await this._getKeyPair();
 
-    if (secretKeyStored) {
-      const secretKey = Uint8Array.from(Object.values(secretKeyStored));
-      const keyPair = Keypair.fromSecretKey(secretKey);
+    const chipherString = localStorage.getItem(MnemonicAdapter._privateStorageKey);
 
-      return {
-        publicKey: new PublicKey(keyPair.publicKey),
-        secretKey: keyPair.secretKey,
-      };
+    if (!chipherString) {
+      return null;
     }
 
-    return null;
+    const decrypted = await window.crypto.subtle.decrypt(
+      {
+        name: this._encryptAlgo,
+      },
+      rsaKeypair.privateKey as CryptoKey,
+      Buffer.from(chipherString, 'hex'),
+    );
+
+    if (!decrypted) {
+      return null;
+    }
+
+    const keyPair = SolanaKeypair.fromSecretKey(new Uint8Array(decrypted));
+
+    return {
+      publicKey: new PublicKey(keyPair.publicKey),
+      secretKey: keyPair.secretKey,
+    };
   }
 
   signTransaction(transaction: Transaction): Promise<Transaction> {
@@ -163,15 +174,12 @@ export class MnemonicAdapter extends BaseMessageSignerWalletAdapter {
   }
 
   private async _saveCurrentSecretKey(secretKey: Uint8Array) {
-    // setStorageValue(MnemonicAdapter._privateStorageKey, secretKey);
-    const encoded = this._textEncoder.encode(secretKey.toString());
+    const keyPair = await this._getKeyPair();
 
     const ciphertext = await window.crypto.subtle.encrypt(
-      {
-        name: 'RSA-OAEP',
-      },
-      this._rsaKeypair.publicKey as CryptoKey,
-      encoded,
+      this._encryptAlgo,
+      keyPair.publicKey as CryptoKey,
+      secretKey,
     );
 
     if (ciphertext) {
@@ -215,23 +223,23 @@ export class MnemonicAdapter extends BaseMessageSignerWalletAdapter {
   }
 
   private static _removeLocalAuthData(): void {
+    // @TODO remove keypair
     localStorage.removeItem(MnemonicAdapter._privateStorageKey);
     localStorage.removeItem(MnemonicAdapter._mnemonicStorageKey);
   }
 
-  private async _initStorage(): Promise<void> {
+  private async _getKeyPair(): Promise<CryptoKeyPair> {
     this._keypairDB = await getDB();
 
-    const keypair = await this._keypairDB.get(STORE_NAME, KEYPAIR_KEY);
+    let keypair = await this._keypairDB.get(STORE_NAME, KEYPAIR_KEY);
 
     if (keypair) {
-      this._rsaKeypair = keypair;
-      return;
+      return keypair;
     }
 
-    this._rsaKeypair = await window.crypto.subtle.generateKey(
+    keypair = await window.crypto.subtle.generateKey(
       {
-        name: 'RSA-OAEP',
+        name: this._encryptAlgo,
         modulusLength: 4096,
         // @FIXME
         publicExponent: new Uint8Array([1, 0, 1]),
@@ -241,6 +249,8 @@ export class MnemonicAdapter extends BaseMessageSignerWalletAdapter {
       ['encrypt', 'decrypt'],
     );
 
-    await this._keypairDB.put(STORE_NAME, this._rsaKeypair, KEYPAIR_KEY);
+    await this._keypairDB.put(STORE_NAME, keypair, KEYPAIR_KEY);
+
+    return keypair;
   }
 }
