@@ -13,6 +13,7 @@ import {
   FiatCurrency,
 } from 'new/services/BuyService/structures';
 import { LocationService } from 'new/services/LocationService';
+import { TokensRepository } from 'new/services/Repositories';
 import { SolanaService } from 'new/services/SolanaService';
 import { numberToString } from 'new/utils/NumberExtensions';
 
@@ -37,6 +38,7 @@ export class BuyViewModel extends ViewModel {
     private _buyService: BuyService,
     private _solanaService: SolanaService,
     private _locationService: LocationService,
+    private _tokensRepository: TokensRepository,
   ) {
     super();
 
@@ -225,8 +227,8 @@ export class BuyViewModel extends ViewModel {
     return this._solanaService.provider.wallet.publicKey.toBase58();
   }
 
-  getToken(mint: string): Promise<Token | undefined> {
-    return this._solanaService.getToken(mint);
+  getTokenWithMint(mint: string): Promise<Token | undefined> {
+    return this._tokensRepository.getTokenWithMint(mint);
   }
 
   setAmount(amount: string): void {

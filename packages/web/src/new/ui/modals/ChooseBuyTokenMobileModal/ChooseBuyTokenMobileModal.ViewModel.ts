@@ -4,8 +4,7 @@ import { singleton } from 'tsyringe';
 import { ViewModel } from 'new/core/viewmodels/ViewModel';
 import type { Token, Wallet } from 'new/sdk/SolanaSDK';
 import { CryptoCurrency } from 'new/services/BuyService/structures';
-import { WalletsRepository } from 'new/services/Repositories';
-import { SolanaService } from 'new/services/SolanaService';
+import { TokensRepository, WalletsRepository } from 'new/services/Repositories';
 
 @singleton()
 export class ChooseBuyTokenMobileModalViewModel extends ViewModel {
@@ -15,7 +14,7 @@ export class ChooseBuyTokenMobileModalViewModel extends ViewModel {
   solToken?: Token;
   usdcToken?: Token;
 
-  constructor(private _wallets: WalletsRepository, private _solanaService: SolanaService) {
+  constructor(private _wallets: WalletsRepository, private _tokensRepository: TokensRepository) {
     super();
 
     makeObservable(this, {
@@ -59,7 +58,7 @@ export class ChooseBuyTokenMobileModalViewModel extends ViewModel {
   }
 
   private _getToken(cryptoCurrency: CryptoCurrency): Promise<Token | undefined> {
-    return this._solanaService.getToken(cryptoCurrency.mintAddress);
+    return this._tokensRepository.getTokenWithMint(cryptoCurrency.mintAddress);
   }
 
   private _setWallets(newSOLWallet?: Wallet, newUSDCWallet?: Wallet): void {

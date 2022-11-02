@@ -1,7 +1,5 @@
 import type { Provider } from '@project-serum/anchor';
-import { networkToChainId } from '@saberhq/token-utils';
 import { Token as SPLToken, u64 } from '@solana/spl-token';
-import { TokenListProvider } from '@solana/spl-token-registry';
 import type {
   AccountInfo as BufferInfo,
   Commitment,
@@ -11,7 +9,13 @@ import type {
 import { Keypair, PublicKey, SystemProgram, Transaction } from '@solana/web3.js';
 import promiseRetry from 'promise-retry';
 
-import type { APIEndpoint, FeeCalculator, Lamports, TransactionID } from './';
+import type {
+  APIEndpoint,
+  FeeCalculator,
+  Lamports,
+  SolanaTokensRepository,
+  TransactionID,
+} from './';
 import {
   AccountInfo,
   AccountInstructions,
@@ -27,6 +31,7 @@ import {
   SPLTokenDestinationAddress,
   Token,
   TokenAccountBalance,
+  TokensRepository,
   Wallet,
 } from './';
 
@@ -40,7 +45,6 @@ export class SolanaSDK {
   provider: Provider;
   // accountStorage: SolanaSDKAccountStorage;
   endpoint: APIEndpoint;
-  supportedTokensCache?: Token[];
 
   constructor({
     provider,
@@ -77,6 +81,41 @@ export class SolanaSDK {
         data: decodedTo.decode(info.data),
       };
     });
+  }
+
+  async getAccountInfoOr<T>({
+    account,
+    anotherAccount,
+    decodedTo,
+  }: {
+    account?: string;
+    anotherAccount?: string;
+    decodedTo: { decode(data: Buffer): T };
+  }): Promise<BufferInfo<T> | null> {
+    if (!account) {
+      return null;
+    }
+
+    let accountInfo = null;
+    try {
+      accountInfo = await this.getAccountInfo({
+        account,
+        decodedTo,
+      });
+    } catch {
+      // ignore
+    }
+
+    if (accountInfo) {
+      return accountInfo;
+    } else if (anotherAccount) {
+      return this.getAccountInfo({
+        account: anotherAccount,
+        decodedTo,
+      });
+    } else {
+      throw SolanaSDKError.couldNotRetrieveAccountInfo();
+    }
   }
 
   async getMinimumBalanceForRentExemption(span: number): Promise<Lamports> {
@@ -681,9 +720,7 @@ export class SolanaSDK {
     destinationAddress,
     amount,
     feePayer,
-    transferChecked,
-    recentBlockhash,
-    minRentExemption,
+    transferChecked, // recentBlockhash, minRentExemption,
   }: {
     account: PublicKey;
     mintAddress: string;
@@ -793,6 +830,21 @@ export class SolanaSDK {
   }
 
   // Helpers
+
+  checkAccountValidation(account: string): Promise<boolean> {
+    return this.getAccountInfo({
+      account,
+      decodedTo: EmptyInfo,
+    })
+      .then(() => true)
+      .catch((error: Error) => {
+        if (error.message === SolanaSDKError.couldNotRetrieveAccountInfo().message) {
+          return false;
+        }
+
+        throw error;
+      });
+  }
 
   async findSPLTokenDestinationAddress({
     mintAddress,
@@ -905,64 +957,22 @@ export class SolanaSDK {
 
   // SolanaSDKTokens
 
-  // TODo: external parser
-  async getTokensList(): Promise<Token[]> {
-    const cache = this.supportedTokensCache;
-    if (cache) {
-      return Promise.resolve(cache);
-    }
-
-    const tokenList = await new TokenListProvider().resolve();
-
-    // map tags
-    const tokens = tokenList
-      .getList()
-      .filter((token) => token.chainId === networkToChainId(this.endpoint.network))
-      .map((item) => {
-        return new Token(item);
-      });
-
-    // renBTC for devnet
-    if (this.endpoint.network === 'devnet') {
-      tokens.push(
-        new Token({
-          chainId: 101,
-          address: 'FsaLodPu4VmSwXGr3gWfwANe4vKf8XSZcCh1CEeJ3jpD',
-          symbol: 'renBTC',
-          name: 'renBTC',
-          decimals: 8,
-          logoURI:
-            'https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/CDJWUqTcYTVAKXAVXoQZFes5JUFc7owSeq7eMQcDSbo5/logo.png',
-          extensions: {
-            website: 'https://renproject.io/',
-            serumV3Usdc: '74Ciu5yRzhe8TFTHvQuEVbFZJrbnCMRoohBK33NNiPtv',
-            coingeckoId: 'renbtc',
-          },
-        }),
-      );
-    }
-
-    this.supportedTokensCache = tokens;
-
-    return Promise.resolve(tokens);
-  }
-
-  getToken(mint: string): Promise<Token | undefined> {
-    return this.getTokensList().then((tokensList) =>
-      tokensList.find((token) => token.address === mint),
+  async getTokenWallets(
+    account: string,
+    tokensRepository?: SolanaTokensRepository,
+  ): Promise<Wallet[]> {
+    const accounts = await this.provider.connection.getTokenAccountsByOwner(
+      new PublicKey(account),
+      {
+        programId: SolanaSDKPublicKey.tokenProgramId,
+      },
     );
-  }
-
-  async getTokenWallets(account: string): Promise<Wallet[]> {
+    const tokens = await (
+      tokensRepository ?? new TokensRepository({ endpoint: this.endpoint })
+    ).getTokensList();
     const knownWallets: Wallet[] = [];
     const unknownAccounts: [string, AccountInfo][] = [];
-
-    const [list, supportedTokens] = await Promise.all([
-      this.provider.connection.getTokenAccountsByOwner(new PublicKey(account), {
-        programId: SolanaSDKPublicKey.tokenProgramId,
-      }),
-      this.getTokensList(),
-    ]);
+    const [list, supportedTokens] = [accounts, tokens];
 
     for (const item of list.value) {
       const pubkey = item.pubkey;
@@ -977,7 +987,7 @@ export class SolanaSDK {
         knownWallets.push(
           new Wallet({
             pubkey: pubkey.toString(),
-            lamports: accountInfo.amount,
+            lamports: accountInfo.lamports,
             token,
           }),
         );
@@ -988,58 +998,28 @@ export class SolanaSDK {
       }
     }
 
-    return this.getMultipleMintDatas({
+    const mintDatas = await this.getMultipleMintDatas({
       mintAddresses: unknownAccounts.map((account) => account[1].mint.toString()),
-    })
-      .then((mintDatas): Wallet[] => {
-        if (Object.keys(mintDatas).length !== unknownAccounts.length) {
-          throw SolanaSDKError.unknown();
-        }
+    });
+    if (Object.keys(mintDatas).length !== unknownAccounts.length) {
+      throw SolanaSDKError.unknown();
+    }
 
-        const wallets: Wallet[] = [];
-        for (const [index, item] of mintDatas.entries()) {
-          wallets.push(
-            new Wallet({
-              pubkey: unknownAccounts[index]![0],
-              lamports: unknownAccounts[index]![1].amount,
-              token: Token.unsupported({
-                mint: unknownAccounts[index]![1].mint.toString(),
-                decimals: item?.decimals,
-              }),
-            }),
-          );
-        }
-
-        return wallets;
-      })
-      .catch(() => {
-        return unknownAccounts.map(
-          (account) =>
-            new Wallet({
-              pubkey: account[0],
-              lamports: account[1].amount,
-              token: Token.unsupported({
-                mint: account[1].mint.toString(),
-              }),
-            }),
-        );
-      })
-      .then((wallets) => knownWallets.concat(wallets));
-  }
-
-  checkAccountValidation(account: string): Promise<boolean> {
-    return this.getAccountInfo({
-      account,
-      decodedTo: EmptyInfo,
-    })
-      .then(() => true)
-      .catch((error: Error) => {
-        if (error.message === SolanaSDKError.couldNotRetrieveAccountInfo().message) {
-          return false;
-        }
-
-        throw error;
-      });
+    const wallets: Wallet[] = [];
+    for (const [index, item] of mintDatas.entries()) {
+      wallets.push(
+        new Wallet({
+          pubkey: unknownAccounts[index]![0],
+          lamports: unknownAccounts[index]![1].lamports,
+          token: Token.unsupported({
+            mint: unknownAccounts[index]![1].mint.toString(),
+            decimals: item?.decimals,
+            supply: item?.supply,
+          }),
+        }),
+      );
+    }
+    return knownWallets.concat(wallets);
   }
 
   // TODO: check

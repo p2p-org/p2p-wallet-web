@@ -1,20 +1,17 @@
 import type { FC } from 'react';
 import { useParams } from 'react-router-dom';
 
-import { styled } from '@linaria/react';
 import { observer } from 'mobx-react-lite';
 import { expr } from 'mobx-utils';
 
 import { QRAddressWidget } from 'components/common/QRAddressWidget';
-import { TransactionsWidget } from 'components/pages/wallet';
 import { useViewModel } from 'new/core/viewmodels/useViewModel';
 import { Layout } from 'new/ui/components/common/Layout';
 import { shortAddress } from 'utils/tokens';
 
+import { History } from './History';
 import { TopWidget } from './TopWidget';
 import { WalletDetailViewModel } from './WalletDetail.ViewModel';
-
-const Wrapper = styled.div``;
 
 export const WalletDetail: FC = observer(() => {
   const viewModel = useViewModel(WalletDetailViewModel);
@@ -46,8 +43,7 @@ export const WalletDetail: FC = observer(() => {
       <TopWidget viewModel={viewModel} />
       {/* TODO: temp */}
       <QRAddressWidget publicKey={publicKey} />
-      {/* TODO: temp */}
-      <TransactionsWidget publicKey={publicKey} />
+      <History wallet={viewModel.wallet} />
     </Layout>
   );
 });

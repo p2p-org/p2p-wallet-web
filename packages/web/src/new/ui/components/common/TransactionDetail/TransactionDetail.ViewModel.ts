@@ -1,4 +1,4 @@
-import { action, makeObservable, observable, reaction } from 'mobx';
+import { action, makeObservable, observable } from 'mobx';
 import { injectable } from 'tsyringe';
 
 import { ViewModel } from 'new/core/viewmodels/ViewModel';
@@ -88,12 +88,9 @@ export class TransactionDetailViewModel
   // bind only on observingTransactionIndex provide
   private _bind(): void {
     this.addReaction(
-      reaction(
-        () => this._transactionHandler.transactions,
-        () => {
-          const pendingTransaction = this._transactionHandler.observeTransaction(
-            this.observingTransactionIndex!,
-          );
+      this._transactionHandler.observeTransaction(
+        this.observingTransactionIndex!,
+        (pendingTransaction) => {
           this.payingFeeWallet = pendingTransaction?.rawTransaction.payingWallet ?? null;
 
           this.parsedTransaction =

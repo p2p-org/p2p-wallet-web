@@ -55,7 +55,7 @@ export class AccountObservableService {
         // Token Account
         else {
           const info = AccountInfo.decode(accountInfo.data);
-          const lamports = info?.amount ?? ZERO; // TODO: check it works right
+          const lamports = info?.lamports ?? ZERO; // TODO: check it works right
           cb({ pubkey, lamports });
         }
       },

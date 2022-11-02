@@ -44,7 +44,7 @@ export const Inputs: FC<BuyViewModelProps> = observer(({ viewModel }) => {
   const [token, setToken] = useState<Token | undefined>();
 
   useLayoutEffect(() => {
-    viewModel.getToken(viewModel.crypto.mintAddress).then(setToken);
+    viewModel.getTokenWithMint(viewModel.crypto.mintAddress).then(setToken);
   }, [viewModel.crypto.mintAddress]);
 
   const isFiatInputCurrency = FiatCurrency.isFiat(viewModel.input.currency);
