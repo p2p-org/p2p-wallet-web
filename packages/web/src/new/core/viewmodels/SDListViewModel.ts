@@ -3,14 +3,25 @@ import { action, makeObservable, observable } from 'mobx';
 import type { SDFetcherState } from './SDViewModel';
 import { SDViewModel } from './SDViewModel';
 
-export interface ISDListViewModel<T> {
-  state: SDFetcherState;
+export interface SDListViewModelType<T> {
+  readonly state: SDFetcherState;
+  readonly isPaginationEnabled: boolean;
+
+  reload(): void;
+  fetchNext(): void;
+
+  getCurrentPage(): number | null;
+
   data: T[];
 
-  customFilter?(item: T): boolean;
+  // own
+  readonly isFetchable: boolean;
 }
 
-export abstract class SDListViewModel<T> extends SDViewModel<T[]> implements ISDListViewModel<T> {
+export abstract class SDListViewModel<T>
+  extends SDViewModel<T[]>
+  implements SDListViewModelType<T>
+{
   // Properties
 
   isPaginationEnabled: boolean;
@@ -50,22 +61,23 @@ export abstract class SDListViewModel<T> extends SDViewModel<T[]> implements ISD
 
   // Actions
 
-  override flush() {
+  override flush(): void {
     this.offset = 0;
     this._isLastPageLoaded = false;
     super.flush();
   }
 
   // Asynchronous request handler
-  override shouldRequest(): boolean {
-    return super.shouldRequest() && this._isLastPageLoaded;
+  override get isFetchable(): boolean {
+    // @ts-ignore
+    return super.isFetchable && !this._isLastPageLoaded;
   }
 
-  fetchNext() {
+  fetchNext(): void {
     super.request();
   }
 
-  override handleNewData(newItems: T[]) {
+  override handleNewData(newItems: T[]): void {
     const _newData = this.join(newItems);
 
     // resign state
@@ -89,7 +101,7 @@ export abstract class SDListViewModel<T> extends SDViewModel<T[]> implements ISD
     return this.data.concat(newItems.filter((item) => !this.data.includes(item)));
   }
 
-  overrideData(newData: T[]) {
+  overrideData(newData: T[]): void {
     const _newData = this.map(newData);
     // TODO: check equality!
     if (_newData !== this.data) {
@@ -108,13 +120,21 @@ export abstract class SDListViewModel<T> extends SDViewModel<T[]> implements ISD
     return _newData;
   }
 
+  getCurrentPage(): number | null {
+    if (!this.isPaginationEnabled || this.limit === 0) {
+      return null;
+    }
+    return this.offset / this.limit;
+  }
+
   // Helper
 
-  updateItem(predicate: (item: T) => boolean, transform: (item: T) => T) {
+  updateItem(predicate: (item: T) => boolean, transform: (item: T) => T): boolean {
     // modify items
     let itemsChanged = false;
     const index = this.data.findIndex(predicate);
     const item = transform(this.data[index]!);
+    // TODO: check comparison works right
     if (item !== this.data[index]) {
       itemsChanged = true;
       const data = this.data;

@@ -6,7 +6,7 @@ import { observer } from 'mobx-react-lite';
 import { expr } from 'mobx-utils';
 import { nanoid } from 'nanoid';
 
-import type { ISDListViewModel } from 'new/core/viewmodels/SDListViewModel';
+import type { SDListViewModel } from 'new/core/viewmodels/SDListViewModel';
 import { SDFetcherState } from 'new/core/viewmodels/SDViewModel';
 import { SDCollectionViewItem } from 'new/ui/components/common/StaticSectionsCollectionView/models/SDCollectionViewItem';
 
@@ -18,7 +18,7 @@ const Wrapper = styled.div`
 const Container = styled.div``;
 
 interface Props<T> {
-  viewModel: Readonly<ISDListViewModel<T>>;
+  viewModel: Readonly<SDListViewModel<T>>;
   numberOfLoadingCells?: number;
   renderPlaceholder: () => React.ReactNode;
   renderItem: (item: T) => React.ReactNode;

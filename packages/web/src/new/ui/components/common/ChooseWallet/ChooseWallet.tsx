@@ -71,7 +71,7 @@ interface Props {
   selector: React.ReactNode;
   selectedWallet: Wallet | null;
   customFilter?: (wallet: Wallet) => boolean;
-  staticWallets: Wallet[] | null;
+  staticWallets?: Wallet[] | null;
   showOtherWallets: boolean;
   onWalletChange: (wallet: Wallet) => void;
   className?: string;

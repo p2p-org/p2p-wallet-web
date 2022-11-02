@@ -226,7 +226,7 @@ export class LockAndMintServiceImpl implements LockAndMintService {
     for (const transaction of incommingTransactions) {
       // get marker date
       let date = new Date();
-      const blocktime = transaction.status.blockTime;
+      const blocktime = transaction.status.blockTime; // TODO: check time, maybe need to multiply by 1000
       if (blocktime) {
         date = new Date(blocktime.toNumber());
       }

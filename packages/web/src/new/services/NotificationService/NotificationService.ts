@@ -1,7 +1,7 @@
 import { makeObservable, observable, runInAction } from 'mobx';
 import { singleton } from 'tsyringe';
 
-import type { RendererType } from 'new/ui/managers/NotificationManager/NotificationManager';
+import type { RendererType } from 'new/ui/managers/NotificationManager';
 
 export type ToastType = 'info' | 'warn' | 'error' | 'component';
 

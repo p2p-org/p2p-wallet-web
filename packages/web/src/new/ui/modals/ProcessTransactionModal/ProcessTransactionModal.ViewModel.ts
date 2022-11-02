@@ -1,5 +1,5 @@
 import type { IReactionDisposer } from 'mobx';
-import { action, computed, makeObservable, observable, reaction } from 'mobx';
+import { action, computed, makeObservable, observable } from 'mobx';
 import assert from 'ts-invariant';
 import { injectable } from 'tsyringe';
 
@@ -99,12 +99,8 @@ export class ProcessTransactionModalViewModel
     });
 
     // observe transaction based on transaction index
-    return reaction(
-      () => this._transactionHandler.transactions,
-      () => {
-        this.pendingTransaction =
-          this._transactionHandler.observeTransaction(index) || unknownErrorInfo;
-      },
-    );
+    return this._transactionHandler.observeTransaction(index, (pendingTransaction) => {
+      this.pendingTransaction = pendingTransaction || unknownErrorInfo;
+    });
   }
 }
