@@ -12,7 +12,6 @@ import { useNameService, useSendState } from 'app/contexts';
 import { AddressText } from 'components/common/AddressText';
 import { Loader } from 'components/common/Loader';
 import { Icon } from 'components/ui';
-import { useTrackEventOnce } from 'utils/hooks/useTrackEventOnce';
 
 import { IconWrapper, WalletIcon } from './common/styled';
 import { ResolvedNameRow } from './ResolvedNameRow';
@@ -165,7 +164,6 @@ const ResolvedNamesList = styled.div`
 export const ToAddressInput: FunctionComponent = () => {
   const inputRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
-  const trackEventOnce = useTrackEventOnce();
 
   const { resolveUsername } = useNameService();
   const {
@@ -250,7 +248,6 @@ export const ToAddressInput: FunctionComponent = () => {
     }
 
     setToPublicKey(nextPublicKey);
-    trackEventOnce('send_address_keydown');
   };
 
   const handleClear = () => {

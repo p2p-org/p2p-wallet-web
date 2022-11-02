@@ -11,7 +11,6 @@ import QRCode from 'qrcode.react';
 import { Card } from 'components/common/Card';
 import { ToastManager } from 'components/common/ToastManager';
 import { Button, Icon } from 'components/ui';
-import { trackEvent } from 'utils/analytics';
 import { askClipboardWritePermission, setToClipboard } from 'utils/clipboard';
 import { getExplorerUrl } from 'utils/connection';
 
@@ -250,10 +249,6 @@ export const QRAddressWidgetOrigin: FunctionComponent<Props> = ({ publicKey, cla
 
   const handleExpandClick = () => {
     setIsExpand(!isExpand);
-
-    if (!isExpand) {
-      trackEvent('wallet_qr_click');
-    }
   };
 
   const handleCopyClick = (type: 'sol' | 'token' | 'mint', address: string) => () => {
@@ -261,14 +256,6 @@ export const QRAddressWidgetOrigin: FunctionComponent<Props> = ({ publicKey, cla
       void navigator.clipboard.writeText(address);
       setCopied(true);
       ToastManager.info(`Address Copied!`);
-
-      if (type === 'sol') {
-        trackEvent('wallet_sol_address_copy');
-      } else if (type === 'token') {
-        trackEvent('wallet_token_address_copy');
-      } else if (type === 'mint') {
-        trackEvent('wallet_mint_address_copy');
-      }
 
       // fade copied after some seconds
       setTimeout(() => {

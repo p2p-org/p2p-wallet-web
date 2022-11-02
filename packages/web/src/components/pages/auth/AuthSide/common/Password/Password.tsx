@@ -1,14 +1,12 @@
 /* eslint-disable react/no-array-index-key */
 import type { FC } from 'react';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import { styled } from '@linaria/react';
 import classNames from 'classnames';
 
 import { ErrorHint } from 'components/common/ErrorHint';
 import { PasswordInput } from 'components/common/PasswordInput';
-import { trackEvent } from 'utils/analytics';
-import { useTrackEventOnce } from 'utils/hooks/useTrackEventOnce';
 
 import { Button } from '../Button';
 import { validatePassword } from './utils';
@@ -115,7 +113,6 @@ type Props = {
 };
 
 export const Password: FC<Props> = ({ type, next }) => {
-  const trackEventOnce = useTrackEventOnce();
   const [password, setPassword] = useState('');
   const [passwordRepeat, setPasswordRepeat] = useState('');
   const [hasPasswordRepeatError, setHasPasswordRepeatError] = useState(false);
@@ -125,32 +122,12 @@ export const Password: FC<Props> = ({ type, next }) => {
     [password],
   );
 
-  useEffect(() => {
-    if (type === 'login') {
-      trackEvent('login_create_password_open');
-    } else if (type === 'signup') {
-      trackEvent('signup_create_password_open');
-    }
-  }, [type]);
-
   const handlePasswordChange = (value: string) => {
     setPassword(value);
-
-    if (type === 'login') {
-      trackEventOnce('login_password_keydown');
-    } else if (type === 'signup') {
-      trackEventOnce('signup_password_keydown');
-    }
   };
 
   const handlePasswordRepeatChange = (value: string) => {
     setPasswordRepeat(value);
-
-    if (type === 'login') {
-      trackEventOnce('login_password_confirm_keydown');
-    } else if (type === 'signup') {
-      trackEventOnce('signup_password_confirm_keydown');
-    }
 
     if (hasPasswordRepeatError) {
       setHasPasswordRepeatError(password !== value);
@@ -162,12 +139,6 @@ export const Password: FC<Props> = ({ type, next }) => {
   };
 
   const handleContinueClick = () => {
-    if (type === 'login') {
-      trackEventOnce('login_continue_create_password_click');
-    } else if (type === 'signup') {
-      trackEventOnce('signup_continue_create_password_click');
-    }
-
     next(password);
   };
 

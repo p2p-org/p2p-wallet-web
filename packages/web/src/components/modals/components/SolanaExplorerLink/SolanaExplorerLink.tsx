@@ -7,7 +7,6 @@ import {
   GoToExplorerIcon,
   GoToExplorerLink,
 } from 'components/modals/TransactionInfoModals/common/styled';
-import { trackEventUniversal } from 'utils/analytics';
 import type { AmplitudeActions } from 'utils/analytics/types';
 import { getExplorerUrl } from 'utils/connection';
 
@@ -23,9 +22,6 @@ export const SolanaExplorerLink: FC<IProps> = (props) => {
       href={props.signature ? getExplorerUrl('tx', props.signature, props.network) : ''}
       target="_blank"
       rel="noopener noreferrer noindex"
-      onClick={() => {
-        trackEventUniversal(props.amplitudeAction);
-      }}
       className={classNames({
         isDisabled: !props.signature,
       })}

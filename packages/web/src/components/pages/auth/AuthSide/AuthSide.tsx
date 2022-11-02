@@ -6,8 +6,6 @@ import { NavLink, Route, Switch, useLocation } from 'react-router-dom';
 import { styled } from '@linaria/react';
 import { useWallet } from '@p2p-wallet-web/core';
 
-import { trackEventUniversal } from 'utils/analytics';
-
 import { LoaderWide } from '../../../common/LoaderWide';
 import { Login } from './Login';
 import { Ready } from './Ready';
@@ -99,10 +97,6 @@ export const AuthSide: FC = () => {
   useEffect(() => {
     goToHomePageIfConnected();
   }, [connected]);
-
-  useEffect(() => {
-    trackEventUniversal({ name: 'Splash_Viewed', data: { Splash_Campaign: null } });
-  }, []);
 
   const next = (nextData: DataType) => {
     setData(nextData);

@@ -9,7 +9,6 @@ import { LoaderBlock } from 'components/common/LoaderBlock';
 import { ToastManager } from 'components/common/ToastManager';
 import { Widget } from 'components/common/Widget';
 import { TransactionList } from 'components/pages/wallet/TransactionsWidget/TransactionList';
-import { trackEvent } from 'utils/analytics';
 
 const TRANSACTIONS_LIMIT = 10;
 
@@ -22,14 +21,6 @@ export const TransactionsWidget: FunctionComponent<Props> = ({ publicKey }) => {
     publicKey,
     TRANSACTIONS_LIMIT,
   );
-
-  useEffect(() => {
-    if (signatures.length) {
-      trackEvent('wallet_activity_scroll', {
-        pageNum: Math.floor(signatures.length / TRANSACTIONS_LIMIT),
-      });
-    }
-  }, [signatures]);
 
   const fetchData = async (isPaging?: boolean) => {
     try {

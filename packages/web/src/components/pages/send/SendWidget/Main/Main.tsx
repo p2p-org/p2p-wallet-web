@@ -4,7 +4,6 @@ import { useHistory } from 'react-router';
 import { styled } from '@linaria/react';
 import type { TokenAccount } from '@p2p-wallet-web/core';
 import { useUserTokenAccounts } from '@p2p-wallet-web/core';
-import { TokenAmount } from '@p2p-wallet-web/token-utils';
 import { theme } from '@p2p-wallet-web/ui';
 import type { Token } from '@saberhq/token-utils';
 import { Feature } from 'flagged';
@@ -12,7 +11,6 @@ import { Feature } from 'flagged';
 import { useFeeCalculation, useSendState } from 'app/contexts';
 import { FeePaySelector } from 'components/common/FeePaySelector';
 import { FEATURE_PAY_BY } from 'config/featureFlags';
-import { trackEvent } from 'utils/analytics';
 
 import { FromToTitle, TopWrapper } from './common/styled';
 import { FromToSelectInput } from './FromToSelectInput';
@@ -82,26 +80,12 @@ export const Main: FC = () => {
       return;
     }
 
-    trackEvent('send_select_token_click', {
-      tokenTicker: nextTokenAccount.balance?.token.symbol || '',
-    });
-
     setFromTokenAccount(nextTokenAccount);
     history.replace(`/send/${nextTokenAccount.key.toBase58()}`);
   };
 
-  const handleFromAmountChange = (minorAmount: string, type?: string) => {
-    let newAmount = minorAmount;
-
-    if (type === 'available') {
-      if (isRawSOL) {
-        const totalFeeSol = new TokenAmount(fromTokenAccount.balance.token, fees.totalFee);
-        newAmount = (Number(newAmount) - Number(totalFeeSol.toExact())).toString();
-      }
-      trackEvent('send_available_click', { sum: Number(newAmount) });
-    } else {
-      trackEvent('send_amount_keydown', { sum: Number(newAmount) });
-    }
+  const handleFromAmountChange = (minorAmount: string) => {
+    const newAmount = minorAmount;
 
     setFromAmount(newAmount);
   };

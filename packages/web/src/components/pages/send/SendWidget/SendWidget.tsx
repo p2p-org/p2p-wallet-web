@@ -4,7 +4,6 @@ import { useEffect } from 'react';
 import { useSolana } from '@p2p-wallet-web/core';
 
 import { checkUserHasTokenAccount, isValidSolanaAddress, useSendState } from 'app/contexts';
-import { useTrackEventOpen } from 'app/hooks/metrics';
 import { WidgetPageWithBottom } from 'components/common/WidgetPageWithBottom';
 import { Main } from 'components/pages/send/SendWidget/Main';
 import { SendButton } from 'components/pages/send/SendWidget/SendButton';
@@ -12,8 +11,6 @@ import { SendButton } from 'components/pages/send/SendWidget/SendButton';
 import { BurnAndRelease } from './BurnAndRelease/BurnAndRelease';
 
 export const SendWidget: FunctionComponent = () => {
-  useTrackEventOpen('Send_Viewed');
-
   const { provider } = useSolana();
   const {
     fromAmount,

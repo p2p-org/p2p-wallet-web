@@ -13,7 +13,6 @@ import { ErrorHint } from 'components/common/ErrorHint';
 import { ToastManager } from 'components/common/ToastManager';
 import { Button } from 'components/pages/auth/AuthSide/common/Button';
 import { localMnemonic } from 'config/constants';
-import { useTrackEventOnce } from 'utils/hooks/useTrackEventOnce';
 
 const Wrapper = styled.div``;
 
@@ -151,7 +150,6 @@ type Props = {
 
 export const Main: FC<Props> = ({ setIsLoading, next }) => {
   const mnemonicRef = useRef<HTMLTextAreaElement | null>(null);
-  const trackEventOnce = useTrackEventOnce();
   const { activate } = useWallet();
   const [mnemonic, setMnemonic] = useState(localMnemonic || '');
   const [hasError, setHasError] = useState(false);
@@ -168,14 +166,6 @@ export const Main: FC<Props> = ({ setIsLoading, next }) => {
       setIsLoading(true);
       try {
         await activate(walletType);
-
-        if (walletType === DefaultWalletType.Sollet) {
-          trackEventOnce('login_solletio_click');
-        } else if (walletType === DefaultWalletType.SolletExtension) {
-          trackEventOnce('login_sollet_extension_click');
-        } else if (walletType === DefaultWalletType.Phantom) {
-          trackEventOnce('login_phantom_click');
-        }
       } catch (error) {
         ToastManager.error((error as Error).message);
       } finally {
@@ -206,8 +196,6 @@ export const Main: FC<Props> = ({ setIsLoading, next }) => {
       setMnemonic(value);
     }
     validateMnemonic(valueTrimmed);
-
-    trackEventOnce('login_seed_keydown');
   };
 
   const handleMnemonicBlur = (e: React.FocusEvent<HTMLTextAreaElement>) => {

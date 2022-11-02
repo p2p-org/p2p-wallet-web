@@ -16,7 +16,6 @@ import {
 import type { TransactionConfirmModalProps } from 'components/modals/TransactionConfirmModal/TransactionConfirmModal';
 import type { TransactionStatusModalProps } from 'components/modals/TransactionInfoModals/TransactionStatusSendModal/TransactionStatusSendModal';
 import { Button, Icon } from 'components/ui';
-import { trackEvent } from 'utils/analytics';
 
 const SendIcon = styled(Icon)`
   width: 24px;
@@ -105,11 +104,6 @@ export const SendButtonSolana: FC<Props> = ({ primary, disabled }) => {
         fromTokenAccount,
         destinationAccount,
         amount: parsedAmount,
-      });
-
-      trackEvent('send_send_click', {
-        tokenTicker: fromTokenAccount.balance.token.symbol || '',
-        sum: parsedAmount.asNumber,
       });
 
       await openModal<void, TransactionStatusModalProps>(

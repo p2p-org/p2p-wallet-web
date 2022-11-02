@@ -7,8 +7,6 @@ import classNames from 'classnames';
 
 import { ErrorHint } from 'components/common/ErrorHint';
 import { Button } from 'components/pages/auth/AuthSide/common/Button';
-import { trackEvent } from 'utils/analytics';
-import { useTrackEventOnce } from 'utils/hooks/useTrackEventOnce';
 
 const Wrapper = styled.div`
   display: flex;
@@ -77,13 +75,8 @@ interface Props {
 
 export const Paste: FC<Props> = ({ mnemonic, next }) => {
   const mnemonicRef = useRef<HTMLTextAreaElement | null>(null);
-  const trackEventOnce = useTrackEventOnce();
   const [userMnemonic, setUserMnemonic] = useState('');
   const [hasError, setHasError] = useState(false);
-
-  useEffect(() => {
-    trackEvent('signup_paste_seed_open');
-  }, []);
 
   useEffect(() => {
     if (mnemonicRef.current) {
@@ -107,7 +100,6 @@ export const Paste: FC<Props> = ({ mnemonic, next }) => {
     }
 
     validateMnemonic(valueTrimmed);
-    trackEventOnce('signup_seed_pasted');
   };
 
   const handleMnemonicBlur = (e: React.FocusEvent<HTMLTextAreaElement>) => {
@@ -117,7 +109,6 @@ export const Paste: FC<Props> = ({ mnemonic, next }) => {
   };
 
   const handleContinueClick = () => {
-    trackEvent('signup_continue_paste_click');
     next();
   };
 

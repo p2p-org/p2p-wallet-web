@@ -2,7 +2,6 @@ import type { FC } from 'react';
 
 import { styled } from '@linaria/react';
 
-import { useTrackEventOpen } from 'app/hooks/metrics';
 import { LaagTooltip } from 'components/ui';
 
 const TooltipContent = styled.div`
@@ -11,8 +10,6 @@ const TooltipContent = styled.div`
 `;
 
 export const AccountCreationFeeTooltip: FC = () => {
-  useTrackEventOpen('Send_Max_Info_Showed');
-
   return (
     <LaagTooltip
       withClose={true}

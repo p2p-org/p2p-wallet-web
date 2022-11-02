@@ -10,8 +10,6 @@ import { ErrorHint } from 'components/common/ErrorHint';
 import { PasswordInput } from 'components/common/PasswordInput';
 import { ToastManager } from 'components/common/ToastManager';
 import { SelectorAccountItem } from 'components/pages/auth/AuthSide/Login/Restore/SelectorAccountItem';
-import { trackEvent } from 'utils/analytics';
-import { useTrackEventOnce } from 'utils/hooks/useTrackEventOnce';
 
 import { Button } from '../../common/Button';
 import { Selector } from '../../common/Selector';
@@ -71,15 +69,12 @@ interface Props {
 }
 
 export const Restore: FC<Props> = ({ setIsLoading, back }) => {
-  const trackEventOnce = useTrackEventOnce();
   const { activate } = useWallet();
   const [password, setPassword] = useState('');
   const [accounts, setAccounts] = useState<SelectorItemType[]>([]);
   const [hasError, setHasError] = useState(false);
 
   useEffect(() => {
-    trackEvent('restore_welcome_back_open');
-
     if (localStorage.getItem(STORAGE_KEY_LOCKED)) {
       const locked = JSON.parse(localStorage.getItem(STORAGE_KEY_LOCKED) || '') as LockedType;
 
@@ -107,7 +102,6 @@ export const Restore: FC<Props> = ({ setIsLoading, back }) => {
     setPassword(value);
 
     if (value) {
-      trackEventOnce('restore_password_keydown');
       void validatePassword(value);
     }
   };
@@ -129,8 +123,6 @@ export const Restore: FC<Props> = ({ setIsLoading, back }) => {
             data.password,
             isSave,
           );
-
-          trackEvent('restore_access_wallet_click');
         } else {
           throw new Error(`Can't restore wallet`);
         }
@@ -143,7 +135,6 @@ export const Restore: FC<Props> = ({ setIsLoading, back }) => {
   };
 
   const handleSeedPhraseClick = () => {
-    trackEvent('restore_access_via_seed_click');
     back();
   };
 

@@ -19,7 +19,6 @@ import {
 } from 'app/contexts';
 import { TokenAvatar } from 'components/common/TokenAvatar';
 import { Select, SelectItem } from 'components/ui';
-import { trackEvent } from 'utils/analytics';
 import { getAvatarSize } from 'utils/common';
 import { useRenNetwork } from 'utils/hooks/renBridge/useNetwork';
 
@@ -106,16 +105,9 @@ export const NetworkSelect: FC = () => {
       }
 
       setSourceNetwork(source);
-      trackEvent('Receive_Network_Changed', { Receive_Network: source });
     },
     [hasBTCTokenAccount, openModal, setSourceNetwork, nativeBalance, accountRentExemption],
   );
-
-  const handleToggleClick = (isOpen: boolean) => {
-    if (isOpen) {
-      trackEvent('Receive_Changing_Network');
-    }
-  };
 
   const title = 'Showing my address for';
   const avatarSize = getAvatarSize(isMobile);
@@ -123,7 +115,6 @@ export const NetworkSelect: FC = () => {
   return (
     <Select
       isLoading={isBTCTokenLoading}
-      onToggle={handleToggleClick}
       mobileListTitle={title}
       value={
         <>

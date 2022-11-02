@@ -20,7 +20,6 @@ import { ModalType, useModals } from 'app/contexts/general/modals';
 import { AmountUSD } from 'components/common/AmountUSD';
 import { SwapAvatars } from 'components/pages/wallet/TransactionsWidget/TransactionRow/swap/SwapAvatars';
 import { Icon } from 'components/ui';
-import { trackEvent } from 'utils/analytics';
 import { shortAddress } from 'utils/tokens';
 
 import { BaseWrapper } from './common/styled';
@@ -171,8 +170,6 @@ export const TransactionRow: FunctionComponent<Props> = ({ signature, source: so
     if (['A', 'IMG'].includes((e.target as HTMLElement).tagName)) {
       return;
     }
-
-    trackEvent('wallet_transaction_details_open');
 
     openModal(ModalType.SHOW_MODAL_TRANSACTION_DETAILS, { signature, sourceAddress });
   };

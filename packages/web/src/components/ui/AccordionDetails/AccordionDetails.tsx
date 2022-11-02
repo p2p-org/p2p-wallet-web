@@ -1,7 +1,5 @@
 import type { FC } from 'react';
 
-import { trackEvent } from 'utils/analytics';
-
 import { Accordion } from '../Accordion';
 import { AccordionTitle } from './AccordionTitle';
 import { ListWrapper, Row, Text } from './common';
@@ -36,14 +34,8 @@ interface Props {
 }
 
 export const AccordionDetails: FC<Props> = (props) => {
-  const handleToggle = (isOpen: boolean) => {
-    if (isOpen) {
-      trackEvent('Buy_Fees_Showed');
-    }
-  };
-
   return (
-    <Accordion title={<AccordionTitle {...props} />} onToggle={handleToggle} noContentPadding>
+    <Accordion title={<AccordionTitle {...props} />} noContentPadding>
       {props.accordion.map((list) => (
         <ListWrapper key={list.id} className={list.className}>
           {list.rows.map((row) => (

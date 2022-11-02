@@ -5,7 +5,6 @@ import { getRenNetworkDetails } from '@renproject/interfaces';
 
 import { LoaderBlock } from 'components/common/LoaderBlock';
 import { UsernameAddressWidget } from 'components/common/UsernameAddressWidget';
-import { trackEvent } from 'utils/analytics';
 import { useRenNetwork } from 'utils/hooks/renBridge/useNetwork';
 import { useLockAndMintProvider } from 'utils/providers/LockAndMintProvider';
 
@@ -19,10 +18,6 @@ export const ReceiveBitcoin: FC = () => {
     () => (getRenNetworkDetails(network).isTestnet ? 1 : 6),
     [network],
   );
-
-  const handleExplorerClick = () => {
-    trackEvent('Receive_Viewing_Explorer', { Receive_Network: 'bitcoin' });
-  };
 
   const lockAndMintProvider = useLockAndMintProvider();
 
@@ -54,7 +49,6 @@ export const ReceiveBitcoin: FC = () => {
           href={`https://btc.com/btc/address/${lockAndMintProvider.gatewayAddress}`}
           target="_blank"
           rel="noopener noreferrer noindex"
-          onClick={handleExplorerClick}
           className="button"
         >
           <ShareIcon name="external" />

@@ -8,7 +8,6 @@ import { TokenAccountRow } from 'components/common/TokenAccountRow';
 import { Button } from 'components/pages/auth/AuthSide/common/Button';
 import { Icon } from 'components/ui';
 import { Popover } from 'components/ui/Popover';
-import { trackEvent } from 'utils/analytics';
 
 import { Selector } from '../../common/Selector';
 import type { SelectorItemType } from '../../common/Selector/Selector';
@@ -99,14 +98,10 @@ export const DerivableAccounts: FC<Props> = ({ seed, next }) => {
   const derivableTokenAccounts = useDerivableTokenAccounts(seed, derivationPathItem.value);
 
   const handleDerivationPathChange = (item: SelectorItemType) => {
-    trackEvent('login_select_derivation_path_click', { derivationPath: item.value });
     setDerivationPathItem(item);
   };
 
   const handleContinueClick = () => {
-    trackEvent('login_continue_derivation_path_click', {
-      derivationPath: derivationPathItem.value,
-    });
     next(derivationPathItem.value);
   };
 

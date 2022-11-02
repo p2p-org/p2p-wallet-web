@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { unstable_batchedUpdates as batch } from 'react-dom';
 
 import { styled } from '@linaria/react';
@@ -14,7 +14,6 @@ import LogoImg from 'assets/images/big-logo.png';
 import { ToastManager } from 'components/common/ToastManager';
 import type { DataType } from 'components/pages/auth/AuthSide/types';
 import { Switch } from 'components/ui';
-import { trackEvent } from 'utils/analytics';
 
 import { Button } from '../common/Button';
 import { OffPasswordModal } from './OffPasswordModal';
@@ -97,14 +96,6 @@ export const Ready: FC<Props> = ({ setIsLoading, data }) => {
   const [isSave, setIsSave] = useState(true);
   const [isShowModal, setIsShowModal] = useState(false);
 
-  useEffect(() => {
-    if (data.type === 'login') {
-      trackEvent('login_wallet_ready_open');
-    } else if (data.type === 'signup') {
-      trackEvent('signup_wallet_ready_open');
-    }
-  }, [data.type]);
-
   const handleCloseModal = (nextIsSave: boolean) => {
     setIsShowModal(false);
     setIsSave(nextIsSave);
@@ -133,12 +124,6 @@ export const Ready: FC<Props> = ({ setIsLoading, data }) => {
           data.password,
           isSave,
         );
-
-        if (data.type === 'login') {
-          trackEvent('login_finish_setup_click', { fastEnter: isSave });
-        } else if (data.type === 'signup') {
-          trackEvent('signup_finish_setup_click', { fastEnter: isSave });
-        }
       } catch (error) {
         ToastManager.error((error as Error).message);
       } finally {
