@@ -13,11 +13,8 @@ assert(
 );
 init(process.env.REACT_APP_AMPLITUDE_API_KEY);
 
-//TODO: remove old track event
-
 // track Event
-//FIXME: rename before final commit
-export const trackEvent1 = (action: AmplitudeActions) => {
+export const trackEvent = (action: AmplitudeActions) => {
   track(action.name, (action as { params: Record<string, unknown> }).params);
 
   if (__DEVELOPMENT__ && isEnabled(Features.LogAmplitudeEvents)) {

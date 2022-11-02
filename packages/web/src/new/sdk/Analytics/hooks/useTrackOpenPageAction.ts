@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useLocation } from 'react-router';
 
-import { trackEvent1 } from '../amplitude';
+import { trackEvent } from '../amplitude';
 import type { OpenPageActionNames } from '../types';
 
 export const useTrackOpenPageAction = (eventName: OpenPageActionNames) => {
@@ -13,7 +13,7 @@ export const useTrackOpenPageAction = (eventName: OpenPageActionNames) => {
       lastScreen = location.state.fromPage;
     }
 
-    trackEvent1({
+    trackEvent({
       name: eventName,
       params: { Last_Screen: lastScreen },
     });

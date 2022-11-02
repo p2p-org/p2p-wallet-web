@@ -4,7 +4,7 @@ import { observer } from 'mobx-react-lite';
 import { expr } from 'mobx-utils';
 
 import { Button } from 'components/ui';
-import { trackEvent1 } from 'new/sdk/Analytics';
+import { trackEvent } from 'new/sdk/Analytics';
 import { Loader } from 'new/ui/components/common/Loader';
 import type { ModalPropsType } from 'new/ui/modals/ModalManager';
 import type { ReceiveBitcoinModalViewModel } from 'new/ui/modals/ReceiveBitcoinModal/ReceiveBitcoinModal.ViewModel';
@@ -29,7 +29,7 @@ export const RenBTCButton: FC<Props & ModalPropsType> = observer(({ viewModel, c
 
   const handleClick = async () => {
     try {
-      trackEvent1({ name: 'Receive_Pay_Button' });
+      trackEvent({ name: 'Receive_Pay_Button' });
 
       await viewModel.createRenBTC();
       close(true);

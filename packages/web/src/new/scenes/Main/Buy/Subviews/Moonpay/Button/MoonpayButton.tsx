@@ -5,7 +5,7 @@ import { observer } from 'mobx-react-lite';
 
 import { Button, Icon } from 'components/ui';
 import type { BuyViewModelProps } from 'new/scenes/Main/Buy/Subviews/Moonpay/types';
-import { trackEvent1 } from 'new/sdk/Analytics';
+import { trackEvent } from 'new/sdk/Analytics';
 import { CryptoCurrency, FiatCurrency } from 'new/services/BuyService/structures';
 import { numberToFiatString } from 'new/utils/NumberExtensions';
 
@@ -79,7 +79,7 @@ export const MoonpayButton: FC<BuyViewModelProps> = observer(({ viewModel }) => 
           ? viewModel.input
           : viewModel.output;
 
-        trackEvent1({
+        trackEvent({
           name: 'Buy_Button_Pressed',
           params: {
             Sum_Currency: fiat.amount,

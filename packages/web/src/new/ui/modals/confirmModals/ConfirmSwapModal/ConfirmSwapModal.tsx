@@ -8,7 +8,7 @@ import { observer } from 'mobx-react-lite';
 import { Modal } from 'components/ui/Modal';
 import { useViewModel } from 'new/core/viewmodels/useViewModel';
 import type { SwapViewModel } from 'new/scenes/Main/Swap';
-import { trackEvent1 } from 'new/sdk/Analytics';
+import { trackEvent } from 'new/sdk/Analytics';
 import { ButtonCancel } from 'new/ui/components/common/ButtonCancel';
 import { rounded } from 'new/utils/NumberExtensions';
 
@@ -62,7 +62,7 @@ export const ConfirmSwapModal: FC<ConfirmSwapModalProps & ModalPropsType> = obse
       vm.authenticateAndSwap();
 
       // track button click
-      trackEvent1({
+      trackEvent({
         name: 'Swap_Approve_Button',
         params: {
           Token_A: viewModel.sourceWallet!.token.symbol,

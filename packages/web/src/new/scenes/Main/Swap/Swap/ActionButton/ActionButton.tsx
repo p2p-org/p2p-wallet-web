@@ -5,7 +5,7 @@ import { expr } from 'mobx-utils';
 
 import { Button } from 'components/ui';
 import { VerificationError } from 'new/scenes/Main/Swap/Swap/types';
-import { trackEvent1 } from 'new/sdk/Analytics';
+import { trackEvent } from 'new/sdk/Analytics';
 
 import type { SwapViewModel } from '../Swap.ViewModel';
 
@@ -20,7 +20,7 @@ export const ActionButton: FC<Props> = observer(({ viewModel }) => {
     void viewModel.openConfirmModal();
 
     // track button click
-    trackEvent1({ name: 'Swap_Review_Button' });
+    trackEvent({ name: 'Swap_Review_Button' });
   };
 
   // setError

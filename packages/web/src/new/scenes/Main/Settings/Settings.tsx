@@ -13,10 +13,10 @@ import { useViewModel } from 'new/core/viewmodels/useViewModel';
 import AppStoreBadge from 'new/scenes/Main/Settings/images/app-store-badge.png';
 import GooglePlayBadge from 'new/scenes/Main/Settings/images/google-play-badge.png';
 import { SettingsViewModel } from 'new/scenes/Main/Settings/Settings.ViewModel';
+import { trackEvent } from 'new/sdk/Analytics';
 import { Appearance, Defaults } from 'new/services/Defaults';
 import { isEnabled } from 'new/services/FeatureFlags';
 import { Features } from 'new/services/FeatureFlags/features';
-import { trackEvent1 } from 'new/sdk/Analytics';
 import { Layout } from 'new/ui/components/common/Layout';
 import { Select, SelectItem } from 'new/ui/components/common/Select';
 import { UsernameAddressWidget } from 'new/ui/components/common/UsernameAddressWidget';
@@ -244,7 +244,7 @@ export const Settings: FC = observer(() => {
                         className="button"
                         rel="noreferrer"
                         onClick={() => {
-                          trackEvent1({ name: 'Google_Click_Button' });
+                          trackEvent({ name: 'Google_Click_Button' });
                         }}
                       >
                         <img
@@ -259,7 +259,7 @@ export const Settings: FC = observer(() => {
                         className="button"
                         rel="noreferrer"
                         onClick={() => {
-                          trackEvent1({ name: 'Appstore_Click_Button' });
+                          trackEvent({ name: 'Appstore_Click_Button' });
                         }}
                       >
                         <img

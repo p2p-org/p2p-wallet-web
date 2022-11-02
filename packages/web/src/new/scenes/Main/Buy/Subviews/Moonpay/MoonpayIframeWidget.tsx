@@ -7,7 +7,7 @@ import { expr } from 'mobx-utils';
 
 import type { BuyViewModelProps } from 'new/scenes/Main/Buy/Subviews/Moonpay/types';
 import { WidgetPageBuy } from 'new/scenes/Main/Buy/Subviews/Moonpay/WidgetPageBuy';
-import { trackEvent1 } from 'new/sdk/Analytics';
+import { trackEvent } from 'new/sdk/Analytics';
 import {
   MOONPAY_API_IP_ADDRESS,
   MOONPAY_API_KEY,
@@ -36,7 +36,7 @@ const moonpayIframeParams: MoonpayIframeParams = {
 export const MoonpayIframeWidget: FC<BuyViewModelProps> = observer(({ viewModel }) => {
   useEffect(() => {
     // track iFrame shown event
-    trackEvent1({ name: 'Moonpay_Window_Opened' });
+    trackEvent({ name: 'Moonpay_Window_Opened' });
 
     // track unsupported region
     const cancellableIpAddressRequest = cancellableAxios<MoonpayIpAddressResponse>({
@@ -44,7 +44,7 @@ export const MoonpayIframeWidget: FC<BuyViewModelProps> = observer(({ viewModel 
       params: baseParams,
     }).then((response) => {
       if (!response.data.isBuyAllowed) {
-        trackEvent1({ name: 'Moonpay_Unsupported_Region_Showed' });
+        trackEvent({ name: 'Moonpay_Unsupported_Region_Showed' });
       }
     });
 

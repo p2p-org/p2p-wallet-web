@@ -1,7 +1,7 @@
 import { makeObservable, observable, runInAction } from 'mobx';
 import { singleton } from 'tsyringe';
 
-import { trackEvent1 } from 'new/sdk/Analytics';
+import { trackEvent } from 'new/sdk/Analytics';
 import type { RendererType } from 'new/ui/managers/NotificationManager/NotificationManager';
 
 export type ToastType = 'info' | 'warn' | 'error' | 'component';
@@ -185,7 +185,7 @@ export class NotificationService {
       text = header;
       header = '';
     }
-    trackEvent1({
+    trackEvent({
       name: 'Error_Showed',
       params: { Current_Screen: location.pathname, Code: header, Description: text },
     });

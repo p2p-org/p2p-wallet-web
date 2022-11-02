@@ -9,7 +9,7 @@ import { observer } from 'mobx-react-lite';
 import { TokenAvatar } from 'components/common/TokenAvatar';
 import { Select, SelectItem } from 'components/ui';
 import type { BuyViewModelProps } from 'new/scenes/Main/Buy/Subviews/Moonpay/types';
-import { trackEvent1 } from 'new/sdk/Analytics';
+import { trackEvent } from 'new/sdk/Analytics';
 import type { CryptoCurrency } from 'new/services/BuyService/structures';
 
 const InfoWrapper = styled.div`
@@ -64,7 +64,7 @@ export const CurrencySelect: FC<BuyViewModelProps> = observer(({ viewModel }) =>
       }
 
       //track event before coin changes
-      trackEvent1({
+      trackEvent({
         name: 'Buy_Coin_Changed',
         params: {
           From_Coin: fromCoin,

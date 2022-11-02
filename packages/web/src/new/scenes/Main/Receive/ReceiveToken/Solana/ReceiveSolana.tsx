@@ -7,7 +7,7 @@ import {
   ShareIcon,
 } from 'components/pages/receive/ReceiveWidget/common/styled';
 import { useViewModel } from 'new/core/viewmodels/useViewModel';
-import { trackEvent1 } from 'new/sdk/Analytics';
+import { trackEvent } from 'new/sdk/Analytics';
 import { UsernameAddressWidget } from 'new/ui/components/common/UsernameAddressWidget';
 import { withNameServiceDomain } from 'new/utils/StringExtensions';
 
@@ -23,10 +23,10 @@ export const ReceiveSolana: FC = () => {
           address={viewModel.pubkeyBase58}
           username={viewModel.username && withNameServiceDomain(viewModel.username)}
           onAddressCopied={() => {
-            trackEvent1({ name: 'Receive_Address_Copied' });
+            trackEvent({ name: 'Receive_Address_Copied' });
           }}
           onQRCodeCopied={() => {
-            trackEvent1({ name: 'Receive_QR_Copied' });
+            trackEvent({ name: 'Receive_QR_Copied' });
           }}
         />
       </Content>
@@ -37,7 +37,7 @@ export const ReceiveSolana: FC = () => {
           rel="noopener noreferrer noindex"
           className="button"
           onClick={() => {
-            trackEvent1({ name: 'Receive_Solana_Explorer' });
+            trackEvent({ name: 'Receive_Solana_Explorer' });
           }}
         >
           <ShareIcon name="external" />

@@ -7,7 +7,7 @@ import { borders, shadows, theme, up } from '@p2p-wallet-web/ui';
 
 import { Icon } from 'components/ui';
 import { appStorePath, playStorePath } from 'new/constants';
-import { trackEvent1 } from 'new/sdk/Analytics';
+import { trackEvent } from 'new/sdk/Analytics';
 
 const Wrapper = styled.div`
   display: grid;
@@ -139,9 +139,9 @@ export const LeftNavMenu: FunctionComponent = () => {
 
   const handleAppLinkClick = (store: 'app_store' | 'google_play') => () => {
     if (store === 'app_store') {
-      trackEvent1({ name: 'Appstore_Click_Button' });
+      trackEvent({ name: 'Appstore_Click_Button' });
     } else if (store === 'google_play') {
-      trackEvent1({ name: 'Google_Click_Button' });
+      trackEvent({ name: 'Google_Click_Button' });
     }
   };
 

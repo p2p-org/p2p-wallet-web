@@ -15,7 +15,7 @@ import { observer } from 'mobx-react-lite';
 import { Button, Icon } from 'components/ui';
 import { Modal } from 'components/ui/Modal';
 import type { SendViewModel } from 'new/scenes/Main/Send';
-import { trackEvent1 } from 'new/sdk/Analytics';
+import { trackEvent } from 'new/sdk/Analytics';
 import { ButtonCancel } from 'new/ui/components/common/ButtonCancel';
 import { ErrorHint } from 'new/ui/components/common/ErrorHint';
 import { PasswordInput } from 'new/ui/components/common/PasswordInput';
@@ -119,7 +119,7 @@ export const ConfirmSendModal: FC<ConfirmSendModalProps & ModalPropsType> = obse
         }
       }
 
-      trackEvent1({
+      trackEvent({
         name: 'Send_Confirm_Button_Pressed',
         params: {
           Send_Network: capitalizeFirstLetter(viewModel.network),
