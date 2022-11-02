@@ -3,6 +3,7 @@ import type {
   ErrorActions,
   GeneralActions,
   HomeActions,
+  OnboardingActions,
   ReceiveActions,
   SendActions,
   SwapActions,
@@ -16,6 +17,7 @@ export type AmplitudeActions =
   | ReceiveActions
   | SendActions
   | SwapActions
-  | ErrorActions;
+  | ErrorActions
+  | OnboardingActions;
 
 export type OpenPageActionNames = WithLastScreenActionNames<AmplitudeActions>;

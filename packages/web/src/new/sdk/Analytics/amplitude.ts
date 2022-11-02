@@ -17,6 +17,7 @@ init(process.env.REACT_APP_AMPLITUDE_API_KEY);
 export const trackEvent = (action: AmplitudeActions) => {
   track(action.name, (action as { params: Record<string, unknown> }).params);
 
+  // log events in console in develop mode via LogAmplitudeEvents feature switch
   if (__DEVELOPMENT__ && isEnabled(Features.LogAmplitudeEvents)) {
     // eslint-disable-next-line no-console
     console.log(
@@ -42,6 +43,7 @@ export const setUserProperty = (property: UserProperties) => {
 
   identify(identifyObj);
 
+  // log events in console in develop mode via LogAmplitudeEvents feature switch
   if (__DEVELOPMENT__ && isEnabled(Features.LogAmplitudeEvents)) {
     // eslint-disable-next-line no-console
     console.log(`AMPLITUDE set User Property:
