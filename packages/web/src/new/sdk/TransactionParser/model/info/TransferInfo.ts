@@ -3,7 +3,7 @@ import type { Wallet } from 'new/sdk/SolanaSDK';
 import type { Info } from './Info';
 
 // The type of transfer in context of current account view.
-enum TransferType {
+export enum TransferType {
   send = 'send',
   receive = 'receive',
 }

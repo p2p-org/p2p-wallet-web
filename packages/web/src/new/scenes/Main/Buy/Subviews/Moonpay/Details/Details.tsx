@@ -1,7 +1,7 @@
 import type { FC } from 'react';
 
-import { computed } from 'mobx';
 import { observer } from 'mobx-react-lite';
+import { expr } from 'mobx-utils';
 
 import type { AccordionList } from 'new/ui/components/ui/AccordionDetails';
 import { AccordionDetails } from 'new/ui/components/ui/AccordionDetails';
@@ -10,7 +10,7 @@ import { numberToFiatString } from 'new/utils/NumberExtensions';
 import type { BuyViewModelProps } from '../types';
 
 export const Details: FC<BuyViewModelProps> = observer(({ viewModel }) => {
-  const accordion = computed<AccordionList>(() => {
+  const accordion = expr<AccordionList>(() => {
     const lists: AccordionList = [
       {
         id: 1,
@@ -60,7 +60,7 @@ export const Details: FC<BuyViewModelProps> = observer(({ viewModel }) => {
     ];
 
     return lists;
-  }).get();
+  });
 
   return (
     <AccordionDetails

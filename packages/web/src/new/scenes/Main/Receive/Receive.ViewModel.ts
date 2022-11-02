@@ -7,7 +7,7 @@ import type { Token } from 'new/sdk/SolanaSDK';
 import { SolanaSDKPublicKey } from 'new/sdk/SolanaSDK';
 import type { ModalPromise } from 'new/services/ModalService';
 import { ModalService, ModalType } from 'new/services/ModalService';
-import { WalletsRepository } from 'new/services/Repositories';
+import { TokensRepository, WalletsRepository } from 'new/services/Repositories';
 import { SolanaService } from 'new/services/SolanaService';
 
 export type TokenTypeName = 'solana' | 'btc';
@@ -60,6 +60,7 @@ export class ReceiveViewModel extends ViewModel {
   constructor(
     private _walletsRepository: WalletsRepository,
     private _solanaSDK: SolanaService,
+    private _tokensRepository: TokensRepository,
     private _modalService: ModalService,
     private _receiveBitcoinViewModel: ReceiveBitcoinViewModel,
   ) {
@@ -73,12 +74,12 @@ export class ReceiveViewModel extends ViewModel {
       switchTokenType: action,
     });
 
-    void this._solanaSDK
-      .getToken(TokenType.solana.mint)
+    void this._tokensRepository
+      .getTokenWithMint(TokenType.solana.mint)
       .then(action((token) => (this.solanaToken = token)));
 
-    void this._solanaSDK
-      .getToken(TokenType.btc.mint)
+    void this._tokensRepository
+      .getTokenWithMint(TokenType.btc.mint)
       .then(action((token) => (this.btcToken = token)));
   }
 

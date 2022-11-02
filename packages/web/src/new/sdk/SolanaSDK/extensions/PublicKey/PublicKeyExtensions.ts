@@ -46,4 +46,20 @@ export class SolanaSDKPublicKey {
       }
     }
   }
+
+  static get usdcMint(): PublicKey {
+    return new PublicKey('EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v');
+  }
+  static get usdtMint(): PublicKey {
+    return new PublicKey('Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB');
+  }
+  static get dexPID(): PublicKey {
+    return new PublicKey('9xQeWvG816bUx9EPjHmaT23yvVM2ZWbrrpZb9PusVFin');
+  }
+  static get serumSwapPID(): PublicKey {
+    return new PublicKey('22Y43yTVxuUkoRKdm9thyRhQ3SdgQS7c7kB6UNCiaczD');
+  }
+  static isUsdx(pubkey: PublicKey): boolean {
+    return pubkey.equals(this.usdcMint) || pubkey.equals(this.usdtMint);
+  }
 }

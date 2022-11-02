@@ -68,7 +68,6 @@ export const MoonpayIframeWidget: FC<BuyViewModelProps> = observer(({ viewModel 
     <WidgetPageBuy>
       <Wrapper>
         <iframe
-          id="moonpayIframe"
           allow="accelerometer; autoplay; camera; gyroscope; payment"
           frameBorder="0"
           width="100%"

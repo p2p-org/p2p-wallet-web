@@ -7,17 +7,28 @@ export function numberToString(
   value: number,
   {
     maximumFractionDigits = 3,
+    showPlus = false,
+    showMinus = true,
     groupingSeparator = ' ',
     autoSetMaximumFractionDigits = false,
   }: {
     maximumFractionDigits?: number;
+    showPlus?: boolean;
+    showMinus?: boolean;
     groupingSeparator?: string | null;
     autoSetMaximumFractionDigits?: boolean;
   },
 ): string {
   const options: Intl.NumberFormatOptions = {};
-  options.maximumFractionDigits = maximumFractionDigits;
-  if (autoSetMaximumFractionDigits) {
+
+  if (showPlus) {
+    // @ts-ignore
+    options.signDisplay = 'exceptZero';
+  }
+
+  if (!autoSetMaximumFractionDigits) {
+    options.maximumFractionDigits = maximumFractionDigits;
+  } else {
     if (value > 1000) {
       options.maximumFractionDigits = 2;
     } else if (value > 100) {
@@ -27,11 +38,11 @@ export function numberToString(
     }
   }
 
-  let _value = value.toLocaleString('en-US', options);
+  const number = showMinus ? value : Math.abs(value);
+  let _value = number.toLocaleString('en-US', options);
   if (typeof groupingSeparator === 'string') {
     _value = _value.replace(/,/g, groupingSeparator);
   }
-
   return _value;
 }
 

@@ -85,6 +85,7 @@ export const Header = styled.div`
 
 export const Title = styled.div`
   margin-bottom: 10px;
+  padding: 0 30px;
 
   color: #000;
   font-weight: bold;
