@@ -23,10 +23,10 @@ const ButtonStyled = styled(Button)`
 
 export const GoBackButton = () => {
   const history = useHistory();
-  const { symbol } = useParams<SwapRouteParams>();
+  const { publicKey } = useParams<SwapRouteParams>();
 
   const handleButtonClick = () => {
-    history.push(generatePath('/swap/:symbol?', { symbol }));
+    history.push(generatePath('/swap/:publicKey?', { publicKey }));
   };
 
   return (
