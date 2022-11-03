@@ -141,7 +141,7 @@ export const RestoreOptions: FC = observer(() => {
   const [hasError, setHasError] = useState(false);
   const handleConnectByClick = (extensionName: WalletName) => () => {
     try {
-      void viewModel.connectExtension(extensionName).finally(() => {});
+      void viewModel.connectExtension(extensionName);
     } catch (error) {
       ToastManager.error((error as Error).message);
     }
