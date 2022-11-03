@@ -1,11 +1,11 @@
-import type { FunctionComponent } from 'react';
+import type { FC } from 'react';
 import { useState } from 'react';
 
 import { styled } from '@linaria/react';
 import { rgba } from 'polished';
 
-import { ToastManager } from 'components/common/ToastManager';
 import { Icon } from 'components/ui';
+import type { LayoutViewModel } from 'new/ui/components/common/Layout/Layout.ViewModel';
 import { Widget } from 'new/ui/components/common/Widget';
 import { Avatar } from 'new/ui/components/ui/Avatar';
 
@@ -75,7 +75,11 @@ const CopyWrapper = styled.div`
   }
 `;
 
-export const ProfileWidget: FunctionComponent = () => {
+type Props = {
+  viewModel: Readonly<LayoutViewModel>;
+};
+
+export const ProfileWidget: FC<Props> = ({ viewModel }) => {
   const [copied, setCopied] = useState(false);
 
   const username = 'konstantin';
@@ -85,7 +89,7 @@ export const ProfileWidget: FunctionComponent = () => {
     try {
       void navigator.clipboard.writeText(`https://${address}`);
       setCopied(true);
-      ToastManager.info('URL Copied!');
+      viewModel.notificationService.info('URL Copied!');
 
       // fade copied after some seconds
       setTimeout(() => {

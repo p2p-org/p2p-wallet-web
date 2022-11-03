@@ -1,4 +1,3 @@
-import { ToastManager } from 'components/common/ToastManager';
 import { browserName, BrowserNames } from 'new/utils/UserAgent';
 
 export const isImageCopyAvailable = browserName !== BrowserNames.FIREFOX;
@@ -29,12 +28,12 @@ export const copyToClipboardImage = async (
   try {
     const data = [
       new ClipboardItem({
-        'image/png': new Promise((resolve) => {
+        'image/png': new Promise((resolve, reject) => {
           qrElement.toBlob((blob: Blob | null) => {
             if (blob) {
               resolve(blob);
             } else {
-              ToastManager.error(`Can't copy to clipboard`);
+              reject(`Can't copy to clipboard`);
             }
           });
         }),

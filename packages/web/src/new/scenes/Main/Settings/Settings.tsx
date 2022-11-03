@@ -7,13 +7,17 @@ import classNames from 'classnames';
 import { observer } from 'mobx-react-lite';
 
 import { Icon, Switch } from 'components/ui';
+import { Fiat } from 'new/app/models/Fiat';
 import { appStorePath, playStorePath } from 'new/constants';
 import { useViewModel } from 'new/core/viewmodels/useViewModel';
 import AppStoreBadge from 'new/scenes/Main/Settings/images/app-store-badge.png';
 import GooglePlayBadge from 'new/scenes/Main/Settings/images/google-play-badge.png';
 import { SettingsViewModel } from 'new/scenes/Main/Settings/Settings.ViewModel';
-import { Defaults } from 'new/services/Defaults';
+import { Appearance, Defaults } from 'new/services/Defaults';
+import { isEnabled } from 'new/services/FeatureFlags';
+import { Features } from 'new/services/FeatureFlags/features';
 import { Layout } from 'new/ui/components/common/Layout';
+import { Select, SelectItem } from 'new/ui/components/common/Select';
 import { UsernameAddressWidget } from 'new/ui/components/common/UsernameAddressWidget';
 import { WidgetPage } from 'new/ui/components/common/WidgetPage';
 import { Accordion } from 'new/ui/components/ui/Accordion';
@@ -73,7 +77,7 @@ const Logout = styled.div`
   cursor: pointer;
 `;
 
-/*const CurrencyItem = styled.div``;
+const CurrencyItem = styled.div``;
 
 const Symbol = styled.span`
   padding-left: 3px;
@@ -83,7 +87,7 @@ const Symbol = styled.span`
 
 const Capitalize = styled.span`
   text-transform: capitalize;
-`;*/
+`;
 
 const Title = styled.div`
   color: #a3a5ba;
@@ -136,7 +140,7 @@ const Text = styled.div`
   margin-bottom: 20px;
 `;
 
-// const FIATS = [Fiat.usd, Fiat.eur, Fiat.rub];
+const FIATS = [Fiat.usd, Fiat.eur, Fiat.rub];
 
 export const Settings: FC = observer(() => {
   const viewModel = useViewModel(SettingsViewModel);
@@ -156,44 +160,48 @@ export const Settings: FC = observer(() => {
       <Wrapper>
         <WidgetPage icon="gear" title="Settings">
           <ItemsWrapper>
-            {/*<Item>
-              <ItemTitle>Currency</ItemTitle>
-              <ItemAction>
-                <Select value={Defaults.fiat.code} mobileListTitle="Choose currency">
-                  {FIATS.map((fiat) => (
-                    <SelectItem
-                      key={fiat.code}
-                      isSelected={fiat.code === Defaults.fiat.code}
-                      onItemClick={() => viewModel.setFiat(fiat)}
+            {isEnabled(Features.ShowAllSettings) ? (
+              <>
+                <Item>
+                  <ItemTitle>Currency</ItemTitle>
+                  <ItemAction>
+                    <Select value={Defaults.fiat.code} mobileListTitle="Choose currency">
+                      {FIATS.map((fiat) => (
+                        <SelectItem
+                          key={fiat.code}
+                          isSelected={fiat.code === Defaults.fiat.code}
+                          onItemClick={() => viewModel.setFiat(fiat)}
+                        >
+                          <CurrencyItem>
+                            {fiat.name}
+                            <Symbol>{`(${fiat.symbol})`}</Symbol>
+                          </CurrencyItem>
+                        </SelectItem>
+                      ))}
+                    </Select>
+                  </ItemAction>
+                </Item>
+                <Item>
+                  <ItemTitle>Appearance</ItemTitle>
+                  <ItemAction>
+                    <Select
+                      value={<Capitalize>{Defaults.appearance}</Capitalize>}
+                      mobileListTitle="Choose appearance"
                     >
-                      <CurrencyItem>
-                        {fiat.name}
-                        <Symbol>{`(${fiat.symbol})`}</Symbol>
-                      </CurrencyItem>
-                    </SelectItem>
-                  ))}
-                </Select>
-              </ItemAction>
-            </Item>
-            <Item>
-              <ItemTitle>Appearance</ItemTitle>
-              <ItemAction>
-                <Select
-                  value={<Capitalize>{Defaults.appearance}</Capitalize>}
-                  mobileListTitle="Choose appearance"
-                >
-                  {Object.values(Appearance).map((appearance: Appearance) => (
-                    <SelectItem
-                      key={appearance}
-                      isSelected={appearance === Defaults.appearance}
-                      onItemClick={() => viewModel.setAppearance(appearance)}
-                    >
-                      <Capitalize>{appearance}</Capitalize>
-                    </SelectItem>
-                  ))}
-                </Select>
-              </ItemAction>
-            </Item>*/}
+                      {Object.values(Appearance).map((appearance: Appearance) => (
+                        <SelectItem
+                          key={appearance}
+                          isSelected={appearance === Defaults.appearance}
+                          onItemClick={() => viewModel.setAppearance(appearance)}
+                        >
+                          <Capitalize>{appearance}</Capitalize>
+                        </SelectItem>
+                      ))}
+                    </Select>
+                  </ItemAction>
+                </Item>
+              </>
+            ) : null}
             <AccordionItem>
               <Accordion
                 title={
@@ -266,15 +274,17 @@ export const Settings: FC = observer(() => {
                 />
               </ItemAction>
             </Item>
-            {/*<Item>
-              <ItemTitle>Use free transactions</ItemTitle>
-              <ItemAction>
-                <Switch
-                  checked={Defaults.useFreeTransactions}
-                  onChange={(checked) => viewModel.setUseFreeTransactions(checked)}
-                />
-              </ItemAction>
-            </Item>*/}
+            {isEnabled(Features.ShowAllSettings) ? (
+              <Item>
+                <ItemTitle>Use free transactions</ItemTitle>
+                <ItemAction>
+                  <Switch
+                    checked={Defaults.useFreeTransactions}
+                    onChange={(checked) => viewModel.setUseFreeTransactions(checked)}
+                  />
+                </ItemAction>
+              </Item>
+            ) : null}
           </ItemsWrapper>
           <LogoutWrapper>
             <Logout onClick={handleLogoutClick}>Logout now</Logout>

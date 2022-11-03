@@ -69,14 +69,6 @@ const AmountInFiatLabel = styled.div`
   }
 `;
 
-// const ClockIcon = styled(Icon)`
-//   width: 15px;
-//   height: 15px;
-//   margin-left: 9px;
-//
-//   color: #ffa631;
-// `;
-
 const TransactionImageViewStyled = styled(TransactionImageView)``;
 
 const BottomStack = styled.div`
@@ -127,7 +119,7 @@ export const TransactionCell: FC<Props> = observer(
     if (isPlaceholder || !transaction) {
       return (
         <Wrapper>
-          <Main onClick={() => {}}>
+          <Main>
             <Skeleton width={48} height={48} borderRadius={12} />
             <div>
               <TopStack>

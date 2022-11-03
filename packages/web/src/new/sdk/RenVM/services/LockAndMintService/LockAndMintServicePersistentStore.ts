@@ -29,6 +29,8 @@ interface LockAndMintServicePersistentStoreType {
   /// Transaction which are being processed
   readonly processingTransactions: ProcessingTx[];
 
+  getProcessingTransactionByTxid(txid: string): ProcessingTx | null;
+
   /// Mark as processing
   markAsProcessing(transaction: ProcessingTx): void;
 
@@ -111,6 +113,11 @@ export class LockAndMintServicePersistentStore implements LockAndMintServicePers
     );
     return data ? plainToInstance(ProcessingTx, data) : [];
   }
+
+  getProcessingTransactionByTxid(txid: string): ProcessingTx | null {
+    return this.processingTransactions.find((_tx) => _tx.tx.txid === txid) || null;
+  }
+
   saveProcessingTransactions(txs: ProcessingTx[]): void {
     this._saveToUserDefault(instanceToPlain(txs), this._userDefaultKeyForProcessingTransactions);
   }

@@ -20,15 +20,15 @@ export class UserNamedAddressWidgetViewModel extends ViewModel {
     void copyToClipboardString(
       value,
       () => this._notificationService.info(`${text} copied!`),
-      (error: Error) => console.error(error),
+      (_: Error) => this._notificationService.error(`Can't copy ${text} to clipboard`),
     );
   }
 
   copyQRCode(qrElement: HTMLCanvasElement): void {
     void copyToClipboardImage(
       qrElement,
-      () => this._notificationService.info('QR code Copied!'),
-      (err: Error) => this._notificationService.error(err.message),
+      () => this._notificationService.info('QR Code copied!'),
+      (_: Error) => this._notificationService.error(`Can't copy QR Code to clipboard`),
     );
   }
 }
