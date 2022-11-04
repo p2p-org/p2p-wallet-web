@@ -17,11 +17,7 @@ import { Mnemonic } from './Create/MnemonicInput';
 import { DerivableAccounts } from './Restore/DerivableAccounts';
 import { RestoreOptions } from './Restore/RestoreOptions';
 
-export interface Props {
-  step: WizardSteps;
-}
-
-export const Wizard: FC<Props> = observer((props) => {
+export const Wizard: FC = observer(() => {
   const location = useLocation();
   const history = useHistory();
   const viewModel = useViewModel(AuthViewModel);
@@ -75,7 +71,7 @@ export const Wizard: FC<Props> = observer((props) => {
     ),
   };
 
-  const elView = VIEW_MAP[props.step];
+  const elView = VIEW_MAP[viewModel.step];
 
   return elView;
 });

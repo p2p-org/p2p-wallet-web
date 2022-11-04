@@ -1,7 +1,6 @@
 import type { FC } from 'react';
 
 import { styled } from '@linaria/react';
-import { DERIVATION_PATH } from '@p2p-wallet-web/core';
 import { observer } from 'mobx-react-lite';
 
 import { Icon } from 'components/ui';
@@ -12,6 +11,7 @@ import { WalletPlaceholder } from 'new/scenes/Main/Auth/Subviews/Restore/WalletP
 import type { Wallet } from 'new/sdk/SolanaSDK';
 import { StaticSectionsCollectionView } from 'new/ui/components/common/StaticSectionsCollectionView';
 
+import { DERIVATION_PATH } from '../../utils';
 import { Button } from '../components/Button';
 import type { SelectorItemType } from './Selector';
 import { Selector } from './Selector';

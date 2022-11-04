@@ -2,11 +2,12 @@ import type { FC, ReactNode } from 'react';
 import { useEffect, useRef, useState } from 'react';
 
 import { styled } from '@linaria/react';
-import type { DERIVATION_PATH, ValueOf } from '@p2p-wallet-web/core';
 import classNames from 'classnames';
 import { observer } from 'mobx-react-lite';
 
 import { Icon } from 'components/ui';
+
+import type { DERIVATION_PATH } from '../../utils';
 
 const Wrapper = styled.div``;
 
@@ -87,6 +88,7 @@ const DropDownListItem = styled.div`
   cursor: pointer;
 `;
 
+export type ValueOf<T> = T[keyof T];
 export type SelectorItemType = {
   label: string | ReactNode;
   value: ValueOf<typeof DERIVATION_PATH>;

@@ -40,8 +40,6 @@ export class SettingsViewModel extends ViewModel {
     void this._nameService
       .getName(this._solanaService.provider.wallet.publicKey.toBase58())
       .then(action((name) => name && (this.username = name)));
-
-    this.walletModel.initialize();
   }
 
   protected override afterReactionsRemoved() {}

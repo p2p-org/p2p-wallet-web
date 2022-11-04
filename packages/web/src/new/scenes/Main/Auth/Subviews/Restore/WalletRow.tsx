@@ -58,23 +58,23 @@ type Props = {
   wallet: Wallet;
 };
 
-export const WalletRow: FC<Props> = (props) => {
+export const WalletRow: FC<Props> = ({ wallet }) => {
   return (
     <Wrapper>
       <ItemWrapper>
-        <TokenAvatar size={44} token={props.wallet.token} />
+        <TokenAvatar size={44} token={wallet.token} />
         <Info>
           <Top>
-            <TokenSymbol>{props.wallet.token.symbol}</TokenSymbol>
+            <TokenSymbol>{wallet.token.symbol}</TokenSymbol>
             <div>
               {Fiat.usd.symbol}
-              {numberToString(props.wallet.amountInCurrentFiat, { maximumFractionDigits: 2 })}
+              {numberToString(wallet.amountInCurrentFiat, { maximumFractionDigits: 2 })}
             </div>
           </Top>
           <Bottom>
-            <div>{props.wallet.shortAddress}</div>
+            <div>{wallet.shortAddress}</div>
             <div>
-              {props.wallet.amount} {props.wallet.token.symbol}
+              {wallet.amount} {wallet.token.symbol}
             </div>
           </Bottom>
         </Info>

@@ -159,7 +159,7 @@ const defaultProps = {
   showNavigation: true,
 };
 
-export const CommonLayout: FC<Props> = observer((props) => {
+export const CommonLayout: FC<Props> = observer(({ showNavigation, children }) => {
   const isDesktop = useIsDesktop();
   const viewModel = useViewModel(AuthViewModel);
 
@@ -173,7 +173,7 @@ export const CommonLayout: FC<Props> = observer((props) => {
     </Left>
   );
 
-  const elNavigation = props.showNavigation && (
+  const elNavigation = showNavigation && (
     <Navigate>
       <TabButton
         className={classNames({ isActive: viewModel.isCreate })}
@@ -190,7 +190,7 @@ export const CommonLayout: FC<Props> = observer((props) => {
     </Navigate>
   );
 
-  const elHead = props.showNavigation && (
+  const elHead = showNavigation && (
     <WalletTitle>
       {viewModel.showBackButton && <BackStyled onClick={viewModel.previousStep} />}
       {viewModel.isCreate ? 'New wallet' : 'Log in to your wallet'}
@@ -204,7 +204,7 @@ export const CommonLayout: FC<Props> = observer((props) => {
         {elNavigation}
         <ContentContainer>
           {elHead}
-          {props.children}
+          {children}
         </ContentContainer>
         {viewModel.connecting && <LoaderWide />}
       </MenuContainer>
