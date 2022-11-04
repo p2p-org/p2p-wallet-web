@@ -4,15 +4,16 @@ import { observer } from 'mobx-react-lite';
 import { expr } from 'mobx-utils';
 import { nanoid } from 'nanoid';
 
-import type { ISDListViewModel } from 'new/core/viewmodels/SDListViewModel';
+import type { SDListViewModelType } from 'new/core/viewmodels/SDListViewModel';
 import { SDFetcherState } from 'new/core/viewmodels/SDViewModel';
+import { InfinityScrollHelper } from 'new/ui/components/common/InfinityScrollHelper';
 
 import { SDCollectionViewItem } from './models/SDCollectionViewItem';
 
 interface Props<T> {
-  viewModel: Readonly<ISDListViewModel<T>>;
+  viewModel: Readonly<SDListViewModelType<T>>;
   numberOfLoadingCells?: number;
-  renderPlaceholder?: (key: string) => React.ReactNode;
+  renderPlaceholder: (key: string) => React.ReactNode;
   renderItem: (item: T, index: number) => React.ReactNode;
   renderEmpty?: (key: string) => React.ReactNode;
   customFilter?: (item: T) => boolean;
@@ -73,21 +74,26 @@ export const StaticSectionsCollectionView = observer(
 
     return (
       <div className={className}>
-        {items.map((item, index) => {
-          if (!item.isEmptyCell) {
-            if (item.isPlaceholder) {
-              return renderPlaceholder?.(item.placeholderIndex!);
+        <InfinityScrollHelper
+          disabled={!viewModel.isFetchable}
+          onNeedLoadMore={() => viewModel.fetchNext()}
+        >
+          {items.map((item, index) => {
+            if (!item.isEmptyCell) {
+              if (item.isPlaceholder) {
+                return renderPlaceholder?.(item.placeholderIndex!);
+              }
+
+              return renderItem(item.value!, index);
             }
 
-            return renderItem(item.value!, index);
-          }
+            if (item.isEmptyCell && renderEmpty) {
+              return renderEmpty(item.emptyCellIndex!);
+            }
 
-          if (item.isEmptyCell && renderEmpty) {
-            return renderEmpty(item.emptyCellIndex!);
-          }
-
-          return null;
-        })}
+            return null;
+          })}
+        </InfinityScrollHelper>
       </div>
     );
   },

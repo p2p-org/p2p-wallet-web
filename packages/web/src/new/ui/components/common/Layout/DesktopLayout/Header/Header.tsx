@@ -113,7 +113,7 @@ const BackLink = styled(NavLink)`
 `;
 
 type Props = {
-  viewModel: LayoutViewModel;
+  viewModel: Readonly<LayoutViewModel>;
   breadcrumb?: BreadcrumbType;
 };
 

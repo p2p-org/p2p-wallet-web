@@ -8,6 +8,7 @@ import type { Appearance } from 'new/services/Defaults';
 import { Defaults } from 'new/services/Defaults';
 import { LocationService } from 'new/services/LocationService';
 import { NameService } from 'new/services/NameService';
+import { NotificationService } from 'new/services/NotificationService';
 import { PricesService } from 'new/services/PriceAPIs/PricesService';
 import { SolanaService } from 'new/services/SolanaService';
 
@@ -21,6 +22,7 @@ export class SettingsViewModel extends ViewModel {
     private _nameService: NameService,
     public walletModel: WalletModel,
     public locationService: LocationService,
+    private _notificationService: NotificationService,
   ) {
     super();
 
@@ -50,7 +52,11 @@ export class SettingsViewModel extends ViewModel {
 
   setFiat(fiat: Fiat) {
     Defaults.fiat = new Fiat(fiat.type);
+
+    this._pricesService.clearCurrentPrices();
     this._pricesService.fetchAllTokensPriceInWatchList();
+
+    this._notificationService.info('Currency changed');
   }
 
   setAppearance(appearance: Appearance): void {

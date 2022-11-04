@@ -6,8 +6,7 @@ import type { Recipient } from 'new/scenes/Main/Send';
 import { Network, SendViewModel } from 'new/scenes/Main/Send';
 import { NameService } from 'new/services/NameService';
 import { SendService } from 'new/services/SendService';
-import { bitcoinAddress, matches } from 'new/utils/RegularExpression';
-import { withNameServiceDomain } from 'new/utils/StringExtensions';
+import { bitcoinAddress, matches, publickey } from 'new/utils/RegularExpression';
 
 @injectable()
 export class RecipientsListViewModel extends SDListViewModel<Recipient> {
@@ -21,7 +20,10 @@ export class RecipientsListViewModel extends SDListViewModel<Recipient> {
       return false;
     }
 
-    return matches(this.searchString, [bitcoinAddress(this._solanaAPIClient.isTestNet())]);
+    return matches(this.searchString, [
+      bitcoinAddress(this._solanaAPIClient.isTestNet()),
+      publickey(),
+    ]);
   }
 
   constructor(
@@ -109,32 +111,14 @@ export class RecipientsListViewModel extends SDListViewModel<Recipient> {
   }
 
   private _findAddressInSolanaNetwork(address: string): Promise<Recipient[]> {
-    return this._nameService
-      .getName(address)
-      .then((name): Promise<[string | null, boolean]> => {
-        if (!name) {
-          return Promise.resolve([name, false]);
-        }
-
-        // check funds
-        return this._solanaAPIClient
-          .checkAccountValidation(address)
-          .catch(() => false)
-          .then((validation) => [name, !validation]);
-      })
+    return this._solanaAPIClient
+      .checkAccountValidation(address)
+      .catch(() => false)
       .then((result) => [
         <Recipient>{
           address,
-          name: result[0] ? withNameServiceDomain(result[0]) : null,
-          hasNoFunds: result[1],
-        },
-      ])
-      .catch(() => [
-        <Recipient>{
-          address,
           name: null,
-          hasNoFunds: false,
-          hasNoInfo: true,
+          hasNoFunds: !result,
         },
       ]);
   }

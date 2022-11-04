@@ -7,7 +7,7 @@ export function truncatingMiddle(
   {
     numOfSymbolsRevealed = 4,
     numOfSymbolsRevealedInSuffix,
-  }: { numOfSymbolsRevealed: number; numOfSymbolsRevealedInSuffix?: number },
+  }: { numOfSymbolsRevealed?: number; numOfSymbolsRevealedInSuffix?: number } = {},
 ): string {
   if (
     text.length <=

@@ -146,7 +146,9 @@ const ButtonWrapper = styled.div`
   padding-top: 12px;
 `;
 
-type TransferParams = {
+export type TransferParams = {
+  header?: string;
+  text?: string;
   status?:
     | 'processing'
     | 'success'
@@ -191,22 +193,26 @@ export const NotifyToast: FunctionComponent<Props> = ({
       icon = <TokenAvatar token={token} size={44} />;
       break;
     case 'swap':
-      icon = (
-        <SwapAvatarsWrapper>
-          <TokenAvatar token={token} size={32} />
-          <TokenAvatar token={tokenB} size={32} />
-        </SwapAvatarsWrapper>
-      );
+      if (token && tokenB) {
+        icon = (
+          <SwapAvatarsWrapper>
+            <TokenAvatar token={token} size={32} />
+            <TokenAvatar token={tokenB} size={32} />
+          </SwapAvatarsWrapper>
+        );
+      }
       break;
     case 'mint':
       icon = (
         <ToastIconWrapper>
-          <ToastIcon name="warning-transparent" style={{ color: '#ffa631' }} />
+          <ToastIcon name="warning" style={{ color: theme.colors.system.warningMain }} />
         </ToastIconWrapper>
       );
       break;
     case 'confirmingDeposit':
-      icon = <TokenAvatar token={tokenBTC} size={44} />;
+      if (tokenBTC) {
+        icon = <TokenAvatar token={tokenBTC} size={44} />;
+      }
       break;
     default:
       icon = null;
@@ -214,7 +220,7 @@ export const NotifyToast: FunctionComponent<Props> = ({
 
   switch (status) {
     case 'processing':
-      statusIcon = <StatusIcon name="clock" style={{ color: '#ffa631' }} />;
+      statusIcon = <StatusIcon name="clock" style={{ color: theme.colors.system.warningMain }} />;
       break;
     case 'success':
       statusIcon = <StatusIcon name="success" style={{ color: '#4caf50' }} />;
@@ -223,7 +229,7 @@ export const NotifyToast: FunctionComponent<Props> = ({
       statusIcon = <StatusIcon name="warning" style={{ color: '#ff5959' }} />;
       break;
     case 'confirmingDeposit':
-      statusIcon = <StatusIcon name="clock" style={{ color: '#a3a5ba' }} />;
+      statusIcon = <StatusIcon name="clock" style={{ color: theme.colors.bg.buttonDisabled }} />;
       break;
     case 'confirmedDeposit':
       statusIcon = <StatusIcon name="clock" />;

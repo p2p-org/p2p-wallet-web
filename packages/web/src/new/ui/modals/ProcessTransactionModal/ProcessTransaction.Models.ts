@@ -151,7 +151,7 @@ export class SwapTransaction extends RawTransactionBase implements RawTransactio
         amount: toLamport(this.amount, this.sourceWallet.token.decimals),
         slippage: this.slippage,
       })
-      .then((txIds) => txIds[0] ?? '');
+      .then((txIds) => txIds.at(-1) ?? '');
   }
 
   get networkFees(): { total: SolanaSDK.Lamports; token: SolanaSDK.Token } | null {

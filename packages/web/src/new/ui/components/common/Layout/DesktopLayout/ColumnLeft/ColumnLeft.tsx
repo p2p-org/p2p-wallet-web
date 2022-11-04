@@ -15,6 +15,7 @@ import {
 } from 'new/ui/components/common/Layout';
 import { LeftNavMenu } from 'new/ui/components/common/Layout/DesktopLayout/ColumnLeft/LeftNavMenu';
 import { ProfileWidget } from 'new/ui/components/common/Layout/DesktopLayout/ColumnLeft/ProfileWidget';
+import type { LayoutViewModel } from 'new/ui/components/common/Layout/Layout.ViewModel';
 
 const ColumnLeftSticky = styled(Sticky)`
   height: fit-content;
@@ -35,11 +36,15 @@ const Wrapper = styled.div`
   grid-template-rows: min-content;
 `;
 
-export const ColumnLeft: FC = observer(() => {
+type Props = {
+  viewModel: Readonly<LayoutViewModel>;
+};
+
+export const ColumnLeft: FC<Props> = observer(({ viewModel }) => {
   return (
     <ColumnLeftSticky top={HEADER_HEIGHT + CONTAINER_PADDING_TOP}>
       <Wrapper>
-        {isEnabled(Features.LeftNavMenuProfile) ? <ProfileWidget /> : null}
+        {isEnabled(Features.LeftNavMenuProfile) ? <ProfileWidget viewModel={viewModel} /> : null}
         <LeftNavMenu />
       </Wrapper>
     </ColumnLeftSticky>

@@ -13,6 +13,7 @@ export enum StatusType {
 // The enum of possible status of transaction in blockchain
 export class Status {
   type: StatusType;
+  // @ts-ignore
   private _percent?: number | null;
   private _error?: string | null;
 
@@ -47,7 +48,7 @@ export class Status {
 
   // The transaction has been done processed but finished with error.
   static error(error?: string | null): Status {
-    return new Status({ type: StatusType.processing, error });
+    return new Status({ type: StatusType.error, error });
   }
 
   // Convert the status as error.

@@ -1,10 +1,9 @@
+import type { u64 } from '@solana/spl-token';
 import {
   buildCancellablePromise,
   CancellablePromise,
   pseudoCancellable,
 } from 'real-cancellable-promise';
-
-import type { u64 } from '@solana/spl-token';
 
 import { LogEvent, Logger } from 'new/sdk/SolanaSDK';
 import { cancellablePromiseRetry } from 'new/utils/promise/cancellablePromiseRetry';
@@ -54,6 +53,8 @@ export class LockAndMintServiceImpl implements LockAndMintService {
   // Flag to indicate of whether log should be shown or not
   private _showLog: boolean;
 
+  private _txSubmittedCallback?: (tx: ProcessingTx) => void;
+
   // Response from gateway address
   private _gatewayAddressResponse?: GatewayAddressResponse;
 
@@ -81,6 +82,7 @@ export class LockAndMintServiceImpl implements LockAndMintService {
     refreshingRate = 5_000,
     // mintingRate = 60_000,
     showLog,
+    txSubmittedCallback,
   }: {
     persistentStore: LockAndMintServicePersistentStore;
     chainProvider: ChainProvider;
@@ -90,6 +92,7 @@ export class LockAndMintServiceImpl implements LockAndMintService {
     refreshingRate?: number;
     mintingRate?: number;
     showLog: boolean;
+    txSubmittedCallback?: (tx: ProcessingTx) => void;
   }) {
     this._persistentStore = persistentStore;
     this._chainProvider = chainProvider;
@@ -99,6 +102,7 @@ export class LockAndMintServiceImpl implements LockAndMintService {
     this._refreshingRate = refreshingRate;
     // this._mintingRate = mintingRate;
     this._showLog = showLog;
+    this._txSubmittedCallback = txSubmittedCallback;
   }
 
   // Start the service
@@ -222,7 +226,7 @@ export class LockAndMintServiceImpl implements LockAndMintService {
     for (const transaction of incommingTransactions) {
       // get marker date
       let date = new Date();
-      const blocktime = transaction.status.blockTime;
+      const blocktime = transaction.status.blockTime; // TODO: check time, maybe need to multiply by 1000
       if (blocktime) {
         date = new Date(blocktime.toNumber());
       }
@@ -250,7 +254,7 @@ export class LockAndMintServiceImpl implements LockAndMintService {
         confirmedTxIds.push(transaction.txid);
       }
 
-      // for inconfirming transaction, mark as received and wait
+      // for incoming transaction, mark as received and wait
       else {
         // mark as received
         this._persistentStore.markAsReceived(transaction, date);
@@ -269,10 +273,10 @@ export class LockAndMintServiceImpl implements LockAndMintService {
       const groupedTransactions = ProcessingTx.grouped(
         this._persistentStore.processingTransactions,
       );
-      const confirmedAndSubmitedTransactions = groupedTransactions.confirmed.concat(
+      const confirmedAndSubmittedTransactions = groupedTransactions.confirmed.concat(
         groupedTransactions.submitted,
       );
-      const transactionsToBeProcessed = confirmedAndSubmitedTransactions.filter(
+      const transactionsToBeProcessed = confirmedAndSubmittedTransactions.filter(
         (_tx) => !_tx.isProcessing && _tx.validationStatus.type === ValidationStatusType.valid,
       );
 
@@ -344,6 +348,12 @@ export class LockAndMintServiceImpl implements LockAndMintService {
           console.error(error);
           // try to mint event if error
         }
+      }
+
+      if (typeof this._txSubmittedCallback === 'function') {
+        this._txSubmittedCallback(
+          this._persistentStore.getProcessingTransactionByTxid(tx.tx.txid)!,
+        );
       }
 
       // mint

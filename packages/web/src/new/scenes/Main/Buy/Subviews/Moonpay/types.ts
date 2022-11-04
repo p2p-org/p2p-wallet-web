@@ -1,5 +1,5 @@
 import type { BuyViewModel } from 'new/scenes/Main/Buy/Buy.ViewModel';
 
 export interface BuyViewModelProps {
-  viewModel: BuyViewModel;
+  viewModel: Readonly<BuyViewModel>;
 }

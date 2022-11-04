@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import '@abraham/reflection';
 
 import { get, hasIn, isFunction, isString, memoize, set } from 'lodash';
