@@ -33,8 +33,7 @@ export const Create: FC<Props & ModalPropsType> = observer(({ viewModel, close }
 
   return (
     <WrapperModal
-      title="Receiving via Bitcoin network"
-      description="Make sure you understand these aspects"
+      title="Create Bitcoin address"
       iconName="clock"
       iconBgClassName="warning"
       close={() => close(false)}
@@ -65,15 +64,12 @@ export const Create: FC<Props & ModalPropsType> = observer(({ viewModel, close }
         </div>
         <List>
           <Row>
-            This address accepts <strong>only Bitcoin</strong>. You may lose assets by sending
-            another coin.
+            You're going to create a public Bitcoin address that will be valid for the next{' '}
+            <strong>24 hours</strong>. You still can hold and send Bitcoin without restrictions.
           </Row>
           <Row>
-            Minimum transaction amount of <strong>0.000112 BTC</strong>.
-          </Row>
-          <Row>
-            <strong>35:59:59</strong>
-            &nbsp; is the remaining time to safely send the assets
+            It's a <strong>one-time address</strong>, so if you send multiple transactions, your
+            money will be lost.
           </Row>
         </List>
       </Section>
