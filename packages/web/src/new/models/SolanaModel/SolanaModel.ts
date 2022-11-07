@@ -1,8 +1,8 @@
 import { Provider } from '@project-serum/anchor';
 import { Connection } from '@solana/web3.js';
-import { get } from 'lodash';
 import { singleton } from 'tsyringe';
 
+import { WalletModel } from 'new/models/WalletModel';
 import { Defaults } from 'new/services/Defaults';
 
 import { Model } from '../../core/models/Model';
@@ -12,7 +12,7 @@ export class SolanaModel extends Model {
   protected _provider: Provider | null = null;
   protected _connection: Connection | null = null;
 
-  constructor() {
+  constructor(private _walletModel: WalletModel) {
     super();
   }
 
@@ -35,12 +35,20 @@ export class SolanaModel extends Model {
   }
 
   protected setUpProvider() {
-    const conn = this.connection;
-    const solana = get(window, 'solana');
+    const connection = this.connection;
+    const solana = this._walletModel.signer;
+
     if (!solana) {
-      throw new Error('~~~ No Solana Object found on window');
+      throw new Error('~~~ No Signer object was provided');
     }
-    this._provider = new Provider(conn, solana, Provider.defaultOptions());
+
+    if (!connection) {
+      throw new Error('~~~ No Connection');
+    }
+
+    if (!this._provider) {
+      this._provider = new Provider(connection, solana, Provider.defaultOptions());
+    }
   }
 
   get connection(): Connection {

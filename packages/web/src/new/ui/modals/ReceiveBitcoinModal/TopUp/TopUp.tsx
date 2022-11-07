@@ -1,11 +1,18 @@
 import type { FC } from 'react';
 import { useHistory } from 'react-router';
 
+import { styled } from '@linaria/react';
+
+import { Icon } from 'components/ui';
 import { ButtonCancel } from 'new/ui/components/common/ButtonCancel';
 import { Button } from 'new/ui/components/ui/Button';
 import type { ModalPropsType } from 'new/ui/managers/ModalManager';
 
 import { List, Row, Section, WrapperModal } from '../common/styled';
+
+const IconStyled = styled(Icon)`
+  margin-right: 8px;
+`;
 
 export const TopUp: FC<ModalPropsType> = ({ close }) => {
   const history = useHistory();
@@ -17,14 +24,14 @@ export const TopUp: FC<ModalPropsType> = ({ close }) => {
 
   return (
     <WrapperModal
-      title="Receiving via Bitcoin network"
-      description="Make sure you understand these aspects"
+      title="Create Bitcoin address"
       iconName="clock"
       iconBgClassName="warning"
       close={() => close(false)}
       footer={
         <>
           <Button primary onClick={handleTopUpClick}>
+            <IconStyled name={'plus'} size={24} />
             Top up your account
           </Button>
           <ButtonCancel onClick={() => close(false)} />

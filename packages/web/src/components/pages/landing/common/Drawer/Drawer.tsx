@@ -4,7 +4,6 @@ import { Link } from 'react-router-dom';
 import { styled } from '@linaria/react';
 
 import { up, useBreakpoint } from 'components/pages/landing/styles/breakpoints';
-import { trackEvent } from 'utils/analytics';
 
 const Wrapper = styled.div`
   position: fixed;
@@ -107,18 +106,8 @@ export const Drawer: FC<Props> = ({ isOpen, onDrawerClose }) => {
         </DrawerBg>
         <DrawerMenu>
           <Logo>Wallet</Logo>
-          {/* <MenuLink href="/#">Explore</MenuLink> */}
-          {/* <MenuLink href="/#">About</MenuLink> */}
-          {/* <MenuLink href="/#">Recent Updates</MenuLink> */}
-          {/* <MenuLink href="/#">FAQ</MenuLink> */}
-          <MenuLink to="/login" onClick={() => trackEvent('landing_i_have_wallet_click')}>
-            I have a wallet
-          </MenuLink>
-          <MenuLink
-            to="/signup"
-            onClick={() => trackEvent('landing_create_wallet_click')}
-            className="green"
-          >
+          <MenuLink to="/onboard">I have a wallet</MenuLink>
+          <MenuLink to="/onboard" className="green">
             Create new wallet
           </MenuLink>
         </DrawerMenu>

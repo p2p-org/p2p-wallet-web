@@ -1,5 +1,3 @@
-import 'new/services/Defaults';
-
 import * as React from 'react';
 import { BrowserRouter, HashRouter, Route, Switch } from 'react-router-dom';
 
@@ -29,7 +27,7 @@ import {
   ModalManager,
   NotificationManager,
 } from 'new/ui/managers';
-import { Auth } from 'pages/Auth';
+import { Auth as AuthTrial } from 'new/scenes/Main/Auth';
 import { Landing } from 'pages/Landing';
 import { AuthRequiredRoute } from 'utils/routes/UserRequiredRoute';
 
@@ -49,7 +47,7 @@ const App: React.FC = observer(() => {
               <LocationManager />
               <Switch>
                 <Route path="/" exact component={Landing} />
-                <Route path="/:type(signup|login)" exact component={Auth} />
+                <Route path="/onboard" exact component={AuthTrial} />
                 <Main>
                   <AuthRequiredRoute path="/wallets" component={Home} />
                   <AuthRequiredRoute path="/wallet/:publicKey" exact component={WalletDetail} />
@@ -57,7 +55,7 @@ const App: React.FC = observer(() => {
                   <AuthRequiredRoute path="/receive/(tokens)?" component={Receive} />
                   <AuthRequiredRoute path="/send/:publicKey/:status(result)" component={Send} />
                   <AuthRequiredRoute path="/send/:publicKey?" component={Send} />
-                  <AuthRequiredRoute path="/swap/(settings)?/:symbol?" component={SwapPage} />
+                  <AuthRequiredRoute path="/swap/(settings)?/:publicKey?" component={SwapPage} />
                   <AuthRequiredRoute path="/settings/network" component={SettingsNetwork} />
                   <AuthRequiredRoute path="/settings" component={Settings} exact />
                   <ModalManager />

@@ -81,7 +81,7 @@ export const StaticSectionsCollectionView = observer(
           {items.map((item, index) => {
             if (!item.isEmptyCell) {
               if (item.isPlaceholder) {
-                return renderPlaceholder(item.placeholderIndex!);
+                return renderPlaceholder?.(item.placeholderIndex!);
               }
 
               return renderItem(item.value!, index);

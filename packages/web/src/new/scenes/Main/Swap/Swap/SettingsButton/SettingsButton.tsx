@@ -22,10 +22,10 @@ const ButtonStyled = styled(Button)`
 
 export const SettingsButton: FC = () => {
   const history = useHistory();
-  const { symbol } = useParams<SwapRouteParams>();
+  const { publicKey } = useParams<SwapRouteParams>();
 
   const handleShowSettings = () => {
-    history.push(generatePath('/swap/settings/:symbol?', { symbol }));
+    history.push(generatePath('/swap/settings/:publicKey?', { publicKey }));
   };
 
   return (

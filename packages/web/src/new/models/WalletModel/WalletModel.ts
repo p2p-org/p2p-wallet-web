@@ -1,16 +1,16 @@
 import '@abraham/reflection';
 
-import type {
-  Adapter,
-  MessageSignerWalletAdapter,
-  SignerWalletAdapter,
-} from '@solana/wallet-adapter-base';
+import type { Adapter, MessageSignerWalletAdapter, WalletName } from '@solana/wallet-adapter-base';
 import { WalletAdapterNetwork } from '@solana/wallet-adapter-base';
+import { PhantomWalletName } from '@solana/wallet-adapter-phantom';
 import type { Transaction } from '@solana/web3.js';
 import { PublicKey } from '@solana/web3.js';
-import { autorun, computed, makeObservable, observable, runInAction } from 'mobx';
+import { action, autorun, computed, makeObservable, observable, runInAction } from 'mobx';
 import { singleton } from 'tsyringe';
 
+import type { Wallet } from 'new/scenes/Main/Auth/MnemonicAdapter';
+import { MnemonicAdapter, MnemonicAdapterName } from 'new/scenes/Main/Auth/MnemonicAdapter';
+import type { ConnectConfig } from 'new/scenes/Main/Auth/typings';
 import { WalletAdaptorService } from 'new/services/WalletAdaptorService';
 
 import { Model } from '../../core/models/Model';
@@ -22,26 +22,104 @@ export class WalletModel extends Model {
   adaptors: Adapter[] = [];
   network: WalletAdapterNetwork;
   connected: boolean;
+  connecting: boolean;
   selectedAdaptor: Adapter | null = null;
 
-  constructor(protected walletAdaptorService: WalletAdaptorService) {
+  private _adaptors: Array<Adapter | MnemonicAdapter> | null = null;
+  private static _previousAdaptorKey = 'previousAdaptor';
+  private static _reloadableAdaptors = [PhantomWalletName];
+
+  constructor(
+    protected walletAdaptorService: WalletAdaptorService,
+    private _mnemonicAdapter: MnemonicAdapter,
+  ) {
     super();
     this.name = '';
     this.network = WalletAdapterNetwork.Mainnet;
     this.publicKey = '';
     this.connected = false;
-    makeObservable(this, {
+    this.connecting = false;
+
+    makeObservable<WalletModel, '_restoreLocal'>(this, {
+      _restoreLocal: action,
+      connectAdaptor: action,
       name: observable,
       publicKey: observable,
       network: observable,
       connected: observable,
-      adaptors: observable,
+      connecting: observable,
       selectedAdaptor: observable,
+      adaptors: observable,
       pubKey: computed,
+      signer: computed,
     });
 
     this.onConnect = this.onConnect.bind(this);
     this.onDisconnect = this.onDisconnect.bind(this);
+  }
+
+  signAllTransactions(transactions: Array<Transaction>): Promise<Array<Transaction>> {
+    if (!this.selectedAdaptor) {
+      throw new Error('Not connected to an adaptor');
+    }
+
+    return this.signer.signAllTransactions(transactions);
+  }
+
+  signTransaction(transaction: Transaction): Promise<Transaction> {
+    if (!this.selectedAdaptor) {
+      throw new Error('Not connected to a wallet adaptor');
+    }
+
+    return this.signer.signTransaction(transaction);
+  }
+
+  async disconnect(): Promise<void> {
+    localStorage.removeItem(WalletModel._previousAdaptorKey);
+
+    await this.selectedAdaptor?.disconnect();
+  }
+
+  async connectAdaptor(adaptorName: string, config?: ConnectConfig): Promise<void> {
+    try {
+      this.setupAdaptors();
+
+      const adaptors = this._getAdaptors();
+      const chosenAdaptor = adaptors.find((adaptor) => adaptor.name === adaptorName);
+
+      if (chosenAdaptor) {
+        this.connecting = true;
+        await chosenAdaptor.connect(config);
+      }
+
+      this._saveAdaptorName(adaptorName);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      this.connecting = false;
+    }
+  }
+
+  protected _saveAdaptorName(adaptorName: string): void {
+    if (adaptorName !== MnemonicAdapterName) {
+      localStorage.setItem(WalletModel._previousAdaptorKey, adaptorName);
+    }
+  }
+
+  protected setUpAdaptor(adaptor: Adapter | MnemonicAdapter): Adapter {
+    adaptor.on('connect', (publicKey: PublicKey) => {
+      this.onConnect(adaptor, publicKey);
+    });
+
+    adaptor.on('disconnect', () => {
+      this.onDisconnect(adaptor);
+    });
+
+    if (adaptor.connected && adaptor.publicKey) {
+      this.onConnect(adaptor, adaptor.publicKey);
+    }
+
+    return adaptor;
   }
 
   protected createReactions() {
@@ -58,6 +136,7 @@ export class WalletModel extends Model {
 
   protected onInitialize(): void {
     this.createReactions();
+    void this._restoreLocal();
   }
 
   protected override onEnd() {
@@ -69,9 +148,7 @@ export class WalletModel extends Model {
   }
 
   protected setupAdaptors() {
-    const { network } = this;
-
-    const originalAdaptors = this.walletAdaptorService.getAdaptors(network);
+    const originalAdaptors = this._getAdaptors();
 
     const newAdaptors = originalAdaptors.map((value) => this.setUpAdaptor(value));
 
@@ -97,44 +174,45 @@ export class WalletModel extends Model {
     });
   }
 
-  protected setUpAdaptor(adaptor: Adapter): Adapter {
-    adaptor.on('connect', (publicKey: PublicKey) => {
-      this.onConnect(adaptor, publicKey);
-    });
-    adaptor.on('disconnect', () => {
-      this.onDisconnect(adaptor);
-    });
-    if (adaptor.connected && adaptor.publicKey) {
-      this.onConnect(adaptor, adaptor.publicKey);
-    }
-    return adaptor;
-  }
-
   get pubKey(): PublicKey {
     return new PublicKey(this.publicKey);
   }
 
-  get signer(): SignerWalletAdapter {
-    return this.selectedAdaptor as SignerWalletAdapter;
+  get signer(): Wallet {
+    return this.selectedAdaptor as Wallet;
   }
 
   get messageSigner(): MessageSignerWalletAdapter {
     return this.selectedAdaptor as MessageSignerWalletAdapter;
   }
 
-  signAllTransactions(transactions: Array<Transaction>): Promise<Array<Transaction>> {
-    if (!this.selectedAdaptor) {
-      throw new Error('Not connected to an adaptor');
+  private _getAdaptors() {
+    if (!this._adaptors) {
+      this._adaptors = this.walletAdaptorService.getAdaptors(this.network);
     }
 
-    return this.signer.signAllTransactions(transactions);
+    return this._adaptors;
   }
 
-  signTransaction(transaction: Transaction): Promise<Transaction> {
-    if (!this.selectedAdaptor) {
-      throw new Error('Not connected to a wallet adaptor');
+  private async _restoreLocal(): Promise<void> {
+    this.connecting = true;
+    const localSinger = await this._mnemonicAdapter.getLocalSigner();
+
+    if (localSinger) {
+      this.connecting = false;
+      return await this.connectAdaptor(MnemonicAdapterName, {
+        type: 'recur',
+        signer: localSinger,
+      });
     }
 
-    return this.signer.signTransaction(transaction);
+    const localAdaptor = localStorage.getItem(WalletModel._previousAdaptorKey);
+    const shouldAutoConnect =
+      localAdaptor && WalletModel._reloadableAdaptors.includes(localAdaptor as WalletName);
+
+    if (shouldAutoConnect) {
+      await this.connectAdaptor(localAdaptor);
+    }
+    this.connecting = false;
   }
 }
