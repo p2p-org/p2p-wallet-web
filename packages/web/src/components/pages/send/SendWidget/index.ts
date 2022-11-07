@@ -1,1 +1,0 @@
-export { SendWidget } from './SendWidget';

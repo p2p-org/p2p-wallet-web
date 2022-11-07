@@ -2,23 +2,27 @@ import { browserName, BrowserNames } from 'new/utils/UserAgent';
 
 export const isImageCopyAvailable = browserName !== BrowserNames.FIREFOX;
 
-export const copyStringToClipboard = async (
+export const copyToClipboardString = async (
   str: string,
-  callback: () => void,
+  callback?: () => void,
   errorCallback?: (err: Error) => void,
 ) => {
   try {
     await navigator.clipboard.writeText(str);
-    callback && callback();
+    if (callback) {
+      callback();
+    }
   } catch (error) {
-    errorCallback && errorCallback(error as Error);
+    if (errorCallback) {
+      errorCallback(error as Error);
+    }
   }
 };
 
 // Promise is needed for Safari. But Chrome also can work with such flow
-export const copyImageToClipboard = async (
+export const copyToClipboardImage = async (
   qrElement: HTMLCanvasElement,
-  callback: () => void,
+  callback?: () => void,
   errorCallback?: (err: Error) => void,
 ) => {
   try {
@@ -37,8 +41,12 @@ export const copyImageToClipboard = async (
     ];
     await navigator.clipboard.write(data);
 
-    callback && callback();
+    if (callback) {
+      callback();
+    }
   } catch (error) {
-    errorCallback && errorCallback(error as Error);
+    if (errorCallback) {
+      errorCallback(error as Error);
+    }
   }
 };

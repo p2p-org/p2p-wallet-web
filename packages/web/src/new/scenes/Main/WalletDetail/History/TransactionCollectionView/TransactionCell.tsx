@@ -25,7 +25,7 @@ import {
 import { truncatingMiddle } from 'new/utils/StringExtensions';
 
 import type { ImageViewType } from './TransactionImageView';
-import { TransactionImageView } from './TransactionImageView';
+import { TransactionImageView, WrapperIcon } from './TransactionImageView';
 
 const Wrapper = styled.div`
   position: relative;
@@ -69,14 +69,6 @@ const AmountInFiatLabel = styled.div`
   }
 `;
 
-// const ClockIcon = styled(Icon)`
-//   width: 15px;
-//   height: 15px;
-//   margin-left: 9px;
-//
-//   color: #ffa631;
-// `;
-
 const TransactionImageViewStyled = styled(TransactionImageView)``;
 
 const BottomStack = styled.div`
@@ -105,7 +97,9 @@ const Main = styled.div`
     border-radius: 12px;
 
     ${TransactionImageViewStyled} {
-      background: #fff;
+      ${WrapperIcon} {
+        background: #fff;
+      }
     }
 
     ${TransactionTypeLabel} {
@@ -117,176 +111,40 @@ const Main = styled.div`
 interface Props {
   transaction?: ParsedTransaction;
   isPlaceholder?: boolean;
+  onTransactionClick?: () => void;
 }
 
-export const TransactionCell: FC<Props> = observer(({ transaction, isPlaceholder = false }) => {
-  if (isPlaceholder || !transaction) {
-    return (
-      <Wrapper>
-        <Main onClick={() => {}}>
-          <Skeleton width={48} height={48} borderRadius={12} />
-          <div>
-            <TopStack>
-              <TransactionTypeLabel>
-                <Skeleton width={50} height={16} />
-              </TransactionTypeLabel>
-              <AmountInFiatLabel>
-                <Skeleton width={50} height={16} />
-              </AmountInFiatLabel>
-            </TopStack>
-            <BottomStack>
-              <div>
-                <Skeleton width={70} height={16} />
-              </div>
-              <div>
-                <Skeleton width={70} height={16} />
-              </div>
-            </BottomStack>
-          </div>
-        </Main>
-      </Wrapper>
-    );
-  }
-
-  const {
-    descriptionLabel,
-    transactionTypeLabel,
-    imageView,
-    statusImage,
-    amountInFiatLabel,
-    amountInFiatLabelTextColor,
-    amountInTokenLabel,
-  } = expr(() => {
-    // clear
-    let descriptionLabel = null;
-
-    // type
-    const transactionTypeLabel = parsedTransactionLabel(transaction);
-
-    // description texts
-    let isUndefinedTransaction = false;
-    switch (transaction.info?.constructor) {
-      case CreateAccountInfo: {
-        const newWallet = (transaction.info as CreateAccountInfo).newWallet;
-        if (newWallet) {
-          descriptionLabel = `${newWallet.token.symbol} Created`;
-        }
-        break;
-      }
-      case CloseAccountInfo: {
-        const closedWallet = (transaction.info as CloseAccountInfo).closedWallet;
-        if (closedWallet) {
-          descriptionLabel = `${closedWallet.token.symbol} Closed`;
-        }
-        break;
-      }
-      case TransferInfo: {
-        switch ((transaction.info as TransferInfo).transferType) {
-          case TransferType.send: {
-            const destination = (transaction.info as TransferInfo).destination;
-            if (destination) {
-              descriptionLabel = `To ${
-                destination.pubkey ? truncatingMiddle(destination.pubkey) : ''
-              }`;
-            }
-            break;
-          }
-          case TransferType.receive: {
-            const source = (transaction.info as TransferInfo).source;
-            if (source) {
-              descriptionLabel = `From ${source.pubkey ? truncatingMiddle(source.pubkey) : ''}`;
-            }
-            break;
-          }
-          default:
-            break;
-        }
-        break;
-      }
-      case SwapInfo: {
-        const source = (transaction.info as SwapInfo).source;
-        const destination = (transaction.info as SwapInfo).destination;
-        if (source && destination) {
-          descriptionLabel = `${source.token.symbol} to ${destination.token.symbol}`;
-        }
-        break;
-      }
-      default: {
-        const signature = transaction.signature;
-        if (signature) {
-          descriptionLabel = truncatingMiddle(signature);
-        }
-        isUndefinedTransaction = true;
-      }
+export const TransactionCell: FC<Props> = observer(
+  ({ transaction, isPlaceholder = false, onTransactionClick }) => {
+    if (isPlaceholder || !transaction) {
+      return (
+        <Wrapper>
+          <Main>
+            <Skeleton width={48} height={48} borderRadius={12} />
+            <div>
+              <TopStack>
+                <TransactionTypeLabel>
+                  <Skeleton width={50} height={16} />
+                </TransactionTypeLabel>
+                <AmountInFiatLabel>
+                  <Skeleton width={50} height={16} />
+                </AmountInFiatLabel>
+              </TopStack>
+              <BottomStack>
+                <div>
+                  <Skeleton width={70} height={16} />
+                </div>
+                <div>
+                  <Skeleton width={70} height={16} />
+                </div>
+              </BottomStack>
+            </div>
+          </Main>
+        </Wrapper>
+      );
     }
 
-    // set up icon
-    let imageView: ImageViewType = null;
-    switch (transaction.info?.constructor) {
-      case SwapInfo: {
-        imageView = {
-          fromOneToOne: {
-            from: (transaction.info as SwapInfo).source?.token,
-            to: (transaction.info as SwapInfo).destination?.token,
-          },
-        };
-        break;
-      }
-      default:
-        imageView = { oneImage: parsedTransactionIcon(transaction) };
-    }
-
-    // set up status icon
-    let statusImage = null;
-    switch (transaction.status.type) {
-      case StatusType.requesting:
-      case StatusType.processing:
-        statusImage = 'clock'; // @ios: transactionIndicatorPending
-        break;
-      case StatusType.error:
-        statusImage = 'warning'; // @ios: transactionIndicatorError
-        break;
-      default:
-        break;
-    }
-
-    // amount in fiat
-    let amountInFiatLabel = null;
-    let amountInFiatLabelTextColor = undefined;
-    const amountInFiat = transaction.amountInFiat;
-    if (amountInFiat) {
-      let amountText = `${Defaults.fiat.symbol}${numberToString(amountInFiat, {
-        maximumFractionDigits: 2,
-        showMinus: false,
-      })}`;
-      if (transaction.amount < 0) {
-        amountText = `- ${amountText}`;
-      } else if (transaction.amount > 0) {
-        amountText = `+ ${amountText}`;
-        amountInFiatLabelTextColor = 'green';
-      } else {
-        amountText = '';
-      }
-      amountInFiatLabel = amountText;
-    }
-
-    // amount
-    let amountInTokenLabel = null;
-    if (!isUndefinedTransaction) {
-      if (transaction.amount !== 0) {
-        amountInTokenLabel = `${numberToString(transaction.amount, {
-          maximumFractionDigits: 9,
-          showPlus: true,
-        })} ${transaction.symbol}`;
-      }
-    } else {
-      const blockhash = transaction.blockhash;
-      if (blockhash) {
-        amountInTokenLabel = `#${truncatingMiddle(blockhash)}`;
-      }
-    }
-
-    return {
+    const {
       descriptionLabel,
       transactionTypeLabel,
       imageView,
@@ -294,26 +152,165 @@ export const TransactionCell: FC<Props> = observer(({ transaction, isPlaceholder
       amountInFiatLabel,
       amountInFiatLabelTextColor,
       amountInTokenLabel,
-    };
-  });
+    } = expr(() => {
+      // clear
+      let descriptionLabel = null;
 
-  return (
-    <Wrapper>
-      <Main onClick={() => {}}>
-        <TransactionImageViewStyled imageView={imageView} statusImage={statusImage} />
-        <div>
-          <TopStack>
-            <TransactionTypeLabel>{transactionTypeLabel}</TransactionTypeLabel>
-            <AmountInFiatLabel className={classNames(amountInFiatLabelTextColor)}>
-              {amountInFiatLabel}
-            </AmountInFiatLabel>
-          </TopStack>
-          <BottomStack>
-            <div>{descriptionLabel}</div>
-            <div>{amountInTokenLabel}</div>
-          </BottomStack>
-        </div>
-      </Main>
-    </Wrapper>
-  );
-});
+      // type
+      const transactionTypeLabel = parsedTransactionLabel(transaction);
+
+      // description texts
+      let isUndefinedTransaction = false;
+      switch (transaction.info?.constructor) {
+        case CreateAccountInfo: {
+          const newWallet = (transaction.info as CreateAccountInfo).newWallet;
+          if (newWallet) {
+            descriptionLabel = `${newWallet.token.symbol} Created`;
+          }
+          break;
+        }
+        case CloseAccountInfo: {
+          const closedWallet = (transaction.info as CloseAccountInfo).closedWallet;
+          if (closedWallet) {
+            descriptionLabel = `${closedWallet.token.symbol} Closed`;
+          }
+          break;
+        }
+        case TransferInfo: {
+          switch ((transaction.info as TransferInfo).transferType) {
+            case TransferType.send: {
+              const destination = (transaction.info as TransferInfo).destination;
+              if (destination) {
+                descriptionLabel = `To ${
+                  destination.pubkey ? truncatingMiddle(destination.pubkey) : ''
+                }`;
+              }
+              break;
+            }
+            case TransferType.receive: {
+              const source = (transaction.info as TransferInfo).source;
+              if (source) {
+                descriptionLabel = `From ${source.pubkey ? truncatingMiddle(source.pubkey) : ''}`;
+              }
+              break;
+            }
+            default:
+              break;
+          }
+          break;
+        }
+        case SwapInfo: {
+          const source = (transaction.info as SwapInfo).source;
+          const destination = (transaction.info as SwapInfo).destination;
+          if (source && destination) {
+            descriptionLabel = `${source.token.symbol} to ${destination.token.symbol}`;
+          }
+          break;
+        }
+        default: {
+          const signature = transaction.signature;
+          if (signature) {
+            descriptionLabel = truncatingMiddle(signature);
+          }
+          isUndefinedTransaction = true;
+        }
+      }
+
+      // set up icon
+      let imageView: ImageViewType = null;
+      switch (transaction.info?.constructor) {
+        case SwapInfo: {
+          imageView = {
+            fromOneToOne: {
+              from: (transaction.info as SwapInfo).source?.token,
+              to: (transaction.info as SwapInfo).destination?.token,
+            },
+          };
+          break;
+        }
+        default:
+          imageView = { oneImage: parsedTransactionIcon(transaction) };
+      }
+
+      // set up status icon
+      let statusImage = null;
+      switch (transaction.status.type) {
+        case StatusType.requesting:
+        case StatusType.processing:
+          statusImage = 'clock'; // @ios: transactionIndicatorPending
+          break;
+        case StatusType.error:
+          statusImage = 'warning'; // @ios: transactionIndicatorError
+          break;
+        default:
+          break;
+      }
+
+      // amount in fiat
+      let amountInFiatLabel = null;
+      let amountInFiatLabelTextColor = undefined;
+      const amountInFiat = transaction.amountInFiat;
+      if (amountInFiat) {
+        let amountText = `${Defaults.fiat.symbol}${numberToString(amountInFiat, {
+          maximumFractionDigits: 2,
+          showMinus: false,
+        })}`;
+        if (transaction.amount < 0) {
+          amountText = `- ${amountText}`;
+        } else if (transaction.amount > 0) {
+          amountText = `+ ${amountText}`;
+          amountInFiatLabelTextColor = 'green';
+        } else {
+          amountText = '';
+        }
+        amountInFiatLabel = amountText;
+      }
+
+      // amount
+      let amountInTokenLabel = null;
+      if (!isUndefinedTransaction) {
+        if (transaction.amount !== 0) {
+          amountInTokenLabel = `${numberToString(transaction.amount, {
+            maximumFractionDigits: 9,
+            showPlus: true,
+          })} ${transaction.symbol}`;
+        }
+      } else {
+        const blockhash = transaction.blockhash;
+        if (blockhash) {
+          amountInTokenLabel = `#${truncatingMiddle(blockhash)}`;
+        }
+      }
+
+      return {
+        descriptionLabel,
+        transactionTypeLabel,
+        imageView,
+        statusImage,
+        amountInFiatLabel,
+        amountInFiatLabelTextColor,
+        amountInTokenLabel,
+      };
+    });
+
+    return (
+      <Wrapper>
+        <Main onClick={onTransactionClick}>
+          <TransactionImageViewStyled imageView={imageView} statusImage={statusImage} />
+          <div>
+            <TopStack>
+              <TransactionTypeLabel>{transactionTypeLabel}</TransactionTypeLabel>
+              <AmountInFiatLabel className={classNames(amountInFiatLabelTextColor)}>
+                {amountInFiatLabel}
+              </AmountInFiatLabel>
+            </TopStack>
+            <BottomStack>
+              <div>{descriptionLabel}</div>
+              <div>{amountInTokenLabel}</div>
+            </BottomStack>
+          </div>
+        </Main>
+      </Wrapper>
+    );
+  },
+);

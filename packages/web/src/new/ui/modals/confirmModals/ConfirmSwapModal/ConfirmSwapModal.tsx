@@ -10,7 +10,7 @@ import { useViewModel } from 'new/core/viewmodels/useViewModel';
 import type { SwapViewModel } from 'new/scenes/Main/Swap';
 import { ButtonCancel } from 'new/ui/components/common/ButtonCancel';
 
-import type { ModalPropsType } from '../../ModalManager';
+import type { ModalPropsType } from '../../../managers/ModalManager';
 import { ArrowDown } from '../common/ArrowDown';
 import { SectionPassword } from '../common/SectionPassword';
 import { Section } from '../common/styled';

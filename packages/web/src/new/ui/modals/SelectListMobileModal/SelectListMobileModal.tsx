@@ -1,7 +1,7 @@
 import type { FC, ReactElement } from 'react';
 
+import type { ModalPropsType } from 'new/ui/managers/ModalManager';
 import { Modal } from 'new/ui/modals/Modal';
-import type { ModalPropsType } from 'new/ui/modals/ModalManager';
 
 type Props = {
   items: ReactElement[];

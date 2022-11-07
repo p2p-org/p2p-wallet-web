@@ -5,9 +5,9 @@ import { theme } from '@p2p-wallet-web/ui';
 import { observer } from 'mobx-react-lite';
 import { expr } from 'mobx-utils';
 
-import { Select, SelectItem } from 'components/ui';
 import type { FeeCellContent } from 'new/scenes/Main/Swap/SwapSettings/SwapSettings.ViewModel';
 import { BaseWalletCellContent } from 'new/ui/components/common/BaseWalletCellContent';
+import { Select, SelectItem } from 'new/ui/components/common/Select';
 import { TokenAvatar } from 'new/ui/components/common/TokenAvatar';
 
 const SelectorValue = styled.div`

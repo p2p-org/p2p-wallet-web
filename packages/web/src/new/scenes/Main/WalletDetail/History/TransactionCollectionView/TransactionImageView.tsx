@@ -31,7 +31,7 @@ const WrapperFromOneToOne = styled(BaseWrapper)`
   }
 `;
 
-const WrapperIcon = styled(BaseWrapper)`
+export const WrapperIcon = styled(BaseWrapper)`
   display: flex;
   align-items: center;
   justify-content: center;
@@ -97,16 +97,15 @@ export const TransactionImageView: FC<Props> = ({ imageView, statusImage, classN
       );
     }
 
-    // @web: changing className only for icon during hover
     return (
-      <WrapperIcon className={className}>
+      <WrapperIcon>
         <TransactionIcon name={(imageView as OneImage).oneImage} />
       </WrapperIcon>
     );
   };
 
   return (
-    <Wrapper>
+    <Wrapper className={className}>
       {renderEl()}
       {statusImage ? (
         <StatusWrapper>

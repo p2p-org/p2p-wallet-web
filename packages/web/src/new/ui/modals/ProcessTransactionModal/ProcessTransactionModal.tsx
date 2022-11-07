@@ -14,7 +14,7 @@ import {
 } from 'components/modals/TransactionInfoModals/common';
 import { Button } from 'components/ui';
 import { useViewModel } from 'new/core/viewmodels/useViewModel';
-import type { ModalPropsType } from 'new/ui/modals/ModalManager';
+import type { ModalPropsType } from 'new/ui/managers/ModalManager';
 import { TransactionID } from 'new/ui/modals/ProcessTransactionModal/Status/TransactionID';
 
 import type { RawTransactionType, SendTransaction } from './ProcessTransaction.Models';
