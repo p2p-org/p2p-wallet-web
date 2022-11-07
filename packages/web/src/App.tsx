@@ -1,3 +1,5 @@
+import 'new/services/Defaults';
+
 import * as React from 'react';
 import { BrowserRouter, HashRouter, Route, Switch } from 'react-router-dom';
 
@@ -20,6 +22,7 @@ import {
   SwapPage,
   WalletDetail,
 } from 'new/scenes/Main';
+import { Auth as AuthTrial } from 'new/scenes/Main/Auth';
 import { Root } from 'new/scenes/Root';
 import {
   DebugFeatureFlagsManager,
@@ -27,7 +30,6 @@ import {
   ModalManager,
   NotificationManager,
 } from 'new/ui/managers';
-import { Auth as AuthTrial } from 'new/scenes/Main/Auth';
 import { Landing } from 'pages/Landing';
 import { AuthRequiredRoute } from 'utils/routes/UserRequiredRoute';
 
