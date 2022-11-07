@@ -10,6 +10,7 @@ import { Intercom } from 'components/common/Intercom';
 import { NotifyToast } from 'components/common/NotifyToast';
 import { ToastManager } from 'components/common/ToastManager';
 import { Main } from 'new/scenes/Main';
+import { Auth as AuthTrial } from 'new/scenes/Main/Auth';
 import { Buy } from 'new/scenes/Main/Buy';
 import { Home } from 'new/scenes/Main/Home';
 import { Receive } from 'new/scenes/Main/Receive';
@@ -23,7 +24,6 @@ import { DebugFeatureFlagsManager } from 'new/ui/managers/DebugFeatureFlagsManag
 import { LocationManager } from 'new/ui/managers/LocationManager';
 import { NotificationManager } from 'new/ui/managers/NotificationManager';
 import { ModalManager } from 'new/ui/modals/ModalManager';
-import { Auth } from 'pages/Auth';
 import { Landing } from 'pages/Landing';
 import { AuthRequiredRoute } from 'utils/routes/UserRequiredRoute';
 
@@ -43,7 +43,7 @@ const App: React.FC = observer(() => {
               <LocationManager />
               <Switch>
                 <Route path="/" exact component={Landing} />
-                <Route path="/:type(signup|login)" exact component={Auth} />
+                <Route path="/onboard" exact component={AuthTrial} />
                 <Main>
                   <AuthRequiredRoute path="/wallets" component={Home} />
                   <AuthRequiredRoute path="/wallet/:publicKey" exact component={WalletDetail} />
