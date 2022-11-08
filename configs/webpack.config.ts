@@ -240,7 +240,7 @@ const config: ConfigFn = (env, argv) => {
       },
     },
 
-    devtool: __DEVELOPMENT__ ? 'eval-cheap-module-source-map' : 'source-map',
+    devtool: __DEVELOPMENT__ ? 'source-map' : false,
 
     devServer: {
       client: {

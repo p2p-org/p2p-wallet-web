@@ -2,7 +2,7 @@ import { singleton } from 'tsyringe';
 
 import { ViewModel } from 'new/core/viewmodels/ViewModel';
 import { NotificationService } from 'new/services/NotificationService';
-import { copyImageToClipboard, copyStringToClipboard } from 'new/utils/Clipboard';
+import { copyToClipboardImage, copyToClipboardString } from 'new/utils/Clipboard';
 
 @singleton()
 export class UserNamedAddressWidgetViewModel extends ViewModel {
@@ -17,7 +17,7 @@ export class UserNamedAddressWidgetViewModel extends ViewModel {
   protected override afterReactionsRemoved() {}
 
   copyString(name: string, value: string, onSuccess?: () => void): void {
-    void copyStringToClipboard(
+    void copyToClipboardString(
       value,
       () => {
         this._notificationService.info(`${name} copied!`);
@@ -31,7 +31,7 @@ export class UserNamedAddressWidgetViewModel extends ViewModel {
   }
 
   copyQRCode(qrElement: HTMLCanvasElement, onSuccess?: () => void): void {
-    void copyImageToClipboard(
+    void copyToClipboardImage(
       qrElement,
       () => {
         this._notificationService.info('QR Code copied!');

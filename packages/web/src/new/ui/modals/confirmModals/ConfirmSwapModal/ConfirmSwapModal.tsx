@@ -12,7 +12,7 @@ import { trackEvent } from 'new/sdk/Analytics';
 import { ButtonCancel } from 'new/ui/components/common/ButtonCancel';
 import { rounded } from 'new/utils/NumberExtensions';
 
-import type { ModalPropsType } from '../../ModalManager';
+import type { ModalPropsType } from '../../../managers/ModalManager';
 import { ArrowDown } from '../common/ArrowDown';
 import { SectionPassword } from '../common/SectionPassword';
 import { Section } from '../common/styled';

@@ -22,7 +22,7 @@ import { PasswordInput } from 'new/ui/components/common/PasswordInput';
 import { numberToString, rounded } from 'new/utils/NumberExtensions';
 import { capitalizeFirstLetter } from 'new/utils/StringExtensions';
 
-import type { ModalPropsType } from '../../ModalManager';
+import type { ModalPropsType } from '../../../managers/ModalManager';
 import { ArrowDown } from '../common/ArrowDown';
 import { Section } from '../common/styled';
 import { AmountSummaryView } from './AmountSummaryView';

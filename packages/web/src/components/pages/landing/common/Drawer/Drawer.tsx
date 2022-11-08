@@ -106,12 +106,8 @@ export const Drawer: FC<Props> = ({ isOpen, onDrawerClose }) => {
         </DrawerBg>
         <DrawerMenu>
           <Logo>Wallet</Logo>
-          {/* <MenuLink href="/#">Explore</MenuLink> */}
-          {/* <MenuLink href="/#">About</MenuLink> */}
-          {/* <MenuLink href="/#">Recent Updates</MenuLink> */}
-          {/* <MenuLink href="/#">FAQ</MenuLink> */}
-          <MenuLink to="/login">I have a wallet</MenuLink>
-          <MenuLink to="/signup" className="green">
+          <MenuLink to="/onboard">I have a wallet</MenuLink>
+          <MenuLink to="/onboard" className="green">
             Create new wallet
           </MenuLink>
         </DrawerMenu>

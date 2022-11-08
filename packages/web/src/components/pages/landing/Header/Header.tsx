@@ -133,7 +133,6 @@ type Props = {
 
 export const Header: FC<Props> = ({ onDrawerToggle }) => {
   const isTablet = useBreakpoint(up.tablet);
-  // const isDesktop = useBreakpoint(up.desktop);
 
   const handleHamburgerClick = () => {
     onDrawerToggle();
@@ -142,7 +141,6 @@ export const Header: FC<Props> = ({ onDrawerToggle }) => {
   return (
     <Wrapper>
       <Left>
-        {/* // isDesktop */}
         {isTablet ? <HamburgerIcon onClick={handleHamburgerClick} /> : undefined}
         <LogoWrapper>
           <Logo />
@@ -150,18 +148,10 @@ export const Header: FC<Props> = ({ onDrawerToggle }) => {
           <Wallet>Wallet</Wallet>
         </LogoWrapper>
       </Left>
-      {/* {isDesktop ? ( */}
-      {/*  <Center> */}
-      {/*    <NavLink href="#explore">Explore</NavLink> */}
-      {/*    <NavLink href="#about">About</NavLink> */}
-      {/*    <NavLink href="#recent">Recent updates</NavLink> */}
-      {/*    <NavLink href="#faq">FAQ</NavLink> */}
-      {/*  </Center> */}
-      {/* ) : undefined} */}
       {isTablet ? (
         <Right>
-          <Button to="/login">I have a wallet</Button>
-          <Button to="/signup" className="white">
+          <Button to="/onboard?restore">I have a wallet</Button>
+          <Button to="/onboard?create" className="white">
             Create wallet
           </Button>
         </Right>

@@ -13,7 +13,6 @@ import { Header } from 'components/pages/landing/Header';
 import { fonts } from 'components/pages/landing/styles/fonts';
 import { Top } from 'components/pages/landing/Top';
 import { Under } from 'components/pages/landing/Under';
-// import { Updates } from 'components/pages/landing/Updates';
 import { YouCan } from 'components/pages/landing/YouCan/YouCan';
 
 const Wrapper = styled.div`

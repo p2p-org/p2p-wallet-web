@@ -14,6 +14,7 @@ import { getInputAmount, getMinimumAmountOut, getOutputAmount } from 'new/sdk/Or
 import type { Wallet } from 'new/sdk/SolanaSDK';
 import { convertToBalance, toLamport } from 'new/sdk/SolanaSDK';
 import { Defaults } from 'new/services/Defaults';
+import { LocationService } from 'new/services/LocationService';
 import { ModalService, ModalType } from 'new/services/ModalService';
 import { PricesService } from 'new/services/PriceAPIs/PricesService';
 import { WalletsRepository } from 'new/services/Repositories';
@@ -75,6 +76,7 @@ export class SwapViewModel extends ViewModel implements SwapViewModelType {
     private _walletsRepository: WalletsRepository,
     private _pricesService: PricesService,
     private _modalService: ModalService,
+    private _locationService: LocationService,
   ) {
     super();
 
@@ -155,16 +157,31 @@ export class SwapViewModel extends ViewModel implements SwapViewModelType {
     this.chooseDestinationWalletViewModel.initialize();
     this.swapSettingsViewModel.initialize();
 
+    // TODO: really wait until wallets load?
     this.addReaction(
       when(
-        () => this._walletsRepository.state === SDFetcherState.loaded, // TODO: really wait until wallets load?
+        () => this._walletsRepository.state === SDFetcherState.loaded,
         () => {
           this.payingWallet = this._walletsRepository.nativeWallet;
           this.reload();
-          this._bind(/* TODO: initialWallet ?? */ this._walletsRepository.nativeWallet);
+
+          const pubkey = this._getPubkey();
+          const initialWallet = this._walletsRepository
+            .getWallets()
+            .find((wallet) => wallet.pubkey === pubkey);
+          // redirect to swap if don't found wallet with pubkey from URL
+          if (pubkey && !initialWallet) {
+            this._locationService.push('/swap');
+          }
+
+          this._bind(initialWallet ?? this._walletsRepository.nativeWallet);
         },
       ),
     );
+  }
+
+  private _getPubkey(): string | undefined {
+    return this._locationService.getParams<{ publicKey?: string }>('/swap/:publicKey?').publicKey;
   }
 
   protected override afterReactionsRemoved(): void {
@@ -315,6 +332,9 @@ export class SwapViewModel extends ViewModel implements SwapViewModelType {
           if (!wallet) {
             return;
           }
+          // @web: sync url with source wallet
+          this._locationService.push(`/swap/${wallet.pubkey}`);
+
           this.payingWallet = wallet;
         },
       ),

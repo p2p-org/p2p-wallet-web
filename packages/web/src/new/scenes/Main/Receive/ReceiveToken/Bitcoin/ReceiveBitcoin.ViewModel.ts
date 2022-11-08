@@ -67,6 +67,8 @@ export class ReceiveBitcoinViewModel extends ViewModel implements LockAndMintSer
     const session = this._persistentStore.session;
     if (!session?.isValid) {
       await this._lockAndMintService.createSession();
+    } else {
+      this._updateSessionEndDate();
     }
   }
 
@@ -121,7 +123,15 @@ export class ReceiveBitcoinViewModel extends ViewModel implements LockAndMintSer
       .catch(action(() => (this.isFetchingFee = false)));
   }
 
-  _checkSessionEnd(): void {
+  private _updateSessionEndDate(): void {
+    const endAt = this._persistentStore.session?.endAt ?? null;
+
+    runInAction(() => {
+      this.sessionEndDate = endAt;
+    });
+  }
+
+  private _checkSessionEnd(): void {
     const endAt = this._persistentStore.session?.endAt;
     if (!endAt) {
       return;
@@ -148,8 +158,7 @@ export class ReceiveBitcoinViewModel extends ViewModel implements LockAndMintSer
   lockAndMintServiceLoaded(gatewayAddress: string): void {
     this.address = gatewayAddress;
 
-    const endAt = this._persistentStore.session?.endAt ?? null;
-    this.sessionEndDate = endAt;
+    this._updateSessionEndDate();
   }
 
   /// Stop loading with error

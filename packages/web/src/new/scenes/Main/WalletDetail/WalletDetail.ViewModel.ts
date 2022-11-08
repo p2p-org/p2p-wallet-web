@@ -3,8 +3,11 @@ import { singleton } from 'tsyringe';
 
 import { ViewModel } from 'new/core/viewmodels/ViewModel';
 import type { Wallet } from 'new/sdk/SolanaSDK';
+import type { ParsedTransaction } from 'new/sdk/TransactionParser';
 import { LocationService } from 'new/services/LocationService';
+import { ModalService, ModalType } from 'new/services/ModalService';
 import { WalletsRepository } from 'new/services/Repositories';
+import type { TransactionModalProps } from 'new/ui/modals/TransactionModal';
 
 enum WalletActionTypeEnum {
   // receive = 'receive',
@@ -91,6 +94,7 @@ export class WalletDetailViewModel extends ViewModel {
   constructor(
     private _walletsRepository: WalletsRepository,
     private _locationService: LocationService, // private _analyticsManager: AnalyticsManager,
+    private _modalService: ModalService,
   ) {
     super();
 
@@ -201,7 +205,9 @@ export class WalletDetailViewModel extends ViewModel {
     }
   }
 
-  // showTransaction(transaction: ParsedTransaction): void {
-  //   // TODO: open modal with transaction
-  // }
+  showTransaction(transaction: ParsedTransaction): void {
+    this._modalService.openModal<void, TransactionModalProps>(ModalType.SHOW_MODAL_TRANSACTION, {
+      transaction,
+    });
+  }
 }

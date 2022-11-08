@@ -17,6 +17,7 @@ export const List = styled.ul`
   grid-gap: 16px;
   margin: 0;
   padding-left: 32px;
+  padding-right: 16px;
 `;
 
 export const Row = styled.li``;

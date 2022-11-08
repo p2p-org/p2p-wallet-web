@@ -2,7 +2,6 @@ import type { FC } from 'react';
 import { useHistory } from 'react-router';
 
 import { styled } from '@linaria/react';
-import { useWallet } from '@saberhq/use-solana';
 import classNames from 'classnames';
 import { observer } from 'mobx-react-lite';
 
@@ -146,14 +145,14 @@ const FIATS = [Fiat.usd, Fiat.eur, Fiat.rub];
 export const Settings: FC = observer(() => {
   const viewModel = useViewModel(SettingsViewModel);
   const history = useHistory();
-  const { disconnect } = useWallet();
 
   const handleNetworkClick = () => {
     history.push('/settings/network');
   };
 
   const handleLogoutClick = () => {
-    void disconnect().then(() => history.go(0));
+    void viewModel.walletModel.disconnect();
+    void viewModel.locationService.reload();
   };
 
   return (

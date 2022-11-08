@@ -3,8 +3,10 @@ import { singleton } from 'tsyringe';
 
 import { Fiat } from 'new/app/models/Fiat';
 import { ViewModel } from 'new/core/viewmodels/ViewModel';
+import { WalletModel } from 'new/models/WalletModel';
 import type { Appearance } from 'new/services/Defaults';
 import { Defaults } from 'new/services/Defaults';
+import { LocationService } from 'new/services/LocationService';
 import { NameService } from 'new/services/NameService';
 import { NotificationService } from 'new/services/NotificationService';
 import { PricesService } from 'new/services/PriceAPIs/PricesService';
@@ -18,6 +20,8 @@ export class SettingsViewModel extends ViewModel {
     private _pricesService: PricesService,
     private _solanaService: SolanaService,
     private _nameService: NameService,
+    public walletModel: WalletModel,
+    public locationService: LocationService,
     private _notificationService: NotificationService,
   ) {
     super();

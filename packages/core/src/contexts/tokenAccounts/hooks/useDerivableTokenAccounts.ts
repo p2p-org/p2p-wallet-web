@@ -16,7 +16,7 @@ export const useDerivableTokenAccounts = (
   seed: string,
   derivationPath: ValueOf<typeof DERIVATION_PATH>,
 ): readonly TokenAccount[] => {
-  const { network } = useConnectionContext();
+  const { network } = useConnectionContext(); // no need
   const sol = RAW_SOL[network];
   const parser: AccountParser<TokenAmount> = useCallback(
     (data) => {

@@ -1,5 +1,5 @@
 export interface SwapRouteParams {
-  symbol?: string;
+  publicKey?: string;
 }
 
 export enum VerificationError {
