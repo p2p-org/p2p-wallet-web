@@ -8,8 +8,8 @@ import { observer } from 'mobx-react-lite';
 import type { Wallet } from 'new/sdk/SolanaSDK';
 import { Defaults } from 'new/services/Defaults';
 import { numberToString } from 'new/utils/NumberExtensions';
+import { truncatingMiddle } from 'new/utils/StringExtensions';
 import { getAvatarSize } from 'utils/common';
-import { shortAddress } from 'utils/tokens';
 
 import { Content, TokenAvatarStyled, TokenBalance, TokenInfo, TokenName, TokenUSD } from './styled';
 
@@ -49,19 +49,29 @@ export const BaseWalletCellContent: FC<Props> = observer(
     const renderTokenName = () => {
       let tokenName = wallet.token.name;
       if (!tokenName) {
-        tokenName = shortAddress(wallet.mintAddress);
+        tokenName = truncatingMiddle(wallet.mintAddress, { numOfSymbolsRevealed: 4 });
       }
 
       return <TokenName title={wallet.mintAddress}>{tokenName}</TokenName>;
     };
 
-    const elTokenBalance = (
-      <TokenBalance>
-        {numberToString(wallet.amount, { maximumFractionDigits: 9 })} {wallet.token.symbol}
-      </TokenBalance>
-    );
+    const renderTokenBalance = () => {
+      if (!wallet.pubkey) {
+        return null;
+      }
+
+      return (
+        <TokenBalance>
+          {numberToString(wallet.amount, { maximumFractionDigits: 9 })} {wallet.token.symbol}
+        </TokenBalance>
+      );
+    };
 
     const renderTokenUSD = () => {
+      if (!wallet.pubkey) {
+        return null;
+      }
+
       if (wallet.amountInCurrentFiat) {
         return (
           <TokenUSD>
@@ -80,7 +90,7 @@ export const BaseWalletCellContent: FC<Props> = observer(
         <Content className={classNames({ isMobilePopupChild })}>
           <TokenInfo>
             {renderTokenName()}
-            {elTokenBalance}
+            {renderTokenBalance()}
             {renderTokenUSD()}
           </TokenInfo>
         </Content>

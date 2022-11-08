@@ -210,6 +210,7 @@ export const ChooseTokenAndAmount: FC<Props> = observer(({ viewModel }) => {
       <MainWrapper>
         <ChooseWallet
           viewModel={vm.chooseWalletViewModel}
+          customFilter={(wallet) => wallet.amount > 0}
           selector={<WalletSelectorContent viewModel={vm.chooseWalletViewModel} />}
           selectedWallet={viewModel.wallet}
           showOtherWallets={false}
