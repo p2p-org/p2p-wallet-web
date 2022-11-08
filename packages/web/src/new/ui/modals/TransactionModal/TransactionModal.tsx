@@ -158,12 +158,14 @@ export const TransactionModal: FC<TransactionModalProps & ModalPropsType> = obse
         }
         close={handleCloseClick}
         footer={
-          <Footer>
-            <SolanaExplorerLink
-              signature={model.transactionId}
-              network={Defaults.apiEndpoint.network}
-            />
-          </Footer>
+          transaction.signature ? (
+            <Footer>
+              <SolanaExplorerLink
+                signature={transaction.signature}
+                network={Defaults.apiEndpoint.network}
+              />
+            </Footer>
+          ) : null
         }
         noDelimiter={false}
       >
