@@ -6,6 +6,7 @@ import { observer } from 'mobx-react-lite';
 import { useViewModel } from 'new/core/viewmodels/useViewModel';
 import { BuyViewModel } from 'new/scenes/Main/Buy/Buy.ViewModel';
 import { MoonpayIframeWidget, MoonpayWidget } from 'new/scenes/Main/Buy/Subviews';
+import { useTrackOpenPageAction } from 'new/sdk/Analytics/hooks/useTrackOpenPageAction';
 import { Layout } from 'new/ui/components/common/Layout';
 
 const Error = styled.div`
@@ -16,6 +17,8 @@ const Error = styled.div`
 
 export const Buy: FC = observer(() => {
   const viewModel = useViewModel(BuyViewModel);
+
+  useTrackOpenPageAction('Buy_Screen_Opened');
 
   const renderContent = () => {
     if (!viewModel.areMoonpayConstantsSet) {

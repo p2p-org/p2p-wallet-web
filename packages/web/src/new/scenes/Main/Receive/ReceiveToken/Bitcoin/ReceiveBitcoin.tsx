@@ -4,6 +4,7 @@ import classNames from 'classnames';
 import { observer } from 'mobx-react-lite';
 
 import { useViewModel } from 'new/core/viewmodels/useViewModel';
+import { trackEvent } from 'new/sdk/Analytics';
 import { LoaderBlock } from 'new/ui/components/common/LoaderBlock';
 import { UsernameAddressWidget } from 'new/ui/components/common/UsernameAddressWidget';
 
@@ -24,7 +25,17 @@ export const ReceiveBitcoin: FC = observer(() => {
   return (
     <>
       <Content className="noTopPadding">
-        {viewModel.address ? <UsernameAddressWidget address={viewModel.address} /> : null}
+        {viewModel.address ? (
+          <UsernameAddressWidget
+            address={viewModel.address}
+            onAddressCopied={() => {
+              trackEvent({ name: 'Receive_Address_Copied' });
+            }}
+            onQRCodeCopied={() => {
+              trackEvent({ name: 'Receive_QR_Copied' });
+            }}
+          />
+        ) : null}
         <Hint viewModel={viewModel} />
         {showReceivingStatuses ? <RenBTCReceivingStatuses /> : null}
       </Content>
@@ -34,6 +45,9 @@ export const ReceiveBitcoin: FC = observer(() => {
           target="_blank"
           rel="noopener noreferrer noindex"
           className={classNames({ button: true, disabled: !viewModel.address })}
+          onClick={() => {
+            trackEvent({ name: 'Receive_Bitcoin_Explorer' });
+          }}
         >
           <ShareIcon name="external" />
           View in Bitcoin explorer

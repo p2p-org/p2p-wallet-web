@@ -9,7 +9,6 @@ import Logo from 'assets/images/logo.png';
 import { AddressText } from 'components/common/AddressText';
 import { ToastManager } from 'components/common/ToastManager';
 import { Button } from 'components/ui';
-import { trackEvent } from 'utils/analytics';
 import { askClipboardWritePermission, setToClipboard } from 'utils/clipboard';
 
 const Wrapper = styled.div`
@@ -92,16 +91,6 @@ type Type = 'receive';
 type CopyType = 'Username' | 'Address';
 
 const handleCopyClick = (type: Type, value: string, text: CopyType) => () => {
-  if (type === 'receive') {
-    switch (text) {
-      case 'Username':
-        trackEvent('Receive_Username_Copied');
-        break;
-      case 'Address':
-        trackEvent('Receive_Address_Copied');
-    }
-  }
-
   return copy(value, text);
 };
 
@@ -132,8 +121,6 @@ export const UsernameAddressWidget: FC<Props> = ({ type, address, username }) =>
     try {
       qrElement.toBlob((blob: Blob | null) => setToClipboard(blob));
       ToastManager.info('QR code Copied!');
-
-      trackEvent('Receive_QR_Saved');
     } catch (error) {
       console.error(error);
     }

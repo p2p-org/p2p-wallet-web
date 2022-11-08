@@ -7,7 +7,6 @@ import { borders, shadows, theme, up } from '@p2p-wallet-web/ui';
 
 import { Icon } from 'components/ui';
 import { appStorePath, playStorePath } from 'config/constants';
-import { trackEvent } from 'utils/analytics';
 
 const Wrapper = styled.div`
   display: grid;
@@ -137,14 +136,6 @@ const Line = styled.hr`
 export const LeftNavMenu: FunctionComponent = () => {
   const location = useLocation();
 
-  const handleAppLinkClick = (store: 'app_store' | 'google_play') => () => {
-    if (store === 'app_store') {
-      trackEvent('App_Store_Pressed');
-    } else if (store === 'google_play') {
-      trackEvent('Google_Play_Pressed');
-    }
-  };
-
   return (
     <Wrapper>
       <NavLinkMenu
@@ -218,13 +209,7 @@ export const LeftNavMenu: FunctionComponent = () => {
       <Separator>
         <Line />
       </Separator>
-      <NavLinkMenu
-        to={{ pathname: appStorePath }}
-        as={Link}
-        target="_blank"
-        className="button"
-        onClick={handleAppLinkClick('app_store')}
-      >
+      <NavLinkMenu to={{ pathname: appStorePath }} as={Link} target="_blank" className="button">
         <NavButton>
           <IconBlock>
             <NavIcon name="app-store" />
@@ -233,13 +218,7 @@ export const LeftNavMenu: FunctionComponent = () => {
           <StoreIcon name="store-icon" />
         </NavButton>
       </NavLinkMenu>
-      <NavLinkMenu
-        to={{ pathname: playStorePath }}
-        as={Link}
-        target="_blank"
-        className="button"
-        onClick={handleAppLinkClick('google_play')}
-      >
+      <NavLinkMenu to={{ pathname: playStorePath }} as={Link} target="_blank" className="button">
         <NavButton>
           <IconBlock>
             <NavIcon name="google-play" />

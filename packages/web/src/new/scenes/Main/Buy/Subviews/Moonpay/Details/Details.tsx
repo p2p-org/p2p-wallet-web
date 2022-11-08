@@ -3,14 +3,15 @@ import type { FC } from 'react';
 import { observer } from 'mobx-react-lite';
 import { expr } from 'mobx-utils';
 
-import type { Accordion } from 'components/ui/AccordionDetails';
-import { AccordionDetails } from 'components/ui/AccordionDetails';
-import type { BuyViewModelProps } from 'new/scenes/Main/Buy/Subviews/Moonpay/types';
+import type { AccordionList } from 'new/ui/components/ui/AccordionDetails';
+import { AccordionDetails } from 'new/ui/components/ui/AccordionDetails';
 import { numberToFiatString } from 'new/utils/NumberExtensions';
 
+import type { BuyViewModelProps } from '../types';
+
 export const Details: FC<BuyViewModelProps> = observer(({ viewModel }) => {
-  const accordion = expr(() => {
-    const lists: Accordion = [
+  const accordion = expr<AccordionList>(() => {
+    const lists: AccordionList = [
       {
         id: 1,
         rows: [

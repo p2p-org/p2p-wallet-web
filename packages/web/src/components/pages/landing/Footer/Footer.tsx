@@ -4,7 +4,6 @@ import { styled } from '@linaria/react';
 
 import LogoImg from 'assets/images/big-logo.png';
 import { ButtonIOS, ButtonWeb } from 'components/pages/landing/common/Button/Button';
-import { trackEvent } from 'utils/analytics';
 
 import { up } from '../styles/breakpoints';
 import LogoP2PImg from './logo.png';
@@ -338,8 +337,8 @@ export const Footer: FC = () => {
           <Logo />
           <Title>Carefully crafted for people from people in and around the world</Title>
           <ButtonWrapper>
-            <ButtonWeb glow onClick={() => trackEvent('landing_go_to_web_wallet_3_click')} />
-            <ButtonIOS glow onClick={() => trackEvent('landing_download_for_ios_4_click')} />
+            <ButtonWeb glow />
+            <ButtonIOS glow />
           </ButtonWrapper>
         </Top>
         <BackgroundBlack>

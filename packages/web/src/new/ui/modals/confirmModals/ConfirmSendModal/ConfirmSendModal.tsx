@@ -2,6 +2,7 @@ import type { FC } from 'react';
 import { useState } from 'react';
 
 import { styled } from '@linaria/react';
+import { ZERO } from '@orca-so/sdk';
 import {
   DEFAULT_WALLET_PROVIDERS,
   DefaultWalletType,
@@ -14,10 +15,12 @@ import { observer } from 'mobx-react-lite';
 import { Button, Icon } from 'components/ui';
 import { Modal } from 'components/ui/Modal';
 import type { SendViewModel } from 'new/scenes/Main/Send';
+import { trackEvent } from 'new/sdk/Analytics';
 import { ButtonCancel } from 'new/ui/components/common/ButtonCancel';
 import { ErrorHint } from 'new/ui/components/common/ErrorHint';
 import { PasswordInput } from 'new/ui/components/common/PasswordInput';
-import { numberToString } from 'new/utils/NumberExtensions';
+import { numberToString, rounded } from 'new/utils/NumberExtensions';
+import { capitalizeFirstLetter } from 'new/utils/StringExtensions';
 
 import type { ModalPropsType } from '../../../managers/ModalManager';
 import { ArrowDown } from '../common/ArrowDown';
@@ -103,6 +106,32 @@ export const ConfirmSendModal: FC<ConfirmSendModalProps & ModalPropsType> = obse
     const handleConfirmClick = () => {
       close(true);
       viewModel.authenticateAndSend();
+
+      // track confirm button clicked
+      const amountInFiat = rounded(viewModel.amount * viewModel.wallet!.priceInCurrentFiat, 2);
+
+      let feeToken: string | null = null;
+      const value = viewModel.feeInfo.value;
+      const payingWallet = viewModel.payingWallet;
+      if (value?.hasAvailableWalletToPayFee && payingWallet) {
+        if (value.feeAmount.total.gt(ZERO)) {
+          feeToken = payingWallet.token.symbol;
+        }
+      }
+
+      trackEvent({
+        name: 'Send_Confirm_Button_Pressed',
+        params: {
+          Send_Network: capitalizeFirstLetter(viewModel.network),
+          Send_Currency: viewModel.wallet!.token.symbol,
+          Send_Sum: viewModel.amount,
+          Send_MAX: viewModel.maxWasClicked,
+          Send_USD: amountInFiat,
+          Send_Free: viewModel.feeInfo.value?.feeAmount.transaction.eq(ZERO) || false,
+          Send_Username: Boolean(viewModel.recipient?.name),
+          Send_Account_Fee_Token: feeToken,
+        },
+      });
     };
 
     const isSecretKeyWallet =

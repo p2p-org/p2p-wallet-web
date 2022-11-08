@@ -6,6 +6,7 @@ import { observer } from 'mobx-react-lite';
 import { WidgetPageWithBottom } from 'components/common/WidgetPageWithBottom';
 import { useViewModel } from 'new/core/viewmodels/useViewModel';
 import { NetworkSelect } from 'new/scenes/Main/Send/NetworkSelect';
+import { useTrackOpenPageAction } from 'new/sdk/Analytics';
 import { Layout } from 'new/ui/components/common/Layout';
 
 import { ActionButton } from './ActionButton';
@@ -21,6 +22,8 @@ const Wrapper = styled.div`
 
 export const Send: FC = observer(() => {
   const viewModel = useViewModel(SendViewModel);
+
+  useTrackOpenPageAction('Send_Start_Screen');
 
   return (
     <Layout>

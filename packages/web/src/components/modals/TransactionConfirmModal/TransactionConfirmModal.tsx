@@ -1,5 +1,5 @@
 import type { FunctionComponent } from 'react';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 import { styled } from '@linaria/react';
 import {
@@ -18,7 +18,6 @@ import type { TransactionDetailsProps } from 'components/common/TransactionDetai
 import type { FeesOriginalProps } from 'components/pages/swap/SwapWidget/Fees/FeesOriginal';
 import { Button, Icon } from 'components/ui';
 import { Modal } from 'components/ui/Modal';
-import { trackEvent } from 'utils/analytics';
 
 import { Section } from './common/styled';
 import type { TransferParams } from './Send';
@@ -86,12 +85,6 @@ export const TransactionConfirmModal: FunctionComponent<
   const [password, setPassword] = useState('');
   const [hasError, setHasError] = useState(false);
 
-  useEffect(() => {
-    if (type === 'send') {
-      trackEvent('Send_Reviewing');
-    }
-  }, []);
-
   const validatePassword = async (value: string) => {
     try {
       await tryUnlockSeedAndMnemonic(value);
@@ -110,10 +103,6 @@ export const TransactionConfirmModal: FunctionComponent<
   };
 
   const handleConfirmClick = () => {
-    if (type === 'send') {
-      trackEvent('Send_Verification_Invoked');
-    }
-
     close(true);
   };
 

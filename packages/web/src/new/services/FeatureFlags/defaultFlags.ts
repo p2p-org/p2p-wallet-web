@@ -6,4 +6,5 @@ export const defaultFlags: FeatureFlagsType = {
   [Features.LeftNavMenuProfile]: false,
   [Features.ShowAllSettings]: false,
   [Features.ShowDevnet]: false,
+  [Features.LogAmplitudeEvents]: false,
 };

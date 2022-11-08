@@ -4,7 +4,6 @@ import { styled } from '@linaria/react';
 
 import { ButtonIOS, ButtonWeb } from 'components/pages/landing/common/Button/Button';
 import { CarouselMobile } from 'components/pages/landing/Under/CarouselMobile';
-import { trackEvent } from 'utils/analytics';
 
 import { up, useBreakpoint } from '../styles/breakpoints';
 import { CarouselDesktop } from './CarouselDesktop';
@@ -143,11 +142,7 @@ export const Under: FC = () => {
       </Top>
       <CarouselWrapper>{isTablet ? <CarouselDesktop /> : <CarouselMobile />}</CarouselWrapper>
       <Bottom>
-        {isTablet ? (
-          <ButtonWeb green />
-        ) : (
-          <ButtonIOS onClick={() => trackEvent('landing_download_for_ios_3_click')} />
-        )}
+        {isTablet ? <ButtonWeb green /> : <ButtonIOS />}
         <Hint>Will take less than a 2 min.</Hint>
       </Bottom>
     </Wrapper>

@@ -5,6 +5,7 @@ import { theme, up } from '@p2p-wallet-web/ui';
 
 import { Icon } from 'components/ui';
 import { useViewModel } from 'new/core/viewmodels/useViewModel';
+import { trackEvent } from 'new/sdk/Analytics';
 import { UsernameAddressWidget } from 'new/ui/components/common/UsernameAddressWidget';
 import { withNameServiceDomain } from 'new/utils/StringExtensions';
 
@@ -67,6 +68,12 @@ export const ReceiveSolana: FC = () => {
         <UsernameAddressWidget
           address={viewModel.pubkeyBase58}
           username={viewModel.username && withNameServiceDomain(viewModel.username)}
+          onAddressCopied={() => {
+            trackEvent({ name: 'Receive_Address_Copied' });
+          }}
+          onQRCodeCopied={() => {
+            trackEvent({ name: 'Receive_QR_Copied' });
+          }}
         />
       </Content>
       <BottomWrapper>
@@ -75,6 +82,9 @@ export const ReceiveSolana: FC = () => {
           target="_blank"
           rel="noopener noreferrer noindex"
           className="button"
+          onClick={() => {
+            trackEvent({ name: 'Receive_Solana_Explorer' });
+          }}
         >
           <ShareIcon name="external" />
           View in Solana explorer

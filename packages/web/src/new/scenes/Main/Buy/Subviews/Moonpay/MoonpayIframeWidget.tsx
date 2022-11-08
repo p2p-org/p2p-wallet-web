@@ -1,22 +1,32 @@
 import type { FC } from 'react';
+import { useEffect } from 'react';
 
 import { styled } from '@linaria/react';
 import { observer } from 'mobx-react-lite';
 import { expr } from 'mobx-utils';
 
-import { useTrackEventOpen } from 'app/hooks/metrics';
 import type { BuyViewModelProps } from 'new/scenes/Main/Buy/Subviews/Moonpay/types';
 import { WidgetPageBuy } from 'new/scenes/Main/Buy/Subviews/Moonpay/WidgetPageBuy';
-import { MOONPAY_API_KEY, MOONPAY_SIGNER_URL } from 'new/services/BuyService/constants';
+import { trackEvent } from 'new/sdk/Analytics';
+import {
+  MOONPAY_API_IP_ADDRESS,
+  MOONPAY_API_KEY,
+  MOONPAY_SIGNER_URL,
+} from 'new/services/BuyService/constants';
 import { buildParams } from 'new/services/BuyService/MoonpayProvider/utils';
-import type { MoonpayIframeParams } from 'new/services/BuyService/types';
+import type { MoonpayIframeParams, MoonpayIpAddressResponse } from 'new/services/BuyService/types';
+import { cancellableAxios } from 'new/utils/promise/PromiseExtensions';
 
 const Wrapper = styled.div`
   height: 640px;
 `;
 
-const baseParams: MoonpayIframeParams = {
+const baseParams = {
   apiKey: MOONPAY_API_KEY,
+};
+
+const moonpayIframeParams: MoonpayIframeParams = {
+  ...baseParams,
   currencyCode: 'sol',
   baseCurrencyAmount: 100,
   baseCurrencyCode: 'usd',
@@ -24,12 +34,30 @@ const baseParams: MoonpayIframeParams = {
 };
 
 export const MoonpayIframeWidget: FC<BuyViewModelProps> = observer(({ viewModel }) => {
-  useTrackEventOpen('Buy_Provider_Step_Viewed');
+  useEffect(() => {
+    // track iFrame shown event
+    trackEvent({ name: 'Moonpay_Window_Opened' });
+
+    // track unsupported region
+    const cancellableIpAddressRequest = cancellableAxios<MoonpayIpAddressResponse>({
+      url: MOONPAY_API_IP_ADDRESS,
+      params: baseParams,
+    }).then((response) => {
+      if (!response.data.isBuyAllowed) {
+        trackEvent({ name: 'Moonpay_Unsupported_Region_Showed' });
+      }
+    });
+
+    return () => {
+      // cancel IP address request
+      cancellableIpAddressRequest.cancel('Moonpay window is closed');
+    };
+  }, []);
 
   const urlWithParams = expr(
     () =>
       `${MOONPAY_SIGNER_URL}?${buildParams<MoonpayIframeParams>({
-        ...baseParams,
+        ...moonpayIframeParams,
         currencyCode: viewModel.crypto.moonpayCode,
         baseCurrencyAmount: viewModel.output.total,
         walletAddress: viewModel.pubkeyBase58,

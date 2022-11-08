@@ -4,7 +4,6 @@ import { styled } from '@linaria/react';
 
 import LogoImg from 'assets/images/big-logo.png';
 import { ButtonIOS, ButtonWeb } from 'components/pages/landing/common/Button/Button';
-import { trackEvent } from 'utils/analytics';
 
 import { up } from '../styles/breakpoints';
 
@@ -153,8 +152,8 @@ export const Top: FC = () => {
         can send money with free transactions and without hidden fees.{' '}
       </Description>
       <ButtonsWrapper>
-        <ButtonWeb glow onClick={() => trackEvent('landing_go_to_web_wallet_1_click')} />
-        <ButtonIOS glow onClick={() => trackEvent('landing_download_for_ios_1_click')} />
+        <ButtonWeb glow />
+        <ButtonIOS glow />
       </ButtonsWrapper>
     </Wrapper>
   );

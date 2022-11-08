@@ -7,6 +7,7 @@ import { ViewModel } from 'new/core/viewmodels/ViewModel';
 import { WalletModel } from 'new/models/WalletModel';
 import { MnemonicAdapter, MnemonicAdapterName } from 'new/scenes/Main/Auth/MnemonicAdapter';
 import { WalletsListViewModel } from 'new/scenes/Main/Auth/Subviews/Wallets.ViewModel';
+import { trackEvent } from 'new/sdk/Analytics';
 
 import type { AuthInfo, AuthState, DerivationPathOption } from './typings';
 import { WizardSteps } from './typings';
@@ -101,10 +102,14 @@ export class AuthViewModel extends ViewModel {
   }
 
   setCreateStart(): void {
+    trackEvent({ name: 'Create_Start_Button' });
+
     this.step = WizardSteps.CREATE_START;
   }
 
   setRestoreStart(): void {
+    trackEvent({ name: 'Restore_Start_Button' });
+
     this.step = WizardSteps.RESTORE_START;
   }
 

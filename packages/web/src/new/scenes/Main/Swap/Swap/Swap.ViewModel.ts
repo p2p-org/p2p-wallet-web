@@ -8,6 +8,7 @@ import { FeeType, FeeTypeEnum, networkFees, transactionFees } from 'new/app/mode
 import { SDFetcherState } from 'new/core/viewmodels/SDViewModel';
 import { ViewModel } from 'new/core/viewmodels/ViewModel';
 import { ActiveInputField, VerificationError } from 'new/scenes/Main/Swap/Swap/types';
+import { trackEvent } from 'new/sdk/Analytics';
 import type { PoolsPair } from 'new/sdk/OrcaSwap';
 import { getInputAmount, getMinimumAmountOut, getOutputAmount } from 'new/sdk/OrcaSwap';
 import type { Wallet } from 'new/sdk/SolanaSDK';
@@ -602,8 +603,14 @@ export class SwapViewModel extends ViewModel implements SwapViewModelType {
   walletDidSelect(wallet: Wallet, isSelectingSourceWallet: boolean): void {
     if (isSelectingSourceWallet) {
       this.sourceWallet = wallet;
+
+      // track TokenA changed
+      trackEvent({ name: 'Swap_Changing_Token_A', params: { Token_A_Name: wallet.token.symbol } });
     } else {
       this.destinationWallet = wallet;
+
+      // track TokenB changed
+      trackEvent({ name: 'Swap_Changing_Token_B', params: { Token_B_Name: wallet.token.symbol } });
     }
   }
 

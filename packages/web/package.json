@@ -22,6 +22,7 @@
   },
   "dependencies": {
     "@abraham/reflection": "^0.10.0",
+    "@amplitude/analytics-browser": "^1.5.5",
     "@emotion/is-prop-valid": "^0.8.8",
     "@linaria/babel-preset": "^3.0.0-beta.15",
     "@linaria/core": "^3.0.0-beta.15",
@@ -57,6 +58,7 @@
     "@solana/web3.js": "1.60.0",
     "@ubeswap/token-math": "^5.0.2",
     "@use-gesture/react": "^10.2.4",
+    "@xstate/react": "^1.5.1",
     "amplitude-js": "^8.3.0",
     "axios": "^0.27.2",
     "bezier-easing": "^2.1.0",
@@ -124,7 +126,6 @@
     "@testing-library/react": "^13.2.0",
     "@testing-library/react-hooks": "^8.0.0",
     "@testing-library/user-event": "^14.2.0",
-    "@types/amplitude-js": "^8.0.0",
     "@types/bn.js": "^5.1.0",
     "@types/bs58": "^4.0.1",
     "@types/classnames": "^2.2.10",

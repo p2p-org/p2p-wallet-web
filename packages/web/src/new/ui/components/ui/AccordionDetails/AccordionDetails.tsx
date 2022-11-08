@@ -32,11 +32,12 @@ interface Props {
   titleBottomName: string | ReactElement;
   titleBottomValue?: string;
   accordion: AccordionList;
+  onToggle?: (isOpen: boolean) => void;
 }
 
-export const AccordionDetails: FC<Props> = ({ accordion, ...props }) => {
+export const AccordionDetails: FC<Props> = ({ accordion, onToggle, ...props }) => {
   return (
-    <Accordion title={<AccordionTitle {...props} />} noContentPadding>
+    <Accordion title={<AccordionTitle {...props} />} onToggle={onToggle} noContentPadding>
       {accordion.map((list) => (
         <ListWrapper key={list.id} className={list.className}>
           {list.rows.map((row) => (

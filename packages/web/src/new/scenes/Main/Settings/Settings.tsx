@@ -12,6 +12,7 @@ import { useViewModel } from 'new/core/viewmodels/useViewModel';
 import AppStoreBadge from 'new/scenes/Main/Settings/images/app-store-badge.png';
 import GooglePlayBadge from 'new/scenes/Main/Settings/images/google-play-badge.png';
 import { SettingsViewModel } from 'new/scenes/Main/Settings/Settings.ViewModel';
+import { trackEvent } from 'new/sdk/Analytics';
 import { Appearance, Defaults } from 'new/services/Defaults';
 import { isEnabled } from 'new/services/FeatureFlags';
 import { Features } from 'new/services/FeatureFlags/features';
@@ -236,14 +237,30 @@ export const Settings: FC = observer(() => {
                     </Text>
                     <div>You can access the feature in the app</div>
                     <MobileButtons>
-                      <a href={playStorePath} target="_blank" className="button" rel="noreferrer">
+                      <a
+                        href={playStorePath}
+                        target="_blank"
+                        className="button"
+                        rel="noreferrer"
+                        onClick={() => {
+                          trackEvent({ name: 'Google_Click_Button' });
+                        }}
+                      >
                         <img
                           src={GooglePlayBadge}
                           height="40"
                           alt="Download P2P Wallet at the Google Play Store"
                         />
                       </a>
-                      <a href={appStorePath} target="_blank" className="button" rel="noreferrer">
+                      <a
+                        href={appStorePath}
+                        target="_blank"
+                        className="button"
+                        rel="noreferrer"
+                        onClick={() => {
+                          trackEvent({ name: 'Appstore_Click_Button' });
+                        }}
+                      >
                         <img
                           src={AppStoreBadge}
                           height="40"

@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import Skeleton from 'react-loading-skeleton';
 
 import { styled } from '@linaria/react';
@@ -18,7 +18,6 @@ import classNames from 'classnames';
 import dayjs from 'dayjs';
 
 import { TokenAvatar } from 'components/common/TokenAvatar';
-import { trackEvent } from 'utils/analytics';
 import { getExplorerUrl } from 'utils/connection';
 import { formatNumber } from 'utils/format';
 import { shortAddress } from 'utils/tokens';
@@ -166,16 +165,6 @@ export const TransactionDetailsModal: FC<Props> = ({ signature, source: sourceAd
     usePubkey(transaction?.details.tokenAccount),
     transaction?.details.amount,
   );
-
-  useEffect(() => {
-    const type = transaction?.details.type;
-
-    if (type === 'send') {
-      trackEvent('Send_Process_Shown');
-    } else if (type === 'swap') {
-      trackEvent('Swap_Process_Shown');
-    }
-  }, [transaction?.details.type]);
 
   // useEffect(() => {
   //   const mount = async () => {

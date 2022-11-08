@@ -80,6 +80,7 @@ export class SendViewModel
 
   wallet: Wallet | null;
   amount: number;
+  maxWasClicked: boolean;
   recipient: Recipient | null;
   network: Network;
   loadingState: LoadableState;
@@ -109,6 +110,7 @@ export class SendViewModel
 
     this.wallet = null;
     this.amount = 0;
+    this.maxWasClicked = false;
     this.recipient = null;
     this.network = Network.solana;
     this.loadingState = LoadableState.notRequested;
@@ -142,6 +144,7 @@ export class SendViewModel
 
       chooseWallet: action,
       enterAmount: action,
+      setMaxWasClicked: action,
 
       selectRecipient: action,
       selectNetwork: action,
@@ -156,6 +159,7 @@ export class SendViewModel
 
     this.wallet = null;
     this.amount = 0;
+    this.maxWasClicked = false;
     this.recipient = null;
     this.network = Network.solana;
     this.loadingState = LoadableState.notRequested;
@@ -447,6 +451,10 @@ export class SendViewModel
   }
 
   ///
+
+  setMaxWasClicked(): void {
+    this.maxWasClicked = true;
+  }
 
   enterAmount(amount: number) {
     this.amount = amount;

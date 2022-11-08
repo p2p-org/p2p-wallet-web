@@ -10,6 +10,7 @@ import { Icon } from 'components/ui';
 import { InputAmount } from 'components/ui/InputAmount';
 import type { SendViewModel } from 'new/scenes/Main/Send';
 import { WalletSelectorContent } from 'new/scenes/Main/Send/ChooseTokenAndAmount/WalletSelectorContent';
+import { trackEvent } from 'new/sdk/Analytics';
 import type { Wallet } from 'new/sdk/SolanaSDK';
 import { Defaults } from 'new/services/Defaults';
 import { AmountTypeButton } from 'new/ui/components/common/AmountTypeButton';
@@ -162,6 +163,7 @@ export const ChooseTokenAndAmount: FC<Props> = observer(({ viewModel }) => {
       groupingSeparator: '',
     });
     viewModel.enterAmount(Number(string));
+    viewModel.setMaxWasClicked();
   };
 
   const handleWalletChange = (wallet: Wallet) => {
@@ -170,6 +172,11 @@ export const ChooseTokenAndAmount: FC<Props> = observer(({ viewModel }) => {
 
   const handleToggleCurrencyModeClick = () => {
     vm.toggleCurrencyMode();
+
+    trackEvent({
+      name: 'Send_USD_Button',
+      params: { Mode: vm.currencyMode === CurrencyMode.fiat ? 'Fiat' : 'Token' },
+    });
   };
 
   const handleAmountChange = (value: string) => {

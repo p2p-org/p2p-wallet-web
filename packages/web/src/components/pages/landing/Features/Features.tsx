@@ -3,7 +3,6 @@ import type { FC } from 'react';
 import { styled } from '@linaria/react';
 
 import { ButtonIOS, ButtonWeb } from 'components/pages/landing/common/Button/Button';
-import { trackEvent } from 'utils/analytics';
 
 import { up, useBreakpoint } from '../styles/breakpoints';
 
@@ -226,8 +225,8 @@ export const Features: FC = () => {
               </FeatureDescription>
             </Feature>
             <ButtonWrapper>
-              <ButtonWeb glow onClick={() => trackEvent('landing_go_to_web_wallet_2_click')} />
-              <ButtonIOS glow onClick={() => trackEvent('landing_download_for_ios_2_click')} />
+              <ButtonWeb glow />
+              <ButtonIOS glow />
             </ButtonWrapper>
           </FeaturesColumn>
         </FeaturesWrapper>

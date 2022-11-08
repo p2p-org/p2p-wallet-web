@@ -8,7 +8,9 @@ import { observer } from 'mobx-react-lite';
 import { Modal } from 'components/ui/Modal';
 import { useViewModel } from 'new/core/viewmodels/useViewModel';
 import type { SwapViewModel } from 'new/scenes/Main/Swap';
+import { trackEvent } from 'new/sdk/Analytics';
 import { ButtonCancel } from 'new/ui/components/common/ButtonCancel';
+import { rounded } from 'new/utils/NumberExtensions';
 
 import type { ModalPropsType } from '../../../managers/ModalManager';
 import { ArrowDown } from '../common/ArrowDown';
@@ -58,6 +60,18 @@ export const ConfirmSwapModal: FC<ConfirmSwapModalProps & ModalPropsType> = obse
     const handleConfirmClick = () => {
       close(true);
       vm.authenticateAndSwap();
+
+      // track button click
+      trackEvent({
+        name: 'Swap_Approve_Button',
+        params: {
+          Token_A: viewModel.sourceWallet!.token.symbol,
+          Token_B: viewModel.destinationWallet!.token.symbol,
+          Swap_Sum: rounded(viewModel.inputAmount!, viewModel.sourceWallet?.token.decimals || 9),
+          Swap_MAX: viewModel.isUsingAllBalance,
+          Swap_USD: rounded(viewModel.inputAmount! * viewModel.sourceWallet!.priceInCurrentFiat, 2),
+        },
+      });
     };
 
     const handleDisabledChange = (flag: boolean) => {
