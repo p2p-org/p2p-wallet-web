@@ -7,9 +7,8 @@ import classNames from 'classnames';
 import { observer } from 'mobx-react-lite';
 
 import { ErrorHint } from 'components/common/ErrorHint';
-import { useViewModel } from 'new/core/viewmodels/useViewModel';
+import type { ViewModelProps } from 'new/scenes/Main/Auth/typings';
 
-import { AuthViewModel } from '../../Auth.ViewModel';
 import { Button } from '../components/Button';
 
 const Wrapper = styled.div`
@@ -72,13 +71,12 @@ const MnemonicTextarea = styled.textarea`
   }
 `;
 
-export const ConfirmMnemonic: FC = observer(() => {
-  const viewModel = useViewModel(AuthViewModel);
+export const ConfirmMnemonicPage: FC<ViewModelProps> = observer(({ authViewModel }) => {
   const [userMnemonic, setUserMnemonic] = useState('');
   const [hasError, setHasError] = useState(false);
 
   const validateMnemonic = (value: string) => {
-    setHasError(value !== viewModel.authInfo.mnemonic);
+    setHasError(value !== authViewModel.authInfo.mnemonic);
   };
 
   const handleMnemonicInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -93,7 +91,7 @@ export const ConfirmMnemonic: FC = observer(() => {
     validateMnemonic(value);
   };
 
-  const isNextDisabled = userMnemonic.trim() !== viewModel.authInfo.mnemonic || hasError;
+  const isNextDisabled = userMnemonic.trim() !== authViewModel.authInfo.mnemonic || hasError;
 
   return (
     <Wrapper>
@@ -112,7 +110,7 @@ export const ConfirmMnemonic: FC = observer(() => {
         />
         {hasError ? <ErrorHint error="Incorrect seed phrase" /> : undefined}
       </MnemonicWrapper>
-      <Button disabled={isNextDisabled} onClick={viewModel.nextStep}>
+      <Button disabled={isNextDisabled} onClick={authViewModel.nextStep}>
         Continue
       </Button>
     </Wrapper>

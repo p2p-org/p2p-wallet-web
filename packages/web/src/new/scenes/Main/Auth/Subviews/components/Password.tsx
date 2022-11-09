@@ -7,9 +7,8 @@ import { observer } from 'mobx-react-lite';
 
 import { ErrorHint } from 'components/common/ErrorHint';
 import { PasswordInput } from 'components/common/PasswordInput';
-import { useViewModel } from 'new/core/viewmodels/useViewModel';
+import type { ViewModelProps } from 'new/scenes/Main/Auth/typings';
 
-import { AuthViewModel } from '../../Auth.ViewModel';
 import { validatePassword } from '../../utils';
 import { Button } from './Button';
 
@@ -110,29 +109,28 @@ const ButtonStyled = styled(Button)`
   margin-top: 32px;
 `;
 
-export const Password: FC = observer(() => {
-  const viewModel = useViewModel(AuthViewModel);
+export const Password: FC<ViewModelProps> = observer(({ authViewModel }) => {
   const [passwordRepeat, setPasswordRepeat] = useState('');
   const [hasPasswordRepeatError, setHasPasswordRepeatError] = useState(false);
 
   const { isLowerCase, isUpperCase, isNumber, isMinLength } = validatePassword(
-    viewModel.authInfo.password,
+    authViewModel.authInfo.password,
   );
 
   const handlePasswordRepeatChange = (value: string) => {
     setPasswordRepeat(value);
 
     if (hasPasswordRepeatError) {
-      setHasPasswordRepeatError(viewModel.authInfo.password !== value);
+      setHasPasswordRepeatError(authViewModel.authInfo.password !== value);
     }
   };
 
   const handlePasswordRepeatBlur = () => {
-    setHasPasswordRepeatError(viewModel.authInfo.password !== passwordRepeat);
+    setHasPasswordRepeatError(authViewModel.authInfo.password !== passwordRepeat);
   };
 
   const elRules = () => {
-    if (!viewModel.authInfo.password) {
+    if (!authViewModel.authInfo.password) {
       return;
     }
 
@@ -172,12 +170,12 @@ export const Password: FC = observer(() => {
   };
 
   const disabled =
-    !viewModel.authInfo.password ||
+    !authViewModel.authInfo.password ||
     !isLowerCase ||
     !isUpperCase ||
     !isNumber ||
     !isMinLength ||
-    viewModel.authInfo.password !== passwordRepeat;
+    authViewModel.authInfo.password !== passwordRepeat;
 
   return (
     <Wrapper>
@@ -188,8 +186,8 @@ export const Password: FC = observer(() => {
       </CreatePasswordHint>
       <PasswordInput
         placeholder="Create new password"
-        value={viewModel.authInfo.password}
-        onChange={viewModel.setPassword}
+        value={authViewModel.authInfo.password}
+        onChange={authViewModel.setPassword}
         isError={false}
       />
       {elRules()}
@@ -203,7 +201,7 @@ export const Password: FC = observer(() => {
         isError={false}
       />
       {hasPasswordRepeatError ? <ErrorHint error="Passwords doesn’t match" /> : undefined}
-      <ButtonStyled disabled={disabled} onClick={viewModel.nextStep}>
+      <ButtonStyled disabled={disabled} onClick={authViewModel.nextStep}>
         Continue
       </ButtonStyled>
     </Wrapper>

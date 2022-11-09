@@ -2,6 +2,8 @@ import type { ReactElement, ReactNode } from 'react';
 
 import type { Signer } from '@solana/web3.js';
 
+import type { AuthViewModel } from 'new/scenes/Main/Auth/Auth.ViewModel';
+
 export enum WizardSteps {
   CREATE_START = 'CREATE_START',
   CREATE_CONFIRM_MNEMONIC = 'CREATE_CONFIRM_MNEMONIC',
@@ -61,6 +63,10 @@ export type StorageInfo = {
 export type ExpiryDataType<T> = {
   value: T;
   expiry: number;
+};
+
+export type ViewModelProps = {
+  authViewModel: AuthViewModel;
 };
 
 export type ValueOf<T> = T[keyof T];
