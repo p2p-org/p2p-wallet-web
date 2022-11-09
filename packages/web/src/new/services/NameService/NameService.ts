@@ -26,7 +26,7 @@ interface NameServiceType {
 // TODO: application scope
 @injectable()
 export class NameService implements NameServiceType {
-  private _endpoint = 'https://solana-fee-relayer.wallet.p2p.org/name_register';
+  private _endpoint = process.env.REACT_APP_NAME_SERVICE_ENDPOINT;
   private _cache: Record<string, string | null> = {};
 
   constructor() {}
