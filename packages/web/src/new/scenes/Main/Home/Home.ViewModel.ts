@@ -31,9 +31,7 @@ export class HomeViewModel extends ViewModel {
     });
   }
 
-  protected override setDefaults() {
-    this.username = null;
-  }
+  protected override setDefaults() {}
 
   protected override onInitialize() {
     // this.walletsRepository.initialize();
