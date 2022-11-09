@@ -54,6 +54,12 @@ class _RemoteConfig {
       return acc;
     }, {} as FeatureFlagsType);
   }
+
+  get usernameDomain(): string {
+    const values = this._getConfig();
+
+    return values[ConfigKeys.UsernameDomain]!.asString();
+  }
 }
 
 export const RemoteConfig = new _RemoteConfig();
