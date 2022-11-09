@@ -82,17 +82,17 @@ const SwitcherText = styled.span`
 export const Final: FC = observer(() => {
   const viewModel = useViewModel(AuthViewModel);
 
-  const [isSave, setIsSave] = useState(true);
+  const [saveLocally, setSaveLocally] = useState(true);
   const [isShowModal, setIsShowModal] = useState(false);
 
   const handleCloseModal = (nextIsSave: boolean) => {
     setIsShowModal(false);
-    setIsSave(nextIsSave);
+    setSaveLocally(nextIsSave);
   };
 
   const handleIsSaveChange = (nextIsSave: boolean) => {
     if (nextIsSave) {
-      setIsSave(nextIsSave);
+      setSaveLocally(nextIsSave);
       return;
     }
 
@@ -101,7 +101,7 @@ export const Final: FC = observer(() => {
 
   const handleFinishClick = () => {
     try {
-      void viewModel.finalize();
+      void viewModel.finalize(saveLocally);
     } catch (error) {
       ToastManager.error((error as Error).message);
     }
@@ -120,7 +120,7 @@ export const Final: FC = observer(() => {
         </Desc>
       </TopWrapper>
       <SwitcherLabel>
-        <Switch checked={isSave} onChange={handleIsSaveChange} />
+        <Switch checked={saveLocally} onChange={handleIsSaveChange} />
         <SwitcherText>Use fast enter with password</SwitcherText>
       </SwitcherLabel>
       <Button onClick={handleFinishClick}>Finish setup</Button>

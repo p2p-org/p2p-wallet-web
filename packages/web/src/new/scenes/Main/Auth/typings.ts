@@ -44,6 +44,7 @@ export type ConnectConfig = SignInConnectConfig | RecurringConnectConfig;
 type SignInConnectConfig = {
   type: 'sign';
   derivationPath: string;
+  saveLocally: boolean;
   storageInfo: StorageInfo;
 };
 
