@@ -46,6 +46,7 @@ jobs:
           REACT_APP_FIREBASE_API_KEY: ${{ secrets.REACT_APP_FIREBASE_API_KEY }}
           REACT_APP_FIREBASE_APP_ID: ${{ secrets.REACT_APP_FIREBASE_APP_ID }}
           REACT_APP_RPCPOOL_API_KEY: ${{ secrets.REACT_APP_RPCPOOL_API_KEY }}
+          REACT_APP_NAME_SERVICE_URL: ${{ secrets.REACT_APP_NAME_SERVICE_URL }}
         run: yarn build
 
       - name: Publish

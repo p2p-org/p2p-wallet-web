@@ -23,7 +23,7 @@ export class FeeRelayerAPIClient implements FeeRelayerAPIClientType {
   // Initializers
   constructor(version = 1) {
     this.version = version;
-    this._baseUrlString = 'https://solana-fee-relayer.wallet.p2p.org'; // TODO: from params
+    this._baseUrlString = process.env.REACT_APP_FEE_RELAYER_URL!; // TODO: from params
   }
 
   // Methods
