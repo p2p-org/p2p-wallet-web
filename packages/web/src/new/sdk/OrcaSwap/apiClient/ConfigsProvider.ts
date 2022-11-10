@@ -8,7 +8,7 @@ export interface OrcaSwapConfigsProvider {
 export class NetworkConfigsProvider implements OrcaSwapConfigsProvider {
   network: string;
   cache?: any;
-  private _urlString = 'https://orca.wallet.p2p.org/info';
+  private _urlString = process.env.REACT_APP_ORCA_CACHE_URL!;
 
   constructor(network: Network) {
     this.network = network;
@@ -24,7 +24,7 @@ export class NetworkConfigsProvider implements OrcaSwapConfigsProvider {
     }
 
     // get
-    const data = await (await fetch(this._urlString)).json();
+    const data = await (await fetch(`${this._urlString}/info`)).json();
 
     this.cache = data;
 
