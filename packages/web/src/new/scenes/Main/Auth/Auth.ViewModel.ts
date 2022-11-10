@@ -5,10 +5,10 @@ import { singleton } from 'tsyringe';
 import { isDev, localMnemonic } from 'config/constants';
 import { ViewModel } from 'new/core/viewmodels/ViewModel';
 import { WalletModel } from 'new/models/WalletModel';
-import { MnemonicAdapter, MnemonicAdapterName } from 'new/scenes/Main/Auth/MnemonicAdapter';
-import { WalletsListViewModel } from 'new/scenes/Main/Auth/Subviews/Wallets.ViewModel';
 import { trackEvent } from 'new/sdk/Analytics';
 
+import { MnemonicAdapter, MnemonicAdapterName } from './MnemonicAdapter';
+import { WalletsListViewModel } from './Subviews/Wallets.ViewModel';
 import type { AuthInfo, AuthState, DerivationPathOption } from './typings';
 import { WizardSteps } from './typings';
 import { DERIVATION_PATH, mnemonicToSeed } from './utils';

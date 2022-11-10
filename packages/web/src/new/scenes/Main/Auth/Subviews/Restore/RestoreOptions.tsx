@@ -13,9 +13,8 @@ import { observer } from 'mobx-react-lite';
 
 import { ErrorHint } from 'components/common/ErrorHint';
 import { ToastManager } from 'components/common/ToastManager';
-import { useViewModel } from 'new/core/viewmodels/useViewModel';
-import { AuthViewModel } from 'new/scenes/Main/Auth/Auth.ViewModel';
 
+import type { ViewModelProps } from '../../typings';
 import { Button } from '../components/Button';
 import { MnemonicTextarea as MnemonicInput } from '../Create/MnemonicInput';
 
@@ -135,13 +134,12 @@ const MnemonicTextarea = styled(MnemonicInput)`
 
 const VALIDATE_MNEMONIC_THROTTLE_TIMEOUTE = 100;
 
-export const RestoreOptions: FC = observer(() => {
-  const viewModel = useViewModel(AuthViewModel);
-  const [mnemonic, setMnemonic] = useState(viewModel.initialRestoreMnemonic);
+export const RestoreOptions: FC<ViewModelProps> = observer(({ authViewModel }) => {
+  const [mnemonic, setMnemonic] = useState(authViewModel.initialRestoreMnemonic);
   const [hasError, setHasError] = useState(false);
   const handleConnectByClick = (extensionName: WalletName) => () => {
     try {
-      void viewModel.connectExtension(extensionName);
+      void authViewModel.connectExtension(extensionName);
     } catch (error) {
       ToastManager.error((error as Error).message);
     }
@@ -180,8 +178,8 @@ export const RestoreOptions: FC = observer(() => {
   const isDisabled = !mnemonic || hasError;
 
   const goNext = () => {
-    viewModel.setMnemonic(mnemonic);
-    viewModel.nextStep();
+    authViewModel.setMnemonic(mnemonic);
+    authViewModel.nextStep();
   };
 
   return (

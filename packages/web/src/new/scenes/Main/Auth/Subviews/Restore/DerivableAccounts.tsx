@@ -5,16 +5,15 @@ import { observer } from 'mobx-react-lite';
 
 import { Icon } from 'components/ui';
 import { Popover } from 'components/ui/Popover';
-import { useViewModel } from 'new/core/viewmodels/useViewModel';
-import { AuthViewModel } from 'new/scenes/Main/Auth/Auth.ViewModel';
-import { WalletPlaceholder } from 'new/scenes/Main/Auth/Subviews/Restore/WalletPlaceholder';
 import type { Wallet } from 'new/sdk/SolanaSDK';
 import { StaticSectionsCollectionView } from 'new/ui/components/common/StaticSectionsCollectionView';
 
+import type { ViewModelProps } from '../../typings';
 import { DERIVATION_PATH } from '../../utils';
 import { Button } from '../components/Button';
 import type { SelectorItemType } from './Selector';
 import { Selector } from './Selector';
+import { WalletPlaceholder } from './WalletPlaceholder';
 import { WalletRow } from './WalletRow';
 
 const Wrapper = styled.div`
@@ -90,9 +89,7 @@ const DERIVATION_PATHS_WITH_LABELS: SelectorItemType[] = [
   },
 ];
 
-export const DerivableAccounts: FC = observer(() => {
-  const viewModel = useViewModel(AuthViewModel);
-
+export const DerivableAccounts: FC<ViewModelProps> = observer(({ authViewModel }) => {
   return (
     <Wrapper>
       <SelectDerivationPath>
@@ -115,21 +112,21 @@ export const DerivableAccounts: FC = observer(() => {
         </Popover>
       </SelectDerivationPath>
       <Selector
-        value={viewModel.authInfo.derivationPath}
+        value={authViewModel.authInfo.derivationPath}
         items={DERIVATION_PATHS_WITH_LABELS}
-        onChange={viewModel.setDerivationPath}
+        onChange={authViewModel.setDerivationPath}
       />
 
       <Derivable>Derivable Accounts</Derivable>
       <AccountsWrapper>
         <StaticSectionsCollectionView<Wallet>
-          viewModel={viewModel.walletListsViewModel}
+          viewModel={authViewModel.walletListsViewModel}
           renderPlaceholder={(key) => <WalletPlaceholder key={key} />}
           renderItem={(wallet) => <WalletRow wallet={wallet} key={wallet.pubkey} />}
         />
       </AccountsWrapper>
 
-      <Button onClick={viewModel.nextStep}>Continue</Button>
+      <Button onClick={authViewModel.nextStep}>Continue</Button>
     </Wrapper>
   );
 });
