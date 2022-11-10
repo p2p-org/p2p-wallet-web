@@ -30,7 +30,7 @@ interface NameServiceType {
 // TODO: application scope
 @injectable()
 export class NameService implements NameServiceType {
-  private _endpoint = process.env.REACT_APP_NAME_SERVICE_ENDPOINT!;
+  private _endpoint = process.env.REACT_APP_NAME_SERVICE_URL!;
   private _cache: Record<string, string | null> = {};
 
   constructor() {}
