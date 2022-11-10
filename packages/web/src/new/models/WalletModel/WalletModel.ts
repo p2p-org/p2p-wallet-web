@@ -52,10 +52,35 @@ export class WalletModel extends Model {
       adaptors: observable,
       pubKey: computed,
       signer: computed,
+      isMnemonicWallet: computed,
     });
 
     this.onConnect = this.onConnect.bind(this);
     this.onDisconnect = this.onDisconnect.bind(this);
+  }
+
+  get pubKey(): PublicKey {
+    return new PublicKey(this.publicKey);
+  }
+
+  get signer(): Wallet {
+    return this.selectedAdaptor as Wallet;
+  }
+
+  get isMnemonicWallet(): boolean {
+    return this.selectedAdaptor?.name === MnemonicAdapterName;
+  }
+
+  get messageSigner(): MessageSignerWalletAdapter {
+    return this.selectedAdaptor as MessageSignerWalletAdapter;
+  }
+
+  confirmPassword(password: string): Promise<boolean> {
+    if (this.selectedAdaptor?.name === MnemonicAdapterName) {
+      return (this.selectedAdaptor as MnemonicAdapter).confirmPassword(password);
+    }
+
+    throw new Error('You must use confirmPassword on Mnemonic adaptor only');
   }
 
   signAllTransactions(transactions: Array<Transaction>): Promise<Array<Transaction>> {
@@ -172,18 +197,6 @@ export class WalletModel extends Model {
       this.name = '';
       this.publicKey = '';
     });
-  }
-
-  get pubKey(): PublicKey {
-    return new PublicKey(this.publicKey);
-  }
-
-  get signer(): Wallet {
-    return this.selectedAdaptor as Wallet;
-  }
-
-  get messageSigner(): MessageSignerWalletAdapter {
-    return this.selectedAdaptor as MessageSignerWalletAdapter;
   }
 
   private _getAdaptors() {

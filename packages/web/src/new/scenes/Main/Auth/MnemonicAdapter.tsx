@@ -17,6 +17,9 @@ import {
 } from 'new/scenes/Main/Auth/utils';
 import { notImplemented } from 'new/utils/decorators';
 
+import type { SeedAndMnemonic } from './utils';
+import { decryptEncryptedTextAsync } from './utils';
+
 export interface Wallet {
   signTransaction(tx: Transaction): Promise<Transaction>;
   signAllTransactions(txs: Transaction[]): Promise<Transaction[]>;
@@ -156,6 +159,22 @@ export class MnemonicAdapter extends BaseMessageSignerWalletAdapter {
     }
   }
 
+  async confirmPassword(password: string) {
+    const encryptedMnemonic = localStorage.getItem(MnemonicAdapter._mnemonicStorageKey);
+
+    if (!encryptedMnemonic) {
+      return false;
+    }
+
+    try {
+      await MnemonicAdapter._decryptSeedAndMnemonic(password, encryptedMnemonic);
+    } catch (e) {
+      return false;
+    }
+
+    return true;
+  }
+
   private static async _saveEncryptedMnemonicAndSeed(payload: StorageInfo) {
     const plaintext = JSON.stringify({
       mnemonic: payload.mnemonic,
@@ -213,6 +232,16 @@ export class MnemonicAdapter extends BaseMessageSignerWalletAdapter {
       iterations,
       digest,
     };
+  }
+
+  private static async _decryptSeedAndMnemonic(
+    password: string,
+    encryptedText: string,
+  ): Promise<SeedAndMnemonic> {
+    const encrypted = JSON.parse(encryptedText);
+    const decrypted = await decryptEncryptedTextAsync(JSON.parse(encrypted.value), password);
+
+    return JSON.parse(Buffer.from(decrypted).toString());
   }
 
   private async _removeLocalAuthData(): Promise<void> {
