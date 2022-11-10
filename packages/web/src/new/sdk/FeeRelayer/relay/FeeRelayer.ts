@@ -193,13 +193,14 @@ export class FeeRelayer implements FeeRelayerType {
 
     try {
       const trx: TransactionID[] = [];
-      for (const preparedTransaction of transactions) {
+      for (const [index, preparedTransaction] of transactions.entries()) {
         const request = await this.relayTransaction({
           context,
           preparedTransaction,
           payingFeeToken: fee,
           relayAccountStatus: context.relayAccountStatus,
-          additionalPaybackFee: transactions.length > 0 ? config.additionalPaybackFee : ZERO,
+          additionalPaybackFee:
+            index === transactions.length - 1 ? config.additionalPaybackFee : ZERO,
           operationType: config.operationType,
           currency: config.currency,
         });
