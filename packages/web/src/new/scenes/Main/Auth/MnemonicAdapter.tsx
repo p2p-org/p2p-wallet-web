@@ -6,16 +6,11 @@ import bs58 from 'bs58';
 import { pbkdf2 } from 'crypto';
 import nacl from 'tweetnacl';
 
-import type { ConnectConfig, StorageInfo } from 'new/scenes/Main/Auth/typings';
-import type { KeyPairDbInstance } from 'new/scenes/Main/Auth/utils';
-import {
-  getDB,
-  getKeyPairFromSeed,
-  KEYPAIR_KEY,
-  setStorageValue,
-  STORE_NAME,
-} from 'new/scenes/Main/Auth/utils';
 import { notImplemented } from 'new/utils/decorators';
+
+import type { ConnectConfig, StorageInfo } from './typings';
+import type { KeyPairDbInstance } from './utils';
+import { getDB, getKeyPairFromSeed, KEYPAIR_KEY, setStorageValue, STORE_NAME } from './utils';
 
 export interface Wallet {
   signTransaction(tx: Transaction): Promise<Transaction>;

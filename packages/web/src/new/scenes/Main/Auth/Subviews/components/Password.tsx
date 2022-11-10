@@ -7,8 +7,8 @@ import { observer } from 'mobx-react-lite';
 
 import { ErrorHint } from 'components/common/ErrorHint';
 import { PasswordInput } from 'components/common/PasswordInput';
-import type { ViewModelProps } from 'new/scenes/Main/Auth/typings';
 
+import type { ViewModelProps } from '../../typings';
 import { validatePassword } from '../../utils';
 import { Button } from './Button';
 

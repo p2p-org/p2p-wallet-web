@@ -2,7 +2,7 @@ import type { ReactElement, ReactNode } from 'react';
 
 import type { Signer } from '@solana/web3.js';
 
-import type { AuthViewModel } from 'new/scenes/Main/Auth/Auth.ViewModel';
+import type { AuthViewModel } from './Auth.ViewModel';
 
 export enum WizardSteps {
   CREATE_START = 'CREATE_START',

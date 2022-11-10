@@ -5,15 +5,15 @@ import { observer } from 'mobx-react-lite';
 
 import { Icon } from 'components/ui';
 import { Popover } from 'components/ui/Popover';
-import { WalletPlaceholder } from 'new/scenes/Main/Auth/Subviews/Restore/WalletPlaceholder';
-import type { ViewModelProps } from 'new/scenes/Main/Auth/typings';
 import type { Wallet } from 'new/sdk/SolanaSDK';
 import { StaticSectionsCollectionView } from 'new/ui/components/common/StaticSectionsCollectionView';
 
+import type { ViewModelProps } from '../../typings';
 import { DERIVATION_PATH } from '../../utils';
 import { Button } from '../components/Button';
 import type { SelectorItemType } from './Selector';
 import { Selector } from './Selector';
+import { WalletPlaceholder } from './WalletPlaceholder';
 import { WalletRow } from './WalletRow';
 
 const Wrapper = styled.div`

@@ -4,8 +4,7 @@ import { useState } from 'react';
 import { styled } from '@linaria/react';
 import { observer } from 'mobx-react-lite';
 
-import type { ViewModelProps } from 'new/scenes/Main/Auth/typings';
-
+import type { ViewModelProps } from '../../typings';
 import { Button } from '../components/Button';
 import { Checkbox } from '../components/Checkbox';
 

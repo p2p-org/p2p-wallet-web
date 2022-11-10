@@ -7,8 +7,8 @@ import { observer } from 'mobx-react-lite';
 import LogoImg from 'assets/images/big-logo.png';
 import { ToastManager } from 'components/common/ToastManager';
 import { Switch } from 'components/ui';
-import type { ViewModelProps } from 'new/scenes/Main/Auth/typings';
 
+import type { ViewModelProps } from '../../typings';
 import { Button } from './Button';
 import { OffPasswordModal } from './Modal';
 

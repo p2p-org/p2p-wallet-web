@@ -6,8 +6,8 @@ import classNames from 'classnames';
 import { observer } from 'mobx-react-lite';
 
 import { LoaderWide } from 'components/common/LoaderWide';
-import type { ViewModelProps } from 'new/scenes/Main/Auth/typings';
 
+import type { ViewModelProps } from '../../typings';
 import app from './assets/app.png';
 import logo from './assets/logo.svg';
 import { Back } from './Back';

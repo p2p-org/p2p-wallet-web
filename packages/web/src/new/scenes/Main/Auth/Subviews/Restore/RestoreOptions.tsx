@@ -13,8 +13,8 @@ import { observer } from 'mobx-react-lite';
 
 import { ErrorHint } from 'components/common/ErrorHint';
 import { ToastManager } from 'components/common/ToastManager';
-import type { ViewModelProps } from 'new/scenes/Main/Auth/typings';
 
+import type { ViewModelProps } from '../../typings';
 import { Button } from '../components/Button';
 import { MnemonicTextarea as MnemonicInput } from '../Create/MnemonicInput';
 

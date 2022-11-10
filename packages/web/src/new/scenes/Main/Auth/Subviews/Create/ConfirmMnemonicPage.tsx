@@ -7,8 +7,8 @@ import classNames from 'classnames';
 import { observer } from 'mobx-react-lite';
 
 import { ErrorHint } from 'components/common/ErrorHint';
-import type { ViewModelProps } from 'new/scenes/Main/Auth/typings';
 
+import type { ViewModelProps } from '../../typings';
 import { Button } from '../components/Button';
 
 const Wrapper = styled.div`
