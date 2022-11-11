@@ -1,8 +1,9 @@
 import type { FC } from 'react';
-import { memo, useState } from 'react';
+import { useState } from 'react';
 
 import { styled } from '@linaria/react';
 import classNames from 'classnames';
+import { observer } from 'mobx-react-lite';
 import { rgba } from 'polished';
 import QRCode from 'qrcode.react';
 
@@ -226,7 +227,7 @@ interface Props {
   viewModel: Readonly<WalletDetailViewModel>;
 }
 
-export const QRAddressWidgetOrigin: FC<Props> = ({ viewModel }) => {
+export const QRAddressWidget: FC<Props> = observer(({ viewModel }) => {
   const [copied, setCopied] = useState(false);
   const [isExpand, setIsExpand] = useState(false);
   const [isShowDetails, setIsShowDetails] = useState(false);
@@ -373,6 +374,4 @@ export const QRAddressWidgetOrigin: FC<Props> = ({ viewModel }) => {
       ) : undefined}
     </WrapperCard>
   );
-};
-
-export const QRAddressWidget = memo(QRAddressWidgetOrigin);
+});
