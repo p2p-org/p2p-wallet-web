@@ -134,9 +134,11 @@ export class MnemonicAdapter extends BaseMessageSignerWalletAdapter {
         this._account = signer;
         this.emit('connect', signer.publicKey);
 
-        await this._saveCurrentSecretKey(signer.secretKey);
+        if (config?.saveLocally) {
+          await this._saveCurrentSecretKey(signer.secretKey);
 
-        await MnemonicAdapter._saveEncryptedMnemonicAndSeed(config.storageInfo);
+          await MnemonicAdapter._saveEncryptedMnemonicAndSeed(config.storageInfo);
+        }
       }
 
       if (config?.type === 'recur') {

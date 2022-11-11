@@ -7,6 +7,7 @@ export interface OrcaSwapConfigsProvider {
 
 export class NetworkConfigsProvider implements OrcaSwapConfigsProvider {
   network: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   cache?: any;
   private _urlString = process.env.REACT_APP_ORCA_CACHE_URL!;
 

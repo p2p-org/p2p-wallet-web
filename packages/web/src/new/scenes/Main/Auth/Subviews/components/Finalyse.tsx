@@ -79,17 +79,17 @@ const SwitcherText = styled.span`
 `;
 
 export const Finalyse: FC<ViewModelProps> = observer(({ authViewModel }) => {
-  const [isSave, setIsSave] = useState(true);
+  const [saveLocally, setSaveLocally] = useState(true);
   const [isShowModal, setIsShowModal] = useState(false);
 
   const handleCloseModal = (nextIsSave: boolean) => {
     setIsShowModal(false);
-    setIsSave(nextIsSave);
+    setSaveLocally(nextIsSave);
   };
 
   const handleIsSaveChange = (nextIsSave: boolean) => {
     if (nextIsSave) {
-      setIsSave(nextIsSave);
+      setSaveLocally(nextIsSave);
       return;
     }
 
@@ -98,7 +98,7 @@ export const Finalyse: FC<ViewModelProps> = observer(({ authViewModel }) => {
 
   const handleFinishClick = () => {
     try {
-      void authViewModel.finalize();
+      void authViewModel.finalize(saveLocally);
     } catch (error) {
       ToastManager.error((error as Error).message);
     }
@@ -117,7 +117,7 @@ export const Finalyse: FC<ViewModelProps> = observer(({ authViewModel }) => {
         </Desc>
       </TopWrapper>
       <SwitcherLabel>
-        <Switch checked={isSave} onChange={handleIsSaveChange} />
+        <Switch checked={saveLocally} onChange={handleIsSaveChange} />
         <SwitcherText>Use fast enter with password</SwitcherText>
       </SwitcherLabel>
       <Button onClick={handleFinishClick}>Finish setup</Button>
