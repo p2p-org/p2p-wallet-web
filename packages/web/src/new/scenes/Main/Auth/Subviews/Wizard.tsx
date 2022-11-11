@@ -4,76 +4,70 @@ import { useLocation } from 'react-router-dom';
 
 import { observer } from 'mobx-react-lite';
 
-import { useViewModel } from 'new/core/viewmodels/useViewModel';
-import { AuthViewModel } from 'new/scenes/Main/Auth/Auth.ViewModel';
-
-import type { ViewMap } from '../typings';
+import type { ViewMap, ViewModelProps } from '../typings';
 import { WizardSteps } from '../typings';
 import { CommonLayout } from './components/CommonLayout';
-import { Final } from './components/Final';
+import { Finalyse } from './components/Finalyse';
 import { Password } from './components/Password';
-import { ConfirmMnemonic } from './Create/ConfirmMnemonic';
-import { Mnemonic } from './Create/MnemonicInput';
+import { ConfirmMnemonicPage } from './Create/ConfirmMnemonicPage';
+import { MnemonicArea } from './Create/MnemonicInput';
 import { DerivableAccounts } from './Restore/DerivableAccounts';
 import { RestoreOptions } from './Restore/RestoreOptions';
 
-export const Wizard: FC = observer(() => {
+export const Wizard: FC<ViewModelProps> = observer(({ authViewModel }) => {
   const location = useLocation();
   const history = useHistory();
-  const viewModel = useViewModel(AuthViewModel);
 
   // @FIXME remove and replace with react-router
   if (location.search === '?restore') {
-    viewModel.setRestoreStart();
+    authViewModel.setRestoreStart();
     history.replace({});
   }
 
   if (location.search === '?create') {
-    viewModel.setCreateStart();
+    authViewModel.setCreateStart();
     history.replace({});
   }
 
   const VIEW_MAP: ViewMap = {
     [WizardSteps.CREATE_START]: (
-      <CommonLayout>
-        <Mnemonic />
+      <CommonLayout authViewModel={authViewModel}>
+        <MnemonicArea authViewModel={authViewModel} />
       </CommonLayout>
     ),
     [WizardSteps.CREATE_CONFIRM_MNEMONIC]: (
-      <CommonLayout>
-        <ConfirmMnemonic />
+      <CommonLayout authViewModel={authViewModel}>
+        <ConfirmMnemonicPage authViewModel={authViewModel} />
       </CommonLayout>
     ),
     [WizardSteps.CREATE_SET_PASSWORD]: (
-      <CommonLayout>
-        <Password />
+      <CommonLayout authViewModel={authViewModel}>
+        <Password authViewModel={authViewModel} />
       </CommonLayout>
     ),
     [WizardSteps.RESTORE_START]: (
-      <CommonLayout>
-        <RestoreOptions />
+      <CommonLayout authViewModel={authViewModel}>
+        <RestoreOptions authViewModel={authViewModel} />
       </CommonLayout>
     ),
     [WizardSteps.RESTORE_PASSWORD]: (
-      <CommonLayout>
-        <Password />
+      <CommonLayout authViewModel={authViewModel}>
+        <Password authViewModel={authViewModel} />
       </CommonLayout>
     ),
     [WizardSteps.RESTORE_ACCOUNTS]: (
-      <CommonLayout>
-        <DerivableAccounts />
+      <CommonLayout authViewModel={authViewModel}>
+        <DerivableAccounts authViewModel={authViewModel} />
       </CommonLayout>
     ),
     [WizardSteps.FINAL]: (
-      <CommonLayout showNavigation={false}>
-        <Final />
+      <CommonLayout authViewModel={authViewModel} showNavigation={false}>
+        <Finalyse authViewModel={authViewModel} />
       </CommonLayout>
     ),
   };
 
-  const elView = VIEW_MAP[viewModel.step];
-
-  return elView;
+  return VIEW_MAP[authViewModel.step];
 });
 
 export default Wizard;

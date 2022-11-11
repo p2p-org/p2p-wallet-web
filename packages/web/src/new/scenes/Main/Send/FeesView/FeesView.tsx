@@ -13,16 +13,17 @@ import type * as SolanaSDK from 'new/sdk/SolanaSDK';
 import { convertToBalance } from 'new/sdk/SolanaSDK';
 import { Defaults } from 'new/services/Defaults';
 import { SendRelayMethodType } from 'new/services/SendService';
-import { numberToString } from 'new/utils/NumberExtensions';
+import { numberToString, numberToTokenString } from 'new/utils/NumberExtensions';
 
 import { FeeTransactionTooltip } from './FeeTransactionTooltip';
 import { FeeView } from './FeeView';
 
 interface Props {
   viewModel: Readonly<SendViewModel>;
+  hideAccountCreationFeeSelector?: boolean;
 }
 
-export const FeesView: FC<Props> = observer(({ viewModel }) => {
+export const FeesView: FC<Props> = observer(({ viewModel, hideAccountCreationFeeSelector }) => {
   const receive = expr(() => {
     const amount = viewModel.amount;
     const wallet = viewModel.wallet;
@@ -166,6 +167,32 @@ export const FeesView: FC<Props> = observer(({ viewModel }) => {
     return `${numberToString(fee, { maximumFractionDigits: 9 })} ${symbol}`;
   });
 
+  const tokenPrice = expr(() => {
+    const { wallet } = viewModel;
+
+    if (!wallet) {
+      return 0;
+    }
+
+    const price = viewModel.getPrice(wallet.token.symbol);
+
+    return `${numberToString(price, { maximumFractionDigits: wallet.token.decimals })} ${
+      Defaults.fiat.code
+    }`;
+  });
+
+  const fiatPrice = expr(() => {
+    const { wallet } = viewModel;
+
+    if (!wallet) {
+      return 0;
+    }
+
+    const price = viewModel.getPrice(wallet.token.symbol);
+    const resultPrice = price === 0 ? 0 : 1 / price;
+    return numberToTokenString(resultPrice, wallet.token);
+  });
+
   return (
     <Accordion
       title={
@@ -180,6 +207,18 @@ export const FeesView: FC<Props> = observer(({ viewModel }) => {
       open
       noContentPadding
     >
+      {viewModel.wallet ? (
+        <ListWrapper>
+          <Row>
+            <Text className="gray nowrap">1 {viewModel.wallet?.token.symbol} price</Text>
+            <Text className="flex-end right">{tokenPrice}</Text>
+          </Row>
+          <Row>
+            <Text className="gray nowrap">1 {Defaults.fiat.code} price</Text>
+            <Text className="flex-end right">{fiatPrice}</Text>
+          </Row>
+        </ListWrapper>
+      ) : null}
       <ListWrapper>
         <Row>
           <Text className="gray">Receive</Text>
@@ -199,7 +238,7 @@ export const FeesView: FC<Props> = observer(({ viewModel }) => {
         ) : null}
         {!otherFeesIsHidden ? otherFees : null}
       </ListWrapper>
-      {!payingFeeTokenIsHidden ? (
+      {!payingFeeTokenIsHidden && !hideAccountCreationFeeSelector ? (
         <ListWrapper>
           <FeeView viewModel={viewModel} />
         </ListWrapper>

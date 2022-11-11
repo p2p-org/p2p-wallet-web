@@ -6,7 +6,7 @@ import { theme, up } from '@p2p-wallet-web/ui';
 import { observer } from 'mobx-react-lite';
 
 import type { HomeViewModel } from 'new/scenes/Main/Home';
-import { Defaults } from 'new/services/Defaults';
+import { withNameServiceDomain } from 'new/utils/StringExtensions';
 
 const Wrapper = styled.div``;
 
@@ -53,16 +53,13 @@ interface Props {
 }
 
 export const BalanceView: FC<Props> = observer(({ viewModel }) => {
-  const domain = Defaults.apiEndpoint.network === 'mainnet-beta' ? '.p2p.sol' : '.p2p';
-
   return (
     <Wrapper>
       <BalanceWrapper>
         <Title>
           {viewModel.username ? (
             <>
-              <Strong>{viewModel.username}</Strong>
-              {domain}
+              <Strong>{withNameServiceDomain(viewModel.username)}</Strong>
             </>
           ) : (
             'Balance'

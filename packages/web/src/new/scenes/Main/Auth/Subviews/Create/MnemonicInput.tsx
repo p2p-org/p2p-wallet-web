@@ -4,9 +4,7 @@ import { useState } from 'react';
 import { styled } from '@linaria/react';
 import { observer } from 'mobx-react-lite';
 
-import { useViewModel } from 'new/core/viewmodels/useViewModel';
-
-import { AuthViewModel } from '../../Auth.ViewModel';
+import type { ViewModelProps } from '../../typings';
 import { Button } from '../components/Button';
 import { Checkbox } from '../components/Checkbox';
 
@@ -133,17 +131,16 @@ const CheckboxWrapper = styled.div`
   }
 `;
 
-export const Mnemonic: FC = observer(() => {
+export const MnemonicArea: FC<ViewModelProps> = observer(({ authViewModel }) => {
   const [checked, setChecked] = useState(false);
-  const viewModel = useViewModel(AuthViewModel);
 
   const handleCheckChange = (nextChecked: boolean) => {
     setChecked(nextChecked);
   };
 
   const nextStep = () => {
-    viewModel.setMnemonic(viewModel.initialCreateMnemonic);
-    viewModel.nextStep();
+    authViewModel.setMnemonic(authViewModel.initialCreateMnemonic);
+    authViewModel.nextStep();
   };
 
   return (
@@ -160,7 +157,7 @@ export const Mnemonic: FC = observer(() => {
       <MnemonicWrapper>
         <MnemonicTextarea
           placeholder="Seed phrase"
-          value={viewModel.initialCreateMnemonic}
+          value={authViewModel.initialCreateMnemonic}
           readOnly
         />
       </MnemonicWrapper>

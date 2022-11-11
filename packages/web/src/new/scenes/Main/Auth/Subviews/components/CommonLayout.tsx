@@ -6,9 +6,8 @@ import classNames from 'classnames';
 import { observer } from 'mobx-react-lite';
 
 import { LoaderWide } from 'components/common/LoaderWide';
-import { useViewModel } from 'new/core/viewmodels/useViewModel';
 
-import { AuthViewModel } from '../../Auth.ViewModel';
+import type { ViewModelProps } from '../../typings';
 import app from './assets/app.png';
 import logo from './assets/logo.svg';
 import { Back } from './Back';
@@ -151,7 +150,7 @@ const ContentContainer = styled.div`
   width: 360px;
 `;
 
-type Props = {
+type Props = ViewModelProps & {
   showNavigation?: boolean;
 };
 
@@ -159,9 +158,8 @@ const defaultProps = {
   showNavigation: true,
 };
 
-export const CommonLayout: FC<Props> = observer(({ showNavigation, children }) => {
+export const CommonLayout: FC<Props> = observer(({ authViewModel, showNavigation, children }) => {
   const isDesktop = useIsDesktop();
-  const viewModel = useViewModel(AuthViewModel);
 
   const elBanner = isDesktop && (
     <Left>
@@ -176,14 +174,14 @@ export const CommonLayout: FC<Props> = observer(({ showNavigation, children }) =
   const elNavigation = showNavigation && (
     <Navigate>
       <TabButton
-        className={classNames({ isActive: viewModel.isCreate })}
-        onClick={viewModel.setCreateStart}
+        className={classNames({ isActive: authViewModel.isCreate })}
+        onClick={authViewModel.setCreateStart}
       >
         Create new wallet
       </TabButton>
       <TabButton
-        className={classNames({ isActive: viewModel.isRestore })}
-        onClick={viewModel.setRestoreStart}
+        className={classNames({ isActive: authViewModel.isRestore })}
+        onClick={authViewModel.setRestoreStart}
       >
         I already have wallet
       </TabButton>
@@ -192,8 +190,8 @@ export const CommonLayout: FC<Props> = observer(({ showNavigation, children }) =
 
   const elHead = showNavigation && (
     <WalletTitle>
-      {viewModel.showBackButton && <BackStyled onClick={viewModel.previousStep} />}
-      {viewModel.isCreate ? 'New wallet' : 'Log in to your wallet'}
+      {authViewModel.showBackButton && <BackStyled onClick={authViewModel.previousStep} />}
+      {authViewModel.isCreate ? 'New wallet' : 'Log in to your wallet'}
     </WalletTitle>
   );
 
@@ -206,7 +204,7 @@ export const CommonLayout: FC<Props> = observer(({ showNavigation, children }) =
           {elHead}
           {children}
         </ContentContainer>
-        {viewModel.connecting && <LoaderWide />}
+        {authViewModel.connecting && <LoaderWide />}
       </MenuContainer>
     </Wrapper>
   );
