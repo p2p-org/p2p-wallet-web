@@ -1,6 +1,6 @@
 import type { Network } from '@saberhq/solana-contrib';
 
-const nameServiceDomain = '.p2p.sol';
+import { RemoteConfig } from 'new/services/RemoteConfig';
 
 export function truncatingMiddle(
   text: string,
@@ -21,11 +21,11 @@ export function truncatingMiddle(
 }
 
 export function withNameServiceDomain(text: string): string {
-  if (text.includes(nameServiceDomain)) {
+  if (text.includes(RemoteConfig.usernameDomain)) {
     return text;
   }
 
-  return `${text}${nameServiceDomain}`;
+  return `${text}${RemoteConfig.usernameDomain}`;
 }
 
 // @web

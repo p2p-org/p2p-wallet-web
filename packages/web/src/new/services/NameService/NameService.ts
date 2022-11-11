@@ -2,19 +2,23 @@ import axios from 'axios';
 import { last } from 'ramda';
 import { injectable } from 'tsyringe';
 
+import type {
+  Name,
+  Owner,
+  RequestDataType,
+  RequestLookupDataType,
+  RequestResolveDataType,
+  ResponseLookup,
+  ResponseResolve,
+} from './types';
+
 const request = axios.create();
 
-type Name = {
-  address?: string;
-  name?: string;
-  parent?: string;
-};
-
-export type Owner = {
-  parent_name: string;
-  owner: string;
-  class: string;
-  name: string;
+const RequestBase: RequestDataType = {
+  jsonrpc: '2.0',
+  method: '',
+  params: {},
+  id: 1,
 };
 
 interface NameServiceType {
@@ -26,10 +30,11 @@ interface NameServiceType {
 // TODO: application scope
 @injectable()
 export class NameService implements NameServiceType {
-  private _endpoint = 'https://solana-fee-relayer.wallet.p2p.org/name_register';
+  private _endpoint = process.env.REACT_APP_NAME_SERVICE_URL!;
   private _cache: Record<string, string | null> = {};
 
   constructor() {}
+
   getName(owner: string): Promise<string | null> {
     if (this._cache[owner]) {
       return Promise.resolve(this._cache[owner] ?? null);
@@ -45,18 +50,24 @@ export class NameService implements NameServiceType {
   }
 
   getOwners(name: string): Promise<Owner[]> {
+    const data: RequestResolveDataType = {
+      ...RequestBase,
+      method: 'resolve_name',
+      params: { name },
+    };
+
     return request
-      .get<Owner[]>(`${this._endpoint}/resolve/${name}`)
+      .post<ResponseResolve>(this._endpoint, data)
       .then(({ data }) => data)
-      .then((result) => {
-        for (const record of result) {
+      .then((data) => {
+        for (const record of data.result) {
           const name = record.name;
           if (name) {
             this._cache[record.owner] = name;
           }
         }
 
-        return result;
+        return data.result;
       });
   }
 
@@ -79,6 +90,12 @@ export class NameService implements NameServiceType {
   // }
 
   private _getNames(owner: string): Promise<Name[]> {
-    return request(`${this._endpoint}/lookup/${owner}`).then(({ data }) => data);
+    const data: RequestLookupDataType = {
+      ...RequestBase,
+      method: 'lookup_name',
+      params: { owner },
+    };
+
+    return request.post<ResponseLookup>(this._endpoint, data).then(({ data }) => data.result);
   }
 }

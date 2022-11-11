@@ -1,8 +1,9 @@
-import { action, computed, makeObservable, observable, reaction } from 'mobx';
+import { computed, makeObservable } from 'mobx';
 import { singleton } from 'tsyringe';
 
 import { SDFetcherState } from 'new/core/viewmodels/SDViewModel';
 import { ViewModel } from 'new/core/viewmodels/ViewModel';
+import { MainViewModel } from 'new/scenes/Main/Main.ViewModel';
 import { Defaults } from 'new/services/Defaults';
 import { ModalService, ModalType } from 'new/services/ModalService';
 import { NameService } from 'new/services/NameService';
@@ -11,57 +12,28 @@ import { numberToString } from 'new/utils/NumberExtensions';
 
 @singleton()
 export class HomeViewModel extends ViewModel {
-  username: string | null;
-
   constructor(
     public walletsRepository: WalletsRepository,
     public nameService: NameService,
     private _modalService: ModalService,
+    private _mainViewModal: MainViewModel,
   ) {
     super();
 
-    this.username = null;
-
     makeObservable(this, {
-      username: observable,
+      username: computed,
       isWalletReady: computed,
       balance: computed,
       isBalanceLoading: computed,
-      changeUsername: action,
     });
   }
 
-  protected override setDefaults() {
-    this.username = null;
-  }
+  protected override setDefaults() {}
 
-  protected override onInitialize() {
-    // this.walletsRepository.initialize();
-
-    this.addReaction(
-      reaction(
-        () => !!this.walletsRepository.nativeWallet?.pubkey,
-        () => {
-          this._getUsername();
-        },
-      ),
-    );
-  }
+  protected override onInitialize() {}
 
   protected override afterReactionsRemoved() {
     // this.walletsRepository.end();
-  }
-
-  private _getUsername() {
-    if (this.walletsRepository.nativeWallet?.pubkey) {
-      void this.nameService.getName(this.walletsRepository.nativeWallet.pubkey).then((username) => {
-        this.changeUsername(username);
-      });
-    }
-  }
-
-  changeUsername(username: string | null) {
-    this.username = username;
   }
 
   get isWalletReady(): boolean {
@@ -112,6 +84,10 @@ export class HomeViewModel extends ViewModel {
 
   get isBalanceLoading() {
     return this.walletsRepository.state === SDFetcherState.loading;
+  }
+
+  get username() {
+    return this._mainViewModal.username;
   }
 
   openChooseBuyTokenMobileModal() {

@@ -7,9 +7,8 @@ import { observer } from 'mobx-react-lite';
 import LogoImg from 'assets/images/big-logo.png';
 import { ToastManager } from 'components/common/ToastManager';
 import { Switch } from 'components/ui';
-import { useViewModel } from 'new/core/viewmodels/useViewModel';
 
-import { AuthViewModel } from '../../Auth.ViewModel';
+import type { ViewModelProps } from '../../typings';
 import { Button } from './Button';
 import { OffPasswordModal } from './Modal';
 
@@ -79,9 +78,7 @@ const SwitcherText = styled.span`
   line-height: 18px;
 `;
 
-export const Final: FC = observer(() => {
-  const viewModel = useViewModel(AuthViewModel);
-
+export const Finalyse: FC<ViewModelProps> = observer(({ authViewModel }) => {
   const [saveLocally, setSaveLocally] = useState(true);
   const [isShowModal, setIsShowModal] = useState(false);
 
@@ -101,7 +98,7 @@ export const Final: FC = observer(() => {
 
   const handleFinishClick = () => {
     try {
-      void viewModel.finalize(saveLocally);
+      void authViewModel.finalize(saveLocally);
     } catch (error) {
       ToastManager.error((error as Error).message);
     }
@@ -113,7 +110,7 @@ export const Final: FC = observer(() => {
 
       <TopWrapper>
         <Logo />
-        <Title>{viewModel.isRestore ? 'Welcome back!' : 'Your wallet is ready!'}</Title>
+        <Title>{authViewModel.isRestore ? 'Welcome back!' : 'Your wallet is ready!'}</Title>
         <Desc>
           You can turn on a quick enter via password. Only you have access to your keys, not the
           government, not us, not anyone else. It’s 100% stored on your devices.
