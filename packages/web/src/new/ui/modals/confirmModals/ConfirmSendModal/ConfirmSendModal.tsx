@@ -15,6 +15,7 @@ import { observer } from 'mobx-react-lite';
 import { Button, Icon } from 'components/ui';
 import { Modal } from 'components/ui/Modal';
 import type { SendViewModel } from 'new/scenes/Main/Send';
+import { FeesView } from 'new/scenes/Main/Send/FeesView';
 import { trackEvent } from 'new/sdk/Analytics';
 import { ButtonCancel } from 'new/ui/components/common/ButtonCancel';
 import { ErrorHint } from 'new/ui/components/common/ErrorHint';
@@ -172,7 +173,7 @@ export const ConfirmSendModal: FC<ConfirmSendModalProps & ModalPropsType> = obse
             <RecipientView viewModel={viewModel} />
           </div>
 
-          {/*<TransactionDetails sendState={sendState} amount={params.amount} />*/}
+          <FeesView viewModel={viewModel} hideAccountCreationFeeSelector={true} />
         </Section>
 
         {isSecretKeyWallet ? (
