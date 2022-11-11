@@ -2,14 +2,10 @@ import type { FC } from 'react';
 import { useLayoutEffect, useState } from 'react';
 
 import { styled } from '@linaria/react';
-import {
-  DEFAULT_WALLET_PROVIDERS,
-  DefaultWalletType,
-  useTryUnlockSeedAndMnemonic,
-  useWallet,
-} from '@p2p-wallet-web/core';
+import { useTryUnlockSeedAndMnemonic } from '@p2p-wallet-web/core';
 import { theme } from '@p2p-wallet-web/ui';
 
+import type { SwapViewModel } from 'new/scenes/Main';
 import { ErrorHint } from 'new/ui/components/common/ErrorHint';
 import { PasswordInput } from 'new/ui/components/common/PasswordInput';
 import { Section } from 'new/ui/modals/confirmModals/common/styled';
@@ -31,22 +27,19 @@ const PasswordInputStyled = styled(PasswordInput)`
 
 interface Props {
   onChange: (flag: boolean) => void;
+  viewModel: Readonly<SwapViewModel>;
 }
 
 // TODO: remake it during auth reimplementation
-export const SectionPassword: FC<Props> = ({ onChange }) => {
-  const { walletProviderInfo } = useWallet();
+export const SectionPassword: FC<Props> = ({ onChange, viewModel }) => {
   const tryUnlockSeedAndMnemonic = useTryUnlockSeedAndMnemonic();
 
   const [password, setPassword] = useState('');
   const [hasError, setHasError] = useState(false);
 
-  const isSecretKeyWallet =
-    walletProviderInfo?.name === DEFAULT_WALLET_PROVIDERS[DefaultWalletType.SecretKey].name;
-
   useLayoutEffect(() => {
-    onChange(isSecretKeyWallet && (!password || hasError));
-  }, [hasError, isSecretKeyWallet, onChange, password]);
+    onChange(viewModel.isMnemonicWallet && (!password || hasError));
+  }, [hasError, viewModel.isMnemonicWallet, onChange, password]);
 
   const validatePassword = async (value: string) => {
     try {
@@ -65,7 +58,7 @@ export const SectionPassword: FC<Props> = ({ onChange }) => {
     }
   };
 
-  if (!isSecretKeyWallet) {
+  if (!viewModel.isMnemonicWallet) {
     return null;
   }
 
