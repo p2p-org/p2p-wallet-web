@@ -1,6 +1,7 @@
 import type { FC } from 'react';
 import { useCallback } from 'react';
-import { generatePath, useHistory, useParams } from 'react-router';
+import { generatePath, useParams } from 'react-router';
+import { useNavigate } from 'react-router-dom';
 
 import { styled } from '@linaria/react';
 import { theme } from '@p2p-wallet-web/ui';
@@ -26,12 +27,12 @@ interface Props {
 }
 
 export const SlippageView: FC<Props> = ({ viewModel }) => {
-  const history = useHistory();
+  const navigate = useNavigate();
   const { symbol } = useParams<SwapRouteParams>();
 
   const handleShowSettings = useCallback(() => {
-    history.push(generatePath('/swap/settings/:symbol?', { symbol }));
-  }, [history, symbol]);
+    navigate(generatePath('/swap/settings/:symbol?', { symbol }));
+  }, [navigate, symbol]);
 
   return (
     <Row>

@@ -1,6 +1,6 @@
 import type { FC } from 'react';
 import { useCallback } from 'react';
-import { useHistory } from 'react-router';
+import { useNavigate } from 'react-router-dom';
 
 import { styled } from '@linaria/react';
 import { theme } from '@p2p-wallet-web/ui';
@@ -52,7 +52,7 @@ const Normal = styled.span`
 `;
 
 export const CurrencySelect: FC<BuyViewModelProps> = observer(({ viewModel }) => {
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const handleItemClick = useCallback(
     (nextCurrency: CryptoCurrency) => () => {
@@ -73,7 +73,7 @@ export const CurrencySelect: FC<BuyViewModelProps> = observer(({ viewModel }) =>
       });
 
       // change coin
-      history.push(`/buy/${nextCurrency.symbol}`);
+      navigate(`/buy/${nextCurrency.symbol}`);
     },
     [],
   );

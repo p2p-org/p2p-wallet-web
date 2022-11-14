@@ -1,4 +1,5 @@
-import type { History } from 'history';
+import type { NavigateFunction } from 'react-router-dom';
+
 import { singleton } from 'tsyringe';
 
 import { ViewModel } from 'new/core/viewmodels/ViewModel';
@@ -16,7 +17,7 @@ export class LocationManagerViewModel extends ViewModel {
 
   protected override afterReactionsRemoved() {}
 
-  setHistory(history: History): void {
-    this._locationService.setHistory(history);
+  setHistory(navigate: NavigateFunction): void {
+    this._locationService.setHistory(navigate);
   }
 }

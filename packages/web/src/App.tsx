@@ -55,9 +55,8 @@ const App: React.FC = observer(() => {
                   <AuthRequiredRoute path="/wallet/:publicKey" element={WalletDetail} />
                   <AuthRequiredRoute path="/buy/:symbol?" element={Buy} />
                   <AuthRequiredRoute path="/receive/(tokens)?" element={Receive} />
-                  <AuthRequiredRoute path="/send/:publicKey/:status(result)" element={Send} />
-                  <AuthRequiredRoute path="/send/:publicKey?" element={Send} />
-                  <AuthRequiredRoute path="/swap/(settings)?/:publicKey?" element={SwapPage} />
+                  <AuthRequiredRoute path="/send/*" element={Send} />
+                  <AuthRequiredRoute path="/swap/*" element={SwapPage} />
                   <AuthRequiredRoute path="/settings/network" element={SettingsNetwork} />
                   <AuthRequiredRoute path="/settings" element={Settings} />
                   <ModalManager />

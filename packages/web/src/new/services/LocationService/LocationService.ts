@@ -56,7 +56,7 @@ export class LocationService {
     return match.params;
   }
 
-  push(pathname: string | Path, props?: LocationState): void {
+  push(pathname: Path, props?: LocationState): void {
     this._assertHistory();
     this._history!.push(pathname, props ?? { fromPage: this._location?.pathname });
   }

@@ -1,5 +1,6 @@
 import type { FC } from 'react';
-import { useHistory, useLocation } from 'react-router';
+import { useLocation } from 'react-router';
+import { useNavigate } from 'react-router-dom';
 
 import { styled } from '@linaria/react';
 
@@ -20,14 +21,14 @@ interface Props {
 }
 
 export const ActionsMobileModal: FC<Props & ModalPropsType> = ({ close, layoutViewModel }) => {
-  const history = useHistory();
+  const navigate = useNavigate();
   const location = useLocation();
 
   const handleButtonClick = (route: string) => () => {
     close(false);
 
     if (location.pathname !== route) {
-      history.push(route, { fromPage: location.pathname });
+      navigate(route, { state: { fromPage: location.pathname } });
     }
   };
 

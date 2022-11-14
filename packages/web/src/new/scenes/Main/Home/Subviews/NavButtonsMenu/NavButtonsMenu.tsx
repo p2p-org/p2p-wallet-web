@@ -1,6 +1,7 @@
 import type { FC } from 'react';
 import { useEffect, useRef, useState } from 'react';
-import { useHistory, useLocation } from 'react-router';
+import { useLocation } from 'react-router';
+import { useNavigate } from 'react-router-dom';
 
 import { styled } from '@linaria/react';
 import classNames from 'classnames';
@@ -32,7 +33,7 @@ interface Props {
 }
 
 export const NavButtonsMenu: FC<Props> = ({ viewModel }) => {
-  const history = useHistory();
+  const navigate = useNavigate();
   const location = useLocation();
 
   const menuRef = useRef<HTMLDivElement>(null);
@@ -58,8 +59,8 @@ export const NavButtonsMenu: FC<Props> = ({ viewModel }) => {
     };
   }, []);
 
-  const handleButtonClick = (route: string) => () => {
-    history.push(route, { fromPage: location.pathname });
+  const handleButtonClick = (to: string) => () => {
+    navigate(to, { state: { fromPage: location.pathname } });
   };
 
   return (

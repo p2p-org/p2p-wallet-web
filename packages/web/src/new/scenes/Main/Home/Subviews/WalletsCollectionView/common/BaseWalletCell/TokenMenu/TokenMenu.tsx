@@ -1,6 +1,7 @@
 import type { FC, HTMLAttributes } from 'react';
 import { useCallback } from 'react';
-import { useHistory, useLocation } from 'react-router';
+import { useLocation } from 'react-router';
+import { useNavigate } from 'react-router-dom';
 
 import { styled } from '@linaria/react';
 import { observer } from 'mobx-react-lite';
@@ -24,14 +25,14 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
 
 export const TokenMenu: FC<Props> = observer(
   ({ wallet, isHidden = false, onToggleClick, className }) => {
-    const history = useHistory();
+    const navigate = useNavigate();
     const location = useLocation();
 
     const handleButtonClick = useCallback(
       (route: string) => () => {
-        history.push(route, { fromPage: location.pathname });
+        navigate(route, { state: { fromPage: location.pathname } });
       },
-      [history, location.pathname],
+      [navigate, location.pathname],
     );
 
     return (
