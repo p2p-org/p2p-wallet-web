@@ -1,0 +1,1 @@
+export { QRAddressWidget } from './QRAddressWidget';

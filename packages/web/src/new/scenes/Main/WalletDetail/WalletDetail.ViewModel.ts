@@ -2,12 +2,15 @@ import { computed, makeObservable, observable, reaction } from 'mobx';
 import { singleton } from 'tsyringe';
 
 import { ViewModel } from 'new/core/viewmodels/ViewModel';
+import { WalletModel } from 'new/models/WalletModel';
 import type { Wallet } from 'new/sdk/SolanaSDK';
 import type { ParsedTransaction } from 'new/sdk/TransactionParser';
 import { LocationService } from 'new/services/LocationService';
 import { ModalService, ModalType } from 'new/services/ModalService';
+import { NotificationService } from 'new/services/NotificationService';
 import { WalletsRepository } from 'new/services/Repositories';
 import type { TransactionModalProps } from 'new/ui/modals/TransactionModal';
+import { copyToClipboardImage, copyToClipboardString } from 'new/utils/Clipboard';
 
 enum WalletActionTypeEnum {
   // receive = 'receive',
@@ -69,6 +72,11 @@ export class WalletDetailViewModel extends ViewModel {
   pubkey: string | null;
 
   wallet: Wallet | null;
+
+  solanaPubkey: string;
+
+  network: string;
+
   get walletActions(): WalletActionType[] {
     const wallet = this.wallet;
     if (!wallet) {
@@ -95,12 +103,15 @@ export class WalletDetailViewModel extends ViewModel {
     private _walletsRepository: WalletsRepository,
     private _locationService: LocationService, // private _analyticsManager: AnalyticsManager,
     private _modalService: ModalService,
+    private _notificationService: NotificationService,
+    _walletModel: WalletModel,
   ) {
     super();
 
     this.pubkey = null;
-
     this.wallet = null;
+    this.solanaPubkey = _walletModel.publicKey;
+    this.network = _walletModel.network;
 
     makeObservable(this, {
       pubkey: observable,
@@ -112,7 +123,6 @@ export class WalletDetailViewModel extends ViewModel {
 
   protected override setDefaults(): void {
     this.pubkey = null;
-
     this.wallet = null;
   }
 
@@ -209,5 +219,32 @@ export class WalletDetailViewModel extends ViewModel {
     this._modalService.openModal<void, TransactionModalProps>(ModalType.SHOW_MODAL_TRANSACTION, {
       transaction,
     });
+  }
+
+  // @web
+  copyString(value: string, onSuccess: () => void, onError: (error: Error) => void): void {
+    void copyToClipboardString(
+      value,
+      () => {
+        this._notificationService.info('Address copied!');
+        onSuccess();
+      },
+      onError,
+    );
+  }
+
+  copyQRCode(
+    qrElement: HTMLCanvasElement,
+    onSuccess: () => void,
+    onError: (error: Error) => void,
+  ): void {
+    void copyToClipboardImage(
+      qrElement,
+      () => {
+        this._notificationService.info('QR Code copied!');
+        onSuccess();
+      },
+      onError,
+    );
   }
 }
