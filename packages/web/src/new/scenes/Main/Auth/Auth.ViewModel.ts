@@ -64,6 +64,7 @@ export class AuthViewModel extends ViewModel {
       showBackButton: computed,
       seed: computed,
       connecting: computed,
+      connected: computed,
       setCreateStart: action.bound,
       setRestoreStart: action.bound,
       previousStep: action.bound,
@@ -201,6 +202,10 @@ export class AuthViewModel extends ViewModel {
 
   get connecting(): boolean {
     return this._walletModel.connecting;
+  }
+
+  get connected(): boolean {
+    return this._walletModel.connected;
   }
 
   private _getList(): Array<WizardSteps> {
