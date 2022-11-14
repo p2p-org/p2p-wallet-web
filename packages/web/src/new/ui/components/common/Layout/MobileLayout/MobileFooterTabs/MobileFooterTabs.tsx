@@ -92,7 +92,8 @@ export const MobileFooterTabs: FC<Props> = ({ viewModel }) => {
     <Wrapper>
       <NavLinkMenu
         as={NavLink}
-        to={{ pathname: '/wallets', state: { fromPage: location.pathname } }}
+        to="/wallets"
+        state={{ fromPage: location.pathname }}
         className="button"
       >
         <NavButton>
@@ -120,7 +121,8 @@ export const MobileFooterTabs: FC<Props> = ({ viewModel }) => {
       </NavLinkMenu>
       <NavLinkMenu
         as={NavLink}
-        to={{ pathname: '/settings', state: { fromPage: location.pathname } }}
+        to="/settings"
+        state={{ fromPage: location.pathname }}
         className="button"
       >
         <NavButton>
