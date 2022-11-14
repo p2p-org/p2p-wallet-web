@@ -30,10 +30,10 @@ export const SwapPage: FC = () => {
 
     return (
       <Routes>
-        <Route path={`/swap/settings/:publicKey?`}>
+        <Route path={`settings/:publicKey?`}>
           <GoBackButton />
         </Route>
-        <Route path={'/swap/:publicKey?'}>
+        <Route path={':publicKey?'}>
           <SettingsButton />
         </Route>
       </Routes>
@@ -43,10 +43,10 @@ export const SwapPage: FC = () => {
   return (
     <Layout mobileAction={mobileHeaderButton}>
       <Routes>
-        <Route path={`/swap/settings/:publicKey?`}>
+        <Route path={`settings/:publicKey?`}>
           <SwapSettings viewModel={viewModel} />
         </Route>
-        <Route path={'/swap/:publicKey?'}>
+        <Route path={':publicKey?'}>
           <Swap viewModel={viewModel} />
         </Route>
       </Routes>
