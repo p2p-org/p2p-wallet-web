@@ -1,22 +1,21 @@
 import type { FC } from 'react';
-import { useParams } from 'react-router-dom';
+import { useLocation } from 'react-router';
 
 import { observer } from 'mobx-react-lite';
 import { expr } from 'mobx-utils';
 
-import { QRAddressWidget } from 'components/common/QRAddressWidget';
-import { useViewModel } from 'new/core/viewmodels/useViewModel';
+import { useViewModel } from 'new/core/viewmodels';
 import { Layout } from 'new/ui/components/common/Layout';
-import { shortAddress } from 'utils/tokens';
+import { truncatingMiddle } from 'new/utils/StringExtensions';
 
 import { History } from './History';
+import { QRAddressWidget } from './QRAddressWidget';
 import { TopWidget } from './TopWidget';
 import { WalletDetailViewModel } from './WalletDetail.ViewModel';
 
 export const WalletDetail: FC = observer(() => {
   const viewModel = useViewModel(WalletDetailViewModel);
-  // TODO: temp
-  const { publicKey } = useParams<{ publicKey: string }>();
+  const location = useLocation();
 
   const currentName = expr(() => {
     if (viewModel.wallet?.token.symbol) {
@@ -24,7 +23,7 @@ export const WalletDetail: FC = observer(() => {
     }
 
     if (viewModel.pubkey) {
-      return `${shortAddress(viewModel.pubkey)} Wallet`;
+      return `${truncatingMiddle(viewModel.pubkey)} Wallet`;
     }
 
     return '';
@@ -41,8 +40,7 @@ export const WalletDetail: FC = observer(() => {
       }}
     >
       <TopWidget viewModel={viewModel} />
-      {/* TODO: temp */}
-      <QRAddressWidget publicKey={publicKey} />
+      <QRAddressWidget viewModel={viewModel} />
       <History viewModel={viewModel} />
     </Layout>
   );

@@ -4,12 +4,13 @@ import { styled } from '@linaria/react';
 import { borders, shadows, theme, up, useIsMobile, useIsTablet } from '@p2p-wallet-web/ui';
 import QRCode from 'qrcode.react';
 
-import { useViewModel } from 'new/core/viewmodels/useViewModel';
+import { useViewModel } from 'new/core/viewmodels';
 import Logo from 'new/ui/assets/images/logo.png';
 import { AddressText } from 'new/ui/components/common/AddressText';
-import { UserNamedAddressWidgetViewModel } from 'new/ui/components/common/UsernameAddressWidget/UserNamedAddressWidget.ViewModel';
 import { Button } from 'new/ui/components/ui/Button';
 import { isImageCopyAvailable } from 'new/utils/Clipboard';
+
+import { UserNamedAddressWidgetViewModel } from './UserNamedAddressWidget.ViewModel';
 
 const Wrapper = styled.div`
   display: grid;
