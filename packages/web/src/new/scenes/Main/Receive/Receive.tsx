@@ -1,6 +1,6 @@
 import type { FC } from 'react';
 import { Route, useRouteMatch } from 'react-router';
-import { Switch } from 'react-router-dom';
+import { Routes } from 'react-router-dom';
 
 import { useTrackOpenPageAction } from 'new/sdk/Analytics';
 
@@ -13,13 +13,13 @@ export const Receive: FC = () => {
   const match = useRouteMatch();
 
   return (
-    <Switch>
+    <Routes>
       <Route path={`${match.path}/tokens`}>
         <SupportedTokens />
       </Route>
-      <Route path={match.path} exact>
+      <Route path={match.path}>
         <ReceiveToken />
       </Route>
-    </Switch>
+    </Routes>
   );
 };

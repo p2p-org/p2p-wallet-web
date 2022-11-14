@@ -1,7 +1,7 @@
 import 'new/services/Defaults';
 
 import * as React from 'react';
-import { BrowserRouter, HashRouter, Route, Switch } from 'react-router-dom';
+import { BrowserRouter, HashRouter, Route, Routes } from 'react-router-dom';
 
 import * as Sentry from '@sentry/react';
 import dayjs from 'dayjs';
@@ -47,22 +47,22 @@ const App: React.FC = observer(() => {
           <Providers>
             <Root>
               <LocationManager />
-              <Switch>
-                <Route path="/" exact component={Landing} />
-                <Route path="/onboard" exact component={AuthTrial} />
+              <Routes>
+                <Route path="/" element={Landing} />
+                <Route path="/onboard" element={AuthTrial} />
                 <Main>
-                  <AuthRequiredRoute path="/wallets" component={Home} />
-                  <AuthRequiredRoute path="/wallet/:publicKey" exact component={WalletDetail} />
-                  <AuthRequiredRoute path="/buy/:symbol?" component={Buy} />
-                  <AuthRequiredRoute path="/receive/(tokens)?" component={Receive} />
-                  <AuthRequiredRoute path="/send/:publicKey/:status(result)" component={Send} />
-                  <AuthRequiredRoute path="/send/:publicKey?" component={Send} />
-                  <AuthRequiredRoute path="/swap/(settings)?/:publicKey?" component={SwapPage} />
-                  <AuthRequiredRoute path="/settings/network" component={SettingsNetwork} />
-                  <AuthRequiredRoute path="/settings" component={Settings} exact />
+                  <AuthRequiredRoute path="/wallets" element={Home} />
+                  <AuthRequiredRoute path="/wallet/:publicKey" element={WalletDetail} />
+                  <AuthRequiredRoute path="/buy/:symbol?" element={Buy} />
+                  <AuthRequiredRoute path="/receive/(tokens)?" element={Receive} />
+                  <AuthRequiredRoute path="/send/:publicKey/:status(result)" element={Send} />
+                  <AuthRequiredRoute path="/send/:publicKey?" element={Send} />
+                  <AuthRequiredRoute path="/swap/(settings)?/:publicKey?" element={SwapPage} />
+                  <AuthRequiredRoute path="/settings/network" element={SettingsNetwork} />
+                  <AuthRequiredRoute path="/settings" element={Settings} />
                   <ModalManager />
                 </Main>
-              </Switch>
+              </Routes>
               <Intercom />
               <ToastManager anchor="left" renderToast={(props) => <NotifyToast {...props} />} />
               <NotificationManager />
