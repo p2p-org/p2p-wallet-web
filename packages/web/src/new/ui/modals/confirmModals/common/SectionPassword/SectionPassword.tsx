@@ -3,6 +3,7 @@ import { useLayoutEffect, useState } from 'react';
 
 import { styled } from '@linaria/react';
 import { theme } from '@p2p-wallet-web/ui';
+import { observer } from 'mobx-react-lite';
 
 import type { SwapViewModel } from 'new/scenes/Main';
 import { ErrorHint } from 'new/ui/components/common/ErrorHint';
@@ -30,7 +31,7 @@ interface Props {
 }
 
 // TODO: remake it during auth reimplementation
-export const SectionPassword: FC<Props> = ({ onChange, viewModel }) => {
+export const SectionPassword: FC<Props> = observer(({ onChange, viewModel }) => {
   const [password, setPassword] = useState('');
   const [hasError, setHasError] = useState(false);
 
@@ -63,4 +64,4 @@ export const SectionPassword: FC<Props> = ({ onChange, viewModel }) => {
       {hasError ? <ErrorHint error="The password is not correct" noIcon /> : null}
     </Section>
   );
-};
+});
