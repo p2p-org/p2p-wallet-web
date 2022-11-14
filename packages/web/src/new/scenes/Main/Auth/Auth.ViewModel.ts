@@ -154,7 +154,7 @@ export class AuthViewModel extends ViewModel {
     this.authInfo.password = value;
   }
 
-  async finalize() {
+  async finalize(saveLocally: boolean): Promise<void> {
     const seed = await this.seed;
 
     const storageInfo = {
@@ -167,6 +167,7 @@ export class AuthViewModel extends ViewModel {
       type: 'sign',
       derivationPath: this.authInfo.derivationPath.value,
       storageInfo,
+      saveLocally,
     });
   }
 
