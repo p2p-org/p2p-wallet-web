@@ -15,7 +15,10 @@ export enum LogEvent {
 
 function getStackTrace() {
   const obj = { stack: '' };
-  Error.captureStackTrace(obj, getStackTrace);
+  // firefox doesn't have captureStackTrace
+  if ('captureStackTrace' in Error) {
+    Error.captureStackTrace(obj, getStackTrace);
+  }
   return obj.stack;
 }
 
