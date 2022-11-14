@@ -76,11 +76,11 @@ export class WalletModel extends Model {
   }
 
   confirmPassword(password: string): Promise<boolean> {
-    if (this.selectedAdaptor?.name === MnemonicAdapterName) {
-      return (this.selectedAdaptor as MnemonicAdapter).confirmPassword(password);
+    if (!(this.selectedAdaptor?.name === MnemonicAdapterName)) {
+      throw new Error('You must use confirmPassword on Mnemonic adaptor only');
     }
 
-    throw new Error('You must use confirmPassword on Mnemonic adaptor only');
+    return (this.selectedAdaptor as MnemonicAdapter).confirmPassword(password);
   }
 
   signAllTransactions(transactions: Array<Transaction>): Promise<Array<Transaction>> {
