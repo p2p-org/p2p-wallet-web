@@ -47,6 +47,7 @@ export class ChooseWalletViewModel extends SDListViewModel<Wallet> {
       createRequest: flow,
       search: action,
       selectWallet: action,
+      clearSearching: action,
     });
   }
 
@@ -159,6 +160,10 @@ export class ChooseWalletViewModel extends SDListViewModel<Wallet> {
       this._pricesService.addToWatchList([wallet.token]);
       this._pricesService.fetchPrices([wallet.token]);
     }
+  }
+
+  clearSearching() {
+    this.search('');
   }
 }
 
