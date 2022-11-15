@@ -105,6 +105,7 @@ export const ChooseWallet: FC<Props> = observer(
           !selectorRef.current?.contains(e.target as HTMLDivElement) &&
           !dropdownRef.current?.contains(e.target as HTMLDivElement)
         ) {
+          viewModel.clearSearching();
           viewModel.setIsOpen(false);
         }
       },
