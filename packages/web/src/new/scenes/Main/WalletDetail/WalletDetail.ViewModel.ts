@@ -137,7 +137,7 @@ export class WalletDetailViewModel extends ViewModel {
     // @web: listen to changes in url
     this.addReaction(
       reaction(
-        () => this._locationService.getParams<{ pubkey?: string }>('/wallet/:pubkey').pubkey,
+        () => this._locationService.getParams<'pubkey'>('/wallet/:pubkey').pubkey,
         (pubkey) => {
           if (pubkey) {
             this.pubkey = pubkey;

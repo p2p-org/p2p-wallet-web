@@ -181,7 +181,7 @@ export class SwapViewModel extends ViewModel implements SwapViewModelType {
   }
 
   private _getPubkey(): string | undefined {
-    return this._locationService.getParams<{ publicKey?: string }>('/swap/:publicKey?').publicKey;
+    return this._locationService.getParams<'publicKey'>('/swap/:publicKey?').publicKey;
   }
 
   protected override afterReactionsRemoved(): void {

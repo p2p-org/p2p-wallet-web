@@ -1,68 +1,60 @@
-import { matchPath } from 'react-router';
+import type { Location, NavigateFunction, Params, Path } from 'react-router-dom';
+import { matchPath } from 'react-router-dom';
 
-import type { History, Location, LocationState, Path, UnregisterCallback } from 'history';
 import { action, makeObservable, observable } from 'mobx';
 import assert from 'ts-invariant';
 import { singleton } from 'tsyringe';
 
 @singleton()
 export class LocationService {
-  _location?: Location;
-
-  private _history?: History;
-  private _removeListener?: UnregisterCallback;
+  private _location?: Location;
+  private _navigate?: NavigateFunction;
 
   constructor() {
-    makeObservable(this, {
+    makeObservable<LocationService, '_location'>(this, {
       _location: observable,
+
+      setLocation: action,
     });
   }
 
-  private _assertHistory(): void {
-    assert(this._history, 'History is not set in LocationService');
+  private _assertNavigate(): void {
+    assert(this._navigate, 'NavigateFunction is not set in LocationService');
   }
 
   private _assertLocation(): void {
     assert(this._location, 'Location is not set in LocationService');
   }
 
-  private _listenHistory(): void {
-    if (this._removeListener) {
-      this._removeListener();
-    }
-
-    this._assertHistory();
-    this._removeListener = this._history!.listen(
-      action((location) => {
-        this._location = location;
-      }),
-    );
+  setLocation(location: Location): void {
+    this._location = location;
   }
 
-  setHistory(history: History): void {
-    this._history = history;
-
-    this._listenHistory();
+  setNavigate(navigate: NavigateFunction): void {
+    this._navigate = navigate;
   }
 
-  getParams<Params>(pathTemplate: string): Params {
+  getParams<ParamKey extends string>(pathTemplate: string): Params<ParamKey> {
     this._assertLocation();
-    const match = matchPath<Params>(this._location!.pathname || '', { path: pathTemplate });
+    const match = matchPath<ParamKey, string>(
+      { path: pathTemplate },
+      this._location!.pathname || '',
+    );
 
     if (!match) {
-      return {} as Params;
+      return {} as Params<ParamKey>;
     }
 
     return match.params;
   }
 
-  push(pathname: Path, props?: LocationState): void {
-    this._assertHistory();
-    this._history!.push(pathname, props ?? { fromPage: this._location?.pathname });
+  push(pathname: Path | string, props?: Record<string, unknown>): void {
+    this._assertNavigate();
+    this._navigate!(pathname, { state: props ?? { fromPage: this._location?.pathname } });
   }
 
   reload(): void {
-    this._assertHistory();
-    this._history!.go(0);
+    this._assertNavigate();
+    this._navigate!(0);
   }
 }
