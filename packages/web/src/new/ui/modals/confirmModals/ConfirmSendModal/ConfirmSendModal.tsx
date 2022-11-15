@@ -3,12 +3,6 @@ import { useState } from 'react';
 
 import { styled } from '@linaria/react';
 import { ZERO } from '@orca-so/sdk';
-import {
-  DEFAULT_WALLET_PROVIDERS,
-  DefaultWalletType,
-  useTryUnlockSeedAndMnemonic,
-  useWallet,
-} from '@p2p-wallet-web/core';
 import { theme } from '@p2p-wallet-web/ui';
 import { observer } from 'mobx-react-lite';
 
@@ -77,9 +71,6 @@ export interface ConfirmSendModalProps {
 
 export const ConfirmSendModal: FC<ConfirmSendModalProps & ModalPropsType> = observer(
   ({ close, viewModel }) => {
-    const { walletProviderInfo } = useWallet();
-    const tryUnlockSeedAndMnemonic = useTryUnlockSeedAndMnemonic();
-
     const [password, setPassword] = useState('');
     const [hasError, setHasError] = useState(false);
 
@@ -88,12 +79,9 @@ export const ConfirmSendModal: FC<ConfirmSendModalProps & ModalPropsType> = obse
     };
 
     const validatePassword = async (value: string) => {
-      try {
-        await tryUnlockSeedAndMnemonic(value);
-        setHasError(false);
-      } catch (error) {
-        setHasError(true);
-      }
+      const valid = await viewModel.confirmPassword(value);
+
+      setHasError(!valid);
     };
 
     const handlePasswordChange = (value: string) => {
@@ -135,10 +123,8 @@ export const ConfirmSendModal: FC<ConfirmSendModalProps & ModalPropsType> = obse
       });
     };
 
-    const isSecretKeyWallet =
-      walletProviderInfo?.name === DEFAULT_WALLET_PROVIDERS[DefaultWalletType.SecretKey].name;
     const isDisabled =
-      (isSecretKeyWallet && (!password || hasError)) ||
+      (viewModel.isMnemonicWallet && (!password || hasError)) ||
       !viewModel.wallet ||
       !viewModel.amount ||
       !viewModel.recipient;
@@ -176,7 +162,7 @@ export const ConfirmSendModal: FC<ConfirmSendModalProps & ModalPropsType> = obse
           <FeesView viewModel={viewModel} hideAccountCreationFeeSelector={true} />
         </Section>
 
-        {isSecretKeyWallet ? (
+        {viewModel.isMnemonicWallet ? (
           <Section className="password">
             <SubTitle>Enter password to confirm</SubTitle>
             <PasswordInputStyled

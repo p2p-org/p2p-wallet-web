@@ -104,7 +104,7 @@ export const ConfirmSwapModal: FC<ConfirmSwapModalProps & ModalPropsType> = obse
           </div>
           <DetailsView viewModel={vm} />
         </Section>
-        <SectionPassword onChange={handleDisabledChange} />
+        <SectionPassword onChange={handleDisabledChange} viewModel={viewModel} />
       </WrapperModal>
     );
   },

@@ -1,5 +1,7 @@
 import * as bip32 from 'bip32';
 import * as bip39 from 'bip39';
+import bs58 from 'bs58';
+import { pbkdf2 } from 'crypto';
 import * as ed25519 from 'ed25519-hd-key';
 import type { DBSchema } from 'idb';
 import { openDB } from 'idb';
@@ -12,6 +14,20 @@ export const DERIVATION_PATH = {
   Deprecated: 'deprecated',
   Bip44: 'bip44',
   Bip44Change: 'bip44Change',
+};
+
+export type SeedAndMnemonic = {
+  seed: string;
+  mnemonic: string;
+};
+
+export type Encrypt = {
+  encrypted: string;
+  nonce: string;
+  kdf: string;
+  salt: string;
+  iterations: number;
+  digest: string;
 };
 
 export const createExpiringValue = <T>(value: T, ms?: number) => {
@@ -145,5 +161,34 @@ export const getDB = async (): Promise<KeyPairDbInstance> =>
       db.createObjectStore(STORE_NAME);
     },
   });
+
+// @TODO checkout
+async function deriveEncryptionKey(
+  password: string,
+  salt: Uint8Array,
+  iterations: number,
+  digest: string,
+) {
+  return new Promise<Buffer>((resolve, reject) =>
+    pbkdf2(password, salt, iterations, nacl.secretbox.keyLength, digest, (err, key) =>
+      err ? reject(err) : resolve(key),
+    ),
+  );
+}
+
+export const decryptEncryptedTextAsync = async (t: Encrypt, password: string) => {
+  const encrypted = bs58.decode(t.encrypted);
+  const nonce = bs58.decode(t.nonce);
+  const salt = bs58.decode(t.salt);
+  const key = await deriveEncryptionKey(password, salt, t.iterations, t.digest);
+
+  const plaintext = nacl.secretbox.open(encrypted, nonce, key);
+
+  if (!plaintext) {
+    throw new Error('Incorrect password');
+  }
+
+  return Buffer.from(plaintext).toString();
+};
 
 export type KeyPairDbInstance = IDBPDatabase<KeypairDB>;
