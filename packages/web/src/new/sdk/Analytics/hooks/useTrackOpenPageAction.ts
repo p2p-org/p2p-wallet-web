@@ -5,12 +5,12 @@ import { trackEvent } from '../amplitude';
 import type { OpenPageActionNames } from '../types';
 
 export const useTrackOpenPageAction = (eventName: OpenPageActionNames) => {
-  const location = useLocation<{ fromPage?: string }>();
+  const location = useLocation<{ redirectTo?: string }>();
 
   useEffect(() => {
     let lastScreen = null;
-    if (location.state.fromPage && location.state.fromPage !== location.pathname) {
-      lastScreen = location.state.fromPage;
+    if (location.state?.redirectTo && location.state?.redirectTo !== location.pathname) {
+      lastScreen = location.state?.redirectTo;
     }
 
     trackEvent({
