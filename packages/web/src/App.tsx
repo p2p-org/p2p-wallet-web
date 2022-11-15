@@ -59,9 +59,9 @@ const App: React.FC = observer(() => {
                   <AuthRequiredRoute path="/swap/*" element={SwapPage} />
                   <AuthRequiredRoute path="/settings/network" element={SettingsNetwork} />
                   <AuthRequiredRoute path="/settings" element={Settings} />
-                  <ModalManager />
                 </Main>
               </Routes>
+              <ModalManager />
               <Intercom />
               <ToastManager anchor="left" renderToast={(props) => <NotifyToast {...props} />} />
               <NotificationManager />

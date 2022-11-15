@@ -1,6 +1,5 @@
 import type { FC } from 'react';
-import { useLocation } from 'react-router';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 import { styled } from '@linaria/react';
 
