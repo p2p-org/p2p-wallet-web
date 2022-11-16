@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 import { styled } from '@linaria/react';
 
@@ -16,10 +16,11 @@ const IconStyled = styled(Icon)`
 
 export const TopUp: FC<ModalPropsType> = ({ close }) => {
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleTopUpClick = () => {
     close(false);
-    navigate('/buy');
+    navigate('/buy', { state: { fromPage: location.pathname } });
   };
 
   return (
