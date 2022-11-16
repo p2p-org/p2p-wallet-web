@@ -1,6 +1,6 @@
 import type { FC } from 'react';
 import { useMemo } from 'react';
-import { generatePath, useParams } from 'react-router';
+import { generatePath, useParams } from 'react-router-dom';
 
 import { styled } from '@linaria/react';
 import { theme } from '@p2p-wallet-web/ui';
@@ -57,7 +57,7 @@ interface Props {
 export const SwapSettings: FC<Props> = observer(({ viewModel: vm }) => {
   const viewModel = vm.swapSettingsViewModel;
 
-  const { publicKey } = useParams<'publicKey'>();
+  const { publicKey } = useParams<{ publicKey?: string }>();
   const pathTemplate = `/swap/${publicKey ? '/:publicKey' : ''}`;
   const backToPath = useMemo(() => generatePath(pathTemplate, { publicKey }), [publicKey]);
 

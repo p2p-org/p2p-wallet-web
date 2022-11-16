@@ -1,7 +1,6 @@
 import type { FC } from 'react';
 import { useCallback } from 'react';
-import { generatePath, useParams } from 'react-router';
-import { useNavigate } from 'react-router-dom';
+import { generatePath, useNavigate, useParams } from 'react-router-dom';
 
 import { styled } from '@linaria/react';
 import { theme } from '@p2p-wallet-web/ui';
@@ -27,7 +26,7 @@ interface Props {
 
 export const SlippageView: FC<Props> = ({ viewModel }) => {
   const navigate = useNavigate();
-  const { publicKey } = useParams<'publicKey'>();
+  const { publicKey } = useParams<{ publicKey?: string }>();
 
   const handleShowSettings = useCallback(() => {
     const pathTemplate = `/swap/settings${publicKey ? '/:publicKey' : ''}`;
