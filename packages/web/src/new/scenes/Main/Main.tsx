@@ -1,4 +1,5 @@
 import type { FC } from 'react';
+import { Outlet } from 'react-router-dom';
 
 import { observer } from 'mobx-react-lite';
 
@@ -10,5 +11,5 @@ export const Main: FC = observer(() => {
   // resolve viewModel
   useViewModel<MainViewModel>(MainViewModel);
 
-  return null;
+  return <Outlet />;
 });
