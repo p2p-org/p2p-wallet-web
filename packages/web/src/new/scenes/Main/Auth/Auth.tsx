@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import { Redirect, useLocation } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
 
 import { observer } from 'mobx-react-lite';
 
@@ -17,7 +17,7 @@ export const Auth: FC = observer(() => {
   const fromPage = (location.state as RedirectState)?.fromPage || '/wallets';
 
   if (authViewModel.connected) {
-    return <Redirect to={fromPage} />;
+    return <Navigate to={fromPage} />;
   }
 
   return <Wizard authViewModel={authViewModel} />;
