@@ -22,7 +22,7 @@ export const Root: FC<Props> = observer(({ children }) => {
       <Redirect
         to={{
           pathname: '/onboard',
-          state: { redirectTo: location.pathname },
+          state: { fromPage: location.pathname },
         }}
       />
     );
