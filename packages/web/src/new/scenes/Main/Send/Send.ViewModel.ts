@@ -5,6 +5,7 @@ import { delay, inject, Lifecycle, scoped } from 'tsyringe';
 import { LoadableRelay, LoadableState } from 'new/app/models/LoadableRelay';
 import { SDFetcherState } from 'new/core/viewmodels/SDViewModel';
 import { ViewModel } from 'new/core/viewmodels/ViewModel';
+import { WalletModel } from 'new/models/WalletModel';
 import type { NetworkSelectViewModelType } from 'new/scenes/Main/Send/NetworkSelect/NetworkSelect.ViewModel';
 import type { SelectAddressError } from 'new/scenes/Main/Send/SelectAddress/SelectAddress.ViewModel';
 import { SelectAddressViewModel } from 'new/scenes/Main/Send/SelectAddress/SelectAddress.ViewModel';
@@ -101,6 +102,7 @@ export class SendViewModel
     public choosePayingWalletViewModel: ChooseWalletViewModel,
     @inject(delay(() => SelectAddressViewModel))
     public selectAddressViewModel: Readonly<SelectAddressViewModel>,
+    private _walletModel: WalletModel,
     private _modalService: ModalService,
   ) {
     super();
@@ -141,6 +143,8 @@ export class SendViewModel
       getFeeInCurrentFiat: computed,
 
       getSelectableNetworks: computed,
+
+      isMnemonicWallet: computed,
 
       chooseWallet: action,
       enterAmount: action,
@@ -431,6 +435,14 @@ export class SendViewModel
       networks.push(Network.bitcoin);
     }
     return networks;
+  }
+
+  get isMnemonicWallet(): boolean {
+    return this._walletModel.isMnemonicWallet;
+  }
+
+  confirmPassword(password: string): Promise<boolean> {
+    return this._walletModel.confirmPassword(password);
   }
 
   getFreeTransactionFeeLimit(): Promise<FeeRelayer.UsageStatus> {
