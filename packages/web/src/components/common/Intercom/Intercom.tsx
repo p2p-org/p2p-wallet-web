@@ -20,5 +20,5 @@ export const Intercom: FC = () => {
     });
   }, [isMobile, update]);
 
-  return null;
+  return <></>;
 };

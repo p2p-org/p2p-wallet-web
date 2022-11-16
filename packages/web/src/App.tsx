@@ -9,8 +9,6 @@ import localizedFormat from 'dayjs/plugin/localizedFormat';
 import { observer } from 'mobx-react-lite';
 
 import { Intercom } from 'components/common/Intercom';
-import { NotifyToast } from 'components/common/NotifyToast';
-import { ToastManager } from 'components/common/ToastManager';
 import {
   Buy,
   Home,
@@ -31,7 +29,7 @@ import {
   NotificationManager,
 } from 'new/ui/managers';
 import { Landing } from 'pages/Landing';
-import { AuthRequiredRoute } from 'utils/routes/UserRequiredRoute';
+import { AuthRequiredRoute } from 'utils/routes';
 
 import { Providers } from './Providers';
 
@@ -46,24 +44,26 @@ const App: React.FC = observer(() => {
         <Router basename={process.env.REACT_APP_BASENAME}>
           <Providers>
             <Root>
-              <LocationManager />
               <Routes>
-                <Route path="/" element={Landing} />
-                <Route path="/onboard" element={AuthTrial} />
-                <Main>
-                  <AuthRequiredRoute path="/wallets" element={Home} />
-                  <AuthRequiredRoute path="/wallet/:publicKey" element={WalletDetail} />
-                  <AuthRequiredRoute path="/buy/:symbol?" element={Buy} />
-                  <AuthRequiredRoute path="/receive/(tokens)?" element={Receive} />
-                  <AuthRequiredRoute path="/send/*" element={Send} />
-                  <AuthRequiredRoute path="/swap/*" element={SwapPage} />
-                  <AuthRequiredRoute path="/settings/network" element={SettingsNetwork} />
-                  <AuthRequiredRoute path="/settings" element={Settings} />
-                </Main>
+                <Route element={<LocationManager />} />
+                <Route element={<Intercom />} />
+
+                <Route path="/" element={<Landing />} />
+                <Route path="/onboard" element={<AuthTrial />} />
+
+                <Route element={<Main />} />
+                <Route element={<AuthRequiredRoute />}>
+                  <Route path="/wallets" element={<Home />} />
+                  <Route path="/wallet/:publicKey" element={<WalletDetail />} />
+                  <Route path="/buy/:symbol?" element={<Buy />} />
+                  <Route path="/receive/(tokens)?" element={<Receive />} />
+                  <Route path="/send/*" element={<Send />} />
+                  <Route path="/swap/*" element={<SwapPage />} />
+                  <Route path="/settings/network" element={<SettingsNetwork />} />
+                  <Route path="/settings" element={<Settings />} />
+                </Route>
               </Routes>
               <ModalManager />
-              <Intercom />
-              <ToastManager anchor="left" renderToast={(props) => <NotifyToast {...props} />} />
               <NotificationManager />
               {__DEVELOPMENT__ || process.env.REACT_APP_STAGING ? (
                 <DebugFeatureFlagsManager />
