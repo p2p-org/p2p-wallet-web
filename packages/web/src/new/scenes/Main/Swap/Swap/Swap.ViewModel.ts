@@ -7,6 +7,7 @@ import type { PayingFee } from 'new/app/models/PayingFee';
 import { FeeType, FeeTypeEnum, networkFees, transactionFees } from 'new/app/models/PayingFee';
 import { SDFetcherState } from 'new/core/viewmodels/SDViewModel';
 import { ViewModel } from 'new/core/viewmodels/ViewModel';
+import { WalletModel } from 'new/models/WalletModel';
 import { ActiveInputField, VerificationError } from 'new/scenes/Main/Swap/Swap/types';
 import { trackEvent } from 'new/sdk/Analytics';
 import type { PoolsPair } from 'new/sdk/OrcaSwap';
@@ -77,6 +78,7 @@ export class SwapViewModel extends ViewModel implements SwapViewModelType {
     private _pricesService: PricesService,
     private _modalService: ModalService,
     private _locationService: LocationService,
+    private _walletModel: WalletModel,
   ) {
     super();
 
@@ -817,6 +819,14 @@ export class SwapViewModel extends ViewModel implements SwapViewModelType {
     }
 
     return null;
+  }
+
+  confirmPassword(password: string): Promise<boolean> {
+    return this._walletModel.confirmPassword(password);
+  }
+
+  get isMnemonicWallet(): boolean {
+    return this._walletModel.isMnemonicWallet;
   }
 }
 

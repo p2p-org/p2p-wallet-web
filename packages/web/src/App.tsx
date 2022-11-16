@@ -20,7 +20,7 @@ import {
   SwapPage,
   WalletDetail,
 } from 'new/scenes/Main';
-import { Auth as AuthTrial } from 'new/scenes/Main/Auth';
+import { Auth } from 'new/scenes/Main/Auth';
 import { Root } from 'new/scenes/Root';
 import {
   DebugFeatureFlagsManager,
@@ -47,7 +47,7 @@ const App: React.FC = observer(() => {
             <Root>
               <Routes>
                 <Route path="/" element={<Landing />} />
-                <Route path="/onboard" element={<AuthTrial />} />
+                <Route path="/onboard" element={<Auth />} />
 
                 <Route element={<Main />}>
                   <Route element={<AuthRequiredRoute />}>

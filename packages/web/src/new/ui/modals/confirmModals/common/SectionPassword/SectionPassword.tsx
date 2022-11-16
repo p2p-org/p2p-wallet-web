@@ -2,14 +2,10 @@ import type { FC } from 'react';
 import { useLayoutEffect, useState } from 'react';
 
 import { styled } from '@linaria/react';
-import {
-  DEFAULT_WALLET_PROVIDERS,
-  DefaultWalletType,
-  useTryUnlockSeedAndMnemonic,
-  useWallet,
-} from '@p2p-wallet-web/core';
 import { theme } from '@p2p-wallet-web/ui';
+import { observer } from 'mobx-react-lite';
 
+import type { SwapViewModel } from 'new/scenes/Main';
 import { ErrorHint } from 'new/ui/components/common/ErrorHint';
 import { PasswordInput } from 'new/ui/components/common/PasswordInput';
 import { Section } from 'new/ui/modals/confirmModals/common/styled';
@@ -31,30 +27,22 @@ const PasswordInputStyled = styled(PasswordInput)`
 
 interface Props {
   onChange: (flag: boolean) => void;
+  viewModel: Readonly<SwapViewModel>;
 }
 
 // TODO: remake it during auth reimplementation
-export const SectionPassword: FC<Props> = ({ onChange }) => {
-  const { walletProviderInfo } = useWallet();
-  const tryUnlockSeedAndMnemonic = useTryUnlockSeedAndMnemonic();
-
+export const SectionPassword: FC<Props> = observer(({ onChange, viewModel }) => {
   const [password, setPassword] = useState('');
   const [hasError, setHasError] = useState(false);
 
-  const isSecretKeyWallet =
-    walletProviderInfo?.name === DEFAULT_WALLET_PROVIDERS[DefaultWalletType.SecretKey].name;
-
   useLayoutEffect(() => {
-    onChange(isSecretKeyWallet && (!password || hasError));
-  }, [hasError, isSecretKeyWallet, onChange, password]);
+    onChange(viewModel.isMnemonicWallet && (!password || hasError));
+  }, [hasError, viewModel.isMnemonicWallet, onChange, password]);
 
   const validatePassword = async (value: string) => {
-    try {
-      await tryUnlockSeedAndMnemonic(value);
-      setHasError(false);
-    } catch (error) {
-      setHasError(true);
-    }
+    const valid = await viewModel.confirmPassword(value);
+
+    setHasError(!valid);
   };
 
   const handlePasswordChange = (value: string) => {
@@ -65,7 +53,7 @@ export const SectionPassword: FC<Props> = ({ onChange }) => {
     }
   };
 
-  if (!isSecretKeyWallet) {
+  if (!viewModel.isMnemonicWallet) {
     return null;
   }
 
@@ -76,4 +64,4 @@ export const SectionPassword: FC<Props> = ({ onChange }) => {
       {hasError ? <ErrorHint error="The password is not correct" noIcon /> : null}
     </Section>
   );
-};
+});
