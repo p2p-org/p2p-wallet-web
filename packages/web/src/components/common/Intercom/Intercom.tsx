@@ -1,6 +1,6 @@
 import type { FC } from 'react';
 import { useEffect } from 'react';
-import { useLocation } from 'react-router';
+import { useLocation } from 'react-router-dom';
 import { useIntercom } from 'react-use-intercom';
 
 import { useIsMobile } from '@p2p-wallet-web/ui';
@@ -20,5 +20,5 @@ export const Intercom: FC = () => {
     });
   }, [isMobile, update]);
 
-  return <></>;
+  return null;
 };

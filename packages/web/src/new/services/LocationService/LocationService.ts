@@ -36,6 +36,7 @@ export class LocationService {
 
   getParams<ParamKey extends string>(pathTemplate: string): Params<ParamKey> {
     this._assertLocation();
+
     const match = matchPath<ParamKey, string>(
       { path: pathTemplate },
       this._location!.pathname || '',

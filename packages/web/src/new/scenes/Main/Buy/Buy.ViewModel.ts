@@ -144,7 +144,7 @@ export class BuyViewModel extends ViewModel {
   }
 
   private _getSymbolFromParams(): CryptoCurrencySymbol {
-    const symbol = this._locationService.getParams<'symbol'>('/buy/:symbol?').symbol || 'SOL';
+    const symbol = this._locationService.getParams<'symbol'>('/buy/:symbol').symbol || 'SOL';
     return symbol as CryptoCurrencySymbol;
   }
 

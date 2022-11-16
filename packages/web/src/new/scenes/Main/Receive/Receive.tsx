@@ -1,6 +1,5 @@
 import type { FC } from 'react';
-import { Route } from 'react-router';
-import { Routes } from 'react-router-dom';
+import { Route, Routes } from 'react-router-dom';
 
 import { useTrackOpenPageAction } from 'new/sdk/Analytics';
 
@@ -12,12 +11,8 @@ export const Receive: FC = () => {
 
   return (
     <Routes>
-      <Route path={`/tokens`}>
-        <SupportedTokens />
-      </Route>
-      <Route>
-        <ReceiveToken />
-      </Route>
+      <Route index element={<ReceiveToken />} />
+      <Route path="tokens" element={<SupportedTokens />} />
     </Routes>
   );
 };

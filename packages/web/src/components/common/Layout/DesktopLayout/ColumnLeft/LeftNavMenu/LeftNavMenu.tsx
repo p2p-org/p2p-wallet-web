@@ -1,6 +1,5 @@
 import type { FunctionComponent } from 'react';
-import { useLocation } from 'react-router';
-import { Link, NavLink } from 'react-router-dom';
+import { Link, NavLink, useLocation } from 'react-router-dom';
 
 import { styled } from '@linaria/react';
 import { borders, shadows, theme, up } from '@p2p-wallet-web/ui';

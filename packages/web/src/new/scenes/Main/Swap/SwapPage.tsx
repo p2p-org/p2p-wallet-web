@@ -30,12 +30,8 @@ export const SwapPage: FC = () => {
 
     return (
       <Routes>
-        <Route path={`/swap/settings/:publicKey?`}>
-          <GoBackButton />
-        </Route>
-        <Route path={'/swap/:publicKey?'}>
-          <SettingsButton />
-        </Route>
+        <Route index element={<SettingsButton />} />
+        <Route path="settings" element={<GoBackButton />} />
       </Routes>
     );
   }, [isMobile]);
@@ -43,12 +39,10 @@ export const SwapPage: FC = () => {
   return (
     <Layout mobileAction={mobileHeaderButton}>
       <Routes>
-        <Route path={`/swap/settings/:publicKey?`}>
-          <SwapSettings viewModel={viewModel} />
-        </Route>
-        <Route path={'/swap/:publicKey?'}>
-          <Swap viewModel={viewModel} />
-        </Route>
+        <Route index element={<Swap viewModel={viewModel} />} />
+        <Route path=":publicKey" element={<Swap viewModel={viewModel} />} />
+
+        <Route path="settings" element={<SwapSettings viewModel={viewModel} />} />
       </Routes>
     </Layout>
   );

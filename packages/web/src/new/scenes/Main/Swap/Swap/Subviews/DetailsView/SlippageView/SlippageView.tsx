@@ -9,7 +9,6 @@ import { theme } from '@p2p-wallet-web/ui';
 import { Icon } from 'components/ui';
 import { Row, Text } from 'components/ui/AccordionDetails/common';
 import type { SwapViewModel } from 'new/scenes/Main/Swap';
-import type { SwapRouteParams } from 'new/scenes/Main/Swap/Swap/types';
 
 const PenIcon = styled(Icon)`
   width: 16px;
@@ -28,11 +27,12 @@ interface Props {
 
 export const SlippageView: FC<Props> = ({ viewModel }) => {
   const navigate = useNavigate();
-  const { symbol } = useParams<SwapRouteParams>();
+  const { publicKey } = useParams<'publicKey'>();
 
   const handleShowSettings = useCallback(() => {
-    navigate(generatePath('/swap/settings/:symbol?', { symbol }));
-  }, [navigate, symbol]);
+    const pathTemplate = `/swap/settings${publicKey ? '/:publicKey' : ''}`;
+    navigate(generatePath(pathTemplate, { publicKey }));
+  }, [navigate, publicKey]);
 
   return (
     <Row>

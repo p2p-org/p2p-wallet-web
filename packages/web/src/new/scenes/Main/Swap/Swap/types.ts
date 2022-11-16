@@ -1,7 +1,3 @@
-export interface SwapRouteParams {
-  publicKey?: string;
-}
-
 export enum VerificationError {
   swappingIsNotAvailable = 'swappingIsNotAvailable',
   sourceWalletIsEmpty = 'sourceWalletIsEmpty',

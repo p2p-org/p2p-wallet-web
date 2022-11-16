@@ -6,8 +6,6 @@ import { theme } from '@p2p-wallet-web/ui';
 
 import { Button, Icon } from 'components/ui';
 
-import type { SwapRouteParams } from '../types';
-
 const Wrapper = styled.div``;
 
 const ActionIcon = styled(Icon)`
@@ -24,10 +22,11 @@ const ButtonStyled = styled(Button)`
 
 export const GoBackButton = () => {
   const navigate = useNavigate();
-  const { publicKey } = useParams<SwapRouteParams>();
+  const { publicKey } = useParams<'publicKey'>();
 
   const handleButtonClick = () => {
-    navigate(generatePath('/swap/:publicKey?', { publicKey }));
+    const pathTemplate = `/swap${publicKey ? '/:publicKey' : ''}`;
+    navigate(generatePath(pathTemplate, { publicKey }));
   };
 
   return (

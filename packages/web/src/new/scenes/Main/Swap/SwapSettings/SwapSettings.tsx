@@ -10,7 +10,6 @@ import { WidgetPageWithBottom } from 'components/common/WidgetPageWithBottom';
 
 import { FeesView } from '../Subviews/FeesView';
 import type { SwapViewModel } from '../Swap/Swap.ViewModel';
-import type { SwapRouteParams } from '../Swap/types';
 import { DescriptionView } from './Subviews/DescriptionView';
 import { SegmentedControl } from './Subviews/SegmentedControl';
 
@@ -57,9 +56,10 @@ interface Props {
 
 export const SwapSettings: FC<Props> = observer(({ viewModel: vm }) => {
   const viewModel = vm.swapSettingsViewModel;
-  // const viewModel = useViewModel(SwapSettingsViewModel);
-  const { symbol } = useParams<SwapRouteParams>();
-  const backToPath = useMemo(() => generatePath('/swap/:symbol?', { symbol }), [symbol]);
+
+  const { publicKey } = useParams<'publicKey'>();
+  const pathTemplate = `/swap/${publicKey ? '/:publicKey' : ''}`;
+  const backToPath = useMemo(() => generatePath(pathTemplate, { publicKey }), [publicKey]);
 
   return (
     <WidgetPageWithBottom title={['Swap', 'Swap settings']} backTo={backToPath}>

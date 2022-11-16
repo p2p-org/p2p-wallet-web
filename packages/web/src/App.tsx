@@ -42,29 +42,31 @@ const App: React.FC = observer(() => {
     <>
       <Sentry.ErrorBoundary>
         <Router basename={process.env.REACT_APP_BASENAME}>
+          <LocationManager />
           <Providers>
             <Root>
               <Routes>
-                <Route element={<LocationManager />} />
-                <Route element={<Intercom />} />
-
                 <Route path="/" element={<Landing />} />
                 <Route path="/onboard" element={<AuthTrial />} />
 
-                <Route element={<Main />} />
-                <Route element={<AuthRequiredRoute />}>
-                  <Route path="/wallets" element={<Home />} />
-                  <Route path="/wallet/:publicKey" element={<WalletDetail />} />
-                  <Route path="/buy/:symbol?" element={<Buy />} />
-                  <Route path="/receive/(tokens)?" element={<Receive />} />
-                  <Route path="/send/*" element={<Send />} />
-                  <Route path="/swap/*" element={<SwapPage />} />
-                  <Route path="/settings/network" element={<SettingsNetwork />} />
-                  <Route path="/settings" element={<Settings />} />
+                <Route element={<Main />}>
+                  <Route element={<AuthRequiredRoute />}>
+                    <Route path="/wallets" element={<Home />} />
+                    <Route path="/wallet/:publicKey" element={<WalletDetail />} />
+                    <Route path="/buy/*" element={<Buy />} />
+                    <Route path="/receive/*" element={<Receive />} />
+                    <Route path="/send/*" element={<Send />} />
+                    <Route path="/swap/*" element={<SwapPage />} />
+                    <Route path="/settings/network" element={<SettingsNetwork />} />
+                    <Route path="/settings" element={<Settings />} />
+                  </Route>
                 </Route>
               </Routes>
+
+              <Intercom />
               <ModalManager />
               <NotificationManager />
+
               {__DEVELOPMENT__ || process.env.REACT_APP_STAGING ? (
                 <DebugFeatureFlagsManager />
               ) : null}

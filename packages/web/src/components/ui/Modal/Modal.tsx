@@ -1,7 +1,7 @@
 import type { FunctionComponent } from 'react';
 import * as React from 'react';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { useLocation } from 'react-router';
+import { useLocation } from 'react-router-dom';
 import { animated, useSpring, useTransition } from 'react-spring';
 
 import { styled } from '@linaria/react';
