@@ -9,8 +9,8 @@ export const useTrackOpenPageAction = (eventName: OpenPageActionNames) => {
 
   useEffect(() => {
     let lastScreen = null;
-    if (location.state.fromPage && location.state.fromPage !== location.pathname) {
-      lastScreen = location.state.fromPage;
+    if (location.state?.fromPage && location.state?.fromPage !== location.pathname) {
+      lastScreen = location.state?.fromPage;
     }
 
     trackEvent({

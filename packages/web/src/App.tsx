@@ -22,7 +22,7 @@ import {
   SwapPage,
   WalletDetail,
 } from 'new/scenes/Main';
-import { Auth as AuthTrial } from 'new/scenes/Main/Auth';
+import { Auth } from 'new/scenes/Main/Auth';
 import { Root } from 'new/scenes/Root';
 import {
   DebugFeatureFlagsManager,
@@ -49,7 +49,7 @@ const App: React.FC = observer(() => {
               <LocationManager />
               <Switch>
                 <Route path="/" exact component={Landing} />
-                <Route path="/onboard" exact component={AuthTrial} />
+                <Route path="/onboard" exact component={Auth} />
                 <Main>
                   <AuthRequiredRoute path="/wallets" component={Home} />
                   <AuthRequiredRoute path="/wallet/:publicKey" exact component={WalletDetail} />

@@ -18,11 +18,14 @@ export const Root: FC<Props> = observer(({ children }) => {
   const isAuth = location.pathname === '/' || location.pathname === '/onboard';
 
   if (!rootViewModel.walletModel.connected && !isAuth) {
-    return <Redirect to={`/onboard${location.search}`} />;
-  }
-
-  if (rootViewModel.walletModel.connected && isAuth) {
-    return <Redirect to={'/wallets'} />;
+    return (
+      <Redirect
+        to={{
+          pathname: '/onboard',
+          state: { fromPage: location.pathname },
+        }}
+      />
+    );
   }
 
   return <>{children}</>;
