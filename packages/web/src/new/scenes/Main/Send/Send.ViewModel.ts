@@ -14,6 +14,7 @@ import type * as SolanaSDK from 'new/sdk/SolanaSDK';
 import type { Wallet } from 'new/sdk/SolanaSDK';
 import { convertToBalance, FeeAmount, toLamport } from 'new/sdk/SolanaSDK';
 import { Defaults } from 'new/services/Defaults';
+import { LocationService } from 'new/services/LocationService';
 import { ModalService, ModalType } from 'new/services/ModalService';
 import { PricesService } from 'new/services/PriceAPIs/PricesService';
 import { WalletsRepository } from 'new/services/Repositories';
@@ -104,6 +105,7 @@ export class SendViewModel
     public selectAddressViewModel: Readonly<SelectAddressViewModel>,
     private _walletModel: WalletModel,
     private _modalService: ModalService,
+    private _locationService: LocationService,
   ) {
     super();
 
@@ -198,6 +200,23 @@ export class SendViewModel
   }
 
   private _bind(): void {
+    // wallet was changed
+    this.addReaction(
+      reaction(
+        () => this.wallet,
+        (wallet) => {
+          if (!wallet) {
+            return;
+          }
+          // @web: sync url with source wallet
+          const newPath = `/send/${wallet.pubkey}`;
+          if (location.pathname !== newPath) {
+            this._locationService.push(newPath);
+          }
+        },
+      ),
+    );
+
     // Smart select fee token
     this.addReaction(
       reaction(
@@ -343,7 +362,11 @@ export class SendViewModel
         runInAction(() => {
           this.loadingState = LoadableState.loaded;
           if (!this.wallet) {
-            this.wallet = this.walletsRepository.nativeWallet;
+            const pubkey = this._getPubkey();
+            const wallet = this.walletsRepository
+              .getWallets()
+              .find((wallet) => wallet.pubkey === pubkey);
+            this.wallet = wallet || this.walletsRepository.nativeWallet;
           }
           const payingWallet = this.walletsRepository
             .getWallets()
@@ -359,6 +382,10 @@ export class SendViewModel
           this.loadingState = LoadableState.error(error);
         });
       });
+  }
+
+  private _getPubkey(): string | undefined {
+    return this._locationService.getParams<'publicKey'>('/send/:publicKey').publicKey;
   }
 
   private _send() {
