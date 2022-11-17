@@ -40,6 +40,7 @@ dayjs.extend(localizedFormat);
 const App: React.FC = observer(() => {
   const Router: React.ElementType = process.env.REACT_APP_STAGING ? HashRouter : BrowserRouter;
 
+  //
   return (
     <>
       <Sentry.ErrorBoundary>
