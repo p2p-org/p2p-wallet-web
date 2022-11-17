@@ -1,3 +1,4 @@
+import isEqual from 'react-fast-compare';
 import type { Location, NavigateFunction, Params, Path } from 'react-router-dom';
 import { matchPath } from 'react-router-dom';
 
@@ -27,7 +28,9 @@ export class LocationService {
   }
 
   setLocation(location: Location): void {
-    this._location = location;
+    if (!isEqual(this._location, location)) {
+      this._location = location;
+    }
   }
 
   setNavigate(navigate: NavigateFunction): void {
@@ -52,6 +55,12 @@ export class LocationService {
   push(pathname: Path | string, props?: Record<string, unknown>): void {
     this._assertNavigate();
     this._navigate!(pathname, { state: props ?? { fromPage: this._location?.pathname } });
+  }
+
+  replace(pathname: Path | string, props?: Record<string, unknown>): void {
+    this._assertNavigate();
+    this._assertLocation();
+    this._navigate!(pathname, { state: props || this._location!.state, replace: true });
   }
 
   reload(): void {
