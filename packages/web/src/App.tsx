@@ -41,6 +41,7 @@ const App: React.FC = observer(() => {
 
   return (
     <>
+      Какой то текст
       <Sentry.ErrorBoundary>
         <Router basename={process.env.REACT_APP_BASENAME}>
           <LocationManager />
