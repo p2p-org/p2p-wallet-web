@@ -1,5 +1,5 @@
 import { useLayoutEffect } from 'react';
-import { useHistory } from 'react-router';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 import { useViewModel } from 'new/core/viewmodels/useViewModel';
 
@@ -8,9 +8,11 @@ import { LocationManagerViewModel } from './LocationManager.ViewModel';
 export const LocationManager = () => {
   const viewModel = useViewModel(LocationManagerViewModel);
 
-  const history = useHistory();
+  const navigate = useNavigate();
+  const location = useLocation();
 
-  useLayoutEffect(() => viewModel.setHistory(history), [history]);
+  useLayoutEffect(() => viewModel.setNavigate(navigate), [navigate]);
+  useLayoutEffect(() => viewModel.setLocation(location), [location]);
 
   return null;
 };

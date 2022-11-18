@@ -1,6 +1,6 @@
 import type { FC } from 'react';
 import React from 'react';
-import { Redirect, useLocation } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
 
 import { observer } from 'mobx-react-lite';
 
@@ -18,14 +18,7 @@ export const Root: FC<Props> = observer(({ children }) => {
   const isAuth = location.pathname === '/' || location.pathname === '/onboard';
 
   if (!rootViewModel.walletModel.connected && !isAuth) {
-    return (
-      <Redirect
-        to={{
-          pathname: '/onboard',
-          state: { fromPage: location.pathname },
-        }}
-      />
-    );
+    return <Navigate to="/onboard" state={{ fromPage: location.pathname }} />;
   }
 
   return <>{children}</>;

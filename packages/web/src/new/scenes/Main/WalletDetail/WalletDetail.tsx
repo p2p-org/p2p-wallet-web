@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import { useLocation } from 'react-router';
+import { useLocation } from 'react-router-dom';
 
 import { observer } from 'mobx-react-lite';
 import { expr } from 'mobx-utils';

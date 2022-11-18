@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import { useHistory } from 'react-router';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 import { styled } from '@linaria/react';
 
@@ -15,11 +15,12 @@ const IconStyled = styled(Icon)`
 `;
 
 export const TopUp: FC<ModalPropsType> = ({ close }) => {
-  const history = useHistory();
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const handleTopUpClick = () => {
     close(false);
-    history.push('/buy');
+    navigate('/buy', { state: { fromPage: location.pathname } });
   };
 
   return (

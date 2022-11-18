@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import { useHistory, useLocation } from 'react-router';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 import { styled } from '@linaria/react';
 import { theme, up, useIsMobile } from '@p2p-wallet-web/ui';
@@ -70,7 +70,7 @@ type Props = {
 };
 
 export const EmptyWalletView: FC<Props> = ({ viewModel }) => {
-  const history = useHistory();
+  const navigate = useNavigate();
   const location = useLocation();
   const isMobile = useIsMobile();
 
@@ -91,7 +91,7 @@ export const EmptyWalletView: FC<Props> = ({ viewModel }) => {
   };
 
   const goToRoute = (route: string) => () => {
-    history.push(route, { fromPage: location.pathname });
+    navigate(route, { state: { fromPage: location.pathname } });
   };
 
   return (

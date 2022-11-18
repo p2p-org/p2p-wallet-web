@@ -1,6 +1,5 @@
 import type { FunctionComponent } from 'react';
-import { useLocation } from 'react-router';
-import { Link, NavLink } from 'react-router-dom';
+import { Link, NavLink, useLocation } from 'react-router-dom';
 
 import { styled } from '@linaria/react';
 import { borders, shadows, theme, up } from '@p2p-wallet-web/ui';
@@ -147,10 +146,7 @@ export const LeftNavMenu: FunctionComponent = () => {
 
   return (
     <Wrapper>
-      <NavLinkMenu
-        to={{ pathname: '/wallets', state: { fromPage: location.pathname } }}
-        className="button"
-      >
+      <NavLinkMenu to="/wallets" state={{ fromPage: location.pathname }} className="button">
         <NavButton>
           <IconBlock>
             <NavIcon name="wallet" />
@@ -159,10 +155,7 @@ export const LeftNavMenu: FunctionComponent = () => {
         </NavButton>
       </NavLinkMenu>
 
-      <NavLinkMenu
-        to={{ pathname: '/buy', state: { fromPage: location.pathname } }}
-        className="button"
-      >
+      <NavLinkMenu to="/buy" state={{ fromPage: location.pathname }} className="button">
         <NavButton>
           <IconBlock>
             <NavIcon name="plus" />
@@ -171,10 +164,7 @@ export const LeftNavMenu: FunctionComponent = () => {
         </NavButton>
       </NavLinkMenu>
 
-      <NavLinkMenu
-        to={{ pathname: '/receive', state: { fromPage: location.pathname } }}
-        className="button"
-      >
+      <NavLinkMenu to="/receive" state={{ fromPage: location.pathname }} className="button">
         <NavButton>
           <IconBlock>
             <NavIcon name="bottom" />
@@ -182,10 +172,7 @@ export const LeftNavMenu: FunctionComponent = () => {
           <Name>Receive</Name>
         </NavButton>
       </NavLinkMenu>
-      <NavLinkMenu
-        to={{ pathname: '/send', state: { fromPage: location.pathname } }}
-        className="button"
-      >
+      <NavLinkMenu to="/send" state={{ fromPage: location.pathname }} className="button">
         <NavButton>
           <IconBlock>
             <NavIcon name="top" />
@@ -193,10 +180,7 @@ export const LeftNavMenu: FunctionComponent = () => {
           <Name>Send</Name>
         </NavButton>
       </NavLinkMenu>
-      <NavLinkMenu
-        to={{ pathname: '/swap', state: { fromPage: location.pathname } }}
-        className="button"
-      >
+      <NavLinkMenu to="/swap" state={{ fromPage: location.pathname }} className="button">
         <NavButton>
           <IconBlock>
             <NavIcon name="swap" />
@@ -204,10 +188,7 @@ export const LeftNavMenu: FunctionComponent = () => {
           <Name>Swap</Name>
         </NavButton>
       </NavLinkMenu>
-      <NavLinkMenu
-        to={{ pathname: '/settings', state: { fromPage: location.pathname } }}
-        className="button"
-      >
+      <NavLinkMenu to="/settings" state={{ fromPage: location.pathname }} className="button">
         <NavButton>
           <IconBlock>
             <NavIcon name="gear" />
@@ -219,7 +200,7 @@ export const LeftNavMenu: FunctionComponent = () => {
         <Line />
       </Separator>
       <NavLinkMenu
-        to={{ pathname: appStorePath }}
+        to={appStorePath}
         as={Link}
         target="_blank"
         className="button"
@@ -234,7 +215,7 @@ export const LeftNavMenu: FunctionComponent = () => {
         </NavButton>
       </NavLinkMenu>
       <NavLinkMenu
-        to={{ pathname: playStorePath }}
+        to={playStorePath}
         as={Link}
         target="_blank"
         className="button"

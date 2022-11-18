@@ -1,11 +1,9 @@
-import { generatePath, useHistory, useParams } from 'react-router';
+import { generatePath, useNavigate, useParams } from 'react-router-dom';
 
 import { styled } from '@linaria/react';
 import { theme } from '@p2p-wallet-web/ui';
 
 import { Button, Icon } from 'components/ui';
-
-import type { SwapRouteParams } from '../types';
 
 const Wrapper = styled.div``;
 
@@ -22,11 +20,12 @@ const ButtonStyled = styled(Button)`
 `;
 
 export const GoBackButton = () => {
-  const history = useHistory();
-  const { publicKey } = useParams<SwapRouteParams>();
+  const navigate = useNavigate();
+  const { publicKey } = useParams<{ publicKey?: string }>();
 
   const handleButtonClick = () => {
-    history.push(generatePath('/swap/:publicKey?', { publicKey }));
+    const pathTemplate = `/swap${publicKey ? '/:publicKey' : ''}`;
+    navigate(generatePath(pathTemplate, { publicKey }));
   };
 
   return (

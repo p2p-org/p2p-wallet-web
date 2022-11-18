@@ -1,6 +1,6 @@
 import type { FC } from 'react';
 import { useCallback } from 'react';
-import { generatePath, useHistory, useParams } from 'react-router';
+import { generatePath, useNavigate, useParams } from 'react-router-dom';
 
 import { styled } from '@linaria/react';
 import { theme } from '@p2p-wallet-web/ui';
@@ -8,7 +8,6 @@ import { theme } from '@p2p-wallet-web/ui';
 import { Icon } from 'components/ui';
 import { Row, Text } from 'components/ui/AccordionDetails/common';
 import type { SwapViewModel } from 'new/scenes/Main/Swap';
-import type { SwapRouteParams } from 'new/scenes/Main/Swap/Swap/types';
 
 const PenIcon = styled(Icon)`
   width: 16px;
@@ -26,12 +25,13 @@ interface Props {
 }
 
 export const SlippageView: FC<Props> = ({ viewModel }) => {
-  const history = useHistory();
-  const { symbol } = useParams<SwapRouteParams>();
+  const navigate = useNavigate();
+  const { publicKey } = useParams<{ publicKey?: string }>();
 
   const handleShowSettings = useCallback(() => {
-    history.push(generatePath('/swap/settings/:symbol?', { symbol }));
-  }, [history, symbol]);
+    const pathTemplate = `/swap/settings${publicKey ? '/:publicKey' : ''}`;
+    navigate(generatePath(pathTemplate, { publicKey }));
+  }, [navigate, publicKey]);
 
   return (
     <Row>

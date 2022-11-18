@@ -1,6 +1,6 @@
 import type { FC } from 'react';
 import { useMemo } from 'react';
-import { Route, Switch } from 'react-router-dom';
+import { Route, Routes } from 'react-router-dom';
 
 import { useIsMobile } from '@p2p-wallet-web/ui';
 
@@ -29,27 +29,21 @@ export const SwapPage: FC = () => {
     }
 
     return (
-      <Switch>
-        <Route path={`/swap/settings/:publicKey?`}>
-          <GoBackButton />
-        </Route>
-        <Route path={'/swap/:publicKey?'}>
-          <SettingsButton />
-        </Route>
-      </Switch>
+      <Routes>
+        <Route index element={<SettingsButton />} />
+        <Route path="settings" element={<GoBackButton />} />
+      </Routes>
     );
   }, [isMobile]);
 
   return (
     <Layout mobileAction={mobileHeaderButton}>
-      <Switch>
-        <Route path={`/swap/settings/:publicKey?`}>
-          <SwapSettings viewModel={viewModel} />
-        </Route>
-        <Route path={'/swap/:publicKey?'}>
-          <Swap viewModel={viewModel} />
-        </Route>
-      </Switch>
+      <Routes>
+        <Route index element={<Swap viewModel={viewModel} />} />
+        <Route path=":publicKey" element={<Swap viewModel={viewModel} />} />
+
+        <Route path="settings" element={<SwapSettings viewModel={viewModel} />} />
+      </Routes>
     </Layout>
   );
 };

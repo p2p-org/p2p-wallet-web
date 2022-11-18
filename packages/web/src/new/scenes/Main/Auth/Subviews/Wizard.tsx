@@ -1,6 +1,5 @@
 import type { FC } from 'react';
-import { useHistory } from 'react-router';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 import { observer } from 'mobx-react-lite';
 
@@ -16,17 +15,17 @@ import { RestoreOptions } from './Restore/RestoreOptions';
 
 export const Wizard: FC<ViewModelProps> = observer(({ authViewModel }) => {
   const location = useLocation();
-  const history = useHistory();
+  const navigate = useNavigate();
 
   // @FIXME remove and replace with react-router
   if (location.search === '?restore') {
     authViewModel.setRestoreStart();
-    history.replace({});
+    navigate({}, { replace: true });
   }
 
   if (location.search === '?create') {
     authViewModel.setCreateStart();
-    history.replace({});
+    navigate({}, { replace: true });
   }
 
   const VIEW_MAP: ViewMap = {

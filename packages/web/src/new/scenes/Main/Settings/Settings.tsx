@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import { useHistory } from 'react-router';
+import { useNavigate } from 'react-router-dom';
 
 import { styled } from '@linaria/react';
 import classNames from 'classnames';
@@ -144,10 +144,10 @@ const FIATS = [Fiat.usd, Fiat.eur, Fiat.rub];
 
 export const Settings: FC = observer(() => {
   const viewModel = useViewModel(SettingsViewModel);
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const handleNetworkClick = () => {
-    history.push('/settings/network');
+    navigate('/settings/network');
   };
 
   const handleLogoutClick = () => {

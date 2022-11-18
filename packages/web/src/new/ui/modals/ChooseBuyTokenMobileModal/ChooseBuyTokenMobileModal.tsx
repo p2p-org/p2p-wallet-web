@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import { useHistory, useLocation } from 'react-router';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 import { observer } from 'mobx-react-lite';
 
@@ -11,7 +11,7 @@ import { ChooseBuyTokenMobileModalViewModel } from 'new/ui/modals/ChooseBuyToken
 import { Modal } from 'new/ui/modals/Modal';
 
 export const ChooseBuyTokenMobileModal: FC<ModalPropsType> = observer(({ close }) => {
-  const history = useHistory();
+  const navigate = useNavigate();
   const location = useLocation();
   const { solWallet, solToken, usdcWallet, usdcToken } = useViewModel(
     ChooseBuyTokenMobileModalViewModel,
@@ -27,7 +27,7 @@ export const ChooseBuyTokenMobileModal: FC<ModalPropsType> = observer(({ close }
     const newPath = `/buy/${cryptoCurrency.symbol}`;
 
     if (location.pathname !== newPath) {
-      history.push(newPath);
+      navigate(newPath);
     }
   };
 
