@@ -1,7 +1,7 @@
 import 'new/services/Defaults';
 
 import * as React from 'react';
-import { BrowserRouter, HashRouter, Route, Routes } from 'react-router-dom';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
 
 import * as Sentry from '@sentry/react';
 import dayjs from 'dayjs';
@@ -36,7 +36,8 @@ import { Providers } from './Providers';
 dayjs.extend(localizedFormat);
 
 const App: React.FC = observer(() => {
-  const Router: React.ElementType = process.env.REACT_APP_STAGING ? HashRouter : BrowserRouter;
+  // const Router: React.ElementType = process.env.REACT_APP_STAGING ? HashRouter : BrowserRouter;
+  const Router: React.ElementType = BrowserRouter;
 
   return (
     <>
