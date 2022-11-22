@@ -61,6 +61,12 @@ export class LocationService {
     this._history!.push(pathname, props ?? { fromPage: this._location?.pathname });
   }
 
+  replace(pathname: string | Path, props?: LocationState): void {
+    this._assertHistory();
+    this._assertLocation();
+    this._history!.replace(pathname, props ?? this._location?.state);
+  }
+
   reload(): void {
     this._assertHistory();
     this._history!.go(0);

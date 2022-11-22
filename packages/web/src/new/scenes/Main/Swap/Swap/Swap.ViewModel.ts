@@ -167,16 +167,19 @@ export class SwapViewModel extends ViewModel implements SwapViewModelType {
           this.payingWallet = this._walletsRepository.nativeWallet;
           this.reload();
 
-          const pubkey = this._getPubkey();
-          const initialWallet = this._walletsRepository
-            .getWallets()
-            .find((wallet) => wallet.pubkey === pubkey);
-          // redirect to swap if don't found wallet with pubkey from URL
-          if (pubkey && !initialWallet) {
-            this._locationService.push('/swap');
-          }
+          setTimeout(() => {
+            const pubkey = this._getPubkey();
+            const initialWallet = this._walletsRepository
+              .getWallets()
+              .find((wallet) => wallet.pubkey === pubkey);
 
-          this._bind(initialWallet ?? this._walletsRepository.nativeWallet);
+            // redirect to swap if don't found wallet with pubkey from URL
+            if (pubkey && !initialWallet) {
+              this._locationService.replace('/swap');
+            }
+
+            this._bind(initialWallet ?? this._walletsRepository.nativeWallet);
+          });
         },
       ),
     );
