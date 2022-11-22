@@ -64,7 +64,10 @@ export class LocationService {
   replace(pathname: string | Path, props?: LocationState): void {
     this._assertHistory();
     this._assertLocation();
-    this._history!.replace(pathname, props ?? this._location?.state);
+    this._history!.replace(
+      pathname,
+      props ?? { ...(this._location!.state as Record<string, unknown>) },
+    );
   }
 
   reload(): void {
