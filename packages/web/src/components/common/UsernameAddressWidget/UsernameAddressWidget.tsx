@@ -26,7 +26,7 @@ const UsernameAddressWrapper = styled.div`
   text-align: center;
 
   border-radius: 12px;
-  ${borders.primaryRGBA}
+  ${borders.primary}
   ${shadows.card};
 
   ${up.tablet} {

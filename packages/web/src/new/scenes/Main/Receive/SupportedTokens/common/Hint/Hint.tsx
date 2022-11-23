@@ -16,7 +16,7 @@ const Wrapper = styled.div`
 
   background: ${theme.colors.bg.app};
   border-radius: 12px;
-  ${borders.primaryRGBA}
+  ${borders.primary}
 
   ${up.tablet} {
     margin-bottom: 0;

@@ -44,7 +44,7 @@ const Wrapper = styled.div`
   ${up.tablet} {
     &:hover:enabled {
       background: ${theme.colors.bg.activePrimary};
-      ${borders.linksRGBA}
+      ${borders.links}
 
       ${TokenAvatarStyled} {
         background: transparent;
