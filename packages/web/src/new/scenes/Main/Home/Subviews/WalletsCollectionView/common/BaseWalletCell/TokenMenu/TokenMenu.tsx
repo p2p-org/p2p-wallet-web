@@ -46,7 +46,7 @@ export const TokenMenu: FC<Props> = observer(
             Send {wallet.token.symbol}
           </MenuItem>
           {wallet.token.symbol ? (
-            <MenuItem icon="swap" onItemClick={handleButtonClick(`/swap/${wallet.token.symbol}`)}>
+            <MenuItem icon="swap" onItemClick={handleButtonClick(`/swap/${wallet.pubkey}`)}>
               Swap {wallet.token.symbol}
             </MenuItem>
           ) : undefined}

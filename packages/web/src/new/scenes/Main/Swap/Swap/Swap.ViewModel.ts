@@ -167,16 +167,24 @@ export class SwapViewModel extends ViewModel implements SwapViewModelType {
           this.payingWallet = this._walletsRepository.nativeWallet;
           this.reload();
 
-          const pubkey = this._getPubkey();
-          const initialWallet = this._walletsRepository
-            .getWallets()
-            .find((wallet) => wallet.pubkey === pubkey);
-          // redirect to swap if don't found wallet with pubkey from URL
-          if (pubkey && !initialWallet) {
-            this._locationService.push('/swap');
-          }
+          setTimeout(() => {
+            const pubkey = this._getPubkey();
+            let initialWallet =
+              this._walletsRepository.getWallets().find((wallet) => wallet.pubkey === pubkey) ||
+              null;
 
-          this._bind(initialWallet ?? this._walletsRepository.nativeWallet);
+            if (!initialWallet) {
+              initialWallet = this._walletsRepository.nativeWallet;
+            }
+
+            if (initialWallet) {
+              this._locationService.replace(`/swap/${initialWallet.pubkey}`);
+            } else {
+              this._locationService.replace('/swap');
+            }
+
+            this._bind(initialWallet);
+          });
         },
       ),
     );
@@ -335,7 +343,10 @@ export class SwapViewModel extends ViewModel implements SwapViewModelType {
             return;
           }
           // @web: sync url with source wallet
-          this._locationService.push(`/swap/${wallet.pubkey}`);
+          const newPath = `/swap/${wallet.pubkey}`;
+          if (newPath !== this._locationService._location?.pathname) {
+            this._locationService.push(newPath);
+          }
 
           this.payingWallet = wallet;
         },
