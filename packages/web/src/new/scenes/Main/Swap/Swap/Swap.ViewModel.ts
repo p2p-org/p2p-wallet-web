@@ -158,6 +158,7 @@ export class SwapViewModel extends ViewModel implements SwapViewModelType {
     this.chooseSourceWalletViewModel.initialize();
     this.chooseDestinationWalletViewModel.initialize();
     this.swapSettingsViewModel.initialize();
+    this._walletsRepository.reload();
 
     // TODO: really wait until wallets load?
     this.addReaction(

@@ -20,6 +20,7 @@ export class WalletsRepository extends SDListViewModel<Wallet> {
   // Properties
 
   private _timer?: NodeJS.Timeout;
+  private _wasRequested = false;
 
   // Getters
 
@@ -65,6 +66,12 @@ export class WalletsRepository extends SDListViewModel<Wallet> {
   protected override afterReactionsRemoved() {
     // TODO: check it works
     this._stopObserving();
+  }
+
+  override reload(): void {
+    if (!this._wasRequested) {
+      super.reload();
+    }
   }
 
   // Binding
@@ -129,6 +136,8 @@ export class WalletsRepository extends SDListViewModel<Wallet> {
   override createRequest = flow<Wallet[], []>(function* (
     this: WalletsRepository,
   ): Generator<Promise<Wallet[]>> {
+    this._wasRequested = true;
+
     return yield Promise.all([
       // TODO: encapsulate address to service
       this._solanaService.provider.connection.getBalance(
@@ -171,6 +180,8 @@ export class WalletsRepository extends SDListViewModel<Wallet> {
   });
 
   private _getNewWallets(): Promise<void> {
+    this._wasRequested = true;
+
     return this._solanaService
       .getTokenWallets(this._solanaService.provider.wallet.publicKey.toString())
       .then((wallets) => {
