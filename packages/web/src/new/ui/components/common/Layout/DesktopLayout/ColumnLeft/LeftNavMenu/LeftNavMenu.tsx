@@ -3,7 +3,7 @@ import { useLocation } from 'react-router';
 import { Link, NavLink } from 'react-router-dom';
 
 import { styled } from '@linaria/react';
-import { borders, shadows, theme, up } from '@p2p-wallet-web/ui';
+import { borders, shadows, theme, up, useIsDesktop } from '@p2p-wallet-web/ui';
 
 import { Icon } from 'components/ui';
 import { appStorePath, playStorePath } from 'new/constants';
@@ -136,6 +136,7 @@ const Line = styled.hr`
 
 export const LeftNavMenu: FunctionComponent = () => {
   const location = useLocation();
+  const isDesktop = useIsDesktop();
 
   const handleAppLinkClick = (store: 'app_store' | 'google_play') => () => {
     if (store === 'app_store') {
@@ -230,7 +231,7 @@ export const LeftNavMenu: FunctionComponent = () => {
             <NavIcon name="app-store" />
           </IconBlock>
           <Name>App Store</Name>
-          <StoreIcon name="store-icon" />
+          {isDesktop ? <StoreIcon name="store-icon" /> : null}
         </NavButton>
       </NavLinkMenu>
       <NavLinkMenu
@@ -245,7 +246,7 @@ export const LeftNavMenu: FunctionComponent = () => {
             <NavIcon name="google-play" />
           </IconBlock>
           <Name>Google Play</Name>
-          <StoreIcon name="store-icon" />
+          {isDesktop ? <StoreIcon name="store-icon" /> : null}
         </NavButton>
       </NavLinkMenu>
     </Wrapper>
