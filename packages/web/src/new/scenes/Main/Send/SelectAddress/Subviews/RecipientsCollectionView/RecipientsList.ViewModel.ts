@@ -2,8 +2,8 @@ import { flow, reaction } from 'mobx';
 import { delay, inject, injectable } from 'tsyringe';
 
 import { SDListViewModel } from 'new/core/viewmodels/SDListViewModel';
-import type { Recipient } from 'new/scenes/Main/Send';
-import { Network, SendViewModel } from 'new/scenes/Main/Send';
+import type { Network, Recipient } from 'new/scenes/Main/Send';
+import { SendViewModel } from 'new/scenes/Main/Send';
 import { NameService } from 'new/services/NameService';
 import { SendService } from 'new/services/SendService';
 import { bitcoinAddress, matches, publickey } from 'new/utils/RegularExpression';
@@ -64,7 +64,7 @@ export class RecipientsListViewModel extends SDListViewModel<Recipient> {
     }
 
     // force find by address when network is bitcoin
-    return yield this._preSelectedNetwork === Network.bitcoin || this.isSearchingByAddress
+    return yield this.isSearchingByAddress
       ? this._findRecipientBy(this.searchString)
       : this._findRecipientsBy(this.searchString);
   });
@@ -83,18 +83,10 @@ export class RecipientsListViewModel extends SDListViewModel<Recipient> {
   }
 
   private _findRecipientBy(address: string): Promise<Recipient[]> {
-    switch (this._preSelectedNetwork) {
-      case Network.bitcoin:
-        return this._findAddressInBitcoinNetwork(address);
-      case Network.solana:
-        return this._findAddressInSolanaNetwork(address);
-      default: {
-        if (matches(address, [bitcoinAddress(this._solanaAPIClient.isTestNet())])) {
-          return this._findAddressInBitcoinNetwork(address);
-        }
-        return this._findAddressInSolanaNetwork(address);
-      }
+    if (matches(address, [bitcoinAddress(this._solanaAPIClient.isTestNet())])) {
+      return this._findAddressInBitcoinNetwork(address);
     }
+    return this._findAddressInSolanaNetwork(address);
   }
 
   private _findAddressInBitcoinNetwork(address: string): Promise<Recipient[]> {
