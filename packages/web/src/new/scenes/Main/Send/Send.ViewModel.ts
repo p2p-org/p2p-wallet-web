@@ -184,6 +184,7 @@ export class SendViewModel
     this.chooseTokenAndAmountViewModel.initialize();
     this.selectAddressViewModel.initialize();
     this.choosePayingWalletViewModel.initialize();
+    this.walletsRepository.reload();
 
     this._bind();
     this.reload();
